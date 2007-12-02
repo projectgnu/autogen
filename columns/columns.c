@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.14 2007/11/01 05:24:24 bkorb Exp $
- *  Time-stamp:        "2007-10-28 15:55:26 bkorb"
+ *  $Id: columns.c,v 4.15 2007/12/02 22:41:16 bkorb Exp $
+ *  Time-stamp:        "2007-11-29 11:57:05 bkorb"
  *
  *  Columns copyright (c) 1992-2007 Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -298,7 +298,7 @@ readLines(void)
     }
 
     if (maxEntryWidth == 0) {
-        fputs( "Warning:  no input text was read\n", stderr );
+        fputs( "columns warning:  no input text was read\n", stderr );
         exit( EXIT_SUCCESS );
     }
 

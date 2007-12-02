@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.28 2007/11/01 05:24:24 bkorb Exp $
+ *  $Id: autogen.c,v 4.29 2007/12/02 22:41:16 bkorb Exp $
  *
- *  Time-stamp:        "2007-10-31 20:38:59 bkorb"
- *  Last Committed:    $Date: 2007/11/01 05:24:24 $
+ *  Time-stamp:        "2007-12-02 12:06:21 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This is the main routine for autogen.
  *
@@ -356,9 +356,9 @@ ag_abend_at( tCC* pzMsg
 #endif
 
     if ((procState >= PROC_STATE_LIB_LOAD) && (pCurTemplate != NULL)) {
-        int line = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
+        int l_no = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
         fprintf( stderr, "Error in template %s, line %d\n\t",
-                 pCurTemplate->pzTplFile, line );
+                 pCurTemplate->pzTplFile, l_no );
     }
     fputs( pzMsg, stderr );
     pzMsg += strlen( pzMsg );

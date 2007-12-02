@@ -1,9 +1,9 @@
 
 /*
- *  $Id: functions.c,v 4.16 2007/11/13 05:51:35 bkorb Exp $
+ *  $Id: functions.c,v 4.17 2007/12/02 22:41:16 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-04 17:52:23 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:51:35 $
+ *  Time-stamp:        "2007-12-02 12:28:56 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This module implements text functions.
  *
@@ -315,14 +315,11 @@ mLoad_Unknown( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     pzCopy = pT->pNext; /* next text dest   */
     pMac->ozText = (pzCopy - pT->pzTemplText);
     pMac->res    = 0;
-
-    do  {
-        *(pzCopy++) = *(pzSrc++);
-    } while (--srcLen > 0);
-    *(pzCopy++) = NUL;
-    *(pzCopy++) = NUL; /* double terminate */
-
-    pT->pNext = pzCopy;
+    memcpy(pzCopy, pzSrc, srcLen);
+    pzCopy      += srcLen;
+    *(pzCopy++)  = NUL;
+    *pzCopy      = NUL; /* double terminate */
+    pT->pNext    = pzCopy;
 
     return pMac + 1;
 

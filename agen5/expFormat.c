@@ -1,10 +1,10 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2007-11-12 20:42:32 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-19 21:12:49 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
- *  $Id: expFormat.c,v 4.21 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: expFormat.c,v 4.22 2007/12/02 22:41:16 bkorb Exp $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.
@@ -35,6 +35,18 @@ static char const zGpl[] =
 "%2$sSee the GNU General Public License for more details.\n%2$s\n"
 "%2$sYou should have received a copy of the GNU General Public License along\n"
 "%2$swith this program.  If not, see <http://www.gnu.org/licenses/>.";
+
+static char const zAgpl[] =
+"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
+"%2$sunder the terms of the GNU General Public License as published by the\n"
+"%2$sFree Software Foundation, either version 3 of the License, or\n"
+"%2$s(at your option) any later version.\n%2$s\n"
+"%2$s%1$s is distributed in the hope that it will be useful, but\n"
+"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+"%2$sSee the GNU Affero General Public License for more details.\n%2$s\n"
+"%2$sYou should have received a copy of the GNU Affero General Public License\n"
+"%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 static char const zLgpl[] =
 "%2$s%1$s is free software: you can redistribute it and/or modify it\n"
@@ -322,7 +334,6 @@ ag_scm_error( SCM res )
  *  @code{prefix} contains the string to start each output line, and
  *  @code{prog_name} contains the name of the program the copyright is
  *  about.
- *
 =*/
 SCM
 ag_scm_gpl( SCM prog_name, SCM prefix )
@@ -347,6 +358,52 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
      *  Allocate-sprintf the result string, then put it in a new SCM.
      */
     pzRes = aprf( zGpl, pzPrg, pzPfx );
+
+    res = AG_SCM_STR02SCM( pzRes );
+    AGFREE( (void*)pzRes );
+    return res;
+}
+
+
+/*=gfunc agpl
+ *
+ * what:  GNU Affero General Public License
+ * general_use:
+ *
+ * exparg: prog-name, name of the program under the GPL
+ * exparg: prefix, String for starting each output line
+ *
+ * doc:
+ *
+ *  Emit a string that contains the GNU Affero General Public License.
+ *  It takes two arguments:
+ *  @code{prefix} contains the string to start each output line, and
+ *  @code{prog_name} contains the name of the program the copyright is
+ *  about.
+=*/
+SCM
+ag_scm_agpl( SCM prog_name, SCM prefix )
+{
+    char*   pzPfx  = ag_scm2zchars( prefix, "AGPL line prefix" );
+    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
+    char*   pzRes;
+    SCM     res;
+
+    /*
+     *  Get the addresses of the program name and prefix strings.
+     *  Make sure they are reasonably sized (<256 for program name
+     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     */
+    if (AG_SCM_STRLEN( prog_name ) >= 256)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+
+    if (AG_SCM_STRLEN( prefix ) >= 128)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+
+    /*
+     *  Allocate-sprintf the result string, then put it in a new SCM.
+     */
+    pzRes = aprf( zAgpl, pzPrg, pzPfx );
 
     res = AG_SCM_STR02SCM( pzRes );
     AGFREE( (void*)pzRes );

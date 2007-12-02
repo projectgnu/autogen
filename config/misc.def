@@ -3,8 +3,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2007-07-04 09:31:45 bkorb"
- *  Last Modified:     $Date: 2007/10/28 19:27:54 $
+/*  Time-stamp:        "2007-12-02 10:42:42 bkorb"
+ *  Last Modified:     $Date: 2007/12/02 22:41:16 $
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,11 +24,11 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.24 2007/10/28 19:27:54 bkorb Exp $
+ *  $Id: misc.def,v 4.25 2007/12/02 22:41:16 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.24 $";
+version = "$Revision: 4.25 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -428,7 +428,7 @@ test = {
     doc = <<-  _EOF_
 	This option will enable two debugging options for AutoGen.
 	viz., --show-defs (dump out the definition tree)
-	and --show-shell (print out all shell commands via `set -x')
+	and --show-shell (trace all shell commands via `set -x')
 	_EOF_;
 };
 

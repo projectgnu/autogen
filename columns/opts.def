@@ -1,9 +1,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.13 2007/11/01 05:24:24 bkorb Exp $
+ *  $Id: opts.def,v 4.14 2007/12/02 22:41:16 bkorb Exp $
  *  Time-stamp:        "2007-10-28 09:30:24 bkorb"
- *  Last Committed:    $Date: 2007/11/01 05:24:24 $
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
  *
@@ -31,6 +31,8 @@ copyright = {
 prog-name      = "columns";
 prog-title     = "Columnize Input Text";
 package        = 'GNU AutoGen';
+homerc         = '.', '$HOME';
+environrc;
 long-opts;
 
 version = "1.2";

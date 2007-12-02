@@ -175,19 +175,22 @@ DEFINE machine-step  =][=
     } else {
         const [= (. t-trans) =]* pTT =
             [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
-#ifdef DEBUG
+[= IF (exist? "debug-flag") \=]
+#ifdef [= debug-flag =]
         firstNext = /* next line */
 #endif
+[= ENDIF \=]
         nxtSt = pTT->next_state;
         [=(. trans-name)=] = pTT->[=(. trans-field)=];
     }
-
-#ifdef DEBUG
+[= IF (exist? "debug-flag") \=]
+#ifdef [= debug-flag =]
     printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
             [=(. PFX)=]_STATE_NAME( [=(. pfx)=]_state ), [=(. pfx)=]_state,
             [=(. PFX)=]_EVT_NAME( trans_evt ), trans_evt,
             [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
-#endif[=
+#endif
+[= ENDIF \=][=
 
   IF (=* (get "method") "case")  =][=
     run-switch    =][=
@@ -196,11 +199,13 @@ DEFINE machine-step  =][=
   ENDIF
 
 =]
-#ifdef DEBUG
+[= IF (exist? "debug-flag") \=]
+#ifdef [= debug-flag =]
     if (nxtSt != firstNext)
         printf( "transition code changed destination state to %s(%d)\n",
                 [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
-#endif[=
+#endif
+[= ENDIF \=][=
 
   IF (not (=* (get "type") "reent")) =]
     [=(. pfx)=]_state = nxtSt;[=
@@ -213,9 +218,11 @@ ENDDEF  machine-step     =][=
 DEFINE fsm-proc-variables
 
   =]
-#ifdef DEBUG
+[= IF (exist? "debug-flag") \=]
+#ifdef [= debug-flag =]
     te_[=(. pfx)=]_state firstNext;
 #endif
+[= ENDIF \=]
     te_[=(. pfx)=]_state nxtSt;[=
     IF (=* (get "method") "call")  =]
     [=(. pfx)=]_callback_t* pT;[=

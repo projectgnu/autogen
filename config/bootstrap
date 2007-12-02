@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2007-07-04 09:45:25 bkorb"
+# Time-stamp:      "2007-12-02 11:59:47 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.15 2007/11/13 05:51:35 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.16 2007/12/02 22:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -285,7 +285,7 @@ do
   ( cd $(dirname $f)
     srcdir=.
     echo running POST-bootstrap.dir in ${PWD}
-    . ./bootstrap.dir recursive
+    PS4=">$(basename ${PWD}-B)> " . ./bootstrap.dir recursive
   ) || exit 1
 done
 

@@ -1,6 +1,6 @@
 /*
- *  Time-stamp:        "2007-07-04 11:17:19 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-12-02 10:32:45 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -24,6 +24,9 @@ autogen definitions fsm;
 method = callout;
 type   = loop;
 prefix = dp;
+#ifdef DEBUG_ENABLED
+debug-flag      = FSM_DEBUG_ENABLED;
+#endif
 
 /*
  * Non-terminal "events"

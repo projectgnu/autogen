@@ -1,9 +1,9 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.8 2007/10/07 16:54:54 bkorb Exp $
+# $Id: functions.tpl,v 4.9 2007/12/02 22:41:16 bkorb Exp $
 
-#  Time-stamp:        "2007-07-04 11:27:05 bkorb"
-#  Last Committed:    $Date: 2007/10/07 16:54:54 $
+#  Time-stamp:        "2007-12-02 12:18:22 bkorb"
+#  Last Committed:    $Date: 2007/12/02 22:41:16 $
 
 ##
 ## This file is part of AutoGen.
@@ -74,9 +74,9 @@ FOR macfunc =]
   ELSE                         =] [=
   ENDIF =] [=
 
-  IF   (exist? "load_proc")    =]L[=
+  IF   (exist? "load-proc")    =]L[=
   ELIF (exist? "in-context")   =]C[=
-    IF (exist? "handler_proc") =][=
+    IF (exist? "handler-proc") =][=
       ERROR % name
          "The %s function is situational and has a handler" =][=
     ENDIF =][=
@@ -85,7 +85,7 @@ FOR macfunc =]
 
   (if (exist? "unload-proc") "R" " ") =][=
 
-  IF (exist? "handler_proc")   =]H[=
+  IF (exist? "handler-proc")   =]H[=
   ELSE                         =] [=
   ENDIF =] - [=
 

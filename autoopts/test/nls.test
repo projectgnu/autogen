@@ -26,11 +26,12 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: nls.test,v 4.7 2007/10/07 16:54:54 bkorb Exp $
+# $Id: nls.test,v 4.8 2007/12/02 22:41:16 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
-export AUTOGEN_TEMPL_DIRS=`cd ${srcdir}/..;pwd`
+AUTOGEN_TEMPL_DIRS=`cd ${srcdir}/..;pwd`
+export AUTOGEN_TEMPL_DIRS
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 

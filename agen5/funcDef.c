@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.21 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: funcDef.c,v 4.22 2007/12/02 22:41:16 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:44:26 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-12-02 14:21:31 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -51,8 +51,6 @@ prepInvokeArgs( tMacro* pMac );
 static void
 build_defs( int defCt, tDefList* pList );
 /* = = = END-STATIC-FORWARD = = = */
-
-tMacro* mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
 
 static int
 orderDefList( const void* p1, const void* p2 )
@@ -349,15 +347,22 @@ prepInvokeArgs( tMacro* pMac )
 }
 
 
-#ifdef DEBUG_ENABLED
-/*=macfunc DEBUG, ifdef DEBUG_ENABLED
+/*=macfunc DEBUG
  *
- *  handler_proc:
+ *  handler-proc:
+ *  load-proc:
+ *
  *  what:  Provide break point spots
  *  desc:
- *      By inserting [+DEBUG n+] into your template, you can set
- *      a breakpoint on the #n case element below and step through
- *      the processing of interesting parts of your template.
+ *
+ *      By inserting [+DEBUG n+] into your template, you can set a debugger
+ *      breakpoint on the #n case element below and step through the processing
+ *      of interesting parts of your template.
+ *
+ *      To be useful, you have to have access to the source tree where autogen
+ *      was built and the template being processed.  The definitions are also
+ *      helpful, but not crucial.  Please contact the author if you think you
+ *      might actually want to use this.
 =*/
 tMacro*
 mFunc_Debug( tTemplate* pT, tMacro* pMac )
@@ -387,9 +392,9 @@ mFunc_Debug( tTemplate* pT, tMacro* pMac )
     case 512:  dummy = '.'; break;
     default:   dummy++;
     }
+
     return pMac+1;
 }
-#endif
 
 
 /*
@@ -689,11 +694,11 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
  *
  *  what:   Loads the debug function so you can set breakpoints
  *          at load time, too :-)
-=*/
+ */
 tMacro*
 mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 {
-    return mLoad_Unknown( pT, pMac, ppzScan );
+    return mLoad_Unknown(pT, pMac, ppzScan);
 }
 
 
@@ -818,8 +823,8 @@ mLoad_Define( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     if (HAVE_OPT( SHOW_DEFS )) {
         tSCC zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";
-        fprintf( pfTrace, zSum, pNewT->macroCt, pNewT->pzTplFile,
-                 pNewT->descSize );
+        fprintf(pfTrace, zSum, pNewT->macroCt, pNewT->pzTplFile,
+                (unsigned int)pNewT->descSize);
     }
 #endif
 

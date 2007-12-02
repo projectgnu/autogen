@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.26 2007/11/17 21:01:55 bkorb Exp $
- *  Time-stamp:        "2007-11-17 10:27:40 bkorb"
- *  Last Committed:    $Date: 2007/11/17 21:01:55 $
+ *  $Id: opts.def,v 4.27 2007/12/02 22:41:16 bkorb Exp $
+ *  Time-stamp:        "2007-12-02 11:10:34 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -545,7 +545,20 @@ flag = {
 
 	@item everything
 	Displays the invocation of every AutoGen macro, even @code{TEXT} macros
-	(i.e. the text outside of macro quotes).
+	(i.e. the text outside of macro quotes).  Additionally, if you rebuild
+	the ``expr.ini'' file with debugging enabled, then all calls to
+	AutoGen defined scheme functions will also get logged:
+	@*
+	@example
+	cd $@{top_builddir@}/agen5
+	DEBUG_ENABLED=true bash bootstrap.dir expr.ini
+	make CFLAGS='-g -DDEBUG_ENABLED=1'
+	@end example
+
+	Be aware tha tyou cannot rebuild this source in this way without first
+	having installed the @code{autogen} executable in your search path.
+	Because of this, "expr.ini" is in the distributed source list, and
+	not in the dependencies.
 	@end table
 	_EOF_;
 #else
@@ -580,6 +593,7 @@ flag = {
 	                 errno, strerror( errno ), pOptDesc->pzLastArg );
 	        exit( EXIT_FAILURE );
 	    }
+	    setvbuf(pfTrace, NULL, _IONBF, 0);
 	FLAG_CODE_END ;
 #else
     doc = "Pass-through AutoGen argument";

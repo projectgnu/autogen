@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Saturday March 24, 2007 at 11:50:21 AM PDT
+ *  It has been AutoGen-ed  Sunday December  2, 2007 at 10:33:38 AM PST
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -38,6 +38,7 @@
 #define DEFINE_FSM
 #include "defParse-fsm.h"
 #include <stdio.h>
+#include <ctype.h>
 
 /*
  *  Do not make changes to this file, except between the START/END
@@ -592,9 +593,6 @@ dp_run_fsm( void )
 {
     te_dp_state dp_state = DP_ST_INIT;
     te_dp_event trans_evt;
-#ifdef DEBUG
-    te_dp_state firstNext;
-#endif
     te_dp_state nxtSt;
     dp_callback_t* pT;
 
@@ -610,26 +608,13 @@ dp_run_fsm( void )
         } else {
             const t_dp_transition* pTT =
             dp_trans_table[ dp_state ] + trans_evt;
-#ifdef DEBUG
-            firstNext = /* next line */
-#endif
             nxtSt = pTT->next_state;
             pT    = pTT->trans_proc;
         }
 
-#ifdef DEBUG
-        printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
-            DP_STATE_NAME( dp_state ), dp_state,
-            DP_EVT_NAME( trans_evt ), trans_evt,
-            DP_STATE_NAME( nxtSt ), nxtSt );
-#endif
         if (pT != NULL)
             nxtSt = (*pT)( dp_state, nxtSt, trans_evt );
-#ifdef DEBUG
-        if (nxtSt != firstNext)
-            printf( "transition code changed destination state to %s(%d)\n",
-                DP_STATE_NAME( nxtSt ), nxtSt );
-#endif
+
         dp_state = nxtSt;
     }
     return dp_state;

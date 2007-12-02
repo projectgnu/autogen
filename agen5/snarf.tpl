@@ -1,8 +1,8 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.12 2007/10/07 16:54:54 bkorb Exp $
-# Time-stamp:        "2007-07-04 11:28:40 bkorb"
-# Last Committed:    $Date: 2007/10/07 16:54:54 $
+# $Id: snarf.tpl,v 4.13 2007/12/02 22:41:16 bkorb Exp $
+# Time-stamp:        "2007-12-02 11:39:39 bkorb"
+# Last Committed:    $Date: 2007/12/02 22:41:16 $
 
 ##
 ## This file is part of AutoGen.
@@ -173,6 +173,106 @@ ENDFOR symbol   =]
 =]
 [=
 
+IF (define init-proc
+      (if (exist? "init")
+          (get "init")
+          (if (exist? "group")
+              (string-append (get "group") "_init")
+              "scm_init")))
+
+   (exist? "debug-enabled")     =]
+#ifdef DEBUG_ENABLED[=
+
+  FOR     gfunc
+
+=]
+static SCM
+agrelay_scm_[= (get "name")     =]([=
+    IF (not (exist? "exparg"))  =]void[=
+         (define pass-list "")  =][=
+    ELSE                        =][=
+         (out-push-new)         =][=
+         FOR exparg ", "        =]SCM scm[= (for-index) =][= ENDFOR =][=
+         (define call-list (out-pop #t))
+         (define pass-list (shellf "echo '%s' | sed 's/SCM s/s/g'" call-list))
+         call-list              =][=
+    ENDIF exparg exists/not     =])
+{
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+        static char const proc_z[] =
+            "Called ag_scm_[= name =]()\n";
+        fwrite(proc_z, sizeof(proc_z) - 1, 1, pfTrace);
+    }
+    return ag_scm_[= name =]([= (. pass-list) =]);
+}
+
+[= ENDFOR  gfunc                =]
+#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+  gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
+                   _Ar, _Ao, _Ax)
+
+#else /* DEBUG_ENABLED *not* */[=
+
+ENDIF debug-enabled exists
+
+=]
+#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+  gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
+                   _Ar, _Ao, _Ax)
+[= (if (exist? "debug-enabled") "#endif\n") \=]
+typedef SCM (*gh_callback_t)(void);
+void [=(. init-proc)=](void);
+
+/*
+ * [=group=] Initialization procedure.
+ */
+void
+[=(. init-proc)=]( void )
+{[=
+
+  (out-push-new)
+
+  (if (exist? "init-code")
+      (prefix "    " (get "init-code")) "") =][=
+
+  FOR  gfunc            =][=
+    INVOKE mk-new-proc  =][=
+  ENDFOR gfunc          =][=
+
+  FOR  syntax           =]
+    scm_make_synt(g_nm+[= (add-to-g_nm) =], [=type=], [=cfn=]);[=
+  ENDFOR syntax         =][=
+
+  FOR symbol =]
+    [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object[=
+    IF (not (and (exist? "init_val") (exist? "const_val")))
+         =](SCM_CAR (scm_intern0 (g_nm+[= (add-to-g_nm) =])));[=
+
+    ELSE            =](scm_intern0 (g_nm+[= (add-to-g_nm) =]));
+    SCM_SETCDR ([=(. scm-prefix)=]sym_[=name=], [=
+      ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
+    ENDIF           =][=
+  ENDFOR symbol     =][=
+
+  (out-suspend "main")
+  (emit-string-table "g_nm")
+  (out-resume "main")
+  (out-pop #t)      =][=
+  (if (exist? "fini-code")
+      (prefix "    " (get "fini-code")) "") =]
+}
+#undef NEW_PROC
+/*
+ * Local Variables:
+ * mode:C
+ * End:
+ *
+ * end of [= (out-name) =] */
+[= #
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+=][=
+
 DEFINE mk-new-proc =][=
 
    (set! ix (add-to-g_nm))
@@ -203,68 +303,5 @@ DEFINE mk-new-proc =][=
    name =]);[=
 
 ENDDEF =][=
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=]
-[= (define init-proc
-      (if (exist? "init")
-          (get "init")
-          (if (exist? "group")
-              (string-append (get "group") "_init")
-              "scm_init"))) =]
-#ifndef __P
-# if defined (__GNUC__) || (defined (__STDC__) && __STDC__)
-#  define __P(args) args
-# else
-#  define __P(args) ()
-# endif  /* GCC.  */
-#endif  /* Not __P.  */
-
-typedef SCM (*gh_callback_t)__P((void));
-void [=(. init-proc)=]( void );
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An ) \
-  gh_new_procedure( (char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An, \
-                    _Ar, _Ao, _Ax )
-
-/*
- * [=group=] Initialization procedure.
- */
-void
-[=(. init-proc)=]( void )
-{[=
-
-  (out-push-new)
-
-  (if (exist? "init-code")
-      (prefix "    " (get "init-code")) "") =][=
-
-  FOR  gfunc            =][=
-      mk-new-proc       =][=
-  ENDFOR gfunc          =][=
-
-  FOR  syntax           =]
-    scm_make_synt(g_nm+[= (add-to-g_nm) =], [=type=], [=cfn=]);[=
-  ENDFOR syntax         =][=
-
-  FOR symbol =]
-    [=(. scm-prefix)=]sym_[=name=] = scm_permanent_object[=
-    IF (not (and (exist? "init_val") (exist? "const_val")))
-         =](SCM_CAR (scm_intern0 (g_nm+[= (add-to-g_nm) =])));[=
-
-    ELSE            =](scm_intern0 (g_nm+[= (add-to-g_nm) =]));
-    SCM_SETCDR ([=(. scm-prefix)=]sym_[=name=], [=
-      ?% init_val "%s" (sprintf "scm_long2num(%s)" (get "const_val"))=]);[=
-    ENDIF           =][=
-  ENDFOR symbol     =][=
-
-  (out-suspend "main")
-  (emit-string-table "g_nm")
-  (out-resume "main")
-  (out-pop #t)      =][=
-  (if (exist? "fini-code")
-      (prefix "    " (get "fini-code")) "") =]
-}
-#undef NEW_PROC
-[= #
 
 end of snarf.tpl \=]

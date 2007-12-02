@@ -1,3 +1,20 @@
+2007-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (ag_abend_at): shadowing warning
+	* agen5/defParse.def (debug-flag): change to something out of the way.
+	* agen5/expFormat.c (ag_scm_agpl): new function for Affero GPL.
+	* agen5/expOutput.c: add tracing for the various (out* ) functions
+	* agen5/expPrint.c (printFault): the fault handler is enabled only
+	when DEBUG_ENABLED is *not* defined.  Under debugging, we want a fault
+	and core dump.
+	* agen5/fsm-trans.tpl (debug-flag): parameterize the name of the
+	"ifdef" used to indicate enabling debug code.
+	* agen5/funcDef.c (mFunc_Debug): doc it and remove CPP ifdef's
+	* agen5/opts.def (trace): doc the fact that 'everything' can now include
+	tracing the AutoGen defined scheme functions.
+	* agen5/tpParse.c: printf warning patrol.
+	* columns/opts.def: enable rc file processing for columns
+	
 2007-11-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/aoconf.tpl (tempdir): use the one embedded in autogen

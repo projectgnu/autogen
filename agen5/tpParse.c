@@ -2,10 +2,10 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.16 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: tpParse.c,v 4.17 2007/12/02 22:41:16 bkorb Exp $
  *
- * Time-stamp:        "2007-11-12 20:44:14 bkorb"
- * Last Committed:    $Date: 2007/11/13 05:49:26 $
+ * Time-stamp:        "2007-12-02 12:39:12 bkorb"
+ * Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This module will load a template and return a template structure.
  *
@@ -218,11 +218,11 @@ nextMacroStart( tCC* pz, tMacro** ppM, tTemplate* pTpl )
 #if defined(DEBUG_ENABLED)
     if (HAVE_OPT( SHOW_DEFS )) {
         int ct = tplNestLevel;
-        fprintf( pfTrace, "%3d ", pM - pTpl->aMacros );
+        fprintf(pfTrace, "%3u ", (unsigned int)(pM - pTpl->aMacros));
         do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
-        fprintf( pfTrace, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
-                 pM->lineNo, pM->endIndex, pzEnd - pz );
+        fprintf(pfTrace, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
+                pM->lineNo, pM->endIndex, (unsigned int)(pzEnd - pz));
     }
 #endif
 
@@ -255,7 +255,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
         int ct = tplNestLevel;
         tMacro* pPm = pM-1;
 
-        fprintf( pfTrace, "%3d ", pPm - pTpl->aMacros );
+        fprintf(pfTrace, "%3u ", (unsigned int)(pPm - pTpl->aMacros));
         do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
         fprintf( pfTrace, zTUndef, apzFuncNames[ pPm->funcCode ],
@@ -349,7 +349,8 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                 int ct = tplNestLevel;
                 if (pM->funcCode == FTYP_BOGUS)
                      fputs( "    ", pfTrace );
-                else fprintf( pfTrace, "%3d ", pM - pTpl->aMacros );
+                else fprintf(pfTrace, "%3u ",
+                             (unsigned int)(pM - pTpl->aMacros));
 
                 do { fputs( "  ", pfTrace ); } while (--ct > 0);
 
@@ -363,7 +364,7 @@ parseTemplate( tMacro* pM, tCC** ppzText )
                         ? zNil
                         : (pTpl->pzTemplText + pM->ozText);
                     fprintf( pfTrace, zTDef, apzFuncNames[ ft ], pM->funcCode,
-                             ln, pM->endIndex, strlen( pz ));
+                             ln, pM->endIndex, (unsigned int)strlen(pz));
                 }
             }
 #endif

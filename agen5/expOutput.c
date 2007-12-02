@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.26 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: expOutput.c,v 4.27 2007/12/02 22:41:16 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:42:27 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-11-23 17:37:45 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This module implements the output file manipulation function
  *
@@ -116,7 +116,8 @@ ag_scm_out_delete( void )
     /*
      *  Delete the current output file
      */
-    fprintf( pfTrace, zSkipMsg, pCurFp->pzOutName );
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf( pfTrace, zSkipMsg, pCurFp->pzOutName );
     outputDepth = 1;
     longjmp( fileAbort, PROBLEM );
     /* NOTREACHED */
@@ -142,7 +143,9 @@ ag_scm_out_move( SCM new_file )
     memcpy( pz, AG_SCM_CHARS( new_file ), sz );
     pz[ sz ] = NUL;
 
-    rename( pCurFp->pzOutName, pz );
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf( pfTrace, "renaming %s to %s\n",  pCurFp->pzOutName, pz);
+    rename(pCurFp->pzOutName, pz);
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
         AGFREE( (void*)pCurFp->pzOutName );
     AGDUPSTR( pCurFp->pzOutName, pz, "file name" );
@@ -185,6 +188,9 @@ ag_scm_out_pop( SCM ret_contents )
         }
     }
 
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fputs("out-pop\n", pfTrace);
+
     outputDepth--;
     closeOutput( AG_FALSE );
     return res;
@@ -224,6 +230,10 @@ ag_scm_out_suspend( SCM suspName )
 
     pSuspended[ suspendCt-1 ].pzSuspendName = gh_scm2newstr( suspName, NULL );
     pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf(pfTrace, "suspended output to '%s'\n",
+                pSuspended[ suspendCt-1 ].pzSuspendName);
+
     pCurFp = pCurFp->pPrev;
     outputDepth--;
 
@@ -254,6 +264,8 @@ ag_scm_out_resume( SCM suspName )
             if (ix < --suspendCt)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;
+            if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+                fprintf(pfTrace, "resuming output to '%s'\n", pzName);
             return SCM_UNDEFINED;
         }
     }
@@ -385,6 +397,9 @@ ag_scm_out_push_add( SCM new_file )
     p->pzOutName = pzNewFile;
     outputDepth++;
     pCurFp       = p;
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf(pfTrace, "appending output to '%s'\n",
+                pzNewFile);
     return SCM_UNDEFINED;
 }
 
@@ -419,6 +434,9 @@ ag_scm_out_push_new( SCM new_file )
         pzNewFile[ sz ] = NUL;
         unlink( pzNewFile );
         addWriteAccess( pzNewFile );
+        if (OPT_VALUE_TRACE > TRACE_NOTHING)
+            fprintf(pfTrace, "creating output to '%s'\n",
+                    pzNewFile);
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     }
     else
@@ -526,6 +544,9 @@ ag_scm_out_switch( SCM new_file )
     tbuf.actime  = time( NULL );
     tbuf.modtime = outTime;
     utime( pCurFp->pzOutName, &tbuf );
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf(pfTrace, "switching output from %s to '%s'\n",
+                pCurFp->pzOutName, pzNewFile);
     pCurFp->pzOutName = pzNewFile;  /* memory leak */
 
     return SCM_UNDEFINED;

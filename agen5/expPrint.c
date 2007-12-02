@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expPrint.c,v 4.18 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: expPrint.c,v 4.19 2007/12/02 22:41:16 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:19:37 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Time-stamp:        "2007-12-02 12:43:09 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -27,29 +27,24 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#ifndef DEBUG_ENABLED
 static sigjmp_buf printJumpEnv;
 static int        printJumpSignal = 0;
-
-static void   printFault( int sig );
-static ssize_t safePrintf( char** pzBuf, char* pzFmt, void** argV );
+#endif
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by mk-fwd */
-static void
-printFault( int sig );
-
 static ssize_t
 safePrintf( char** ppzBuf, char* pzFmt, void** argV );
 /* = = = END-STATIC-FORWARD = = = */
 
-static void
-printFault( int sig )
+#ifndef DEBUG_ENABLED
+ static void printFault( int sig )
 {
     printJumpSignal = sig;
     siglongjmp( printJumpEnv, sig );
 }
-
+#endif
 
 static ssize_t
 safePrintf( char** ppzBuf, char* pzFmt, void** argV )

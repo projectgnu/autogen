@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.18 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: expString.c,v 4.19 2007/12/02 22:41:16 bkorb Exp $
  *
  *  Time-stamp:        "2007-07-06 13:34:10 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Last Committed:    $Date: 2007/12/02 22:41:16 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -962,11 +962,11 @@ ag_scm_sub_shell_str( SCM obj )
 SCM
 ag_scm_stack( SCM obj )
 {
-    SCM   res;
-    SCM * pos = &res;
+    SCM         res;
+    SCM *       pos = &res;
     tDefEntry** ppDE;
-        tDefEntry* pDE;
-        SCM        str;
+    tDefEntry*  pDE;
+    SCM         str;
 
     res = SCM_EOL;
 
