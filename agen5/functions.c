@@ -1,9 +1,9 @@
 
 /*
- *  $Id: functions.c,v 4.17 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: functions.c,v 4.18 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 12:28:56 bkorb"
- *  Last Committed:    $Date: 2007/12/02 22:41:16 $
+ *  Time-stamp:        "2007-12-02 15:08:05 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements text functions.
  *
@@ -72,11 +72,11 @@ mFunc_Include( tTemplate* pT, tMacro* pMac )
             else *pzE = NUL;
         }
 
-        if (OPT_VALUE_TRACE > TRACE_NOTHING) {
+        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE) {
             tSCC zTplFmt[] = "Template %s included\n";
             tSCC zLinFmt[] = "\tfrom %s line %d\n";
             fprintf( pfTrace, zTplFmt, pNewTpl->pzTplFile );
-            if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+            if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                 fprintf( pfTrace, zLinFmt, pCurTemplate->pzTplFile,
                          pMac->lineNo );
         }

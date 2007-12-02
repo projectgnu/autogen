@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcFor.c,v 4.20 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: funcFor.c,v 4.21 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:44:22 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-12-02 15:10:11 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements the FOR text macro.
  *
@@ -698,7 +698,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
                 fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
                          pT->pzTemplText + pMac->ozName );
 
-                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
             }
 
@@ -747,7 +747,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
         fprintf( pfTrace, "FOR %s repeated %d times\n",
                  pT->pzTemplText + pMac->ozName, loopCt );
 
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
     }
 

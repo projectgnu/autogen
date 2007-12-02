@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.16 2007/11/15 19:51:09 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.17 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:      "2007-11-12 22:50:03 bkorb"
+ *  Time-stamp:      "2007-12-02 15:02:27 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -205,7 +205,7 @@ addSysEnv( char* pzEnvName )
     if (getenv( pzEnvName ) == NULL) {
         char* pz;
 
-        if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
             fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
         pz = aprf( zFmt, pzEnvName );
         TAGMEM( pz, "Added environment var" );

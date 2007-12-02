@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.27 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: expOutput.c,v 4.28 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-23 17:37:45 bkorb"
- *  Last Committed:    $Date: 2007/12/02 22:41:16 $
+ *  Time-stamp:        "2007-12-02 15:05:04 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements the output file manipulation function
  *
@@ -116,7 +116,7 @@ ag_scm_out_delete( void )
     /*
      *  Delete the current output file
      */
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf( pfTrace, zSkipMsg, pCurFp->pzOutName );
     outputDepth = 1;
     longjmp( fileAbort, PROBLEM );
@@ -143,7 +143,7 @@ ag_scm_out_move( SCM new_file )
     memcpy( pz, AG_SCM_CHARS( new_file ), sz );
     pz[ sz ] = NUL;
 
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf( pfTrace, "renaming %s to %s\n",  pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
@@ -397,9 +397,8 @@ ag_scm_out_push_add( SCM new_file )
     p->pzOutName = pzNewFile;
     outputDepth++;
     pCurFp       = p;
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        fprintf(pfTrace, "appending output to '%s'\n",
-                pzNewFile);
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+        fprintf(pfTrace, "appending output to '%s'\n", pzNewFile);
     return SCM_UNDEFINED;
 }
 
@@ -434,9 +433,8 @@ ag_scm_out_push_new( SCM new_file )
         pzNewFile[ sz ] = NUL;
         unlink( pzNewFile );
         addWriteAccess( pzNewFile );
-        if (OPT_VALUE_TRACE > TRACE_NOTHING)
-            fprintf(pfTrace, "creating output to '%s'\n",
-                    pzNewFile);
+        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+            fprintf(pfTrace, "creating output to '%s'\n", pzNewFile);
         p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
     }
     else
@@ -544,7 +542,7 @@ ag_scm_out_switch( SCM new_file )
     tbuf.actime  = time( NULL );
     tbuf.modtime = outTime;
     utime( pCurFp->pzOutName, &tbuf );
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, "switching output from %s to '%s'\n",
                 pCurFp->pzOutName, pzNewFile);
     pCurFp->pzOutName = pzNewFile;  /* memory leak */

@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.19 2007/11/15 19:51:09 bkorb Exp $
+ *  $Id: funcCase.c,v 4.20 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-15 11:24:03 bkorb"
- *  Last Committed:    $Date: 2007/11/15 19:51:09 $
+ *  Time-stamp:        "2007-12-02 15:09:39 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements the CASE text function.
  */
@@ -999,7 +999,7 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
                 fprintf( pfTrace, "CASE string `%s' did not match\n",
                          pzSampleText );
 
-                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pMac->lineNo );
             }
@@ -1024,7 +1024,7 @@ mFunc_Case( tTemplate* pT, tMacro* pMac )
                          apzMatchName[ pMac->funcCode & 0x0F ],
                          pT->pzTemplText + pMac->ozText );
 
-                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pMac->lineNo );
             }

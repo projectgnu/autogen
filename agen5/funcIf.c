@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcIf.c,v 4.14 2007/11/17 21:01:55 bkorb Exp $
+ *  $Id: funcIf.c,v 4.15 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-17 09:42:05 bkorb"
- *  Last Committed:    $Date: 2007/11/17 21:01:55 $
+ *  Time-stamp:        "2007-12-02 15:10:46 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements the _IF text function.
  *
@@ -168,7 +168,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
                          ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
                          pMac->lineNo );
 
-                if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+                if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                              pIf->lineNo );
             }
@@ -183,7 +183,7 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
         fprintf( pfTrace, "IF `%s' macro selected no clause\n",
                  pCurTemplate->pzTemplText + pCurMacro->ozText );
 
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                      pIf->lineNo );
     }
@@ -252,7 +252,7 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
         fprintf( pfTrace, "WHILE macro repeated %d times\n", ct );
 
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
     }
 

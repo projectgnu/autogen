@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.27 2007/12/02 22:41:16 bkorb Exp $
- *  Time-stamp:        "2007-12-02 11:10:34 bkorb"
- *  Last Committed:    $Date: 2007/12/02 22:41:16 $
+ *  $Id: opts.def,v 4.28 2007/12/02 23:12:07 bkorb Exp $
+ *  Time-stamp:        "2007-12-02 14:56:34 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -515,8 +515,8 @@ flag = {
     arg-default = nothing;
     arg-name    = level;
     descrip     = "tracing level of detail";
-    keyword     = nothing, server-shell, templates, block-macros,
-                  expressions, everything;
+    keyword     = nothing, debug-message, server-shell, templates,
+                  block-macros, expressions, everything;
 
 #ifndef XML2AG
 	doc = <<-  _EOF_

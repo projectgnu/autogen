@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.22 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: funcDef.c,v 4.23 2007/12/02 23:12:07 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 14:21:31 bkorb"
- *  Last Committed:    $Date: 2007/12/02 22:41:16 $
+ *  Time-stamp:        "2007-12-02 15:08:28 bkorb"
+ *  Last Committed:    $Date: 2007/12/02 23:12:07 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -352,12 +352,15 @@ prepInvokeArgs( tMacro* pMac )
  *  handler-proc:
  *  load-proc:
  *
- *  what:  Provide break point spots
+ *  what:  Print debug message to trace output
  *  desc:
  *
+ *      If the tracing level is at "debug-message" or above, this macro
+ *      prints a debug message to trace output.  This message is not evaluated.
+ *      This macro can also be used to set useful debugger breakpoints.
  *      By inserting [+DEBUG n+] into your template, you can set a debugger
- *      breakpoint on the #n case element below and step through the processing
- *      of interesting parts of your template.
+ *      breakpoint on the #n case element below (in the AutoGen source) and
+ *      step through the processing of interesting parts of your template.
  *
  *      To be useful, you have to have access to the source tree where autogen
  *      was built and the template being processed.  The definitions are also
@@ -368,17 +371,23 @@ tMacro*
 mFunc_Debug( tTemplate* pT, tMacro* pMac )
 {
     static int dummy = 0;
+    char const * pz  = pT->pzTemplText + pMac->ozText;
 
-    if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        fprintf( pfTrace, "  --  DEBUG %s -- FOR index %d\n",
-                 pT->pzTemplText + pMac->ozText, (forInfo.fi_depth <= 0) ? -1
-                 : forInfo.fi_data[ forInfo.fi_depth - 1].for_index );
+    if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
+        fprintf(pfTrace, "  --  DEBUG %s -- FOR index %d\n",
+                pz, (forInfo.fi_depth <= 0) ? -1
+                : forInfo.fi_data[ forInfo.fi_depth - 1].for_index );
     /*
      *  The case element values were chosen to thwart most
      *  optimizers that might be too bright for its own good.
      *  (`dummy' is write-only and could be ignored)
      */
-    switch (atoi( pT->pzTemplText + pMac->ozText )) {
+    while (! IS_DEC_DIGIT_CHAR(*pz)) {
+        if (*pz == NUL)
+            break;
+        pz++;
+    }
+    switch (atoi(pz)) {
     case 0:    dummy = 'A'; break;
     case 1:    dummy = 'u'; break;
     case 2:    dummy = 't'; break;
@@ -562,7 +571,7 @@ mFunc_Define( tTemplate* pT, tMacro* pMac )
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
         fprintf( pfTrace, zTplInvoked, pT->pzTplName, defCt );
-        if (OPT_VALUE_TRACE < TRACE_EVERYTHING)
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
                      pMac->lineNo );
     }
