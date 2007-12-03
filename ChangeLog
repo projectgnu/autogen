@@ -14,6 +14,7 @@
 	tracing the AutoGen defined scheme functions.
 	* agen5/tpParse.c: printf warning patrol.
 	* columns/opts.def: enable rc file processing for columns
+	* agen5/test/debug.test: validate the now distributed functionality
 	
 2007-11-17  Bruce Korb  <bkorb@gnu.org>
 

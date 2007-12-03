@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-07-04 11:51:47 bkorb"
+## Time-stamp:      "2007-12-02 17:12:53 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,14 +22,14 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.14 2007/12/03 01:34:13 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test
 
 NOSHELL_TESTS = \
-  alist.test   case.test                 defref.test  dynref.test  \
+  alist.test   case.test    debug.test   defref.test  dynref.test  \
   endmac.test  for.test     forfrom.test forin.test   format.test  get.test   \
   gperf.test   heredef.test html.test    in.test      license.test line.test  \
   loop.test    make.test    match.test   pseudo.test  reorder.test stack.test \

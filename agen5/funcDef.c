@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.24 2007/12/02 23:34:55 bkorb Exp $
+ *  $Id: funcDef.c,v 4.25 2007/12/03 01:34:13 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 15:28:05 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:34:55 $
+ *  Time-stamp:        "2007-12-02 17:04:59 bkorb"
+ *  Last Committed:    $Date: 2007/12/03 01:34:13 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -706,9 +706,11 @@ mFunc_Invoke( tTemplate* pT, tMacro* pMac )
  *          at load time, too :-)
  */
 tMacro*
-mLoad_Debug( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_Debug(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
-    return mLoad_Unknown(pT, pMac, ppzScan);
+    if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
+        return mLoad_Unknown(pT, pMac, ppzScan);
+    return mLoad_Comment(pT, pMac, ppzScan);
 }
 
 

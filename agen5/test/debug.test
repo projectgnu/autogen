@@ -1,0 +1,153 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# debug.test --- definition reference testing
+#
+# Time-stamp:        "2007-12-02 17:29:32 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+# Last Modified:     $Date: 2007/12/03 01:34:13 $
+#            by: bkorb
+##
+## This file is part of AutoGen.
+## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+#
+# $Id: debug.test,v 4.1 2007/12/03 01:34:13 bkorb Exp $
+# ----------------------------------------------------------------------
+
+. ./defs
+
+# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+
+cat > ${testname}.tpl <<_EOF_
+<= AutoGen5 template test =>
+The last of each list:<=
+FOR list =><= DEBUG slot 64 =>
+  LAST -> <= val[$] =>
+
+  list -> <=
+  FOR val ", " =><= DEBUG bucket 128 => val[<=(for-index)=>]=<=val=><=
+  ENDFOR =><=
+ENDFOR =>
+_EOF_
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+# Create the files we need in the test environment
+cat > ${testname}.def <<_EOF_
+AutoGen definitions "${testname}." "tpl";
+list =    { val = L0.first, L0.last; };
+List[3] = { val = L3.third.all; };
+_EOF_
+
+# # # # # # # # # # ANTICIPATED RESULTS # # # # # # # # #
+
+cat > ${testname}.base1 <<\_EOF_
+eval from file agInit.c line 152:
+(debug-enable 'backtrace)
+marker ``<='' loaded
+marker ``=>'' loaded
+Starting test template
+Text       (12) in debug.tpl at line 2
+  The last of each list:
+FOR        ( D) in debug.tpl at line 3
+FOR list loop in debug.tpl on line 3 begins:
+DEBUG      ( 3) in debug.tpl at line 3
+  slot 64
+  --  DEBUG slot 64 -- FOR index 0
+Text       (12) in debug.tpl at line 3
+  
+Unknown    (13) in debug.tpl at line 4
+remapped to Expr (13) in debug.tpl at line 4
+	based on val[$]
+Text       (12) in debug.tpl at line 4
+  
+FOR        ( D) in debug.tpl at line 7
+  , 
+FOR val loop in debug.tpl on line 7 begins:
+DEBUG      ( 3) in debug.tpl at line 7
+  bucket 128
+  --  DEBUG bucket 128 -- FOR index 0
+Text       (12) in debug.tpl at line 7
+   val[
+EXPR       ( C) in debug.tpl at line 7
+  (for-index)
+eval from file debug.tpl line 7:
+(for-index)
+Text       (12) in debug.tpl at line 7
+  ]=
+Unknown    (13) in debug.tpl at line 7
+remapped to Expr (13) in debug.tpl at line 7
+	based on val
+DEBUG      ( 3) in debug.tpl at line 7
+  bucket 128
+  --  DEBUG bucket 128 -- FOR index 1
+Text       (12) in debug.tpl at line 7
+   val[
+EXPR       ( C) in debug.tpl at line 7
+  (for-index)
+eval from file debug.tpl line 7:
+(for-index)
+Text       (12) in debug.tpl at line 7
+  ]=
+EXPR       ( C) in debug.tpl at line 7
+FOR val repeated 2 times
+	from debug.tpl line 7
+DEBUG      ( 3) in debug.tpl at line 3
+  slot 64
+  --  DEBUG slot 64 -- FOR index 3
+Text       (12) in debug.tpl at line 3
+  
+EXPR       ( C) in debug.tpl at line 4
+Text       (12) in debug.tpl at line 4
+  
+FOR        ( D) in debug.tpl at line 7
+  , 
+FOR val loop in debug.tpl on line 7 begins:
+DEBUG      ( 3) in debug.tpl at line 7
+  bucket 128
+  --  DEBUG bucket 128 -- FOR index 0
+Text       (12) in debug.tpl at line 7
+   val[
+EXPR       ( C) in debug.tpl at line 7
+  (for-index)
+eval from file debug.tpl line 7:
+(for-index)
+Text       (12) in debug.tpl at line 7
+  ]=
+EXPR       ( C) in debug.tpl at line 7
+FOR val repeated 1 times
+	from debug.tpl line 7
+FOR list repeated 2 times
+	from debug.tpl line 3
+Text       (12) in debug.tpl at line 9
+  
+_EOF_
+
+trace_args=--trace=everything\ --trace-out=${testname}.trace1
+${AGexe} ${trace_args} ${testname}.def || failure AutoGen failed
+cmp -s ${testname}.base1 ${testname}.trace1 || \
+  failure "`diff -c ${testname}.base1 ${testname}.trace1`"
+
+touch ${testname}.base2
+
+trace_args=--trace-out=${testname}.trace2
+${AGexe} ${trace_args} ${testname}.def || failure AutoGen failed
+cmp -s ${testname}.base2 ${testname}.trace2 || \
+  failure "`diff -c ${testname}.base2 ${testname}.trace2`"
+
+cleanup
+
+# end of debug.test

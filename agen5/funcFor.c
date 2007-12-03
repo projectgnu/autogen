@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcFor.c,v 4.21 2007/12/02 23:12:07 bkorb Exp $
+ *  $Id: funcFor.c,v 4.22 2007/12/03 01:34:13 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 15:10:11 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:12:07 $
+ *  Time-stamp:        "2007-12-02 15:58:01 bkorb"
+ *  Last Committed:    $Date: 2007/12/03 01:34:13 $
  *
  *  This module implements the FOR text macro.
  *
@@ -689,6 +689,13 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
     tDefEntry*  pDef;
     int         loopCt;
 
+    /*
+     *  "funcPrivate" is used by the "FOR x IN ..." variation of the macro.
+     *  When parsed, a chain of text definitions are hung off of "funcPrivate".
+     *  "doForEach()" will then chase through the linked list of text
+     *  values.  This winds up being identical to [+ FOR var +] where
+     *  a list of "var" values has been set.
+     */
     if (pMac->funcPrivate != NULL)
         pDef = pMac->funcPrivate;
     else {
@@ -706,6 +713,9 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
         }
     }
 
+    /*
+     *  Push the current FOR context onto a stack.
+     */
     if (++(forInfo.fi_depth) > forInfo.fi_alloc) {
         forInfo.fi_alloc += 5;
         if (forInfo.fi_data == NULL)
@@ -727,6 +737,9 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
                  pT->pzTemplText + pMac->ozName, pT->pzTplFile,
                  pMac->lineNo );
 
+    /*
+     *  Check for a FOR iterating based on scheme macros
+     */
     if (pT->pzTemplText[ pMac->ozText ] == '(') {
         pFS->for_from  = \
         pFS->for_to    = 0x7BAD0BAD;
@@ -737,6 +750,9 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
         loopCt = doForByStep( pT, pMac, pDef );
     }
     else {
+        /*
+         *  The FOR iterates over a list of definitions
+         */
         pFS->for_pzSep = pT->pzTemplText + pMac->ozText;
         loopCt = doForEach( pT, pMac, pDef );
     }
