@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.25 2007/12/03 01:34:13 bkorb Exp $
+ *  $Id: funcDef.c,v 4.26 2007/12/03 02:10:14 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 17:04:59 bkorb"
- *  Last Committed:    $Date: 2007/12/03 01:34:13 $
+ *  Time-stamp:        "2007-12-02 18:08:49 bkorb"
+ *  Last Committed:    $Date: 2007/12/03 02:10:14 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -371,38 +371,47 @@ prepInvokeArgs( tMacro* pMac )
 tMacro*
 mFunc_Debug( tTemplate* pT, tMacro* pMac )
 {
-    static int dummy = 0;
+    int dummy;
     char const * pz  = pT->pzTemplText + pMac->ozText;
+    int  for_index = (forInfo.fi_depth <= 0)
+        ? -1
+        : forInfo.fi_data[ forInfo.fi_depth - 1].for_index;
 
-    if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "  --  DEBUG %s -- FOR index %d\n",
-                pz, (forInfo.fi_depth <= 0) ? -1
-                : forInfo.fi_data[ forInfo.fi_depth - 1].for_index );
+    fprintf(pfTrace, "  --  DEBUG %s -- FOR index %d", pz, for_index);
+
     /*
      *  The case element values were chosen to thwart most
      *  optimizers that might be too bright for its own good.
      *  (`dummy' is write-only and could be ignored)
      */
-    while (! IS_DEC_DIGIT_CHAR(*pz)) {
-        if (*pz == NUL)
+    do  {
+        if (IS_DEC_DIGIT_CHAR(*pz)) {
+            for_index = atoi(pz);
             break;
-        pz++;
-    }
-    switch (atoi(pz)) {
+        }
+    } while (*(pz++) != NUL);
+
+    if (for_index < 0)
+        for_index = -1;
+
+    switch (for_index) {
+    case -1:   dummy = 'X'; break;
     case 0:    dummy = 'A'; break;
     case 1:    dummy = 'u'; break;
     case 2:    dummy = 't'; break;
-    case 4:    dummy = 'o'; break;
-    case 8:    dummy = 'G'; break;
-    case 16:   dummy = 'e'; break;
-    case 32:   dummy = 'n'; break;
-    case 64:   dummy = 'X'; break;
-    case 128:  dummy = 'Y'; break;
-    case 256:  dummy = 'Z'; break;
-    case 512:  dummy = '.'; break;
+    case 3:    dummy = 'o'; break;
+    case 4:    dummy = 'G'; break;
+    case 5:    dummy = 'e'; break;
+    case 6:    dummy = 'n'; break;
+    case 7:    dummy = 'X'; break;
+    case 8:    dummy = 'Y'; break;
+    case 9:    dummy = 'Z'; break;
+    case 10:   dummy = '.'; break;
     default:   dummy++;
     }
-
+    if (IS_GRAPHIC_CHAR(dummy))
+        fprintf(pfTrace, " (%c)", dummy);
+    putc('\n', pfTrace);
     return pMac+1;
 }
 
