@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcDef.c,v 4.26 2007/12/03 02:10:14 bkorb Exp $
+ *  $Id: funcDef.c,v 4.27 2007/12/10 20:01:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 18:08:49 bkorb"
- *  Last Committed:    $Date: 2007/12/03 02:10:14 $
+ *  Time-stamp:        "2007-12-02 18:13:29 bkorb"
+ *  Last Committed:    $Date: 2007/12/10 20:01:26 $
  *
  *  This module implements the DEFINE text function.
  *
@@ -371,7 +371,7 @@ prepInvokeArgs( tMacro* pMac )
 tMacro*
 mFunc_Debug( tTemplate* pT, tMacro* pMac )
 {
-    int dummy;
+    static int dummy = 0;
     char const * pz  = pT->pzTemplText + pMac->ozText;
     int  for_index = (forInfo.fi_depth <= 0)
         ? -1
@@ -403,9 +403,9 @@ mFunc_Debug( tTemplate* pT, tMacro* pMac )
     case 4:    dummy = 'G'; break;
     case 5:    dummy = 'e'; break;
     case 6:    dummy = 'n'; break;
-    case 7:    dummy = 'X'; break;
-    case 8:    dummy = 'Y'; break;
-    case 9:    dummy = 'Z'; break;
+    case 7:    dummy = 'N'; break;
+    case 8:    dummy = 'U'; break;
+    case 9:    dummy = 'T'; break;
     case 10:   dummy = '.'; break;
     default:   dummy++;
     }

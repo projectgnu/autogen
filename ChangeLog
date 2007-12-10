@@ -1,3 +1,11 @@
+2007-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c (ag_scm_out_emit_suspended): new function
+	* autoopts/test/defs.in (init_tests): new function - refactor code
+	and make certain that the .log text is emitted to stderr on errors.
+	* autoopts/test/getopt.test (AUTOGEN_TEMPL_DIRS): export this
+	environment variable for nested autogen invocations.
+	
 2007-12-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (ag_abend_at): shadowing warning

@@ -2,7 +2,7 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2007-07-04 10:35:02 bkorb"
+## Time-stamp:      "2007-11-16 21:59:17 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@ in=autoopts-config.in
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.6 2007/11/01 05:24:24 bkorb Exp $
+## $Id: aoconf-tpl.in,v 4.7 2007/12/10 20:01:26 bkorb Exp $
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.
@@ -129,11 +129,8 @@ echo "${val}"
 MAN PAGE TEMPLATE:  =][=
 
 (out-switch "autoopts-config.1")
-(define tmp-dir (shell
-  "tempdir=`(mktemp -d .ao-XXXXXX) 2>/dev/null`
-   test -z \"${tempdir}\" && tempdir=${TMPDIR:-/tmp}/.ao-$$
-   test -d ${tempdir} || mkdir -p ${tmpdir} || die cannot mkdir ${tempdir}
-   echo ${tempdir}/" ))
+(make-tmp-dir)
+(define temp-list "")
 (dne "\\\" " "\\\" ")
 
 =]
@@ -156,7 +153,11 @@ one or more hyphens.  They are silently ignored.
 
 FOR cfg
 
-  =][= (out-push-new (string-append tmp-dir (get "c-name"))) \=]
+  =][=
+ (set! txt (string-append tmp-dir "/" (get "c-name")))
+ (set! temp-list (string-append temp-list txt "\n"))
+
+ (out-push-new txt) \=]
 .TP
 .BR [= c-name =]
 .sp
@@ -174,7 +175,7 @@ The unconfigured value is:  [= c-val =][=
 
 ENDFOR cfg
 
-=][= `cat ${tempdir}/* && rm -rf ${tempdir}` =]
+=][= (shellf "cat `sort <<_EOF_\n%s_EOF_\n`" temp-list) =]
 .SH "SEE ALSO"
 .IR Autogen
 Info system documentation.

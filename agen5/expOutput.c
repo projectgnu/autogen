@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.28 2007/12/02 23:12:07 bkorb Exp $
+ *  $Id: expOutput.c,v 4.29 2007/12/10 20:01:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 15:05:04 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:12:07 $
+ *  Time-stamp:        "2007-12-05 06:19:49 bkorb"
+ *  Last Committed:    $Date: 2007/12/10 20:01:26 $
  *
  *  This module implements the output file manipulation function
  *
@@ -274,6 +274,22 @@ ag_scm_out_resume( SCM suspName )
                     pzName ));
     /* NOTREACHED */
     return SCM_UNDEFINED;
+}
+
+
+/*=gfunc out_emit_suspended
+ *
+ * what:   emit the text of suspended output
+ * exparg: suspName, A name tag of suspended output
+ * doc:
+ *  This function is equivalent to
+ *  @code{(begin (out-resume <name>) (out-pop #t))}
+=*/
+SCM
+ag_scm_out_emit_suspended( SCM suspName )
+{
+    (void)ag_scm_out_resume(suspName);
+    return ag_scm_out_pop(SCM_BOOL_T);
 }
 
 

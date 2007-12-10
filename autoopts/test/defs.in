@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2007-11-16 22:33:09 bkorb"
+# Time-stamp:     "2007-12-10 09:46:11 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2007/11/17 21:01:55 $
+# Last Modified:  $Date: 2007/12/10 20:01:26 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.19 2007/11/17 21:01:55 bkorb Exp $
+# $Id: defs.in,v 4.20 2007/12/10 20:01:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -86,6 +86,64 @@ purge()
   fi
 }
 
+set_exe() {
+  eval f=\${${1}}
+  d=`dirname $f`
+  d=`cd $d >/dev/null && pwd`
+  PATH=${d}:${PATH}
+  f=`basename $f`
+  eval ${1}=${d}/${f}
+}
+
+init_tests() {
+    logfile=`pwd`/testdir/${testname}.log
+    exec 8>&2 1>${logfile} 2>&1
+    set -x
+
+    TMPDIR=`pwd`/testdir/${testname}-tmpd
+    export TMPDIR
+    mkdir ${TMPDIR}
+
+    f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
+    PATH=${f}:${PATH}
+
+    set_exe AGexe
+    set_exe GDexe
+    set_exe CLexe
+
+    builddir=`pwd`
+    CFLAGS=`echo ${CFLAGS} | sed 's/-Werror//'`
+
+    export PATH
+    echo PATH is ${PATH} >&2
+    which columns >&2
+    which autogen >&2
+
+    lo_dir=${top_builddir}/autoopts
+    test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
+    LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}:${LD_LIBRARY_PATH-/dev/null}
+    LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
+    export LD_LIBRARY_PATH
+
+    if test ${GUILE_VERSION} -gt 107000
+    then
+      case ${AG_VERSION} in
+      *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
+      *     ) GUILE_WARN_DEPRECATED=no ;;
+      esac
+      export GUILE_WARN_DEPRECATED
+    fi
+
+    test -f /usr/lib/libgen.so && {
+      case "${LIB}" in
+      *-lgen* ) : ;;
+      * ) LIB="${LIB} -lgen" ;;
+      esac
+    }
+
+    export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
+}
+
 be_silent()
 {
     setx=:
@@ -99,6 +157,8 @@ be_silent()
     else msg=echo
          mkdir testdir || exit 1
     fi
+
+    init_tests
 }
 
 be_verbose()
@@ -108,7 +168,8 @@ be_verbose()
     msg=:
     VERBOSE=true
     test -d testdir || mkdir testdir || exit 1
-    # exec > testdir/${testname}.log 2>&1
+
+    init_tests
 }
 
 # A standard failure function
@@ -116,14 +177,14 @@ be_verbose()
 failure()
 {
   ${setx}
+  cd ${testsubdir}
   if test -d ../FAILURES
   then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
   else mkdir ../FAILURES ; fi
 
   set +x
   exec > /dev/null 2>&8
-  cat ${testname}.log >&2
-  cd ${testsubdir}
+  cat ${logfile} >&2
 
   ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
   for f in core*
@@ -174,69 +235,6 @@ case "$-" in
      esac
      ;;
 esac
-exec 8>&2 1>testdir/${testname}.log 2>&1
-set -x
-
-# for d in ${LIBGUILE_PATH}/../bin \
-#          `dirname ${AGexe}` \
-#          `dirname ${GDexe}` \
-#          `dirname ${CLexe}`
-# do d=`\cd ${d} && pwd`
-#    PATH=${d}:${PATH}
-# done
-
-TMPDIR=`pwd`/testdir/${testname}-tmpd
-export TMPDIR
-mkdir ${TMPDIR}
-
-d=`dirname  ${AGexe}`
-f=`basename ${AGexe}`
-AGexe=`cd ${d} && pwd`/${f}
-
-d=`dirname  ${GDexe}`
-f=`basename ${GDexe}`
-GDexe=`cd ${d} && pwd`/${f}
-
-d=`dirname  ${CLexe}`
-f=`basename ${CLexe}`
-CLexe=`cd ${d} && pwd`/${f}
-
-builddir=`pwd`
-CFLAGS=`echo ${CFLAGS} | sed 's/-Werror//'`
-
-f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
-PATH=${top_builddir}/columns:${f}:${PATH}
-
-export PATH
-echo PATH is ${PATH} >&2
-which columns >&2
-which autogen >&2
-
-lo_dir=${top_builddir}/autoopts
-test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
-LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}:${LD_LIBRARY_PATH-/dev/null}
-LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
-export LD_LIBRARY_PATH
-
-if test ${GUILE_VERSION} -gt 107000
-then
-  case ${AG_VERSION} in
-  *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
-  *     ) GUILE_WARN_DEPRECATED=no ;;
-  esac
-  export GUILE_WARN_DEPRECATED
-fi
-
-test -f /usr/lib/libgen.so && {
-  case "${LIB}" in
-  *-lgen* ) : ;;
-  * ) LIB="${LIB} -lgen" ;;
-  esac
-}
-
-export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 cd testdir || {
   echo "Cannot make or change into testdir" >&8
