@@ -1,10 +1,10 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.22 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: expState.c,v 4.23 2007/12/23 21:02:18 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:42:22 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Time-stamp:        "2007-12-23 12:49:15 bkorb"
+ *  Last Committed:    $Date: 2007/12/23 21:02:18 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
@@ -491,6 +491,76 @@ ag_scm_get( SCM agName, SCM altVal )
     }
 
     return AG_SCM_STR02SCM( pE->val.pzText );
+}
+
+
+/*=gfunc get_c_name
+ *
+ * what:   get named value, mapped to C name syntax
+ *
+ * exparg: ag-name, name of AutoGen value
+ *
+ * doc:
+ *
+ *  Get the first string value associated with the name.  It will either
+ *  return the associated string value (if the name resolves), the alternate
+ *  value (if one is provided), or else the empty string.  The result is
+ *  passed through "string->c-name!".
+=*/
+SCM
+ag_scm_get_c_name(SCM agName)
+{
+    tDefEntry*  pE;
+    ag_bool     x;
+
+    if (! AG_SCM_STRING_P( agName ))
+         pE = NULL;
+    else pE = findDefEntry( ag_scm2zchars( agName, "ag value" ), &x );
+
+    if ((pE == NULL) || (pE->valType != VALTYP_TEXT))
+        return AG_SCM_STR02SCM(zNil);
+
+    return ag_scm_string_to_c_name_x( AG_SCM_STR02SCM( pE->val.pzText));
+}
+
+
+/*=gfunc get_up_name
+ *
+ * what:   get upper cased named value, mapped to C name syntax
+ *
+ * exparg: ag-name, name of AutoGen value
+ *
+ * doc:
+ *
+ *  Get the first string value associated with the name.  It will either
+ *  return the associated string value (if the name resolves), the alternate
+ *  value (if one is provided), or else the empty string.  The result is
+ *  passed through "string->c-name!" and "string->up-case!".
+=*/
+SCM
+ag_scm_get_up_name(SCM agName)
+{
+    return ag_scm_string_upcase_x( ag_scm_get_c_name( agName));
+}
+
+
+/*=gfunc get_down_name
+ *
+ * what:   get lower cased named value, mapped to C name syntax
+ *
+ * exparg: ag-name, name of AutoGen value
+ *
+ * doc:
+ *
+ *  Get the first string value associated with the name.  It will either
+ *  return the associated string value (if the name resolves), the alternate
+ *  value (if one is provided), or else the empty string.  The result is
+ *  passed through "string->c-name!" and "string->down-case!".
+=*/
+SCM
+ag_scm_get_down_name(SCM agName)
+{
+    return ag_scm_string_downcase_x( ag_scm_get_c_name( agName));
 }
 
 

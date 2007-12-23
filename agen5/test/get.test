@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # get.test --- test get functionality
 #
-# Time-stamp:        "2007-07-04 11:30:01 bkorb"
+# Time-stamp:        "2007-12-23 12:54:09 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2007/12/23 21:02:18 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: get.test,v 4.5 2007/10/07 16:54:54 bkorb Exp $
+# $Id: get.test,v 4.6 2007/12/23 21:02:18 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -48,6 +48,12 @@ ENDIF =][=
 
 - bogus "\nA OK2" =][=
 - foo   "\nBOGUS" =]
+[= (get "fuz-zy") =]
+[= (get "fuz_zy") =]
+[= (get "fuz^zy") =]
+[= (get-c-name    "fuz-zy") =]
+[= (get-up-name   "fuz-zy") =]
+[= (get-down-name "fuz-zy") =]
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -59,6 +65,7 @@ AutoGen definitions $testname;
 foo = { bar = { nada = nothing; }; };
 foo = { bar = { baz  = mumble;  }; };  /* this is the one */
 foo = { bar = { baz  = grumble; }; };
+fuz-zy = Mum-Ble;
 _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
@@ -68,6 +75,12 @@ echo creating $testname.out
 cat > $testname.out <<'_EOF_'
 A OK
 A OK2
+Mum-Ble
+Mum-Ble
+Mum-Ble
+Mum_Ble
+MUM_BLE
+mum_ble
 _EOF_
 
 ${AGexe} $testname.def || failure ${AGexe} failed
