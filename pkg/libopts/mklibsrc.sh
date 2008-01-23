@@ -6,7 +6,8 @@
 ##              by: bkorb
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -21,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.31 2007/11/17 21:01:55 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.32 2008/01/23 00:35:27 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -117,7 +118,7 @@ tar cvf - ${tag} | $gz > ${top_builddir}/autoopts/${tag}.${sfx}
 rm -rf ${tag}
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

@@ -58,7 +58,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.10 2007/10/28 19:27:54 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.11 2008/01/23 00:35:27 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -182,7 +182,7 @@ optionPrintVersion(
          "" )
      (get "version") ) +]\n\
 Written by [+(join ", " (stack "copyright.author"))+].\n\n\
-Copyright (c) [+ copyright.date +] by [+ copyright.owner +]\n[+
+copyright (c) [+ copyright.date +] by [+ copyright.owner +]\n[+
 
 CASE copyright.type +][+
 *= gpl    +]\

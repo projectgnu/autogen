@@ -4,11 +4,12 @@ h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
 # Time-stamp:      "2007-11-16 21:32:33 bkorb"
-# ID:  $Id: options_h.tpl,v 4.37 2007/12/10 20:01:26 bkorb Exp $
+# ID:  $Id: options_h.tpl,v 4.38 2008/01/23 00:35:27 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control

@@ -3,12 +3,13 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2007-08-03 23:10:09 bkorb"
+# Time-stamp:        "2008-01-22 16:12:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -26,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: config.test,v 4.6 2007/10/07 16:54:54 bkorb Exp $
+# $Id: config.test,v 4.7 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
@@ -132,6 +133,12 @@ cat > ${testname}.cfg <<-  \_EOConfig_
 	brown fox\tjumped\n\
 	over everything."
 
+	stumble2   The\
+	quick\
+	brown\
+	\
+	fix.
+
 	<n4_ty type=nested>
 	   foo : foolish
 	   <b4r type=bool> YES!! </b4r>
@@ -160,6 +167,11 @@ cat > ${testname}.res <<-  \_EOResult_
 	n4_ty    -- nested:   0xXXXXXXXX
 	stumble  -- string:   The	quickbrown fox	jumped
 	over everything.
+	stumble2 -- string:   The
+	quick
+	brown
+
+	fix.
 	zzyzx    -- integer:   42
 	./config.cfg -- nested:   0xXXXXXXXX
 	_EOResult_
@@ -183,7 +195,7 @@ cmp ${testname}.out ${testname}.res || {
 cleanup
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

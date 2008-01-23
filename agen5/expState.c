@@ -1,16 +1,17 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.23 2007/12/23 21:02:18 bkorb Exp $
+ *  $Id: expState.c,v 4.24 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-12-23 12:49:15 bkorb"
- *  Last Committed:    $Date: 2007/12/23 21:02:18 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

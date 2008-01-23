@@ -1,8 +1,8 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2007-07-04 11:43:06 bkorb"
+[= # Time-stamp:        "2008-01-20 12:46:32 bkorb"
 
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

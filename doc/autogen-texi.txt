@@ -2014,11 +2014,11 @@ are, in fact, used in the presence of other options.
 See @xref{Common Attributes}, and @xref{Option Conflict Attributes}.
 
 @item
-There are several automatically supported options.  They will have short
-flags if any options have option flags and the flags are not suppressed.
-The associated flag may be altered or suppressed by specifying
-no value or an alternate character for ``@code{xxx-value;}'' in the option
-definition file.  ``@code{xxx}'' is the name of the option below:
+There are several @ref{automatic options, automatically supported options}.
+They will have short flags if any options have option flags and the flags
+are not suppressed.  The associated flag may be altered or suppressed by
+specifying no value or an alternate character for ``@code{xxx-value;}'' in
+the option definition file.  ``@code{xxx}'' is the name of the option below:
 
 @table @samp
 @item --help

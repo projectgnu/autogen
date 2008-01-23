@@ -4,11 +4,12 @@
 #
 # Time-stamp:        "2007-07-04 11:30:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2008/01/23 00:35:27 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -24,7 +25,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: loop.test,v 4.6 2007/10/07 16:54:54 bkorb Exp $
+# $Id: loop.test,v 4.7 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -72,7 +73,7 @@ cmp -s ${testname}.base ${testname}.test || \
 cleanup
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

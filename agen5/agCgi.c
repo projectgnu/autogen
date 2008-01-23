@@ -1,17 +1,18 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.17 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: agCgi.c,v 4.18 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-07-04 11:14:03 bkorb"
- *  Last Committed:    $Date: 2007/10/07 16:54:54 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
  *  AutoGen process.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

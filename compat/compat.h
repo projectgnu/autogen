@@ -4,12 +4,13 @@
  *
  *  Time-stamp:      "2007-07-04 09:51:34 bkorb"
  *
- * $Id: compat.h,v 4.18 2007/10/07 16:54:54 bkorb Exp $
+ * $Id: compat.h,v 4.19 2008/01/23 00:35:27 bkorb Exp $
  *
  *  compat.h is free software.
  *  This file is part of AutoGen.
  *
- *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

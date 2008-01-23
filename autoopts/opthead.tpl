@@ -1,12 +1,13 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.29 2007/10/07 16:54:54 bkorb Exp $
+# $Id: opthead.tpl,v 4.30 2008/01/23 00:35:27 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
 # Time-stamp:      "2007-08-04 12:10:26 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -452,7 +453,7 @@ ENDIF this is not a lib
 =]
 #endif /* [=(. header-guard)=] */[= # /*
  * Local Variables:
- * Mode: C
+ * mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:

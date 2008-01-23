@@ -1,15 +1,16 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.29 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: autogen.c,v 4.30 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-12-02 12:06:21 bkorb"
- *  Last Committed:    $Date: 2007/12/02 22:41:16 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This is the main routine for autogen.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

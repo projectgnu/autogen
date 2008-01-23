@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.25 2007/10/07 16:54:54 bkorb Exp $
+ *  save.c  $Id: save.c,v 4.26 2008/01/23 00:35:27 bkorb Exp $
  * Time-stamp:      "2007-09-08 13:04:32 bkorb"
  *
  *  This module's routines will take the currently set options and
@@ -9,7 +9,8 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

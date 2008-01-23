@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Time-stamp:        "2007-11-18 10:58:48 bkorb"
-# Last Committed:    $Date: 2007/11/18 22:49:19 $
+# Last Committed:    $Date: 2008/01/23 00:35:27 $
 #
 ##
 ##  This file is part of AutoGen.
@@ -172,7 +172,7 @@ rm -f ${tmp_files}
 exit 0
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## sh-basic-offset: 2

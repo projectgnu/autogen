@@ -7,7 +7,8 @@
 ##
 ##  This file is part of AutoGen.
 ##
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -22,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.16 2007/12/02 22:41:16 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.17 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a

@@ -1,15 +1,16 @@
 /*
- *  $Id: defLoad.c,v 4.18 2007/11/13 05:49:26 bkorb Exp $
+ *  $Id: defLoad.c,v 4.19 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-11-12 20:50:31 bkorb"
- *  Last Committed:    $Date: 2007/11/13 05:49:26 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

@@ -1,14 +1,15 @@
 
 /*
- *  $Id: funcDef.c,v 4.27 2007/12/10 20:01:26 bkorb Exp $
+ *  $Id: funcDef.c,v 4.28 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-12-02 18:13:29 bkorb"
- *  Last Committed:    $Date: 2007/12/10 20:01:26 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This module implements the DEFINE text function.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

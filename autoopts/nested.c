@@ -1,13 +1,14 @@
 
 /*
- *  $Id: nested.c,v 4.25 2007/11/17 21:01:55 bkorb Exp $
- *  Time-stamp:      "2007-11-17 09:40:28 bkorb"
+ *  $Id: nested.c,v 4.26 2008/01/23 00:35:27 bkorb Exp $
+ *  Time-stamp:      "2008-01-22 11:40:15 bkorb"
  *
  *   Automated Options Nested Values module.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -29,7 +30,7 @@
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
 static void
-removeBackslashes( char* pzSrc );
+removeLineContinue( char* pzSrc );
 
 static char const*
 scanQuotedString( char const* pzTxt );
@@ -63,27 +64,42 @@ static void
 sortNestedList( tArgList* pAL );
 /* = = = END-STATIC-FORWARD = = = */
 
-/*  removeBackslashes
+/*  removeLineContinue
  *
- *  This function assumes that all newline characters were preceeded by
- *  backslashes that need removal.
+ *  Backslashes are used for line continuations.  We keep the newline
+ *  characters, but trim out the backslash:
  */
 static void
-removeBackslashes( char* pzSrc )
+removeLineContinue( char* pzSrc )
 {
-    char* pzD = strchr(pzSrc, '\n');
+    char* pzD;
 
-    if (pzD == NULL)
-        return;
-    *--pzD = '\n';
+    do  {
+        while (*pzSrc == '\n')  pzSrc++;
+        pzD = strchr(pzSrc, '\n');
+        if (pzD == NULL)
+            return;
 
+        /*
+         *  pzD has skipped at least one non-newline character and now
+         *  points to a newline character.  It now becomes the source and
+         *  pzD goes to the previous character.
+         */
+        pzSrc = pzD--;
+        if (*pzD != '\\')
+            pzD++;
+    } while (pzD == pzSrc);
+
+    /*
+     *  Start shifting text.
+     */
     for (;;) {
         char ch = ((*pzD++) = *(pzSrc++));
         switch (ch) {
-        case '\n': *--pzD = ch; break;
         case NUL:  return;
-        default:
-            ;
+        case '\\':
+            if (*pzSrc == '\n')
+                --pzD; /* rewrite on next iteration */
         }
     }
 }
@@ -338,7 +354,7 @@ re_switch:
                 pNV = addStringValue( &(pRes->v.nestVal), pzName, nameLen,
                                       pzVal, dataLen );
                 if (pNV != NULL)
-                    removeBackslashes( pNV->v.strVal );
+                    removeLineContinue( pNV->v.strVal );
                 goto leave_scan_name;
             }
         }

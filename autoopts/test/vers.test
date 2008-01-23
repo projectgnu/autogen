@@ -7,12 +7,13 @@
 #
 # Time-stamp:        "2007-07-04 10:10:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/10/07 16:54:54 $
+# Last Modified:     $Date: 2008/01/23 00:35:27 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -30,7 +31,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
-# $Id: vers.test,v 4.5 2007/10/07 16:54:54 bkorb Exp $
+# $Id: vers.test,v 4.6 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -71,7 +72,7 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 4.5 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
+ver="`echo '$Revision: 4.6 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
 echo "version = '$ver';" >> $testname.def
 
 echo ${AG_L} $testname.def
@@ -102,7 +103,7 @@ cmp -s $testname.h*lp || \
 cleanup
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
 ## End:

@@ -1,14 +1,15 @@
 
 /*
- *  $Id: expOutput.c,v 4.29 2007/12/10 20:01:26 bkorb Exp $
+ *  $Id: expOutput.c,v 4.30 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-12-05 06:19:49 bkorb"
- *  Last Committed:    $Date: 2007/12/10 20:01:26 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  This module implements the output file manipulation function
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

@@ -1,6 +1,6 @@
 
-/*  $Id: version.c,v 4.14 2007/10/07 16:54:54 bkorb Exp $
- * Time-stamp:      "2007-07-04 13:42:04 bkorb"
+/*  $Id: version.c,v 4.15 2008/01/23 00:35:27 bkorb Exp $
+ * Time-stamp:      "2008-01-22 15:41:47 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -8,12 +8,13 @@
 
 static char const zAOV[] =
     "Automated Options version %s\n"
-    "\tcopyright (c) 1999-2007 Bruce Korb - all rights reserved\n";
+    "\tcopyright (c) 1999-2008 Bruce Korb - all rights reserved\n";
 
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

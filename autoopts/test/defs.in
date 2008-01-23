@@ -5,11 +5,12 @@
 #
 # Time-stamp:     "2007-12-10 09:46:11 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2007/12/10 20:01:26 $
+# Last Modified:  $Date: 2008/01/23 00:35:27 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -27,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.20 2007/12/10 20:01:26 bkorb Exp $
+# $Id: defs.in,v 4.21 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -273,7 +274,7 @@ case "$-" in
 esac
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## End:
 

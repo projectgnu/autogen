@@ -1,13 +1,14 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.33 2007/11/11 06:13:28 bkorb Exp $
+#$Id: optcode.tpl,v 4.34 2008/01/23 00:35:27 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
 # Time-stamp:      "2007-10-28 16:25:42 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb.
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb.
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb.
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -650,7 +651,7 @@ translate_option_strings( void )
 #endif[=
  # /*
  * Local Variables:
- * Mode: C
+ * mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:

@@ -3,12 +3,13 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2007-12-10 09:54:52 bkorb"
+# Time-stamp:        "2008-01-22 16:16:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -26,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.19 2007/12/10 20:01:26 bkorb Exp $
+# $Id: getopt.test,v 4.20 2008/01/23 00:35:27 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -111,7 +112,7 @@ help-value = 'h';
 gnu-usage;
 
 copyright = {
-    date  = "2003-2007";
+    date  = "2003-2008";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";
@@ -249,7 +250,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (c) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2008 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -502,7 +503,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (c) 2003-2007 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2008 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -671,7 +672,7 @@ version-value;
 cleanup
 
 ## Local Variables:
-## Mode: shell-script
+## mode: shell-script
 ## indent-tabs-mode: nil
 ## End:
 

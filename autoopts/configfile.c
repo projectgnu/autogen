@@ -1,12 +1,13 @@
 /*
- *  $Id: configfile.c,v 4.39 2007/11/17 21:01:55 bkorb Exp $
+ *  $Id: configfile.c,v 4.40 2008/01/23 00:35:27 bkorb Exp $
  *  Time-stamp:      "2007-11-17 01:32:00 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

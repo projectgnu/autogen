@@ -1,14 +1,16 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.15 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: columns.c,v 4.16 2008/01/23 00:35:27 bkorb Exp $
  *  Time-stamp:        "2007-11-29 11:57:05 bkorb"
  *
- *  Columns copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *  Columns copyright (c) 1992-2008 Bruce Korb - all rights reserved
+ *  Columns copyright (c) 1992-2008 Bruce Korb - all rights reserved
  *  Columns is free software.
  *  This file is part of AutoGen.
  *
- *  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

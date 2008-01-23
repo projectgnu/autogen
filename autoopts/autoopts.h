@@ -2,14 +2,15 @@
 /*
  *  Time-stamp:      "2007-11-04 16:44:06 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.37 2007/11/11 06:13:28 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.38 2008/01/23 00:35:27 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

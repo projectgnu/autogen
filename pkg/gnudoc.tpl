@@ -2,8 +2,8 @@
 
 html
 
-# Time-stamp: "2007-07-04 11:41:17 bkorb"
-# Version:    "$Revision: 4.11 $
+# Time-stamp: "2008-01-19 10:42:04 bkorb"
+# Version:    "$Revision: 4.12 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
@@ -24,7 +24,7 @@ html
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.11 2007/10/07 16:54:54 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.12 2008/01/23 00:35:27 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -34,7 +34,7 @@ html
 <meta http-equiv="content-type" content='text/html; charset=utf-8' />
 <meta name="generator" content="AutoGen [=(. autogen-version)=]"/>
 <!--#include virtual="/server/banner.html" -->
-<h3>[= project =] version [= version =] - Table of Contents</H3>
+<h3>[= project =] version [= version =] - Table of Contents</h3>
 
 <!-- This document is in XML, and xhtml 1.0 -->
 <!-- Please make sure to properly nest your tags -->
@@ -147,7 +147,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2007/10/07 16:54:54 $ $Author: bkorb $
+$Date: 2008/01/23 00:35:27 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>

@@ -1,14 +1,15 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.28 2007/11/15 19:51:09 bkorb Exp $
+ *  $Id: agShell.c,v 4.29 2008/01/23 00:35:27 bkorb Exp $
  *
  *  Time-stamp:        "2007-11-12 22:27:11 bkorb"
- *  Last Committed:    $Date: 2007/11/15 19:51:09 $
+ *  Last Committed:    $Date: 2008/01/23 00:35:27 $
  *
  *  Manage a server shell process
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
