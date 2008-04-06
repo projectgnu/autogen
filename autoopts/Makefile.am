@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2007-11-17 00:55:35 bkorb"
+## Time-stamp:      "2008-04-06 12:45:12 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.39 2007/11/17 21:01:55 bkorb Exp $
+## $Id: Makefile.am,v 4.40 2008/04/06 22:46:05 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -76,11 +76,11 @@ STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
+OPTCODE_TPL = options.tpl optcode.tpl opthead.tpl optlib.tpl optmain.tpl
 CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
-    aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl  \
-    optcode.tpl opthead.tpl options.tpl optlib.tpl optmain.tpl usage.tpl
+    aginfo.tpl  aginfo3.tpl agman1.tpl  agman3.tpl getopt.tpl usage.tpl
 
-TPL_FILES   = $(CLIENT_TPLS)
+TPL_FILES   = $(CLIENT_TPLS) $(OPTCODE_TPL)
 DEF_FILES   = genshell.def stdoptions.def $(srcdir)/funcs.def
 MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in
 pkgconfigdir=$(libdir)/pkgconfig
@@ -100,20 +100,21 @@ nodist_libopts_la_SOURCES = libopts.c
 libopts_la_SOURCES        = $(HDRS)
 libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
+libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
 libguileopts_la_SOURCES   = guileopt.c
 libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
 libguileopts_la_LIBADD    = libopts.la
 libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
 
-EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) $(TPL_FILES) \
+EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
 INST_M4DATA               = autoopts.m4
 INST_ND_PKGDATA           = $(libsrc)
 INST_PKGCFG               = autoopts.pc
-INST_PKGDATA              = autoopts.m4 $(CLIENT_TPLS)
+INST_PKGDATA              = autoopts.m4 $(TPL_FILES)
 INST_LIBS                 = libopts.la libguileopts.la
 INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
 INST_SH                   = autoopts-config
@@ -177,9 +178,11 @@ autoopts.pc : mk-autoopts-pc
 
 install-data-hook:
 	@destdir='$(DESTDIR)$(includedir)/autoopts' \
+	pkgdatadir='$(DESTDIR)$(pkgdatadir)' \
 	top_builddir='$(top_builddir)' \
-	export destdir top_builddir ; \
-	$(SHELL) $(srcdir)/install-options-h
+	LIBOPTS_VER='$(LIBOPTS_VER)' \
+	conf_shell='$(conf_shell)'  \
+	$(SHELL) $(srcdir)/install-options-h $(TPL_FILES)
 
 libopts.i : libopts.o
 	$(COMPILE) -E libopts.c > libopts-lines.i
