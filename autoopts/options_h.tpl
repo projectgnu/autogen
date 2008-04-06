@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-11-16 21:32:33 bkorb"
-# ID:  $Id: options_h.tpl,v 4.38 2008/01/23 00:35:27 bkorb Exp $
+# Time-stamp:      "2008-02-03 10:04:01 bkorb"
+# ID:  $Id: options_h.tpl,v 4.39 2008/04/06 22:49:07 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -87,11 +87,9 @@ h=options.h
  ;;;
 
 (shellf "
-sed 's/@AO_SOVERS@/%s/' options.tpl > XXXX
-mv -f XXXX options.tpl
 sed 's/@AO_TEMPLATE_VERSION@/%s/' opthead.tpl > XXXX
 mv -f XXXX opthead.tpl"
- (get "vers-sovers") (get "vers-curr"))
+ (get "vers-curr"))
 
 =]
 #define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
