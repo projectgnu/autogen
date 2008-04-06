@@ -3,8 +3,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2007-12-02 10:42:42 bkorb"
- *  Last Modified:     $Date: 2007/12/02 22:41:16 $
+/*  Time-stamp:        "2008-04-06 15:42:34 bkorb"
+ *  Last Modified:     $Date: 2008/04/06 22:49:30 $
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,11 +24,11 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.25 2007/12/02 22:41:16 bkorb Exp $
+ *  $Id: misc.def,v 4.26 2008/04/06 22:49:30 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.25 $";
+version = "$Revision: 4.26 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -433,6 +433,7 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
+	AC_CHECK_HEADERS(libio.h)
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
 	AC_CHECK_FUNCS(fopencookie funopen, break)
@@ -442,6 +443,32 @@ do-always = <<- _END_ALWAYS_
 	   ;;
 	esac
 	AC_C_INLINE
+
+	# Note that BSD does not typedef these in its headers, but instead
+	# calls for them to be identical in signature to read(2), write(2),
+	# lseek(2), and close(2).  Newlib however does include typedefs
+	# in its stdio.h for these, and they do not match the signatures
+	# of the BSD implementation.  So this test relies on the fact
+	# that any typedef will succeed for BSD, while only one that
+	# matches the existing definitions in stdio.h will succeed for
+	# a newlib system.
+
+	if test "X${ac_cv_func_funopen}" = Xyes; then
+	  AC_CACHE_CHECK([for cookie_function_t type],
+	    [ag_cv_cookie_function_t],
+	    [AC_TRY_COMPILE([#include <stdio.h>
+	      typedef int cookie_read_function_t (void *, char *, int);
+	      ], [], ag_cv_cookie_function_t="bsd",
+	      AC_TRY_COMPILE([#include <stdio.h>
+	        typedef ssize_t cookie_read_function_t (void *, char *, size_t);
+	        ], [], ag_cv_cookie_function_t="newlib",
+	        AC_MSG_ERROR([Unknown flavor of cookie_XXX_t types])))])
+	fi	  
+	if test "X${ag_cv_cookie_function_t}" = Xbsd; then
+	  AC_DEFINE([NEED_COOKIE_FUNCTION_TYPEDEFS], [1],
+	    [Define if typedefs for the funopen function pointers are required.])
+	fi
+
 	AC_CACHE_CHECK([for static inline], [snv_cv_static_inline], [
 	AC_TRY_COMPILE([static inline foo(bar) int bar; { return bar; }],
 	  [return foo(0);],
