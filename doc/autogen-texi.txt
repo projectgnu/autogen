@@ -3429,6 +3429,11 @@ keyword entry.  @code{keyword} option types will have an enumeration and
 @code{set-membership} option types will have a set of unsigned bits
 @code{#define}-d.
 
+If the @code{arg-type} is specifically @code{keyword}, you may also add
+special handling code with a @code{extra-code} attribute.  After
+@code{optionEnumerationVal} has converted the input string into an
+enumeration, you may insert code to process this enumeration value
+(@code{pOptDesc->optArg.argEnum}).
 
 @node arg-optional
 @subsubsection Option Argument Optional
