@@ -1,7 +1,7 @@
 /*-
  * copyright (c) 2004-2008 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2007-07-04 11:20:11 bkorb"
+ * Time-stamp:      "2008-04-06 15:39:52 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -66,7 +66,9 @@
 #include <string.h>
 
 #if defined(HAVE_FOPENCOOKIE)
-#  include <libio.h>
+#  if defined(HAVE_LIBIO_H)
+#    include <libio.h>
+#  endif
    typedef _IO_off64_t  fmem_off_t;
    typedef int          seek_pos_t;
 
@@ -74,10 +76,12 @@
    typedef size_t  fmem_off_t;
    typedef fpos_t  seek_pos_t;
 
-   typedef int     (cookie_read_function_t )(void *, char *, int);
-   typedef int     (cookie_write_function_t)(void *, char const *, int);
-   typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
-   typedef int     (cookie_close_function_t)(void *);
+#  ifdef NEED_COOKIE_FUNCTION_TYPEDEFS
+     typedef int     (cookie_read_function_t )(void *, char *, int);
+     typedef int     (cookie_write_function_t)(void *, char const *, int);
+     typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
+     typedef int     (cookie_close_function_t)(void *);
+#  endif /* NEED_COOKIE_FUNCTION_TYPEDEFS */
 
 #else
 #  error  OOPS
