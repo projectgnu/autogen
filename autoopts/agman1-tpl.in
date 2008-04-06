@@ -4,7 +4,7 @@
 ##
 ##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2007-11-10 14:14:12 bkorb"
+## Time-stamp:      "2008-04-06 14:27:40 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -29,7 +29,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.14 2007/11/11 06:13:28 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.15 2008/04/06 22:46:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -365,10 +365,10 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: DEBUG
-:+][+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  )   :+]
 .fi
+or their numeric equivalent.
 .in -4[+: (if (exist? "arg-default") "\n.sp" ) :+][+:
 
       ELIF (=* (get "arg-type") "num")         :+]
