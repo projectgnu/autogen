@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.30 2008/01/23 00:35:27 bkorb Exp $
+# $Id: opthead.tpl,v 4.31 2008/04/06 22:48:04 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-08-04 12:10:26 bkorb"
+# Time-stamp:      "2008-04-06 12:10:06 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -173,7 +173,16 @@ ELSE we have a prefix:
 
   UP-prefix pname ) =][=
 
-ENDIF prefix/not    =]
+ENDIF prefix/not    =][=
+
+  IF (exist? "export")  =]
+
+/* * * * * *
+ *
+ *  Globals exported from the [=prog_title=] option definitions
+ */
+[=  (join "\n\n" (stack "export")) =][=
+  ENDIF  export? =]
 [=
 
 CASE guard-option-names               =][=
@@ -220,7 +229,8 @@ CASE guard-option-names               =][=
 ESAC on guard-option-names
 
 =]
-/*
+/* * * * * *
+ *
  *  Interface defines for specific options.
  */[=
 
@@ -246,7 +256,7 @@ FOR flag =][=
  ENDIF                =][=
 ENDFOR  flag
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 Autoopts maintained option values.
 
@@ -257,8 +267,7 @@ Otherwise, we will use the INDEX_* values for the option value.
 There are no documentation strings because these defines
 are used identically to the user-generated VALUE defines.
 
-:=]
-[=
+=][=
 
 DEFINE set-std-value =]
 #define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
@@ -393,15 +402,6 @@ extern "C" {
 #endif
 
 extern tOptions   [=(. pname)=]Options;[=
-
-  IF (exist? "export")  =]
-
-/* * * * * *
- *
- *  Globals exported from the [=prog_title=] option definitions
- */
-[=  (join "\n\n" (stack "export")) =][=
-  ENDIF  export? =][=
 
  (if (> (string-length added-hdr) 0)
      (begin
