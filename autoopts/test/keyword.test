@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2007-11-12 21:43:01 bkorb"
+# Time-stamp:        "2008-04-06 16:58:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: keyword.test,v 4.15 2008/01/23 00:35:27 bkorb Exp $
+# $Id: keyword.test,v 4.16 2008/04/07 00:03:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -199,6 +199,7 @@ The available keywords are:
 nothing      templates    block-macros
 expressions  explanations
 .fi
+or their numeric equivalent.
 .in -4
 .sp
 The default \fIlevel\fP for this option is:
@@ -226,6 +227,7 @@ ninth       tenth       eleventh    twelfth
 thirteenth  fourteenth  fifteenth   sixteenth
 seventeenth eighteenth
 .fi
+or their numeric equivalent.
 .in -4
 .sp
 The default \fImember-list\fP for this option is:
