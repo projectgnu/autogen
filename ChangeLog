@@ -1,3 +1,21 @@
+2008-04-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c (): Only typedef the function types when it is needed.
+	It is not needed (and problematical) for a future release of CygWin
+	* autoopts/Makefile.am: Fix up template handling.
+	* autoopts/agman1.tpl: Note that numeric equivalents can be used for
+	enums, too.
+	* autoopts/install-options-h: Adjust for different template collection
+	names.
+	* autoopts/opthead.tpl (): Move the export definitions higher up
+	in the generated header.
+	* autoopts/options.tpl: Make the version more readable.
+	* autoopts/options_h.tpl: emit the more readable version into
+	the header comments
+	* config/misc.def: cope with CygWin
+	Thanks to: Brian Dessent <brian@dessent.net>
+	* doc/autogen-texi.txt: doc the extra-code for keyword options
+
 2007-12-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c (ag_scm_get_c_name): New: combines "get" with

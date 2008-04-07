@@ -87,3 +87,12 @@ now run configure as follows:
     --with-libguile-link='-L/opt/sfw/lib -lguile -lm -R/opt/sfw/lib'
 
 Isn't that special?
+
+
+***  Bootstrap note: ***
+
+I have some private tools referenced in the various bootstrap scripts.
+Unless you have these tools, bootstrap won't work for you.  I intend
+to fix this as time permits.  Meanwhile, there is also a tarball in CVS
+of all the bootstrap-generated files:
+   noag-boot.sh

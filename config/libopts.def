@@ -3,8 +3,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Last Modified:     $Date: 2007/10/07 16:54:54 $
- *  Time-stamp:        "2007-10-06 11:58:09 bkorb"
+/*  Last Modified:     $Date: 2008/04/07 00:03:30 $
+ *  Time-stamp:        "2008-04-06 16:43:49 bkorb"
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,12 +24,12 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.20 2007/10/07 16:54:54 bkorb Exp $
+ *  $Id: libopts.def,v 4.21 2008/04/07 00:03:30 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.20 $";
+version     = "$Revision: 4.21 $";
 output-file = libopts.m4;
 
 test   = {
@@ -307,14 +307,11 @@ do-first = <<-_EOF_
 	# ========================
 	AC_CHECK_HEADERS(stdint.h inttypes.h, break)
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
-	   intptr_t, uint_t])
+	   intptr_t, uintptr_t, uint_t])
 
-	# ====================
-	# uintptr type & sizes
-	# ====================
-	AC_CHECK_TYPES([uintptr_t], ,
-	       [AC_DEFINE([uintptr_t], unsigned long,
-	                  [Alternate uintptr_t for systems without it.])])
+	# =====
+	# sizes
+	# =====
 	AC_CHECK_SIZEOF(char*, 4)
 	AC_CHECK_SIZEOF(int,   4)
 	AC_CHECK_SIZEOF(long,  4)
