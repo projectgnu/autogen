@@ -2,7 +2,7 @@
 
 ##  Documentation template
 ##
-## Time-stamp:        "2007-07-04 11:52:17 bkorb"
+## Time-stamp:        "2008-04-06 17:19:47 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: aginfo-tpl.in,v 4.4 2007/10/07 16:54:54 bkorb Exp $
+## $Id: aginfo-tpl.in,v 4.5 2008/04/14 15:33:43 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 (setenv "SHELL" "/bin/sh")
@@ -261,6 +261,10 @@ The available keywords are:
             (join "\n" (stack "keyword"))  ) =]
 @end example
 [=
+
+      IF (=* (get "arg-type") "key") =]
+or their numeric equivalent.[=
+      ENDIF =][=
 
     ENDIF key/set arg =][=
 

@@ -77,8 +77,8 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
   # ----------------------------------------------------------------------
   # Checks for typedefs
   # ----------------------------------------------------------------------
-  AC_CHECK_TYPE(wchar_t)
-  AC_CHECK_TYPE(wint_t, [], [], [
+  AC_CHECK_TYPES(wchar_t)
+  AC_CHECK_TYPES(wint_t, [], [], [
     AC_INCLUDES_DEFAULT
     #if HAVE_RUNETYPE_H
     # include <runetype.h>
@@ -87,7 +87,7 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
     # include <wchar.h>
     #endif
     ])
-  AC_CHECK_TYPES([long double, intmax_t, size_t])
+  AC_CHECK_TYPES([long double], [intmax_t], [size_t])
 
   # ----------------------------------------------------------------------
   # Checks for library calls

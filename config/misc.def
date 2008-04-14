@@ -3,8 +3,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2008-04-06 15:42:34 bkorb"
- *  Last Modified:     $Date: 2008/04/06 22:49:30 $
+/*  Time-stamp:        "2008-04-06 17:52:12 bkorb"
+ *  Last Modified:     $Date: 2008/04/14 15:33:43 $
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,11 +24,11 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: misc.def,v 4.26 2008/04/06 22:49:30 bkorb Exp $
+ *  $Id: misc.def,v 4.27 2008/04/14 15:33:43 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 group = ag;
-version = "$Revision: 4.26 $";
+version = "$Revision: 4.27 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -150,7 +150,8 @@ test   = {
            };
 
   action = { no; act-type = script; asis;
-             act-text = '  AC_MSG_ERROR([Cannot find working libguile])';
+             act-text = '  AC_MSG_ERROR([Cannot find libguile.'
+                        '  libguile is required.])';
            };
 
   doc = <<- _END_OF_DOC_

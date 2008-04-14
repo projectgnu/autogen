@@ -1,10 +1,19 @@
+2008-04-09  Gary V. Vaughan  <gary@gnu.org>
+
+	* snprintfv/snprintfv.m4 (wint_t, wchar_t): Use AC_CHECK_TYPES so
+	that autoheader defines entries in config-h.in for wint_t and
+	wchar_t, since AC_CHECK_TYPE doesn't automatically call AC_DEFINE
+	when autoconf can't find a type.
+	Reported by Harlan Stenn <Harlan.Stenn@pfcs.com>
+
 2008-04-06  Bruce Korb  <bkorb@gnu.org>
 
-	* agen5/fmemopen.c (): Only typedef the function types when it is needed.
+	* agen5/fmemopen.c: Only typedef the function types when it is needed.
 	It is not needed (and problematical) for a future release of CygWin
 	* autoopts/Makefile.am: Fix up template handling.
 	* autoopts/agman1.tpl: Note that numeric equivalents can be used for
 	enums, too.
+	* autoopts/aginfo.tpl: ditto
 	* autoopts/install-options-h: Adjust for different template collection
 	names.
 	* autoopts/opthead.tpl (): Move the export definitions higher up

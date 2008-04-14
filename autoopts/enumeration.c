@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.22 2008/01/23 00:35:27 bkorb Exp $
- * Time-stamp:      "2007-11-12 21:42:14 bkorb"
+ *  $Id: enumeration.c,v 4.23 2008/04/14 15:33:43 bkorb Exp $
+ * Time-stamp:      "2008-04-06 17:32:20 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -208,20 +208,10 @@ findName(
     if (res < name_ct)
         return res; /* partial match */
 
-    if (res == name_ct) {
-        pz_enum_err_fmt = zNoKey; /* no partial matches */
-
-    } else {
-        /*
-         *  Too many partial matches.
-         */
-        pz_enum_err_fmt = zAmbigKey;
-        res = name_ct;
-    }
-
+    pz_enum_err_fmt = (res == name_ct) ? zNoKey : zAmbigKey;
     option_usage_fp = stderr;
     enumError(pOpts, pOD, paz_names, (int)name_ct);
-    return res;
+    return name_ct;
 }
 
 
@@ -318,7 +308,7 @@ optionEnumerationVal(
     }
 
     default:
-        res = findName( pOD->optArg.argString, pOpts, pOD, paz_names, name_ct );
+        res = findName(pOD->optArg.argString, pOpts, pOD, paz_names, name_ct);
 
         if (pOD->fOptState & OPTST_ALLOC_ARG) {
             AGFREE(pOD->optArg.argString);
@@ -469,6 +459,8 @@ optionSetMembers(
                 if (pz != pzArg + len) {
                     char z[ AO_NAME_SIZE ];
                     tCC* p;
+                    int  shift_ct;
+
                     if (*pz != NUL) {
                         if (len >= AO_NAME_LIMIT)
                             break;
@@ -479,7 +471,12 @@ optionSetMembers(
                         p = pzArg;
                     }
 
-                    bit = 1UL << findName(p, pOpts, pOD, paz_names, name_ct);
+                    shift_ct = findName(p, pOpts, pOD, paz_names, name_ct);
+                    if (shift_ct >= name_ct) {
+                        pOD->optCookie = (void*)0;
+                        return;
+                    }
+                    bit = 1UL << shift_ct;
                 }
                 if (iv)
                      res &= ~bit;
