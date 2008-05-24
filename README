@@ -45,7 +45,12 @@ applications that use those templates.
 
    autogen -L $prefix/share/autogen --save=$HOME/.autogenrc
 
-4. You can build and install AutoGen, ensuring you have the
+4. If you have an old Guile library, you will find that its error reporting
+   does not work so well.  Consequently, you will see "make check" failures
+   in the output text where you would expect to find file name and line
+   number references for the invalid input.  Please upgrade your Guile lib.
+
+5. You can build and install AutoGen, ensuring you have the
    automake/autoconf/libtool-s needed, and then editing
    agen5/opts.def thus:
 

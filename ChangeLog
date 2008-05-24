@@ -8,8 +8,6 @@
 
 2008-04-06  Bruce Korb  <bkorb@gnu.org>
 
-	* agen5/fmemopen.c: Only typedef the function types when it is needed.
-	It is not needed (and problematical) for a future release of CygWin
 	* autoopts/Makefile.am: Fix up template handling.
 	* autoopts/agman1.tpl: Note that numeric equivalents can be used for
 	enums, too.
@@ -24,6 +22,18 @@
 	* config/misc.def: cope with CygWin
 	Thanks to: Brian Dessent <brian@dessent.net>
 	* doc/autogen-texi.txt: doc the extra-code for keyword options
+	* autoopts/enumeration.c (optionSetMembers): Accommodate a failure
+	to find a named value.
+	* autoopts/install-options-h: burn the config shell name into all
+	installed templates.
+	* compat/compat.h: add in hackarounds for missing standard int types.
+
+2008-03-11  Brian Dessent  <brian@dessent.net>
+
+	* config/misc.def (do_always): Check for funopen cookie typedefs
+	and define FUNOPEN_FLAVOR to 'bsd' or 'newlib'.
+	* agen5/fmemopen.c: Don't define typedefs for cookie_*_function_t
+	types for newlib systems.
 
 2007-12-10  Bruce Korb  <bkorb@gnu.org>
 
