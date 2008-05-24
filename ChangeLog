@@ -1,3 +1,7 @@
+2008-05-24  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.5 release
+
 2008-04-09  Gary V. Vaughan  <gary@gnu.org>
 
 	* snprintfv/snprintfv.m4 (wint_t, wchar_t): Use AC_CHECK_TYPES so
@@ -34,6 +38,10 @@
 	and define FUNOPEN_FLAVOR to 'bsd' or 'newlib'.
 	* agen5/fmemopen.c: Don't define typedefs for cookie_*_function_t
 	types for newlib systems.
+
+2007-12-23  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.4 release
 
 2007-12-10  Bruce Korb  <bkorb@gnu.org>
 
