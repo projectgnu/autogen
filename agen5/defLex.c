@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.26 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: defLex.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 22:33:12 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-06-07 15:06:50 bkorb"
+ *  Last Committed:    $Date: 2008/06/14 22:23:53 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -164,7 +164,7 @@ scanAgain:
         if (pCurCtx->pzScan[1] != '<')
             goto BrokenToken;
 
-        pz = assembleHereString( pCurCtx->pzScan + 2 );
+        pz = assembleHereString(pCurCtx->pzScan + 2);
         if (pz == NULL) {
             lastToken = DP_EV_INVALID;
             return DP_EV_INVALID;
@@ -519,10 +519,12 @@ assembleName( char* pzScan, te_dp_event* pRetVal )
 static char*
 assembleHereString( char* pzScan )
 {
+    static char const endless[] = "Unterminated HereString";
     ag_bool  trimTabs = AG_FALSE;
     char     zMark[ MAX_HEREMARK_LEN ];
     size_t   markLen = 0;
     char*    pzDest;
+    int      here_string_line_no;
 
     /*
      *  See if we are to strip leading tab chars
@@ -568,13 +570,13 @@ assembleHereString( char* pzScan )
      */
     pzScan = strchr( pzScan, '\n' );
     if (pzScan == NULL)
-        AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                        pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+        AG_ABEND( aprf( zErrMsg, pzProg, endless, pCurCtx->pzCtxFname,
+                        pCurCtx->lineNo ));
 
     /*
      *  And skip the first new line + conditionally skip tabs
      */
-    pCurCtx->lineNo++;
+    here_string_line_no = pCurCtx->lineNo++;
     pzScan++;
 
     if (trimTabs)
@@ -595,8 +597,8 @@ assembleHereString( char* pzScan )
                 goto lineDone;
 
             case NUL:
-                AG_ABEND( aprf( zErrMsg, pzProg, "Unterminated HereString",
-                                pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+                AG_ABEND( aprf( zErrMsg, pzProg, endless, pCurCtx->pzCtxFname,
+                                here_string_line_no));
             }
         } lineDone:;
 

@@ -1,6 +1,6 @@
 
 /*
- *  sort.c  $Id: sort.c,v 4.14 2008/01/23 00:35:27 bkorb Exp $
+ *  sort.c  $Id: sort.c,v 4.15 2008/06/14 22:23:53 bkorb Exp $
  * Time-stamp:      "2007-07-04 11:34:52 bkorb"
  *
  *  This module implements argument sorting.
@@ -28,7 +28,7 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static tSuccess
 mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
                char** ppzOpts, int* pOptsIdx );

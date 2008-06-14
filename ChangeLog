@@ -1,3 +1,22 @@
+2008-06-14  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defLex.c (assembleName): keep track of where the here string
+	starts, in case of an error.
+	* autoopts/configfile.c (handleStructure): when reading in a string
+	value in "XML" format, convert %HH byte code formats into the proper
+	character value.
+	* autoopts/load.c (assembleArgValue): a newline may also separate
+	a name from its argument string.
+	* autoopts/save.c (print_a_value): print any kind of value, including
+	hierarchical values.  If an enumeration or set membership conversion
+	function is available, use that.  Otherwise, emit them as numbers.
+	(printValueList): print a list of values from an argument array
+	(printHierarchyList): The list must come from an option descriptor.
+	* autoopts/test/nested.test: augment to test this stuff.
+	* compat/compat.h (wchar_t, mode_t, uid_t, gid_t): remove
+	* config/libopts.def (AC_CHECK_TYPES): add pid_t
+	* configure.in (AC_CHECK_TYPES): remove mode_t, pid_t, uid_t and gid_t
+
 2008-05-24  Bruce Korb  <bkorb@gnu.org>
 
 	5.9.5 release

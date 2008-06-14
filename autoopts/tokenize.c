@@ -31,7 +31,7 @@
 #define ch_t   unsigned char
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 copy_cooked( ch_t** ppDest, char const ** ppSrc );
 

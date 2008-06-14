@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.26 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2008-01-22 11:40:15 bkorb"
+ *  $Id: nested.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
+ *  Time-stamp:      "2008-06-14 11:20:06 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -28,7 +28,7 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 removeLineContinue( char* pzSrc );
 
@@ -292,9 +292,9 @@ scanNameEntry(char const* pzName, tOptionValue* pRes)
      *  Scan over characters that name a value.  These names may not end
      *  with a colon, but they may contain colons.
      */
-    while (IS_VALUE_NAME_CHAR(*pzScan))      { pzScan++; nameLen++; }
-    if (pzScan[-1] == ':')              { pzScan--; nameLen--; }
-    while (IS_HORIZ_WHITE_CHAR(*pzScan))     pzScan++;
+    while (IS_VALUE_NAME_CHAR(*pzScan))   { pzScan++; nameLen++; }
+    if (pzScan[-1] == ':')                { pzScan--; nameLen--; }
+    while (IS_HORIZ_WHITE_CHAR(*pzScan))    pzScan++;
 
 re_switch:
     switch (*pzScan) {

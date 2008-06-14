@@ -1,6 +1,6 @@
 
 /*
- *  $Id: putshell.c,v 4.23 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: putshell.c,v 4.24 2008/06/14 22:23:53 bkorb Exp $
  * Time-stamp:      "2007-11-12 20:39:57 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -30,7 +30,7 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 putQuotedStr( tCC* pzStr );
 /* = = = END-STATIC-FORWARD = = = */

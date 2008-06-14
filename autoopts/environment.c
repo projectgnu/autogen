@@ -1,6 +1,6 @@
 
 /*
- *  $Id: environment.c,v 4.16 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: environment.c,v 4.17 2008/06/14 22:23:53 bkorb Exp $
  * Time-stamp:      "2007-07-04 11:33:50 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -31,7 +31,10 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
+static void
+checkEnvOpt(tOptState * os, char * env_name,
+            tOptions* pOpts, teEnvPresetType type);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*

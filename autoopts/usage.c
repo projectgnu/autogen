@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.24 2008/01/23 00:35:27 bkorb Exp $
+ *  usage.c  $Id: usage.c,v 4.25 2008/06/14 22:23:53 bkorb Exp $
  * Time-stamp:      "2007-11-12 20:49:02 bkorb"
  *
  *  This module implements the default usage procedure for
@@ -44,7 +44,7 @@ static char    zOptFmtLine[ 16 ];
 static ag_bool displayEnum;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static ag_bool
 checkGNUUsage( tOptions* pOpts );
 

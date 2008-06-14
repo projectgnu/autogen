@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 4.15 2008/01/23 00:35:27 bkorb Exp $
+/*  $Id: version.c,v 4.16 2008/06/14 22:23:53 bkorb Exp $
  * Time-stamp:      "2008-01-22 15:41:47 bkorb"
  *
  *  This module implements the default usage procedure for
@@ -34,7 +34,7 @@ static char const zAOV[] =
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
 /* = = = END-STATIC-FORWARD = = = */

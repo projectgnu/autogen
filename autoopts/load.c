@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.34 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2007-11-12 20:38:32 bkorb"
+ *  $Id: load.c,v 4.35 2008/06/14 22:23:53 bkorb Exp $
+ *  Time-stamp:      "2008-06-14 11:11:37 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -32,7 +32,7 @@
 tOptionLoadMode option_load_mode = OPTION_LOAD_UNCOOKED;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static ag_bool
 insertProgramPath(
     char*   pzBuf,
@@ -339,7 +339,7 @@ mungeString( char* pzTxt, tOptionLoadMode mode )
 static char*
 assembleArgValue( char* pzTxt, tOptionLoadMode mode )
 {
-    tSCC zBrk[] = " \t:=";
+    tSCC zBrk[] = " \t\n:=";
     char* pzEnd = strpbrk( pzTxt, zBrk );
     int   space_break;
 

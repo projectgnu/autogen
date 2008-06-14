@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.40 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2007-11-17 01:32:00 bkorb"
+ *  $Id: configfile.c,v 4.41 2008/06/14 22:23:53 bkorb Exp $
+ *  Time-stamp:      "2008-06-14 12:07:53 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -27,7 +27,7 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static void
 filePreset(
     tOptions*     pOpts,
@@ -417,7 +417,7 @@ filePreset(
     int           direction )
 {
     tmap_info_t   cfgfile;
-    tOptState     st = OPTSTATE_INITIALIZER(PRESET);
+    tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
     char*         pzFileText =
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
 
@@ -425,8 +425,8 @@ filePreset(
         return;
 
     if (direction == DIRECTION_CALLED) {
-        st.flags  = OPTST_DEFINED;
-        direction = DIRECTION_PROCESS;
+        optst.flags = OPTST_DEFINED;
+        direction   = DIRECTION_PROCESS;
     }
 
     /*
@@ -436,18 +436,19 @@ filePreset(
      *  and we consider stuff set herein to be "set" by the client program.
      */
     if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
-        st.flags = OPTST_SET;
+        optst.flags = OPTST_SET;
 
     do  {
         while (IS_WHITESPACE_CHAR(*pzFileText))  pzFileText++;
 
         if (IS_VAR_FIRST_CHAR(*pzFileText)) {
-            pzFileText = handleConfig( pOpts, &st, pzFileText, direction );
+            pzFileText = handleConfig(pOpts, &optst, pzFileText, direction);
 
         } else switch (*pzFileText) {
         case '<':
             if (IS_VAR_FIRST_CHAR(pzFileText[1]))
-                pzFileText = handleStructure(pOpts, &st, pzFileText, direction);
+                pzFileText =
+                    handleStructure(pOpts, &optst, pzFileText, direction);
 
             else switch (pzFileText[1]) {
             case '?':
@@ -679,7 +680,7 @@ handleStructure(
     int           direction )
 {
     tOptionLoadMode mode = option_load_mode;
-    tOptionValue     valu;
+    tOptionValue    valu;
 
     char* pzName = ++pzText;
     char* pzData;
@@ -751,6 +752,32 @@ handleStructure(
      *  Erase any attributes parsed by "parseAttributes()".
      */
     memset(pcNulPoint, ' ', pzData - pcNulPoint);
+
+    if ((pOS->pOD->fOptState & OPTST_ARG_TYPE_MASK) == OPARG_TYPE_STRING) {
+        char * pzSrc = pzData;
+        char * pzDst = pzData;
+        char bf[4];
+        bf[2] = NUL;
+
+        for (;;) {
+            int ch = ((int)*(pzSrc++)) & 0xFF;
+            switch (ch) {
+            case NUL: goto string_fixup_done;
+
+            case '%':
+                bf[0] = *(pzSrc++);
+                bf[1] = *(pzSrc++);
+                if ((bf[0] == NUL) || (bf[1] == NUL))
+                    goto string_fixup_done;
+                ch = strtoul(bf, NULL, 16);
+                /* FALLTHROUGH */
+
+            default:
+                *(pzDst++) = ch;
+            }
+        } string_fixup_done:;
+        *pzDst = NUL;
+    }
 
     /*
      *  "pzName" points to what looks like text for one option/configurable.
@@ -912,35 +939,37 @@ optionFileLoad( tOptions* pOpts, char const* pzProgram )
 void
 optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
 {
+    struct stat sb;
+
     /*
      *  IF the option is not being disabled, THEN load the file.  There must
      *  be a file.  (If it is being disabled, then the disablement processing
      *  already took place.  It must be done to suppress preloading of ini/rc
      *  files.)
      */
-    if (! DISABLED_OPT( pOptDesc )) {
-        struct stat sb;
-        if (stat( pOptDesc->optArg.argString, &sb ) != 0) {
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
+    if (DISABLED_OPT(pOptDesc))
+        return;
 
-            fprintf( stderr, zFSErrOptLoad, errno, strerror( errno ),
-                     pOptDesc->optArg.argString );
-            exit(EX_NOINPUT);
-            /* NOT REACHED */
-        }
+    if (stat( pOptDesc->optArg.argString, &sb ) != 0) {
+        if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+            return;
 
-        if (! S_ISREG( sb.st_mode )) {
-            if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
-                return;
-
-            fprintf( stderr, zNotFile, pOptDesc->optArg.argString );
-            exit(EX_NOINPUT);
-            /* NOT REACHED */
-        }
-
-        filePreset(pOpts, pOptDesc->optArg.argString, DIRECTION_CALLED);
+        fprintf( stderr, zFSErrOptLoad, errno, strerror( errno ),
+                 pOptDesc->optArg.argString );
+        exit(EX_NOINPUT);
+        /* NOT REACHED */
     }
+
+    if (! S_ISREG( sb.st_mode )) {
+        if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
+            return;
+
+        fprintf( stderr, zNotFile, pOptDesc->optArg.argString );
+        exit(EX_NOINPUT);
+        /* NOT REACHED */
+    }
+
+    filePreset(pOpts, pOptDesc->optArg.argString, DIRECTION_CALLED);
 }
 
 

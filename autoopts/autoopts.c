@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.36 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: autoopts.c,v 4.37 2008/06/14 22:23:53 bkorb Exp $
  *  Time-stamp:      "2007-11-12 20:35:53 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -33,7 +33,7 @@
 static char const zNil[] = "";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState );
 

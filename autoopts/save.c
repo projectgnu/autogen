@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.26 2008/01/23 00:35:27 bkorb Exp $
- * Time-stamp:      "2007-09-08 13:04:32 bkorb"
+ *  save.c  $Id: save.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
+ * Time-stamp:      "2008-06-14 15:16:11 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -32,7 +32,7 @@
 tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
+/* static forward declarations maintained by mk-fwd */
 static tCC*
 findDirName( tOptions* pOpts, int* p_free );
 
@@ -44,6 +44,15 @@ printEntry(
     FILE *     fp,
     tOptDesc * p,
     tCC*       pzLA );
+
+static void
+print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp);
+
+static void
+printValueList(FILE * fp, char const * name, tArgList * al);
+
+static void
+printHierarchy(FILE * fp, tOptDesc * p);
 /* = = = END-STATIC-FORWARD = = = */
 
 static tCC*
@@ -309,6 +318,169 @@ printEntry(
 }
 
 
+static void
+print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
+{
+    static char const open_atr[]  = "<%s>";
+    static char const bool_atr[]  = "<%1$s type=\"boolean\">%2$s</%1$s>\n";
+    static char const numb_atr[]  = "<%1$s type=\"integer\">0x%2$lX</%1$s>\n";
+    static char const type_atr[]  = "<%s type=\"%s\">";
+    static char const null_atr[]  = "<%s/>\n";
+    static char const close_atr[] = "</%s>\n";
+
+    while (--depth >= 0)
+        putc(' ', fp), putc(' ', fp);
+
+    switch (ovp->valType) {
+    default:
+    case OPARG_TYPE_NONE:
+        fprintf(fp, null_atr, ovp->pzName);
+        break;
+
+    case OPARG_TYPE_STRING:
+    {
+        char const * pz = ovp->v.strVal;
+
+        fprintf(fp, open_atr, ovp->pzName);
+        for (;;) {
+            int ch = ((int)*(pz++)) & 0xFF;
+
+            switch (ch) {
+            case NUL: goto string_done;
+
+            case '%':
+            case '<':
+            case 1 ... (' ' - 1):
+            case ('~' + 1) ... 0xFF:
+                fprintf(fp, "%%%02X", ch);
+                break;
+
+            default:
+                putc(ch, fp);
+            }
+        } string_done:;
+        fprintf(fp, close_atr, ovp->pzName);
+        break;
+    }
+    case OPARG_TYPE_ENUMERATION:
+    case OPARG_TYPE_MEMBERSHIP:
+        if (pOD != NULL) {
+            uintptr_t val = pOD->optArg.argEnum;
+            char const * typ = (ovp->valType == OPARG_TYPE_ENUMERATION)
+                ? "keyword" : "set-membership";
+
+            fprintf(fp, type_atr, ovp->pzName, typ);
+
+            /*
+             *  This is a magic incantation that will convert the
+             *  bit flag values back into a string suitable for printing.
+             */
+            (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
+            if (pOD->optArg.argString != NULL) {
+                fputs(pOD->optArg.argString, fp);
+
+                if (ovp->valType != OPARG_TYPE_ENUMERATION) {
+                    /*
+                     *  set membership strings get allocated
+                     */
+                    AGFREE( (void*)pOD->optArg.argString );
+                    pOD->fOptState &= ~OPTST_ALLOC_ARG;
+                }
+            }
+
+            pOD->optArg.argEnum = val;
+            fprintf(fp, close_atr, ovp->pzName);
+            break;
+        }
+        /* FALLTHROUGH */
+
+    case OPARG_TYPE_NUMERIC:
+        fprintf(fp, numb_atr, ovp->pzName, ovp->v.longVal);
+        break;
+
+    case OPARG_TYPE_BOOLEAN:
+        fprintf(fp, bool_atr, ovp->pzName,
+                ovp->v.boolVal ? "true" : "false");
+        break;
+
+    case OPARG_TYPE_HIERARCHY:
+        printValueList(fp, ovp->pzName, ovp->v.nestVal);
+        break;
+    }
+}
+
+
+static void
+printValueList(FILE * fp, char const * name, tArgList * al)
+{
+    static int depth = 1;
+
+    int sp_ct;
+    int opt_ct;
+    void ** opt_list;
+
+    if (al == NULL)
+        return;
+    opt_ct   = al->useCt;
+    opt_list = (void **)al->apzArgs;
+
+    if (opt_ct <= 0) {
+        fprintf(fp, "<%s/>\n", name);
+        return;
+    }
+
+    fprintf(fp, "<%s>\n", name);
+
+    depth++;
+    while (--opt_ct >= 0) {
+        tOptionValue const * ovp = *(opt_list++);
+
+        print_a_value(fp, depth, NULL, ovp);
+    }
+    depth--;
+
+    for (sp_ct = depth; --sp_ct >= 0;)
+        putc(' ', fp), putc(' ', fp);
+    fprintf(fp, "</%s>\n", name);
+}
+
+
+static void
+printHierarchy(FILE * fp, tOptDesc * p)
+{
+    int opt_ct;
+    tArgList * al = p->optCookie;
+    void ** opt_list;
+
+    if (al == NULL)
+        return;
+
+    opt_ct   = al->useCt;
+    opt_list = (void **)al->apzArgs;
+
+    if (opt_ct <= 0)
+        return;
+
+    do  {
+        tOptionValue const * base = *(opt_list++);
+        tOptionValue const * ovp = optionGetValue(base, NULL);
+
+        if (ovp == NULL)
+            continue;
+
+        fprintf(fp, "<%s>\n", p->pz_Name);
+
+        do  {
+            print_a_value(fp, 1, p, ovp);
+
+        } while (ovp = optionNextValue(base, ovp),
+                 ovp != NULL);
+
+        fprintf(fp, "</%s>\n", p->pz_Name);
+    } while (--opt_ct > 0);
+}
+
+
 /*=export_func  optionSaveFile
  *
  * what:  saves the option state to a file
@@ -323,6 +495,14 @@ printEntry(
  * @code{homerc} attribute.  If no @code{rcfile} attribute was specified, it
  * will default to @code{.@i{programname}rc}.  If you wish to specify another
  * file, you should invoke the @code{SET_OPT_SAVE_OPTS( @i{filename} )} macro.
+ *
+ * The recommend usage is as follows:
+ * @example
+ *    optionProcess(&progOptions, argc, argv);
+ *    if (i_want_a_non_standard_place_for_this)
+ *        SET_OPT_SAVE_OPTS("myfilename");
+ *    optionSaveFile(&progOptions);
+ * @end example
  *
  * err:
  *
@@ -481,6 +661,10 @@ optionSaveFile( tOptions* pOpts )
 
         case OPARG_TYPE_BOOLEAN:
             printEntry( fp, p, p->optArg.argBool ? "true" : "false" );
+            break;
+
+        case OPARG_TYPE_HIERARCHY:
+            printHierarchy(fp, p);
             break;
 
         default:
