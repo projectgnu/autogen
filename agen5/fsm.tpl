@@ -4,10 +4,9 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2007-11-04 17:34:51 bkorb"
+#  Time-stamp:      "2008-06-14 16:09:07 bkorb"
 
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it

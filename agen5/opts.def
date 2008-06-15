@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.29 2007/12/02 23:39:50 bkorb Exp $
- *  Time-stamp:        "2007-12-02 15:38:40 bkorb"
- *  Last Committed:    $Date: 2007/12/02 23:39:50 $
+ *  $Id: opts.def,v 4.30 2008/06/15 14:59:05 bkorb Exp $
+ *  Time-stamp:        "2008-06-14 16:13:16 bkorb"
+ *  Last Committed:    $Date: 2008/06/15 14:59:05 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -25,7 +25,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date  = "1992-2007";
+    date  = "1992-2008";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
     type  = gpl;
