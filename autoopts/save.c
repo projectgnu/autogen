@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
- * Time-stamp:      "2008-06-14 15:16:11 bkorb"
+ *  save.c  $Id: save.c,v 4.28 2008/06/15 19:03:29 bkorb Exp $
+ * Time-stamp:      "2008-06-15 11:54:49 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -322,9 +322,9 @@ static void
 print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
 {
     static char const open_atr[]  = "<%s>";
-    static char const bool_atr[]  = "<%1$s type=\"boolean\">%2$s</%1$s>\n";
-    static char const numb_atr[]  = "<%1$s type=\"integer\">0x%2$lX</%1$s>\n";
-    static char const type_atr[]  = "<%s type=\"%s\">";
+    static char const bool_atr[]  = "<%1$s type=boolean>%2$s</%1$s>\n";
+    static char const numb_atr[]  = "<%1$s type=integer>0x%2$lX</%1$s>\n";
+    static char const type_atr[]  = "<%s type=%s>";
     static char const null_atr[]  = "<%s/>\n";
     static char const close_atr[] = "</%s>\n";
 
@@ -348,11 +348,12 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
             switch (ch) {
             case NUL: goto string_done;
 
-            case '%':
+            case '&':
             case '<':
+            case '>':
             case 1 ... (' ' - 1):
             case ('~' + 1) ... 0xFF:
-                fprintf(fp, "%%%02X", ch);
+                emit_special_char(fp, ch);
                 break;
 
             default:
@@ -429,7 +430,7 @@ printValueList(FILE * fp, char const * name, tArgList * al)
         return;
     }
 
-    fprintf(fp, "<%s>\n", name);
+    fprintf(fp, "<%s type=nested>\n", name);
 
     depth++;
     while (--opt_ct >= 0) {
@@ -468,7 +469,7 @@ printHierarchy(FILE * fp, tOptDesc * p)
         if (ovp == NULL)
             continue;
 
-        fprintf(fp, "<%s>\n", p->pz_Name);
+        fprintf(fp, "<%s type=nested>\n", p->pz_Name);
 
         do  {
             print_a_value(fp, 1, p, ovp);

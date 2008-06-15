@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2007-12-10 09:46:11 bkorb"
+# Time-stamp:     "2008-06-15 08:21:10 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2008/01/23 00:35:27 $
+# Last Modified:  $Date: 2008/06/15 19:03:29 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.21 2008/01/23 00:35:27 bkorb Exp $
+# $Id: defs.in,v 4.22 2008/06/15 19:03:29 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -64,6 +64,8 @@ LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
 : ${testsubdir:=@testsubdir@}
 : ${CC:=@CC@}
 test -z "${CC}" && echo "No CC configured" && exit 1
+nl='
+'
 
 #  If only the "rm(1)" command could be relied upon....
 #

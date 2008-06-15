@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2008-06-14 13:18:24 bkorb"
+# Time-stamp:        "2008-06-15 11:58:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/06/14 22:23:53 $
+# Last Modified:     $Date: 2008/06/15 19:03:29 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,7 +29,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: nested.test,v 4.9 2008/06/14 22:23:53 bkorb Exp $
+# $Id: nested.test,v 4.10 2008/06/15 19:03:29 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -188,7 +188,7 @@ cmp -s ${testname}-res1.* || \
 
 # # # # # # # # # # DOUBLE ARG TEST # # # # # # # # #
 
-arg1='stumble, foo, <bar type=integer>1234</bar>, able'
+arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 (./${testname} -s "${arg1}" -s "${arg2}" \
     | sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
@@ -200,7 +200,7 @@ cat > ${testname}-res2.base <<- _EOF_
 	struct   -- nested:   0xXXXXXXXX
 	able     -- no value
 	bar      -- integer:   1234
-	foo      -- no value
+	foo      -- string:   foo	lish
 	stumble  -- no value
 
 	struct opt #2:
@@ -223,16 +223,16 @@ cat > ${testname}-res3.base <<- _EOF_
 	#  preset/initialization file
 	#  ***DATE***
 	#
-	<struct>
+	<struct type=nested>
 	  <able/>
-	  <bar type="integer">0x4D2</bar>
-	  <foo/>
+	  <bar type=integer>0x4D2</bar>
+	  <foo>foo&#x09;lish</foo>
 	  <stumble/>
 	</struct>
-	<struct>
-	  <bar type="integer">0x10E1</bar>
+	<struct type=nested>
+	  <bar type=integer>0x10E1</bar>
 	  <foo/>
-	  <gr>
+	  <gr type=nested>
 	    <one/>
 	    <three/>
 	    <two>2</two>
@@ -242,6 +242,14 @@ cat > ${testname}-res3.base <<- _EOF_
 files=${testname}-res3.base\ ${testname}.d/${testname}.cfg
 cmp -s ${files} || \
     failure "saved config${nl}`diff ${files}`"
+
+# Copy the config file and verify that the contents are the same.
+#
+./${testname} "->${testname}.d/${testname}.cfg2"
+sed -i '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2
+files=${testname}.d/${testname}.cfg\ ${testname}.d/${testname}.cfg2
+cmp -s ${files} || \
+    failure "re-saved config${nl}`diff ${files}`"
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
 

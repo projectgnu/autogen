@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
- *  Time-stamp:      "2008-06-14 11:20:06 bkorb"
+ *  $Id: nested.c,v 4.28 2008/06/15 19:03:29 bkorb Exp $
+ *  Time-stamp:      "2008-06-15 11:24:57 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -26,6 +26,20 @@
  *  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
+
+typedef struct {
+    int     xml_ch;
+    int     xml_len;
+    char    xml_txt[8];
+} xml_xlate_t;
+
+static xml_xlate_t const xml_xlate[] = {
+    { '&', 4, "amp;"  },
+    { '<', 3, "lt;"   },
+    { '>', 3, "gt;"   },
+    { '"', 5, "quot;" },
+    { '\'',5, "apos;" }
+};
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by mk-fwd */
@@ -164,9 +178,24 @@ addStringValue( void** pp, char const* pzName, size_t nameLen,
 
     } else {
         pNV->valType = OPARG_TYPE_STRING;
-        if (dataLen > 0)
-            memcpy( pNV->v.strVal, pzValue, dataLen );
-        pNV->v.strVal[dataLen] = NUL;
+        if (dataLen > 0) {
+            char const * pzSrc = pzValue;
+            char * pzDst = pNV->v.strVal;
+            int    ct    = dataLen;
+            do  {
+                int ch = *(pzSrc++) & 0xFF;
+                if (ch == NUL) goto data_copy_done;
+                if (ch == '&')
+                    ch = get_special_char(&pzSrc, &ct);
+                *(pzDst++) = ch;
+            } while (--ct > 0);
+        data_copy_done:
+            *pzDst = NUL;
+
+        } else {
+            pNV->v.strVal[0] = NUL;
+        }
+
         pNV->pzName = pNV->v.strVal + dataLen + 1;
     }
 
@@ -431,7 +460,7 @@ scanXmlEntry( char const* pzName, tOptionValue* pRes )
         }
         addStringValue(&(pRes->v.nestVal), pzName, nameLen, NULL, (size_t)0);
         option_load_mode = save_mode;
-        return pzScan+2;
+        return pzScan+1;
 
     default:
         option_load_mode = save_mode;
@@ -707,6 +736,83 @@ optionNestedVal( tOptions* pOpts, tOptDesc* pOD )
     if (pOV != NULL)
         addArgListEntry( &(pOD->optCookie), (void*)pOV );
 }
+
+
+/*
+ * get_special_char
+ */
+LOCAL int
+get_special_char(char const ** ppz, int * ct)
+{
+    char const * pz = *ppz;
+
+    if (*ct < 3)
+        return '&';
+
+    if (*pz == '#') {
+        int base = 10;
+        int retch;
+
+        pz++;
+        if (*pz == 'x') {
+            base = 16;
+            pz++;
+        }
+        retch = (int)strtoul(pz, (char **)&pz, base);
+        if (*pz != ';')
+            return '&';
+        base = ++pz - *ppz;
+        if (base > *ct)
+            return '&';
+
+        *ct -= base;
+        *ppz = pz;
+        return retch;
+    }
+
+    {
+        int ctr = sizeof(xml_xlate) / sizeof(xml_xlate[0]);
+        xml_xlate_t const * xlatp = xml_xlate;
+
+        for (;;) {
+            if (  (*ct >= xlatp->xml_len)
+               && (strncmp(pz, xlatp->xml_txt, xlatp->xml_len) == 0)) {
+                *ppz += xlatp->xml_len;
+                *ct  -= xlatp->xml_len;
+                return xlatp->xml_ch;
+            }
+
+            if (--ctr <= 0)
+                break;
+            xlatp++;
+        }
+    }
+    return '&';
+}
+
+
+/*
+ * emit_special_char
+ */
+LOCAL void
+emit_special_char(FILE * fp, int ch)
+{
+    int ctr = sizeof(xml_xlate) / sizeof(xml_xlate[0]);
+    xml_xlate_t const * xlatp = xml_xlate;
+
+    putc('&', fp);
+    for (;;) {
+        if (ch == xlatp->xml_ch) {
+            fputs(xlatp->xml_txt, fp);
+            return;
+        }
+        if (--ctr <= 0)
+            break;
+        xlatp++;
+    }
+    fprintf(fp, "#x%02X;", (ch & 0xFF));
+}
+
 /*
  * Local Variables:
  * mode: C
