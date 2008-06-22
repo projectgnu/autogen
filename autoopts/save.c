@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.28 2008/06/15 19:03:29 bkorb Exp $
- * Time-stamp:      "2008-06-15 11:54:49 bkorb"
+ *  save.c  $Id: save.c,v 4.29 2008/06/22 16:26:25 bkorb Exp $
+ * Time-stamp:      "2008-06-21 10:54:47 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -29,7 +29,8 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
-tSCC  zWarn[] = "%s WARNING:  cannot save options - ";
+static char const  zWarn[] = "%s WARNING:  cannot save options - ";
+static char const close_xml[] = "</%s>\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by mk-fwd */
@@ -47,6 +48,9 @@ printEntry(
 
 static void
 print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp);
+
+static void
+print_a_string(FILE * fp, char const * name, char const * pz);
 
 static void
 printValueList(FILE * fp, char const * name, tArgList * al);
@@ -321,12 +325,10 @@ printEntry(
 static void
 print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
 {
-    static char const open_atr[]  = "<%s>";
     static char const bool_atr[]  = "<%1$s type=boolean>%2$s</%1$s>\n";
     static char const numb_atr[]  = "<%1$s type=integer>0x%2$lX</%1$s>\n";
     static char const type_atr[]  = "<%s type=%s>";
     static char const null_atr[]  = "<%s/>\n";
-    static char const close_atr[] = "</%s>\n";
 
     while (--depth >= 0)
         putc(' ', fp), putc(' ', fp);
@@ -338,31 +340,9 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
         break;
 
     case OPARG_TYPE_STRING:
-    {
-        char const * pz = ovp->v.strVal;
-
-        fprintf(fp, open_atr, ovp->pzName);
-        for (;;) {
-            int ch = ((int)*(pz++)) & 0xFF;
-
-            switch (ch) {
-            case NUL: goto string_done;
-
-            case '&':
-            case '<':
-            case '>':
-            case 1 ... (' ' - 1):
-            case ('~' + 1) ... 0xFF:
-                emit_special_char(fp, ch);
-                break;
-
-            default:
-                putc(ch, fp);
-            }
-        } string_done:;
-        fprintf(fp, close_atr, ovp->pzName);
+        print_a_string(fp, ovp->pzName, ovp->v.strVal);
         break;
-    }
+
     case OPARG_TYPE_ENUMERATION:
     case OPARG_TYPE_MEMBERSHIP:
         if (pOD != NULL) {
@@ -390,7 +370,7 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
             }
 
             pOD->optArg.argEnum = val;
-            fprintf(fp, close_atr, ovp->pzName);
+            fprintf(fp, close_xml, ovp->pzName);
             break;
         }
         /* FALLTHROUGH */
@@ -408,6 +388,43 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
         printValueList(fp, ovp->pzName, ovp->v.nestVal);
         break;
     }
+}
+
+
+static void
+print_a_string(FILE * fp, char const * name, char const * pz)
+{
+    static char const open_atr[]  = "<%s>";
+
+    fprintf(fp, open_atr, name);
+    for (;;) {
+        int ch = ((int)*(pz++)) & 0xFF;
+
+        switch (ch) {
+        case NUL: goto string_done;
+
+        case '&':
+        case '<':
+        case '>':
+#if __GNUC__ >= 4
+        case 1 ... (' ' - 1):
+        case ('~' + 1) ... 0xFF:
+#endif
+            emit_special_char(fp, ch);
+            break;
+
+        default:
+#if __GNUC__ < 4
+            if (  (ch >= 1) && (ch <= (' ' - 1))
+               || ((ch >= ('~' + 1)) && (ch <= 0xFF)) ) {
+                emit_special_char(fp, ch);
+                break;
+            }
+#endif
+            putc(ch, fp);
+        }
+    } string_done:;
+    fprintf(fp, close_xml, name);
 }
 
 

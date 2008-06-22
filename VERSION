@@ -2,10 +2,10 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2008-06-15 11:56:52 bkorb"
+# Time-stamp:        "2008-06-21 10:42:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2008/06/15 19:03:29 $
+# Last Committed:    $Date: 2008/06/22 16:26:24 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".6pre3"
+AG_PATCHLEVEL=".6pre6"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -43,9 +43,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=31
-AO_REVISION=1
-AO_AGE=6
+AO_CURRENT=32
+AO_REVISION=0
+AO_AGE=7
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0

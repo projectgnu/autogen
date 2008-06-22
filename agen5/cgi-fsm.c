@@ -1,16 +1,16 @@
-/*
+/*  
  *  EDIT THIS FILE WITH CAUTION  (cgi-fsm.c)
- *
- *  It has been AutoGen-ed  Saturday June 24, 2006 at 11:54:48 AM PDT
+ *  
+ *  It has been AutoGen-ed  Thursday June 19, 2008 at 09:45:14 AM PDT
  *  From the definitions    cgi.def
  *  and the template file   fsm
  *
  *  Automated Finite State Machine
  *
- *  copyright (c) 2001-2008 by Bruce Korb - all rights reserved
- *  copyright (c) 2001-2008 by Bruce Korb - all rights reserved
- *  AutoFSM is free software copyrighted by Bruce Korb.
+ *  copyright (c) 2001-2007 by Bruce Korb - all rights reserved
  *
+ *  AutoFSM is free software copyrighted by Bruce Korb.
+ *  
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
@@ -22,7 +22,7 @@
  *  3. Neither the name ``Bruce Korb'' nor the name of any other
  *     contributor may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ *  
  *  AutoFSM IS PROVIDED BY Bruce Korb ``AS IS'' AND ANY EXPRESS
  *  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,6 +38,7 @@
 #define DEFINE_FSM
 #include "cgi-fsm.h"
 #include <stdio.h>
+#include <ctype.h>
 
 /*
  *  Do not make changes to this file, except between the START/END
@@ -186,9 +187,6 @@ cgi_run_fsm(
 {
     te_cgi_state cgi_state = CGI_ST_INIT;
     te_cgi_event trans_evt;
-#ifdef DEBUG
-    te_cgi_state firstNext;
-#endif
     te_cgi_state nxtSt;
     te_cgi_trans trans;
 
@@ -229,19 +227,10 @@ cgi_run_fsm(
         } else {
             const t_cgi_transition* pTT =
             cgi_trans_table[ cgi_state ] + trans_evt;
-#ifdef DEBUG
-            firstNext = /* next line */
-#endif
             nxtSt = pTT->next_state;
             trans = pTT->transition;
         }
 
-#ifdef DEBUG
-        printf( "in state %s(%d) step %s(%d) to %s(%d)\n",
-            CGI_STATE_NAME( cgi_state ), cgi_state,
-            CGI_EVT_NAME( trans_evt ), trans_evt,
-            CGI_STATE_NAME( nxtSt ), nxtSt );
-#endif
 
         switch (trans) {
         case CGI_TR_INVALID:
@@ -311,11 +300,7 @@ cgi_run_fsm(
             exit( cgi_invalid_transition( cgi_state, trans_evt ));
             /* END   == BROKEN MACHINE == DO NOT CHANGE THIS COMMENT */
         }
-#ifdef DEBUG
-        if (nxtSt != firstNext)
-            printf( "transition code changed destination state to %s(%d)\n",
-                CGI_STATE_NAME( nxtSt ), nxtSt );
-#endif
+
         cgi_state = nxtSt;
     }
     return cgi_state;

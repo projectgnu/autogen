@@ -87,7 +87,7 @@ AC_DEFUN([INVOKE_SNPRINTFV_MACROS],[
     # include <wchar.h>
     #endif
     ])
-  AC_CHECK_TYPES([long double], [intmax_t], [size_t])
+  AC_CHECK_TYPES([long double])
 
   # ----------------------------------------------------------------------
   # Checks for library calls

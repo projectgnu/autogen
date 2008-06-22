@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.34 2008/01/23 00:35:27 bkorb Exp $
+#$Id: optcode.tpl,v 4.35 2008/06/22 16:26:24 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2007-10-28 16:25:42 bkorb"
+# Time-stamp:      "2008-06-17 23:24:00 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

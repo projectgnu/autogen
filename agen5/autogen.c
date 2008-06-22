@@ -1,10 +1,10 @@
 
 /*
  *  autogen.c
- *  $Id: autogen.c,v 4.30 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: autogen.c,v 4.31 2008/06/22 16:26:24 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 12:06:21 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-06-22 09:12:20 bkorb"
+ *  Last Committed:    $Date: 2008/06/22 16:26:24 $
  *
  *  This is the main routine for autogen.
  *
@@ -63,6 +63,7 @@ signalSetup( sighandler_proc_t* chldHandler,
 static void
 inner_main( int argc, char** argv )
 {
+    atexit(doneCheck);
     initialize( argc, argv );
 
     procState = PROC_STATE_LOAD_DEFS;
@@ -86,6 +87,7 @@ inner_main( int argc, char** argv )
     }
 
     procState = PROC_STATE_DONE;
+    signalSetup( SIG_DFL, SIG_DFL );
     exit( EXIT_SUCCESS );
 }
 
@@ -103,7 +105,7 @@ main(int argc, char** argv)
     if (sigsetjmp( abendJumpEnv, 0 ) != 0)
         signalExit( abendJumpSignal );
 
-    signalSetup( ignoreSignal, abendSignal );
+    signalSetup(ignoreSignal, abendSignal);
 
 #if GUILE_VERSION >= 107000
     if (getenv( "GUILE_WARN_DEPRECATED" ) == NULL)
@@ -183,8 +185,15 @@ signalExit( int sig )
 static void
 abendSignal( int sig )
 {
-    abendJumpSignal = sig;
-    siglongjmp( abendJumpEnv, sig );
+    switch (procState) {
+    case PROC_STATE_DONE:
+    case PROC_STATE_ABORTING:
+        break;
+
+    default:
+        abendJumpSignal = sig;
+        siglongjmp( abendJumpEnv, sig );
+    }
 }
 
 
@@ -216,6 +225,16 @@ doneCheck( void )
 #if GUILE_VERSION >= 107000
     int exit_code = EXIT_SUCCESS;
 #endif
+
+    /*
+     *  There are contexts wherein this function can get registered twice.
+     */
+    {
+        static int doneCheckDone = 0;
+        if (doneCheckDone)
+            return;
+        doneCheckDone = 1;
+    }
 
 #ifdef SHELL_ENABLED
     ag_scm_c_eval_string_from_file_line(
@@ -395,7 +414,6 @@ signalSetup( sighandler_proc_t* chldHandler,
 #else
     const int maxSig = NSIG;
 #endif
-    atexit( doneCheck );
 
     sa.sa_flags   = 0;
     sigemptyset( &sa.sa_mask );

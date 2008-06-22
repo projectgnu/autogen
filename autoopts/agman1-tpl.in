@@ -4,7 +4,7 @@
 ##
 ##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2008-04-06 14:27:40 bkorb"
+## Time-stamp:      "2008-06-19 08:50:16 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -29,7 +29,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.15 2008/04/06 22:46:49 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.16 2008/06/22 16:26:24 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -515,7 +515,7 @@ by loading values from [+:
 .nf
   \fB[+: (. PROG_NAME) :+]_<option-name>\fP or \fB[+: (. PROG_NAME) :+]\fP
 .fi
-.aj[+:
+.ad[+:
     IF (exist? "homerc") :+]
 The environmental presets take precedence (are processed later than)
 the configuration files.[+:
@@ -523,12 +523,14 @@ the configuration files.[+:
   ELSE      :+].[+:
   ENDIF     :+][+:
 
-  CASE (count "homerc") :+][+:
+  CASE
+    (define rc-file (if (exist? "rcfile") (get "rcfile")
+                    (string-append "." prog_name "rc")  ))
+    (count "homerc") :+][+:
   == "0"    :+][+:
   == "1"    :+]
 The \fIhomerc\fP file is "\fI[+:homerc:+]\fP", unless that is a directory.
-In that case, the file "\fI[+: ?% rcfile "%s"
-(string-append "." prog_name "rc") :+]\fP"
+In that case, the file "\fI[+: (. rc-file) :+]\fP"
 is searched for within that directory.[+:
 
   *         :+]
@@ -536,8 +538,7 @@ The \fIhomerc\fP files are [+:
     FOR homerc ", "  :+][+:
       IF (last-for?) :+]and [+:
       ENDIF :+]"\fI[+: homerc :+]\fP"[+: ENDFOR :+].
-If any of these are directories, then the file \fI[+: ?% rcfile "%s"
-(string-append "." prog_name "rc") :+]\fP
+If any of these are directories, then the file \fI[+: (. rc-file) :+]\fP
 is searched for within those directories.[+:
   ESAC      :+][+:
 

@@ -5,7 +5,7 @@
 #
 # Time-stamp:     "2008-06-15 08:21:10 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2008/06/15 19:03:29 $
+# Last Modified:  $Date: 2008/06/22 16:26:25 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.22 2008/06/15 19:03:29 bkorb Exp $
+# $Id: defs.in,v 4.23 2008/06/22 16:26:25 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -59,11 +59,11 @@ GDexe="@GDexe@"
 INC="@LIBGUILE_CFLAGS@"
 LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
 
-:     ${CFLAGS:=@DEFS@ @CFLAGS@}
-:   ${CPPFLAGS:=@CPPFLAGS@}
-: ${testsubdir:=@testsubdir@}
-: ${CC:=@CC@}
-test -z "${CC}" && echo "No CC configured" && exit 1
+test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
+test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
+test -z "${testsubdir}" && testsubdir='@testsubdir@'
+test -z "${CC}"         && CC='@CC@'
+test -z "${CC}"         && echo "No CC configured" && exit 1
 nl='
 '
 

@@ -1,3 +1,21 @@
+2008-05-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (signalSetup) remove "atexit(3)" call.  This routine
+	is called more than once.
+	(inner_main): set signals back to default before calling "exit(3)".
+	Make the "atexit" call here.
+	(signalExit): do not make toe siglongjmp when in DONE or ABORTING state.
+	(doneCheck): make certain this code executes only once.
+	* autoopts/agman1.tpl: "adjust" is spelled ".ad" in nroff-speak
+	* autoopts/install-options-h: burn the "${bindir}" into the
+	installed templates also.
+	* autoopts/options.tpl: use the installation bindir, if necessary,
+	to try to find the columns program.
+	* autoopts/optlib.tpl: Most "DISABLE_*" macros do not take an argument.
+	the nested/hierarchical options are an exception.  The nested values
+	provided are to be used to find entries to remove, instead of removing
+	them all.
+
 2008-06-14  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defLex.c (assembleName): keep track of where the here string

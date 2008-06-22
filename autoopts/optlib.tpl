@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2007-11-17 10:30:16 bkorb"
+# Time-stamp:      "2008-06-19 10:44:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.29 2007/11/17 21:01:55 bkorb Exp $
+# $Id: optlib.tpl,v 4.30 2008/06/22 16:26:24 bkorb Exp $
 
 =][=
 
@@ -215,6 +215,9 @@ DEFINE set-defines
         [=set-desc=].optArg.argEnum = (a)[=
   =*  set        =]; \
         [=set-desc=].optArg.argIntptr = (a)[=
+  ~*  hier|nest  =]; \
+        [=set-desc=].optArg.argString = (a)[=
+
   ESAC arg-type  =][=
 
   IF (hash-ref have-cb-procs flg-name) =]; \
@@ -222,16 +225,24 @@ DEFINE set-defines
                 [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
   ENDIF "callout procedure exists" =] )[=
 
-  IF (exist? "disable") =]
+  IF (exist? "disable") =][=
+    IF (~* (get "arg-type") "hier|nest") =]
+#define DISABLE_[=(. opt-name)=](a)   STMTS( \
+        [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
+        [=set-desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
+        [=set-desc=].optArg.argString = (a); \
+        optionNestedVal(&[=(. pname)=]Options, \
+                         [=(. pname)=]Options.pOptDesc + [=set-index=]);)[=
+    ELSE =]
 #define DISABLE_[=(. opt-name)=]   STMTS( \
         [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
         [=set-desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
         [=set-desc=].optArg.argString = NULL[=
-    IF (hash-ref have-cb-procs flg-name) =]; \
+      IF (hash-ref have-cb-procs flg-name) =]; \
         (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
-    ENDIF "callout procedure exists" =] )[=
-
+      ENDIF "callout procedure exists" =] )[=
+    ENDIF  =][=
   ENDIF disable exists =][=
 
 ENDDEF set-defines

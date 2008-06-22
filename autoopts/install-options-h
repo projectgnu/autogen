@@ -1,8 +1,8 @@
 #! /bin/sh
 set -x
 
-# Time-stamp:        "2008-04-06 12:56:45 bkorb"
-# Last Committed:    $Date: 2008/04/06 22:47:33 $
+# Time-stamp:        "2008-06-17 23:22:28 bkorb"
+# Last Committed:    $Date: 2008/06/22 16:26:24 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -39,6 +39,7 @@ do
     fi
 
     sed -e "s/@LIBOPTS_VER@/${LIBOPTS_VER}/" \
+        -e "s%@bindir@%${bindir}%" \
         -e '/^(setenv "SHELL" /s@.*@(setenv "SHELL" "'${conf_shell}'")@' \
         ${srcdir}/${tpl} > ${pkgdatadir}/${tpl}
 done
