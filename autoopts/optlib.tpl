@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2008-06-19 10:44:14 bkorb"
+# Time-stamp:      "2008-06-22 10:12:38 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.30 2008/06/22 16:26:24 bkorb Exp $
+# $Id: optlib.tpl,v 4.31 2008/06/22 17:39:49 bkorb Exp $
 
 =][=
 
@@ -792,7 +792,9 @@ DEFINE opt-desc         =][=
                   (exist? "flag-code"))   =]doOpt[=(. cap-name)=][=
          ELSE                             =]NULL[=
          ENDIF =],
-     /* desc, NAME, name */ z[=(. cap-name)=]Text, NULL, NULL,
+     /* desc, NAME, name */ z[=
+         (set! default-text (string-append default-text
+               "\n    { NULL }," )) cap-name =]Text, NULL, NULL,
      /* disablement strs */ NULL, NULL },[=
 
   ELSE
@@ -822,10 +824,13 @@ DEFINE opt-desc         =][=
          (if (=* (get "arg-type") "set") "NOLIMIT"
              (if (exist? "max") (get "max") "1") ) =], 0,
      /* opt state flags  */ [=(. UP-name)=]_FLAGS, 0,
-     /* last opt argumnt */ { [=
-         IF (exist? "arg-default")
-              =]z[=(. cap-name)=]DefaultArg[=
-         ELSE =]NULL[= ENDIF =] },
+     /* last opt argumnt */ [=
+         (set! tmp-val (if (exist? "arg-default")
+               (string-append "{ z" cap-name "DefaultArg },")
+               "{ NULL }," ))
+         (set! default-text (string-append default-text
+               "\n    " tmp-val ))
+         tmp-val =]
      /* arg list/cookie  */ [=
             (if (and (=* (get "arg-type") "set") (exist? "arg-default"))
                 (string-append cap-name "CookieBits") "NULL") =],

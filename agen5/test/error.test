@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2007-12-02 13:18:39 bkorb"
+# Time-stamp:        "2008-06-22 10:07:08 bkorb"
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -25,7 +25,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: error.test,v 4.19 2008/01/23 00:35:27 bkorb Exp $
+# $Id: error.test,v 4.20 2008/06/22 17:39:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -215,8 +215,6 @@ ${AGexe} -T ${testname}.tpl6 ${agopts}6 \
   failure "Your Guile lib exits 0 on failure"
 
 cat > ${testname}.base6 <<EOF
-${testname}.tpl6:7:4: In expression (stumble-over-unbound-variable):
-${testname}.tpl6:7:4: Unbound variable: stumble-over-unbound-variable
 Scheme evaluation error.  AutoGen ABEND-ing in template
 	error.tpl6 on line 3
 Failing Guile command:  = = = = =
@@ -231,15 +229,13 @@ if (exist? "nothing")
 =================================
 EOF
 
-if test ${GUILE_VERSION} -gt 107000
-then
-  echo "WARNING:  Guile 1.7.x cannot display error line numbers" >&2
-  exec 3> ${testname}.base6-tmp
-  echo 'ERROR: Unbound variable: stumble-over-unbound-variable' >&3
-  sed 1,2d ${testname}.base6 >&3
-  exec 3>&-
-  mv -f ${testname}.base6-tmp ${testname}.base6
-fi
+# Guile keeps changing its mind about what it ought to print in the
+# face of an unbound variable.  So, the heck with it.  We've tried to
+# print file and line, but it was made just too hard.  Strip out all
+# the Guile library error messages.  :(
+#
+sed -n '/^Scheme evaluation error./,$p' ${testname}.out6 > ${testname}.tmp6
+mv -f ${testname}.tmp6 ${testname}.out6
 
 cmp -s  ${testname}.base6  ${testname}.out6 || \
   failure "expected->actual `diff -c ${testname}.base6 ${testname}.out6`"

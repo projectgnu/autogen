@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-02-03 10:04:01 bkorb"
-# ID:  $Id: options_h.tpl,v 4.39 2008/04/06 22:49:07 bkorb Exp $
+# Time-stamp:      "2008-06-22 10:37:30 bkorb"
+# ID:  $Id: options_h.tpl,v 4.40 2008/06/22 17:39:49 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -323,19 +323,19 @@ struct options {
     unsigned int        curOptIdx;
     char*               pzCurOpt;
 
-    char const*         pzProgPath;
-    char const*         pzProgName;
-    char const* const   pzPROGNAME;
-    char const* const   pzRcName;
-    char const* const   pzCopyright;
-    char const* const   pzCopyNotice;
-    char const* const   pzFullVersion;
+    char const*         pzProgPath;         /* PUBLIC */
+    char const*         pzProgName;         /* PUBLIC */
+    char const* const   pzPROGNAME;         /* PUBLIC */
+    char const* const   pzRcName;           /* PUBLIC */
+    char const* const   pzCopyright;        /* PUBLIC */
+    char const* const   pzCopyNotice;       /* PUBLIC */
+    char const* const   pzFullVersion;      /* PUBLIC */
     char const* const* const papzHomeList;
     char const* const   pzUsageTitle;
     char const* const   pzExplain;
     char const* const   pzDetail;
-    tOptDesc*   const   pOptDesc;
-    char const* const   pzBugAddr;
+    tOptDesc*   const   pOptDesc;           /* PUBLIC */
+    char const* const   pzBugAddr;          /* PUBLIC */
 
     void*               pExtensions;
     void*               pSavedState;
@@ -348,7 +348,16 @@ struct options {
     int const           presetOptCt;
     char const *        pzFullUsage;
     char const *        pzShortUsage;
+    /* PUBLIC: */
+    optArgBucket_t const * const originalOptArgArray;
 };
+/*
+ *  Versions where in various fields first appear:
+ *  ($AO_CURRENT * 4096 + $AO_REVISION, but $AO_REVISION is zero)
+ */
+#define originalOptArgArray_STRUCT_VERSION  131072 /* AO_CURRENT = 32 )) */
+#define HAS_originalOptArgArray(_opt) \
+    ((_opt)->structVersion >= originalOptArgArray_STRUCT_VERSION)
 
 /*
  *  "token list" structure returned by "string_tokenize()"

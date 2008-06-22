@@ -15,6 +15,14 @@
 	the nested/hierarchical options are an exception.  The nested values
 	provided are to be used to find entries to remove, instead of removing
 	them all.
+	* agen5/test/error.test: Guile error messages are way too unpredictable
+	to be able to know what they are going to look like.  Remove them
+	from the compared error text.
+	* autoopts/*.tpl: Add a new field to the option structure, and the
+	AutoOpts version where it first appears:
+	+    optArgBucket_t const * const originalOptArgArray;
+	+#define  originalOptArgArray_STRUCT_VERSION  131072
+	and fill it in with the initialization values.
 
 2008-06-14  Bruce Korb  <bkorb@gnu.org>
 

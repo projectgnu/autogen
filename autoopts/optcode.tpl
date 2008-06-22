@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.35 2008/06/22 16:26:24 bkorb Exp $
+#$Id: optcode.tpl,v 4.36 2008/06/22 17:39:49 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-06-17 23:24:00 bkorb"
+# Time-stamp:      "2008-06-22 10:24:58 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -221,7 +221,8 @@ ENDIF
  *
  *  Define the [=(. pname-cap)=] Option Descriptions.
  */
-static tOptDesc optDesc[ [=(. UP-prefix)=]OPTION_CT ] = {[=
+static tOptDesc optDesc[ [= (define default-text "") UP-prefix
+=]OPTION_CT ] = {[=
 
 FOR flag "\n"           =][=
 
@@ -241,7 +242,9 @@ IF (exist? "version")   =]
 #endif
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]VERSION, [= (. VALUE-pfx) =]VERSION,
+         (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+         INDEX-pfx =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -260,7 +263,9 @@ IF (exist? "version")   =]
 ENDIF =]
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]HELP, [= (. VALUE-pfx) =]HELP,
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -273,7 +278,9 @@ ENDIF =]
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -290,7 +297,9 @@ IF (exist? "usage-opt")
 =],
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]USAGE, [= (. VALUE-pfx) =]USAGE,
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]USAGE, [= (. VALUE-pfx) =]USAGE,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -311,7 +320,9 @@ IF (exist? "homerc")
 =],
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -325,7 +336,9 @@ IF (exist? "homerc")
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
@@ -446,6 +459,11 @@ ESAC   no-xlate         =]
 # define OPTPROC_BASE OPTPROC_NONE
 # define translate_option_strings NULL
 #endif /* ENABLE_NLS */
+static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
+(. UP-prefix) =]OPTION_CT ] = {[=
+   (substring/shared default-text 0 (- (string-length default-text) 1)) =]
+};
+
 [= INVOKE usage-text usage-type = full  \=]
 [= INVOKE usage-text usage-type = short \=]
 
@@ -493,7 +511,8 @@ tOptions [=(. pname)=]Options = {
     },
     [= (. option-ct) =] /* full option count */, [=
        (count "flag")=] /* user option count */,
-    [= (. pname) =]_full_usage, [= (. pname) =]_short_usage
+    [= (. pname) =]_full_usage, [= (. pname) =]_short_usage,
+    original[=(. pname-cap)=]Defaults
 };
 [=
 
