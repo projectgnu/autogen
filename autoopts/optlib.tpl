@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2008-06-22 10:12:38 bkorb"
+# Time-stamp:      "2008-07-27 12:59:37 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.31 2008/06/22 17:39:49 bkorb Exp $
+# $Id: optlib.tpl,v 4.32 2008/07/27 20:06:05 bkorb Exp $
 
 =][=
 
@@ -719,46 +719,42 @@ DEFINE   help-strs
 /*
  *  Help/More_Help[= version "/Version"=] option descriptions:
  */
-tSCC zHelpText[]       = "Display usage information and exit";
-tSCC zHelp_Name[]      = "help";
-
-tSCC zMore_HelpText[]  = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[] = "more-help";[=
+tSCC zHelpText[]          = "Display usage information and exit";
+tSCC zHelp_Name[]         = "help";
+tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
+tSCC zMore_Help_Name[]    = "more-help";[=
 
   IF (exist? "version")
 
 =]
-
-tSCC zVersionText[]    = "Output version information and exit";
-tSCC zVersion_Name[]   = "version";[=
+tSCC zVersionText[]       = "Output version information and exit";
+tSCC zVersion_Name[]      = "version";[=
 
   ENDIF (exist? "version")      =][=
+
+  IF (exist? "resettable")
+
+=]
+tSCC zResetText[]         = "Reset an option's state";
+tSCC zReset_Name[]        = "reset-option";[=
+
+  ENDIF (exist? "resettable")      =][=
 
   IF (exist? "usage-opt")
 
 =]
-
-/*
- *  usage option description:
- */
-tSCC zUsageText[]     = "Abbreviated usage to stdout";
-tSCC zUsage_Name[]    = "usage";[=
+tSCC zUsageText[]         = "Abbreviated usage to stdout";
+tSCC zUsage_Name[]        = "usage";[=
 
   ENDIF (exist? "usage-opt")    =][=
 
   IF (exist? "homerc")
 
 =]
-
-/*
- *  Save/Load_Opts option description:
- */
 tSCC zSave_OptsText[]     = "Save the option state to a config file";
 tSCC zSave_Opts_Name[]    = "save-opts";
-
 tSCC zLoad_OptsText[]     = "Load options from a config file";
 tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
-
 tSCC zNotLoad_Opts_Name[] = "no-load-opts";
 tSCC zNotLoad_Opts_Pfx[]  = "no";
 #define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=

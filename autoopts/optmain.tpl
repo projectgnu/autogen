@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2007-11-17 12:18:57 bkorb"
+# Time-stamp:      "2008-07-26 19:24:58 bkorb"
 
-# $Id: optmain.tpl,v 4.28 2007/11/17 21:01:55 bkorb Exp $
+# $Id: optmain.tpl,v 4.29 2008/07/27 20:06:05 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -516,7 +516,8 @@ DEFINE decl-callbacks
 
     "optionPagedUsage\n"
 
-    (if (exist? "version") "optionPrintVersion\n" "")
+    (if (exist? "version")    "optionPrintVersion\n" "")
+    (if (exist? "resettable") "optionResetOpt\n" "")
   ) )
 
   (define extern-test-list (string-append
@@ -751,8 +752,8 @@ ENDDEF   callback-proc-header
 DEFINE   scale-val
 
 =]
-    switch (*pzEnd) {
-    case '\0': break;
+    switch (*(pzEnd++)) {
+    case '\0': pzEnd--;     break;
     case 't':  val *= 1000;
     case 'g':  val *= 1000;
     case 'm':  val *= 1000;
@@ -765,6 +766,7 @@ DEFINE   scale-val
 
     default:   goto bad_value;
     }
+    if (*pzEnd != '\0')  goto bad_value;
 [=
 
 ENDDEF   scale-val
@@ -777,10 +779,11 @@ DEFINE range-option-code
 
 (if (not (=* (get "arg-type") "num"))
     (error (string-append "range option " low-name " is not numeric")) )
+(define range-count (count "arg-range"))
 
 \=]
     static const struct {long const rmin, rmax;} rng[[=
-      (count "arg-range")  =]] = {
+      (. range-count)  =]] = {
 [=(out-push-new)      =][=
   FOR arg-range ",\n" =]{ [=
     CASE arg-range    =][=
@@ -803,20 +806,38 @@ DEFINE range-option-code
   (shellf "${CLexe} -I8 --spread=2 <<_EOF_\n%s\n_EOF_"
           (out-pop #t)) =] };
     long val;
-    int ix;
+    int  ix;
     char * pzEnd;
-    char const * pzIndent = "\t\t\t\t  ";
-    extern FILE* option_usage_fp;
 
-    if (pOptDesc == NULL) /* usage is requesting range list
-                             option_usage_fp has already been set */
-        goto emit_ranges;
+    if (pOptions <= OPTPROC_EMIT_LIMIT)
+        goto emit_ranges;[=
 
+  IF (exist? "resettable")
+
+=]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;[=
+
+  ENDIF
+
+=]
+
+    errno = 0;
     val = strtol(pOptDesc->optArg.argString, &pzEnd, 0);
-    if (pOptDesc->optArg.argString == pzEnd)
+    if ((pOptDesc->optArg.argString == pzEnd) || (errno != 0))
         goto bad_value;
-[=  IF (exist? "scaled") =][= INVOKE scale-val =][= ENDIF =]
-    for (ix = 0; ix < [=(count "arg-range")=]; ix++) {
+[=
+
+    IF (exist? "scaled")
+        =][= INVOKE scale-val =][=
+    ELSE  =]
+    if (*pzEnd != '\0')
+        goto bad_value;[=
+
+    ENDIF
+
+=]
+    for (ix = 0; ix < [=(. range-count)=]; ix++) {
         if (val < rng[ix].rmin)
             continue;  /* ranges need not be ordered. */
         if (val == rng[ix].rmin)
@@ -830,51 +851,9 @@ DEFINE range-option-code
   bad_value:
 
     option_usage_fp = stderr;
-    fprintf(stderr, _("%s error:  %s option value ``%s''is out of range.\n"),
-            pOptions->pzProgName, pOptDesc->pz_Name, pOptDesc->optArg.argString);
-    pzIndent = "\t";
 
-  emit_ranges:[=
-
-  IF (exist? "scaled") =]
-    {
-        char const * pz =
-            _("%sis scalable with a suffix: k/K/m/M/g/G/t/T\n");
-        fprintf(option_usage_fp, pz, pzIndent);
-    }
-[=ENDIF =][=
-
-
-  IF (> (count "arg-range") 1) =]
-    fprintf( option_usage_fp, _("%sit must lie in one of the ranges:\n"),
-             pzIndent );
-    for ( ix=0;; ) {
-        if (rng[ix].rmax == LONG_MIN)
-             fprintf(option_usage_fp, _("%s%ld exactly"), pzIndent,
-                     rng[ix].rmin);
-        else fprintf(option_usage_fp, _("%s%ld to %ld"), pzIndent,
-                      rng[ix].rmin, rng[ix].rmax );
-        if (++ix >= [=(count "arg-range")=])
-            break;
-        fputs( _(", or\n"), option_usage_fp );
-    }
-
-    fputc( '\n', option_usage_fp );[=
-
-  ELIF (*==* (get "arg-range") "->")  =]
-    fprintf( option_usage_fp, _("%sit must lie in the range: %ld to %ld\n"),
-             pzIndent, rng[0].rmin, rng[0].rmax );[=
-
-  ELSE  =]
-    fprintf( option_usage_fp, _("%sit must be: %ld exactly\n"),
-             pzIndent, rng[0].rmin );[=
-
-  ENDIF =]
-    if (pOptDesc == NULL)
-        return;
-
-    [=(. UP-prefix)=]USAGE( EXIT_FAILURE );
-    /* NOTREACHED */
+  emit_ranges:
+    optionShowRange(pOptions, pOptDesc, (void *)rng, [= (. range-count) =]);
     return;
 
   valid_return:
@@ -906,13 +885,27 @@ DEFINE   keyword-code           =][=
    (join "\n" (stack "keyword"))
   "\n_EOF_\n"  )) =]
     };
-[=
+
+    if (pOptions <= OPTPROC_EMIT_LIMIT) {
+        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
+        return; /* protect AutoOpts client code from internal callbacks */
+    }[=
+
+  IF (exist? "resettable")
+
+=]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;[=
+
+  ENDIF
+
+=][=
 
   IF (exist? "arg-optional")
 
 =]
-    if (  ((unsigned long)pOptions > 0x0FUL)
-       && (pOptDesc->optArg.argString == NULL))
+
+    if (pOptDesc->optArg.argString == NULL)
         pOptDesc->optArg.argEnum = [=
              (string-append UP-name "_"    (if (> (len "arg-optional") 0)
                 (up-c-name "arg-optional") (if (exist? "arg-default")
@@ -926,6 +919,7 @@ DEFINE   keyword-code           =][=
   ELSE
 
 =]
+
     pOptDesc->optArg.argEnum =
         optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
 [=
@@ -935,10 +929,6 @@ DEFINE   keyword-code           =][=
   IF (exist? "extra-code")
 
 =]
-
-    if (((unsigned long)pOptions) <= 0x0FUL)
-        return; /* protect AutoOpts client code from internal callbacks */
-
 [= extra-code                   =][=
 
   ENDIF                         =][=
@@ -960,7 +950,17 @@ DEFINE   set-membership-code
   "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
   (join "\n" (stack "keyword"))
   "\n_EOF_\n" )) =]
-    };
+    };[=
+
+  IF (exist? "resettable")
+
+=]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;[=
+
+  ENDIF
+
+=]
     optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);[=
 
 ENDDEF   set-membership-code
@@ -989,7 +989,17 @@ DEFINE   file-name-code
 #  define FOPEN_BINARY_FLAG
 #endif
     mode.file_mode = [= (c-string (get "file-mode")) =] FOPEN_BINARY_FLAG;
-[= ENDIF =]
+[= ENDIF =][=
+
+  IF (exist? "resettable")
+
+=]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;[=
+
+  ENDIF
+
+=]
     optionFileCheck(pOptions, pOptDesc, type, mode);[=
 
 ENDDEF   file-name-code
@@ -1026,7 +1036,7 @@ DEFINE define-option-callbacks      =][=
          (extract (string-append (base-name) ".c.save") (string-append
                   "/*  %s =-= " cap-name " Opt Code =-= %s */"))
                                     =][=
-      ENDIF                         =][=
+      ENDIF
 
 # # # # # # # # # # # # # # # # # # =][=
 

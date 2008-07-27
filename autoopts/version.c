@@ -1,14 +1,10 @@
 
-/*  $Id: version.c,v 4.16 2008/06/14 22:23:53 bkorb Exp $
- * Time-stamp:      "2008-01-22 15:41:47 bkorb"
+/*  $Id: version.c,v 4.17 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-27 10:11:30 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */
-
-static char const zAOV[] =
-    "Automated Options version %s\n"
-    "\tcopyright (c) 1999-2008 Bruce Korb - all rights reserved\n";
 
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
@@ -91,7 +87,7 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
             fputs( pOpts->pzCopyright, fp );
             fputc( '\n', fp );
         }
-        fprintf( fp, zAOV, optionVersion() );
+        fprintf( fp, zAO_Ver, optionVersion() );
         if (pOpts->pzBugAddr != NULL)
             fprintf( fp, zPlsSendBugs, pOpts->pzBugAddr );
         break;
@@ -108,7 +104,7 @@ printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp )
             fputc( '\n', fp );
         }
 
-        fprintf( fp, zAOV, optionVersion() );
+        fprintf( fp, zAO_Ver, optionVersion() );
         if (pOpts->pzBugAddr != NULL)
             fprintf( fp, zPlsSendBugs, pOpts->pzBugAddr );
         break;

@@ -1,9 +1,9 @@
 
 /*
- *  $Id: defLex.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
+ *  $Id: defLex.c,v 4.28 2008/07/27 20:06:05 bkorb Exp $
  *
- *  Time-stamp:        "2008-06-07 15:06:50 bkorb"
- *  Last Committed:    $Date: 2008/06/14 22:23:53 $
+ *  Time-stamp:        "2008-07-26 10:06:56 bkorb"
+ *  Last Committed:    $Date: 2008/07/27 20:06:05 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -207,7 +207,8 @@ scanAgain:
 
     case '`':
     {
-        char* pz = ao_string_cook( pCurCtx->pzScan, &(pCurCtx->lineNo));
+        int line_no = pCurCtx->lineNo;
+        char* pz = ao_string_cook( pCurCtx->pzScan, &line_no);
 
         if (pz == NULL)
             goto NUL_error;
@@ -218,6 +219,8 @@ scanAgain:
 
         lastToken = DP_EV_STRING;
         pz = runShell( (char const*)pz_token );
+        pCurCtx->lineNo = line_no;
+
         if (pz == NULL)
             goto scanAgain;
         TAGMEM( pz, "shell definition string" );
@@ -333,13 +336,21 @@ loadScheme( void )
     char*    pzEnd     = (char*)skipScheme( pzText, pzText + strlen( pzText ));
     char     endCh     = *pzEnd;
     int      schemeLen = (pzEnd - pzText);
+    int      next_ln;
     SCM      res;
 
     /*
      *  NUL terminate the Scheme expression, run it, then restore
      *  the NUL-ed character.
      */
-    *pzEnd = NUL;
+    if (*pzEnd == NUL)
+        AG_ABEND(aprf(zErrMsg, pzProg,
+                      "end of Guile/scheme expression not found",
+                      pCurCtx->pzCtxFname, pCurCtx->lineNo));
+
+    *pzEnd  = NUL;
+    next_ln = pCurCtx->lineNo + count_nl(pzText);
+
     procState = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
         pzText, pCurCtx->pzCtxFname, pCurCtx->lineNo );
@@ -348,6 +359,8 @@ loadScheme( void )
 
     pCurCtx->pzScan = pzEnd;
     pzEnd = (char*)resolveSCM( res ); /* ignore const-ness */
+    pCurCtx->lineNo = next_ln;
+
     if (strlen( pzEnd ) >= schemeLen) {
         AGDUPSTR( pzEnd, pzEnd, "SCM Result" );
 

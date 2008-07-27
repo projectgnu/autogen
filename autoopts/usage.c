@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.25 2008/06/14 22:23:53 bkorb Exp $
- * Time-stamp:      "2007-11-12 20:49:02 bkorb"
+ *  usage.c  $Id: usage.c,v 4.26 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-26 18:14:26 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -331,13 +331,13 @@ printExtendedUsage(
          *  THEN call it, requesting the range or other special info
          */
         if (  (pOD->pOptProc != NULL)
-              && (pOD->pOptProc != optionNumericVal) ) {
-            (*(pOD->pOptProc))(pOptions, NULL);
+           && (pOD->pOptProc != optionNumericVal) ) {
+            (*(pOD->pOptProc))(OPTPROC_EMIT_USAGE, pOD);
         }
         break;
 
     case OPARG_TYPE_FILE:
-        (*(pOD->pOptProc))(pOptions, NULL);
+        (*(pOD->pOptProc))(OPTPROC_EMIT_USAGE, pOD);
         break;
     }
 
@@ -631,7 +631,7 @@ printProgramDetails( tOptions* pOptions )
             switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
             case OPARG_TYPE_ENUMERATION:
             case OPARG_TYPE_MEMBERSHIP:
-                (*(pOD->pOptProc))( NULL, pOD );
+                (*(pOD->pOptProc))(OPTPROC_EMIT_USAGE, pOD);
             }
         }  while (pOD++, optNo++, (--ct > 0));
     }

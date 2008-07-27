@@ -1,7 +1,7 @@
 
 /*
- *  $Id: makeshell.c,v 4.27 2008/06/14 22:23:53 bkorb Exp $
- * Time-stamp:      "2007-11-12 20:38:43 bkorb"
+ *  $Id: makeshell.c,v 4.28 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-26 16:10:51 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -673,7 +673,7 @@ emitSetup( tOptions* pOpts )
          */
         switch (OPTST_GET_ARGTYPE(pOptDesc->fOptState)) {
         case OPARG_TYPE_ENUMERATION:
-            (*(pOptDesc->pOptProc))( (tOptions*)2UL, pOptDesc );
+            (*(pOptDesc->pOptProc))(OPTPROC_EMIT_SHELL, pOptDesc );
             pzDefault = pOptDesc->optArg.argString;
             break;
 

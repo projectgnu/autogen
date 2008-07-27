@@ -1,10 +1,10 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.19 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: agUtils.c,v 4.20 2008/07/27 20:06:05 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:43:32 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-07-26 10:00:15 bkorb"
+ *  Last Committed:    $Date: 2008/07/27 20:06:05 $
  *
  *  This is the main routine for autogen.
  *
@@ -365,6 +365,21 @@ skipScheme( tCC* pzSrc,  tCC* pzEnd )
             pzSrc = skipQuote( pzSrc-1 );
         }
     }
+}
+
+
+LOCAL int
+count_nl(char const * pz)
+{
+    int ct = 0;
+    for (;;) {
+        char const * p = strchr(pz, '\n');
+        if (p == NULL)
+            break;
+        ct++;
+        pz = p + 1;
+    }
+    return ct;
 }
 
 

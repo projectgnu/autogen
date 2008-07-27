@@ -31,6 +31,7 @@ prefix    = optst;
 bit[ 0] = { b-name = set;           b-what = 'Set via the "SET_OPT()" macro'; };
 bit[ 1] = { b-name = preset;        b-what = 'Set via an RC/INI file'; };
 bit[ 2] = { b-name = defined;       b-what = 'Set via a command line option'; };
+bit[ 3] = { b-name = reset;         b-what = 'Reset via command line option'; };
 
 bit[ 4] = { b-name = equivalence;   b-what = 'selected by equiv\'ed option'; };
 bit[ 5] = { b-name = disabled;      b-what = 'option is in disabled state'; };
@@ -62,12 +63,12 @@ no-code;
 
 mask = {
   m-name  = set;
-  b-name  = set, preset, defined;
+  b-name  = set, preset, reset, defined;
 };
 
 mask = {
   m-name  = mutable;
-  b-name  = set, preset, defined, equivalence, disabled, alloc-arg;
+  b-name  = set, preset, reset, defined, equivalence, disabled, alloc-arg;
 };
 
 mask = {

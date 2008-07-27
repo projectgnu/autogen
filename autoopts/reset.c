@@ -1,11 +1,10 @@
 
 /*
- *  $Id: reset.c,v 4.1 2008/07/05 23:13:39 bkorb Exp $
- *  Time-stamp:      "2008-06-24 16:09:07 bkorb"
+ *  $Id: reset.c,v 4.2 2008/07/27 20:06:05 bkorb Exp $
+ *  Time-stamp:      "2008-07-26 18:09:29 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
@@ -26,15 +25,16 @@
  */
 
 
-/*=export_func  optionNumericVal
+/*=export_func  optionResetOpt
  * private:
  *
- * what:  Decipher a boolean value
- * arg:   + tOptions* + pOpts    + program options descriptor +
+ * what:  Reset the value of an option
+ * arg:   + tOptions* + pOpts    + program options descriptor  +
  * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
  *
  * doc:
- *  Decipher a numeric value.
+ *  This code will cause another option to be reset to its initial state.
+ *  For example, --reset=foo will cause the --foo option to be reset.
 =*/
 void
 optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
@@ -48,30 +48,16 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
         pOpts->pUsageProc(pOpts, EXIT_FAILURE);
     }
 
-    switch (pzArg[1]) {
-    case NUL:
-        opt_state.pzOptArg = NULL;
-        goto find_short;
-
-    case '=':
-    case ' ':
-    case '\t':
-        opt_state.pzOptArg = pzArg + 2;
-        while (IS_HORIZ_WHITE_CHAR(*(opt_state.pzOptArg)))
-            (opt_state.pzOptArg)++;
-
-    find_short:
+    if (pzArg[1] == NUL) {
         succ = shortOptionFind(pOpts, (tAoUC)*pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptChr, pOpts->pzProgPath, *pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
         }
-        break;
-
-    default:
+    } else {
         succ = longOptionFind(pOpts, pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
-            fprintf(stderr, zIllOptStr, pOpts->pzProgPath, *pzArg);
+            fprintf(stderr, zIllOptStr, pOpts->pzProgPath, pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
         }
     }

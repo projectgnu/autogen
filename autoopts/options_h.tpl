@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-06-22 10:37:30 bkorb"
-# ID:  $Id: options_h.tpl,v 4.40 2008/06/22 17:39:49 bkorb Exp $
+# Time-stamp:      "2008-07-27 09:44:35 bkorb"
+# ID:  $Id: options_h.tpl,v 4.41 2008/07/27 20:06:05 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -216,6 +216,10 @@ typedef enum { AG_FALSE = 0, AG_TRUE } ag_bool;
 typedef struct options  tOptions;
 typedef struct optDesc  tOptDesc;
 typedef struct optNames tOptNames;
+#define OPTPROC_EMIT_USAGE      ((tOptions *)0x01UL)
+#define OPTPROC_EMIT_SHELL      ((tOptions *)0x02UL)
+#define OPTPROC_RETURN_VALNAME  ((tOptions *)0x03UL)
+#define OPTPROC_EMIT_LIMIT      ((tOptions *)0x0FUL)
 
 /*
  *  The option procedures do the special processing for each
@@ -353,9 +357,9 @@ struct options {
 };
 /*
  *  Versions where in various fields first appear:
- *  ($AO_CURRENT * 4096 + $AO_REVISION, but $AO_REVISION is zero)
+ *  ($AO_CURRENT * 4096 + $AO_REVISION, but $AO_REVISION must be zero)
  */
-#define originalOptArgArray_STRUCT_VERSION  131072 /* AO_CURRENT = 32 )) */
+#define originalOptArgArray_STRUCT_VERSION  131072 /* AO_CURRENT = 32 */
 #define HAS_originalOptArgArray(_opt) \
     ((_opt)->structVersion >= originalOptArgArray_STRUCT_VERSION)
 

@@ -5,9 +5,9 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-10-31 20:12:29 bkorb"
+# Time-stamp:        "2008-07-27 11:48:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/01/23 00:35:27 $
+# Last Modified:     $Date: 2008/07/27 20:06:05 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -31,7 +31,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: handler.test,v 4.19 2008/01/23 00:35:27 bkorb Exp $
+# $Id: handler.test,v 4.20 2008/07/27 20:06:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -147,6 +147,11 @@ doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
         "alpha",  "beta",   "gamma",  "omega"
     };
 
+    if (pOptions <= OPTPROC_EMIT_LIMIT) {
+        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, 5);
+        return; /* protect AutoOpts client code from internal callbacks */
+    }
+
     pOptDesc->optArg.argEnum =
         optionEnumerationVal( pOptions, pOptDesc, azNames, 5 );
 
@@ -175,8 +180,12 @@ doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
         "alpha",  "beta",   "gamma",  "omega"
     };
 
-    if (  ((unsigned long)pOptions > 0x0FUL)
-       && (pOptDesc->optArg.argString == NULL))
+    if (pOptions <= OPTPROC_EMIT_LIMIT) {
+        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, 4);
+        return; /* protect AutoOpts client code from internal callbacks */
+    }
+
+    if (pOptDesc->optArg.argString == NULL)
         pOptDesc->optArg.argEnum = FOURTH_GAMMA;
     else
         pOptDesc->optArg.argEnum =

@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.36 2008/06/22 17:39:49 bkorb Exp $
+#$Id: optcode.tpl,v 4.37 2008/07/27 20:06:05 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-06-22 10:24:58 bkorb"
+# Time-stamp:      "2008-07-26 19:19:40 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -100,7 +100,9 @@ INCLUDE "optmain.tpl"
 
 IF (exist? "flag.arg-range")
 
-=]#include <stdio.h>[=
+=]#include <stdio.h>
+#include <errno.h>
+extern FILE * option_usage_fp;[=
 
 ENDIF  =][=
 
@@ -232,6 +234,29 @@ ENDFOR flag
 
 =][=
 
+IF (exist? "resettable")
+
+=],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }," ))
+        INDEX-pfx =]RESET, [= (. VALUE-pfx) =]RESET,
+     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ RESET_OPT_FLAGS, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ optionResetOpt,
+     /* desc, NAME, name */ zResetText, NULL, zReset_Name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF
+
+=][=
+
 IF (exist? "version")   =]
 
 #ifdef NO_OPTIONAL_OPT_ARGS
@@ -264,7 +289,7 @@ ENDIF =]
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL }," ))
+               "\n    { NULL },\n    { NULL }," ))
         INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -278,9 +303,7 @@ ENDIF =]
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL }," ))
-        INDEX-pfx =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
+        (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -321,7 +344,7 @@ IF (exist? "homerc")
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL }," ))
+               "\n    { NULL },\n    { NULL }," ))
         INDEX-pfx =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -336,9 +359,7 @@ IF (exist? "homerc")
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL }," ))
-        INDEX-pfx =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
+        (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,

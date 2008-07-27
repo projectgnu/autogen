@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-11-17 12:18:52 bkorb"
+# Time-stamp:        "2008-07-27 09:27:09 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,7 +29,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: argument.test,v 4.10 2008/01/23 00:35:27 bkorb Exp $
+# $Id: argument.test,v 4.11 2008/07/27 20:06:05 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -110,7 +110,7 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
    -o Str option         The option option descrip
    -s Num second         The second option descrip
 				  is scalable with a suffix: k/K/m/M/g/G/t/T
-				  it must lie in one of the ranges:
+				  It must lie in one of the ranges:
 				  -1 exactly, or
 				  3 to 17, or
 				  32 to 8191

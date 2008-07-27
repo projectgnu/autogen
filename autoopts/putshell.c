@@ -1,7 +1,7 @@
 
 /*
- *  $Id: putshell.c,v 4.24 2008/06/14 22:23:53 bkorb Exp $
- * Time-stamp:      "2007-11-12 20:39:57 bkorb"
+ *  $Id: putshell.c,v 4.25 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-27 12:14:38 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -159,7 +159,7 @@ optionPutShell( tOptions* pOpts )
             printf( zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
                     (int)(uintptr_t)(pOD->optCookie) );
             pOD->optCookie = (void*)(uintptr_t)~0UL;
-            (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
+            (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD);
 
             /*
              *  We are building the typeset list.  The list returned starts with
@@ -171,12 +171,12 @@ optionPutShell( tOptions* pOpts )
                 while (IS_PLUS_N_SPACE_CHAR(*pz))  pz++;
 
                 for (;;) {
-                    int ch = *(pz++);
-                         if (IS_LOWER_CASE_CHAR(ch))   fputc(toupper(ch), stdout);
-                    else if (IS_UPPER_CASE_CHAR(ch))   fputc(ch, stdout);
-                    else if (IS_PLUS_N_SPACE_CHAR(ch)) goto name_done;
-                    else if (ch == NUL)           { pz--; goto name_done; }
-                    else fputc( '_', stdout );
+                  int ch = *(pz++);
+                       if (IS_LOWER_CASE_CHAR(ch))   fputc(toupper(ch), stdout);
+                  else if (IS_UPPER_CASE_CHAR(ch))   fputc(ch, stdout);
+                  else if (IS_PLUS_N_SPACE_CHAR(ch)) goto name_done;
+                  else if (ch == NUL)        { pz--; goto name_done; }
+                  else fputc( '_', stdout );
                 } name_done:;
                 printf( "=%1$lu # 0x%1$lX\n", (unsigned long)val );
                 val <<= 1;
@@ -245,11 +245,19 @@ optionPutShell( tOptions* pOpts )
          *  to emit the value corresponding to the "optArg" number.
          */
         else if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_ENUMERATION) {
+            uintptr_t e_val = pOD->optArg.argEnum;
             printf( zOptValFmt, pOpts->pzPROGNAME, pOD->pz_NAME );
-            fputc( '\'', stdout );
-            (*(pOD->pOptProc))( (tOptions*)1UL, pOD );
-            fputc( '\'', stdout );
-            printf( zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME );
+
+            /*
+             *  Convert value to string, print that and restore numeric value.
+             */
+            (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD);
+            printf("'%s'", pOD->optArg.argString);
+            if (pOD->fOptState & OPTST_ALLOC_ARG)
+                AGFREE(pOD->optArg.argString);
+            pOD->optArg.argEnum = e_val;
+
+            printf(zOptEnd, pOpts->pzPROGNAME, pOD->pz_NAME);
         }
 
         /*

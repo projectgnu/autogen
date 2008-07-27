@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.14 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2007-11-17 10:40:58 bkorb"
+ *  $Id: numeric.c,v 4.15 2008/07/27 20:06:05 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 09:30:04 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -25,10 +25,70 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
+/*=export_func  optionShowRange
+ * private:
+ *
+ * what:  
+ * arg:   + tOptions* + pOpts     + program options descriptor  +
+ * arg:   + tOptDesc* + pOptDesc  + the descriptor for this arg +
+ * arg:   + void *    + rng_table + the value range tables      +
+ * arg:   + int       + rng_count + the number of entries       +
+ *
+ * doc:
+ *   Show information about a numeric option with range constraints.
+=*/
+void
+optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
+{
+    const struct {long const rmin, rmax;} * rng = rng_table;
+    char const * pz_indent =
+        (pOpts != OPTPROC_EMIT_USAGE) ? "\t" : "\t\t\t\t  ";
+
+    if ((pOpts == OPTPROC_EMIT_USAGE) || (pOpts > OPTPROC_EMIT_LIMIT)) {
+        char const * lie_in_range = zRangeLie;
+
+        if (pOpts > OPTPROC_EMIT_LIMIT) {
+            fprintf(option_usage_fp, zRangeErr,
+                    pOpts->pzProgName, pOD->pz_Name, pOD->optArg.argString);
+            fprintf(option_usage_fp, "The %s option:\n", pOD->pz_Name);
+            lie_in_range = zRangeBadLie;
+        }
+
+        if (pOD->fOptState & OPTST_SCALED_NUM)
+            fprintf(option_usage_fp, zRangeScaled, pz_indent);
+
+        if (rng_ct > 1)
+            fprintf(option_usage_fp, lie_in_range, pz_indent);
+        else {
+            pz_indent = "";
+            fprintf(option_usage_fp, zRangeOnly, pz_indent);
+        }
+
+        for (;;) {
+            if (rng->rmax == LONG_MIN)
+                fprintf(option_usage_fp, zRangeExact, pz_indent, rng->rmin);
+            else
+                fprintf(option_usage_fp, zRange, pz_indent, rng->rmin,
+                        rng->rmax);
+
+            if  (--rng_ct <= 0) {
+                fputc('\n', option_usage_fp);
+                break;
+            }
+            fputs(zRangeOr, option_usage_fp);
+            rng++;
+        }
+
+        if (pOpts > OPTPROC_EMIT_LIMIT)
+            pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+    }
+}
+
+
 /*=export_func  optionNumericVal
  * private:
  *
- * what:  Decipher a boolean value
+ * what:  process an option with a numeric value.
  * arg:   + tOptions* + pOpts    + program options descriptor +
  * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
  *
@@ -36,7 +96,7 @@
  *  Decipher a numeric value.
 =*/
 void
-optionNumericVal( tOptions* pOpts, tOptDesc* pOD )
+optionNumericVal(tOptions* pOpts, tOptDesc* pOD )
 {
     char* pz;
     long  val;

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: file.c,v 4.3 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2007-10-30 11:36:13 bkorb"
+ *  $Id: file.c,v 4.4 2008/07/27 20:06:05 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 10:24:42 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -47,7 +47,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
 {
     char * fname;
 
-    if (pOD == NULL) {
+    if ((uintptr_t)pOpts < 0xFUL) {
         switch (ftype & FTYPE_MODE_EXIST_MASK) {
         case FTYPE_MODE_MUST_NOT_EXIST:
             fputs(zFileCannotExist, option_usage_fp);
@@ -73,7 +73,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
                 if (errno == 0)
                     errno = EINVAL;
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        "stat-ing for non-existant", pOD->pz_Name, fname);
+                        zFSOptErrNoExist, fname, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -88,7 +88,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
             if (  (stat(fname, &sb) != 0)
                || (errno = EINVAL, ! S_ISDIR(sb.st_mode)) ){
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        "stat-ing for directory", pOD->pz_Name, fname);
+                        zFSOptErrMayExist, fname, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -100,7 +100,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
             if (  (stat(fname, &sb) != 0)
                || (errno = EINVAL, ! S_ISREG(sb.st_mode)) ){
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        "stat-ing for regular", pOD->pz_Name, fname);
+                        zFSOptErrMustExist, fname, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -118,7 +118,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
         int fd = open(fname, mode.file_flags);
         if (fd < 0) {
             fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    "open-ing", pOD->pz_Name, fname);
+                    zFSOptErrOpen, fname, pOD->pz_Name);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }
@@ -131,7 +131,7 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
         FILE* fp = fopen(fname, mode.file_mode);
         if (fp == NULL) {
             fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    "fopen-ing", pOD->pz_Name, fname);
+                    zFSOptErrFopen, fname, pOD->pz_Name);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }

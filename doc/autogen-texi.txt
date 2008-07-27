@@ -3812,7 +3812,7 @@ section and before the @code{AUTHOR} section.
 @subsection Automatically Supported Options
 @cindex automatic options
 
-AutoOpts provides automated support for six options.  @code{help} and
+AutoOpts provides automated support for several options.  @code{help} and
 @code{more-help} are always provided.  @code{version} is provided if
 @code{version} is defined in the option definitions @xref{program attributes}.
 @code{save-opts} and @code{load-opts} are provided if at least
@@ -3855,6 +3855,18 @@ been provided, then the copyright will be printed, too.  If it is followed
 by the letter @code{n}, then the full copyright notice (if available) will
 be printed.
 
+@item load-opts -<
+@cindex configuration file
+This option will load options from the named file.  They will be treated
+exactly as if they were loaded from the normally found configuration files, but
+will not be loaded until the option is actually processed.  This can also be
+used within another configuration file, causing them to nest.  This is the
+@strong{only} option that can be activated inside of config files or with
+environment variables.
+
+Specifying the negated form of the option (@code{--no-load-opts}) will
+suppress the processing of configuration files and environment variables.
+
 @item save-opts ->
 @cindex configuration file
 This option will cause the option state to be printed in the configuration file
@@ -3876,17 +3888,19 @@ state, but the state will @strong{not} actually be saved.  You must call
 and @code{optionProcess} will not return.  You may wish to invoke
 @code{CLEAR_OPT( SAVE_OPTS )} (@pxref{CLEAR_OPT}) beforehand.
 
-@item load-opts -<
-@cindex configuration file
-This option will load options from the named file.  They will be treated
-exactly as if they were loaded from the normally found configuration files, but
-will not be loaded until the option is actually processed.  This can also be
-used within another configuration file, causing them to nest.  This is the
-@strong{only} option that can be activated inside of config files or with
-environment variables.
+@item reset-option -R
+This option takes the name of an option for the current program and resets
+its state such that it is set back to its original, compile-time initialized
+value.  If the option state is subsequently stored (via @code{--save-opts}),
+the named option will not appear in that file.
 
-Specifying the negated form of the option (@code{--no-load-opts}) will
-suppress the processing of configuration files and environment variables.
+This option is enabled by setting the global program attribute,
+@code{resettable}.  If set, all option callbacks must look for the
+@code{OPTST_RESET} bit in the @code{fOptState} field of the option descriptor.
+If set, the @code{optCookie} and @code{optArg} fields will be unchanged from
+their last setting.  When the callback returns, these fields will be set to
+their original values.  If you use this feature and you have allocated data
+hanging off of the cookie, you need to deallocate it.
 @end table
 
 @node standard options

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.37 2008/06/14 22:23:53 bkorb Exp $
- *  Time-stamp:      "2007-11-12 20:35:53 bkorb"
+ *  $Id: autoopts.c,v 4.38 2008/07/27 20:06:05 bkorb Exp $
+ *  Time-stamp:      "2008-07-14 19:28:05 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -262,15 +262,21 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
     int        matchCt  = 0;
     int        matchIdx = 0;
     int        nameLen;
+    char       opt_name_buf[128];
 
     /*
      *  IF the value is attached to the name,
-     *  THEN clip it off.
-     *  Either way, figure out how long our name is
+     *  copy it off so we can NUL terminate.
      */
     if (pzEq != NULL) {
         nameLen = (int)(pzEq - pzOptName);
-        *pzEq = NUL;
+        if (nameLen >= sizeof(opt_name_buf))
+            return FAILURE;
+        memcpy(opt_name_buf, pzOptName, nameLen);
+        opt_name_buf[nameLen] = NUL;
+        pzOptName = opt_name_buf;
+        pzEq++;
+
     } else nameLen = strlen( pzOptName );
 
     do  {
@@ -326,9 +332,6 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
 
     } while (pOD++, (++idx < idxLim));
 
-    if (pzEq != NULL)
-        *(pzEq++) = '=';
-
     /*
      *  Make sure we either found an exact match or found only one partial
      */
@@ -367,8 +370,8 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
      *  THEN call the usage procedure.
      */
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-        fprintf( stderr, zIllOptStr, pOpts->pzProgPath,
-                 (matchCt == 0) ? zIllegal : zAmbiguous, pzOptName );
+        fprintf(stderr, (matchCt == 0) ? zIllOptStr : zAmbigOptStr,
+                pOpts->pzProgPath, pzOptName);
         (*pOpts->pUsageProc)( pOpts, EXIT_FAILURE );
     }
 

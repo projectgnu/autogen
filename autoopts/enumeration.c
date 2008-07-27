@@ -1,7 +1,7 @@
 
 /*
- *  $Id: enumeration.c,v 4.23 2008/04/14 15:33:43 bkorb Exp $
- * Time-stamp:      "2008-04-06 17:32:20 bkorb"
+ *  $Id: enumeration.c,v 4.24 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-27 12:28:01 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -57,15 +57,15 @@ enumError(
     tCC* const *  paz_names,
     int           name_ct )
 {
-    static char const mask_msg[] =
-        "  or an integer mask with any of the lower %d bits set\n";
-
     size_t max_len = 0;
     size_t ttl_len = 0;
     int    ct_down = name_ct;
     int    hidden  = 0;
 
-    if (pOpts > (tOptions*)0x0FUL)
+    /*
+     *  A real "pOpts" pointer means someone messed up.  Give a real error.
+     */
+    if (pOpts > OPTPROC_EMIT_LIMIT)
         fprintf(option_usage_fp, pz_enum_err_fmt, pOpts->pzProgName,
                 pOD->optArg.argString, pOD->pz_Name);
 
@@ -149,21 +149,21 @@ enumError(
         }
         fprintf(option_usage_fp, "%s\n", *paz_names);
     }
-    if (pOpts == (tOptions*)0x01UL)
-        fprintf(option_usage_fp, mask_msg, name_ct);
-    else
-        fprintf(option_usage_fp, "  or an integer between %d and %d\n",
-                hidden, name_ct - 1 + hidden);
 
-    /*
-     *  IF we do not have a pOpts pointer, then this output is being requested
-     *  by the usage procedure.  Let's not re-invoke it recursively.
-     */
-    if (pOpts > (tOptions*)0x0FUL)
+    if (pOpts > OPTPROC_EMIT_LIMIT) {
+        fprintf(option_usage_fp, zIntRange, hidden, name_ct - 1 + hidden);
+
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+        /* NOTREACHED */
+    }
 
-    if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP)
+
+    if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP) {
+        fprintf(option_usage_fp, zLowerBits, name_ct);
         fputs(zSetMemberSettings, option_usage_fp);
+    } else {
+        fprintf(option_usage_fp, zIntRange, hidden, name_ct - 1 + hidden);
+    }
 }
 
 
@@ -235,7 +235,7 @@ optionKeywordName(
     tOptDesc od;
 
     od.optArg.argEnum = enum_val;
-    (*(pOD->pOptProc))( (void*)(2UL), &od );
+    (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, &od );
     return od.optArg.argString;
 }
 
@@ -272,14 +272,14 @@ optionEnumerationVal(
      *  then it is some sort of special request.
      */
     switch ((uintptr_t)pOpts) {
-    case 0UL:
+    case (uintptr_t)OPTPROC_EMIT_USAGE:
         /*
          *  print the list of enumeration names.
          */
         enumError(pOpts, pOD, paz_names, (int)name_ct);
         break;
 
-    case 1UL:
+    case (uintptr_t)OPTPROC_EMIT_SHELL:
     {
         unsigned int ix = pOD->optArg.argEnum;
         /*
@@ -293,7 +293,7 @@ optionEnumerationVal(
         break;
     }
 
-    case 2UL:
+    case (uintptr_t)OPTPROC_RETURN_VALNAME:
     {
         tSCC zInval[] = "*INVALID*";
         unsigned int ix = pOD->optArg.argEnum;
@@ -303,7 +303,7 @@ optionEnumerationVal(
         if (ix >= name_ct)
             return (uintptr_t)zInval;
 
-        res = (uintptr_t)paz_names[ ix ];
+        pOD->optArg.argString = paz_names[ix];
         break;
     }
 
@@ -349,39 +349,43 @@ optionSetMembers(
      *  then it is some sort of special request.
      */
     switch ((uintptr_t)pOpts) {
-    case 0UL:
+    case (uintptr_t)OPTPROC_EMIT_USAGE:
         /*
          *  print the list of enumeration names.
          */
-        enumError((tOptions*)0x01UL, pOD, paz_names, (int)name_ct );
+        enumError(OPTPROC_EMIT_USAGE, pOD, paz_names, (int)name_ct );
         return;
 
-    case 1UL:
+    case (uintptr_t)OPTPROC_EMIT_SHELL:
     {
         /*
          *  print the name string.
          */
+        int       ix   =  0;
         uintptr_t bits = (uintptr_t)pOD->optCookie;
-        uintptr_t res  = 0;
         size_t    len  = 0;
+
+        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
 
         while (bits != 0) {
             if (bits & 1) {
                 if (len++ > 0) fputs( " | ", stdout );
-                fputs( paz_names[ res ], stdout );
+                fputs(paz_names[ix], stdout);
             }
-            if (++res >= name_ct) break;
+            if (++ix >= name_ct) break;
             bits >>= 1;
         }
         return;
     }
 
-    case 2UL:
+    case (uintptr_t)OPTPROC_RETURN_VALNAME:
     {
         char*     pz;
         uintptr_t bits = (uintptr_t)pOD->optCookie;
-        uintptr_t res  = 0;
-        size_t    len  = 0;
+        int       ix   = 0;
+        size_t    len  = 5;
+
+        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
 
         /*
          *  Replace the enumeration value with the name string.
@@ -389,12 +393,12 @@ optionSetMembers(
          */
         while (bits != 0) {
             if (bits & 1)
-                len += strlen( paz_names[ res ]) + 8;
-            if (++res >= name_ct) break;
+                len += strlen( paz_names[ix]) + 8;
+            if (++ix >= name_ct) break;
             bits >>= 1;
         }
 
-        pOD->optArg.argString = pz = AGALOC( len, "enum name" );
+        pOD->optArg.argString = pz = AGALOC(len, "enum name");
 
         /*
          *  Start by clearing all the bits.  We want to turn off any defaults
@@ -404,14 +408,16 @@ optionSetMembers(
         strcpy( pz, "none" );
         pz += 4;
         bits = (uintptr_t)pOD->optCookie;
-        res = 0;
+        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
+        ix = 0;
+
         while (bits != 0) {
             if (bits & 1) {
                 strcpy( pz, " + " );
-                strcpy( pz+3, paz_names[ res ]);
-                pz += strlen( paz_names[ res ]) + 3;
+                strcpy( pz+3, paz_names[ix]);
+                pz += strlen( paz_names[ix]) + 3;
             }
-            if (++res >= name_ct) break;
+            if (++ix >= name_ct) break;
             bits >>= 1;
         }
         return;
@@ -420,6 +426,9 @@ optionSetMembers(
     default:
         break;
     }
+
+    if ((pOD->fOptState & OPTST_RESET) != 0)
+        return;
 
     {
         tCC*      pzArg = pOD->optArg.argString;

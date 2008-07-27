@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.31 2008/04/06 22:48:04 bkorb Exp $
+# $Id: opthead.tpl,v 4.32 2008/07/27 20:06:05 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-04-06 12:10:06 bkorb"
+# Time-stamp:      "2008-07-05 14:17:55 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,10 +32,21 @@
  *  These macros are documented in the AutoGen info file in the
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
  */
-[= (make-header-guard "autoopts") =][=
-% config-header "\n#include \"%s\""=]
+[= (make-header-guard "autoopts")       =][=
+
+  `test_exe() {
+     test -n "${1}" && test -x ${1} && ${1} -v >/dev/null
+     test $? -ne 0 && return 1
+     CLexe=${1}
+   }
+   test_exe ${CLexe} || \
+     test_exe ${top_builddir}/columns/columns || \
+     test_exe @bindir@/columns || \
+     die "cannot locate columns program"
+  `                                     =][=
+% config-header "\n#include \"%s\""     =]
 #include <autoopts/options.h>
-[= IF (not (exist? "library")) =]
+[= IF (not (exist? "library"))          =]
 /*
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
@@ -66,6 +77,11 @@ IF (exist? "library")           =]
         LIBRARY_OPTION_COUNT[=
 
 ELSE                            =][=
+
+  IF (exist? "resettable")      =]
+        [= (. INDEX-pfx) =]RESET            = [=
+                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
+  ENDIF                         =][=
 
   IF (exist? "version")         =]
         [= (. INDEX-pfx) =]VERSION          = [=
@@ -300,6 +316,13 @@ IF (exist? "flag.value")        =][=
        val-UPNAME  = "MORE_HELP"
        std-value   = "!"        =][=
 
+  IF (exist? "resettable")      =][=
+    INVOKE set-std-value
+       val-name    = "reset-value"
+       val-UPNAME  = "RESET"
+       std-value   = "R"        =][=
+  ENDIF  have "reset"           =][=
+
   IF (exist? "version")         =][=
     INVOKE set-std-value
        val-name    = "version-value"
@@ -318,7 +341,7 @@ IF (exist? "flag.value")        =][=
     INVOKE set-std-value
        val-name    = "save-opts-value"
        val-UPNAME  = "SAVE_OPTS"
-       std-value   = ">"    =][=
+       std-value   = ">"        =][=
 
     INVOKE set-std-value
        val-name    = "load-opts-value"
@@ -328,6 +351,9 @@ IF (exist? "flag.value")        =][=
 
 ELSE  NO "flag.value"           =][=
 
+  IF (exist? "resettable")      =]
+#define [= (. VALUE-pfx) =]RESET          [= (. INDEX-pfx) =]RESET[=
+  ENDIF  have "reset"           =][=
   IF (exist? "version")         =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
   ENDIF  have "version"         =]

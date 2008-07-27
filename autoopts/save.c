@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.29 2008/06/22 16:26:25 bkorb Exp $
- * Time-stamp:      "2008-06-21 10:54:47 bkorb"
+ *  save.c  $Id: save.c,v 4.30 2008/07/27 20:06:05 bkorb Exp $
+ * Time-stamp:      "2008-07-27 09:53:10 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -346,6 +346,7 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
     case OPARG_TYPE_ENUMERATION:
     case OPARG_TYPE_MEMBERSHIP:
         if (pOD != NULL) {
+            tAoUI     opt_state = pOD->fOptState;
             uintptr_t val = pOD->optArg.argEnum;
             char const * typ = (ovp->valType == OPARG_TYPE_ENUMERATION)
                 ? "keyword" : "set-membership";
@@ -356,7 +357,7 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
              *  This is a magic incantation that will convert the
              *  bit flag values back into a string suitable for printing.
              */
-            (*(pOD->pOptProc))( (tOptions*)2UL, pOD );
+            (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD );
             if (pOD->optArg.argString != NULL) {
                 fputs(pOD->optArg.argString, fp);
 
@@ -365,11 +366,11 @@ print_a_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
                      *  set membership strings get allocated
                      */
                     AGFREE( (void*)pOD->optArg.argString );
-                    pOD->fOptState &= ~OPTST_ALLOC_ARG;
                 }
             }
 
             pOD->optArg.argEnum = val;
+            pOD->fOptState = opt_state;
             fprintf(fp, close_xml, ovp->pzName);
             break;
         }
@@ -661,7 +662,7 @@ optionSaveFile( tOptions* pOpts )
              *  This is a magic incantation that will convert the
              *  bit flag values back into a string suitable for printing.
              */
-            (*(p->pOptProc))( (tOptions*)2UL, p );
+            (*(p->pOptProc))(OPTPROC_RETURN_VALNAME, p);
             printEntry( fp, p, (void*)(p->optArg.argString));
 
             if (  (p->optArg.argString != NULL)

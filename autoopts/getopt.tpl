@@ -35,6 +35,7 @@ DEFINE emit-usage-string    +][+
   INCLUDE "usage.tpl"       +][+
   (kr-string (string-append (shell (string-append
   "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
+       -e '/: illegal option --/d' \
        -e 's/ --version\\[=arg\\]/ --version      /' \
        -e '/ --more-help /d' <<_EOF_\n" (out-pop #t) "\n_EOF_"
   )) "\n" ))  +][+
@@ -58,7 +59,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.11 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.12 2008/07/27 20:06:05 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
