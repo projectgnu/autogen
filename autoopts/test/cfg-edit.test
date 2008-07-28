@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2008-07-27 15:02:34 bkorb"
+# Time-stamp:        "2008-07-27 20:59:06 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: cfg-edit.test,v 4.1 2008/07/28 02:18:55 bkorb Exp $
+# $Id: cfg-edit.test,v 4.2 2008/07/28 04:30:39 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
@@ -34,6 +34,7 @@
 
 test -d ${testname}.d || mkdir -p ${testname}.d
 test_name=`echo ${testname} | sed 's/-/_/g'`
+cfg_file=${testname}.d/${testname}.cfg
 
 exec 5> ${testname}.def
 cat >&5 <<- _EOF_
@@ -43,7 +44,7 @@ cat >&5 <<- _EOF_
 	config-header = 'config.h';
 	prog-name  = "test_${testname}";
 	prog-title = "Test AutoOpts for ${testname}";
-	homerc     = ${testname}.d/${testname}.cfg;
+	homerc     = ${cfg_file};
 	resettable;
 	argument   = '[ <output-config-file> ]';
 
@@ -74,12 +75,12 @@ cat >&5 <<- _EOF_
 	        tOptions * const pOpts = &test_${test_name}Options;
 	        int svix = pOpts->specOptIdx.save_opts;
 	        tOptDesc * pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts;
-	        char const * pzFile = "${testname}-save.cfg";
+	        char const * pzFile = "${cfg_file}-default";
 
 	        if (argc > 0)
 	            pzFile = *argv;
 	        if (svix == 0) exit(1);
-	        pOD->optArg.argString = pzFile;
+	        SET_OPT_SAVE_OPTS(pzFile);
 	        optionSaveFile(pOpts);
 	    }
 	_EOF_
@@ -118,7 +119,7 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
 
 
 The following option preset mechanisms are supported:
- - reading file ${testname}.d/${testname}.cfg
+ - reading file ${cfg_file}
 
 The valid "members" option keywords are:
   one two three four five six seven eight nine ten
@@ -131,7 +132,19 @@ _EOF_
 cmp -s ${basehelp} ${testname}.help || \
   failure "`diff ${basehelp} ${testname}.help`"
 
-./${testname} -m 'one + three + five + seven' '->'
+./${testname} -m 'one + three + seven' '->'
+members=`sed -n 's/^members *//p' ${cfg_file}`
+case "${members}" in
+'none + one + three + five + seven' ) : ;;
+* ) failure "members not set to one, three, five and seven" ;;
+esac
+
+./${testname} -R '*' '->'
+members=`sed -n 's/^members *//p' ${cfg_file}` 2>/dev/null
+case "${members}" in
+'' ) : ;;
+* ) failure "members entry not removed"
+esac
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
 

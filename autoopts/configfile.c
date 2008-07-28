@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.41 2008/06/14 22:23:53 bkorb Exp $
- *  Time-stamp:      "2008-06-14 12:07:53 bkorb"
+ *  $Id: configfile.c,v 4.42 2008/07/28 04:30:39 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 20:47:06 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -947,7 +947,8 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
      *  already took place.  It must be done to suppress preloading of ini/rc
      *  files.)
      */
-    if (DISABLED_OPT(pOptDesc))
+    if (  DISABLED_OPT(pOptDesc)
+       || ((pOptDesc->fOptState & OPTST_RESET) != 0))
         return;
 
     if (stat( pOptDesc->optArg.argString, &sb ) != 0) {

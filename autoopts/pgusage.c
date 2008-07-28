@@ -1,7 +1,7 @@
 
 /*
- *  $Id: pgusage.c,v 4.15 2008/01/23 00:35:27 bkorb Exp $
- * Time-stamp:      "2007-07-04 11:34:23 bkorb"
+ *  $Id: pgusage.c,v 4.16 2008/07/28 04:30:39 bkorb Exp $
+ * Time-stamp:      "2008-07-27 21:08:42 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -47,6 +47,9 @@ void
 optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {
 #if defined(__windows__) && !defined(__CYGWIN__)
+    if ((pOD->fOptState & OPTST_RESET) != 0)
+        return;
+
     (*pOptions->pUsageProc)( pOptions, EXIT_SUCCESS );
 #else
     static pid_t     my_pid;
@@ -60,6 +63,9 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
     switch (pagerState) {
     case PAGER_STATE_INITIAL:
     {
+        if ((pOD->fOptState & OPTST_RESET) != 0)
+            return;
+
         my_pid  = getpid();
 #ifdef HAVE_SNPRINTF
         snprintf(zPageUsage, sizeof(zPageUsage), "/tmp/use.%lu", (tAoUL)my_pid);

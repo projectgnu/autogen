@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.38 2008/07/28 02:18:55 bkorb Exp $
+#$Id: optcode.tpl,v 4.39 2008/07/28 04:30:39 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-07-27 15:23:53 bkorb"
+# Time-stamp:      "2008-07-27 20:35:44 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -582,15 +582,18 @@ doUsageOpt(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {[=
-
-IF (exist? "usage-opt") =]
+  IF (exist? "resettable") =]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;
+[=ENDIF=][=
+  IF (exist? "usage-opt") =]
     int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
         ? EXIT_SUCCESS : EX_USAGE;
     [= (. UP-prefix) =]USAGE(ex_code);[=
 
-ELSE   =]
+  ELSE   =]
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );[=
-ENDIF  =]
+  ENDIF  =]
 }[=
 
 IF (or (exist? "flag.flag-code")

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.28 2008/06/15 19:03:29 bkorb Exp $
- *  Time-stamp:      "2008-06-15 11:24:57 bkorb"
+ *  $Id: nested.c,v 4.29 2008/07/28 04:30:39 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 20:03:01 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -728,13 +728,35 @@ optionLoadNested(char const* pzTxt, char const* pzName, size_t nameLen)
  *  Nested value was found on the command line
 =*/
 void
-optionNestedVal( tOptions* pOpts, tOptDesc* pOD )
+optionNestedVal(tOptions* pOpts, tOptDesc* pOD)
 {
-    tOptionValue* pOV = optionLoadNested(
-        pOD->optArg.argString, pOD->pz_Name, strlen(pOD->pz_Name));
+    if (pOpts < OPTPROC_EMIT_LIMIT)
+        return;
 
-    if (pOV != NULL)
-        addArgListEntry( &(pOD->optCookie), (void*)pOV );
+    if (pOD->fOptState & OPTST_RESET) {
+        tArgList* pAL = pOD->optCookie;
+        int       ct;
+        tCC **    av;
+
+        if (pAL == NULL)
+            return;
+        ct = pAL->useCt;
+        av = pAL->apzArgs;
+
+        while (--ct >= 0) {
+            void * p = (void *)*(av++);
+            optionUnloadNested((tOptionValue const *)p);
+        }
+
+        AGFREE(av);
+
+    } else {
+        tOptionValue* pOV = optionLoadNested(
+            pOD->optArg.argString, pOD->pz_Name, strlen(pOD->pz_Name));
+
+        if (pOV != NULL)
+            addArgListEntry( &(pOD->optCookie), (void*)pOV );
+    }
 }
 
 

@@ -1,7 +1,7 @@
 
 /*
- *  $Id: reset.c,v 4.3 2008/07/28 02:18:55 bkorb Exp $
- *  Time-stamp:      "2008-07-27 15:50:40 bkorb"
+ *  $Id: reset.c,v 4.4 2008/07/28 04:30:39 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 20:28:00 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -24,6 +24,35 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
+static void
+optionReset( tOptions* pOpts, tOptDesc* pOD )
+{
+    pOD->fOptState &= OPTST_PERSISTENT_MASK;
+    pOD->fOptState |= OPTST_RESET;
+    if (pOD->pOptProc != NULL)
+        pOD->pOptProc(pOpts, pOD);
+    pOD->optArg.argString =
+        pOpts->originalOptArgArray[ pOD->optIndex ].argString;
+    pOD->optCookie = pOpts->originalOptArgCookie[ pOD->optIndex ];
+    pOD->fOptState &= OPTST_PERSISTENT_MASK;
+}
+
+
+static void
+optionResetEverything(tOptions * pOpts)
+{
+    tOptDesc * pOD = pOpts->pOptDesc;
+    int        ct  = pOpts->optCt;
+
+    for (;;) {
+        optionReset(pOpts, pOD);
+
+        if (--ct <= 0)
+            break;
+        pOD++;
+    }
+}
+
 
 /*=export_func  optionResetOpt
  * private:
@@ -39,9 +68,14 @@
 void
 optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
 {
+    static ag_bool reset_active = AG_FALSE;
+
     tOptState opt_state = OPTSTATE_INITIALIZER(DEFINED);
     char const * pzArg = pOD->optArg.argString;
     tSuccess     succ;
+
+    if (reset_active)
+        return;
 
     if (  (! HAS_originalOptArgArray(pOpts))
        || (pOpts->originalOptArgCookie == NULL)) {
@@ -54,7 +88,15 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
         pOpts->pUsageProc(pOpts, EXIT_FAILURE);
     }
 
+    reset_active = AG_TRUE;
+
     if (pzArg[1] == NUL) {
+        if (*pzArg == '*') {
+            optionResetEverything(pOpts);
+            reset_active = AG_FALSE;
+            return;
+        }
+
         succ = shortOptionFind(pOpts, (tAoUC)*pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptChr, pOpts->pzProgPath, *pzArg);
@@ -74,15 +116,8 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
      *  Call any callout procedure to handle whatever it needs to.
      *  Finally, clear the reset flag, too.
      */
-    pOD = opt_state.pOD;
-    pOD->fOptState &= OPTST_PERSISTENT_MASK;
-    pOD->fOptState |= OPTST_RESET;
-    if (pOD->pOptProc != NULL)
-        pOD->pOptProc(pOpts, pOD);
-    pOD->optArg.argString =
-        pOpts->originalOptArgArray[ pOD->optIndex ].argString;
-    pOD->optCookie = pOpts->originalOptArgCookie[ pOD->optIndex ];
-    pOD->fOptState &= OPTST_PERSISTENT_MASK;
+    optionReset(pOpts, opt_state.pOD);
+    reset_active = AG_FALSE;
 }
 /*
  * Local Variables:
