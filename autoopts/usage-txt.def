@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.20 2008/07/27 20:06:05 bkorb Exp $
+   $Id: usage-txt.def,v 4.21 2008/07/28 02:18:55 bkorb Exp $
  */
 
 /*
@@ -334,7 +334,7 @@ utxt = { ut-name = NoPreset;
 };
 
 utxt = { ut-name = NoResetArg;
-         ut-text = "The 'reset' option requires an argument\n";
+         ut-text = "The 'reset-option' option requires an argument\n";
 };
 
 utxt = { ut-name = NoRq_NoShrtTtl;
@@ -457,6 +457,10 @@ utxt = { ut-name = RangeExact;
 
 utxt = { ut-name = RangeScaled;
          ut-text = "%sis scalable with a suffix: k/K/m/M/g/G/t/T\n";
+};
+
+utxt = { ut-name = ResetNotConfig;
+         ut-text = "The --reset-option has not been configured.\n";
 };
 
 utxt = { ut-name = ReqFmt;

@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2008-06-15 08:21:10 bkorb"
+# Time-stamp:     "2008-07-27 14:04:02 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2008/06/22 16:26:25 $
+# Last Modified:  $Date: 2008/07/28 02:18:55 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,11 +28,12 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.23 2008/06/22 16:26:25 bkorb Exp $
+# $Id: defs.in,v 4.24 2008/07/28 02:18:55 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`
+test_name=`echo ${testname} | sed 's/-/_/g'`
 export progname testname
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

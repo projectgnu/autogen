@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.37 2008/07/27 20:06:05 bkorb Exp $
+#$Id: optcode.tpl,v 4.38 2008/07/28 02:18:55 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-07-26 19:19:40 bkorb"
+# Time-stamp:      "2008-07-27 15:23:53 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -103,6 +103,11 @@ IF (exist? "flag.arg-range")
 =]#include <stdio.h>
 #include <errno.h>
 extern FILE * option_usage_fp;[=
+
+ENDIF  =][=
+
+IF (exist? "resettable") =]
+#include <stdlib.h>[=
 
 ENDIF  =][=
 
@@ -223,7 +228,10 @@ ENDIF
  *
  *  Define the [=(. pname-cap)=] Option Descriptions.
  */
-static tOptDesc optDesc[ [= (define default-text "") UP-prefix
+static tOptDesc optDesc[ [=
+(define default-text "")
+(define default-cookie "")
+UP-prefix
 =]OPTION_CT ] = {[=
 
 FOR flag "\n"           =][=
@@ -236,22 +244,25 @@ ENDFOR flag
 
 IF (exist? "resettable")
 
-=],
+=]
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
                "\n    { NULL }," ))
-        INDEX-pfx =]RESET, [= (. VALUE-pfx) =]RESET,
+        (set! default-cookie (string-append default-cookie
+               "\n    NULL," ))
+        INDEX-pfx =]RESET_OPTION, [= (. VALUE-pfx) =]RESET_OPTION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ RESET_OPT_FLAGS, 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+			  | OPTST_NO_INIT, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ optionResetOpt,
      /* desc, NAME, name */ zResetText, NULL, zReset_Name,
-     /* disablement strs */ NULL, NULL }[=
+     /* disablement strs */ NULL, NULL },[=
 
 ENDIF
 
@@ -269,6 +280,8 @@ IF (exist? "version")   =]
   {  /* entry idx, value */ [=
          (set! default-text (string-append default-text
                "\n    { NULL }," ))
+        (set! default-cookie (string-append default-cookie
+               "\n    NULL," ))
          INDEX-pfx =]VERSION, [= (. VALUE-pfx) =]VERSION,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -290,6 +303,8 @@ ENDIF =]
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
                "\n    { NULL },\n    { NULL }," ))
+        (set! default-cookie (string-append default-cookie
+               "\n    NULL,\n    NULL," ))
         INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -322,6 +337,8 @@ IF (exist? "usage-opt")
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
                "\n    { NULL }," ))
+        (set! default-cookie (string-append default-cookie
+               "\n    NULL," ))
         INDEX-pfx =]USAGE, [= (. VALUE-pfx) =]USAGE,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -345,6 +362,8 @@ IF (exist? "homerc")
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
                "\n    { NULL },\n    { NULL }," ))
+        (set! default-cookie (string-append default-cookie
+               "\n    NULL,\n    NULL," ))
         INDEX-pfx =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
@@ -363,7 +382,7 @@ IF (exist? "homerc")
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) \
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
 			  | OPTST_DISABLE_IMM, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
@@ -480,11 +499,16 @@ ESAC   no-xlate         =]
 # define OPTPROC_BASE OPTPROC_NONE
 # define translate_option_strings NULL
 #endif /* ENABLE_NLS */
+[= IF (exist? "resettable") =]
 static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
 (. UP-prefix) =]OPTION_CT ] = {[=
    (substring/shared default-text 0 (- (string-length default-text) 1)) =]
 };
-
+static void * const original[=(. pname-cap)=]Cookies[ [=
+(. UP-prefix) =]OPTION_CT ] = {[=
+   (substring/shared default-cookie 0 (- (string-length default-cookie) 1)) =]
+};
+[= ENDIF =]
 [= INVOKE usage-text usage-type = full  \=]
 [= INVOKE usage-text usage-type = short \=]
 
@@ -533,7 +557,11 @@ tOptions [=(. pname)=]Options = {
     [= (. option-ct) =] /* full option count */, [=
        (count "flag")=] /* user option count */,
     [= (. pname) =]_full_usage, [= (. pname) =]_short_usage,
-    original[=(. pname-cap)=]Defaults
+[= IF (exist? "resettable") \=]
+    original[=(. pname-cap)=]Defaults, original[=(. pname-cap)=]Cookies
+[= ELSE \=]
+    NULL, NULL
+[= ENDIF \=]
 };
 [=
 

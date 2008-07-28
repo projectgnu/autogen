@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.32 2008/07/27 20:06:05 bkorb Exp $
+# $Id: opthead.tpl,v 4.33 2008/07/28 02:18:55 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-07-05 14:17:55 bkorb"
+# Time-stamp:      "2008-07-27 13:20:57 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -79,7 +79,7 @@ IF (exist? "library")           =]
 ELSE                            =][=
 
   IF (exist? "resettable")      =]
-        [= (. INDEX-pfx) =]RESET            = [=
+        [= (. INDEX-pfx) =]RESET_OPTION     = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
   ENDIF                         =][=
 
@@ -319,7 +319,7 @@ IF (exist? "flag.value")        =][=
   IF (exist? "resettable")      =][=
     INVOKE set-std-value
        val-name    = "reset-value"
-       val-UPNAME  = "RESET"
+       val-UPNAME  = "RESET_OPTION"
        std-value   = "R"        =][=
   ENDIF  have "reset"           =][=
 
@@ -352,7 +352,7 @@ IF (exist? "flag.value")        =][=
 ELSE  NO "flag.value"           =][=
 
   IF (exist? "resettable")      =]
-#define [= (. VALUE-pfx) =]RESET          [= (. INDEX-pfx) =]RESET[=
+#define [= (. VALUE-pfx) =]RESET_OPTION   [= (. INDEX-pfx) =]RESET_OPTION[=
   ENDIF  have "reset"           =][=
   IF (exist? "version")         =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=

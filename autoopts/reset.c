@@ -1,7 +1,7 @@
 
 /*
- *  $Id: reset.c,v 4.2 2008/07/27 20:06:05 bkorb Exp $
- *  Time-stamp:      "2008-07-26 18:09:29 bkorb"
+ *  $Id: reset.c,v 4.3 2008/07/28 02:18:55 bkorb Exp $
+ *  Time-stamp:      "2008-07-27 15:50:40 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -43,6 +43,12 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
     char const * pzArg = pOD->optArg.argString;
     tSuccess     succ;
 
+    if (  (! HAS_originalOptArgArray(pOpts))
+       || (pOpts->originalOptArgCookie == NULL)) {
+        fputs(zResetNotConfig, stderr);
+        _exit(EX_SOFTWARE);
+    }
+
     if ((pzArg == NULL) || (*pzArg == NUL)) {
         fputs(zNoResetArg, stderr);
         pOpts->pUsageProc(pOpts, EXIT_FAILURE);
@@ -55,7 +61,7 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
         }
     } else {
-        succ = longOptionFind(pOpts, pzArg, &opt_state);
+        succ = longOptionFind(pOpts, (char *)pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptStr, pOpts->pzProgPath, pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
@@ -75,6 +81,7 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
         pOD->pOptProc(pOpts, pOD);
     pOD->optArg.argString =
         pOpts->originalOptArgArray[ pOD->optIndex ].argString;
+    pOD->optCookie = pOpts->originalOptArgCookie[ pOD->optIndex ];
     pOD->fOptState &= OPTST_PERSISTENT_MASK;
 }
 /*

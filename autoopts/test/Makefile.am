@@ -4,7 +4,7 @@
 ##
 ## Time-stamp:      "2007-07-04 11:54:14 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2007/10/07 16:54:54 $
+## Last Modified:   $Date: 2008/07/28 02:18:55 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,11 +27,11 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.15 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.16 2008/07/28 02:18:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
-TESTS      = nested.test \
+TESTS      = nested.test cfg-edit.test \
     argument.test cond.test    config.test enums.test   equiv.test \
     errors.test   getopt.test  guile.test  handler.test immediate.test \
     keyword.test  library.test main.test   nls.test     rc.test \

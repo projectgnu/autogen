@@ -40,7 +40,7 @@ bit[11] = { b-name = reorder;     b-what = 'reorder operands after opts'; };
 bit[12] = { b-name = gnuusage;    b-what = 'emit usage in GNU style'; };
 bit[13] = { b-name = translate;   b-what = 'Translate strings in tOptions'; };
 bit[14] = { b-name = has-immed;   b-what = 'program defines immed options'; };
-bit[15] = { b-name = resettable;  b-what = 'Support --reset option'; };
+
 bit[16] = { b-name = nxlat-opt-cfg; b-what = 'suppress for config only'; };
 bit[17] = { b-name = nxlat-opt;     b-what = 'suppress xlation always'; };
 bit[19] = { b-name = presetting;  b-what = 'opt processing in preset state'; };

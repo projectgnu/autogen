@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2008-07-26 19:24:58 bkorb"
+# Time-stamp:      "2008-07-27 14:12:00 bkorb"
 
-# $Id: optmain.tpl,v 4.29 2008/07/27 20:06:05 bkorb Exp $
+# $Id: optmain.tpl,v 4.30 2008/07/28 02:18:55 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -941,6 +941,8 @@ DEFINE   set-membership-code
 
 =][=
 
+(if (not (exist? "keyword"))
+    (error "set membership requires keywords"))
 (set! tmp-ct (count "keyword"))
 (emit (tpl-file-line extract-fmt))
 (ag-fprintf 0 "    static char const * const azNames[%d] = {\n" tmp-ct)
