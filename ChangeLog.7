@@ -1,0 +1,374 @@
+
+2007-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c (ag_scm_get_c_name): New: combines "get" with
+	"string->c-name!"
+	(ag_scm_get_up_name): new: combines "get-c-name" with
+	"string-upcase!"
+	(ag_scm_get_down_name): new: combines "get-c-name" with
+	"string-downcase!"
+
+2007-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c (ag_scm_out_emit_suspended): new function
+	* autoopts/test/defs.in (init_tests): new function - refactor code
+	and make certain that the .log text is emitted to stderr on errors.
+	* autoopts/test/getopt.test (AUTOGEN_TEMPL_DIRS): export this
+	environment variable for nested autogen invocations.
+	
+2007-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (ag_abend_at): shadowing warning
+	* agen5/defParse.def (debug-flag): change to something out of the way.
+	* agen5/expFormat.c (ag_scm_agpl): new function for Affero GPL.
+	* agen5/expOutput.c: add tracing for the various (out* ) functions
+	* agen5/expPrint.c (printFault): the fault handler is enabled only
+	when DEBUG_ENABLED is *not* defined.  Under debugging, we want a fault
+	and core dump.
+	* agen5/fsm-trans.tpl (debug-flag): parameterize the name of the
+	"ifdef" used to indicate enabling debug code.
+	* agen5/funcDef.c (mFunc_Debug): doc it and remove CPP ifdef's
+	* agen5/opts.def (trace): doc the fact that 'everything' can now include
+	tracing the AutoGen defined scheme functions.
+	* agen5/tpParse.c: printf warning patrol.
+	* columns/opts.def: enable rc file processing for columns
+	* agen5/test/debug.test: validate the now distributed functionality
+	
+2007-11-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/aoconf.tpl (tempdir): use the one embedded in autogen
+	* autoopts/nested.c (addNumberValue): it's a number (integer) value,
+	not a boolean value.
+	* autoopts/test/getopt.test (getopts_long): not all systems have it.
+	Don't test it on all systems.
+	* autoopts/value-type.[ch]: newly generated file pair to enumerate and
+	identify config file value type keywords.
+	* autoopts/xat-attribute.[ch]: newly generated file pair for XML config
+	file entry types: type words members cooked uncooked keep
+	* autoopts/configfile.c (parseAttributes): use these gperf generated
+	files to simplify this code.
+	(parseKeyWordType): likewise
+	* autoopts/cook.c (ao_string_cook_escape_char): fix solaris CC issue
+	* autoopts/nested.c (addBoolValue): use IS_FALSE_TYPE_CHAR char test.
+	* autoopts/numeric.c (optionNumericVal): handle scaling suffix
+	* autoopts/opt-state.def (scaled-num): new marker bit for number option
+	args that may take a scaling suffix
+	* autoopts/optlib.tpl (scaled): detect and handle attribute
+	* autoopts/optmain.tpl (scale-val) detect and handle 'scaled' attribute
+	* autoopts/test/argument.test: test new feature
+	* autoopts/usage-txt.def: remove keywords now handled by gperf.
+
+2007-11-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agInit.c (initialize): make sure "pzShellProgram" is initialized
+	to something reasonable at startup time.  ("reasonable" means not "csh"
+	and not "tcsh".)
+	* agen5/agShell.c (chainOpen): remove the "pzShellProgram" init code
+	* agen5/defDirect.c (doDir_shell): ditto
+	* agen5/defLex.c (scanAgain): ditto
+	* agen5/funcCase.c (XXX_Match): strip the "const" attribute from the
+	match text pointer for the compile_re call.
+	* autoopts/Makefile.am (pkgconfig): the files are DATA files
+
+2007-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/ag-char-map.h: new file with custom character categories
+	* all over: replace ctype macros with the character categories.
+	* agen5/defLex.c (assembleName): remove the "zNameChars" private
+	character category map
+	* autoopts/cook.c (ao_string_cook_escape_char): use the char
+	categories for detecting hex and octal numbers.
+
+2007-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c (compile_re): make the pattern argument
+	"char const *" because it does not modify the string, but
+	coerce it into "char *" because that is what "regcomp" uses.
+	* autoopts/autoopts.h (AGFREE): coerce the argument into being
+	deallocatable.
+	* autoopts/install-options-h (#include): the ending file name is
+	now "stdio.h", not "sys/types.h".
+	* autoopts/load.c (insertProgramPath): coerce the pointer to be
+	deallocated into "void *" from "char const *".
+
+2007-10-28  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl (flag.arg-type): accept "file" as a new type.
+	* autoopts/optmain.tpl (file-name-code): implement callback for "file".
+	* autoopts/optlib.tpl (VALUE): implement new #define for opened files
+	* autoopts/options_h.tpl: enumerate the new option argument type.
+	* autoopts/autoopts.h (arg_types_t): add pzFile to list of known types
+	* autoopts/file.c: new implement the functionality
+	* autoopts/test/argument.test: test this stuff
+	* autoopts/usage-txt.def: add a few new translatable strings.
+	* autoopts/usage.c (printExtendedUsage): print file existence req.
+	* doc/autogen-texi.txt: doc this stuff
+	* agen5/autogen.c (doneCheck): the option strings are gone by the time
+	doneCheck() is called.  Use a global "trace_is_to_pipe" to track
+	whether trace output is going to a pipe or a file.
+	* agen5/opts.def (trace_is_to_pipe): define and set value
+
+2007-10-27  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpLoad.c (findFile): Entries in the argument stack must be
+	allocated.  Free the old one and allocate the new one.
+	* autoopts/optlib.tpl (emit-non-doc-option): utilize the new
+	"fill mode" operation instead of the texinfo command "fmt".
+	* autoopts/test/getopt.test (compile_getopt): make sure that
+	only temporary variations of the option templates are used.
+	* autoopts/usage.tpl (flags): make sure these all refer to things
+	inside of the testing directory.  Nothing installed.
+	* columns/columns.c: implement a --fill option that works much
+	like "fmt", but does not depend upon texinfo tools being installed.
+	* columns/opts.def (fill): define the option
+	* xml2ag/Makefile.am (EXTRA_DIST): do not distribute files that
+	should get generated during the build process.
+
+2007-10-06  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.3
+
+	* autoopts/getopt.tpl (USAGE): function names belong next to the
+	opening parenthesis for their argument list.
+	* config/libopts.def (do-first): check for strsignal function.
+	* configure.in (AC_CHECK_FUNCS): don't check for strsignal here
+
+2007-09-08  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/save.c (optionSaveFile): If an option is in "disabled" state
+	because it was selected via an alias, then emit the name of the alias
+	option into the generated config file instead of faulting.
+
+2007-08-04  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (optionProcess): re-call the translation
+	procedure if: we have one, translations are active, we did not
+	translate option names before config processing, and we need to
+	before command line option processing.
+	* autoopts/configfile.c (validateOptionsStruct): if we are not to
+	translate option names for the command line, then we are also not
+	to translate for config time either.
+	* autoopts/optcode.tpl (translate_option_strings): rework it so that
+	option names are only translated when the OPTPROC_NXLAT_OPT_CFG
+	flag bit is turned off.
+	(OPTPROC_BASE): set that bit or OPTPROC_NXLAT_OPT, if requested.
+	* autoopts/opthead.tpl (XLAT): emit four macros for controlling the
+	setting of these two bits (both off, both on, and one or other on).
+	* autoopts/optlib.tpl (emit-nondoc-option): emit "TRANSLATORS:"
+	comment for any options with "translators" defined.
+	* autoopts/proc-state.def (bit[16]): define option name translation
+	suppression bits.
+	* doc/autogen-texi.txt: doc all this stuff
+
+2007-07-15  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.2
+
+	* autoopts/usage.tpl: new - emits usage text (full or short).
+	* autoopts/getopt.tpl: use it
+	* autoopts/optlib.tpl: use it, when the usage text string is empty
+	* autoopts/optcode.tpl (OPTPROC_X_LAT_USAGE): remove -- not needed
+	* autoopts/opthead.tpl (version): reorder it
+
+2007-07-14  Bruce Korb  <bkorb@gnu.org>
+
+	* VERSION: Going to revision 30 of the interface.
+	* agen5/loadPseudo.c (doSuffixSpec): require that there be something
+	after the '=' marker in a suffix specification.  Make sure any
+	allocated memory is deallocatable.
+	* agen5/tpProcess.c (processTemplate): deallocate the file name format
+	string, if necessary.
+	* autoopts/optcode.tpl (full-usage): new
+	(short-usage): new -- make it optional to have the full usage text
+	produced so that it can be readily translated.
+	* autoopts/options_h.tpl (struct options): add pzFullUsage and
+	pzShortUsage
+	* autoopts/optlib.tpl(usage-text): new macro for producing the text.
+	* autoopts/proc-state.def (bit): bit numbers must not ever wiggle, so
+	fix them all.
+	* autoopts/test/nls.test: augment for translatable usage text.
+	* autoopts/usage.c (optionUsage): give priority to usage strings over
+	computed usage text.
+
+2007-07-04  Bruce Korb  <bkorb@gnu.org>
+
+	* *EVERYWHERE*: update licensing terms to GPLv3
+
+2007-05-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/schemedef.scm (make-header-guard): remove
+	* agen5/expOutput.c (ag_scm_make_header_guard): written in C.
+	Will not put multiple underscored together.
+	* agen5/expString.c: code cleanup
+	* options/options.tpl: make sure no two options use the same flag char.
+	* snprintfv/printf.c: remove excessive logic nesting.
+
+2007-04-28  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9.1
+
+	* autoopts/getopt.tpl: include stdio.h and string.h and #define a value
+	for DIRCH, setting it to '/' normally, but '\\' for Windows.
+
+2007-04-28  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def (optional_args): new configurable.  Default
+	is enabled, so users must specify, --disable-optional-args to
+	disable optional arguments to command line options.
+	NO_OPTIONAL_OPT_ARGS is #defined if this is specified.
+	* autoopts/optcode.tpl (version):
+	Set the --version option flags to different values, depending upon
+	whether NO_OPTIONAL_OPT_ARGS is defined or not.  --version will not
+	take an argument if this is undefined.
+	* autoopts/options_h.tpl (OPTST_ARG_OPTIONAL):
+	Set to zero if NO_OPTIONAL_OPT_ARGS is defined.  i.e. never set this
+	bit when client code is compiled with --disable-optional-args
+	* autoopts/version.c (printVersion): If the caller was compiled with
+	NO_OPTIONAL_OPT_ARGS defined, then default to a plain version-only
+	output.
+	* autoopts/test/errors.test: test that the autoopts templates can
+	detect conflicting flag values.
+	* compat/windows-config.h: also include limits.h
+	* config/confmacs.tpl: cleanups
+	* getdefs/gdinit.c (validateOptions): set a name if --srcfile or
+	--linenum are not specified or are specified with an empty string.
+	* getdefs/getdefs.c (doPreamble): do the same thing for --filelist
+
+2007-04-14  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (doPresets): Check for a "save_opts" option.
+	If present, the next option is the load opts option.  When doing presets,
+	check for a disablement and do not load files or enviornment presets
+	if --no-load-opts has been specified.  General cleanup of LOAD_OPTS
+	environment variable handling.
+	* autoopts/autoopts.h: add some new exit codes: EX_NOINPUT, EX_SOFTWARE
+	and EX_CONFIG.
+	* autoopts/configfile.c: use a couple of these for "config file not
+	found" (EX_NOINPUT) and "you did not pass a valid option def structure"
+	(EX_CONFIG).
+	* autoopts/environment.c (checkEnvOpt): process one option specific
+	environment variable.  (doEnvPresets): call that routine for
+	${PROGNAME_LOAD_OPTS} also.
+	* autoopts/usage.c (optionUsage): implement "usage" option (triggered
+	when "usage_exit_code" is set to EX_USAGE).
+	* autoopts/options_h.tpl (sysexits.h): conditionally include this
+	* autoopts/install-options-h: strip out the conditional "sysexits.h"
+	inclusion and insert the include directly, if present.
+	* autoopts/options.tpl (usage-opt): new attribute used to trigger
+	addition of "usage" option.  Implement "usage" option.
+	* autoopts/optcode.tpl: Implement "usage" option.
+	* autoopts/opthead.tpl: Implement "usage" option.
+	* autoopts/optlib.tpl:  Implement "usage" option.
+
+2007-03-24  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/directive.tpl: disable "inline" from generated code.  The CVS
+	version of GCC objects to some constructs.  Also, hide output from
+	"make"
+	* agen5/fsm-macro.tpl: Some compilers feel uncomfortable using the
+	"address of" operator on a procedure, so do not generate the dispatch
+	table with that operator.
+	* agen5/defParse-fsm.c: regenerate
+	* agen5/tpLoad.c (loadMacros): use the "z" size modifier for size_t
+	format arguments
+
+2007-03-19  Stepan Kasal  <kasal@ucw.cz>
+
+	* Makefile.am (MAINTAINERCLEANFILES): Remove files generated by
+	  autotools.
+	* snprintfv/Makefile.am:
+	* doc/Makefile.am:
+	* getdefs/test/Makefile.am:
+	* getdefs/Makefile.am:
+	* pkg/Makefile.am:
+	* columns/Makefile.am:
+	* agen5/test/Makefile.am:
+	* agen5/Makefile.am (MAINTAINERCLEANFILES): Remove Makefile.in
+
+2007-02-18  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.9
+
+2007-02-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (handleOption): misuse of format argument indexing
+	was overlooked several years ago. :(
+	* autoopts/usage-txt.def (AtMost): fix the string
+	* config/bootstrap.local (config_versions): bootstrap debian packaging
+	* pkg/mkpkg.debian: new
+	* pkg/debian/*: new
+	* pkg/mkpkg.sh: check for debian packaging tools & use 'em if found.
+
+2007-02-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpLoad.c (findFile): add a "pzReferrer" argument.  The
+	dirname from that string is now used for searching for files.
+	That directory is used after the current dir and before the search
+	list.
+	(loadTemplate): also needs a referrer argument to pass through to
+	the findFile function.
+	* agen5/*.*: fix findFile & loadTemplate calls
+	* autoopts/load.c (optionMakePath): accept "$@" to mean pkgdatadir
+	* autoopts/Makefile.am (libopts_la_CFLAGS): define to:
+	-DPKGDATADIR='"$(pkgdatadir)"'
+
+2007-01-29  Andreas Schwab  <schwab@suse.de>
+
+	* agen5/loadPseudo.c (copyMarker): make the last arg be size_t*
+
+2007-01-27  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.8.9
+
+2007-01-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/nested.c (scanXmlEntry): do not include closing '>' in val
+	* */Makefile.am: mark with .NOTPARALLEL
+	* autoopts/test/defs.in: make GREP, EGREP and FGREP configurable
+	* */test/*.test: use these instead of fixed name commands
+	* autoopts/makeshell.c (optionParseShell): using a configurable in
+	a generated script is pretty pointless -- especially for code intended
+	to be removed.  Therefore, emit a plain, vanilla "grep" command.
+	* config/misc.def: special Debian dispensation: avoid using
+	"guile-config" to derive version since they do not use any standard
+	configuration tools.  Use "dpkg" to determine the Guile version.
+	use AC_PROG_GREP et al. for $(GREP) variables.
+
+2007-01-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c (optionParseShell): grep for environment variables
+	that start a line in the "env" output, not just anywhere
+	* autoopts/test/shell.test: adjust
+	* autoopts/autoopts.h (tOptionLoadMode): moved from option_h.tpl
+	(option_load_mode): new global
+	* autoopts/configfile.c (configFileLoad): propagate the string scan
+	mode via a global since it disappears going through an indirect call.
+	(handleStructure): use that global.
+	* autoopts/load.c (loadOptionLine): use the global
+	* autoopts/nested.c: use the global
+	* autoopts/options_h.tpl (tOptionLoadMode): do not externalize
+	* config/bootstrap.local (check_tools): do not bother looking for byacc
+
+2007-01-13  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/nested.c (scanNameEntry): break out of scan loop at end of
+	string, too.  :)
+
+2007-01-12  Brian Utterback  <brian.utterback@sun.com>
+
+	* config/libopts.def (dev_zero): use "ls -lL" to test /dev/zero
+
+2007-01-07  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c (processTemplate): NULL out the last scheme command
+	on "problem" exit, as the command has finished successfully.
+	* autoopts/options.tpl (must-set): disallow both "min" and "must-set"
+	for one option.  A non-zero "min" implies that it must be set, though
+	the converse is not true.
+	* autoopts/options_h.tpl (optDesc): mark as "const" the constant fields.
+	* autoopts/save.c (printEntry): an option can be marked as "disabled" if
+	it was selected by an equivalenced option.  Select option name carefully.
+
+2006-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	= REL 5.8.8
