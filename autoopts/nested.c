@@ -1,7 +1,7 @@
 
 /*
- *  $Id: nested.c,v 4.29 2008/07/28 04:30:39 bkorb Exp $
- *  Time-stamp:      "2008-07-27 20:03:01 bkorb"
+ *  $Id: nested.c,v 4.30 2008/08/02 16:09:35 bkorb Exp $
+ *  Time-stamp:      "2008-07-28 19:18:28 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -748,7 +748,7 @@ optionNestedVal(tOptions* pOpts, tOptDesc* pOD)
             optionUnloadNested((tOptionValue const *)p);
         }
 
-        AGFREE(av);
+        AGFREE(pOD->optCookie);
 
     } else {
         tOptionValue* pOV = optionLoadNested(

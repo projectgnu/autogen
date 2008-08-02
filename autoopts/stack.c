@@ -1,8 +1,8 @@
 
 /*
  *  stack.c
- *  $Id: stack.c,v 4.16 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:      "2007-07-04 11:34:57 bkorb"
+ *  $Id: stack.c,v 4.17 2008/08/02 16:09:35 bkorb Exp $
+ *  Time-stamp:      "2008-07-30 16:56:32 bkorb"
  *
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
@@ -50,7 +50,12 @@ optionUnstackArg(
 {
     int       res;
 
-    tArgList* pAL = (tArgList*)pOptDesc->optCookie;
+    tArgList* pAL;
+
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;
+    pAL = (tArgList*)pOptDesc->optCookie;
+
     /*
      *  IF we don't have any stacked options,
      *  THEN indicate that we don't have any of these options
@@ -232,11 +237,24 @@ optionStackArg(
 {
     char * pz;
 
-    if (pOD->optArg.argString == NULL)
-        return;
+    if ((pOD->fOptState & OPTST_RESET) != 0) {
+        tArgList* pAL = (void*)pOD->optCookie;
+        int ix;
+        if (pAL == NULL)
+            return;
 
-    AGDUPSTR(pz, pOD->optArg.argString, "stack arg");
-    addArgListEntry( &(pOD->optCookie), (void*)pz );
+        ix = pAL->useCt;
+        while (--ix >= 0)
+            AGFREE(pAL->apzArgs[ix]);
+        AGFREE(pAL);
+
+    } else {
+        if (pOD->optArg.argString == NULL)
+            return;
+
+        AGDUPSTR(pz, pOD->optArg.argString, "stack arg");
+        addArgListEntry( &(pOD->optCookie), (void*)pz );
+    }
 }
 /*
  * Local Variables:

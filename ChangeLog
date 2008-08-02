@@ -1,3 +1,17 @@
+2008-08-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/boolean.c (optionBooleanVal): bail out for OPTST_RESET
+	* autoopts/stack.c (optionUnstackArg): bail out for OPTST_RESET
+	(optionStackArg) special handling for OPTST_RESET
+	* autoopts/numeric.c (optionNumericVal): bail out for OPTST_RESET
+	(optionShowRange): display "everything above" and "everything below"
+	ranges in a little more friendly manner.
+	* autoopts/usage-txt.def: add these new messges and improve "between".
+	* autoopts/test/cfg-edit.test: new test
+	* autoopts/test/*.test: adjust for "between" message change
+	* autoopts/optlib.tpl: stacked args require options that accept more
+	than one instance.
+
 2008-07-27  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c (count_nl): new - count newline chars in a string.

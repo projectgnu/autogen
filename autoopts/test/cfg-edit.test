@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2008-07-27 20:59:06 bkorb"
+# Time-stamp:        "2008-07-31 12:05:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: cfg-edit.test,v 4.2 2008/07/28 04:30:39 bkorb Exp $
+# $Id: cfg-edit.test,v 4.3 2008/08/02 16:09:35 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
@@ -63,6 +63,41 @@ cat >&5 <<- _EOF_
 	    keyword = one, two, three, four, five, six, seven, eight, nine, ten;
 	    arg-default = five;
 	    arg-type = set;
+	};
+
+	flag = {
+	    name = enumerate;
+	    value = e;
+	    descrip = 'a test enumeration';
+	    keyword = uno, dos, tres, quatro, cinco, seis, siete, ocho;
+	    arg-default = cinco;
+	    arg-type = keyword;
+	};
+
+	flag = {
+	    name = stacking;
+	    value = k;
+	    descrip = 'stack up a list';
+	    arg-default = initialized;
+	    arg-type = string;
+	    stack-arg; max = NOLIMIT;
+	};
+
+	flag = {
+	    name = number;
+	    value = n;
+	    descrip = 'a range constrained int';
+	    arg-default = 32;
+	    arg-type = number;
+	    arg-range = '->-1', '1->31', '33', '64->';
+	};
+
+	flag = {
+	    name = boolean;
+	    value = b;
+	    descrip = 'a boolean value';
+	    arg-default = true;
+	    arg-type = boolean;
 	};
 
 	main = {
@@ -109,6 +144,16 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
 				- may appear multiple times
    -m Mbr members        membership set
 				- is a set membership option
+   -e KWd enumerate      a test enumeration
+   -k Str stacking       stack up a list
+				- may appear multiple times
+   -n Num number         a range constrained int
+				  It must lie in one of the ranges:
+				  less than or equal to -1, or
+				  1 to 31, or
+				  33 exactly, or
+				  greater than or equal to 64
+   -b T/F boolean        a boolean value
    -R Str reset-option   Reset an option's state
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -127,6 +172,9 @@ The valid "members" option keywords are:
 or you may use a numeric representation.  Preceding these with a '!' will
 clear the bits, specifying 'none' will clear all bits, and 'all' will set them
 all.  Multiple entries may be passed as an option argument list.
+The valid "enumerate" option keywords are:
+  uno dos tres quatro cinco seis siete ocho
+  or an integer from 0 through 7
 _EOF_
 
 cmp -s ${basehelp} ${testname}.help || \
@@ -145,6 +193,83 @@ case "${members}" in
 '' ) : ;;
 * ) failure "members entry not removed"
 esac
+
+arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
+arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
+
+./${testname} -m 'one + three' -b true -m 'seven' \
+    -s "${arg1}" -n -200 -s "${arg2}" -e ocho \
+    '->'
+sed '/^#/d' ${cfg_file} > ${testname}-X
+mv -f ${testname}-X ${cfg_file}
+cat > ${testname}.sample-cfg <<- \_EOF_
+	<struct type=nested>
+	  <able/>
+	  <bar type=integer>0x4D2</bar>
+	  <foo>foo&#x09;lish</foo>
+	  <stumble/>
+	</struct>
+	<struct type=nested>
+	  <bar type=integer>0x10E1</bar>
+	  <foo/>
+	  <gr type=nested>
+	    <one/>
+	    <three/>
+	    <two>2</two>
+	  </gr>
+	</struct>
+	members             none + one + three + five + seven
+	enumerate           ocho
+	number              -200
+	boolean             true
+	_EOF_
+pair=${testname}.sample-cfg\ ${cfg_file}
+cmp ${pair} || \
+    failure "improperly saved state:${nl}`diff ${pair}`"
+
+./${testname} ${cfg_file}-2
+sed '/^#/d' ${cfg_file}-2 > ${testname}-X
+mv -f ${testname}-X ${cfg_file}-2
+cmp ${cfg_file} ${cfg_file}-2 || \
+    failure "mismatched: re-saved config${nl}`diff ${cfg_file} ${cfg_file}-2`"
+
+rm -f ${cfg_file}-2
+./${testname} -R struct ${cfg_file}-2
+test "X`egrep -v '^#' ${cfg_file}-2`" = "X`egrep '^[a-z]' ${cfg_file}`" || \
+    failure "structure not erased${nl}`cat ${cfg_file}-2`"
+
+mv -f ${cfg_file}-2 ${cfg_file}
+ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+test ${ct} -eq 4 || failure "wrong line count${nl}`cat ${cfg_file}`"
+
+./${testname} -R 'boolean' '->'
+ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+test ${ct} -eq 3 || failure "boolean is still there${nl}`cat ${cfg_file}`"
+
+./${testname} -R 'members' '->'
+ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+test ${ct} -eq 2 || failure "members are still members${nl}`cat ${cfg_file}`"
+
+./${testname} -R 'enumerate' '->'
+ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+test ${ct} -eq 1 || failure "enumerate still enumerated${nl}`cat ${cfg_file}`"
+
+./${testname} -R 'number' '->'
+ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+test ${ct} -eq 0 || failure "number still counts${nl}`cat ${cfg_file}`"
+
+./${testname} -k alpha -k beta -k omega ${cfg_file}-XX
+sed '/^#/d' ${cfg_file}-XX > ${cfg_file}-2
+cat > ${cfg_file}-3 <<- _EOF_
+	stacking            alpha
+	stacking            beta
+	stacking            omega
+	_EOF_
+cmp ${cfg_file}-[23] || \
+    failure "missing stacking args:${nl}`diff -c ${cfg_file}-[23]`"
+./${testname} -R k ${cfg_file}-2
+ct=`egrep '^[a-z]' ${cfg_file}-2 | wc -l`
+test ${ct} -eq 0 || failure "arg values still stacked"
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
 

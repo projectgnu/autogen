@@ -3649,13 +3649,20 @@ type.
 @subsection Option Argument Handling
 @cindex Option Argument Handling
 
-AutoOpts will either specify or automatically generate callback procedures for
-options that take specialized arguments.  The only option argument types that
-are not specialized are plain string arguments and no argument at all.  For
-options that fall into one of those two categories, you may specify your own
-callback function, as specified below.  If the option takes a string argument,
-then you may specify that the option is to be handled by the @code{libopts}
-library procedures @code{stackOptArg()} or @code{unstackOptArg()} (see below).
+AutoOpts will either specify or automatically generate callback procedures
+for options that take specialized arguments.  The only option argument types
+that are not specialized are plain string arguments and no argument at all.
+For options that fall into one of those two categories, you may specify your
+own callback function, as specified below.  If you do this and if you
+specify that options are resettable (@pxref{automatic options}), then your
+option handling code @strong{must} look for the @code{OPTST_RESET} bit in
+the @code{fOptState} field of the option descriptor.
+
+If the option takes a string argument, then you may specify that the option
+is to be handled by the @code{libopts} library procedures
+@code{stackOptArg()} or @code{unstackOptArg()} (see below).  In this case,
+you may not provide option handling code.
+
 Finally, @code{documentation} options (@pxref{opt-attr documentation}) may
 also be marked as @code{settable} (@pxref{opt-attr settable}) and have special
 callback functions (either @code{flag-code}, @code{extract-code}, or
@@ -3817,17 +3824,16 @@ section and before the @code{AUTHOR} section.
 @cindex automatic options
 
 AutoOpts provides automated support for several options.  @code{help} and
-@code{more-help} are always provided.  @code{version} is provided if
-@code{version} is defined in the option definitions @xref{program attributes}.
-@code{save-opts} and @code{load-opts} are provided if at least
-one @code{homerc} is defined @xref{program attributes}.
+@code{more-help} are always provided.  The others are conditional upon
+various global program attributes being defined @xref{program attributes}.
 
-Below are the option names and flag values.  The flags are activated if and
-only if at least one user-defined option also uses a flag value.
-These flags may be deleted or changed to characters of your choosing by
-specifying @code{xxx-value = "y";}, where @code{xxx} is one of the five names
-below and @code{y} is either empty or the character of your choice.  For
-example, to change the help flag from @code{?} to @code{h}, specify
+Below are the option names and default flag values.  The flags are activated
+if and only if at least one user-defined option also uses a flag value.  The
+long names are supported as option names if @code{long-opts} has been
+specified.  These option flags may be deleted or changed to characters of your
+choosing by specifying @code{xxx-value = "y";}, where @code{xxx} is one of the
+option names below and @code{y} is either empty or the character of your choice.
+For example, to change the help flag from @code{?} to @code{h}, specify
 @code{help-value = "h";}; and to require that @code{save-opts} be specified
 only with its long option name, specify @code{save-opts-value = "";}.
 
@@ -3857,19 +3863,22 @@ This will print the program name, title and version.  If it is followed by
 the letter @code{c} and a value for @code{copyright} and @code{owner} have
 been provided, then the copyright will be printed, too.  If it is followed
 by the letter @code{n}, then the full copyright notice (if available) will
-be printed.
+be printed.  The @code{version} attribute must be specified in the option
+definition file.
 
 @item load-opts -<
 @cindex configuration file
 This option will load options from the named file.  They will be treated
-exactly as if they were loaded from the normally found configuration files, but
-will not be loaded until the option is actually processed.  This can also be
-used within another configuration file, causing them to nest.  This is the
-@strong{only} option that can be activated inside of config files or with
-environment variables.
+exactly as if they were loaded from the normally found configuration files,
+but will not be loaded until the option is actually processed.  This can also
+be used within another configuration file, causing them to nest.  This is the
+@strong{only} automatically supported option that can be activated inside of
+config files or with environment variables.
 
 Specifying the negated form of the option (@code{--no-load-opts}) will
 suppress the processing of configuration files and environment variables.
+
+This option is activated by specifying one or more @code{homerc} attributes.
 
 @item save-opts ->
 @cindex configuration file
@@ -3890,21 +3899,27 @@ state, but the state will @strong{not} actually be saved.  You must call
 @strong{CAVEAT:} if, after invoking this macro, you call
 @code{optionProcess}, the option processing state will be saved to this file
 and @code{optionProcess} will not return.  You may wish to invoke
-@code{CLEAR_OPT( SAVE_OPTS )} (@pxref{CLEAR_OPT}) beforehand.
+@code{CLEAR_OPT( SAVE_OPTS )} (@pxref{CLEAR_OPT}) beforehand if you do need
+to reinvoke @code{optionProcess}.
+
+This option is activated by specifying one or more @code{homerc} attributes.
 
 @item reset-option -R
-This option takes the name of an option for the current program and resets
-its state such that it is set back to its original, compile-time initialized
-value.  If the option state is subsequently stored (via @code{--save-opts}),
-the named option will not appear in that file.
-
 This option is enabled by setting the global program attribute,
-@code{resettable}.  If set, all option callbacks must look for the
-@code{OPTST_RESET} bit in the @code{fOptState} field of the option descriptor.
-If set, the @code{optCookie} and @code{optArg} fields will be unchanged from
-their last setting.  When the callback returns, these fields will be set to
-their original values.  If you use this feature and you have allocated data
-hanging off of the cookie, you need to deallocate it.
+@code{resettable}.  This option takes the name of an option for the current
+program and resets its state such that it is set back to its original,
+compile-time initialized value.  If the option state is subsequently stored
+(via @code{--save-opts}), the named option will not appear in that file.
+
+This option is activated by specifying the @code{resettable} attribute.
+
+@strong{BEWARE}:  If the @code{resettable} attribute is specified, all
+option callbacks @strong{must} look for the @code{OPTST_RESET} bit in the
+@code{fOptState} field of the option descriptor.  If set, the @code{optCookie}
+and @code{optArg} fields will be unchanged from their last setting.  When the
+callback returns, these fields will be set to their original values.  If you
+use this feature and you have allocated data hanging off of the cookie, you
+need to deallocate it.
 @end table
 
 @node standard options

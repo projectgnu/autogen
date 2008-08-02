@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2008-07-27 12:59:37 bkorb"
+# Time-stamp:      "2008-07-30 16:33:17 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.32 2008/07/27 20:06:05 bkorb Exp $
+# $Id: optlib.tpl,v 4.33 2008/08/02 16:09:35 bkorb Exp $
 
 =][=
 
@@ -111,6 +111,10 @@ DEFINE save-name-morphs
 
   =][=
   ELIF (exist? "stack-arg")     =][=
+
+    (if (not (exist? "max"))
+        (error (string-append flg-name
+               " has a stacked arg, but can only appear once")) )
 
     (set! have-proc #t)
     (set! is-priv   #f)

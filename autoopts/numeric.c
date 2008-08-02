@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.15 2008/07/27 20:06:05 bkorb Exp $
- *  Time-stamp:      "2008-07-27 09:30:04 bkorb"
+ *  $Id: numeric.c,v 4.16 2008/08/02 16:09:35 bkorb Exp $
+ *  Time-stamp:      "2008-07-31 11:52:52 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -67,6 +67,10 @@ optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
         for (;;) {
             if (rng->rmax == LONG_MIN)
                 fprintf(option_usage_fp, zRangeExact, pz_indent, rng->rmin);
+            else if (rng->rmin == LONG_MIN)
+                fprintf(option_usage_fp, zRangeUpto, pz_indent, rng->rmax);
+            else if (rng->rmax == LONG_MAX)
+                fprintf(option_usage_fp, zRangeAbove, pz_indent, rng->rmin);
             else
                 fprintf(option_usage_fp, zRange, pz_indent, rng->rmin,
                         rng->rmax);
@@ -100,6 +104,9 @@ optionNumericVal(tOptions* pOpts, tOptDesc* pOD )
 {
     char* pz;
     long  val;
+
+    if ((pOD->fOptState & OPTST_RESET) != 0)
+        return;
 
     /*
      *  Numeric options may have a range associated with it.

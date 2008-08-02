@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.21 2008/07/28 02:18:55 bkorb Exp $
+   $Id: usage-txt.def,v 4.22 2008/08/02 16:09:35 bkorb Exp $
  */
 
 /*
@@ -272,7 +272,7 @@ utxt = { ut-name = Illegal;
 };
 
 utxt = { ut-name = IntRange;
-         ut-text = "  or an integer between %d and %d\n";
+         ut-text = "  or an integer from %d through %d\n";
 };
 
 utxt = { ut-name = InvalOptDesc;
@@ -431,6 +431,10 @@ utxt = { ut-name = Range;
          ut-text = "%s%ld to %ld";
 };
 
+utxt = { ut-name = RangeAbove;
+         ut-text = "%sgreater than or equal to %ld";
+};
+
 utxt = { ut-name = RangeLie;
          ut-text = "%sIt must lie in one of the ranges:\n";
 };
@@ -457,6 +461,10 @@ utxt = { ut-name = RangeExact;
 
 utxt = { ut-name = RangeScaled;
          ut-text = "%sis scalable with a suffix: k/K/m/M/g/G/t/T\n";
+};
+
+utxt = { ut-name = RangeUpto;
+         ut-text = "%sless than or equal to %ld";
 };
 
 utxt = { ut-name = ResetNotConfig;
