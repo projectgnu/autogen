@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2008-07-27 14:12:00 bkorb"
+# Time-stamp:      "2008-08-02 14:39:14 bkorb"
 
-# $Id: optmain.tpl,v 4.30 2008/07/28 02:18:55 bkorb Exp $
+# $Id: optmain.tpl,v 4.31 2008/08/02 22:49:57 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -480,8 +480,8 @@ DEFINE build-main               =][= FOR main[] =][=
   == main                       =][=
      INVOKE build-test-main     =][=
 
-  == include                    =][=
-     INCLUDE tpl                =][=
+  == include                    =]
+[=   INCLUDE tpl                =][=
 
   == invoke                     =][=
      INVOKE (get "func")        =][=

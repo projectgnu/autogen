@@ -2488,7 +2488,7 @@ have provided at least one @code{homerc} attribute.
 default: .<prog-name>rc
 
 @cindex resettable
-@item reseettable
+@item resettable
 Specifies that the @code{--reset-option} command line option is to be supported.
 
 @cindex short-usage

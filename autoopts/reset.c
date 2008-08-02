@@ -1,7 +1,7 @@
 
 /*
- *  $Id: reset.c,v 4.4 2008/07/28 04:30:39 bkorb Exp $
- *  Time-stamp:      "2008-07-27 20:28:00 bkorb"
+ *  $Id: reset.c,v 4.5 2008/08/02 22:49:57 bkorb Exp $
+ *  Time-stamp:      "2008-08-02 12:25:18 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -42,7 +42,7 @@ static void
 optionResetEverything(tOptions * pOpts)
 {
     tOptDesc * pOD = pOpts->pOptDesc;
-    int        ct  = pOpts->optCt;
+    int        ct  = pOpts->presetOptCt;
 
     for (;;) {
         optionReset(pOpts, pOD);

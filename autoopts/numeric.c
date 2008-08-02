@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.16 2008/08/02 16:09:35 bkorb Exp $
- *  Time-stamp:      "2008-07-31 11:52:52 bkorb"
+ *  $Id: numeric.c,v 4.17 2008/08/02 22:49:57 bkorb Exp $
+ *  Time-stamp:      "2008-08-02 12:03:20 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -52,6 +52,7 @@ optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
                     pOpts->pzProgName, pOD->pz_Name, pOD->optArg.argString);
             fprintf(option_usage_fp, "The %s option:\n", pOD->pz_Name);
             lie_in_range = zRangeBadLie;
+            pz_indent = "";
         }
 
         if (pOD->fOptState & OPTST_SCALED_NUM)
@@ -60,7 +61,6 @@ optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
         if (rng_ct > 1)
             fprintf(option_usage_fp, lie_in_range, pz_indent);
         else {
-            pz_indent = "";
             fprintf(option_usage_fp, zRangeOnly, pz_indent);
         }
 

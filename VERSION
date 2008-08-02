@@ -2,10 +2,10 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2008-07-31 11:19:41 bkorb"
+# Time-stamp:        "2008-08-02 14:39:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2008/08/02 16:09:35 $
+# Last Committed:    $Date: 2008/08/02 22:49:57 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".6pre9"
+AG_PATCHLEVEL=".6pre10"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

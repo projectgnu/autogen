@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.33 2008/07/28 02:18:55 bkorb Exp $
+# $Id: opthead.tpl,v 4.34 2008/08/02 22:49:57 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-07-27 13:20:57 bkorb"
+# Time-stamp:      "2008-08-02 14:44:49 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -438,14 +438,12 @@ extern tOptions   [=(. pname)=]Options;[=
 
 #if defined(ENABLE_NLS)
 # ifndef _
-#    include <stdio.h>
-     static inline char* aoGetsText( char const* pz ) {
-         if (pz == NULL) return NULL;
-         return (char*)gettext( pz );
-     }
-#    define _(s)  aoGetsText(s)
-# else  /* _() */
-#    define _(s)  s
+#   include <stdio.h>
+    static inline char* aoGetsText( char const* pz ) {
+        if (pz == NULL) return NULL;
+        return (char*)gettext( pz );
+    }
+#   define _(s)  aoGetsText(s)
 # endif /* _() */
 
 # define OPT_NO_XLAT_CFG_NAMES  STMTS([=(. pname)=]Options.fOptSet |= \
