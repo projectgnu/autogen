@@ -80,3 +80,8 @@ mask = {
   m-name  = arg-type;
   b-name  = arg-type-1, arg-type-2, arg-type-3, arg-type-4;
 };
+
+mask = {
+  m-name  = do-not-save;
+  b-name  = no-init, document, omitted;
+};

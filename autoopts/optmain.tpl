@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2008-08-02 14:39:14 bkorb"
+# Time-stamp:      "2008-08-03 15:35:03 bkorb"
 
-# $Id: optmain.tpl,v 4.31 2008/08/02 22:49:57 bkorb Exp $
+# $Id: optmain.tpl,v 4.32 2008/08/04 01:01:31 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -338,7 +338,7 @@ CASE handler-type =][=
         if (fd < 0) {
             fprintf( stderr, pz_fs_err, errno, strerror(errno), "open",
                      pz_fname );
-            free( file_text );
+            free(file_text);
             return 1;
         }
 
@@ -445,7 +445,7 @@ main(int argc, char** argv)
         if (in_ct == 0)
             fputs( _("[=(. prog-name)
                    =] Warning:  no input lines were read\n"), stderr );
-        free( buf );
+        free(buf);
     }[=
 
     (def-file-line "main-fini" extract-fmt) =][=
@@ -857,6 +857,10 @@ DEFINE range-option-code
     return;
 
   valid_return:
+    if ((pOptDesc->fOptState & OPTST_ALLOC_ARG) != 0) {
+        free((void *)pOptDesc->optArg.argString);
+        pOptDesc->fOptState &= ~OPTST_ALLOC_ARG;
+    }
     pOptDesc->optArg.argInt = val;[=
 
 ENDDEF   range-option-code
@@ -974,14 +978,16 @@ DEFINE   file-name-code
 \=]
     static teOptFileType const  type =
         [= (set! tmp-val (get "open-file")) =][=
-   CASE file-exists             =][=
-   == ""                        =]FTYPE_MODE_MAY_EXIST[=
-   =* "no"                      =]FTYPE_MODE_MUST_NOT_EXIST[=
-   *                            =]FTYPE_MODE_MUST_EXIST[=
-   ESAC =] + [= CASE open-file  =][=
-   == ""                        =]FTYPE_MODE_NO_OPEN[=
-   =* "desc"                    =]FTYPE_MODE_OPEN_FD[=
-   *                            =]FTYPE_MODE_FOPEN_FP[=
+   CASE file-exists                 =][=
+   == ""                            =]FTYPE_MODE_MAY_EXIST[=
+   =* "no"                          =]FTYPE_MODE_MUST_NOT_EXIST[=
+   *                                =]FTYPE_MODE_MUST_EXIST[=
+   ESAC =] + [= CASE open-file      =][=
+
+   == ""                            =]FTYPE_MODE_NO_OPEN[=
+   =* "desc"                        =]FTYPE_MODE_OPEN_FD[=
+   *                                =]FTYPE_MODE_FOPEN_FP[=
+
    ESAC =];
     static tuFileMode           mode;
 [= IF (or (=* tmp-val "desc") (== tmp-val "")) \=]
@@ -991,17 +997,7 @@ DEFINE   file-name-code
 #  define FOPEN_BINARY_FLAG
 #endif
     mode.file_mode = [= (c-string (get "file-mode")) =] FOPEN_BINARY_FLAG;
-[= ENDIF =][=
-
-  IF (exist? "resettable")
-
-=]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;[=
-
-  ENDIF
-
-=]
+[= ENDIF =]
     optionFileCheck(pOptions, pOptDesc, type, mode);[=
 
 ENDDEF   file-name-code

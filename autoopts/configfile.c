@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.42 2008/07/28 04:30:39 bkorb Exp $
- *  Time-stamp:      "2008-07-27 20:47:06 bkorb"
+ *  $Id: configfile.c,v 4.43 2008/08/04 01:01:31 bkorb Exp $
+ *  Time-stamp:      "2008-08-03 11:00:30 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1196,8 +1196,7 @@ validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
           || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
 
-        fprintf( stderr, zAO_Err, pzProgram,
-                 NUM_TO_VER( pOpts->structVersion ));
+        fprintf(stderr, zAO_Err, pzProgram, NUM_TO_VER(pOpts->structVersion));
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
             fputs( zAO_Big, stderr );
         else

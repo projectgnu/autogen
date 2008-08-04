@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.30 2008/07/27 20:06:05 bkorb Exp $
- * Time-stamp:      "2008-07-27 09:53:10 bkorb"
+ *  save.c  $Id: save.c,v 4.31 2008/08/04 01:01:31 bkorb Exp $
+ * Time-stamp:      "2008-08-03 14:26:51 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -57,6 +57,24 @@ printValueList(FILE * fp, char const * name, tArgList * al);
 
 static void
 printHierarchy(FILE * fp, tOptDesc * p);
+
+static FILE *
+openSaveFile( tOptions* pOpts );
+
+static void
+printNoArgOpt(FILE * fp, tOptDesc * p, tOptDesc * pOD);
+
+static void
+printStringArg(FILE * fp, tOptDesc * pOD);
+
+static void
+printEnumArg(FILE * fp, tOptDesc * pOD);
+
+static void
+printSetMemberArg(FILE * fp, tOptDesc * pOD);
+
+static void
+printFileArg(FILE * fp, tOptDesc * pOD, tOptions* pOpts);
 /* = = = END-STATIC-FORWARD = = = */
 
 static tCC*
@@ -500,6 +518,156 @@ printHierarchy(FILE * fp, tOptDesc * p)
 }
 
 
+static FILE *
+openSaveFile( tOptions* pOpts )
+{
+    FILE*     fp;
+
+    {
+        int   free_name = 0;
+        tCC*  pzFName = findFileName( pOpts, &free_name );
+        if (pzFName == NULL)
+            return NULL;
+
+        fp = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
+        if (fp == NULL) {
+            fprintf( stderr, zWarn, pOpts->pzProgName );
+            fprintf( stderr, zNoCreat, errno, strerror( errno ), pzFName );
+            if (free_name)
+                AGFREE((void*) pzFName );
+            return fp;
+        }
+
+        if (free_name)
+            AGFREE( (void*)pzFName );
+    }
+
+    {
+        char const*  pz = pOpts->pzUsageTitle;
+        fputs( "#  ", fp );
+        do { fputc( *pz, fp ); } while (*(pz++) != '\n');
+    }
+
+    {
+        time_t  timeVal = time( NULL );
+        char*   pzTime  = ctime( &timeVal );
+
+        fprintf( fp, zPresetFile, pzTime );
+#ifdef HAVE_ALLOCATED_CTIME
+        /*
+         *  The return values for ctime(), localtime(), and gmtime()
+         *  normally point to static data that is overwritten by each call.
+         *  The test to detect allocated ctime, so we leak the memory.
+         */
+        AGFREE( (void*)pzTime );
+#endif
+    }
+
+    return fp;
+}
+
+static void
+printNoArgOpt(FILE * fp, tOptDesc * p, tOptDesc * pOD)
+{
+    /*
+     * The aliased to argument indicates whether or not the option
+     * is "disabled".  However, the original option has the name
+     * string, so we get that there, not with "p".
+     */
+    char const * pznm =
+        (DISABLED_OPT( p )) ? pOD->pz_DisableName : pOD->pz_Name;
+    /*
+     *  If the option was disabled and the disablement name is NULL,
+     *  then the disablement was caused by aliasing.
+     *  Use the name as the string to emit.
+     */
+    if (pznm == NULL)
+        pznm = pOD->pz_Name;
+
+    fprintf(fp, "%s\n", pznm);
+}
+
+static void
+printStringArg(FILE * fp, tOptDesc * pOD)
+{
+    if (pOD->fOptState & OPTST_STACKED) {
+        tArgList*  pAL = (tArgList*)pOD->optCookie;
+        int        uct = pAL->useCt;
+        tCC**      ppz = pAL->apzArgs;
+
+        /*
+         *  un-disable multiple copies of disabled options.
+         */
+        if (uct > 1)
+            pOD->fOptState &= ~OPTST_DISABLED;
+
+        while (uct-- > 0)
+            printEntry( fp, pOD, *(ppz++) );
+    } else {
+        printEntry( fp, pOD, pOD->optArg.argString );
+    }
+}
+
+static void
+printEnumArg(FILE * fp, tOptDesc * pOD)
+{
+    uintptr_t val = pOD->optArg.argEnum;
+
+    /*
+     *  This is a magic incantation that will convert the
+     *  bit flag values back into a string suitable for printing.
+     */
+    (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD);
+    printEntry( fp, pOD, (void*)(pOD->optArg.argString));
+
+    pOD->optArg.argEnum = val;
+}
+
+static void
+printSetMemberArg(FILE * fp, tOptDesc * pOD)
+{
+    uintptr_t val = pOD->optArg.argEnum;
+
+    /*
+     *  This is a magic incantation that will convert the
+     *  bit flag values back into a string suitable for printing.
+     */
+    (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD);
+    printEntry( fp, pOD, (void*)(pOD->optArg.argString));
+
+    if (pOD->optArg.argString != NULL) {
+        /*
+         *  set membership strings get allocated
+         */
+        AGFREE( (void*)pOD->optArg.argString );
+        pOD->fOptState &= ~OPTST_ALLOC_ARG;
+    }
+
+    pOD->optArg.argEnum = val;
+}
+
+static void
+printFileArg(FILE * fp, tOptDesc * pOD, tOptions* pOpts)
+{
+    /*
+     *  If the cookie is not NULL, then it has the file name, period.
+     *  Otherwise, if we have a non-NULL string argument, then....
+     */
+    if (pOD->optCookie != NULL)
+        printEntry(fp, pOD, pOD->optCookie);
+
+    else if (HAS_originalOptArgArray(pOpts)) {
+        char const * orig =
+            pOpts->originalOptArgArray[pOD->optIndex].argString;
+
+        if (pOD->optArg.argString == orig)
+            return;
+
+        printEntry(fp, pOD, pOD->optArg.argString);
+    }
+}
+
+
 /*=export_func  optionSaveFile
  *
  * what:  saves the option state to a file
@@ -534,47 +702,10 @@ optionSaveFile( tOptions* pOpts )
 {
     tOptDesc* pOD;
     int       ct;
-    FILE*     fp;
+    FILE*     fp = openSaveFile(pOpts);
 
-    {
-        int   free_name = 0;
-        tCC*  pzFName = findFileName( pOpts, &free_name );
-        if (pzFName == NULL)
-            return;
-
-        fp = fopen( pzFName, "w" FOPEN_BINARY_FLAG );
-        if (fp == NULL) {
-            fprintf( stderr, zWarn, pOpts->pzProgName );
-            fprintf( stderr, zNoCreat, errno, strerror( errno ), pzFName );
-            if (free_name)
-                AGFREE((void*) pzFName );
-            return;
-        }
-
-        if (free_name)
-            AGFREE( (void*)pzFName );
-    }
-
-    {
-        char const*  pz = pOpts->pzUsageTitle;
-        fputs( "#  ", fp );
-        do { fputc( *pz, fp ); } while (*(pz++) != '\n');
-    }
-
-    {
-        time_t  timeVal = time( NULL );
-        char*   pzTime  = ctime( &timeVal );
-
-        fprintf( fp, zPresetFile, pzTime );
-#ifdef HAVE_ALLOCATED_CTIME
-        /*
-         *  The return values for ctime(), localtime(), and gmtime()
-         *  normally point to static data that is overwritten by each call.
-         *  The test to detect allocated ctime, so we leak the memory.
-         */
-        AGFREE( (void*)pzTime );
-#endif
-    }
+    if (fp == NULL)
+        return;
 
     /*
      *  FOR each of the defined options, ...
@@ -582,7 +713,6 @@ optionSaveFile( tOptions* pOpts )
     ct  = pOpts->presetOptCt;
     pOD = pOpts->pOptDesc;
     do  {
-        int arg_state;
         tOptDesc*  p;
 
         /*
@@ -590,12 +720,14 @@ optionSaveFile( tOptions* pOpts )
          *     OR it does not take an initialization value
          *     OR it is equivalenced to another option
          *  THEN continue (ignore it)
+         *
+         *  Equivalenced options get picked up when the equivalenced-to
+         *  option is processed.
          */
         if (UNUSED_OPT( pOD ))
             continue;
 
-        if ((pOD->fOptState & (OPTST_NO_INIT|OPTST_DOCUMENT|OPTST_OMITTED))
-            != 0)
+        if ((pOD->fOptState & OPTST_DO_NOT_SAVE_MASK) != 0)
             continue;
 
         if (  (pOD->optEquivIndex != NO_EQUIVALENT)
@@ -603,80 +735,33 @@ optionSaveFile( tOptions* pOpts )
             continue;
 
         /*
-         *  Set a temporary pointer to the real option description
-         *  (i.e. account for equivalencing)
+         *  The option argument data are found at the equivalenced-to option,
+         *  but the actual option argument type comes from the original
+         *  option descriptor.  Be careful!
          */
         p = ((pOD->fOptState & OPTST_EQUIVALENCE) != 0)
             ? (pOpts->pOptDesc + pOD->optActualIndex) : pOD;
 
-        /*
-         *  IF    no arguments are allowed
-         *  THEN just print the name and continue
-         */
-        if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_NONE) {
-            char const * pznm =
-                (DISABLED_OPT( p )) ? p->pz_DisableName : p->pz_Name;
-            /*
-             *  If the option was disabled and the disablement name is NULL,
-             *  then the disablement was caused by aliasing.
-             *  Use the name as the string to emit.
-             */
-            if (pznm == NULL)
-                pznm = p->pz_Name;
+        switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        case OPARG_TYPE_NONE:
+            printNoArgOpt(fp, p, pOD);
+            break;
 
-            fprintf(fp, "%s\n", pznm);
-            continue;
-        }
-
-        arg_state = OPTST_GET_ARGTYPE(p->fOptState);
-        switch (arg_state) {
-        case 0:
         case OPARG_TYPE_NUMERIC:
             printEntry( fp, p, (void*)(p->optArg.argInt));
             break;
 
         case OPARG_TYPE_STRING:
-            if (p->fOptState & OPTST_STACKED) {
-                tArgList*  pAL = (tArgList*)p->optCookie;
-                int        uct = pAL->useCt;
-                tCC**      ppz = pAL->apzArgs;
-
-                /*
-                 *  Disallow multiple copies of disabled options.
-                 */
-                if (uct > 1)
-                    p->fOptState &= ~OPTST_DISABLED;
-
-                while (uct-- > 0)
-                    printEntry( fp, p, *(ppz++) );
-            } else {
-                printEntry( fp, p, p->optArg.argString );
-            }
+            printStringArg(fp, p);
             break;
 
         case OPARG_TYPE_ENUMERATION:
-        case OPARG_TYPE_MEMBERSHIP:
-        {
-            uintptr_t val = p->optArg.argEnum;
-            /*
-             *  This is a magic incantation that will convert the
-             *  bit flag values back into a string suitable for printing.
-             */
-            (*(p->pOptProc))(OPTPROC_RETURN_VALNAME, p);
-            printEntry( fp, p, (void*)(p->optArg.argString));
-
-            if (  (p->optArg.argString != NULL)
-               && (arg_state != OPARG_TYPE_ENUMERATION)) {
-                /*
-                 *  set membership strings get allocated
-                 */
-                AGFREE( (void*)p->optArg.argString );
-                p->fOptState &= ~OPTST_ALLOC_ARG;
-            }
-
-            p->optArg.argEnum = val;
+            printEnumArg(fp, p);
             break;
-        }
+
+        case OPARG_TYPE_MEMBERSHIP:
+            printSetMemberArg(fp, p);
+            break;
 
         case OPARG_TYPE_BOOLEAN:
             printEntry( fp, p, p->optArg.argBool ? "true" : "false" );
@@ -684,6 +769,10 @@ optionSaveFile( tOptions* pOpts )
 
         case OPARG_TYPE_HIERARCHY:
             printHierarchy(fp, p);
+            break;
+
+        case OPARG_TYPE_FILE:
+            printFileArg(fp, p, pOpts);
             break;
 
         default:

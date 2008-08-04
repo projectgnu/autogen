@@ -1,7 +1,7 @@
 
 /*
- *  $Id: file.c,v 4.4 2008/07/27 20:06:05 bkorb Exp $
- *  Time-stamp:      "2008-07-27 10:24:42 bkorb"
+ *  $Id: file.c,v 4.5 2008/08/04 01:01:31 bkorb Exp $
+ *  Time-stamp:      "2008-08-03 15:56:55 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -45,9 +45,10 @@ void
 optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
                 teOptFileType ftype, tuFileMode mode)
 {
-    char * fname;
+    if (pOpts <= OPTPROC_EMIT_LIMIT) {
+        if (pOpts != OPTPROC_EMIT_USAGE)
+            return;
 
-    if ((uintptr_t)pOpts < 0xFUL) {
         switch (ftype & FTYPE_MODE_EXIST_MASK) {
         case FTYPE_MODE_MUST_NOT_EXIST:
             fputs(zFileCannotExist, option_usage_fp);
@@ -60,20 +61,25 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
         return;
     }
 
+    if ((pOD->fOptState & OPTST_RESET) != 0) {
+        if (pOD->optCookie != NULL)
+            AGFREE(pOD->optCookie);
+        return;
+    }
+
     {
         struct stat sb;
-        AGDUPSTR(fname, pOD->optArg.argString, "copy file name");
 
         errno = 0;
 
         switch (ftype & FTYPE_MODE_EXIST_MASK) {
         case FTYPE_MODE_MUST_NOT_EXIST:
-            if (  (stat(fname, &sb) == 0)
+            if (  (stat(pOD->optArg.argString, &sb) == 0)
                || (errno != ENOENT) ){
                 if (errno == 0)
                     errno = EINVAL;
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        zFSOptErrNoExist, fname, pOD->pz_Name);
+                        zFSOptErrNoExist, pOD->optArg.argString, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -82,13 +88,13 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
         default:
         case FTYPE_MODE_MAY_EXIST:
         {
-            char * p = strrchr(fname, DIRCH);
+            char * p = strrchr(pOD->optArg.argString, DIRCH);
             if (p != NULL)
                 *p = NUL;
-            if (  (stat(fname, &sb) != 0)
+            if (  (stat(pOD->optArg.argString, &sb) != 0)
                || (errno = EINVAL, ! S_ISDIR(sb.st_mode)) ){
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        zFSOptErrMayExist, fname, pOD->pz_Name);
+                        zFSOptErrMayExist, pOD->optArg.argString, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -97,10 +103,10 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
         }
 
         case FTYPE_MODE_MUST_EXIST:
-            if (  (stat(fname, &sb) != 0)
+            if (  (stat(pOD->optArg.argString, &sb) != 0)
                || (errno = EINVAL, ! S_ISREG(sb.st_mode)) ){
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        zFSOptErrMustExist, fname, pOD->pz_Name);
+                        zFSOptErrMustExist, pOD->optArg.argString, pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }
@@ -115,32 +121,44 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
 
     case FTYPE_MODE_OPEN_FD:
     {
-        int fd = open(fname, mode.file_flags);
+        int fd = open(pOD->optArg.argString, mode.file_flags);
         if (fd < 0) {
             fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    zFSOptErrOpen, fname, pOD->pz_Name);
+                    zFSOptErrOpen, pOD->optArg.argString, pOD->pz_Name);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }
+
+        if ((pOD->fOptState & OPTST_ALLOC_ARG) != 0)
+            pOD->optCookie = (void *)pOD->optArg.argString;
+        else
+            AGDUPSTR(pOD->optCookie, pOD->optArg.argString, "file name");
+
         pOD->optArg.argFd = fd;
+        pOD->fOptState &= ~OPTST_ALLOC_ARG;
         break;
     }
 
     case FTYPE_MODE_FOPEN_FP:
     {
-        FILE* fp = fopen(fname, mode.file_mode);
+        FILE* fp = fopen(pOD->optArg.argString, mode.file_mode);
         if (fp == NULL) {
             fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    zFSOptErrFopen, fname, pOD->pz_Name);
+                    zFSOptErrFopen, pOD->optArg.argString, pOD->pz_Name);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }
+
+        if ((pOD->fOptState & OPTST_ALLOC_ARG) != 0)
+            pOD->optCookie = (void *)pOD->optArg.argString;
+        else
+            AGDUPSTR(pOD->optCookie, pOD->optArg.argString, "file name");
+
         pOD->optArg.argFp = fp;
+        pOD->fOptState &= ~OPTST_ALLOC_ARG;
         break;
     }
     }
-
-    AGFREE(fname);
 }
 /*
  * Local Variables:

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2008-07-31 12:05:26 bkorb"
+# Time-stamp:        "2008-08-03 16:30:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,15 +26,14 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: cfg-edit.test,v 4.3 2008/08/02 16:09:35 bkorb Exp $
+# $Id: cfg-edit.test,v 4.4 2008/08/04 01:01:31 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-test -d ${testname}.d || mkdir -p ${testname}.d
 test_name=`echo ${testname} | sed 's/-/_/g'`
-cfg_file=${testname}.d/${testname}.cfg
+cfg_file=`basename ${TMPDIR}`/${testname}.cfg
 
 exec 5> ${testname}.def
 cat >&5 <<- _EOF_
@@ -100,6 +99,33 @@ cat >&5 <<- _EOF_
 	    arg-type = boolean;
 	};
 
+	flag = {
+	    name = in-file;
+	    value = I;
+	    descrip = 'an input file';
+	    arg-type = file;
+	    open-file = descriptor;
+	    file-mode = O_RDONLY;
+	    file-exists = yes;
+	};
+
+	flag = {
+	    name = out-file;
+	    value = O;
+	    descrip = 'an output file';
+	    arg-type = file;
+	    open-file = fopen;
+	    file-mode = w;
+	    file-exists = no;
+	};
+
+	flag = {
+	    name = test-file;
+	    value = T;
+	    descrip = 'a test file';
+	    arg-type = file;
+	};
+
 	main = {
 	    main-type = main;
 	_EOF_
@@ -109,7 +135,6 @@ cat >&5 <<- _EOF_
 	    {
 	        tOptions * const pOpts = &test_${test_name}Options;
 	        int svix = pOpts->specOptIdx.save_opts;
-	        tOptDesc * pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts;
 	        char const * pzFile = "${cfg_file}-default";
 
 	        if (argc > 0)
@@ -154,6 +179,11 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
 				  33 exactly, or
 				  greater than or equal to 64
    -b T/F boolean        a boolean value
+   -I Fil in-file        an input file
+				- file must pre-exist
+   -O Fil out-file       an output file
+				- file must not pre-exist
+   -T Fil test-file      a test file
    -R Str reset-option   Reset an option's state
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
@@ -197,9 +227,13 @@ esac
 arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 
+dir=`echo ${TMPDIR} | sed "s@^\`pwd\`//*@@"`
 ./${testname} -m 'one + three' -b true -m 'seven' \
     -s "${arg1}" -n -200 -s "${arg2}" -e ocho \
-    '->'
+    -I ${srcdir}/${testname}.test \
+    -O ${dir}/${testname}-out-file \
+    -T ${dir}/${testname}-test-file \
+   '->'
 sed '/^#/d' ${cfg_file} > ${testname}-X
 mv -f ${testname}-X ${cfg_file}
 cat > ${testname}.sample-cfg <<- \_EOF_
@@ -223,10 +257,17 @@ cat > ${testname}.sample-cfg <<- \_EOF_
 	number              -200
 	boolean             true
 	_EOF_
+
+cat >> ${testname}.sample-cfg <<- _EOF_
+	in-file             ${srcdir}/${testname}.test
+	out-file            ${dir}/${testname}-out-file
+	test-file           ${dir}/${testname}-test-file
+	_EOF_
 pair=${testname}.sample-cfg\ ${cfg_file}
 cmp ${pair} || \
     failure "improperly saved state:${nl}`diff ${pair}`"
 
+rm -f ${dir}/${testname}-out-file
 ./${testname} ${cfg_file}-2
 sed '/^#/d' ${cfg_file}-2 > ${testname}-X
 mv -f ${testname}-X ${cfg_file}-2
@@ -234,29 +275,30 @@ cmp ${cfg_file} ${cfg_file}-2 || \
     failure "mismatched: re-saved config${nl}`diff ${cfg_file} ${cfg_file}-2`"
 
 rm -f ${cfg_file}-2
+rm -f ${dir}/${testname}-out-file
 ./${testname} -R struct ${cfg_file}-2
 test "X`egrep -v '^#' ${cfg_file}-2`" = "X`egrep '^[a-z]' ${cfg_file}`" || \
     failure "structure not erased${nl}`cat ${cfg_file}-2`"
 
+opt_ct=7
 mv -f ${cfg_file}-2 ${cfg_file}
 ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
-test ${ct} -eq 4 || failure "wrong line count${nl}`cat ${cfg_file}`"
+test ${ct} -eq ${opt_ct} || failure "wrong line count${nl}`cat ${cfg_file}`"
 
-./${testname} -R 'boolean' '->'
-ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
-test ${ct} -eq 3 || failure "boolean is still there${nl}`cat ${cfg_file}`"
+rm -f ${dir}/${testname}-out-file
 
-./${testname} -R 'members' '->'
-ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
-test ${ct} -eq 2 || failure "members are still members${nl}`cat ${cfg_file}`"
+remove_opt() {
+    opt_ct=`expr $opt_ct - 1`
+    ./${testname} -R ${1} '->'
+    ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
+    test ${ct} -eq ${opt_ct} || \
+        failure "${1} is still there${nl}`cat ${cfg_file}`"
+}
 
-./${testname} -R 'enumerate' '->'
-ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
-test ${ct} -eq 1 || failure "enumerate still enumerated${nl}`cat ${cfg_file}`"
-
-./${testname} -R 'number' '->'
-ct=`egrep '^[a-z]' ${cfg_file} | wc -l`
-test ${ct} -eq 0 || failure "number still counts${nl}`cat ${cfg_file}`"
+for f in out-file in-file test-file boolean members enumerate number
+do
+    remove_opt $f
+done
 
 ./${testname} -k alpha -k beta -k omega ${cfg_file}-XX
 sed '/^#/d' ${cfg_file}-XX > ${cfg_file}-2

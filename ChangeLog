@@ -1,3 +1,12 @@
+2008-08-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/file.c (optionFileCheck): When opening the file, stash
+	the file name in the cookie, so it can be saved in a config file.
+	* autoopts/save.c (optionSaveFile): reconfigure function and ensure
+	that all option argument types get saved off.
+	* autoopts/test/cfg-edit.test: test the three flavors of file argument
+	types (do not open, open(2), and fopen(3)).
+
 2008-08-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/boolean.c (optionBooleanVal): bail out for OPTST_RESET

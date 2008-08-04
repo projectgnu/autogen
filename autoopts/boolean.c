@@ -1,7 +1,7 @@
 
 /*
- *  $Id: boolean.c,v 4.13 2008/08/02 16:09:35 bkorb Exp $
- * Time-stamp:      "2008-07-31 11:53:47 bkorb"
+ *  $Id: boolean.c,v 4.14 2008/08/04 01:01:31 bkorb Exp $
+ * Time-stamp:      "2008-08-03 13:06:02 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -50,6 +50,11 @@ optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
 
     if ((pOD->fOptState & OPTST_RESET) != 0)
         return;
+
+    if (pOD->optArg.argString == NULL) {
+        pOD->optArg.argBool = AG_FALSE;
+        return;
+    }
 
     switch (*(pOD->optArg.argString)) {
     case '0':
