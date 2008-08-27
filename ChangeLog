@@ -1,3 +1,11 @@
+2008-08-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defFind.c (entryListSearch): names must start with a valid
+	"first character of a variable" character.
+	* autoopts/autoopts.c (findOptDesc): for named option mode,
+	if hyphens introduce an argument, then the argument must be an option
+	name  and cannot be the option argument to the default option.
+
 2008-08-03  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/file.c (optionFileCheck): When opening the file, stash

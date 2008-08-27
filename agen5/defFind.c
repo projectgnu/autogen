@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.18 2008/08/27 14:35:49 bkorb Exp $
+ *  $Id: defFind.c,v 4.19 2008/08/27 14:45:56 bkorb Exp $
  *
- *  Time-stamp:        "2008-08-10 12:06:47 bkorb"
- *  Last Committed:    $Date: 2008/08/27 14:35:49 $
+ *  Time-stamp:        "2008-08-27 07:40:28 bkorb"
+ *  Last Committed:    $Date: 2008/08/27 14:45:56 $
  *
  *  This module locates definitions.
  *
@@ -585,7 +585,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
-        if (! IS_ALPHANUMERIC_CHAR(*pzName)) {
+        if (! IS_VAR_FIRST_CHAR(*pzName)) {
             strncpy(zDefinitionName, pzName, sizeof(zDefinitionName) - 1);
             zDefinitionName[ sizeof(zDefinitionName) - 1] = NUL;
             ILLFORMEDNAME();
