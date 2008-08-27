@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.38 2008/07/27 20:06:05 bkorb Exp $
- *  Time-stamp:      "2008-07-14 19:28:05 bkorb"
+ *  $Id: autoopts.c,v 4.39 2008/08/27 14:35:49 bkorb Exp $
+ *  Time-stamp:      "2008-08-10 10:17:06 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -469,16 +469,28 @@ findOptDesc( tOptions* pOpts, tOptState* pOptState )
      *  IF all arguments must be named options, ...
      */
     if (NAMED_OPTS(pOpts)) {
-        char* pz = pOpts->pzCurOpt;
+        char *   pz  = pOpts->pzCurOpt;
+        int      def;
+        tSuccess res; 
+        tAoUS *  def_opt;
+
         pOpts->curOptIdx++;
 
-        /*
-         *  Skip over any flag/option markers.
-         *  In this mode, they are not required.
-         */
-        while (*pz == '-') pz++;
+        if (*pz != '-')
+            return longOptionFind(pOpts, pz, pOptState);
 
-        return longOptionFind( pOpts, pz, pOptState );
+        /*
+         *  The name is prefixed with one or more hyphens.  Strip them off
+         *  and disable the "default_opt" setting.  Use heavy recasting to
+         *  strip off the "const" quality of the "default_opt" field.
+         */
+        while (*(++pz) == '-')   ;
+        def_opt = (void *)&(pOpts->specOptIdx.default_opt);
+        def = *def_opt;
+        *def_opt = NO_EQUIVALENT;
+        res = longOptionFind(pOpts, pz, pOptState);
+        *def_opt = def;
+        return res;
     }
 
     /*

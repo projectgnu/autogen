@@ -4,7 +4,7 @@
 ##
 ##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2008-06-19 08:50:16 bkorb"
+## Time-stamp:      "2008-08-10 11:56:26 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -29,7 +29,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.16 2008/06/22 16:26:24 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.17 2008/08/27 14:35:49 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -412,9 +412,9 @@ esac"
       ENDIF     :+][+:
 
       IF (exist? "arg-default") :+]
-The default [+:(. opt-arg):+] for this option is:
+The default [+: (. opt-arg) :+] for this option is:
 .ti +4
- [+: arg-default :+][+:
+ [+: (join " + " (stack "arg-default" )) :+][+:
       ENDIF     :+]
 .sp
 [+:

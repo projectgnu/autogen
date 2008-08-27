@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.40 2008/08/04 01:01:31 bkorb Exp $
+#$Id: optcode.tpl,v 4.41 2008/08/27 14:35:49 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-08-03 12:15:31 bkorb"
+# Time-stamp:      "2008-08-10 11:27:47 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -146,9 +146,7 @@ tSCC zCopyright[] =
        [= (set! tmp-text (kr-string
        (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
                 (get "copyright.date") (get "copyright.owner") )))
-       tmp-text =];
-tSCC zCopyrightNotice[] =
-[=
+       tmp-text =][=
 
   CASE (get "copyright.type") =][=
 
@@ -161,9 +159,11 @@ tSCC zCopyrightNotice[] =
   ESAC =][=
 
 (emit (def-file-line "copyright.text" extract-fmt))
-(kr-string (shell (string-append
-"${CLexe} --fill <<\\_EOF_\n" tmp-text "\n_EOF_"
-))) =];[=
+(set! tmp-text (shell (string-append
+"${CLexe} --fill <<\\_EOF_\n" tmp-text "\n_EOF_")))
+
+(sprintf ";\ntSCC zCopyrightNotice[%d] =\n%s;\n"
+ (+ (string-length tmp-text) 1) (kr-string tmp-text)  ) =][=
 
 ENDIF "copyright notes"
 

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2008-07-31 11:59:02 bkorb"
+# Time-stamp:        "2008-08-10 11:56:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: keyword.test,v 4.17 2008/08/02 16:09:35 bkorb Exp $
+# $Id: keyword.test,v 4.18 2008/08/27 14:35:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -232,7 +232,7 @@ or their numeric equivalent.
 .sp
 The default \fImember-list\fP for this option is:
 .ti +4
- second
+ second + fourth
 .sp
 This option has not been fully documented.
 .TP

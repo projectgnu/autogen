@@ -101,3 +101,15 @@ Unless you have these tools, bootstrap won't work for you.  I intend
 to fix this as time permits.  Meanwhile, there is also a tarball in CVS
 of all the bootstrap-generated files:
    noag-boot.sh
+
+***  Licensing: ***
+
+  autogen is under GPL, but that does not cause the output produced by
+  autogen to be under GPL.  The reason is that the output contains next to
+  nothing that comes directly from autogen's source code.  Thus, the output
+  is not a "derivative work" of autogen (in the sense of U.S.@: copyright
+  law).  The output is primarily a derivative of the input templates.
+
+  On the other hand, the output produced by autogen contains essentially all
+  of the input template.  Therefore the output is under the same license,
+  with the same copyright holder, as the input that was passed to autogen.

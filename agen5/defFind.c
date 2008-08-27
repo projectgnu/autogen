@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.17 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: defFind.c,v 4.18 2008/08/27 14:35:49 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:44:29 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-08-10 12:06:47 bkorb"
+ *  Last Committed:    $Date: 2008/08/27 14:35:49 $
  *
  *  This module locates definitions.
  *
@@ -560,7 +560,7 @@ findDefEntry( char* pzName, ag_bool* pIsIndexed )
 
 
 /*
- *  findEntryList
+ *  entryListSearch
  *
  *  Find the definition entry for the name passed in.  It is okay to find
  *  block entries IFF they are found on the current level.  Once you start
@@ -585,6 +585,13 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
+        if (! IS_ALPHANUMERIC_CHAR(*pzName)) {
+            strncpy(zDefinitionName, pzName, sizeof(zDefinitionName) - 1);
+            zDefinitionName[ sizeof(zDefinitionName) - 1] = NUL;
+            ILLFORMEDNAME();
+            return NULL;
+        }
+
         canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
         pzName = zDefinitionName;
         defList.usedCt = 0;

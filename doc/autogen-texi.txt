@@ -1388,6 +1388,18 @@ If there is a Scheme error in this expression, Guile 1.4 and Guile 1.6
 will report the template line number where the error occurs.  Guile 1.7
 has lost this capability.
 
+Guile has the capability of creating and manipulating variables that
+can be referenced later on in the template processing.  If you define
+such a variable, it is invisible to AutoGen.  To reference its value,
+you must use a Guile expression.  For example,
+@examle
+[+ (define my-var "some-string-value") +]
+@end example
+can have that string inserted later, but only as in:
+@examle
+[+ (. my-var) +]
+@end example
+
 Additionally, other than in the @code{%} and @code{?%} expressions, the
 Guile expressions may be introduced with the Guile comment character
 (@code{;}) and you may put a series of Guile expressions within a single
@@ -3457,7 +3469,8 @@ gets configured with @code{--disable-optional-args}.
 @subsubsection Default Option Argument Value
 @cindex arg-default
 This specifies the default option argument value to be used when the option is
-not specified or preset.
+not specified or preset.  You may specify multiple @code{arg-default} values if
+the argument type is @code{set membership}.
 
 @node arg-type string
 @subsubsection Arg Type String
@@ -3586,7 +3599,12 @@ if (opt & OPTN_NAME_FIRST)
 @end example
 
 AutoOpts produces a special purpose procedure for this option.
-
+To set multiple bits as the default (initial) value, you must
+specify an initial numeric value (which might become inaccurate over
+time), or else specify @code{arg-default} multiple times.  Do not
+specify a series of names conjoined with @code{+} symbols as the
+value for any of the @code{arg-default} attributes.  That works for
+option parsing, but not for the option code generation.
 
 @node arg-type hierarchy
 @subsubsection Arg Type Hierarchical
