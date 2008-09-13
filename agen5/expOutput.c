@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.30 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: expOutput.c,v 4.31 2008/09/13 16:31:10 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-05 06:19:49 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-08-31 13:21:45 bkorb"
+ *  Last Committed:    $Date: 2008/09/13 16:31:10 $
  *
  *  This module implements the output file manipulation function
  *
@@ -726,7 +726,17 @@ ag_scm_make_header_guard(SCM name)
          *  Full, maximal length of output
          */
         size_t hsz = lsz + osz + sizeof(grd) + 1;
-        char * scan_p = AGALOC(hsz, "header guard string");
+        char * scan_p;
+
+        /*
+         * Sanity:
+         */
+        if (*lpz == NUL) {
+            lpz = hdr;
+            lsz = sizeof(hdr) - 1;
+            hsz += lsz;
+        }
+        scan_p = AGALOC(hsz, "header guard string");
 
         gpz = scan_p;
         do  {
