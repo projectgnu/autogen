@@ -1392,11 +1392,11 @@ Guile has the capability of creating and manipulating variables that
 can be referenced later on in the template processing.  If you define
 such a variable, it is invisible to AutoGen.  To reference its value,
 you must use a Guile expression.  For example,
-@examle
+@example
 [+ (define my-var "some-string-value") +]
 @end example
 can have that string inserted later, but only as in:
-@examle
+@example
 [+ (. my-var) +]
 @end example
 
