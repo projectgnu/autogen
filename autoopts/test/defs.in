@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2008-07-27 14:04:02 bkorb"
+# Time-stamp:     "2008-09-21 12:47:46 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2008/07/28 02:18:55 $
+# Last Modified:  $Date: 2008/09/21 20:17:31 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.24 2008/07/28 02:18:55 bkorb Exp $
+# $Id: defs.in,v 4.25 2008/09/21 20:17:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -53,7 +53,7 @@ AG_VERSION="@AG_VERSION@"
 GREP="@GREP@"
 EGREP="@EGREP@"
 FGREP="@FGREP@"
-SHELL="@SHELL@"
+SHELL="@CONFIG_SHELL@"
 AGexe="@AGexe@"
 CLexe="@CLexe@"
 GDexe="@GDexe@"
@@ -65,6 +65,7 @@ test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
 test -z "${testsubdir}" && testsubdir='@testsubdir@'
 test -z "${CC}"         && CC='@CC@'
 test -z "${CC}"         && echo "No CC configured" && exit 1
+test -z "${PAGER}"      && PAGER=more
 nl='
 '
 
@@ -125,7 +126,8 @@ init_tests() {
 
     lo_dir=${top_builddir}/autoopts
     test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
-    LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}:${LD_LIBRARY_PATH-/dev/null}
+    test "X${LD_LIBRARY_PATH}" = X || LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}${LD_LIBRARY_PATH}
     LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
     export LD_LIBRARY_PATH
 
@@ -268,7 +270,7 @@ AG_L="${AGexe} -L`cd ${srcdir}/..;pwd`"
 test_main=yes
 use_flags=true
 
-: "=== Running $progname for ${testname} using ${SHELL=sh} ==="
+: "=== Running $progname for ${testname} using ${SHELL} ==="
 chmod +w * > /dev/null 2>&1 || :
 export SHELL
 case "$-" in

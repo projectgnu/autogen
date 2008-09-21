@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2008-07-26 15:25:01 bkorb"
+# Time-stamp:        "2008-09-21 12:46:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.21 2008/07/27 20:06:05 bkorb Exp $
+# $Id: getopt.test,v 4.22 2008/09/21 20:17:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -53,7 +53,7 @@ compile_getopt() {
 
   # Finally, compile this thing:
   #
-  ${CC:-cc} ${CFLAGS} -c ${testname}${1}-getopt.c || \
+  ${CC} ${CFLAGS} -c ${testname}${1}-getopt.c || \
     failure "could not compile ${testname}1-getopt.c"
 
   cmp -s ${testname}${1}-base.c ${testname}${1}-getopt.c || { set +x ; \
@@ -89,7 +89,7 @@ cd ${builddir}/testdir
 #
 destdir=${TMPDIR}/autoopts \
 top_builddir=${top_builddir} \
-${SHELL:-/bin/sh} ${top_srcdir}/autoopts/install-options-h
+${SHELL} ${top_srcdir}/autoopts/install-options-h
 AUTOGEN_TEMPL_DIRS=${TMPDIR}
 export AUTOGEN_TEMPL_DIRS
 

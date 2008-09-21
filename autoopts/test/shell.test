@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-07-04 10:11:28 bkorb"
+# Time-stamp:        "2008-09-21 12:44:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,33 +29,31 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: shell.test,v 4.10 2008/01/23 00:35:27 bkorb Exp $
+# $Id: shell.test,v 4.11 2008/09/21 20:17:31 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
-SHELL=/bin/sh
-export SHELL
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-echo "creating $testname.def in `pwd`"
+echo "creating ${testname}.def in `pwd`"
 
- testname="$testname"       \
+ testname="${testname}"       \
 test_main="${test_main}"    \
  argument="reg-arg [ ... ]" \
 long_opts=true  \
 ${SHELLX} ${stdopts} option: second || failure "Could not run stdopts.def"
 
-echo ${AG_L} $testname.def
-${AG_L} $testname.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
@@ -69,22 +67,22 @@ Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
 _EOF_
 
-cmp -s $testname.h*lp || \
+cmp -s ${testname}.h*lp || \
   failure "`diff ${testname}.hlp ${testname}.help`"
 
-./$testname -X 2> /dev/null && \
-  failure $testname should not accept bogus options
+./${testname} -X 2> /dev/null && \
+  failure ${testname} should not accept bogus options
 
-./$testname -o 2> /dev/null && \
-  failure $testname should not accept missing options argument
+./${testname} -o 2> /dev/null && \
+  failure ${testname} should not accept missing options argument
 
-./$testname 2> /dev/null && \
-  failure $testname must have an argument
+./${testname} 2> /dev/null && \
+  failure ${testname} must have an argument
 
 # # # # # # # # # # SHELL OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.out
-cat > $testname.out <<_EOF_
+echo creating ${testname}.out
+cat > ${testname}.out <<_EOF_
 OPTION_CT=3
 export OPTION_CT
 TEST_SHELL_OPTION='opt-arg'
@@ -93,25 +91,25 @@ TEST_SHELL_SECOND=1 # 0x1
 export TEST_SHELL_SECOND
 _EOF_
 
-./$testname -o opt-arg -s a1 a2 > $testname.test || \
-  failure $testname did not handle its options
+./${testname} -o opt-arg -s a1 a2 > ${testname}.test || \
+  failure ${testname} did not handle its options
 
-cmp -s $testname.test $testname.out || \
-  failure "`diff $testname.out $testname.test`"
+cmp -s ${testname}.test ${testname}.out || \
+  failure "`diff ${testname}.out ${testname}.test`"
 
-sed '/test-main/s/yes/optionParseShell/' $testname.def > XX
-mv -f XX $testname.def
+sed '/test-main/s/yes/optionParseShell/' ${testname}.def > XX
+mv -f XX ${testname}.def
 
-echo ${AG_L} $testname.def
-${AG_L} $testname.def || \
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+echo creating ${testname}.hlp
+cat > ${testname}.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -160,9 +158,10 @@ cmp -s ${files} || \
 
 # # # # # # # # # # SCRIPT OUTPUT FILE # # # # # # # # #
 
-echo creating $testname.sht
-cat > $testname.sht <<'_EOF_'
-#! /bin/sh
+echo creating ${testname}.sht
+exec 3> ${testname}.sht
+printf '#! %s\nPAGER="%s"\n' "${SHELL}" "${PAGER}" >&3
+cat >&3 <<'_EOF_'
 TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
@@ -265,7 +264,7 @@ do
         'more-he' | \
         'more-hel' | \
         'more-help' )
-            echo "$TEST_SHELL_LONGUSAGE_TEXT" | ${PAGER-more}
+            echo "$TEST_SHELL_LONGUSAGE_TEXT" | ${PAGER}
             exit 0
             ;;
 
@@ -342,7 +341,7 @@ do
             ;;
 
         '!' )
-            echo "$TEST_SHELL_LONGUSAGE_TEXT" | ${PAGER-more}
+            echo "$TEST_SHELL_LONGUSAGE_TEXT" | ${PAGER}
             exit 0
             ;;
 
@@ -433,30 +432,31 @@ unset OPT_ARG_VAL || :
 
 env | grep '^TEST_SHELL_'
 _EOF_
+exec 3>&-
 
 # # # # # # # # # # SCRIPT OUTPUT TESTING # # # # # # # # #
 
-rm -f $testname.sh
-./$testname -o $testname.sh
+rm -f ${testname}.sh
+./${testname} -o ${testname}.sh
 
-sed '2,9d'  $testname.sh > XXX
-mv -f XXX $testname.sh
-cmp -s $testname.sh* || \
-  failure "`diff $testname.sh $testname.sht`"
+sed '2,9d'  ${testname}.sh > XXX
+mv -f XXX ${testname}.sh
+cmp -s ${testname}.sh* || \
+  failure "`diff ${testname}.sh ${testname}.sht`"
 
 # # # # # # # # # # SCRIPT PROCESSING TEST # # # # # # # # #
 
-chmod +x $testname.sh
-./$testname.sh  --opt opt-arg -s a1 a2 | sort > $testname.test || \
-  failure $testname did not handle its options
+chmod +x ${testname}.sh
+./${testname}.sh  --opt opt-arg -s a1 a2 | sort > ${testname}.test || \
+  failure ${testname} did not handle its options
 
-sort > $testname.out <<_EOF_
+sort > ${testname}.out <<_EOF_
 TEST_SHELL_OPTION=opt-arg
 TEST_SHELL_SECOND=true
 _EOF_
 
-cmp -s $testname.out $testname.test || \
-  failure "`diff $testname.out $testname.test`"
+cmp -s ${testname}.out ${testname}.test || \
+  failure "`diff ${testname}.out ${testname}.test`"
 
 cleanup
 

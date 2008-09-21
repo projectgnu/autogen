@@ -1,8 +1,8 @@
 #! /bin/sh
 set -x
 
-# Time-stamp:        "2008-07-14 18:43:58 bkorb"
-# Last Committed:    $Date: 2008/07/27 20:06:05 $
+# Time-stamp:        "2008-09-21 13:03:14 bkorb"
+# Last Committed:    $Date: 2008/09/21 20:17:31 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -31,6 +31,13 @@ srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 test -z "${pkgdatadir}" && exit 1
 
+test -z "${CONFIG_SHELL}" && CONFIG_SHELL=/bin/sh
+
+sedcmd="
+    s/@LIBOPTS_VER@/${LIBOPTS_VER}/
+    s%@bindir@%${bindir}%
+"
+
 for tpl in $*
 do
     if test -d ${pkgdatadir}
@@ -38,9 +45,7 @@ do
     else mkdir -p ${pkgdatadir} || exit 1
     fi
 
-    sed -e "s/@LIBOPTS_VER@/${LIBOPTS_VER}/" \
-        -e "s%@bindir@%${bindir}%" \
-        ${srcdir}/${tpl} > ${pkgdatadir}/${tpl}
+    sed "${sedcmd}" ${srcdir}/${tpl} > ${pkgdatadir}/${tpl}
 done
 
 rm -f ${destdir}/options.h

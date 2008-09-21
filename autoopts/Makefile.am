@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2008-07-27 14:27:17 bkorb"
+## Time-stamp:      "2008-09-21 12:32:26 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.42 2008/07/28 02:18:55 bkorb Exp $
+## $Id: Makefile.am,v 4.43 2008/09/21 20:17:31 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -181,7 +181,7 @@ install-data-hook:
 	pkgdatadir='$(DESTDIR)$(pkgdatadir)' \
 	top_builddir='$(top_builddir)' \
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
-	conf_shell='$(conf_shell)'  \
+	CONFIG_SHELL='$(CONFIG_SHELL)'  \
 	bindir='$(bindir)' \
 	$(SHELL) $(srcdir)/install-options-h $(TPL_FILES)
 
