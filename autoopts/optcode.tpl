@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.41 2008/08/27 14:35:49 bkorb Exp $
+#$Id: optcode.tpl,v 4.42 2008/09/21 20:16:33 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-08-10 11:27:47 bkorb"
+# Time-stamp:      "2008-09-13 11:04:49 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -427,6 +427,7 @@ ENDIF                   =][=
 
 (out-push-new)         \=]
 s/@[a-z]*{\([^{@}]*\)}/``\1''/g
+s=@<prog-name>@=[= prog-name =]=g
 /^@\(end *\)*example/d
 s/^@item *$/\
 /[=
