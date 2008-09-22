@@ -29,12 +29,12 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman3-tpl.in,v 4.6 2008/09/21 20:16:33 bkorb Exp $
+## $Id: agman3-tpl.in,v 4.7 2008/09/22 00:28:15 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 null
 
-## (setenv "SHELL" "@CONFIG_SHELL@")
+(setenv "SHELL" "@CONFIG_SHELL@")
 
 +}{+
 
