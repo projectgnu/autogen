@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2007-12-02 11:59:47 bkorb"
+# Time-stamp:      "2008-09-21 16:27:50 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.17 2008/01/23 00:35:27 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.18 2008/09/22 00:28:03 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -52,6 +52,13 @@
 # can be generated after checkout using this bootstrap procedure.
 
 # Code:
+
+mainpid=$$
+die() {
+    echo "bootstrap failure:  $*" >&2
+    kill -9 ${mainpid}
+    exit 1
+}
 
 case `set -o` in
 *posix*) set -o posix  ;;
@@ -84,6 +91,9 @@ case "$-" in
 (*x*)   setx=set\ -x dashx=-x VERBOSE=true  ;;
 (*)     setx=:       dashx=   VERBOSE=false ;;
 esac
+nl='
+'
+
 export setx dashx VERBOSE
 
 # Figure out the absolute path to the working directory.

@@ -4,7 +4,7 @@
 #  Header must come first.  An env variable is set that
 #  is used in processing the C file.
 #
-#  $Id: options-tpl.in,v 4.2 2008/09/21 20:17:31 bkorb Exp $
+#  $Id: options-tpl.in,v 4.3 2008/09/22 00:28:03 bkorb Exp $
 # Time-stamp:      "2008-09-21 12:59:13 bkorb"
 
 h
@@ -45,7 +45,7 @@ c
 
 (define extract-fmt       "\n/* extracted from %s near line %d */\n")
 
-## (setenv "SHELL" "@CONFIG_SHELL@")
+(setenv "SHELL" "@CONFIG_SHELL@")
 
 =][=
  (if (= "h" (suffix))

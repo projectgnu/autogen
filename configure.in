@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.in --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2008-09-21 12:28:20 bkorb"
+dnl Time-stamp:      "2008-09-21 16:16:37 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
@@ -22,7 +22,7 @@ dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.29 2008/09/21 20:17:31 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.30 2008/09/22 00:28:03 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -36,7 +36,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.29 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.30 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile
@@ -238,7 +238,6 @@ else
 fi
 ]
 AC_SUBST(INCLIST)
-AC_SUBST(CONFIG_SHELL)
 [
 case "${GCC}" in
  yes)
@@ -251,11 +250,12 @@ esac
 AM_CONFIG_HEADER(config.h:config-h.in)
 AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
                 [chmod +x doc/mk-agen-texi.sh])
-AC_CONFIG_FILES([autoopts/options.tpl:autoopts/options-tpl.in])
 ==ADD_CONFIG_FILES==
 
 AC_CONFIG_COMMANDS([stamp-h],
 [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+[CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}]
+AC_SUBST(CONFIG_SHELL)
 AC_OUTPUT
 
 echo \

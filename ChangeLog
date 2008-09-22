@@ -1,3 +1,12 @@
+2008-09-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expOutput.c (ag_scm_make_header_guard): it is possible to get
+	the "leader" string to be empty.  If that happens, use a default.
+	* autoopts/install-options-h: let configure script config the templates
+	* autoopts/*.tpl: rename several to *-tpl.in and have configure fix 'em
+	* autoopts/test/defs.in: avoid features Solaris /bin/sh cannot handle
+	* configure.in: make certain CONFIG_SHELL is not empty
+
 2008-08-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defFind.c (entryListSearch): names must start with a valid
