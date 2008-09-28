@@ -2,7 +2,7 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2008-09-21 13:36:02 bkorb"
+## Time-stamp:      "2008-09-23 08:53:38 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@ in=autoopts-config.in
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.9 2008/09/22 00:28:15 bkorb Exp $
+## $Id: aoconf-tpl.in,v 4.10 2008/09/28 23:22:56 bkorb Exp $
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.
@@ -254,7 +254,10 @@ FOR cfg  =][=
 ENDFOR
 
 =]
-test -n "${ldopts}" && ldflags="${ldopts}${libdir} ${ldflags}"
+test -n "${ldopts}" && {
+    ldflags="${ldopts}${libdir} ${ldflags}"
+    libs=${ldflags}
+}
 test "${includedir}" = "/usr/include" && cflags=""
 [=
 

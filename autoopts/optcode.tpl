@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.42 2008/09/21 20:16:33 bkorb Exp $
+#$Id: optcode.tpl,v 4.43 2008/09/28 23:22:56 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-09-13 11:04:49 bkorb"
+# Time-stamp:      "2008-09-23 09:45:44 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -97,6 +97,7 @@ INCLUDE "optmain.tpl"
 #include <sys/types.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 [=
 
 IF (exist? "flag.arg-range")
@@ -107,13 +108,10 @@ extern FILE * option_usage_fp;[=
 
 ENDIF                     =][=
 
-IF (exist? "resettable")  =]
-#include <stdlib.h>[=
-  IF (exist? "flag.open-file") =]
+IF (and (exist? "resettable") (exist? "flag.open-file")) =]
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>[=
-  ENDIF                   =][=
 ENDIF                     =][=
 
 IF (or (= "optionPutShell"    (get "main.shell-process"))

@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2008-09-21 17:10:05 bkorb"
+# Time-stamp:        "2008-09-21 17:37:06 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.33 2008/09/22 00:28:03 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.34 2008/09/28 23:22:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -177,7 +177,6 @@ config_configurables()
     eval sed "${sed}" ${config_file} > configure.tmp
 
     mv -f configure.tmp ${config_file}
-    cat configure.files >&2
     rm -f configure.files
 }
 

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2008-09-21 12:46:02 bkorb"
+# Time-stamp:        "2008-09-23 13:32:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.22 2008/09/21 20:17:31 bkorb Exp $
+# $Id: getopt.test,v 4.23 2008/09/28 23:22:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -70,12 +70,15 @@ compile_getopt() {
 #
 mkdir -p ${TMPDIR}/autoopts
 
-CFLAGS="-I ${TMPDIR} ${CFLAGS} ${INC}"
+CFLAGS="-I${TMPDIR} ${CFLAGS} ${INC}"
 LDFLAGS="${LDFLAGS} ${LIB}"
 export CFLAGS LDFLAGS TMPDIR
 
 aolib=${top_builddir}/autoopts/.libs/libopts.a
 test -f ${aolib} || aolib=${top_builddir}/autoopts/libopts.a
+case " ${LDFLAGS} " in
+*' -lgen '* ) aolib=${aolib}\ -lgen ;;
+esac
 
 cd ${top_srcdir}/autoopts
 cp opt*.tpl getopt.tpl ${TMPDIR}/.

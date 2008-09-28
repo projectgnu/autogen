@@ -1,3 +1,11 @@
+2008-09-28  Alan Pae  <alanpae@ilkda.com>
+
+	* agen5/defDirect.c (leave): label conflicts with system header. Rename.
+	* autoopts/aoconf-tpl.in (libs): make sure it is the same as ldflags
+	* autoopts/optcode.tpl (stdlib.h): is very often needed, so always incl.
+	* autoopts/save.c (compile_getopt): Make a very picky compiler happy
+	* autoopts/test/getopt.test (lgen): make sure it is in aolib, if needed
+
 2008-09-21  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expOutput.c (ag_scm_make_header_guard): it is possible to get

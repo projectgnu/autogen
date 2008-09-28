@@ -1,7 +1,7 @@
 
 /*
- *  save.c  $Id: save.c,v 4.31 2008/08/04 01:01:31 bkorb Exp $
- * Time-stamp:      "2008-08-03 14:26:51 bkorb"
+ *  save.c  $Id: save.c,v 4.32 2008/09/28 23:22:56 bkorb Exp $
+ * Time-stamp:      "2008-09-23 14:24:58 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -434,7 +434,7 @@ print_a_string(FILE * fp, char const * name, char const * pz)
 
         default:
 #if __GNUC__ < 4
-            if (  (ch >= 1) && (ch <= (' ' - 1))
+            if (  ((ch >= 1) && (ch <= (' ' - 1)))
                || ((ch >= ('~' + 1)) && (ch <= 0xFF)) ) {
                 emit_special_char(fp, ch);
                 break;

@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.28 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: defDirect.c,v 4.29 2008/09/28 23:22:56 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-17 09:46:24 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-09-23 09:06:37 bkorb"
+ *  Last Committed:    $Date: 2008/09/28 23:22:56 $
  *
  *  This module processes definition file directives.
  *
@@ -228,7 +228,7 @@ skipToEndif( char* pzStart )
             if (pz != NULL)
                  pzRet = pz+1;
             else pzRet = pzScan + strlen( pzScan );
-            goto leave;
+            goto leave_func;
         }
 
         case DIR_IFDEF:
@@ -247,7 +247,7 @@ skipToEndif( char* pzStart )
         }  /* switch (findDirective( pzScan )) */
     }
 
- leave:
+ leave_func:
     while (pzStart < pzRet) {
         if (*(pzStart++) == '\n')
             pCurCtx->lineNo++;
@@ -353,7 +353,7 @@ skipToElseEnd( char* pzStart )
             if (pz != NULL)
                  pzRet = pz+1;
             else pzRet = pzScan + strlen( pzScan );
-            goto leave;
+            goto leave_func;
         }
 
         case DIR_IFDEF:
@@ -374,7 +374,7 @@ skipToElseEnd( char* pzStart )
         }  /* switch (findDirective( pzScan )) */
     }
 
- leave:
+ leave_func:
     while (pzStart < pzRet) {
         if (*(pzStart++) == '\n')
             pCurCtx->lineNo++;
