@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.43 2008/09/28 23:22:56 bkorb Exp $
+#$Id: optcode.tpl,v 4.44 2008/11/01 20:28:58 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-09-23 09:45:44 bkorb"
+# Time-stamp:      "2008-10-06 19:33:10 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -506,11 +506,11 @@ ESAC   no-xlate         =]
 [= IF (exist? "resettable") =]
 static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
 (. UP-prefix) =]OPTION_CT ] = {[=
-   (substring/shared default-text 0 (- (string-length default-text) 1)) =]
+   (substring default-text 0 (- (string-length default-text) 1)) =]
 };
 static void * const original[=(. pname-cap)=]Cookies[ [=
 (. UP-prefix) =]OPTION_CT ] = {[=
-   (substring/shared default-cookie 0 (- (string-length default-cookie) 1)) =]
+   (substring default-cookie 0 (- (string-length default-cookie) 1)) =]
 };
 [= ENDIF =]
 [= INVOKE usage-text usage-type = full  \=]

@@ -1,3 +1,8 @@
+2008-10-06  Bruce Korb  <bkorb@gnu.org>
+
+	* configure.in: old guile headers are not up to all the warnings
+	* autoopts/optcode.tpl: older guile cannot handle "substring/shared"
+
 2008-09-28  Alan Pae  <alanpae@ilkda.com>
 
 	* agen5/defDirect.c (leave): label conflicts with system header. Rename.
