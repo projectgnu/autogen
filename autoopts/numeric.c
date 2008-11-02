@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.17 2008/08/02 22:49:57 bkorb Exp $
- *  Time-stamp:      "2008-08-02 12:03:20 bkorb"
+ *  $Id: numeric.c,v 4.18 2008/11/02 18:51:00 bkorb Exp $
+ *  Time-stamp:      "2008-11-01 14:28:56 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -116,8 +116,9 @@ optionNumericVal(tOptions* pOpts, tOptDesc* pOD )
     if ((pOD == NULL) || (pOD->optArg.argString == NULL))
         return;
 
+    errno = 0;
     val = strtol(pOD->optArg.argString, &pz, 0);
-    if (pz == pOD->optArg.argString)
+    if ((pz == pOD->optArg.argString) || (errno != 0))
         goto bad_number;
 
     if ((pOD->fOptState & OPTST_SCALED_NUM) != 0)
@@ -154,6 +155,7 @@ bad_number:
 
     pOD->optArg.argInt = ~0;
 }
+
 /*
  * Local Variables:
  * mode: C

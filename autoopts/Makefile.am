@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2008-09-21 15:43:03 bkorb"
+## Time-stamp:      "2008-11-01 16:25:01 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.44 2008/09/22 00:28:03 bkorb Exp $
+## $Id: Makefile.am,v 4.45 2008/11/02 18:51:00 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -68,7 +68,8 @@ CSRC        = $(GEN_SRC) \
     boolean.c configfile.c cook.c      enumeration.c environment.c \
     file.c    genshell.c   load.c      makeshell.c   nested.c numeric.c \
     pgusage.c putshell.c   reset.c     restore.c     save.c   sort.c    \
-    stack.c   streqvcmp.c  text_mmap.c tokenize.c    usage.c  version.c
+    stack.c   streqvcmp.c  text_mmap.c tokenize.c    time.c \
+    usage.c   version.c
 
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
 

@@ -1,7 +1,7 @@
 #! /bin/sh
 #
-## Time-stamp:      "2007-07-04 10:11:23 bkorb"
-## ident            $Id: stdopts.def,v 4.6 2008/01/23 00:35:27 bkorb Exp $
+## Time-stamp:      "2008-11-01 19:37:01 bkorb"
+## ident            $Id: stdopts.def,v 4.7 2008/11/02 18:51:00 bkorb Exp $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -47,47 +47,54 @@ test -n "${long_opts}" && echo "long-opts;" >&5
 
 for flag
 do
-  case "$flag" in
-  ?*:?* )
-    arg=`echo $flag | sed 's/.*://'`
-    flag=`echo $flag | sed 's/:.*//'`
-    arg="    arg-type = string; arg_default = '$arg';"
-    ;;
+    fname=`echo "${flag}" | sed 's/[^a-zA-Z0-9_-].*//'`
+    flag=`echo "${flag}"  | sed "s/^${fname}//"`
 
-  ?*=[0-9]* )
-    arg=`echo $flag | sed 's/.*=//'`
-    flag=`echo $flag | sed 's/=.*//'`
-    arg="    arg-type = number; arg_default = '$arg';"
-    ;;
+    case "${flag}" in
+    :* )
+        aval=`echo $flag | sed 's/^://'`
+        arg="    arg-type = string;"
+        test -n "${aval}" && arg="${arg} arg_default = '${aval}';"
+        ;;
 
-  ?*: )
-    flag=`echo $flag | sed 's/://'`
-    arg="    arg-type = string;"
-    ;;
+    =* )
+        aval=`echo $flag | sed 's/=//'`
+        arg="    arg-type = number;"
+        test -n "${aval}" && arg="${arg} arg_default = '${aval}';"
+        ;;
 
-  ?*= )
-    flag=`echo $flag | sed 's/=//'`
-    arg="    arg-type = number;"
-    ;;
+    @* )
+        arg=`echo $flag  | sed 's/@//'`
+        case "${arg}" in
+        *=* ) default=`echo $flag | sed 's/.*=//'`
+              arg=`echo $arg | sed 's/=.*//'`
+              arg="    arg-type = '${arg}'; arg-default='${default}';"
+              ;;
 
-  * )
-    unset arg
-    ;;
-  esac
+        * )
+              arg="    arg-type = '${arg}';"
+              ;;
+        esac
+        ;;
 
-  cat <<-_EOF_
+    * )
+        unset arg
+        ;;
+    esac
+
+    cat <<-_EOF_
 	flag = {
-	    name = "$flag";
-	    descrip = "The $flag option descrip";
+	    name = "${fname}";
+	    descrip = "The ${fname} option descrip";
 	_EOF_
 
-  ${use_flags} && {
-    flag=`echo $flag | sed 's/\(.\).*/\1/'`
-    echo "    value = '${flag}';"
-  }
-  test -n "${arg}" && echo "${arg}"
-  echo "};"
-  echo
+    ${use_flags} && {
+        fname=`echo ${fname} | sed 's/\(.\).*/\1/'`
+        echo "    value = '${fname}';"
+    }
+    test -n "${arg}" && echo "${arg}"
+    echo "};"
+    echo
 done >&5
 
 exec 5>&-

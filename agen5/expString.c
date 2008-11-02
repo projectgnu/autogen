@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.20 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: expString.c,v 4.21 2008/11/02 18:51:00 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-06 13:34:10 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-11-02 08:36:09 bkorb"
+ *  Last Committed:    $Date: 2008/11/02 18:51:00 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -1187,6 +1187,37 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
     if (pzStr != AG_SCM_CHARS( Str ))
         AGFREE( (char*)pzStr );
     return res;
+}
+
+
+/*=gfunc time_string_to_number
+ *
+ * what:   duration string to seconds
+ * general_use:
+ * exparg: time_spec, string to parse
+ *
+ * doc:    Convert the argument string to a time period in seconds.
+ *         The string may use multiple parts consisting of days, hours
+ *         minutes and seconds.  These are indicated with a suffix of
+ *         @code{d}, @code{h}, @code{m} and @code{s} respectively.
+ *         Hours, minutes and seconds may also be represented with
+ *         @code{HH:MM:SS} or, without hours, as @code{MM:SS}.
+=*/
+SCM
+ag_scm_time_string_to_number( SCM time_spec )
+{
+    extern time_t parse_time(char const * in_pz);
+
+    tCC *   pz;
+    time_t  time_period;
+
+    if (! AG_SCM_STRING_P( time_spec ))
+        return SCM_UNDEFINED;
+
+    pz = AG_SCM_CHARS( time_spec );
+    time_period = parse_time(pz);
+    
+    return AG_SCM_INT2SCM((int)time_period);
 }
 
 /*

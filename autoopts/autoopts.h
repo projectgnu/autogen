@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2008-06-15 10:32:43 bkorb"
+ *  Time-stamp:      "2008-11-01 20:08:06 bkorb"
  *
- *  autoopts.h  $Id: autoopts.h,v 4.39 2008/06/22 16:26:24 bkorb Exp $
+ *  autoopts.h  $Id: autoopts.h,v 4.40 2008/11/02 18:51:00 bkorb Exp $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -209,6 +209,7 @@ typedef struct {
     tCC*    pzNoF;
     tCC*    pzSpc;
     tCC*    pzOptFmt;
+    tCC*    pzTime;
 } arg_types_t;
 
 #define AGALOC( c, w )          ao_malloc((size_t)c)

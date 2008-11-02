@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.22 2008/08/02 16:09:35 bkorb Exp $
+   $Id: usage-txt.def,v 4.23 2008/11/02 18:51:00 bkorb Exp $
  */
 
 /*
@@ -235,6 +235,11 @@ utxt = { ut-type = char;
 utxt = { ut-type = char;
          ut-name = GnuKeyLArg;
          ut-text = "=Mbr";
+};
+
+utxt = { ut-type = char;
+         ut-name = GnuTimeArg;
+         ut-text = "=Tim";
 };
 
 utxt = { ut-name = GnuNestArg;
@@ -530,6 +535,10 @@ utxt = { ut-name = StdKeyArg;
 
 utxt = { ut-name = StdKeyLArg;
          ut-text = "Mbr";
+};
+
+utxt = { ut-name = StdTimeArg;
+         ut-text = "Tim";
 };
 
 utxt = { ut-name = StdNestArg;

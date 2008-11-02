@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2008-07-30 16:33:17 bkorb"
+# Time-stamp:      "2008-11-01 19:24:43 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.33 2008/08/02 16:09:35 bkorb Exp $
+# $Id: optlib.tpl,v 4.34 2008/11/02 18:51:00 bkorb Exp $
 
 =][=
 
@@ -148,6 +148,13 @@ DEFINE save-name-morphs
          (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
+    =*   time                   =][=
+         (set! proc-name "optionTimeVal")
+         (set! test-name proc-name)
+         (set! is-extern #t)
+         (set! is-priv   #f)
+         (set! have-proc #t)    =][=
+
     ~*   key|set|fil            =][=
          (set! test-name proc-name)
          (set! is-extern #f)
@@ -212,6 +219,8 @@ DEFINE set-defines
   ~*  str|fil    =]; \
         [=set-desc=].optArg.argString = (a)[=
   =*  num        =]; \
+        [=set-desc=].optArg.argInt = (a)[=
+  =*  time       =]; \
         [=set-desc=].optArg.argInt = (a)[=
   =*  bool       =]; \
         [=set-desc=].optArg.argBool = (a)[=
@@ -414,6 +423,10 @@ typedef enum {[=
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] ([=(. value-desc)=].optArg.argInt)[=
 
+  =*  time       =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argInt)[=
+
   =*  key        =]
 #define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
                  =] optionKeywordName( &[=(. value-desc)=], (_v))
@@ -556,6 +569,10 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* num                   =]
 #define [=(. def-arg-name)=]((char const*)[= arg-default =])[=
 
+       =* time                  =]
+#define [=(. def-arg-name)=]((char const*)[=
+        (time-string->number (get "arg-default")) =])[=
+
        =* bool                  =][=
           CASE arg-default      =][=
           ~ n.*|f.*|0           =]
@@ -630,6 +647,9 @@ static const int
         | OPTST_SET_ARGTYPE(OPARG_TYPE_NUMERIC)[=
                IF (exist? "scaled")            =] \
         | OPTST_SCALED_NUM[=        ENDIF      =][=
+
+            =*  time       =] \
+        | OPTST_SET_ARGTYPE(OPARG_TYPE_TIME)[=
 
             =*  bool       =] \
         | OPTST_SET_ARGTYPE(OPARG_TYPE_BOOLEAN)[=

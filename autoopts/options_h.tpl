@@ -3,8 +3,8 @@
 h=options.h
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-07-27 15:16:36 bkorb"
-# ID:  $Id: options_h.tpl,v 4.42 2008/07/28 02:18:55 bkorb Exp $
+# Time-stamp:      "2008-11-01 16:47:39 bkorb"
+# ID:  $Id: options_h.tpl,v 4.43 2008/11/02 18:51:00 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -105,7 +105,8 @@ typedef enum {
     OPARG_TYPE_MEMBERSHIP       = 4,    /* opt arg sets set membership bits  */
     OPARG_TYPE_NUMERIC          = 5,    /* opt arg has numeric value         */
     OPARG_TYPE_HIERARCHY        = 6,    /* option arg is hierarchical value  */
-    OPARG_TYPE_FILE             = 7     /* option arg names a file           */
+    OPARG_TYPE_FILE             = 7,    /* option arg names a file           */
+    OPARG_TYPE_TIME             = 8     /* opt arg is a time duration        */
 } teOptArgType;
 
 typedef struct optionValue {

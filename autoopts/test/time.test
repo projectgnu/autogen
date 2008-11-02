@@ -1,11 +1,9 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# argument.test ---  test argument program attribute
-#                    make sure that when it is not specified
-#                    then option processing consumes all args.
+# time.test ---  test time duration argument
 #
-# Time-stamp:        "2008-11-01 18:24:43 bkorb"
+# Time-stamp:        "2008-11-01 20:33:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,9 +27,77 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: time.test,v 4.1 2008/11/02 01:25:16 bkorb Exp $
+# $Id: time.test,v 4.2 2008/11/02 18:51:00 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo "creating ${testname}.def in `pwd`"
+unset test_main
+export testname argument long_opts
+
+${SHELLX} ${stdopts} ${testname}@time='1d 2 h 15:10'
+here='<<'
+cat >> ${testname}.def <<- _EOF_
+	main = {
+	  main-type = main;
+	  main-text = ${here}- CodeEnd
+		printf("arg %s represents %d seconds", argv[-1],
+		       OPT_VALUE_TIME);
+		return 0;
+		CodeEnd;
+	};
+	_EOF_
+
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+
+basehlp=${testname}.hlp
+echo creating ${basehlp}
+cat > ${basehlp} <<'_EOF_'
+test_time - Test AutoOpts for time
+USAGE:  time [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -t Tim time           The time option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${testname}.h*lp || \
+  failure "`diff ${basehlp} ${testname}.help`"
+
+time_val=213791
+
+ck() {
+    tim=`./${testname} -t "$*" | \
+        sed -n 's/.* represents \([0-9]*\) seconds/\1/p'`
+    test -z "${tim}" && failure ${testname} could not parse "$*"
+    test ${tim} -eq ${time_val} || \
+        failure ${testname} misevaluated "$*"
+}
+
+ck 2 d 11h 23:11
+ck 2 d 11h 23m 11s
+
+tim=`./${testname} -t '2 d 10h 83:11'` && \
+  failure ${testname} handled bad options
+
+# # # # # # # # # # T E S T   E N D # # # # # # # # # #
+
+cleanup
+
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of argument.test

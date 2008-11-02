@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.26 2008/07/27 20:06:05 bkorb Exp $
- * Time-stamp:      "2008-07-26 18:14:26 bkorb"
+ *  usage.c  $Id: usage.c,v 4.27 2008/11/02 18:51:00 bkorb Exp $
+ * Time-stamp:      "2008-11-01 20:09:17 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -512,6 +512,7 @@ printOneUsage(
         case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
         case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
         case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
+        case OPARG_TYPE_TIME:        pzArgType = pAT->pzTime; break;
         default:                     goto bogus_desc;
         }
 
@@ -570,9 +571,9 @@ printOptionUsage(
          *  THEN document that the remaining options are not user opts
          */
         if (  (pOpts->presetOptCt == optNo)
-              && (ex_code == EXIT_SUCCESS)
-              && (docCt > 0)
-              && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
+           && (ex_code == EXIT_SUCCESS)
+           && (docCt > 0)
+           && ((pOD[-1].fOptState & OPTST_DOCUMENT) == 0) )
             fprintf( option_usage_fp, argTypes.pzBrk, zAuto, pOptTitle );
 
         printOneUsage( pOpts, pOD, &argTypes );
@@ -669,6 +670,7 @@ setGnuOptFmts( tOptions* pOpts, tCC** ppT )
     argTypes.pzNum  = zGnuNumArg;
     argTypes.pzKey  = zGnuKeyArg;
     argTypes.pzKeyL = zGnuKeyLArg;
+    argTypes.pzTime = zGnuTimeArg;
     argTypes.pzFile = zGnuFileArg;
     argTypes.pzBool = zGnuBoolArg;
     argTypes.pzNest = zGnuNestArg;
@@ -707,6 +709,7 @@ setStdOptFmts( tOptions* pOpts, tCC** ppT )
     argTypes.pzNum  = zStdNumArg;
     argTypes.pzKey  = zStdKeyArg;
     argTypes.pzKeyL = zStdKeyLArg;
+    argTypes.pzTime = zStdTimeArg;
     argTypes.pzFile = zStdFileArg;
     argTypes.pzBool = zStdBoolArg;
     argTypes.pzNest = zStdNestArg;

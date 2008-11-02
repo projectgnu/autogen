@@ -190,8 +190,7 @@ extern char const* az_name_list[ 3 ];
 @end example
 
 @noindent
-Then you also have @file{list.c} that defines the actual
-strings:
+Then you also have @file{list.c} that defines the actual strings:
 
 @example
 #include "list.h"
@@ -3426,6 +3425,7 @@ the following table.  The first three letters is sufficient.
 * arg-type set membership:: Arg Type Set Membership
 * arg-type hierarchy::      Arg Type Hierarchical
 * arg-type file name::      Arg Type File Name
+* arg-type time::           Arg Type Time Duration
 
 Supporting attributes for particular argument types:
 
@@ -3525,6 +3525,7 @@ The value must match one of the entries.  If it can match more than one,
 then you have redundancies, but no harm will come of it.
 @end itemize
 @end table
+
 
 @node arg-type boolean
 @subsubsection Arg Type Boolean
@@ -3662,6 +3663,53 @@ If ``open-file'' is set and not empty, then you must specify the open mode.
 Set the value to the flag bits or mode string as appropriate for the open
 type.
 @end table
+
+
+@node arg-type time
+@subsubsection Arg Type Time Duration
+@code{arg-type = time;}
+
+The argument will be converted into a number of seconds.  It may be
+a multi-part number with different parts being multiplied into a seconds
+value and added into the final result.  Valid forms are in the table
+below.  Upper cased letters represent numbers that must be used in the
+expressions.
+
+@table @samp
+@item [[HH:]MM:]SS
+where the hyphens (@code{-}) are really colons(@code{:}), but the
+texi doc system won't allow colons there.
+
+@code{HH} is multiplied by @code{3600} and @code{MM} multiplied by @code{60}
+before they are added to @code{SS}.  This time specification may not be
+followed by any other time specs.  @code{HH} and @code{MM} are both optional,
+though @code{HH} cannot be specified without @code{MM}.
+
+@item DAYS d
+@code{DAYS} is multiplied by the number of seconds in a day.  This value may
+be followed by (and added to) values specified by @code{HH:MM:SS} or the
+suffixed values below.  If present, it must always be first.
+
+@item HRS h
+@code{HRS} is multiplied by the number of seconds in an hour.  This value may
+be followed by (and added to) values specified by @code{MM:SS} or the
+suffixed values below.
+
+@item MINS m
+@code{MINS} is multiplied by the number of seconds in a minute.  This value may
+be followed by (and added to) a count of seconds.
+
+@item SECS s
+This value can only be the last value in a time specification.  The @code{s}
+suffix is optional.
+@end table
+
+@example
+   5 d 1:10:05    ==> 5 days + 1 hour 10 minutes and 5 seconds
+   5 d 1 h 10 m 5 ==> yields: 436205 seconds
+   5d1h10m5s      ==> same result -- spaces are optioal.
+@end example
+
 
 @node Option Argument Handling
 @subsection Option Argument Handling

@@ -1,7 +1,17 @@
-2008-10-06  Bruce Korb  <bkorb@gnu.org>
+2008-11-02  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: old guile headers are not up to all the warnings
 	* autoopts/optcode.tpl: older guile cannot handle "substring/shared"
+	* autoopts/autoopts.h (arg_types_t): add 'time'.
+	* autoopts/options_h.tpl (teOptArgType): add OPARG_TYPE_TIME
+	* autoopts/time.c: new module containing optionTimeVal and parse_time
+	* agen5/expString.c (ag_scm_time_string_to_number): New: convert a time
+	duration string into a number of seconds.
+	* autoopts/optlib.tpl (arg-type): handle 'time'
+	* autoopts/usage-txt.def (GnuTimeArg)
+	(StdTimeArg) handle 'time'
+	* autoopts/usage.c (printOneUsage): handle 'time'
+	* doc/autogen-texi.txt: describe 'time' argument type
 
 2008-09-28  Alan Pae  <alanpae@ilkda.com>
 
