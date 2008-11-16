@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2008-11-01 16:25:01 bkorb"
+## Time-stamp:      "2008-11-16 12:03:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.45 2008/11/02 18:51:00 bkorb Exp $
+## $Id: Makefile.am,v 4.46 2008/11/16 23:56:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -83,7 +83,9 @@ CLIENT_TPLS = stdoptions.def rc-sample.tpl agman-lib.tpl \
 
 TPL_FILES   = $(CLIENT_TPLS) $(OPTCODE_TPL)
 DEF_FILES   = genshell.def stdoptions.def $(srcdir)/funcs.def
-MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in
+MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in \
+		parse-duration.h parse-duration.c
+
 pkgconfigdir=$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

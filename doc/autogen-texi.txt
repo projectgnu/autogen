@@ -3707,7 +3707,7 @@ suffix is optional.
 @example
    5 d 1:10:05    ==> 5 days + 1 hour 10 minutes and 5 seconds
    5 d 1 h 10 m 5 ==> yields: 436205 seconds
-   5d1h10m5s      ==> same result -- spaces are optioal.
+   5d1h10m5s      ==> same result -- spaces are optional.
 @end example
 
 

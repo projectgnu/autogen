@@ -2,7 +2,7 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2007-11-17 11:12:12 bkorb"
+## Time-stamp:      "2008-11-16 15:15:26 bkorb"
 ##              by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: mklibsrc.sh,v 4.32 2008/01/23 00:35:27 bkorb Exp $
+## $Id: mklibsrc.sh,v 4.33 2008/11/16 23:56:30 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 
@@ -51,6 +51,9 @@ files=`fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
            -e '/^compat\/compat\.h$/d' `
 
+egrep "#define HAVE_PARSE_DURATION" ${top_builddir}/config.h >/dev/null || \
+  files="${files} parse-duration.c parse-duration.h"
+
 for f in libopts.c ${files}
 do
   if test -f ${f}
@@ -64,7 +67,6 @@ cp -f ${top_srcdir}/pkg/libopts/COPYING.* ${tagd}/.
 cd ${top_srcdir}/compat
 cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
    ${tagd}/compat/.
-
 #
 #  END WORK IN SOURCE DIRECTORY
 #

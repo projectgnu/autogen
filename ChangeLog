@@ -1,3 +1,10 @@
+2008-11-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am (MISC_FILES): until parse-duration.[ch] are
+	obtained from gnulib, add them to the extra files for distribution.
+	* autoopts/parse-duration.c: new file, pending addition to gnulib.
+	* autoopts/parse-duration.h: new file, pending addition to gnulib.
+
 2008-11-02  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: old guile headers are not up to all the warnings
@@ -96,7 +103,7 @@
 	is called more than once.
 	(inner_main): set signals back to default before calling "exit(3)".
 	Make the "atexit" call here.
-	(signalExit): do not make toe siglongjmp when in DONE or ABORTING state.
+	(signalExit): do not make the siglongjmp when in DONE or ABORTING state.
 	(doneCheck): make certain this code executes only once.
 	* autoopts/agman1.tpl: "adjust" is spelled ".ad" in nroff-speak
 	* autoopts/install-options-h: burn the "${bindir}" into the

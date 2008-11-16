@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.21 2008/11/02 18:51:00 bkorb Exp $
+ *  $Id: expString.c,v 4.22 2008/11/16 23:56:30 bkorb Exp $
  *
- *  Time-stamp:        "2008-11-02 08:36:09 bkorb"
- *  Last Committed:    $Date: 2008/11/02 18:51:00 $
+ *  Time-stamp:        "2008-11-16 12:28:30 bkorb"
+ *  Last Committed:    $Date: 2008/11/16 23:56:30 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -1206,7 +1206,7 @@ ag_scm_string_substitute( SCM Str, SCM Match, SCM Repl )
 SCM
 ag_scm_time_string_to_number( SCM time_spec )
 {
-    extern time_t parse_time(char const * in_pz);
+    extern time_t parse_duration(char const * in_pz);
 
     tCC *   pz;
     time_t  time_period;
@@ -1215,7 +1215,7 @@ ag_scm_time_string_to_number( SCM time_spec )
         return SCM_UNDEFINED;
 
     pz = AG_SCM_CHARS( time_spec );
-    time_period = parse_time(pz);
+    time_period = parse_duration(pz);
     
     return AG_SCM_INT2SCM((int)time_period);
 }
