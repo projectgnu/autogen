@@ -3710,6 +3710,12 @@ suffix is optional.
    5d1h10m5s      ==> same result -- spaces are optional.
 @end example
 
+When saved into a config file, the value will be stored as a simple count
+of seconds.  There are actually more (many) accepted time duration strings.
+The full documentation can be found with ISO-8601 documentation and the
+more extedded documentation when ``parse_duration()'' becomes more widely
+available.
+
 
 @node Option Argument Handling
 @subsection Option Argument Handling
