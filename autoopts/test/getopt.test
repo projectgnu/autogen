@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2008-09-23 13:32:57 bkorb"
+# Time-stamp:        "2008-12-10 20:49:28 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.23 2008/09/28 23:22:56 bkorb Exp $
+# $Id: getopt.test,v 4.24 2008/12/14 16:25:39 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -215,7 +215,7 @@ void
 optionUsage (tOptions* pOptions, int status)
 {
   if (status != 0)
-    fprintf (stderr, _("Try `%s --help' for more information.\n"),
+    fprintf (stderr, _("Try `%s -h' for more information.\n"),
              test_getoptOptions.pzProgName);
   else
     {
@@ -228,8 +228,7 @@ USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
    -M         option with min ct\n\
    -2         option with min ct\n\
    -v         Output version information and exit\n\
-   -h         Display usage information and exit\n\
-   -!         Extended usage information passed thru pager\n\n\n\
+   -h         Display usage information and exit\n\n\n\
 please send bug reports to:  bkorb@gnu.org\n"), stdout);
     }
 

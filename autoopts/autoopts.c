@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.39 2008/08/27 14:35:49 bkorb Exp $
- *  Time-stamp:      "2008-08-10 10:17:06 bkorb"
+ *  $Id: autoopts.c,v 4.40 2008/12/14 16:25:39 bkorb Exp $
+ *  Time-stamp:      "2008-12-06 10:13:07 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -685,8 +685,8 @@ nextOption( tOptions* pOpts, tOptState* pOptState )
 
         default:
         case TOPT_DEFAULT:
-            fputs( "AutoOpts lib error: defaulted to option with optional arg\n",
-                   stderr );
+            fputs("AutoOpts lib error: defaulted to option with optional arg\n",
+                  stderr );
             exit( EX_SOFTWARE );
         }
 

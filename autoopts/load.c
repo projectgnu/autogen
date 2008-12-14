@@ -1,7 +1,7 @@
 
 /*
- *  $Id: load.c,v 4.35 2008/06/14 22:23:53 bkorb Exp $
- *  Time-stamp:      "2008-06-14 11:11:37 bkorb"
+ *  $Id: load.c,v 4.36 2008/12/14 16:25:39 bkorb Exp $
+ *  Time-stamp:      "2008-12-06 10:16:05 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -64,8 +64,8 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode );
  * ret-desc: AG_TRUE if the name was handled, otherwise AG_FALSE.
  *           If the name does not start with ``$'', then it is handled
  *           simply by copying the input name to the output buffer and
- *           resolving the name with either @code{canonicalize_file_name(3GLIBC)}
- *           or @code{realpath(3C)}.
+ *           resolving the name with either
+ *           @code{canonicalize_file_name(3GLIBC)} or @code{realpath(3C)}.
  *
  * doc:
  *

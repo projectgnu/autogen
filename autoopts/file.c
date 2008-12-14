@@ -1,7 +1,7 @@
 
 /*
- *  $Id: file.c,v 4.5 2008/08/04 01:01:31 bkorb Exp $
- *  Time-stamp:      "2008-08-03 15:56:55 bkorb"
+ *  $Id: file.c,v 4.6 2008/12/14 16:25:39 bkorb Exp $
+ *  Time-stamp:      "2008-12-06 10:15:33 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -106,7 +106,8 @@ optionFileCheck(tOptions* pOpts, tOptDesc* pOD,
             if (  (stat(pOD->optArg.argString, &sb) != 0)
                || (errno = EINVAL, ! S_ISREG(sb.st_mode)) ){
                 fprintf(stderr, zFSOptError, errno, strerror(errno),
-                        zFSOptErrMustExist, pOD->optArg.argString, pOD->pz_Name);
+                        zFSOptErrMustExist, pOD->optArg.argString,
+                        pOD->pz_Name);
                 pOpts->pUsageProc(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }

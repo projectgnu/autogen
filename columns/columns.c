@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.16 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:        "2007-11-29 11:57:05 bkorb"
+ *  $Id: columns.c,v 4.17 2008/12/14 16:25:39 bkorb Exp $
+ *  Time-stamp:        "2008-12-06 15:18:09 bkorb"
  *
  *  Columns copyright (c) 1992-2008 Bruce Korb - all rights reserved
  *  Columns copyright (c) 1992-2008 Bruce Korb - all rights reserved
@@ -153,12 +153,12 @@ static uint32_t
 handleIndent( tCC* pzIndentArg )
 {
     char* pz;
-    uint32_t colCt = strtoul( pzIndentArg, &pz, 0 );
+    unsigned int colCt = (unsigned int)strtoul(pzIndentArg, &pz, 0);
 
     /*
      *  IF the indent argument is a number
      */
-    if ((*pz == '\0') && (colCt > 0) && (colCt < OPT_VALUE_WIDTH)) {
+    if ((*pz == NUL) && (colCt > 0) && (colCt < OPT_VALUE_WIDTH)) {
         char* p;
 
         /*
@@ -166,7 +166,7 @@ handleIndent( tCC* pzIndentArg )
          */
         pzLinePfx = p = malloc( (size_t)colCt + 1 );
         if (pzLinePfx == NULL) {
-            fprintf( stderr, "Cannot malloc %d bytes\n", colCt + 1 );
+            fprintf(stderr, "Cannot malloc %u bytes\n", colCt + 1);
             exit( EXIT_FAILURE );
         }
 
@@ -174,7 +174,7 @@ handleIndent( tCC* pzIndentArg )
          *  Set it to a NUL terminated string of spaces
          */
         memset(p, ' ', (size_t)colCt);
-        p[ colCt ] = '\0';
+        p[colCt] = NUL;
 
     } else {
         tCC* p;
@@ -193,7 +193,7 @@ handleIndent( tCC* pzIndentArg )
              *  strings some time in the future, but not now.
              */
             switch (*p++) {
-            case '\0':
+            case NUL:
                 goto colsCounted;
 
             case '\t':
@@ -256,7 +256,7 @@ readLines(void)
             len--;
         }
 
-        *pzText = '\0';
+        *pzText = NUL;
 
         /*
          *  IF the input lines are to be reformatted,
@@ -495,7 +495,7 @@ writeColumns( void )
             if (HAVE_OPT( SEPARATION )) {
                 char* pz = pzE + strlen( pzE )
                          - strlen( OPT_ARG( SEPARATION ));
-                *pz = '\0';
+                *pz = NUL;
             }
             fputs( pzE, stdout );
             putc( '\n', stdout );
@@ -533,7 +533,7 @@ writeRows( void )
     if (HAVE_OPT( SEPARATION )) {
         char* pz = papzLines[ usedCt-1 ];
         pz += strlen( pz ) - strlen( OPT_ARG( SEPARATION ));
-        *pz = '\0';
+        *pz = NUL;
     }
 
     if (pzFirstPfx != NULL) {

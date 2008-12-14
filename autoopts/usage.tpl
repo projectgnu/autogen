@@ -89,16 +89,20 @@ ENDFOR flag
 (out-pop)
 (out-push-new)  \=]
 
-cd ${tmp_dir}
 defs=-DTEST_[= (string-upcase! (string->c-name! (get "prog-name"))) =]_OPTS=1
 cflags=`autoopts-config cflags`
 ldflags=`autoopts-config ldflags`
-flags="${defs} ${cflags}"
+flags="${defs} ${cflags} ${CFLAGS}"
 
-autogen [= prog-name=].def || die "Cannot gen [= prog-name =]"
-${CC:-cc} ${flags} -g -o [= prog-name =] [= prog-name =].c ${ldflags} || \
-  die cannot compile [= prog-name =].c in `pwd`
-./[= prog-name =] [=
+( cd ${tmp_dir}
+  autogen [= prog-name=].def
+) || die "Cannot gen [= prog-name =]"
+exe=tmp-[= prog-name =]-$$
+cfile=${tmp_dir}/[= prog-name =].c
+${CC:-cc} ${flags} -g -o ${exe} ${cfile} ${ldflags} || \
+  die cannot compile ${cfile}
+mv -f ${exe} ${tmp_dir}/[= prog-name =]
+${tmp_dir}/[= prog-name =] [=
 
 CASE usage-type =][=
 == short        =][=
@@ -118,7 +122,7 @@ CASE usage-type =][=
 =][=
 
 ESAC      =] || \
-  die cannot obtain [= prog-name =] help in `pwd`[=
+  die cannot obtain [= prog-name =] help in ${tmp_dir}[=
 
 (shell (out-pop #t))
 

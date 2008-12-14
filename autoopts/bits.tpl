@@ -3,7 +3,7 @@
 h
 c
 
-## Time-stamp:      "2007-07-04 10:32:09 bkorb"
+## Time-stamp:      "2008-12-06 10:15:10 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -171,7 +171,7 @@ FOR bit (for-from 0) (for-by 1) =][=
            (set! ix          (string-table-add "nm" tmp))
            (set! offset-list (string-append offset-list (sprintf "%d\n" ix)))
            (set! sorted-off  (string-append sorted-off
-                             (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
+                     (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
         )
 
         (set! offset-list (string-append offset-list "0\n" ))
@@ -363,7 +363,7 @@ str_to_id( char const * str, char const ** p_str )
             break;
 
         /*
-         * Partial match.  Look for preceeding matches.  One may be a full match.
+         * Partial match.  Look for earlier match.  One may be a full match.
          */
         lo = av;
         while (lo > 0) {
@@ -551,7 +551,7 @@ DEFINE  emit-word-macro     =][=
 
   FOR bit   =][=
 
-    (sprintf def-fmt (id-name "_BIT"))  =](1[= one =] << [= (id-name "_ID") =])[=
+    (sprintf def-fmt (id-name "_BIT"))  =](1[= one =] << [=(id-name "_ID")=])[=
 
   ENDFOR    =][=
 

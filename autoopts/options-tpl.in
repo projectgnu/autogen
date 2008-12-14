@@ -4,8 +4,8 @@
 #  Header must come first.  An env variable is set that
 #  is used in processing the C file.
 #
-#  $Id: options-tpl.in,v 4.3 2008/09/22 00:28:03 bkorb Exp $
-# Time-stamp:      "2008-09-21 12:59:13 bkorb"
+#  $Id: options-tpl.in,v 4.4 2008/12/14 16:25:39 bkorb Exp $
+# Time-stamp:      "2008-12-13 12:20:07 bkorb"
 
 h
 c
@@ -107,8 +107,8 @@ CASE    (suffix)        =][=
       (error "Too many default options"))
 
   (if (exist? "library") (begin
-      (if (not (exist? "flag[0].documentation"))
-          (error "The first option of a library must be a documentation option"))
+      (if (not (exist? "flag[0].documentation")) (error
+          "The first option of a library must be a documentation option"))
       (if (not (exist? "flag[0].lib-name"))
           (error "The first option of a library must specify 'lib-name'"))
       (if (< 1 (count "flag.lib-name"))
@@ -239,7 +239,7 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
     (if (and (> tmp-val 0) (exist? "arg-type")
              (not (=* (get "arg-type") "str"))  )
         (error (sprintf
-               "Option %s has a %s argument and a conflicting callback procedure"
+               "Option %s has a %s argument and a callback procedure"
                (get "name") (get "arg-type") )
     )   )
 

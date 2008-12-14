@@ -1,11 +1,22 @@
-2008-11-16  Bruce Korb  <bkorb@gnu.org>
+2008-12-04  Brian Dessent  <brian@dessent.net>
+
+	* configure.in: require WERROR=yes to enable -Werror on compiles.
+
+2008-12-04  Leo Davis  <ldav1s@users.sourceforge.net>
+
+	* autoopts/getopt.tpl: when using option names as C variables,
+	they *must* be passed through "string->c-name!".
+	* autoopts/usage.tpl: CFLAGS may contain ``-I'' options with
+	relative paths.  Therefore, do the compile from the current dir.
+
+202008-11-16  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am (MISC_FILES): until parse-duration.[ch] are
 	obtained from gnulib, add them to the extra files for distribution.
 	* autoopts/parse-duration.c: new file, pending addition to gnulib.
 	* autoopts/parse-duration.h: new file, pending addition to gnulib.
 
-2008-11-02  Bruce Korb  <bkorb@gnu.org>
+08-11-02  Bruce Korb  <bkorb@gnu.org>
 
 	* configure.in: old guile headers are not up to all the warnings
 	* autoopts/optcode.tpl: older guile cannot handle "substring/shared"

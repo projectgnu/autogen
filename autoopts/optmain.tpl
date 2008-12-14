@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2008-08-03 15:35:03 bkorb"
+# Time-stamp:      "2008-12-06 10:20:07 bkorb"
 
-# $Id: optmain.tpl,v 4.32 2008/08/04 01:01:31 bkorb Exp $
+# $Id: optmain.tpl,v 4.33 2008/12/14 16:25:39 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -891,7 +891,8 @@ DEFINE   keyword-code           =][=
     };
 
     if (pOptions <= OPTPROC_EMIT_LIMIT) {
-        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
+        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, [=
+           (. tmp-ct)=]);
         return; /* protect AutoOpts client code from internal callbacks */
     }[=
 

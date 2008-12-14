@@ -37,6 +37,7 @@ DEFINE emit-usage-string    +][+
   "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
        -e '/: illegal option --/d' \
        -e 's/ --version\\[=arg\\]/ --version      /' \
+       -e '/Extended usage information/d' \
        -e '/ --more-help /d' <<_EOF_\n" (out-pop #t) "\n_EOF_"
   )) "\n" ))  +][+
 
@@ -59,7 +60,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.12 2008/07/27 20:06:05 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.13 2008/12/14 16:25:39 bkorb Exp $
  */
 #include <sys/types.h>
 #include <stdlib.h>
@@ -139,7 +140,13 @@ static char z_opts[] = "[+ # close quote for emacs " +][+
         ESAC            +][+
       ENDIF             +][+
     ENDIF               +][+
-   # open quote for emacs " +]";
+
+    (define help-opt
+      (if (exist? "long-opts")    "--help"
+      (if (not (exist? "value"))  "help"
+      (if (exist? "help-value")   (string-append "-" (get "help-value"))
+                                  "-?" ))) )
+    ;; open quote for emacs " +]";
 
 /*
  *  AutoOpts library replacement routines:
@@ -148,7 +155,7 @@ void
 optionUsage (tOptions* pOptions, int status)
 {
   if (status != 0)
-    fprintf (stderr, _("Try `%s --help' for more information.\n"),
+    fprintf (stderr, _("Try `%s [+(. help-opt)+]' for more information.\n"),
              [+ (. prog-name) +]Options.pzProgName);
   else
     {
@@ -333,15 +340,15 @@ FOR flag +][+
   if (HAVE_OPT( [+ (. OPT-NAME) +] )) {[+
 
     FOR flags-cant +]
-    if (HAVE_OPT( [+ (string-upcase! (get "flags-cant")) +] ))
+    if (HAVE_OPT( [+ (string-upcase! (string->c-name! (get "flags-cant"))) +] ))
       usage_cannot (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
-                   (string-upcase! (get "flags-cant")) +]).pz_Name);[+
+        (string-upcase! (string->c-name! (get "flags-cant"))) +]).pz_Name);[+
     ENDFOR cant    +][+
 
     FOR flags-must +]
-    if (! HAVE_OPT( [+ (string-upcase! (get "flags-must")) +] ))
+    if (! HAVE_OPT( [+(string-upcase! (string->c-name! (get "flags-must")))+] ))
       usage_must (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
-                   (string-upcase! (get "flags-must")) +]).pz_Name);[+
+        (string-upcase! (string->c-name! (get "flags-must"))) +]).pz_Name);[+
     ENDFOR must    +][+
     IF (exist? "min") +][+
       IF (> (string->number (get "min" "0")) 1) +]
