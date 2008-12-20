@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Time-stamp:        "2007-11-18 10:58:48 bkorb"
-# Last Committed:    $Date: 2008/01/23 00:35:27 $
+# Time-stamp:        "2008-12-20 10:31:57 bkorb"
+# Last Committed:    $Date: 2008/12/20 18:35:09 $
 #
 ##
 ##  This file is part of AutoGen.
@@ -109,17 +109,17 @@ bail_out() {
    exit 1
 }
 
-# Make sure the executables are there
-#
-test -x ${AGexe} || (cd `dirname ${AGexe}` ; ${MAKE}) || exit 0
-test -x ${GDexe} || (cd `dirname ${GDexe}` ; ${MAKE}) || exit 0
-test -x ${CLexe} || (cd `dirname ${CLexe}` ; ${MAKE}) || exit 0
-
 exec 8>&2 2> texi$$.log
 tmp_files=texi$$.log
 printf '\n\n\n\n' >&2
 
 set -x
+
+# Make sure the executables are there
+#
+test -x ${AGexe} || (cd `dirname ${AGexe}` ; ${MAKE}) || exit 0
+test -x ${GDexe} || (cd `dirname ${GDexe}` ; ${MAKE}) || exit 0
+test -x ${CLexe} || (cd `dirname ${CLexe}` ; ${MAKE}) || exit 0
 
 # See to it that the .texi files have been generated, too.
 #
@@ -160,6 +160,7 @@ do test -f ${f} || bail_out cannot find doc file: ${f}
 done
 opts=`echo -t${timer} -L${srcdir} -L${top_srcdir} -L${top_srcdir}/autoopts`
 echo + ${AGexe} ${opts} autogen.def >&8
+
 ${AGexe} ${opts} autogen.def || bail_out could not regenerate doc
 
 set +x

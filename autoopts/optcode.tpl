@@ -1,9 +1,9 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.44 2008/11/01 20:28:58 bkorb Exp $
+#$Id: optcode.tpl,v 4.45 2008/12/20 18:35:09 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-10-06 19:33:10 bkorb"
+# Time-stamp:      "2008-12-14 09:56:30 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -318,7 +318,11 @@ ENDIF =]
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ doUsageOpt,
      /* desc, NAME, name */ zHelpText, NULL, zHelp_Name,
-     /* disablement strs */ NULL, NULL },
+     /* disablement strs */ NULL, NULL }[=
+
+IF (not (exist? "no-libopts"))
+
+=],
 
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
@@ -332,6 +336,8 @@ ENDIF =]
      /* option proc      */ optionPagedUsage,
      /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
      /* disablement strs */ NULL, NULL }[=
+
+ENDIF not have no-libopts  =][=
 
 IF (exist? "usage-opt")
 
@@ -548,13 +554,15 @@ tOptions [=(. pname)=]Options = {
     /*
      *  Indexes to special options
      */
-    { [= (. INDEX-pfx) =]MORE_HELP,
+    { [= (if (exist? "no-libopts") "NO_EQUIVALENT"
+             (string-append INDEX-pfx "MORE_HELP"))
+       =], /* more-help option index */
       [=IF (exist? "homerc")
              =][= (. INDEX-pfx) =]SAVE_OPTS[=
-        ELSE =] 0 /* no option state saving */[=
-        ENDIF=],
+        ELSE =]NO_EQUIVALENT[=
+        ENDIF=], /* save option index */
       [= (if (>= number-opt-index 0) number-opt-index "NO_EQUIVALENT")
-        =] /* index of '-#' option */,
+        =], /* '-#' option index */
       [= (if (>= default-opt-index 0) default-opt-index "NO_EQUIVALENT")
         =] /* index of default opt */
     },

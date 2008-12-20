@@ -1,5 +1,6 @@
 [+ AutoGen5 Template  -*- Mode: C -*-
 
+   h=%s-temp.h
    c=%s-temp.c
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,9 +37,8 @@ DEFINE emit-usage-string    +][+
   (kr-string (string-append (shell (string-append
   "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
        -e '/: illegal option --/d' \
-       -e 's/ --version\\[=arg\\]/ --version      /' \
-       -e '/Extended usage information/d' \
-       -e '/ --more-help /d' <<_EOF_\n" (out-pop #t) "\n_EOF_"
+       -e 's/ --version\\[=arg\\]/ --version      /' <<_EOF_\n"
+  (out-pop #t) "\n_EOF_"
   )) "\n" ))  +][+
 
 ENDDEF
@@ -48,7 +48,7 @@ ENDDEF
       (error "'settable' must be specified globally for getopt_long\n"))
   (define prog-name (string->c-name! (get "prog-name")))
   (define PROG-NAME (string-upcase prog-name))
-  (out-move (string-append "getopt-" prog-name ".c"))
+  (out-move (string-append "getopt-" prog-name "." (suffix)))
   (dne " *  " "/* " ) +]
  *
 [+ CASE copyright.type +][+
@@ -60,14 +60,23 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.13 2008/12/14 16:25:39 bkorb Exp $
- */
+ *  $Id: getopt.tpl,v 4.14 2008/12/20 18:35:09 bkorb Exp $
+ */[+
+CASE (suffix) +][+
+== h +]
+[+   (make-header-guard "autoopts") +]
+
+extern int process_[+(. prog-name)+]_opts (int argc, char** argv);
+
+#endif /* [+ (. header-guard) +] */
+[+ == c +]
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <[+ (if (exist? "long-opts") "getopt" "unistd") +].h>
 #include "[+ (base-name) +].h"
+#include "[+ (. header-file) +]"
 
 #ifndef DIRCH
 #  if defined(_WIN32) && !defined(__CYGWIN__)
@@ -142,10 +151,10 @@ static char z_opts[] = "[+ # close quote for emacs " +][+
     ENDIF               +][+
 
     (define help-opt
-      (if (exist? "long-opts")    "--help"
-      (if (not (exist? "value"))  "help"
-      (if (exist? "help-value")   (string-append "-" (get "help-value"))
-                                  "-?" ))) )
+      (if (exist? "long-opts")        "--help"
+      (if (not (exist? "flag.value")) "help"
+      (if (exist? "help-value")       (string-append "-" (get "help-value"))
+                                      "-?" ))) )
     ;; open quote for emacs " +]";
 
 /*
@@ -164,16 +173,6 @@ optionUsage (tOptions* pOptions, int status)
     }
 
   exit (status);
-}
-
-void
-optionPagedUsage(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
-{
-  fputs (_("[+(. prog-name)
-    +] error: paged usage help has been disabled\n"), stderr);
-  optionUsage (pOptions, EXIT_FAILURE);
 }
 
 void
@@ -391,3 +390,4 @@ FOR flag +][+
 ENDFOR   +]
   return 0;
 }
+[+ ESAC \+]

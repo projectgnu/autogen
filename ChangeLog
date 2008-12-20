@@ -1,3 +1,14 @@
+2008-12-20  Leo Davis  <ldav1s@users.sourceforge.net>
+            Bruce Korb  <bkorb@gnu.org>
+	
+	* autoopts/getopt.tpl(more-help): thoroughly expunged
+	* autoopts/optcode.tpl(no-libopts): make expunging --more-help possible
+	* autoopts/opthead.tpl: ditto
+	* autoopts/optlib.tpl: ditto
+	* autoopts/test/getopt.test: adjust for altered format
+	* autoopts/usage.tpl: specify that libopts is not used.
+	* autoopts/agman1-tpl.in: don't doc --more-help if no-libopts spec'd.
+
 2008-12-04  Brian Dessent  <brian@dessent.net>
 
 	* configure.in: require WERROR=yes to enable -Werror on compiles.

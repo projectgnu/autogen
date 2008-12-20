@@ -1,7 +1,7 @@
 
 /*
- *  $Id: autoopts.c,v 4.40 2008/12/14 16:25:39 bkorb Exp $
- *  Time-stamp:      "2008-12-06 10:13:07 bkorb"
+ *  $Id: autoopts.c,v 4.41 2008/12/20 18:35:08 bkorb Exp $
+ *  Time-stamp:      "2008-12-16 14:52:28 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -830,7 +830,8 @@ doPresets( tOptions* pOpts )
      *  has a --load-opts option.  See if a command line option has disabled
      *  option presetting.
      */
-    if (pOpts->specOptIdx.save_opts != 0) {
+    if (  (pOpts->specOptIdx.save_opts != NO_EQUIVALENT)
+       && (pOpts->specOptIdx.save_opts != 0)) {
         pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts + 1;
         if (DISABLED_OPT(pOD))
             return SUCCESS;
@@ -1097,7 +1098,8 @@ optionProcess(
      *  THEN do that now before testing for conflicts.
      *       (conflicts are ignored in preset options)
      */
-    if (pOpts->specOptIdx.save_opts != 0) {
+    if (  (pOpts->specOptIdx.save_opts != NO_EQUIVALENT)
+       && (pOpts->specOptIdx.save_opts != 0)) {
         tOptDesc*  pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts;
 
         if (SELECTED_OPT( pOD )) {

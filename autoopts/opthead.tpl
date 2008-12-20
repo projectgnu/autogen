@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.35 2008/09/21 20:16:33 bkorb Exp $
+# $Id: opthead.tpl,v 4.36 2008/12/20 18:35:09 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-09-13 10:47:57 bkorb"
+# Time-stamp:      "2008-12-14 09:31:55 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -91,9 +91,13 @@ ELSE                            =][=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
   ENDIF                         =]
         [= (. INDEX-pfx) =]HELP             = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
+                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
+
+  IF (not (exist? "no-libopts")) =],
         [= (. INDEX-pfx) =]MORE_HELP        = [=
                 (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
+
+  ENDIF                         =][=
 
   IF (exist? "usage-opt")       =],
         [= (. INDEX-pfx) =]USAGE            = [=
@@ -314,10 +318,12 @@ IF (exist? "flag.value")        =][=
        val-UPNAME  = "HELP"
        std-value   = "?"        =][=
 
-  INVOKE set-std-value
-       val-name    = "more-help-value"
-       val-UPNAME  = "MORE_HELP"
-       std-value   = "!"        =][=
+  IF (not (exist? "no-libopts")) =][=
+    INVOKE set-std-value
+         val-name    = "more-help-value"
+         val-UPNAME  = "MORE_HELP"
+         std-value   = "!"      =][=
+  ENDIF don't have no-libopts ' =][=
 
   IF (exist? "resettable")      =][=
     INVOKE set-std-value
@@ -360,8 +366,12 @@ ELSE  NO "flag.value"           =][=
   IF (exist? "version")         =]
 #define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
   ENDIF  have "version"         =]
-#define [= (. VALUE-pfx) =]HELP           [= (. INDEX-pfx) =]HELP
+#define [= (. VALUE-pfx) =]HELP           [= (. INDEX-pfx) =]HELP[=
+
+  IF (not (exist? "no-libopts")) =]
 #define [= (. VALUE-pfx) =]MORE_HELP      [= (. INDEX-pfx) =]MORE_HELP[=
+  ENDIF don't have no-libopts ' =][=
+
   IF (exist? "usage-opt")       =]
 #define [= (. VALUE-pfx) =]USAGE          [= (. INDEX-pfx) =]USAGE[=
   ENDIF  have "usage-opt"       =][=

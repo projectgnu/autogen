@@ -4,7 +4,7 @@
 ##
 ##  AutoOpts copyright 1992-2007 Bruce Korb
 ##
-## Time-stamp:      "2008-09-21 12:55:41 bkorb"
+## Time-stamp:      "2008-12-14 09:41:44 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -29,7 +29,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.19 2008/09/22 00:28:15 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.20 2008/12/20 18:35:08 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -436,7 +436,9 @@ ENDFOR flag
   ELSE   :+][+:
      IF (exist? "long-opts") :+]\--[+: ENDIF :+]help[+:
   ENDIF  :+]
-Display usage information and exit.
+Display usage information and exit.[+:
+
+  IF (not (exist? "no-libopts")) :+]
 .TP
 .BR [+:
 
@@ -447,6 +449,7 @@ Display usage information and exit.
   ENDIF  :+]
 Extended usage information passed thru pager.[+:
 
+ENDIF no no-libopts :+][+:
 
 IF (exist? "homerc") :+]
 .TP

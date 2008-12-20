@@ -12,6 +12,7 @@
 
 =]
 AutoGen Definitions options.tpl;
+no-libopts;
 [=
 
 FOR var IN  prog-name prog-title argument      config-header

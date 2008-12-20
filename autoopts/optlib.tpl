@@ -2,7 +2,7 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 #
-# Time-stamp:      "2008-11-01 19:24:43 bkorb"
+# Time-stamp:      "2008-12-20 09:25:11 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,7 +24,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.34 2008/11/02 18:51:00 bkorb Exp $
+# $Id: optlib.tpl,v 4.35 2008/12/20 18:35:09 bkorb Exp $
 
 =][=
 
@@ -741,12 +741,20 @@ DEFINE   help-strs
 =]
 
 /*
- *  Help/More_Help[= version "/Version"=] option descriptions:
+ *  Help[= (string-append
+   (if (exist? "no-libopts") "" "/More_Help")
+   (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
 tSCC zHelpText[]          = "Display usage information and exit";
-tSCC zHelp_Name[]         = "help";
+tSCC zHelp_Name[]         = "help";[=
+
+  IF (not (exist? "no-libopts"))
+
+=]
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
 tSCC zMore_Help_Name[]    = "more-help";[=
+
+  ENDIF (not (exist? "no-libopts"))  =][=
 
   IF (exist? "version")
 
