@@ -2,9 +2,9 @@
 
 # Automated Options copyright 1992-2007 Bruce Korb
 
-# Time-stamp:      "2008-12-06 10:20:07 bkorb"
+# Time-stamp:      "2008-12-20 10:50:52 bkorb"
 
-# $Id: optmain.tpl,v 4.33 2008/12/14 16:25:39 bkorb Exp $
+# $Id: optmain.tpl,v 4.34 2008/12/20 18:54:17 bkorb Exp $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -110,7 +110,28 @@ DEFINE build-test-main
 =][=
 (tpl-file-line extract-fmt)
 =]
-#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
+#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */[=
+
+  IF (= (get "test-main") "optionParseShell")
+
+=]
+
+extern tOptions  genshelloptOptions;
+extern void      optionParseShell( tOptions* );
+extern tOptions* pShellParseOptions;[=
+
+  ELIF (not (exist? "main-text"))  =][=
+
+    (define option-emitter-proc (get "test-main"))
+    (if (<= (string-length option-emitter-proc) 3)
+        (set! option-emitter-proc "optionPutShell"))
+=]
+
+extern void [= (. option-emitter-proc) =]( tOptions* );[=
+
+  ENDIF
+
+=]
 
 int
 main(int argc, char** argv)
@@ -118,10 +139,6 @@ main(int argc, char** argv)
     int res = EXIT_SUCCESS;[=
 
   IF (= (get "test-main") "optionParseShell") =]
-    extern tOptions  genshelloptOptions;
-    extern void      optionParseShell( tOptions* );
-    extern tOptions* pShellParseOptions;
-
     /*
      *  Stash a pointer to the options we are generating.
      *  `genshellUsage()' will use it.
@@ -145,16 +162,11 @@ main(int argc, char** argv)
   (def-file-line "main-text" extract-fmt) =][=
   main-text         =][=
 
-  ELSE=]
-    (void)optionProcess( &[=(. pname)=]Options, argc, argv );[=
+  ELSE test-main is not optionParseShell and main-text not exist
 
-    (set! opt-name (get "test-main"))
-    (if (<= (string-length opt-name) 3)
-        (set! opt-name "optionPutShell")) =]
-    {
-        void [= (. opt-name) =]( tOptions* );
-        [= (. opt-name) =]( &[=(. pname)=]Options );
-    }[=
+=]
+    (void)optionProcess( &[=(. pname)=]Options, argc, argv );
+    [= (. option-emitter-proc) =]( &[=(. pname)=]Options );[=
   ENDIF=]
     return res;
 }

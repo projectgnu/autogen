@@ -8,6 +8,7 @@
 	* autoopts/test/getopt.test: adjust for altered format
 	* autoopts/usage.tpl: specify that libopts is not used.
 	* autoopts/agman1-tpl.in: don't doc --more-help if no-libopts spec'd.
+	* autoopts/optmain.tpl: eliminate nested external declarations.
 
 2008-12-04  Brian Dessent  <brian@dessent.net>
 
