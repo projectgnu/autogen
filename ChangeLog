@@ -1,3 +1,17 @@
+2008-12-28  Bruce Korb  <bkorb@gnu.org>
+	
+	* agen5/defFind.c (hash_name_t): new structure for hashing the looked
+	up define names
+	(hash_string): new
+	(stringAdd): new
+	(print_used_defines): new
+	* agen5/opts.def (used-defines): new option
+	* autoopts/optcode.tpl (plus-marks): obsolete attribute
+	* doc: doc this stuff
+	* getdefs/gdinit.c (validateOptions): allow a user specified pattern
+	to include the '/\*=' characters at the start.  Free some memory
+	explicitly instead of with program exit.
+
 2008-12-20  Leo Davis  <ldav1s@users.sourceforge.net>
             Bruce Korb  <bkorb@gnu.org>
 	
@@ -27,6 +41,10 @@
 	obtained from gnulib, add them to the extra files for distribution.
 	* autoopts/parse-duration.c: new file, pending addition to gnulib.
 	* autoopts/parse-duration.h: new file, pending addition to gnulib.
+
+2008-11-16  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.6 release
 
 08-11-02  Bruce Korb  <bkorb@gnu.org>
 

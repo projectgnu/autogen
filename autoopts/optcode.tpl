@@ -1,13 +1,12 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.45 2008/12/20 18:35:09 bkorb Exp $
+#$Id: optcode.tpl,v 4.46 2008/12/29 06:13:59 bkorb Exp $
 
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-12-14 09:56:30 bkorb"
+# Time-stamp:      "2008-12-27 18:28:49 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb.
 ##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb.
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
@@ -114,8 +113,8 @@ IF (and (exist? "resettable") (exist? "flag.open-file")) =]
 #include <unistd.h>[=
 ENDIF                     =][=
 
-IF (or (= "optionPutShell"    (get "main.shell-process"))
-       (= "optionParseShell"  (get "main.shell-parser"))
+IF (or (= "shell-process"  (get "main.main-type"))
+       (= "shell-parser"   (get "main.main-type"))
        (exist? "main.code")) =]
 #define [= (set! make-test-main #t) main-guard =] 1[=
 ENDIF
@@ -532,9 +531,7 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]
     + OPTPROC_NEGATIONS[=  ENDIF=][=IF (>=   number-opt-index 0)         =]
     + OPTPROC_NUM_OPT[=    ENDIF=][=IF      (exist? "environrc")         =]
-    + OPTPROC_ENVIRON[=    ENDIF=][=IF (and (exist? "plus-marks")
-                                            (exist? "flag.disable"))     =]
-    + OPTPROC_PLUSMARKS[=  ENDIF=][=IF (not (exist? "argument"))         =]
+    + OPTPROC_ENVIRON[=    ENDIF=][=IF (not (exist? "argument"))         =]
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
@@ -618,13 +615,13 @@ IF (or (exist? "flag.flag-code")
 ENDIF                           =][=
 
 IF (. make-test-main)           =][=
-  invoke build-test-main        =][=
+  INVOKE build-test-main        =][=
 
 ELIF (exist? "guile-main")      =][=
-  invoke build-guile-main       =][=
+  INVOKE build-guile-main       =][=
 
 ELIF (exist? "main")            =][=
-  invoke build-main             =][=
+  INVOKE build-main             =][=
 
 ENDIF "test/guile main"
 

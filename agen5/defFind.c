@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.19 2008/08/27 14:45:56 bkorb Exp $
+ *  $Id: defFind.c,v 4.20 2008/12/29 06:13:59 bkorb Exp $
  *
- *  Time-stamp:        "2008-08-27 07:40:28 bkorb"
- *  Last Committed:    $Date: 2008/08/27 14:45:56 $
+ *  Time-stamp:        "2008-12-26 10:16:52 bkorb"
+ *  Last Committed:    $Date: 2008/12/29 06:13:59 $
  *
  *  This module locates definitions.
  *
@@ -34,6 +34,15 @@ typedef struct defEntryList tDefEntryList;
 
 tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
 
+typedef struct hash_name_s hash_name_t;
+struct hash_name_s {
+    hash_name_t *   next;
+    char            str[0];
+};
+
+static hash_name_t ** hash_table = NULL;
+static int hash_table_ct = 0;
+
 static char zDefinitionName[ AG_PATH_MAX ];
 
 static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
@@ -56,6 +65,12 @@ badName( char* pzD, char const* pzS, size_t srcLen );
 
 static tDefEntry*
 defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed );
+
+static int
+hash_string(unsigned char const * pzStr);
+
+static void
+stringAdd(char const * pz);
 
 static tDefEntry**
 entryListSearch( char* pzName, tDefCtx* pDefCtx );
@@ -551,11 +566,137 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
     return NULL;
 }
 
+/*
+ *  This makes certain assumptions about the underlying architecture.
+ *  Doesn't matter tho.  A high collision rate just makes it a teensy
+ *  bit slower.
+ */
+static int
+hash_string(unsigned char const * pz)
+{
+    unsigned int res = 0;
+    while (*pz)
+        res ^= (res << 3) ^ *(pz++);
+
+    return res & (hash_table_ct - 1);
+}
+
+static void
+stringAdd(char const * pz)
+{
+    unsigned char z[256];
+    size_t z_len;
+
+    /*
+     *  If there is no hash table, create one.
+     */
+    if (hash_table_ct == 0) {
+        size_t ct = pCurTemplate->macroCt;
+        if (ct < 128)
+            ct = 128;
+        else {
+            int bit_ct = 0;
+            while (ct > 1) {
+                bit_ct++;
+                ct >>= 1;
+            }
+            ct = 1 << bit_ct;
+        }
+
+        hash_table_ct = ct;
+        hash_table    = malloc(ct * sizeof (*hash_table));
+        memset(hash_table, NUL, ct * sizeof (*hash_table));
+    }
+
+    /*
+     *  Save only the last component of the name, sans any index, too.
+     */
+    {
+        char const * p = strrchr(pz, '.');
+        if (p != NULL)
+            pz = p + 1;
+        p = strchr(pz, '[');
+
+        if (p != NULL) {
+            z_len = (p - pz) + 1;
+            if (z_len > sizeof(z))
+                return;
+            memcpy(z, pz, z_len - 1);
+            z[z_len - 1] = NUL;
+
+        } else {
+            z_len = strlen(pz) + 1;
+            if (z_len > sizeof(z))
+                return;
+            memcpy(z, pz, z_len);
+        }
+    }
+
+    /*
+     *  canonicalize the name
+     */
+    strtransform((char *)z, (char *)z);
+
+    /*
+     *  If a new name, insert it in order.
+     */
+    {
+        int ix = hash_string(z);
+
+        hash_name_t ** hptr = &(hash_table[ix]), *new;
+        while (*hptr != NULL) {
+            int cmp = memcmp(z, (*hptr)->str, z_len);
+            if (cmp == 0)
+                return; /* old name */
+
+            if (cmp > 0)
+                break; /* no matching name can be found */
+
+            hptr = &((*hptr)->next);
+        }
+
+        new       = malloc(sizeof (*new) + z_len);
+        new->next = *hptr;
+        *hptr     = new;
+        memcpy(new->str, z, z_len);
+    }
+}
 
 LOCAL tDefEntry*
 findDefEntry( char* pzName, ag_bool* pIsIndexed )
 {
+    if (HAVE_OPT(USED_DEFINES))
+        stringAdd(pzName);
     return defEntrySearch( pzName, &currDefCtx, pIsIndexed );
+}
+
+
+LOCAL void
+print_used_defines(void)
+{
+    static char const cmd[] =
+        "echo 'definition names looked up'\n"
+        "sed 's/[-^]/-/g'|sort -u -f\n"
+        "echo 'end of looked up definitions'";
+
+    int ix = 0;
+        
+    FILE * fp;
+
+    if (hash_table_ct == 0)
+        return;
+
+    fp = popen(cmd, "w");
+    if (fp == NULL) return;
+
+    while (ix < hash_table_ct) {
+        hash_name_t * hn = hash_table[ix++];
+        while (hn != NULL) {
+            fprintf(fp, "%s\n", hn->str);
+            hn = hn->next;
+        }
+    }
+    pclose(fp);
 }
 
 

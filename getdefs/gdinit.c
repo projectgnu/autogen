@@ -1,11 +1,11 @@
 /*
- *  $Id: gdinit.c,v 4.13 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: gdinit.c,v 4.14 2008/12/29 06:13:59 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2007-11-04 10:38:57 bkorb"
- *  Last Modified:     $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-12-28 10:35:38 bkorb"
+ *  Last Modified:     $Date: 2008/12/29 06:13:59 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
@@ -275,16 +275,24 @@ processEmbeddedOptions( char* pzText )
 LOCAL void
 validateOptions( void )
 {
+    static char const default_pat[] =
+        "/\\*=(\\*|"
+        "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
+    static char const pat_wrapper[] = "/\\*=(%s)";
+    ag_bool free_pat = AG_FALSE;
+
     /*
      *  Our default pattern is to accept all names following
      *  the '/' '*' '=' character sequence.  We ignore case.
      */
-    if ((! HAVE_OPT( DEFS_TO_GET )) || (*OPT_ARG( DEFS_TO_GET ) == NUL)) {
-        pzDefPat = "/\\*=(\\*|"
-                   "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
+    if ((! HAVE_OPT(DEFS_TO_GET)) || (*OPT_ARG(DEFS_TO_GET) == NUL)) {
+        pzDefPat = default_pat;
+
+    } else if (strncmp(OPT_ARG(DEFS_TO_GET), default_pat, 4) == 0) {
+        pzDefPat = OPT_ARG(DEFS_TO_GET);
 
     } else {
-        tCC*   pz  = OPT_ARG( DEFS_TO_GET );
+        tCC*   pz  = OPT_ARG(DEFS_TO_GET);
         size_t len = strlen( pz ) + 16;
         char*  bf  = malloc( len );
 
@@ -297,8 +305,9 @@ validateOptions( void )
          *  IF a pattern has been supplied, enclose it with
          *  the '/' '*' '=' part of the pattern.
          */
-        snprintf( bf, len, "/\\*=(%s)", pz );
+        snprintf( bf, len, pat_wrapper, pz );
         pzDefPat = bf;
+        free_pat = AG_TRUE;
     }
 
     /*
@@ -316,6 +325,10 @@ validateOptions( void )
             fprintf( stderr, zReErr, rerr, zRER, pzDefPat );
             exit( EXIT_FAILURE );
         }
+
+        if (free_pat)
+            free((void *)pzDefPat);
+        pzDefPat = NULL;
 
         rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
         if (rerr != 0) {
@@ -357,6 +370,9 @@ validateOptions( void )
         struct stat stb;
 
         if ((ct == 1) && (strcmp( *ppz, "-" ) == 0)) {
+            /*
+             *  Read the list of input files from stdin.
+             */
             loadStdin();
             ct  = STACKCT_OPT(  INPUT );
             ppz = STACKLST_OPT( INPUT );

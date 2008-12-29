@@ -1951,6 +1951,80 @@ Extraction from autogen.texi
 @end ignore
 
 @ignore
+START == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
+@c === SECTION MARKER
+
+@node AutoFSM
+@section Automated Finite State Machine
+@cindex AutoFSM
+@cindex finite state machine
+
+The templates to generate a finite state machine in C or C++ is included
+with AutoGen.  The documentation is not.  The documentation is in HTML
+format for @uref{http://www.gnu.org/software/autogen/autofsm.html,viewing},
+or you can @uref{http://download.sourceforge.net/autogen/,download FSM}.
+
+@node AutoXDR
+@section Combined RPC Marshalling
+@cindex RPC
+@cindex rpcgen
+@cindex remote procedure call
+@cindex AutoXDR
+@cindex XDR
+
+The templates and NFSv4 definitions are not included with AutoGen in any way.
+The folks that designed NFSv4 noticed that much time and bandwidth was
+wasted sending queries and responses when many of them could be bundled.
+The protocol bundles the data, but there is no support for it in rpcgen.
+That means you have to write your own code to do that.  Until now.
+Download this and you will have a large, complex example of how to use
+@code{AutoXDR} for generating the marshaling and unmarshaling of combined
+RPC calls.  There is a brief example
+@uref{http://www.gnu.org/software/autogen/xdr/index.html,on the web}, but
+you should @uref{http://download.sourceforge.net/autogen/,download AutoXDR}.
+
+@c === SECTION MARKER
+
+@node AutoEvents
+@section Automated Event Management
+@cindex AutoEvents
+
+Large software development projects invariably have a need to manage
+the distribution and display of state information and state changes.
+In other words, they need to manage their software events.  Generally,
+each such project invents its own way of accomplishing this and then
+struggles to get all of its components to play the same way.  It is a
+difficult process and not always completely successful.  This project
+helps with that.
+
+AutoEvents completely separates the tasks of supplying the data
+needed for a particular event from the methods used to manage the
+distribution and display of that event.  Consequently, the programmer
+writing the code no longer has to worry about that part of the
+problem.  Likewise the persons responsible for designing the event
+management and distribution no longer have to worry about getting
+programmers to write conforming code.
+
+This is a work in progress.  See my
+@uref{http://www.gnu.org/software/autogen/autoevents.html,web page}
+on the subject, if you are interested.
+I have some useful things put together, but it is not ready
+to call a product.
+
+@ignore
+END   == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
+Extraction from autogen.texi
+@end ignore
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@c  AUTOOPTS SECTIONS
+@c
+@c
+@ignore
 START == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
@@ -1977,6 +2051,7 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 * getopt_long::         Using getopt(3C)
 * i18n::                Internationalizing AutoOpts
 * Naming Conflicts::    Naming Conflicts
+* Option Define Names:: Option Definition Name Index
 @end menu
 
 @c === SECTION MARKER
@@ -2037,6 +2112,7 @@ the option definition file.  ``@code{xxx}'' is the name of the option below:
 These are always available.  ``@code{more-help}'' will pass the full usage
 text through a pager.
 @item --usage
+@vindex usage-opt
 This is added to the option list if ``@code{usage-opt}'' is specified.
 It yields the abbreviated usage to @file{stdout}.
 @item --version
@@ -2323,17 +2399,17 @@ after option processing.  The rest have been alphabetized.  Except as noted,
 there may be only one copy of each of these definitions:
 
 @table @samp
-@cindex prog-name
 @item prog-name
+@vindex prog-name
 This attribute is required.  Variable names derived from this name
 are derived using @code{string->c_name!} (@pxref{SCM string->c-name!}).
 
-@cindex prog-title
 @item prog-title
+@vindex prog-title
 This attribute is required and may be any descriptive text.
 
-@cindex argument
 @item argument
+@vindex argument
 This attribute is required if your program uses operand arguments.
 It specifies the syntax of the arguments that @strong{follow} the options.
 It may not be empty, but if it is not supplied, then option processing
@@ -2343,29 +2419,28 @@ absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
 
-@cindex allow-errors
 @item allow-errors
+@vindex allow-errors
 The presence of this attribute indicates ignoring any command line
 option errors.  This may also be turned on and off by invoking the
 macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
 generated interface file.
 
-@cindex config-header
 @item config-header
-@cindex configuration file
+@vindex config-header
 The contents of this attribute should be just the name of the configuration
 file.  A "#include" naming this file will be inserted at the top of the
 generated header.
 
-@cindex environrc
 @item environrc
+@vindex environrc
 Indicates looking in the environment for values of variables named,
 @code{PROGRAM_OPTNAME} or @code{PROGRAM}, where @code{PROGRAM} is the
 upper cased @code{C-name} of the program and @code{OPTNAME} is the
 upper cased @code{C-name} of a specific option.
 
-@cindex export
 @item export
+@vindex export
 This string is inserted into the .h interface file.  Generally used for
 global variables or @code{#include} directives required by
 @code{flag-code} text and shared with other program text.
@@ -2373,8 +2448,8 @@ Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
 @code{config-header}, above.n.
 
-@cindex full-usage
 @item full-usage
+@vindex full-usage
 If this attribute is provided, it may specify the full length
 usage text, or a variable name assignable to a ``char const *'' pointer,
 or it may be empty.  The meanings are determined by  the length.
@@ -2396,8 +2471,8 @@ This string should be readily translatable and provision will be made
 to translate it if this is provided and the source code is compiled with
 ``ENABLE_NLS'' defined.
 
-@cindex guard-option-names
 @item guard-option-names
+@vindex guard-option-names
 AutoOpts generates macros that presume that there are no @code{cpp} macros
 with the same name as the option name.  For example, if you have an option
 named, @code{debug}, then you must not use @code{#ifdef DEBUG} in your code.
@@ -2432,8 +2507,8 @@ enumeration prefix.  e.g. you will need to use @code{HAVE_OPT(INDEX_OPT_DEBUG)}
 instead of @code{HAVE_OPT(DEBUG)}.
 @end itemize
 
-@cindex homerc
 @item homerc
+@vindex homerc
 Specifies either a directory or a file using a specific path (like @code{.}
 or @file{/usr/local/share/progname}) or an environment variable (like
 @file{$HOME/rc/} or @file{$PREFIX/share/progname}) or the directory
@@ -2442,14 +2517,14 @@ the rcfile.  Use as many as you like.  The presence of this attribute
 activates the @code{--save-opts} and @code{--load-opts} options.
 @xref{loading rcfile}.
 
-@cindex include
 @item include
+@vindex include
 This string is inserted into the .c file.  Generally used for global
 variables required only by @code{flag-code} program text.
 
-@cindex long-opts
-@cindex named option mode
 @item long-opts
+@vindex long-opts
+@cindex named option mode
 Presence indicates GNU-standard long option processing.  If any options
 do not have an option value (flag character) specified, and least one
 does specify such a value, then you must specify @code{long-opts}.  If
@@ -2469,8 +2544,14 @@ One of the options may be specified as the default
 (as long as it has a required option argument).
 @end itemize
 
-@cindex no-xlate
+@item no-libopts
+@vindex no-libopts
+If you are going to handle your option processing with the @code{getopt.tpl}
+template instead of using libopts, then specify this attribute.  It will
+suppress mention of @code{--more-help} in the generated documentation.
+
 @item no-xlate
+@vindex no-xlate
 Modifies when or whether option names get translated.  If provided,
 it must be assigned one of two values:
 @table @samp
@@ -2485,31 +2566,43 @@ translations for that text.
 See also the various ``@code{XLAT}'' interface entries in the
 AutoOpts Programmatic Interface section (@pxref{AutoOpts API}).
 
-@cindex prefix
 @item prefix
+@vindex prefix
 This value is inserted into @strong{all} global names.  This will
 disambiguate them if more than one set of options are to be compiled
 into a single program.
 
-@cindex rcfile
+@item prog-group
+@vindex prog-group
+The version text in the @file{getopt.tpl} template will include this
+text in parentheses after the program name, when this attribute is specified.
+For example:
+@example
+mumble (stumble) 1.0
+@end example
+@noindent
+says that the ``@code{mumble}'' program is version 1.0 and is part of the
+``@code{stumble}'' group of programs.
+
 @item rcfile
+@vindex rcfile
 Specifies the configuration file name.  This is only useful if you
 have provided at least one @code{homerc} attribute.
 @noindent
 default: .<prog-name>rc
 
-@cindex resettable
 @item resettable
+@vindex resettable
 Specifies that the @code{--reset-option} command line option is to be supported.
 
-@cindex short-usage
 @item short-usage
+@vindex short-usage
 If this attribute is provided, it is used to specify an abbreviated
 version of the usage text.  This text is constructed in the same way
 as the ``full-usage'', described above.
 
-@cindex version
 @item version
+@vindex version
 Specifies the program version and activates the VERSION option,
 @xref{automatic options}.
 @end table
@@ -2536,14 +2629,19 @@ will describe how to do all of these different things.
 @subsubsection AutoOpt-ed Library for AutoOpt-ed Program
 
 The library source code must provide an option definition file that consists
-of only the @code{flag} entries.  The first @code{flag} entry must contain the
-following attributes:
+of only the attribute @code{library}
+@vindex library
+and @code{flag} entries.  The ``library'' attribute does not need any
+associated value, so it will generally appeary by itself on a line folowed
+by a semi-colon.  The first @code{flag} entry must contain the following
+attributes:
 
 @table @samp
 @item name
 This name is used in the construction of a global pointer of type
 @code{tOptDesc const*}.  It is always required.
 @item documentation
+@vindex documentation
 It tells @code{AutoOpts} that this option serves no normal purpose.
 It will be used to add usage clarity and to locate option descriptors
 in the library code.
@@ -2551,6 +2649,7 @@ in the library code.
 This is a string that is inserted in the extended usage display
 before the options specific to the current library.  It is always required.
 @item lib-name
+@vindex lib-name
 This should match the name of the library.  This string is also used in
 the construction of the option descriptor pointer name.  In the end, it
 looks like this:
@@ -2641,10 +2740,12 @@ Repeat until done.
 
 When AutoOpts generates the code to parse the command line options, it has
 the ability to produce any of several types of @code{main()} procedures.
-This is done by specifying a global structured value for @code{main}.  The
-values that it contains are dependent on the value set for the one value it
-must have: @code{main-type}.
+This is done by specifying a global structured value for
+@vindex main
+@code{main}.  The values that it contains are dependent on the value set for
+the one value it must have: @code{main-type}.
 
+@vindex main-type
 The recognized values for @code{main-type} are:
 @menu
 * main guile::              guile: main and inner_main procedures
@@ -2672,15 +2773,19 @@ When the @code{main-type} is specified to be @code{guile},
 a @code{main()} procedure is generated that calls @code{gh_enter()}, providing
 it with a generated @code{inner_main()} to invoke.  If you must perform
 certain tasks before calling @code{gh_enter()}, you may specify such code
-in the value for the @code{before-guile-boot} attribute.
+in the value for the
+@vindex before-guile-boot
+@code{before-guile-boot} attribute.
 
 The @code{inner_main()} procedure itself will process the command line
 arguments (by calling @code{optionProcess()},
 @pxref{libopts-optionProcess}), and then either invoke the code
-specified with the @code{guile-main} attribute, or else export the
-parsed options to Guile symbols and invoke the @code{scm_shell()}
-function from the Guile library.  This latter will render the program
-nearly identical to the stock @code{guile(1)} program.
+specified with the
+@vindex guile-main
+@code{guile-main} attribute, or else export the parsed options to Guile
+symbols and invoke the @code{scm_shell()} function from the Guile library.
+This latter will render the program nearly identical to the stock
+@code{guile(1)} program.
 
 @node main shell-process
 @subsubsection shell-process: emit Bourne shell results
@@ -2746,20 +2851,22 @@ on the second line.
 @subsubsection main: user supplied main procedure
 
 You must supply a value for the @code{main-text} attribute.
-You may also supply a value for @code{option-code}.  If you do, then
-the @code{optionProcess} invocation will not be emitted into the code.
-AutoOpts will wrap the @code{main-text} inside of:
+You may also supply a value for
+@vindex option-code
+@code{option-code}.  If you do, then the @code{optionProcess} invocation
+will not be emitted into the code.  AutoOpts will wrap the @code{main-text}
+inside of:
 
 @example
 int
 main( int argc, char** argv )
 @{
-    @{
+    @{ // replaced by option-code, if that exists
         int ct = optionProcess( &<<prog-name>>Options, argc, argv );
         argc -= ct;
         argv += ct;
     @}
-<<your text goes here>>
+<<your main-text goes here>>
 @}
 @end example
 
@@ -2817,6 +2924,7 @@ There are a number of attributes to @code{main} that may be used:
 
 @table @code
 @item  handler-proc
+@vindex handler-proc
 This attribute is required.  It is used to name the procedure to call.
 That procedure is presumed to be external, but if you provide the code
 for it, then the procedure is emitted as a static procedure in the
@@ -2843,6 +2951,7 @@ here is part of the emitted code:
 @end example
 
 @item handler-type
+@vindex handler-type
 If you do not supply this attribute, your handler procedure must be
 the default type.  The profile of the procedure must be:
 
@@ -2851,8 +2960,8 @@ int @i{my_handler}( char const *pz_entry );
 @end example
 
 @noindent
-However, if you do supply this attribute, you may select any of three
-alternate flavors:
+However, if you do supply this attribute, you may set the value to any of
+four alternate flavors:
 
 @table @samp
 @item name-of-file
@@ -2891,6 +3000,7 @@ system call.
 @end table
 
 @item @i{my_handler}-code
+@vindex MYHANDLER-code
 With this attribute, you provide the code for your handler procedure
 in the option definition file.  In this case, your @code{main()}
 procedure specification might look something like this:
@@ -2920,14 +3030,17 @@ static int
 @end example
 
 @item main-init
+@vindex main-init
 This is code that gets inserted after the options have been processed, but
 before the handler procs get invoked.
 
 @item main-fini
+@vindex main-fini
 This is code that gets inserted after all the entries have been processed,
 just before returning from @code{main()}.
 
 @item comment-char
+@vindex comment-char
 If you wish comment lines to start with a character other than a hash
 (@code{#}) character, then specify one character with this attribute.
 If that character is the @code{NUL} byte, then only blank lines will be
@@ -2942,17 +3055,20 @@ These attributes are used to define how and what information is displayed
 to the user of the program.
 
 @table @samp
-@cindex copyright
 @item copyright
+@vindex copyright
 The @code{copyright} is a structured value containing three to five
 values.  If @code{copyright} is used, then the first three are required.
 
 @enumerate
 @item
+@vindex date
 @file{date} - the list of applicable dates for the copyright.
 @item
+@vindex owner
 @file{owner} - the name of the copyright holder.
 @item
+@vindex type
 @file{type} - specifies the type of distribution license.
 AutoOpts/AutoGen will automatically support the text of the GNU Public
 License (@file{GPL}), the GNU General Public License with Library extensions
@@ -2960,12 +3076,15 @@ License (@file{GPL}), the GNU General Public License with Library extensions
 write-it-yourself copyright notice (@file{NOTE}).  Only these values are
 recognized.
 @item
+@vindex text
 @file{text} - the text of the copyright notice.  It is only needed
 if @file{type} is set to @file{NOTE}.
 @item
+@vindex author
 @file{author} - in case the author name is to appear in the documentation
 and is different from the copyright owner.
 @item
+@vindex eaddr
 @file{eaddr} - email address for receiving praises and complaints.
 Typically that of the author or copyright holder.
 @end enumerate
@@ -2973,40 +3092,40 @@ Typically that of the author or copyright holder.
 An example of this might be:
 @example
 copyright = @{
-    date  = "1992-2004";
+    date  = "1992-2008";
     owner = "Bruce Korb";
     eaddr = 'bkorb@@gnu.org';
     type  = GPL;
 @};
 @end example
 
-@cindex detail
 @item detail
+@vindex detail
 This string is added to the usage output when the HELP option is
 selected.
 
-@cindex explain
 @item explain
+@vindex explain
 Gives additional information whenever the usage routine is invoked..
 
-@cindex package
 @item package
+@vindex package
 The name of the package the program belongs to.  This will appear
 parenthetically after the program name in the version and usage output,
 e.g.:  @code{autogen @i{(GNU autogen)} - The Automated Program Generator}.
 
-@cindex preserve-case
 @item preserve-case
+@vindex preserve-case
 This attribute will not change anything except appearance.
 Normally, the option names are all documented in lower case.
 However, if you specify this attribute, then they will display
 in the case used in their specification.  Command line options
 will still be matched without case sensitivity.
 
-@cindex prog-desc
 @item prog-desc @strong{and}
-@cindex opts-ptr
 @itemx opts-ptr
+@vindex prog-desc
+@vindex opts-ptr
 These define global pointer variables that point to the program
 descriptor and the first option descriptor for a library option.  This
 is intended for use by certain libraries that need command line and/or
@@ -3018,8 +3137,8 @@ is marked as @code{settable}.  The library client program will invoke the
 @code{SET_OPTION} macro which will invoke a handler function that will
 finally set these global variables.
 
-@cindex usage
 @item usage
+@vindex usage
 Optionally names the usage procedure, if the library routine
 @code{optionUsage()} does not work for you.  If you specify
 @code{my_usage} as the value of this attribute, for example, you will
@@ -3029,8 +3148,8 @@ need to provide that procedure and it must conform to this profile:
 void @i{my_usage}( tOptions* pOptions, int exitCode )
 @end example
 
-@cindex gnu-usage
 @item gnu-usage
+@vindex gnu-usage
 Normally, the default format produced by the @code{optionUsage} procedure
 is @i{AutoOpts Standard}.  By specifying this attribute, the default format
 will be @i{GNU-ish style}.  Either default may be overridden by the user with
@@ -3038,8 +3157,8 @@ the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
 or @code{autoopts}, it will alter the style appropriately.  This attribute
 will conflict with the @code{usage} attribute.
 
-@cindex reorder-args
 @item reorder-args
+@vindex reorder-args
 Some applications traditionally require that the command operands be
 intermixed with the command options.  In order to handle that, the arguments
 must be reordered.  If you are writing such an application, specify this
@@ -3085,8 +3204,8 @@ These option attributes do not fit well with the above categories.
 Every option must have exactly one copy of both of these attributes.
 
 @table @samp
-@cindex name
 @item name
+@vindex name
 Long name for the option.  Even if you are not accepting long options
 and are only accepting flags, it must be provided.  AutoOpts generates
 private, named storage that requires this name.  This name also causes
@@ -3120,8 +3239,8 @@ guard-option-names;
 @end example
 @end enumerate
 
-@cindex descrip
 @item descrip
+@vindex descrip
 Except for documentation options, a @strong{very} brief description of
 the option.  About 40 characters on one line, maximum.  It appears on
 the @code{usage()} output next to the option name.  If, however, the
@@ -3138,44 +3257,46 @@ These option attributes are optional.  Any that do appear in the
 definition of a flag, may appear only once.
 
 @table @samp
-@cindex value
 @item value
+@vindex value
 The flag character to specify for traditional option flags, e.g., @code{-L}.
 
-@cindex max
 @item max
+@vindex max
 Maximum occurrence count (invalid if @var{disable} present).
 The default maximum is 1.  @code{NOLIMIT} can be used for the value,
 otherwise it must be a number or a @code{#define} that evaluates to a number.
 
-@cindex min
 @item min
+@vindex min
 Minimum occurrence count.  If present, then the option @strong{must}
 appear on the command line.  Do not define it with the value zero (0).
 
-@cindex must-set
 @item must-set
+@vindex must-set
 If an option must be specified, but it need not be specified on
 the command line, then specify this attribute for the option.
 
-@cindex enable
 @item enable
+@vindex enable
 Long-name prefix for enabling the option (invalid if @var{disable}
 @strong{not} present).  Only useful if long option names are being
 processed.
 
-@cindex disable
 @item disable
+@vindex disable
 Prefix for disabling (inverting sense of) the option.  Only useful
 if long option names are being processed.
 
-@cindex enabled
 @item enabled
+@vindex enabled
 If default is for option being enabled.  (Otherwise, the OPTST_DISABLED
 bit is set at compile time.)  Only useful if the option can be disabled.
 
 @item ifdef
 @itemx ifndef
+@vindex ifdef
+@vindex ifndef
 If an option is relevant on certain platforms or when certain features
 are enabled or disabled, you can specify the compile time flag used
 to indicate when the option should be compiled in or out.  For example,
@@ -3209,6 +3330,7 @@ is @code{#define}-d.  Watch those switch statements.
 
 @node opt-attr settable
 @subsubsection Program may set option
+@vindex settable
 If the option can be set outside of option processing, specify
 ``@code{settable}''.  If this attribute is defined, special macros for setting
 this particular option will be inserted into the interface file.  For example,
@@ -3218,6 +3340,7 @@ interacts with the @var{documentation} attribute.
 
 @node opt-attr no-preset
 @subsubsection Option cannot be pre-configured
+@vindex no-preset
 @cindex configuration file
 If presetting this option is not allowed, specify ``@code{no-preset}''.
 (Thus, environment variables and values set in configuration files will be
@@ -3225,6 +3348,7 @@ ignored.)
 
 @node opt-attr equivalence
 @subsubsection Option Equivalence Class
+@vindex equivalence
 Generally, when several options are mutually exclusive and basically serve the
 purpose of selecting one of several processing modes, specify the
 ``@code{equivalence}'' attribute.  These options will be considered an
@@ -3275,6 +3399,7 @@ default:    /* cannot happen */
 
 @node opt-attr default option
 @subsubsection Default Option
+@vindex default
 If your program processes its arguments in named option mode (See
 ``long-opts'' in @ref{program attributes}), then you may select @strong{one}
 of your options to be the default option.  Do so by using attribute
@@ -3294,6 +3419,7 @@ option description text in the usage output.  Libraries may choose
 to make it settable so that the library can determine which command
 line option is the first one that pertains to the library.
 
+@vindex documentation
 If the ``@code{documentation}'' attribute is present, then all other
 attributes are disabled except @code{settable}, @code{call-proc} and
 @code{flag_-ode}.  @code{settable} must be and is only specified if
@@ -3308,6 +3434,7 @@ appear in generated man pages or in the generated invoking texinfo doc.
 
 @node opt-attr translators
 @subsubsection Translator Notes
+@vindex translators
 If you need to give the translators a special note about a particular option,
 please use the ``@code{translators}'' attribute.  The attribute text will be
 emitted into the generated @code{.c} text where the option related strings get
@@ -3338,16 +3465,16 @@ be used only if they are to have an effect on the processing of subsequent
 options.
 
 @table @samp
-@cindex immediate
 @item immediate
+@vindex immediate
 Use this option attribute to specify that the enabled form of the option
 is to be processed immediately.  The @code{help} and @code{more-help}
 options are so specified.  They will also call @code{exit()} upon
 completion, so they @strong{do} have an effect on the processing
 of the remaining options :-).
 
-@cindex immed-disable
 @item immed-disable
+@vindex immed-disable
 Use this option attribute to specify that the disabled form of the
 option is to be processed immediately.  The @code{load-opts} option is
 so specified.  The @code{--no-load-opts} command line option will
@@ -3411,11 +3538,11 @@ callback function will be able to place its own restrictions on what that
 string may contain or represent.
 
 Option argument handling attributes depend upon the value set for the
-@code{arg-type} attribute.
-@cindex arg-type
-It specifies the type of argument the option will take.  If not present,
-the option cannot take an argument.  If present, it must be an entry in
-the following table.  The first three letters is sufficient.
+@vindex arg-type
+@code{arg-type} attribute.  It specifies the type of argument the option
+will take.  If not present, the option cannot take an argument.  If present,
+it must be an entry in the following table.  The first three letters is
+sufficient.
 
 @menu
 * arg-type string::         Arg Type String
@@ -3436,7 +3563,7 @@ Supporting attributes for particular argument types:
 
 @node arg-keyword
 @subsubsection Keyword list
-@cindex keyword
+@vindex keyword
 If the @code{arg-type} is @code{keyword} (@pxref{arg-type keyword}) or
 @code{set-membership} (@pxref{arg-type set membership}), then you must specify
 the list of keywords by a series of @code{keyword} entries.  The interface
@@ -3446,14 +3573,15 @@ keyword entry.  @code{keyword} option types will have an enumeration and
 @code{#define}-d.
 
 If the @code{arg-type} is specifically @code{keyword}, you may also add
-special handling code with a @code{extra-code} attribute.  After
-@code{optionEnumerationVal} has converted the input string into an
-enumeration, you may insert code to process this enumeration value
-(@code{pOptDesc->optArg.argEnum}).
+special handling code with a
+@vindex extra-code
+@code{extra-code} attribute.  After @code{optionEnumerationVal} has
+converted the input string into an enumeration, you may insert code to
+process this enumeration value (@code{pOptDesc->optArg.argEnum}).
 
 @node arg-optional
 @subsubsection Option Argument Optional
-@cindex arg-optional
+@vindex arg-optional
 This attribute indicates that the user does not have to supply an argument for
 the option.  This is only valid if the @var{arg-type} is @code{string}
 (@pxref{arg-type string}) or @code{keyword} (@pxref{arg-type keyword}).  If it
@@ -3467,7 +3595,7 @@ gets configured with @code{--disable-optional-args}.
 
 @node arg-default
 @subsubsection Default Option Argument Value
-@cindex arg-default
+@vindex arg-default
 This specifies the default option argument value to be used when the option is
 not specified or preset.  You may specify multiple @code{arg-default} values if
 the argument type is @code{set membership}.
@@ -3491,14 +3619,14 @@ produces a special purpose procedure for this option.
 
 @table @samp
 @item scaled
-@cindex scaled
+@vindex scaled
 @code{scaled} marks the option so that suffixes of @samp{k}, @samp{K},
 @samp{m}, @samp{M}, @samp{g}, @samp{G}, @samp{t}, and @samp{T} will multiply
 the given number by a power of 1000 or 1024.  Lower case letters scale by a
 power of 1000 and upper case scale by a power of 1024.
 
 @item arg-range
-@cindex arg-range
+@vindex arg-range
 @code{arg-range} is used to create a callback procedure for validating the
 range of the option argument.  It must match one of the range entries.  Each
 @code{arg-range} should consist of either an integer by itself or an integer
@@ -3544,7 +3672,7 @@ string that starts with @code{f}, @code{F}, @code{n} or @code{N}
 The argument must match a specified list of strings (@pxref{arg-keyword}).
 Assuming you have named the option, @code{optn-name}, the strings will be
 converted into an enumeration of type @code{te_Optn_Name} with the values
-@code{OPTN_NAME_KEYWORD}.  If you have @strong{not} specified a default value,
+@code{OPTN_NAME_KEYWORD}.*  If you have @strong{not} specified a default value,
 the value @code{OPTN_NAME_UNDEFINED} will be inserted with the value zero.
 The option will be initialized to that value.  You may now use this in your
 code as follows:
@@ -3574,6 +3702,10 @@ printf( "you selected the %s keyword\n",
         OPT_OPTN_NAME_VAL2STR(opt) );
 @end example
 
+* Note: you may replace the @code{OPTN_NAME} enumeration prefix with
+another prefix by specifying a
+@vindex prefix-enum
+@code{prefix-enum} attribute.
 
 @node arg-type set membership
 @subsubsection Arg Type Set Membership
@@ -3641,7 +3773,7 @@ attributes for the option:
 
 @table @samp
 @item file-exists
-@cindex file-exists
+@vindex file-exists
 If not specified or empty, then the directory portion of the name is checked.
 The directory must exist or the argument is rejected and the usage procedure
 is invoked.
@@ -3651,14 +3783,14 @@ existence.  If the value begins with the two letters ``no'', then the file
 must not pre-exist.  Otherwise, the file is expected to exist.
 
 @item open-file
-@cindex open-file
+@vindex open-file
 If not specified or empty, the file is left alone.
 If the value begins with the four letters ``desc''[@i{riptor}], then
 @code{open(2)} is used and @code{optArg.argFd} is set.  Otherwise, the
 file is opened with @code{fopen} and @code{optArg.argFp} is set.
 
 @item file-mode
-@cindex file-mode
+@vindex file-mode
 If ``open-file'' is set and not empty, then you must specify the open mode.
 Set the value to the flag bits or mode string as appropriate for the open
 type.
@@ -3741,8 +3873,8 @@ callback functions (either @code{flag-code}, @code{extract-code}, or
 @code{call-proc}).
 
 @table @samp
-@cindex flag-code
 @item flag-code
+@vindex flag-code
 statements to execute when the option is encountered.
 The generated procedure will look like this:
 
@@ -3757,8 +3889,8 @@ doOpt<name>( tOptions* pOptions, tOptDesc* pOptDesc )
 Only certain fields within the @code{tOptions} and @code{tOptDesc}
 structures may be accessed.  @xref{Option Processing Data}.
 
-@cindex extract-code
 @item extract-code
+@vindex extract-code
 This is effectively identical to @code{flag-code}, except that the
 source is kept in the output file instead of the definitions file.
 A long comment is used to demarcate the code.  You must not modify
@@ -3766,21 +3898,21 @@ that marker.  @i{Before} regenerating the option code file,
 the old file is renamed from MUMBLE.c to MUMBLE.c.save.  The template
 will be looking there for the text to copy into the new output file.
 
-@cindex call-proc
 @item call-proc
+@vindex call-proc
 external procedure to call when option is encountered.  The calling
 sequence must conform to the sequence defined above for the generated
 procedure, @code{doOpt<name>}.  It has the same restrictions
 regarding the fields within the structures passed in as arguments.
 @xref{Option Processing Data}.
 
-@cindex flag-proc
 @item flag-proc
+@vindex flag-proc
 Name of another option whose @code{flag-code} can be executed
 when this option is encountered.
 
-@cindex stack-arg
 @item stack-arg
+@vindex stack-arg
 Call a special library routine to stack the option's arguments.  Special
 macros in the interface file are provided for determining how many of the
 options were found (@code{STACKCT_OPT(NAME)}) and to obtain a pointer to a
@@ -3792,8 +3924,8 @@ If this stacked argument option has a disablement prefix, then the entire
 stack of arguments will be cleared by specifying the option with that
 disablement prefix.
 
-@cindex unstack-arg
 @item unstack-arg
+@vindex unstack-arg
 Call a special library routine to remove (``unstack'') strings
 from a @code{stack-arg} option stack.  This attribute must name
 the option that is to be ``unstacked''.  Neither this option nor
@@ -3850,8 +3982,15 @@ advantage of these templates, you must add several attributes to your
 option definitions.
 
 @table @samp
-@cindex option documentation
+@item arg-name
+@vindex arg-name
+If an option has an argument, the argument should have a name for
+documentation purposes.  It will default to @code{arg-type}, but
+it will likely be clearer with something else like, @code{file-name}
+instead of @code{string} (the type).
+
 @item doc
+@vindex doc
 First, every @code{flag} definition @emph{other than} ``documentation''
 definitions, must have a @code{doc} attribute defined.  If the option takes
 an argument, then it will need an @code{arg-name} attribute as well.  The
@@ -3865,30 +4004,28 @@ Options marked with the ``documentation'' attribute are for documenting
 the usage text.  All other options should have the ``doc'' attribute in
 order to document the usage of the option in the generated man pages.
 
-@cindex option argument name
-@item arg-name
-If an option has an argument, the argument should have a name for
-documentation purposes.  It will default to @code{arg-type}, but
-it will likely be clearer with something else like, @code{file-name}
-instead of @code{string} (the type).
+@item man-doc
+@vindex man-doc
+Finally, if you need to add man page sections like @code{SEE ALSO} or
+@code{USAGE} or other, put that text in a @code{man-doc} definition.  This
+text will be inserted verbatim in the man page after the @code{OPTIONS}
+section and before the @code{AUTHOR} section.
 
-@cindex prog-man-descrip
-@cindex prog-info-descrip
+@item option-info
+@vindex option-info
+This text will be inserted as a lead-in paragraph in the @code{OPTIONS}
+section of the generated man page.
+
 @item prog-man-descrip
 @itemx prog-info-descrip
+@vindex prog-man-descrip
+@vindex prog-info-descrip
 Then, you need to supply a brief description of what your program does.
 If you already have a @code{detail} definition, this may be sufficient.
 If not, or if you need special formatting for one of the manual formats,
 then you will need either a definition for @code{prog-man-descrip} or
 @code{prog-info-descrip} or both.  These will be inserted verbatim
 in the man page document and the info document, respectively.
-
-@cindex man-doc
-@item man-doc
-Finally, if you need to add man page sections like @code{SEE ALSO} or
-@code{USAGE} or other, put that text in a @code{man-doc} definition.  This
-text will be inserted verbatim in the man page after the @code{OPTIONS}
-section and before the @code{AUTHOR} section.
 @end table
 
 @node automatic options
@@ -3903,11 +4040,20 @@ Below are the option names and default flag values.  The flags are activated
 if and only if at least one user-defined option also uses a flag value.  The
 long names are supported as option names if @code{long-opts} has been
 specified.  These option flags may be deleted or changed to characters of your
-choosing by specifying @code{xxx-value = "y";}, where @code{xxx} is one of the
+choosing by specifying
+@vindex more-help-value
+@vindex usage-value
+@vindex version-value
+@vindex load-opts-value
+@vindex reset-value
+@code{xxx-value = "y";}, where @code{xxx} is one of the
 option names below and @code{y} is either empty or the character of your choice.
 For example, to change the help flag from @code{?} to @code{h}, specify
+@vindex help-value
 @code{help-value = "h";}; and to require that @code{save-opts} be specified
-only with its long option name, specify @code{save-opts-value = "";}.
+only with its long option name, specify
+@vindex save-opts-value
+@code{save-opts-value = "";}.
 
 With the exception of the @code{load-opts} option, none of these automatically
 supported options will be recognized in configuration files or environment
@@ -5239,10 +5385,15 @@ Option conflict/requirement verification is disabled.
 @end enumerate
 
 Both of these methods are enabled by running AutoGen on
-the definitions file with the additional global attribute:
+the definitions file with the additional main procedure attribute:
 
 @example
-test-main [ = proc-to-call ] ;
+main = @{ main-type = shell-process; @};
+@end example
+@noindent
+or:
+@example
+main = @{ main-type = shell-parser; @};
 @end example
 
 If you do not supply a @code{proc-to-call}, it will default to
@@ -5675,92 +5826,18 @@ conflicts by specifying the @code{guard-option-names} attribute
 (@pxref{program attributes}).  That emitted code will also @code{#undef}-ine
 the conflicting name.
 
-@page
-@node Add-Ons
-@chapter Add-on packages for AutoGen
-
-This chapter includes several programs that either work closely
-with AutoGen (extracting definitions or providing special formatting
-functions), or leverage off of AutoGen technology.  There is also
-a formatting library that helps make AutoGen possible.
-
-AutoOpts ought to appear in this list as well, but since it is
-the primary reason why many people would even look into AutoGen
-at all, I decided to leave it in the list of chapters.
+@node Option Define Names
+@section Option Definition Name Index
+@printindex vr
 
 @ignore
 END   == AUTOINFO == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
 @end ignore
 
-@ignore
-START == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
-
-@c === SECTION MARKER
-
-@node AutoFSM
-@section Automated Finite State Machine
-@cindex AutoFSM
-@cindex finite state machine
-
-The templates to generate a finite state machine in C or C++ is included
-with AutoGen.  The documentation is not.  The documentation is in HTML
-format for @uref{http://www.gnu.org/software/autogen/autofsm.html,viewing},
-or you can @uref{http://download.sourceforge.net/autogen/,download FSM}.
-
-@node AutoXDR
-@section Combined RPC Marshalling
-@cindex RPC
-@cindex rpcgen
-@cindex remote procedure call
-@cindex AutoXDR
-@cindex XDR
-
-The templates and NFSv4 definitions are not included with AutoGen in any way.
-The folks that designed NFSv4 noticed that much time and bandwidth was
-wasted sending queries and responses when many of them could be bundled.
-The protocol bundles the data, but there is no support for it in rpcgen.
-That means you have to write your own code to do that.  Until now.
-Download this and you will have a large, complex example of how to use
-@code{AutoXDR} for generating the marshaling and unmarshaling of combined
-RPC calls.  There is a brief example
-@uref{http://www.gnu.org/software/autogen/xdr/index.html,on the web}, but
-you should @uref{http://download.sourceforge.net/autogen/,download AutoXDR}.
-
-@c === SECTION MARKER
-
-@node AutoEvents
-@section Automated Event Management
-@cindex AutoEvents
-
-Large software development projects invariably have a need to manage
-the distribution and display of state information and state changes.
-In other words, they need to manage their software events.  Generally,
-each such project invents its own way of accomplishing this and then
-struggles to get all of its components to play the same way.  It is a
-difficult process and not always completely successful.  This project
-helps with that.
-
-AutoEvents completely separates the tasks of supplying the data
-needed for a particular event from the methods used to manage the
-distribution and display of that event.  Consequently, the programmer
-writing the code no longer has to worry about that part of the
-problem.  Likewise the persons responsible for designing the event
-management and distribution no longer have to worry about getting
-programmers to write conforming code.
-
-This is a work in progress.  See my
-@uref{http://www.gnu.org/software/autogen/autoevents.html,web page}
-on the subject, if you are interested.
-I have some useful things put together, but it is not ready
-to call a product.
-
-@ignore
-END   == AUTOFSM == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
-Extraction from autogen.texi
-@end ignore
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@c  TRAILER
 
 @c  LocalWords:  AutoGen texinfo Korb tpl bruce Exp texi autogen setfilename AG
 @c  LocalWords:  settitle setchapternewpage dne dircategory direntry ifinfo gpl

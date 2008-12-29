@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2007-12-02 11:46:11 bkorb"
+# Time-stamp:        "2008-12-25 16:43:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/01/23 00:35:27 $
+# Last Modified:     $Date: 2008/12/29 06:13:59 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -24,7 +24,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: snarf.test,v 4.18 2008/01/23 00:35:27 bkorb Exp $
+# $Id: snarf.test,v 4.19 2008/12/29 06:13:59 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -64,6 +64,7 @@ _EOF_
 
 # # # # # # # # # # PROCESS SOURCE FILE # # # # # # # # #
 
+f=`echo ${AGexe} | sed 's/ .*//'`
 cat > ${testname}.cfg <<- _EOF_
 	subblock       exparg=arg_name,arg_desc,arg_optional,arg_list
 	template       snarf
@@ -73,7 +74,7 @@ cat > ${testname}.cfg <<- _EOF_
 	base-name      ${testname}
 	agarg          -L$srcdir/..
 	input          ${testname}.c
-	autogen        ${AGexe}
+	autogen        ${f}
 	_EOF_
 unset DEBUG_ENABLED
 

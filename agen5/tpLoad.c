@@ -1,9 +1,9 @@
 
 /*
- *  $Id: tpLoad.c,v 4.24 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: tpLoad.c,v 4.25 2008/12/29 06:13:59 bkorb Exp $
  *
- * Time-stamp:        "2007-10-30 08:17:58 bkorb"
- * Last Committed:    $Date: 2008/01/23 00:35:27 $
+ * Time-stamp:        "2008-12-25 11:12:48 bkorb"
+ * Last Committed:    $Date: 2008/12/29 06:13:59 $
  *
  *  This module will load a template and return a template structure.
  *
@@ -431,6 +431,9 @@ unloadTemplate( tTemplate* pT )
 LOCAL void
 cleanup( tTemplate* pTF )
 {
+    if (HAVE_OPT(USED_DEFINES))
+        print_used_defines();
+
     optionFree(&autogenOptions);
 
     for (;;) {

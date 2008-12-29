@@ -3,9 +3,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.30 2008/06/15 14:59:05 bkorb Exp $
- *  Time-stamp:        "2008-06-14 16:13:16 bkorb"
- *  Last Committed:    $Date: 2008/06/15 14:59:05 $
+ *  $Id: opts.def,v 4.31 2008/12/29 06:13:59 bkorb Exp $
+ *  Time-stamp:        "2008-12-28 09:35:26 bkorb"
+ *  Last Committed:    $Date: 2008/12/29 06:13:59 $
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@ autogen definitions options;
 copyright = {
     date  = "1992-2008";
     owner = "Bruce Korb";
-    eaddr = "autogen-users@lists.sourceforge.net";
+    eaddr = 'autogen-users@lists.sourceforge.net';
     type  = gpl;
 };
 
@@ -615,6 +615,26 @@ flag = {
     doc = <<- _EOF_
 	This will print out the complete definition tree before processing
 	the template.
+	_EOF_ ;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+flag = {
+    name        = used-defines;
+    descrip     = "Show the definitions used";
+#ifndef XML2AG
+    no-preset;
+    doc = <<- _EOF_
+	This will print out the names of definition values searched for
+	during the processing of the template, whether actually found or
+	not.  There may be other referenced definitions in a template in
+	portions of the template not evaluated.  Some of the names listed
+	may be computed names and others AutoGen macro arguments.  This is
+	not a means for producing a definitive, all-encompassing list of all
+	and only the values used from a definition file.  This is intended
+	as an aid to template documentation only.
 	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";

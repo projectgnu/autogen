@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.14 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: getdefs.c,v 4.15 2008/12/29 06:13:59 bkorb Exp $
  *
  *    getdefs copyright 1999-2007 Bruce Korb
  *
- *  Time-stamp:        "2007-11-04 10:39:32 bkorb"
+ *  Time-stamp:        "2008-12-28 10:34:16 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -99,7 +99,7 @@ main( int    argc,
 
     outFp = startAutogen();
 
-    doPreamble( outFp );
+    doPreamble(outFp);
 
     /*
      *  Process each input file
@@ -113,6 +113,10 @@ main( int    argc,
         } while (--ct > 0);
     }
 
+    /*
+     *  IF we don't have an ordering file, but we do have a "first index",
+     *  THEN alphabetize by definition name.
+     */
     if ((pzIndexText == NULL) && HAVE_OPT( FIRST_INDEX )) {
         qsort( (void*)papzBlocks, blkUseCt, sizeof( char* ), compar_defname );
         setFirstIndex();
@@ -890,11 +894,15 @@ processFile( tCC* pzFile )
 
 /*
  *  setFirstIndex
+ *
+ *  Go through all our different kinds of defines.  On the first occurrence
+ *  of each different name, check for an index value.  If not supplied,
+ *  then insert ``[OPT_VALUE_FIRST_INDEX]'' after the object name.
  */
 static void
 setFirstIndex( void )
 {
-    char    zNm[ 128 ] = "";
+    char    zNm[ 128 ] = { NUL };
     int     nmLn = 1;
     int     ct   = blkUseCt;
     char**  ppz  = papzBlocks;
@@ -902,42 +910,41 @@ setFirstIndex( void )
     if (ct == 0)
         exit( EXIT_FAILURE );
 
-    while (--ct >= 0) {
-        char* pzOld = *ppz;
-        char* pzNew;
-        int   changed = (strneqvcmp( pzOld, zNm, nmLn ) != 0);
+    for (; --ct >= 0; ppz++) {
+        char *  pzOld = *ppz;
+        int     changed = (strneqvcmp( pzOld, zNm, nmLn ) != 0);
+        char *  pzNew;
 
         /*
          *  IF the name still matches, then check the following character.
-         *  If it is neither whitespace nor an open bracket, then
-         *  we have a new entry type.
+         *  If it is whitespace or an open bracket, then
+         *  it's the old type.  Continue to the next entry.
          */
-        if (! changed)
-            changed = (! isspace( pzOld[ nmLn ])) && (pzOld[nmLn] != '[');
-
-        if (changed) {
-            pzNew = zNm;
-            nmLn  = 0;
-            while (isalnum( *pzOld ) || (*pzOld == '_') || (*pzOld == '-')) {
-                nmLn++;
-                *(pzNew++) = *(pzOld++);
-            }
-            *pzNew = NUL;
-
-            /*
-             *  IF the source has specified its own index, then do not
-             *  supply our own new one.
-             */
-            if (*pzOld != '[') {
-                pzNew = (char*)malloc( strlen( pzOld ) + nmLn + 10 );
-                sprintf( pzNew, "%s[%d]%s", zNm,
-                         (int)OPT_VALUE_FIRST_INDEX, pzOld );
-                free( (void*)(*ppz) );
-                *ppz = pzNew;
-            }
+        if (! changed) {
+            if (isspace( pzOld[ nmLn ]) || (pzOld[nmLn] == '['))
+                continue;
         }
 
-        ppz++;
+        pzNew = zNm;
+        nmLn  = 0;
+        while (isalnum( *pzOld )
+               || (*pzOld == '_') || (*pzOld == '-') || (*pzOld == '^')) {
+            nmLn++;
+            *(pzNew++) = *(pzOld++);
+        }
+        *pzNew = NUL;
+
+        /*
+         *  IF the source has specified its own index, then do not
+         *  supply our own new one.
+         */
+        if (*pzOld != '[') {
+            pzNew = (char*)malloc( strlen( pzOld ) + nmLn + 10 );
+            sprintf( pzNew, "%s[%d]%s", zNm,
+                     (int)OPT_VALUE_FIRST_INDEX, pzOld );
+            free( (void*)(*ppz) );
+            *ppz = pzNew;
+        }
     }
 }
 

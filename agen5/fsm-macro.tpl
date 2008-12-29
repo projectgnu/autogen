@@ -1,7 +1,7 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  Time-stamp:        "2007-07-04 11:51:12 bkorb"
-#  Last Committed:    $Date: 2007/10/07 16:54:54 $
+#  Time-stamp:        "2008-12-26 09:55:46 bkorb"
+#  Last Committed:    $Date: 2008/12/29 06:13:59 $
 ##
 ## This file is part of AutoGen.
 ## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
@@ -241,7 +241,7 @@ DEFINE preamble
  *
  *  Automated Finite State Machine
  *
- *  copyright (c) 2001-2007 by Bruce Korb - all rights reserved
+ *  copyright (c) 2001-2008 by Bruce Korb - all rights reserved
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=

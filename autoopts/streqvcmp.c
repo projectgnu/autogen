@@ -1,7 +1,7 @@
 
 /*
- *  $Id: streqvcmp.c,v 4.14 2008/01/23 00:35:27 bkorb Exp $
- * Time-stamp:      "2007-07-04 11:35:12 bkorb"
+ *  $Id: streqvcmp.c,v 4.15 2008/12/29 06:13:59 bkorb Exp $
+ * Time-stamp:      "2008-12-26 10:15:46 bkorb"
  *
  *  String Equivalence Comparison
  *
@@ -245,6 +245,8 @@ strequate( char const* s )
  * character is put into the output.
  * This function name is mapped to option_strtransform so as to not conflict
  * with the POSIX name space.
+ *
+ * The source and destination may be the same.
  *
  * err:  none.
 =*/
