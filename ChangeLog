@@ -1,3 +1,7 @@
+2008-12-29  Leo Davis  <ldav1s@users.sourceforge.net>
+
+        * autoopts/test/nested.test: Mac OS/X requires ``-e'' with its sed.
+	
 2008-12-28  Bruce Korb  <bkorb@gnu.org>
 	
 	* agen5/defFind.c (hash_name_t): new structure for hashing the looked

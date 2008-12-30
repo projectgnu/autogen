@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2008-06-15 11:58:00 bkorb"
+# Time-stamp:        "2008-12-29 14:55:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/06/15 19:03:29 $
+# Last Modified:     $Date: 2008/12/30 00:50:58 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,7 +29,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: nested.test,v 4.10 2008/06/15 19:03:29 bkorb Exp $
+# $Id: nested.test,v 4.11 2008/12/30 00:50:58 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -217,7 +217,7 @@ cmp -s ${testname}-res2.* || \
   failure "`diff ${testname}-res2.*`"
 
 ./${testname} -s "${arg1}" -s "${arg2}" '->'
-sed -i '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg
+sed -i -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg
 cat > ${testname}-res3.base <<- _EOF_
 	#  test_nested - Test AutoOpts for nested
 	#  preset/initialization file
@@ -246,7 +246,7 @@ cmp -s ${files} || \
 # Copy the config file and verify that the contents are the same.
 #
 ./${testname} "->${testname}.d/${testname}.cfg2"
-sed -i '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2
+sed -i -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2
 files=${testname}.d/${testname}.cfg\ ${testname}.d/${testname}.cfg2
 cmp -s ${files} || \
     failure "re-saved config${nl}`diff ${files}`"
