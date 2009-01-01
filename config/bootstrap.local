@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2008-12-31 14:52:21 bkorb"
+# Time-stamp:        "2008-12-31 17:43:44 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.35 2009/01/01 01:00:49 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.36 2009/01/01 01:44:40 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
@@ -160,7 +160,7 @@ config_configurables()
         printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
     done >&4
 
-    printf "AC_CONFIG_FILES([Makefile.am" >&4
+    printf "AC_CONFIG_FILES([Makefile" >&4
 
     for f in ${plaincfg}
     do
