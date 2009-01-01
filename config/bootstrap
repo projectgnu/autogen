@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2008-09-21 16:27:50 bkorb"
+# Time-stamp:      "2008-12-31 14:33:35 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap,v 4.18 2008/09/22 00:28:03 bkorb Exp $
+# @(#) $Id: bootstrap,v 4.19 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -173,6 +173,7 @@ libtoolize_reqver=1.5
 #
 out_of_date()
 {
+    local PS4=">${FUNCNAME}> "
     if test "X${1}" = "X${2}"
     then return 1 ; fi
 

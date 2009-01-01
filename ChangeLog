@@ -15,6 +15,10 @@
 	* getdefs/gdinit.c (validateOptions): allow a user specified pattern
 	to include the '/\*=' characters at the start.  Free some memory
 	explicitly instead of with program exit.
+	* agen5/agInit.c (initialize): configure the default shell.
+	* agen5/autogen.h (pzShellProgram): initialize to configured value
+	* configure.in (CONFIG_SHELL): make it an unquoted define
+	* autoopts/test/usage.test: play with the --used-defines option a bit
 
 2008-12-20  Leo Davis  <ldav1s@users.sourceforge.net>
             Bruce Korb  <bkorb@gnu.org>

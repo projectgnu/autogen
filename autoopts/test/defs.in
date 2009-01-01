@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2008-12-28 22:07:29 bkorb"
+# Time-stamp:     "2008-12-31 12:43:49 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-# Last Modified:  $Date: 2008/12/29 06:13:59 $
+# Last Modified:  $Date: 2009/01/01 01:00:49 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,7 +28,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: defs.in,v 4.26 2008/12/29 06:13:59 bkorb Exp $
+# $Id: defs.in,v 4.27 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -59,6 +59,7 @@ CLexe="@CLexe@"
 GDexe="@GDexe@"
 INC="@LIBGUILE_CFLAGS@"
 LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
+DEBUG_ENABLED='@DEBUG_ENABLED@'
 
 test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
 test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
@@ -68,11 +69,13 @@ test -z "${CC}"         && echo "No CC configured" && exit 1
 test -z "${PAGER}"      && PAGER=more
 nl='
 '
+test -z "${BASH_VERSION}" && local() { : ; }
 
 #  If only the "rm(1)" command could be relied upon....
 #
 purge()
 {
+  local PS4='>purge>'
   rm -rf ${*} 2>/dev/null
   bad=''
   for f
@@ -92,6 +95,7 @@ purge()
 }
 
 set_exe() {
+  local PS4='>set_exe>'
   eval f=\${${1}}
   d=`dirname $f`
   d=`cd $d >/dev/null && pwd`
@@ -101,6 +105,7 @@ set_exe() {
 }
 
 init_tests() {
+    local PS4='>ini>'
     logfile=`pwd`/testdir/${testname}.log
     exec 8>&2 1>${logfile} 2>&1
     set -x
@@ -183,6 +188,7 @@ be_verbose()
 #
 failure()
 {
+  local PS4='>fail>'
   ${setx}
   cd ${testsubdir}
   if test -d ../FAILURES
@@ -214,6 +220,7 @@ cleanup()
 
 compile()
 {
+  local PS4='>cc>'
   ${setx}
   test "X${Csrc}"  = "X" && Csrc="${testname}"
   test "X${Cexe}"  = "X" && Cexe="${Csrc}"

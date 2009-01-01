@@ -1,9 +1,9 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.29 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: agShell.c,v 4.30 2009/01/01 01:00:49 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 22:27:11 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-12-31 13:55:28 bkorb"
+ *  Last Committed:    $Date: 2009/01/01 01:00:49 $
  *
  *  Manage a server shell process
  *
@@ -237,7 +237,6 @@ chainOpen( int       stdinFd,
        (pzShell == NULL) || (*pzShell == NUL)) {
 
         pzShell = pzShellProgram;
-
         *ppArgs = pzShell;
     }
 

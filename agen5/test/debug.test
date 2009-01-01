@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2007-12-02 17:48:29 bkorb"
+# Time-stamp:        "2008-12-31 12:50:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2007/12/03 01:57:54 $
+# Last Modified:     $Date: 2009/01/01 01:00:49 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: debug.test,v 4.2 2007/12/03 01:57:54 bkorb Exp $
+# $Id: debug.test,v 4.3 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -138,7 +138,8 @@ _EOF_
 
 trace_args=--trace=everything\ --trace-out=${testname}.trace
 ${AGexe} ${trace_args} ${testname}.def || failure AutoGen failed
-sed 's@from file .*agInit.*@from file agInit.c line XXX:@' \
+sed -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
+    -e '/Called ag_scm_for_index/d' \
     ${testname}.trace > ${testname}.trace1
 cmp -s ${testname}.base1 ${testname}.trace1 || \
   failure "`diff -c ${testname}.base1 ${testname}.trace1`"

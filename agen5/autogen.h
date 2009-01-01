@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.33 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: autogen.h,v 4.34 2009/01/01 01:00:49 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-10 15:04:13 bkorb"
- *  Last Committed:    $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2008-12-31 13:53:26 bkorb"
+ *  Last Committed:    $Date: 2009/01/01 01:00:49 $
  *
  *  Global header file for AutoGen
  *
@@ -300,6 +300,9 @@ typedef struct {
     char*   entries[1];
 } tList;
 
+#define _MkStr(_s) #_s
+#define MK_STR(_s) _MkStr(_s)
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  GLOBAL VARIABLES
@@ -326,7 +329,7 @@ MODE FILE*       pfTrace          VALUE( NULL );
 MODE char*       pzTmpStderr      VALUE( NULL );
 
 MODE tCC*        serverArgs[2]    VALUE( { NULL } );
-MODE tCC*        pzShellProgram   VALUE( NULL );
+MODE tCC*        pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
 
 /*
  *  AutoGen definiton and template context

@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2008-09-21 17:37:06 bkorb"
+# Time-stamp:        "2008-12-31 14:52:21 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -23,11 +23,12 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: bootstrap.local,v 4.34 2008/09/28 23:22:56 bkorb Exp $
+# @(#) $Id: bootstrap.local,v 4.35 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 locate_exe()
 {
+    local PS4=">${FUNCNAME}> "
     if [ -x "$1" ]
     then
         echo "$1"
@@ -64,6 +65,7 @@ locate_exe()
 
 make_funcs_def()
 {
+    local PS4=">${FUNCNAME}> "
   ${VERBOSE} && set -x
   svdir=${PWD}
   cd ${srcdir}/autoopts
@@ -143,24 +145,29 @@ make_funcs_def()
 
 config_configurables()
 {
+    local PS4=">${FUNCNAME}> "
     exec 4> configure.files
-    local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
-    find ${tops} -type f -name '*-tpl.in' | \
-        egrep -v '/CVS/|/SCCS/' | \
-        while read f
-        do
-        g=${f%-tpl.in}.tpl
+    local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am)
+    local allcfg=$(
+        find ${tops} -type f -name '*.in' -o -name 'Makefile.am' | \
+            egrep -v '/CVS/|/SCCS/|/.git/')
+    local renamecfg=$(echo "${allcfg}" | egrep -e '-tpl\.in$')
+    local plaincfg=$(echo "${allcfg}"  | egrep -v -e '-(tpl|pc)\.in$')
+
+    for f in ${renamecfg}
+    do
+        g=$(echo $f | sed 's/-\([a-z]*\)\.in$/.\1/')
         printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
     done >&4
 
-    echo "AC_CONFIG_FILES([\\" >&4
-    for f in $(
-        find ${tops} -name 'Makefile.am' -o -name '*.in' | \
-            sed '/-tpl.in$/d;s,\.\(am\|in\)$,,;/^configure$/d' | \
-            sort -u)
-        do
-            echo "    ${f}"
-        done >&4
+    printf "AC_CONFIG_FILES([Makefile.am" >&4
+
+    for f in ${plaincfg}
+    do
+        f=${f%.am}
+        f=${f%.in}
+        printf ' \\\n    %s' ${f}
+    done >&4
     echo '])' >&4
     exec 4>&-
 
@@ -182,6 +189,7 @@ config_configurables()
 
 config_versions()
 {
+    local PS4=">${FUNCNAME}> "
     set -a
     eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION)"
     set +a

@@ -1,5 +1,17 @@
 New in __CURRENT_VERSION__ November 2008
 
+* several cleanups.
+* "more-help" is only supported with libopts is in use at run time.
+  Allow for it to be expunged from the documentation.
+* Add a #define for the configured shell to config.h
+* add --used-defines to autogen.  You can now find out all the names
+  that autogen looked up during processing.  That will include computed
+  names and values passed to macros by name and it won't include names
+  only referenced in sections of a template that were not processed.
+  But it helps in documenting a template anyway.
+
+New in 5.9.6 November 2008
+
 * Hierarchically valued options can now be stored with ``--save-opt'' option
 
 * option state may now be "reset".  This is indistinguishable from the

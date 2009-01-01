@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2008-08-27 08:18:58 bkorb"
+# Time-stamp:        "2008-12-31 12:19:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: cfg-edit.test,v 4.5 2008/09/13 16:30:12 bkorb Exp $
+# $Id: cfg-edit.test,v 4.6 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 . ./defs
 
@@ -227,9 +227,9 @@ esac
 
 arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
+dir=`echo ${TMPDIR} | sed "s@^\`pwd\`//*@@"`
 out_file=${dir}/${testname}-out-file
 rm -f ${out_file}
-dir=`echo ${TMPDIR} | sed "s@^\`pwd\`//*@@"`
 ./${testname} -m 'one + three' -b true -m 'seven' \
     -s "${arg1}" -n -200 -s "${arg2}" -e ocho \
     -I ${srcdir}/${testname}.test \

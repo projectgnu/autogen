@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.18 2008/01/23 00:35:27 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.19 2009/01/01 01:00:49 bkorb Exp $
  *
- *  Time-stamp:      "2007-12-02 15:02:27 bkorb"
+ *  Time-stamp:      "2008-12-31 14:06:19 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -115,36 +115,6 @@ initialize( int arg_ct, char** arg_vec )
 
         addSysEnv( z );
 #endif
-    }
-
-    {
-        static char const bin_sh[] = "/bin/sh";
-#       define sh_z (bin_sh + 5)
-
-        pzShellProgram = getenv(zShellEnv);
-
-        if (pzShellProgram != NULL) {
-            char const * pzCsh = pzShellProgram;
-            pzCsh += strlen(pzCsh) - 3;
-            if ((pzCsh >= pzShellProgram) &&
-                (strcmp(pzCsh, "csh") == 0))
-                pzShellProgram = NULL;
-        }
-
-        if (pzShellProgram == NULL) {
-#           ifdef __sun
-            static char const xpg_sh[] = "/usr/xpg4/bin/sh";
-
-            if (access(xpg_sh, X_OK) == 0)
-                pzShellProgram = xpg_sh;
-            else
-#           endif
-                if (access(bin_sh, X_OK) == 0)
-                    pzShellProgram = bin_sh;
-                else pzShellProgram = sh_z;
-
-        }
-        putenv( aprf("%s=%s", zShellEnv, pzShellProgram));
     }
 
     doOptions(arg_ct, arg_vec);

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2007-07-04 10:11:07 bkorb"
+## Time-stamp:      "2008-12-31 12:48:53 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,7 +27,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: usage.test,v 4.7 2008/01/23 00:35:27 bkorb Exp $
+# $Id: usage.test,v 4.8 2009/01/01 01:00:49 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -619,6 +619,7 @@ nl='
 '
 emit_defs()
 {
+  local PS4='>ed>'
   exec 4> $1.def
   cat >&4 <<-  _EOF_
 	AutoGen Definitions options;
@@ -708,6 +709,9 @@ emit_defs()
 
 test_list=""
 tname=${testname}
+defnames_raw=${TMPDIR}/defnames.raw
+defnames_file=${TMPDIR}/defnames.uniq
+AG_L=${AG_L}\ --used-defines
 
 for long_opts in true false
 do
@@ -740,8 +744,13 @@ do
           testname=${tname}_${name}
           emit_defs ${testname}
           test_list="${test_list} ${testname}"
-          ${AG_L} ${testname}.def || \
+          echo firstline >> ${defnames_raw}
+          ${AG_L} ${testname}.def >> ${defnames_raw} || {
+             cat ${defnames_raw}
              failure "AutoGen could not process $testname"
+          }
+          sed -e '1,/definition names looked up/d' \
+              -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
           compile ${helpstr}
           cmp -s ${testname}.help ${testname}.hlp || \
              failure "FAILED ${testname} hlp -> help
@@ -773,6 +782,90 @@ do
   done
 done
 
+test -z "${DEBUG_ENABLED}" && cleanup && exit 0
+
+sort -u -o ${defnames_file} ${defnames_file}
+sort -u > ${defnames_raw} <<- _EOF_
+	allow_errors
+	arg_default
+	arg_optional
+	arg_range
+	arg_type
+	argument
+	call_proc
+	code
+	config_header
+	copyright
+	default
+	descrip
+	detail
+	disable
+	documentation
+	eaddr
+	enable
+	enabled
+	environrc
+	equivalence
+	explain
+	export
+	extract_code
+	field
+	flag
+	flag_code
+	flag_proc
+	flags_cant
+	flags_must
+	full_usage
+	gnu_usage
+	guard_option_names
+	help_value
+	homerc
+	ifdef
+	ifndef
+	immed_disable
+	immediate
+	include
+	lib_name
+	library
+	long_opts
+	main_text
+	main_type
+	max
+	min
+	more_help_value
+	must_set
+	name
+	no_libopts
+	no_preset
+	no_xlate
+	package
+	prefix
+	prefix_enum
+	preserve_case
+	prog_name
+	prog_title
+	reorder_args
+	resettable
+	scaled
+	settable
+	short_usage
+	stack_arg
+	std_value
+	test_main
+	translators
+	unstack_arg
+	usage
+	usage_opt
+	usage_type
+	val_name
+	val_upname
+	value
+	version
+	_EOF_
+
+cmp ${defnames_raw} ${defnames_file} || \
+    failure "${defnames_raw} and ${defnames_file} do not compare${nl}`
+        diff ${defnames_raw} ${defnames_file}`"
 cleanup
 
 ## Local Variables:
