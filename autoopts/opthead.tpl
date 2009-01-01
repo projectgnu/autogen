@@ -1,8 +1,8 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.36 2008/12/20 18:35:09 bkorb Exp $
+# $Id: opthead.tpl,v 4.37 2009/01/01 02:54:37 bkorb Exp $
 # Automated Options copyright 1992-2007 Bruce Korb
-# Time-stamp:      "2008-12-14 09:31:55 bkorb"
+# Time-stamp:      "2008-12-31 18:50:24 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,20 +33,6 @@
  *  "AutoOpts" chapter.  Please refer to that doc for usage help.
  */
 [= (make-header-guard "autoopts")       =][=
-
-  `tried=""
-   test_exe() {
-     tried="${tried} ${1}"
-     test -n "${1}" && test -x ${1} && ${1} -v >/dev/null
-     test $? -ne 0 && return 1
-     CLexe=${1}
-   }
-   test_exe ${CLexe} || \
-     test_exe ${top_builddir}/columns/columns || \
-     test_exe @bindir@/columns || \
-     test_exe columns || \
-     die "cannot locate columns program:  ${tried}"
-  `                                     =][=
 % config-header "\n#include \"%s\""     =]
 #include <autoopts/options.h>
 [= IF (not (exist? "library"))          =]

@@ -4,8 +4,8 @@
 #  Header must come first.  An env variable is set that
 #  is used in processing the C file.
 #
-#  $Id: options-tpl.in,v 4.4 2008/12/14 16:25:39 bkorb Exp $
-# Time-stamp:      "2008-12-13 12:20:07 bkorb"
+#  $Id: options-tpl.in,v 4.5 2009/01/01 02:54:37 bkorb Exp $
+# Time-stamp:      "2008-12-31 18:53:44 bkorb"
 
 h
 c
@@ -48,6 +48,7 @@ c
 (setenv "SHELL" "@CONFIG_SHELL@")
 
 =][=
+
  (if (= "h" (suffix))
      (begin
           (if (not (exist? "flag.name"))
@@ -79,6 +80,22 @@ c
 CASE    (suffix)        =][=
 
 == h                    =][=
+
+  `tried=""
+   test_exe() {
+     tried="${tried} ${1}"
+     test -n "${1}" && test -x ${1} && ${1} -v >/dev/null
+     test $? -ne 0 && return 1
+     CLexe=${1}
+   }
+   test_exe "${CLexe}" || \
+     test_exe ${top_builddir}/columns/columns || \
+     test_exe @bindir@/columns || \
+     test_exe columns || \
+     die "cannot locate columns program:  ${tried}"
+  `
+
+=][=
 
   (define do-ifdefs (or (exist? "flag.ifdef") (exist? "flag.ifndef")))
 
