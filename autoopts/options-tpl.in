@@ -4,8 +4,8 @@
 #  Header must come first.  An env variable is set that
 #  is used in processing the C file.
 #
-#  $Id: options-tpl.in,v 4.6 2009/01/01 03:00:20 bkorb Exp $
-# Time-stamp:      "2008-12-31 18:59:52 bkorb"
+#  $Id: options-tpl.in,v 4.7 2009/01/01 03:07:06 bkorb Exp $
+# Time-stamp:      "2008-12-31 19:06:39 bkorb"
 
 h
 c
@@ -88,10 +88,11 @@ CASE    (suffix)        =][=
      test $? -ne 0 && return 1
      CLexe=${1}
    }
-   exec_prefix='@exec_prefix@'
+   prefix="@prefix@"
+   exec_prefix="@exec_prefix@"
    test_exe "${CLexe}" || \
      test_exe ${top_builddir}/columns/columns || \
-     test_exe "@bindir@"/columns || \
+     test_exe "@bindir@/columns" || \
      test_exe columns || \
      die "cannot locate columns program:  ${tried}"
   `
