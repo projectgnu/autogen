@@ -2,15 +2,13 @@
 
 ## agman-lib.tpl -- Template for command line man pages
 ##
-##  AutoOpts copyright 1992-2007 Bruce Korb
-##
-## Time-stamp:      "2007-07-04 10:36:45 bkorb"
+## Time-stamp:      "2009-01-01 08:42:54 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -29,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman-lib.tpl,v 4.5 2007/10/07 16:54:54 bkorb Exp $
+## $Id: agman-lib.tpl,v 4.6 2009/01/01 16:49:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included

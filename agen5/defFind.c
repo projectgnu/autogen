@@ -1,14 +1,13 @@
 /*
- *  $Id: defFind.c,v 4.21 2009/01/01 02:29:42 bkorb Exp $
+ *  $Id: defFind.c,v 4.22 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2008-12-31 18:15:02 bkorb"
- *  Last Committed:    $Date: 2009/01/01 02:29:42 $
+ *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module locates definitions.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

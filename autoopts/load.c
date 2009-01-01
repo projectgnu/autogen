@@ -1,6 +1,6 @@
 
 /*
- *  $Id: load.c,v 4.36 2008/12/14 16:25:39 bkorb Exp $
+ *  $Id: load.c,v 4.37 2009/01/01 16:49:26 bkorb Exp $
  *  Time-stamp:      "2008-12-06 10:16:05 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
@@ -9,8 +9,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

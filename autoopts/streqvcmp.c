@@ -1,6 +1,6 @@
 
 /*
- *  $Id: streqvcmp.c,v 4.15 2008/12/29 06:13:59 bkorb Exp $
+ *  $Id: streqvcmp.c,v 4.16 2009/01/01 16:49:26 bkorb Exp $
  * Time-stamp:      "2008-12-26 10:15:46 bkorb"
  *
  *  String Equivalence Comparison
@@ -12,8 +12,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

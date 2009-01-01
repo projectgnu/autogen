@@ -2,12 +2,11 @@
 
 h
 
-# $Id: strsignal.tpl,v 4.6 2007/10/07 16:54:54 bkorb Exp $
+# $Id: strsignal.tpl,v 4.7 2009/01/01 16:49:26 bkorb Exp $
 
 ##
 ##  This file is part of AutoGen.
-##
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -29,7 +28,7 @@ h
  *
  *  Generated for a [=`uname -r`=] [=`uname`=] platform
  *
- *  strsignal copyright (c) 1992-2007 Bruce Korb - all rights reserved
+ *  strsignal copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  */

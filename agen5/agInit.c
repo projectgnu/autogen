@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.19 2009/01/01 01:00:49 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:      "2008-12-31 14:06:19 bkorb"
  *
@@ -8,8 +8,7 @@
  *  children will return.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

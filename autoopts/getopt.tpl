@@ -5,7 +5,7 @@
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -60,7 +60,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.14 2008/12/20 18:35:09 bkorb Exp $
+ *  $Id: getopt.tpl,v 4.15 2009/01/01 16:49:26 bkorb Exp $
  */[+
 CASE (suffix) +][+
 == h +]

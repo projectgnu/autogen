@@ -4,12 +4,10 @@
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Time-stamp:        "2008-12-27 16:50:28 bkorb"
-## Last Committed:    $Date: 2008/12/29 06:13:59 $
+## Last Committed:    $Date: 2009/01/01 16:49:26 $
 ##
 ##  This file is part of AutoGen.
-##
-##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
-##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -24,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.35 2008/12/29 06:13:59 bkorb Exp $
+## $Id: auto_gen.tpl,v 4.36 2009/01/01 16:49:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi

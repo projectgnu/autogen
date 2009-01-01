@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.41 2008/12/20 18:35:08 bkorb Exp $
+ *  $Id: autoopts.c,v 4.42 2009/01/01 16:49:26 bkorb Exp $
  *  Time-stamp:      "2008-12-16 14:52:28 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -10,8 +10,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

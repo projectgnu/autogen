@@ -3,13 +3,12 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2008-12-20 09:50:40 bkorb"
+# Time-stamp:        "2009-01-01 08:39:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
-##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -27,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.25 2008/12/20 18:35:09 bkorb Exp $
+# $Id: getopt.test,v 4.26 2009/01/01 16:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -116,7 +115,7 @@ gnu-usage;
 no-libopts;
 
 copyright = {
-    date  = "2003-2008";
+    date  = "2003-2009";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";

@@ -1,16 +1,15 @@
 
 /*
- *  $Id: defLex.c,v 4.28 2008/07/27 20:06:05 bkorb Exp $
+ *  $Id: defLex.c,v 4.29 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2008-07-26 10:06:56 bkorb"
- *  Last Committed:    $Date: 2008/07/27 20:06:05 $
+ *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

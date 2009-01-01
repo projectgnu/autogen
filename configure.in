@@ -6,8 +6,7 @@ dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
-dnl  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+dnl  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 dnl
 dnl AutoGen is free software: you can redistribute it and/or modify it
 dnl under the terms of the GNU General Public License as published by the
@@ -22,7 +21,7 @@ dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.33 2009/01/01 01:00:49 bkorb Exp $
+dnl Code: $Id: configure.in,v 4.34 2009/01/01 16:49:26 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -36,7 +35,7 @@ ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
-ifdef([AC_REVISION],AC_REVISION($Revision: 4.33 $),)dnl
+ifdef([AC_REVISION],AC_REVISION($Revision: 4.34 $),)dnl
 [config_start_time=`date +%s 2>/dev/null`]
 # ----------------------------------------------------------------------
 # Substitute VERSION vars here, so that they can be used by the Makefile

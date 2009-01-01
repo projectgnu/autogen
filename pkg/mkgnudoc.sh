@@ -4,8 +4,7 @@
 ## Time-stamp:      "2007-07-04 11:58:07 bkorb"
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
-##  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -20,7 +19,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: mkgnudoc.sh,v 4.12 2008/01/23 00:35:27 bkorb Exp $
+## $Id: mkgnudoc.sh,v 4.13 2009/01/01 16:49:26 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 

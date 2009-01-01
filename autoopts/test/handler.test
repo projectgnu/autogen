@@ -7,13 +7,12 @@
 #
 # Time-stamp:        "2008-07-27 11:48:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/07/27 20:06:05 $
+# Last Modified:     $Date: 2009/01/01 16:49:26 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
-##  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -31,7 +30,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: handler.test,v 4.20 2008/07/27 20:06:05 bkorb Exp $
+# $Id: handler.test,v 4.21 2009/01/01 16:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

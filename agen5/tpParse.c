@@ -2,16 +2,15 @@
 /*
  *  tpParse.c
  *
- *  $Id: tpParse.c,v 4.18 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: tpParse.c,v 4.19 2009/01/01 16:49:26 bkorb Exp $
  *
  * Time-stamp:        "2007-12-02 12:39:12 bkorb"
- * Last Committed:    $Date: 2008/01/23 00:35:27 $
+ * Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
- * AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- * AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ * AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

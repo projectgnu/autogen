@@ -1,12 +1,12 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.19 2007/11/18 22:49:19 bkorb Exp $
-# Time-stamp:        "2007-11-18 11:43:59 bkorb"
-# Last Committed:    $Date: 2007/11/18 22:49:19 $
+# $Id: directive.tpl,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+# Time-stamp:        "2009-01-01 08:48:03 bkorb"
+# Last Committed:    $Date: 2009/01/01 16:49:26 $
 
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -35,7 +35,9 @@ h =]
 
   (string-append
      (dne " *  " "/*  ")
-     "\n *\n *  copyright 1992-2007 Bruce Korb\n *\n"
+     "\n *"
+     "\n *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved"
+     "\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"
      (make-header-guard "autogen")

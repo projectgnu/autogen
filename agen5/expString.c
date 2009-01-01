@@ -1,17 +1,16 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.22 2008/11/16 23:56:30 bkorb Exp $
+ *  $Id: expString.c,v 4.23 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2008-11-16 12:28:30 bkorb"
- *  Last Committed:    $Date: 2008/11/16 23:56:30 $
+ *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

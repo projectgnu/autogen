@@ -1,16 +1,15 @@
 /*
- *  $Id: gdinit.c,v 4.14 2008/12/29 06:13:59 bkorb Exp $
+ *  $Id: gdinit.c,v 4.15 2009/01/01 16:49:26 bkorb Exp $
  *
- *    getdefs copyright 1999-2007 Bruce Korb
+ *    getdefs copyright 1999-2009 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2008-12-28 10:35:38 bkorb"
- *  Last Modified:     $Date: 2008/12/29 06:13:59 $
+ *  Time-stamp:        "2009-01-01 08:36:27 bkorb"
+ *  Last Modified:     $Date: 2009/01/01 16:49:26 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

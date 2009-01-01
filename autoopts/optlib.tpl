@@ -1,12 +1,10 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Automated Options copyright 1992-2007 Bruce Korb
-#
-# Time-stamp:      "2008-12-20 09:25:11 bkorb"
+# Time-stamp:      "2009-01-01 08:40:36 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -24,7 +22,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.35 2008/12/20 18:35:09 bkorb Exp $
+# $Id: optlib.tpl,v 4.36 2009/01/01 16:49:26 bkorb Exp $
 
 =][=
 

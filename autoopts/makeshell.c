@@ -1,6 +1,6 @@
 
 /*
- *  $Id: makeshell.c,v 4.28 2008/07/27 20:06:05 bkorb Exp $
+ *  $Id: makeshell.c,v 4.29 2009/01/01 16:49:26 bkorb Exp $
  * Time-stamp:      "2008-07-26 16:10:51 bkorb"
  *
  *  This module will interpret the options set in the tOptions
@@ -8,8 +8,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

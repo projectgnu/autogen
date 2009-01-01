@@ -1,16 +1,15 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.34 2009/01/01 01:00:49 bkorb Exp $
+ *  $Id: autogen.h,v 4.35 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2008-12-31 13:53:26 bkorb"
- *  Last Committed:    $Date: 2009/01/01 01:00:49 $
+ *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  Global header file for AutoGen
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

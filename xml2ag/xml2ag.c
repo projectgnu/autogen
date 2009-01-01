@@ -1,16 +1,14 @@
 
 /*
  *  xml2ag.c
- *  $Id: xml2ag.c,v 4.14 2008/01/23 00:35:27 bkorb Exp $
- *  Time-stamp:         "2007-07-04 11:59:12 bkorb"
- *  This is the main routine for xml2ag.
+ *  $Id: xml2ag.c,v 4.15 2009/01/01 16:49:26 bkorb Exp $
+ *  Time-stamp:         "2009-01-01 08:33:14 bkorb"
  *
- *  xml2ag copyright (c) 2002-2008 Bruce Korb - all rights reserved
- *  xml2ag copyright (c) 2002-2008 Bruce Korb - all rights reserved
+ *  This is the main routine for xml2ag.
+ *  xml2ag copyright (c) 2002-2009 by Bruce Korb - all rights reserved
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

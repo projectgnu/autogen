@@ -4,12 +4,11 @@
 #
 # Time-stamp:        "2007-07-04 11:29:17 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/01/23 00:35:27 $
+# Last Modified:     $Date: 2009/01/01 16:49:26 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
-## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -25,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: daemon.test,v 4.5 2008/01/23 00:35:27 bkorb Exp $
+# $Id: daemon.test,v 4.6 2009/01/01 16:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 tdir=$( (mktemp -d $PWD/.daemon-XXXXXX.d) 2>/dev/null)

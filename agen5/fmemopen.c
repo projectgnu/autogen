@@ -1,5 +1,5 @@
 /*-
- * copyright (c) 2004-2008 by Bruce Korb.  All rights reserved.
+ * copyright (c) 2004-2009 by Bruce Korb.  All rights reserved.
  *
  * Time-stamp:      "2008-04-06 15:39:52 bkorb"
  *

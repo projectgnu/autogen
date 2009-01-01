@@ -1,5 +1,5 @@
 
-/*  $Id: version.c,v 4.17 2008/07/27 20:06:05 bkorb Exp $
+/*  $Id: version.c,v 4.18 2009/01/01 16:49:26 bkorb Exp $
  * Time-stamp:      "2008-07-27 10:11:30 bkorb"
  *
  *  This module implements the default usage procedure for
@@ -9,8 +9,7 @@
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

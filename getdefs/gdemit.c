@@ -1,16 +1,15 @@
 /*
- *  $Id: gdemit.c,v 4.12 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: gdemit.c,v 4.13 2009/01/01 16:49:26 bkorb Exp $
  *
- *    getdefs copyright 1999-2007 Bruce Korb
+ *    getdefs copyright 1999-2009 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2007-11-04 10:37:09 bkorb"
- *  Last Modified:     $Date: 2008/01/23 00:35:27 $
+ *  Time-stamp:        "2009-01-01 08:36:38 bkorb"
+ *  Last Modified:     $Date: 2009/01/01 16:49:26 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen copyright 1992-2007 Bruce Korb - all rights reserved
  *

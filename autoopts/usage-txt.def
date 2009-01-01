@@ -4,7 +4,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id: usage-txt.def,v 4.23 2008/11/02 18:51:00 bkorb Exp $
+   $Id: usage-txt.def,v 4.24 2009/01/01 16:49:26 bkorb Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ utxt = { ut-name = AO_Sml;
 
 utxt = { ut-name = AO_Ver;
          ut-text = "Automated Options version %s\n"
-    "\tcopyright (c) 1999-2008 Bruce Korb - all rights reserved\n";
+    "\tcopyright (c) 1999-2009 by Bruce Korb - all rights reserved\n";
 };
 
 utxt = { ut-name = All;

@@ -1,11 +1,11 @@
 
 /*
- *  $Id: reset.c,v 4.5 2008/08/02 22:49:57 bkorb Exp $
+ *  $Id: reset.c,v 4.6 2009/01/01 16:49:26 bkorb Exp $
  *  Time-stamp:      "2008-08-02 12:25:18 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

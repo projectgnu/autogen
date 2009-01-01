@@ -1,6 +1,6 @@
 
 /*
- *  $Id: boolean.c,v 4.14 2008/08/04 01:01:31 bkorb Exp $
+ *  $Id: boolean.c,v 4.15 2009/01/01 16:49:26 bkorb Exp $
  * Time-stamp:      "2008-08-03 13:06:02 bkorb"
  *
  *   Automated Options Paged Usage module.
@@ -10,8 +10,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

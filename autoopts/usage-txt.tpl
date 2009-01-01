@@ -5,11 +5,11 @@
   pot
 
 # Time-stamp:        "2007-07-04 13:33:38 bkorb"
-# Last Committed:    $Date: 2007/10/07 16:54:54 $
+# Last Committed:    $Date: 2009/01/01 16:49:26 $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control

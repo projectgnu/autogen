@@ -1,14 +1,13 @@
 
 /*
- *  $Id: guileopt.c,v 4.15 2008/01/23 00:35:27 bkorb Exp $
+ *  $Id: guileopt.c,v 4.16 2009/01/01 16:49:26 bkorb Exp $
  * Time-stamp:      "2007-07-04 10:23:29 bkorb"
  *
  *  This module will export the option values to the Guile environment.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
- *  AutoOpts is copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+ *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

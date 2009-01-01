@@ -2,14 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2008-12-25 16:43:42 bkorb"
+# Time-stamp:        "2009-01-01 08:44:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2008/12/29 06:13:59 $
+# Last Modified:     $Date: 2009/01/01 16:49:26 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
-## AutoGen copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -24,7 +23,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: snarf.test,v 4.19 2008/12/29 06:13:59 bkorb Exp $
+# $Id: snarf.test,v 4.20 2009/01/01 16:49:26 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -96,7 +95,7 @@ cat > ${testname}.ini.OK1 <<'_EOF_'
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2007 Bruce Korb
+ *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -150,7 +149,7 @@ cat > ${testname}.h.OK <<_EOF_
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2007 Bruce Korb
+ *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -220,7 +219,7 @@ cat > ${testname}.ini.OK2 <<'_EOF_'
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright 1992-2007 Bruce Korb
+ *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

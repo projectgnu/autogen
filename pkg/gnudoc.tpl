@@ -2,11 +2,11 @@
 
 html
 
-# Time-stamp: "2008-01-19 10:42:04 bkorb"
-# Version:    "$Revision: 4.12 $
+# Time-stamp: "2009-01-01 08:34:50 bkorb"
+# Version:    "$Revision: 4.13 $
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@ html
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.12 2008/01/23 00:35:27 bkorb Exp $
+  ==  $Id: gnudoc.tpl,v 4.13 2009/01/01 16:49:26 bkorb Exp $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "
@@ -137,7 +137,7 @@ Please send broken links and other corrections (or suggestions) to
 </p>
 
 <p>
-Copyright (C) 2005 Free Software Foundation, Inc.,
+Copyright (C) 2009 Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02111, USA
 <br />
 Verbatim copying and distribution of this entire article is
@@ -147,7 +147,7 @@ permitted in any medium, provided this notice is preserved.
 <p>
 Updated:
 <!-- timestamp start -->
-$Date: 2008/01/23 00:35:27 $ $Author: bkorb $
+$Date: 2009/01/01 16:49:26 $ $Author: bkorb $
 <!-- timestamp end -->
 </p>
 </div>
