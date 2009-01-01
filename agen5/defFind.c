@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.20 2008/12/29 06:13:59 bkorb Exp $
+ *  $Id: defFind.c,v 4.21 2009/01/01 02:29:42 bkorb Exp $
  *
- *  Time-stamp:        "2008-12-26 10:16:52 bkorb"
- *  Last Committed:    $Date: 2008/12/29 06:13:59 $
+ *  Time-stamp:        "2008-12-31 18:15:02 bkorb"
+ *  Last Committed:    $Date: 2009/01/01 02:29:42 $
  *
  *  This module locates definitions.
  *
@@ -67,7 +67,7 @@ static tDefEntry*
 defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed );
 
 static int
-hash_string(unsigned char const * pzStr);
+hash_string(unsigned char const * pz);
 
 static void
 stringAdd(char const * pz);
