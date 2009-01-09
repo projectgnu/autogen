@@ -112,7 +112,7 @@ CASE usage-type =][=
           (string-append "-"
               (if (exist? "usage-value") (get "usage-value") "u")) ) =][=
    ELSE no usage-opt 
-      =]--give-me-short-usage 2>&1 | sed /give-me-short-usage/d[=
+      =]--give-me-short-usage 2>&1 | sed -e '/: illegal option /d'[=
    ENDIF        =][=
 
 *               =][=

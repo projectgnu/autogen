@@ -1,3 +1,21 @@
+2009-01-08  Bruce Korb  <bkorb@gnu.org>
+	
+	* config/libopts.def (wchar_t): someone says they still need this for
+	the libopts tear-off library.  wchar_t is no longer used there. ???
+
+2009-01-07  Leo Davis  <ldav1s@users.sourceforge.net>
+
+        * autoopts/usage.tpl: sometimes (on a Mac?), the option in error is
+	not reproduced, so the sed-it-away expression doesn't match.
+	* agen5/test/error.test: cope with guile 1.6.4 error messages
+	* autoopts/configfile.c (handleStructure): correct the place where
+	the argument type is found.
+	* autoopts/usage.tpl: sometimes (when?) the bad option is not printed.
+	
+2008-12-31  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.7 release
+
 2008-12-29  Leo Davis  <ldav1s@users.sourceforge.net>
 
         * autoopts/test/nested.test: Mac OS/X requires ``-e'' with its sed.

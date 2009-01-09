@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.44 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:      "2008-08-03 11:00:30 bkorb"
+ *  $Id: configfile.c,v 4.45 2009/01/09 06:34:20 bkorb Exp $
+ *  Time-stamp:      "2009-01-08 22:22:27 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -752,7 +752,11 @@ handleStructure(
      */
     memset(pcNulPoint, ' ', pzData - pcNulPoint);
 
-    if ((pOS->pOD->fOptState & OPTST_ARG_TYPE_MASK) == OPARG_TYPE_STRING) {
+    /*
+     *  If we are getting a "string" value, the process the XML-ish
+     *  %XX hex characters.
+     */
+    if (valu.valType == OPARG_TYPE_STRING) {
         char * pzSrc = pzData;
         char * pzDst = pzData;
         char bf[4];

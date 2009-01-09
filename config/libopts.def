@@ -3,8 +3,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Last Modified:     $Date: 2008/06/14 22:23:53 $
- *  Time-stamp:        "2008-06-14 09:33:03 bkorb"
+/*  Last Modified:     $Date: 2009/01/09 06:34:20 $
+ *  Time-stamp:        "2009-01-03 02:31:55 bkorb"
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -24,12 +24,12 @@ autogen definitions conftest.tpl;
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id: libopts.def,v 4.22 2008/06/14 22:23:53 bkorb Exp $
+ *  $Id: libopts.def,v 4.23 2009/01/09 06:34:20 bkorb Exp $
  *  -------------------------------------------------------------------
  */
 
 group       = libopts;
-version     = "$Revision: 4.22 $";
+version     = "$Revision: 4.23 $";
 output-file = libopts.m4;
 
 test   = {
@@ -302,12 +302,37 @@ do-first = <<-_EOF_
 	  AC_MSG_ERROR([You must have one of limits.h, sys/limits.h or values.h])
 	fi
 
+	# ----------------------------------------------------------------------
+	# check for various programs used during the build.
+	# On OS/X, "wchar.h" needs "runetype.h" to work properly.
+	# ----------------------------------------------------------------------
+	AC_CHECK_HEADERS([runetype.h wchar.h], [], [],[
+	AC_INCLUDES_DEFAULT
+	#if HAVE_RUNETYPE_H
+	# include <runetype.h>
+	#endif
+	])
+
+	# ----------------------------------------------------------------------
+	# Checks for typedefs
+	# ----------------------------------------------------------------------
+	AC_CHECK_TYPES(wchar_t)
+	AC_CHECK_TYPES(wint_t, [], [], [
+	AC_INCLUDES_DEFAULT
+	#if HAVE_RUNETYPE_H
+	# include <runetype.h>
+	#endif
+	#if HAVE_WCHAR_H
+	# include <wchar.h>
+	#endif
+	])
+
 	# ========================
 	# ...and int types headers
 	# ========================
 	AC_CHECK_HEADERS(stdint.h inttypes.h, break)
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
-	   intptr_t, uintptr_t, uint_t, pid_t])
+	   intptr_t, uintptr_t, uint_t, pid_t, size_t])
 
 	# =====
 	# sizes
