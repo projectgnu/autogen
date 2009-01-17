@@ -1,7 +1,7 @@
 
 /*
- *  $Id: numeric.c,v 4.19 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:      "2008-11-01 14:28:56 bkorb"
+ *  $Id: numeric.c,v 4.20 2009/01/17 22:08:09 bkorb Exp $
+ *  Time-stamp:      "2009-01-11 18:05:28 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -39,9 +39,14 @@
 void
 optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
 {
+    static char const bullet[] = "\t\t\t\t- ";
+    static char const deepin[] = "\t\t\t\t  ";
+    static char const onetab[] = "\t";
+
     const struct {long const rmin, rmax;} * rng = rng_table;
+
     char const * pz_indent =
-        (pOpts != OPTPROC_EMIT_USAGE) ? "\t" : "\t\t\t\t  ";
+        (pOpts != OPTPROC_EMIT_USAGE) ? onetab : bullet;
 
     if ((pOpts == OPTPROC_EMIT_USAGE) || (pOpts > OPTPROC_EMIT_LIMIT)) {
         char const * lie_in_range = zRangeLie;
@@ -57,10 +62,14 @@ optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
         if (pOD->fOptState & OPTST_SCALED_NUM)
             fprintf(option_usage_fp, zRangeScaled, pz_indent);
 
-        if (rng_ct > 1)
+        if (rng_ct > 1) {
             fprintf(option_usage_fp, lie_in_range, pz_indent);
-        else {
+            pz_indent =
+                (pOpts != OPTPROC_EMIT_USAGE) ? onetab : deepin;
+
+        } else {
             fprintf(option_usage_fp, zRangeOnly, pz_indent);
+            pz_indent = onetab + 1; /* empty string */
         }
 
         for (;;) {
@@ -80,6 +89,8 @@ optionShowRange(tOptions* pOpts, tOptDesc* pOD, void * rng_table, int rng_ct)
             }
             fputs(zRangeOr, option_usage_fp);
             rng++;
+            pz_indent =
+                (pOpts != OPTPROC_EMIT_USAGE) ? onetab : deepin;
         }
 
         if (pOpts > OPTPROC_EMIT_LIMIT)

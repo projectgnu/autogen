@@ -1,7 +1,7 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.38 2009/01/01 16:49:26 bkorb Exp $
-# Time-stamp:      "2009-01-01 08:41:07 bkorb"
+# $Id: opthead.tpl,v 4.39 2009/01/17 22:08:09 bkorb Exp $
+# Time-stamp:      "2009-01-17 12:58:16 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,7 +33,21 @@
 [= (make-header-guard "autoopts")       =][=
 % config-header "\n#include \"%s\""     =]
 #include <autoopts/options.h>
-[= IF (not (exist? "library"))          =]
+[= IF
+
+  (define option-ct 0)
+  (define index-sep-str "")
+
+  (set! max-name-len (+ max-name-len 2))
+  (define index-fmt (sprintf "%%s\n    %s%%-%ds=%%3d" INDEX-pfx max-name-len))
+
+   (define add-opt-index (lambda (opt-nm) (begin
+      (set! option-ct (+ option-ct 1))
+      (ag-fprintf 0 index-fmt index-sep-str opt-nm (- option-ct 1))
+      (set! index-sep-str ",")
+   ) ) )
+
+   (not (exist? "library"))          =]
 /*
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
@@ -52,49 +66,30 @@
  *  Enumeration of each option:
  */
 typedef enum {[=
-FOR flag    =][=
-  IF (not (exist? "documentation")) =]
-        [= (sprintf "%-26s =%3d," (index-name "name") (for-index)) =][=
-  ENDIF     =][=
-ENDFOR flag =][=
+FOR flag                                =][=
+  (if (exist? "documentation")
+      (set! option-ct (+ option-ct 1))
+      (add-opt-index (up-c-name "name"))
+  )
+  =][=
+ENDFOR flag                             =][=
 
-(define option-ct (count "flag")) =][=
-
-IF (exist? "library")           =]
+IF (exist? "library")                   =],
         LIBRARY_OPTION_COUNT[=
 
-ELSE                            =][=
+ELSE not exists library                 =][=
 
-  IF (exist? "resettable")      =]
-        [= (. INDEX-pfx) =]RESET_OPTION     = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
-  ENDIF                         =][=
+  (if (exist? "resettable")       (add-opt-index "RESET_OPTION"))
+  (if (exist? "version")          (add-opt-index "VERSION"))
+  (add-opt-index "HELP")
+  (if (not (exist? "no-libopts")) (add-opt-index "MORE_HELP"))
+  (if (exist? "usage-opt")        (add-opt-index "USAGE"))
 
-  IF (exist? "version")         =]
-        [= (. INDEX-pfx) =]VERSION          = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],[=
-  ENDIF                         =]
-        [= (. INDEX-pfx) =]HELP             = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-
-  IF (not (exist? "no-libopts")) =],
-        [= (. INDEX-pfx) =]MORE_HELP        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-
-  ENDIF                         =][=
-
-  IF (exist? "usage-opt")       =],
-        [= (. INDEX-pfx) =]USAGE            = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-  ENDIF                         =][=
-
-  IF (exist? "homerc")          =],
-        [= (. INDEX-pfx) =]SAVE_OPTS        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=],
-        [= (. INDEX-pfx) =]LOAD_OPTS        = [=
-                (set! option-ct (+ option-ct 1)) (- option-ct 1)=][=
-  ENDIF                         =][=
-ENDIF                           =]
+  (if (exist? "homerc") (begin
+      (add-opt-index "SAVE_OPTS")
+      (add-opt-index "LOAD_OPTS")
+  )   )                                 =][=
+ENDIF  not exist library                =]
 } te[=(. Cap-prefix)=]OptIndex;
 
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
@@ -293,79 +288,80 @@ DEFINE set-std-value =]
    ~~ .    =]'[=(get tmp-val)=]'[=
    *       =][=(error "value (flag) codes must be single characters") =][=
    ESAC    =][=
-ENDDEF set-std-value            =][=
+ENDDEF set-std-value                    =][=
 
-IF (exist? "flag.value")        =][=
+IF (exist? "flag.value")                =][=
 
   INVOKE set-std-value
        val-name    = "help-value"
        val-UPNAME  = "HELP"
-       std-value   = "?"        =][=
+       std-value   = "?"                =][=
 
-  IF (not (exist? "no-libopts")) =][=
+  IF (not (exist? "no-libopts"))        =][=
     INVOKE set-std-value
          val-name    = "more-help-value"
          val-UPNAME  = "MORE_HELP"
-         std-value   = "!"      =][=
-  ENDIF don't have no-libopts ' =][=
+         std-value   = "!"              =][=
+  ENDIF don't have no-libopts '         =][=
 
-  IF (exist? "resettable")      =][=
+  IF (exist? "resettable")              =][=
     INVOKE set-std-value
        val-name    = "reset-value"
        val-UPNAME  = "RESET_OPTION"
-       std-value   = "R"        =][=
-  ENDIF  have "reset"           =][=
+       std-value   = "R"                =][=
+  ENDIF  have "reset"                   =][=
 
-  IF (exist? "version")         =][=
+  IF (exist? "version")                 =][=
     INVOKE set-std-value
        val-name    = "version-value"
        val-UPNAME  = "VERSION"
-       std-value   = "v"        =][=
-  ENDIF  have "version"         =][=
+       std-value   = "v"                =][=
+  ENDIF  have "version"                 =][=
 
-  IF (exist? "usage-opt")       =][=
+  IF (exist? "usage-opt")               =][=
     INVOKE set-std-value
        val-name    = "usage-value"
        val-UPNAME  = "USAGE"
-       std-value   = "u"        =][=
-  ENDIF  have "usage-opt"       =][=
+       std-value   = "u"                =][=
+  ENDIF  have "usage-opt"               =][=
 
-  IF (exist? "homerc")          =][=
-    INVOKE set-std-value
-       val-name    = "save-opts-value"
-       val-UPNAME  = "SAVE_OPTS"
-       std-value   = ">"        =][=
+  IF (exist? "homerc")                  =][=
+    IF (not (exist? "disable-save"))    =][=
+      INVOKE set-std-value
+         val-name    = "save-opts-value"
+         val-UPNAME  = "SAVE_OPTS"
+         std-value   = ">"              =][=
+    ENDIF                               =][=
+    IF (not (exist? "disable-load"))    =][=
+      INVOKE set-std-value
+         val-name    = "load-opts-value"
+         val-UPNAME  = "LOAD_OPTS"
+         std-value   = "<"              =][=
+    ELSE                                =]
+#define [= (sprintf "%-23s 0" (string-append VALUE-pfx "LOAD_OPTS"))
+         =][=
+    ENDIF                               =][=
+  ENDIF  have "homerc"                  =][=
 
-    INVOKE set-std-value
-       val-name    = "load-opts-value"
-       val-UPNAME  = "LOAD_OPTS"
-       std-value   = "<"        =][=
-  ENDIF  have "homerc"          =][=
+ELSE  NO "flag.value"                   =]
+[=
+ (set! index-fmt (string-append
+       "\n#define " VALUE-pfx "%1$-16s " INDEX-pfx "%1$s"))
+ (define std-vals (lambda (std-nm)
+                   (ag-fprintf 0 index-fmt std-nm) ))
 
-ELSE  NO "flag.value"           =][=
+ (if (exist? "resettable")       (std-vals "RESET_OPTION"))
+ (if (exist? "version")          (std-vals "VERSION"))
+ (std-vals "HELP")
+ (if (not (exist? "no-libopts")) (std-vals "MORE_HELP"))
+ (if (exist? "usage-opt")        (std-vals "USAGE"))
+ (if (exist? "homerc")           (begin
+    (if (not (exist? "disable-save")) (std-vals "SAVE_OPTS"))
+    (std-vals "LOAD_OPTS") ))           =][=
 
-  IF (exist? "resettable")      =]
-#define [= (. VALUE-pfx) =]RESET_OPTION   [= (. INDEX-pfx) =]RESET_OPTION[=
-  ENDIF  have "reset"           =][=
-  IF (exist? "version")         =]
-#define [= (. VALUE-pfx) =]VERSION        [= (. INDEX-pfx) =]VERSION[=
-  ENDIF  have "version"         =]
-#define [= (. VALUE-pfx) =]HELP           [= (. INDEX-pfx) =]HELP[=
+ENDIF    have flag.value/not            =][=
 
-  IF (not (exist? "no-libopts")) =]
-#define [= (. VALUE-pfx) =]MORE_HELP      [= (. INDEX-pfx) =]MORE_HELP[=
-  ENDIF don't have no-libopts ' =][=
-
-  IF (exist? "usage-opt")       =]
-#define [= (. VALUE-pfx) =]USAGE          [= (. INDEX-pfx) =]USAGE[=
-  ENDIF  have "usage-opt"       =][=
-  IF (exist? "homerc")          =]
-#define [= (. VALUE-pfx) =]SAVE_OPTS      [= (. INDEX-pfx) =]SAVE_OPTS
-#define [= (. VALUE-pfx) =]LOAD_OPTS      [= (. INDEX-pfx) =]LOAD_OPTS[=
-  ENDIF  have "homerc"          =][=
-ENDIF    have flag.value/not    =][=
-
-IF (exist? "homerc")            =]
+IF (exist? "homerc")                    =]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT_MASK; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \

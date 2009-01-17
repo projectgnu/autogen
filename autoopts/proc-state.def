@@ -29,17 +29,19 @@ bit[ 0] = { b-name = longopt;     b-what = 'Process long style options'; };
 bit[ 1] = { b-name = shortopt;    b-what = 'Process short style "flags"'; };
 bit[ 2] = { b-name = errstop;     b-what = 'Stop on argument errors'; };
 bit[ 3] = { b-name = disabledopt; b-what = 'Current option is disabled'; };
+
 bit[ 4] = { b-name = no-req-opt;  b-what = 'no options are required'; };
 bit[ 5] = { b-name = num-opt;     b-what = 'there is a number option'; };
 bit[ 6] = { b-name = initdone;    b-what = 'have inits been done?'; };
 bit[ 7] = { b-name = negations;   b-what = 'any negation options?'; };
+
 bit[ 8] = { b-name = environ;     b-what = 'check environment?'; };
 bit[ 9] = { b-name = no-args;     b-what = 'Disallow remaining arguments'; };
 bit[10] = { b-name = args-req;    b-what = 'Require args after options'; };
 bit[11] = { b-name = reorder;     b-what = 'reorder operands after opts'; };
+
 bit[12] = { b-name = gnuusage;    b-what = 'emit usage in GNU style'; };
 bit[13] = { b-name = translate;   b-what = 'Translate strings in tOptions'; };
-bit[14] = { b-name = has-immed;   b-what = 'program defines immed options'; };
 
 bit[16] = { b-name = nxlat-opt-cfg; b-what = 'suppress for config only'; };
 bit[17] = { b-name = nxlat-opt;     b-what = 'suppress xlation always'; };

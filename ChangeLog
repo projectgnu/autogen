@@ -1,3 +1,17 @@
+2009-01-17  Bruce Korb  <bkorb@gnu.org>
+	
+	* autoopts/autoopts.c (nextOption): too large, split it up.
+	* autoopts/environment.c (doPrognameEnv): remove redundant test,
+	clarify the processing for the various settings of "type".
+	* autoopts/numeric.c (optionShowRange): clean up indentation
+	* autoopts/opt-state.def (deprecated): new option attribute
+	(no-usage): three flag bits now suppress option description.
+	* autoopts/optcode.tpl (disable-load): suppress stuff when present
+	(disable-save): similar
+	* autoopts/opthead.tpl: ditto, plus code cleanup
+	* autoopts/optlib.tpl: more of same
+	* autoopts/proc-state.def (has-immed): removed.  Not used.
+
 2009-01-08  Bruce Korb  <bkorb@gnu.org>
 	
 	* config/libopts.def (wchar_t): someone says they still need this for

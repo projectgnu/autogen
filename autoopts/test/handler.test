@@ -5,9 +5,9 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2008-07-27 11:48:04 bkorb"
+# Time-stamp:        "2009-01-11 17:53:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2009/01/01 16:49:26 $
+# Last Modified:     $Date: 2009/01/17 22:08:09 $
 #            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -30,7 +30,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: handler.test,v 4.21 2009/01/01 16:49:26 bkorb Exp $
+# $Id: handler.test,v 4.22 2009/01/17 22:08:09 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -118,6 +118,7 @@ doUsageOpt(
     tOptions*   pOptions,
     tOptDesc*   pOptDesc )
 {
+    (void)pOptions;
     USAGE( EXIT_SUCCESS );
 }
 

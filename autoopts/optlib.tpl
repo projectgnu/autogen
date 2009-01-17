@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-01-01 08:40:36 bkorb"
+# Time-stamp:      "2009-01-17 13:26:26 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -22,7 +22,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.36 2009/01/01 16:49:26 bkorb Exp $
+# $Id: optlib.tpl,v 4.37 2009/01/17 22:08:09 bkorb Exp $
 
 =][=
 
@@ -598,6 +598,9 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* str                   =]
 tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
 
+       =* file                  =]
+tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
+
        *                        =][=
           (error (string-append cap-name
                  " has arg-default, but no valid arg-type"))  =][=
@@ -627,6 +630,8 @@ static const int
          stack-arg      " | OPTST_STACKED"     =][=
          must-set       " | OPTST_MUST_SET"    =][=
          no-preset      " | OPTST_NO_INIT"     =][=
+         no-command     " | OPTST_NO_COMMAND"  =][=
+         deprecated     " | OPTST_DEPRECATED"  =][=
 
          CASE immediate =][=
          =    also      =] | OPTST_IMM | OPTST_TWICE[=
@@ -689,19 +694,19 @@ DEFINE   opt-strs
  *  "Must also have options" and "Incompatible options"[=
   ENDIF =]:
  */[=
-  IF (hash-ref ifdef-ed flg-name) =]
+  IF (hash-ref ifdef-ed flg-name)       =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
-  ENDIF  ifdef-ed                 =]
+  ENDIF  ifdef-ed                       =]
 tSCC    z[=(. cap-name)=]Text[] =
         [=(set! tmp-text (kr-string (get "descrip")))  tmp-text=];[=
 
-  IF (exist? "documentation")     =]
+  IF (exist? "documentation")           =]
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
-  ELSE  NOT a doc option:         =][=
-     emit-nondoc-option           =][=
-  ENDIF  (exist? "documentation") =][=
+  ELSE  NOT a doc option:               =][=
+     INVOKE emit-nondoc-option          =][=
+  ENDIF  (exist? "documentation")       =][=
 
-  IF (hash-ref ifdef-ed flg-name) =]
+  IF (hash-ref ifdef-ed flg-name)       =]
 
 #else   /* disable [= (. cap-name)=] */
 #define [=(string-append VALUE-pfx UP-name)=] NO_EQUIVALENT
@@ -734,7 +739,7 @@ ENDDEF opt-strs
 
 Define the arrays of values associated with help/version/etc. =][=
 
-DEFINE   help-strs
+DEFINE help-strs
 
 =]
 
@@ -752,7 +757,7 @@ tSCC zHelp_Name[]         = "help";[=
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
 tSCC zMore_Help_Name[]    = "more-help";[=
 
-  ENDIF (not (exist? "no-libopts"))  =][=
+  ENDIF (not (exist? "no-libopts"))     =][=
 
   IF (exist? "version")
 
@@ -760,7 +765,7 @@ tSCC zMore_Help_Name[]    = "more-help";[=
 tSCC zVersionText[]       = "Output version information and exit";
 tSCC zVersion_Name[]      = "version";[=
 
-  ENDIF (exist? "version")      =][=
+  ENDIF (exist? "version")              =][=
 
   IF (exist? "resettable")
 
@@ -768,7 +773,7 @@ tSCC zVersion_Name[]      = "version";[=
 tSCC zResetText[]         = "Reset an option's state";
 tSCC zReset_Name[]        = "reset-option";[=
 
-  ENDIF (exist? "resettable")      =][=
+  ENDIF (exist? "resettable")           =][=
 
   IF (exist? "usage-opt")
 
@@ -776,18 +781,24 @@ tSCC zReset_Name[]        = "reset-option";[=
 tSCC zUsageText[]         = "Abbreviated usage to stdout";
 tSCC zUsage_Name[]        = "usage";[=
 
-  ENDIF (exist? "usage-opt")    =][=
+  ENDIF (exist? "usage-opt")            =][=
 
-  IF (exist? "homerc")
+  IF (exist? "homerc")                  =][=
 
-=]
+    IF (not (exist? "disable-save"))    =]
 tSCC zSave_OptsText[]     = "Save the option state to a config file";
-tSCC zSave_Opts_Name[]    = "save-opts";
+tSCC zSave_Opts_Name[]    = "save-opts";[=
+
+    ENDIF no disable-save               =][=
+
+    IF (not (exist? "disable-load"))    =]
 tSCC zLoad_OptsText[]     = "Load options from a config file";
 tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
 tSCC zNotLoad_Opts_Name[] = "no-load-opts";
 tSCC zNotLoad_Opts_Pfx[]  = "no";
 #define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
+
+    ENDIF no disable-load               =][=
 
   ENDIF (exist? "homerc") =][=
 

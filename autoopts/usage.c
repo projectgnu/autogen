@@ -1,7 +1,7 @@
 
 /*
- *  usage.c  $Id: usage.c,v 4.28 2009/01/01 16:49:26 bkorb Exp $
- * Time-stamp:      "2008-11-01 20:09:17 bkorb"
+ *  usage.c  $Id: usage.c,v 4.29 2009/01/17 22:08:09 bkorb Exp $
+ * Time-stamp:      "2009-01-17 13:18:23 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -549,7 +549,7 @@ printOptionUsage(
     int        docCt  = 0;
 
     do  {
-        if ((pOD->fOptState & OPTST_OMITTED) != 0)
+        if ((pOD->fOptState & OPTST_NO_USAGE_MASK) != 0)
             continue;
 
         if ((pOD->fOptState & OPTST_DOCUMENT) != 0) {

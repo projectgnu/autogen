@@ -1,8 +1,8 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.47 2009/01/01 16:49:26 bkorb Exp $
+#$Id: optcode.tpl,v 4.48 2009/01/17 22:08:09 bkorb Exp $
 
-# Time-stamp:      "2009-01-01 08:41:51 bkorb"
+# Time-stamp:      "2009-01-17 13:14:01 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -209,7 +209,7 @@ ENDFOR flag
 
 =][=
 
-INVOKE  help-strs       =][=
+INVOKE help-strs        =][=
 INVOKE decl-callbacks   =][=
 
 IF (and (exist? "version") make-test-main)
@@ -318,9 +318,7 @@ ENDIF =]
      /* desc, NAME, name */ zHelpText, NULL, zHelp_Name,
      /* disablement strs */ NULL, NULL }[=
 
-IF (not (exist? "no-libopts"))
-
-=],
+IF (not (exist? "no-libopts"))          =],
 
   {  /* entry idx, value */ [=
         (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
@@ -335,11 +333,9 @@ IF (not (exist? "no-libopts"))
      /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
      /* disablement strs */ NULL, NULL }[=
 
-ENDIF not have no-libopts  =][=
+ENDIF not have no-libopts               =][=
 
-IF (exist? "usage-opt")
-
-=],
+IF (exist? "usage-opt")                 =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
@@ -358,13 +354,9 @@ IF (exist? "usage-opt")
      /* desc, NAME, name */ zUsageText, NULL, zUsage_Name,
      /* disablement strs */ NULL, NULL }[=
 
-ENDIF
+ENDIF have usage-opt                    =][=
 
-=][=
-
-IF (exist? "homerc")
-
-=],
+IF (exist? "homerc")                    =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
@@ -376,12 +368,15 @@ IF (exist? "homerc")
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, 0,
+                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT[=
+    (if (exist? "disable-save") "| OPTST_NO_COMMAND") =], 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ NULL,
-     /* desc, NAME, name */ zSave_OptsText, NULL, zSave_Opts_Name,
+     /* desc, NAME, name */ [=
+    (if (exist? "disable-save") "NULL, NULL, NULL"
+         "zSave_OptsText, NULL, zSave_Opts_Name")=],
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
@@ -390,15 +385,20 @@ IF (exist? "homerc")
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-			  | OPTST_DISABLE_IMM, 0,
+			  | OPTST_DISABLE_IMM[=
+    (if (exist? "disable-load") "| OPTST_NO_COMMAND") =], 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
      /* option proc      */ optionLoadOpt,
-     /* desc, NAME, name */ zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name,
-     /* disablement strs */ zNotLoad_Opts_Name, zNotLoad_Opts_Pfx }[=
+     /* desc, NAME, name */ [=
+    (if (exist? "disable-load") "NULL, NULL, NULL"
+         "zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name")=],
+     /* disablement strs */ [=
+    (if (exist? "disable-load") "NULL, NULL"
+         "zNotLoad_Opts_Name, zNotLoad_Opts_Pfx")=] }[=
 
-ENDIF
+ENDIF have homerc
 
 =]
 };
@@ -534,10 +534,7 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
-    + OPTPROC_GNUUSAGE[=   ENDIF=][=IF (or  (exist? "flag.immediate")
-                                            (exist? "flag.immed-disable")
-                                            (exist? "homerc")  )         =]
-    + OPTPROC_HAS_IMMED[=  ENDIF=] ),
+    + OPTPROC_GNUUSAGE[=   ENDIF=] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         zPROGNAME,
     zRcName,      zCopyright,   zCopyrightNotice,
@@ -597,9 +594,11 @@ doUsageOpt(
   IF (exist? "usage-opt") =]
     int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
         ? EXIT_SUCCESS : EX_USAGE;
+    (void)pOptions;
     [= (. UP-prefix) =]USAGE(ex_code);[=
 
   ELSE   =]
+    (void)pOptions;
     [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );[=
   ENDIF  =]
 }[=

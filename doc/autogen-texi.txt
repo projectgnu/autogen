@@ -2431,6 +2431,13 @@ The contents of this attribute should be just the name of the configuration
 file.  A "#include" naming this file will be inserted at the top of the
 generated header.
 
+@item disable-load
+@itemx disable-save
+@vindex disable-load
+@vindex disable-save
+Indicates that the command line usage of @code{--load-opts} and/or
+@code{--save-opts} are disallowed.
+
 @item environrc
 @vindex environrc
 Indicates looking in the environment for values of variables named,
@@ -3276,16 +3283,22 @@ appear on the command line.  Do not define it with the value zero (0).
 If an option must be specified, but it need not be specified on
 the command line, then specify this attribute for the option.
 
-@item enable
-@vindex enable
-Long-name prefix for enabling the option (invalid if @var{disable}
-@strong{not} present).  Only useful if long option names are being
-processed.
+@item deprecated
+@vindex deprecated
+There are two effects to this attribute:  the usage text will not
+show the option, and the generated documentation will mark it with:
+``@strong{NOTE: THIS OPTION IS DEPRECATED}''.
 
 @item disable
 @vindex disable
 Prefix for disabling (inverting sense of) the option.  Only useful
 if long option names are being processed.
+
+@item enable
+@vindex enable
+Long-name prefix for enabling the option (invalid if @var{disable}
+@strong{not} present).  Only useful if long option names are being
+processed.
 
 @item enabled
 @vindex enabled
@@ -3325,6 +3338,12 @@ that is active only if @code{WITH_MUMBLING} is @code{#define}-d, then
 @code{VALUE_OPT_MUMBLING} will be @code{#define}-d iff @code{WITH_MUMBLING}
 is @code{#define}-d.  Watch those switch statements.
 @end itemize
+
+@item no-command
+@vindex no-command
+This option specifies that the option is not allowed on the command line.
+Such an option may not take a @code{value} (flag character) attribute.
+The program must have the @code{homerc} (@pxref{program attributes}) option set.
 @end table
 
 @node opt-attr settable

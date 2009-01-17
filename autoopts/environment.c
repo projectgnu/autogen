@@ -1,7 +1,7 @@
 
 /*
- *  $Id: environment.c,v 4.18 2009/01/01 16:49:26 bkorb Exp $
- * Time-stamp:      "2007-07-04 11:33:50 bkorb"
+ *  $Id: environment.c,v 4.19 2009/01/17 22:08:09 bkorb Exp $
+ * Time-stamp:      "2009-01-12 05:52:44 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -52,15 +52,9 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
     char**        sv_argv;
 
     /*
-     *  IF there is no such environment variable
-     *   *or* there is, but we are doing immediate opts and there are
-     *        no immediate opts to do (--help inside $PROGNAME is silly,
-     *        but --no-load-defs is not, so that is marked)
-     *  THEN bail out now.  (
+     *  No such beast?  Then bail now.
      */
-    if (  (pczOptStr == NULL)
-       || (  (type == ENV_IMM)
-          && ((pOpts->fOptSet & OPTPROC_HAS_IMMED) == 0)  )  )
+    if (pczOptStr == NULL)
         return;
 
     /*
@@ -93,27 +87,17 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
 
     switch (type) {
     case ENV_IMM:
-        /*
-         *  We know the OPTPROC_HAS_IMMED bit is set.
-         */
         (void)doImmediateOpts( pOpts );
         break;
 
+    case ENV_ALL:
+        (void)doImmediateOpts( pOpts );
+        pOpts->curOptIdx = 1;
+        pOpts->pzCurOpt  = NULL;
+        /* FALLTHROUGH */
+
     case ENV_NON_IMM:
         (void)doRegularOpts( pOpts );
-        break;
-
-    default:
-        /*
-         *  Only to immediate opts if the OPTPROC_HAS_IMMED bit is set.
-         */
-        if (pOpts->fOptSet & OPTPROC_HAS_IMMED) {
-            (void)doImmediateOpts( pOpts );
-            pOpts->curOptIdx = 1;
-            pOpts->pzCurOpt  = NULL;
-        }
-        (void)doRegularOpts( pOpts );
-        break;
     }
 
     /*
