@@ -1,11 +1,11 @@
 /*
- *  $Id: gdinit.c,v 4.15 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: gdinit.c,v 4.16 2009/01/18 05:52:31 bkorb Exp $
  *
  *    getdefs copyright 1999-2009 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2009-01-01 08:36:27 bkorb"
- *  Last Modified:     $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-01-17 21:24:43 bkorb"
+ *  Last Modified:     $Date: 2009/01/18 05:52:31 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
@@ -39,6 +39,29 @@ static void
 loadStdin( void );
 /* = = = END-STATIC-FORWARD = = = */
 
+LOCAL void
+die(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stderr, "%s error:  ", getdefsOptions.pzProgName);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    exit(EXIT_FAILURE);
+}
+
+LOCAL void
+fserr_die(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stderr, "%s fserr %d (%s):  ", getdefsOptions.pzProgName,
+            errno, strerror(errno));
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    exit(EXIT_FAILURE);
+}
+
 /*
  *  compressOptionText
  */
@@ -71,10 +94,8 @@ compressOptionText( char* pzS, char* pzE )
     {
         size_t len = (pzD - pzR);
         pzD = malloc( len + 1 );
-        if (pzD == NULL) {
-            fprintf(stderr, "cannot dup %d byte string\n", (int)(pzD - pzR));
-            exit( EXIT_FAILURE );
-        }
+        if (pzD == NULL)
+            die("cannot dup %d byte string\n", (int)(pzD - pzR));
 
         memcpy( pzD, pzR, len );
         pzD[ len ] = NUL;
@@ -105,10 +126,8 @@ fixupSubblockString( tCC* pzSrc )
      */
     {
         char* p = strchr( pzString, '=' );
-        if (p == NULL) {
-            fprintf( stderr, zNoList, pzString );
-            USAGE( EXIT_FAILURE );
-        }
+        if (p == NULL)
+            die(zNoList, pzString);
 
         /*
          *  NUL the equal char
@@ -121,10 +140,9 @@ fixupSubblockString( tCC* pzSrc )
          *  Make sure at least one attribute name is defined
          */
         while (isspace( *p )) p++;
-        if (*p == NUL) {
-            fprintf( stderr, zNoList, pzString );
-            USAGE( EXIT_FAILURE );
-        }
+        if (*p == NUL)
+            die(zNoList, pzString);
+
         pzCopy = p;
     }
 
@@ -133,9 +151,9 @@ fixupSubblockString( tCC* pzSrc )
          *  Attribute names must start with an alpha
          */
         if (! isalpha( *pzCopy )) {
-            fprintf( stderr, "ERROR:  attribute names must start "
-                     "with an alphabetic character:\n\t%s\n",
-                     pzString );
+            fprintf(stderr, "ERROR:  attribute names must start "
+                    "with an alphabetic character:\n\t%s\n",
+                    pzString);
             USAGE( EXIT_FAILURE );
         }
 
@@ -295,16 +313,14 @@ validateOptions( void )
         size_t len = strlen( pz ) + 16;
         char*  bf  = malloc( len );
 
-        if (bf == NULL) {
-            fprintf( stderr, zMallocErr, (int)len, "definition pattern" );
-            exit( EXIT_FAILURE );
-        }
+        if (bf == NULL)
+            die(zMallocErr, (int)len, "definition pattern");
 
         /*
          *  IF a pattern has been supplied, enclose it with
          *  the '/' '*' '=' part of the pattern.
          */
-        snprintf( bf, len, pat_wrapper, pz );
+        snprintf(bf, len, pat_wrapper, pz);
         pzDefPat = bf;
         free_pat = AG_TRUE;
     }
@@ -321,8 +337,7 @@ validateOptions( void )
         int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );
         if (rerr != 0) {
             regerror( rerr, &define_re, zRER, sizeof( zRER ));
-            fprintf( stderr, zReErr, rerr, zRER, pzDefPat );
-            exit( EXIT_FAILURE );
+            die(zReErr, rerr, zRER, pzDefPat);
         }
 
         if (free_pat)
@@ -332,8 +347,7 @@ validateOptions( void )
         rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
         if (rerr != 0) {
             regerror( rerr, &attrib_re, zRER, sizeof( zRER ));
-            fprintf( stderr, zReErr, rerr, zRER, zAttribRe );
-            exit( EXIT_FAILURE );
+            die(zReErr, rerr, zRER, zAttribRe);
         }
     }
 
@@ -376,6 +390,7 @@ validateOptions( void )
             ct  = STACKCT_OPT(  INPUT );
             ppz = STACKLST_OPT( INPUT );
         }
+
         do  {
             if (stat( *ppz++, &stb ) != 0)
                 break;
@@ -387,11 +402,9 @@ validateOptions( void )
             if (++(stb.st_mtime) > modtime)
                 modtime = stb.st_mtime;
         } while (--ct > 0);
-        if (ct > 0) {
-            fprintf( stderr, "Error %d (%s) stat-ing %s for text file\n",
-                     errno, strerror( errno ), ppz[-1] );
-            USAGE( EXIT_FAILURE );
-        }
+
+        if (ct > 0)
+            fserr_die("stat-ing %s for text file\n", ppz[-1]);
     }
 
     /*

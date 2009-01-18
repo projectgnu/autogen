@@ -1,11 +1,11 @@
 /*
- *  $Id: gdemit.c,v 4.13 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: gdemit.c,v 4.14 2009/01/18 05:52:31 bkorb Exp $
  *
  *    getdefs copyright 1999-2009 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2009-01-01 08:36:38 bkorb"
- *  Last Modified:     $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-01-17 21:28:13 bkorb"
+ *  Last Modified:     $Date: 2009/01/18 05:52:31 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.
@@ -199,11 +199,9 @@ emitDefinition( char* pzDef, char* pzOut )
         while (AG_NAME_CHAR(*pzDef))
             *p++ = *pzOut++ = *pzDef++;
 
-        if (p >= zEntryName + sizeof( zEntryName )) {
-            fprintf( stderr, "getdefs error:  names constrained to %d bytes\n",
-                     MAXNAMELEN );
-            exit( EXIT_FAILURE );
-        }
+        if (p >= zEntryName + sizeof( zEntryName ))
+            die("names are constrained to %d bytes\n", MAXNAMELEN);
+
         *p = NUL;
     }
 

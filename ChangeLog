@@ -11,6 +11,7 @@
 	* autoopts/opthead.tpl: ditto, plus code cleanup
 	* autoopts/optlib.tpl: more of same
 	* autoopts/proc-state.def (has-immed): removed.  Not used.
+	* getdefs/*.c: add "die()" function and use it throughout.
 
 2009-01-08  Bruce Korb  <bkorb@gnu.org>
 	

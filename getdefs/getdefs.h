@@ -1,10 +1,10 @@
 /*  -*- Mode: C -*-
  *
- *  $Id: getdefs.h,v 4.7 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: getdefs.h,v 4.8 2009/01/18 05:52:31 bkorb Exp $
  *
  *    getdefs copyright (c) 1999-2009 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2009-01-01 08:35:54 bkorb"
+ *  Time-stamp:        "2009-01-17 21:02:23 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -31,6 +31,8 @@
 #include "compat/compat.h"
 #include <sys/wait.h>
 #include <utime.h>
+#include <stdarg.h>
+
 #include REGEX_HEADER
 
 #include "opts.h"
