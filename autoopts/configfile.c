@@ -1,6 +1,6 @@
 /*
- *  $Id: configfile.c,v 4.45 2009/01/09 06:34:20 bkorb Exp $
- *  Time-stamp:      "2009-01-08 22:22:27 bkorb"
+ *  $Id: configfile.c,v 4.46 2009/01/18 22:48:51 bkorb Exp $
+ *  Time-stamp:      "2009-01-18 10:21:58 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -801,12 +801,21 @@ handleStructure(
 LOCAL void
 internalFileLoad( tOptions* pOpts )
 {
-    int     idx;
-    int     inc = DIRECTION_PRESET;
-    char    zFileName[ AG_PATH_MAX+1 ];
+    uint32_t  svfl;
+    int       idx;
+    int       inc;
+    char      zFileName[ AG_PATH_MAX+1 ];
 
     if (pOpts->papzHomeList == NULL)
         return;
+
+    svfl = pOpts->fOptSet;
+    inc  = DIRECTION_PRESET;
+
+    /*
+     *  Never stop on errors in config files.
+     */
+    pOpts->fOptSet &= ~OPTPROC_ERRSTOP;
 
     /*
      *  Find the last RC entry (highest priority entry)
@@ -880,6 +889,8 @@ internalFileLoad( tOptions* pOpts )
             }
         }
     } /* twice for every path in the home list, ... */
+
+    pOpts->fOptSet = svfl;
 }
 
 

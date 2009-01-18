@@ -12,6 +12,10 @@
 	* autoopts/optlib.tpl: more of same
 	* autoopts/proc-state.def (has-immed): removed.  Not used.
 	* getdefs/*.c: add "die()" function and use it throughout.
+	* autoopts/configfile.c (internalFileLoad): turn off error stops when
+	processing config files.
+	* autoopts/optcode.tpl (save-opts): no value with disable-save attr.
+	(load-opts): no value with disable-load attr.
 
 2009-01-08  Bruce Korb  <bkorb@gnu.org>
 	

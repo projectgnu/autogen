@@ -1,8 +1,8 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.48 2009/01/17 22:08:09 bkorb Exp $
+#$Id: optcode.tpl,v 4.49 2009/01/18 22:48:51 bkorb Exp $
 
-# Time-stamp:      "2009-01-17 13:14:01 bkorb"
+# Time-stamp:      "2009-01-18 12:49:00 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -363,7 +363,10 @@ IF (exist? "homerc")                    =],
                "\n    { NULL },\n    { NULL }," ))
         (set! default-cookie (string-append default-cookie
                "\n    NULL,\n    NULL," ))
-        INDEX-pfx =]SAVE_OPTS, [= (. VALUE-pfx) =]SAVE_OPTS,
+        INDEX-pfx =]SAVE_OPTS, [=
+           (if (not (exist? "disable-save"))
+               (string-append VALUE-pfx "SAVE_OPTS")
+               "0") =],
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
@@ -380,7 +383,10 @@ IF (exist? "homerc")                    =],
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]LOAD_OPTS, [= (. VALUE-pfx) =]LOAD_OPTS,
+        (. INDEX-pfx) =]LOAD_OPTS, [=
+           (if (not (exist? "disable-load"))
+               (string-append VALUE-pfx "LOAD_OPTS")
+               "0") =],
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
