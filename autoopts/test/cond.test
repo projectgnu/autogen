@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2007-07-04 10:12:50 bkorb"
+# Time-stamp:        "2009-01-17 15:59:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: cond.test,v 4.11 2009/01/01 16:49:26 bkorb Exp $
+# $Id: cond.test,v 4.12 2009/01/18 00:20:23 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -54,10 +54,10 @@ ${AG_L} ${testname}.def || \
 compile "-?"
 set -x
 
-# # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
+# # # # # # # # # # FIRST TEST # # # # # # # # #
 
-echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+echo creating ${testname}-1.help
+cat > ${testname}-1.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -68,12 +68,14 @@ USAGE:  cond [ -<flag> [<val>] ]...
 
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.h*lp`"
+cmp -s ${testname}-1.help ${testname}.help || \
+  failure "`diff ${testname}-1.help ${testname}.help`"
+
+# # # # # # # # # # SECOND TEST # # # # # # # # #
 
 INC="${INC} -DCOND=1"
 compile "-?"
-cat > ${testname}.hlp <<'_EOF_'
+cat > ${testname}-2.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -85,8 +87,10 @@ USAGE:  cond [ -<flag> [<val>] ]...
 
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.h*lp`"
+cmp -s ${testname}-2.help ${testname}.help || \
+  failure "`diff ${testname}-2.help ${testname}.help`"
+
+# # # # # # # # # # THIRD TEST # # # # # # # # #
 
 echo guard-option-names\; >> ${testname}.def
 echo ${AG_L} ${testname}.def
@@ -102,6 +106,22 @@ echo '#warning undefining SECOND due to option name conflict' \
 
 cmp -s ${testname}-??.log || \
   failure "warning diffs:  `diff ${testname}-??.log`"
+
+# # # # # # # # # # FOURTH TEST # # # # # # # # #
+
+sed '/value = c/s/$/ deprecated;/' ${testname}.def > ${testname}.def3
+mv -f  ${testname}.def3  ${testname}.def
+echo ${AG_L} ${testname}.def
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+compile "-?"
+
+cmp -s ${testname}-1.help ${testname}.help || \
+  failure "`diff ${testname}-1.help ${testname}.help`"
+
+./${testname} -c || \
+    failure "could not process -c option"
 
 cleanup
 

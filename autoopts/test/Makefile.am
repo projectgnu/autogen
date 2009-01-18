@@ -2,9 +2,9 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2008-11-01 18:47:24 bkorb"
+## Time-stamp:      "2009-01-17 15:43:36 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2008/11/02 18:51:00 $
+## Last Modified:   $Date: 2009/01/18 00:20:23 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.17 2008/11/02 18:51:00 bkorb Exp $
+## $Id: Makefile.am,v 4.18 2009/01/18 00:20:23 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
@@ -41,7 +41,7 @@ testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = set -a ; \
 	CFLAGS='$(DEFS) $(CFLAGS)' CPPFLAGS='$(CPPFLAGS)' \
-	testsubdir=$(testsubdir)
+	DEBUG_USAGE='$(DEBUG_USAGE)' testsubdir=$(testsubdir)
 #`
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
