@@ -3440,7 +3440,7 @@ line option is the first one that pertains to the library.
 @vindex documentation
 If the ``@code{documentation}'' attribute is present, then all other
 attributes are disabled except @code{settable}, @code{call-proc} and
-@code{flag_-ode}.  @code{settable} must be and is only specified if
+@code{flag-code}.  @code{settable} must be and is only specified if
 @code{call-proc}, @code{extract-code} or @code{flag-code} has been specified.
 When present, the @code{descrip} attribute will be displayed only when the
 @code{--help} option has been specified.  It will be displayed flush to the
