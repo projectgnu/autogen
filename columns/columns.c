@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.18 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:        "2008-12-06 15:18:09 bkorb"
+ *  $Id: columns.c,v 4.19 2009/01/25 19:31:56 bkorb Exp $
+ *  Time-stamp:        "2009-01-25 10:19:02 bkorb"
  *
  *  Columns copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -52,6 +52,12 @@ size_t  indentSize = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
+static void
+fserr_die(char const * fmt, ...);
+
+static inline void *
+malloc_or_die(size_t sz);
+
 static uint32_t
 handleIndent( tCC* pzIndentArg );
 
@@ -72,13 +78,9 @@ compProc( const void* p1, const void* p2 );
 /* = = = END-STATIC-FORWARD = = = */
 
 int
-main( int    argc,
-      char** argv )
+main(int argc, char ** argv)
 {
-    if (optionProcess( &columnsOptions, argc, argv ) != argc) {
-        fputs( "Error:  this program takes no arguments\n", stderr );
-        USAGE( EXIT_FAILURE );
-    }
+    (void)optionProcess( &columnsOptions, argc, argv );
 
     if (HAVE_OPT( INDENT )) {
         indentSize = handleIndent( OPT_ARG( INDENT ));
@@ -111,7 +113,7 @@ main( int    argc,
                 pzFirstPfx = pzLinePfx;
 
             } else if (firstSize < indentSize) {
-                char* tmp = malloc( indentSize + 1 );
+                char* tmp = malloc_or_die( indentSize + 1 );
                 char  z[10];
                 snprintf( z, sizeof(z), "%%-%ds", (int)indentSize );
                 snprintf( tmp, indentSize + 1, z, pzFirstPfx );
@@ -147,6 +149,30 @@ main( int    argc,
 }
 
 
+static void
+fserr_die(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fprintf(stderr, "%s fserr %d (%s):  ", columnsOptions.pzProgName,
+            errno, strerror(errno));
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    exit(EXIT_FAILURE);
+}
+
+static inline void *
+malloc_or_die(size_t sz)
+{
+    void * res = malloc(sz);
+    if (res == NULL) {
+        errno = ENOMEM;
+        fserr_die("could not allocate %d bytes", sz);
+    }
+    return res;
+}
+
+
 static uint32_t
 handleIndent( tCC* pzIndentArg )
 {
@@ -162,11 +188,7 @@ handleIndent( tCC* pzIndentArg )
         /*
          *  Allocate a string to hold the line prefix
          */
-        pzLinePfx = p = malloc( (size_t)colCt + 1 );
-        if (pzLinePfx == NULL) {
-            fprintf(stderr, "Cannot malloc %u bytes\n", colCt + 1);
-            exit( EXIT_FAILURE );
-        }
+        pzLinePfx = p = malloc_or_die( (size_t)colCt + 1 );
 
         /*
          *  Set it to a NUL terminated string of spaces
@@ -272,7 +294,7 @@ readLines(void)
          *  Allocate a string and space in the pointer array.
          */
         len += sepLen + 1;
-        pzL = (char*)malloc( len );
+        pzL = (char*)malloc_or_die( len );
         if (++usedCt > allocCt) {
             allocCt += 128;
             papzLines = (char**)realloc( (void*)papzLines,
@@ -387,7 +409,7 @@ writeColumns( void )
         return;
     }
 
-    pPL   = (tpPrintList)malloc( colCt * sizeof( tPrintList ));
+    pPL   = (tpPrintList)malloc_or_die( colCt * sizeof( tPrintList ));
 
     /*
      *  This "loop" is normally executed half way through and exited.

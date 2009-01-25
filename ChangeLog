@@ -16,6 +16,8 @@
 	processing config files.
 	* autoopts/optcode.tpl (save-opts): no value with disable-save attr.
 	(load-opts): no value with disable-load attr.
+	* autoopts/test/rc.test: test these disable-load/save things.
+	* columns/columns.c: clean up error messages
 
 2009-01-08  Bruce Korb  <bkorb@gnu.org>
 	

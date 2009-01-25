@@ -1,9 +1,9 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.15 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:        "2009-01-01 08:38:24 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  $Id: opts.def,v 4.16 2009/01/25 19:31:56 bkorb Exp $
+ *  Time-stamp:        "2009-01-25 10:13:56 bkorb"
+ *  Last Committed:    $Date: 2009/01/25 19:31:56 $
  *
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *
@@ -25,7 +25,7 @@ copyright = {
     date   = "1999-2009";
     type   = gpl;
     owner  = "Bruce Korb";
-    eaddr  = "autogen-users@lists.sourceforge.net";
+    eaddr  = 'autogen-users@lists.sourceforge.net';
 };
 
 prog-name      = "columns";
@@ -40,6 +40,8 @@ version = "1.2";
 export = <<- EOExport
 	#include "config.h"
 	#include <ctype.h>
+	#include <errno.h>
+	#include <stdarg.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>

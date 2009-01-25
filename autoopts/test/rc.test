@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2007-07-04 10:11:32 bkorb"
+# Time-stamp:        "2009-01-25 11:26:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: rc.test,v 4.15 2009/01/01 16:49:26 bkorb Exp $
+# $Id: rc.test,v 4.16 2009/01/25 19:31:56 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -54,7 +54,7 @@ ${AG_L} ${testname}.def || \
 
 # # # # # # # # # # VALIDATE HELP # # # # # # # # #
 
-cat > ${testname}-base.help <<_EOF_
+cat > ${testname}-base1.help <<_EOF_
 test_rc - Test AutoOpts for rc
 USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
   Flg Arg Option-Name    Description
@@ -79,8 +79,8 @@ _EOF_
 mkdir ${testname}.rc ${testname}.run
 compile "--help"
 sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
-    ${testname}.help > ${testname}-res.help
-cmp ${testname}-*.help || \
+    ${testname}.help > ${testname}-res1.help
+cmp ${testname}-*1.help || \
   failure "`diff ${testname}-*.help`"
 
 # # # # # # # # # # DO THE REAL TEST # # # # # # # # #
@@ -138,6 +138,7 @@ cmp ${testname}-2.cmds ${testname}-2.test || {
   cd ..
   failure "${df}"
 }
+
 # # # # # # # # # # SECOND TEST OUTPUT FILE # # # # # # # # #
 
 cat >> ../${testname}.rc/${testname}.file  <<_EOF_
@@ -198,6 +199,39 @@ cmp  ${testname}.cmds ${testname}.test || {
   cd ..
   failure "${df}"
 }
+
+# # # # # # # # # # THIRD TEST OUTPUT FILE # # # # # # # # #
+
+cd ${testsubdir}
+
+echo 'disable-save;' >> ${testname}.def
+
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+compile "--help"
+sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+    ${testname}.help > ${testname}-res2.help
+egrep -v ' save-opts  +Save ' ${testname}-base1.help > ${testname}-base2.help
+
+cmp ${testname}-*2.help || \
+  failure "`diff ${testname}-*2.help`"
+
+echo 'disable-load;' >> ${testname}.def
+
+${AG_L} ${testname}.def || \
+  failure AutoGen could not process
+
+compile "--help"
+sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+    ${testname}.help > ${testname}-res3.help
+
+sed -e '/ load-opts   *Load /,/multiple times$/d' \
+    -e '/ save-opts   *Save /d' \
+    ${testname}-base1.help > ${testname}-base3.help
+
+cmp ${testname}-*3.help || \
+  failure "`diff ${testname}-*3.help`"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 

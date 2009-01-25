@@ -1,6 +1,6 @@
 
 /*
- *  $Id: autoopts.c,v 4.43 2009/01/17 22:08:09 bkorb Exp $
+ *  $Id: autoopts.c,v 4.44 2009/01/25 19:31:56 bkorb Exp $
  *  Time-stamp:      "2009-01-12 02:49:49 bkorb"
  *
  *  This file contains all of the routines that must be linked into
@@ -37,7 +37,16 @@ static tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
 static tSuccess
-nextOption( tOptions* pOpts, tOptState* pOptState );
+next_opt_arg_must(tOptions* pOpts, tOptState* pOptState);
+
+static tSuccess
+next_opt_arg_may(tOptions* pOpts, tOptState* pOptState);
+
+static tSuccess
+next_opt_arg_none(tOptions* pOpts, tOptState* pOptState);
+
+static tSuccess
+nextOption(tOptions* pOpts, tOptState* pOptState);
 
 static tSuccess
 doPresets( tOptions* pOpts );
