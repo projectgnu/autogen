@@ -1,5 +1,16 @@
 New in __CURRENT_VERSION__ November 2008
 
+* options may now be "deprecated".  They get processed, but do not show
+  in the usage output.
+
+* options may be marked "no-command", meaning they are not to appear on
+  the command line.  Thus, they are recognized in config files only.
+
+* "disable-save" and "disable-load" may be used to prevent the command
+  line options from loading or saving options from/to a file.
+
+New in 5.9.7 December 2008
+
 * several cleanups.
 * "more-help" is only supported with libopts is in use at run time.
   Allow for it to be expunged from the documentation.
@@ -23,22 +34,3 @@ New in 5.9.6 November 2008
   The value seen by the program is an integer number of seconds.
   (This is not a date/time.)  The duration of a year is always 365 days
   and the duration of a month is always 30 days.
-
-* various obscure cleanups.
-
-New in 5.9.4 August 2008
-
-* integer number arguments may now have their values suffixed with
-  one of the letters k/K/m/M/g/G/t/T to signify scaling by powers
-  of 1000 (lower case) or 1024 (upper case).  Specify, "scaled".
-
-* AutoOpts "arg-type" may now be set to "file".  Existence of the directory
-  portion of the name will be checked.  The existence (or not) of the actual
-  file may also be checked.  Finally, the file may be pre-opened with either
-  "fopen(3C)" or "open(2)".
-
-* The "columns" program now accepts a "--fill" option to cause it to fill
-  text instead of filling columns.
-
-* The tests should no longer indirectly reference installed versions of
-  the binaries.  They should all work out of the build directories.

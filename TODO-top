@@ -1,7 +1,2 @@
 #  -*- Mode: Outline -*-
-#  $Date: 2009/01/25 19:31:56 $
-
-* Pending
-
-** Change the invocations of getdefs to send output to stdout in
-   preference to invoking autogen internally.  The current method is ugly.
+#  $Date: 2009/02/06 23:54:30 $
