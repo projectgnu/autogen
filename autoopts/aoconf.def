@@ -3,8 +3,8 @@ AutoGen Definitions aoconf.tpl;
 // This file is used for bootstrapping only.  Useful _only_ for
 // checked out source files.
 
-// Time-stamp:        "2007-07-04 10:35:14 bkorb"
-// Last Committed:    $Date: 2007/11/01 05:24:24 $
+// Time-stamp:        "2009-01-18 12:57:55 bkorb"
+// Last Committed:    $Date: 2009/05/16 15:06:59 $
 
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.

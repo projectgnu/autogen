@@ -1,6 +1,6 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2007-11-17 01:31:14 bkorb"
-# $Id: bootstrap.dir,v 4.11 2007/11/17 21:01:55 bkorb Exp $
+# Time-stamp:      "2009-01-12 04:52:23 bkorb"
+# $Id: bootstrap.dir,v 4.12 2009/05/16 15:06:59 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
