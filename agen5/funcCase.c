@@ -1,9 +1,9 @@
 
 /*
- *  $Id: funcCase.c,v 4.22 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: funcCase.c,v 4.23 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 15:09:39 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 19:01:11 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This module implements the CASE text function.
  */
@@ -141,7 +141,7 @@ compile_re(regex_t* pRe, char const * pzPat, int flags)
     void * const pat = (void *)pzPat;
     int  rerr = regcomp(pRe, pat, flags);
     if (rerr != 0) {
-        char zEr[ 128 ];
+        char zEr[ SCRIBBLE_SIZE ];
         regerror( rerr, pRe, zEr, sizeof( zEr ));
         fprintf( stderr, zBadRe, rerr, zEr, pzPat );
         AG_ABEND( "Bad regular expression" );

@@ -1,10 +1,10 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2007-11-19 21:12:49 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 18:58:51 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
- *  $Id: expFormat.c,v 4.24 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: expFormat.c,v 4.25 2009/07/21 03:21:57 bkorb Exp $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.
@@ -141,7 +141,7 @@ SCM
 ag_scm_dne( SCM prefix, SCM first, SCM opt )
 {
     int      noDate   = 0;
-    char     zScribble[ 128 ];
+    char     zScribble[ SCRIBBLE_SIZE ];
     char*    pzRes;
     tCC*     pzFirst  = zNil;
     SCM      res;
@@ -158,8 +158,8 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
         first    = opt;
     }
 
-    if (pfxLen > 128 )
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (pfxLen > SCRIBBLE_SIZE )
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
     /*
      *  IF we also have a 'first' prefix string,
@@ -167,8 +167,8 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
      */
     if (AG_SCM_STRING_P( first )) {
         int len = AG_SCM_STRLEN( first );
-        if (len >= 128)
-            AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+        if (len >= SCRIBBLE_SIZE)
+            AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
         pzFirst = aprf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
                         ag_scm2zchars( first, "first-prefix" ), pzPrefix );
@@ -179,11 +179,14 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     } else {
         time_t    curTime = time( NULL );
         struct tm*  pTime = localtime( &curTime );
-        strftime( zScribble, (size_t)128, "%A %B %e, %Y at %r %Z", pTime );
+        strftime( zScribble, (size_t)SCRIBBLE_SIZE, "%A %B %e, %Y at %r %Z", pTime );
     }
 
     {
         char const* pz;
+        tFpStack*   pfp = pCurFp;
+
+        while (pfp->flags & FPF_UNLINK)  pfp = pfp->pPrev;
         if (! ENABLED_OPT( DEFINITIONS ))
             pz = "<<no definitions>>";
 
@@ -197,7 +200,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
         }
 
         pzRes = aprf( ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
-                      pzPrefix, pCurFp->pzOutName, zScribble,
+                      pzPrefix, pfp->pzOutName, zScribble,
                       pz, pzTemplFileName, pzFirst );
     }
 
@@ -344,15 +347,15 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
     SCM     res;
 
     /*
-     *  Get the addresses of the program name and prefix strings.
-     *  Make sure they are reasonably sized (<256 for program name
-     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     *  Get the addresses of the program name prefix and owner strings.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( prefix ) >= 128)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
@@ -390,15 +393,15 @@ ag_scm_agpl( SCM prog_name, SCM prefix )
     SCM     res;
 
     /*
-     *  Get the addresses of the program name and prefix strings.
-     *  Make sure they are reasonably sized (<256 for program name
-     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     *  Get the addresses of the program name prefix and owner strings.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( prefix ) >= 128)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
@@ -438,17 +441,17 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
 
     /*
      *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (<256 for program name
-     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( prefix ) >= 128)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( owner ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, 256 ));
+    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
@@ -495,17 +498,17 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 
     /*
      *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (<256 for program name
-     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( prefix ) >= 128)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( owner ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, 256 ));
+    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
 
     /*
      *  Allocate-sprintf the result string, then put it in a new SCM.
@@ -591,17 +594,17 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 
     /*
      *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (<256 for program name
-     *  and <128 for a line prefix).  Copy them to the scratch buffer.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, 256 ));
+    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( prefix ) >= 128)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, 128 ));
+    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
 
-    if (AG_SCM_STRLEN( owner ) >= 256)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, 256 ));
+    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
+        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
 
     /*
      *  Reformat the string with the given arguments

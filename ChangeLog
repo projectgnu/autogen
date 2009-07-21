@@ -1,3 +1,17 @@
+2009-07-17  Bruce Korb  <bkorb@gnu.org>
+	
+	* agen5/autogen.h (SCRIBBLE_SIZE): define it
+	* agen5/agInit.c (SCRIBBLE_SIZE): use #define for size of scribble space
+	* agen5/agUtils.c: ditto
+	* agen5/defFind.c: again
+	* agen5/expOutput.c: again
+	* agen5/expString.c: again
+	* agen5/funcCase.c: again
+	* agen5/expFormat.c (ag_scm_dne): get correct file name, and
+	SCRIBBLE_SIZE again
+	* autoopts/environment.c (doEnvPresets): 2 no-op vals for save_opts.
+	* autoopts/save.c (findDirName): also
+
 2009-01-17  Bruce Korb  <bkorb@gnu.org>
 	
 	* autoopts/autoopts.c (nextOption): too large, split it up.

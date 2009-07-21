@@ -1,10 +1,10 @@
 
 /*
  *  autogen.h
- *  $Id: autogen.h,v 4.35 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: autogen.h,v 4.36 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2008-12-31 13:53:26 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 18:56:32 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  Global header file for AutoGen
  *
@@ -114,8 +114,9 @@ typedef struct for_info      tForInfo;
 typedef struct for_state     tForState;
 typedef struct template_lib_marker tTlibMark;
 
-#define MAX_SUFFIX_LEN    8  /* maximum length of a file name suffix */
-#define MAX_HEREMARK_LEN 64  /* max length of a here mark */
+#define MAX_SUFFIX_LEN     8  /* maximum length of a file name suffix */
+#define MAX_HEREMARK_LEN  64  /* max length of a here mark */
+#define SCRIBBLE_SIZE    256  /* much larger than any short name */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

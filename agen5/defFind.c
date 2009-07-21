@@ -1,8 +1,8 @@
 /*
- *  $Id: defFind.c,v 4.22 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: defFind.c,v 4.23 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2008-12-31 18:15:02 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 19:00:11 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This module locates definitions.
  *
@@ -583,7 +583,7 @@ hash_string(unsigned char const * pz)
 static void
 stringAdd(char const * pz)
 {
-    unsigned char z[256];
+    unsigned char z[SCRIBBLE_SIZE];
     size_t z_len;
 
     /*
@@ -591,8 +591,8 @@ stringAdd(char const * pz)
      */
     if (hash_table_ct == 0) {
         size_t ct = pCurTemplate->macroCt;
-        if (ct < 128)
-            ct = 128;
+        if (ct < SCRIBBLE_SIZE)
+            ct = SCRIBBLE_SIZE;
         else {
             int bit_ct = 0;
             while (ct > 1) {

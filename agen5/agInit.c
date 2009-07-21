@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.21 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:      "2008-12-31 14:06:19 bkorb"
+ *  Time-stamp:      "2009-07-09 19:00:28 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -70,7 +70,7 @@ initialize( int arg_ct, char** arg_vec )
     SET_OPT_TEMPL_DIRS( "$$/../share/autogen" );
 
     {
-        char z[ 128 ] = "__autogen__";
+        char z[ SCRIBBLE_SIZE ] = "__autogen__";
 #if defined( HAVE_SOLARIS_SYSINFO )
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,

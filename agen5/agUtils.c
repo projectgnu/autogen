@@ -1,10 +1,10 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.21 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: agUtils.c,v 4.22 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2008-07-26 10:00:15 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 20:18:45 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This is the main routine for autogen.
  *
@@ -53,8 +53,6 @@ strlcpy( char* dest, tCC* src, size_t n )
         }
     }
 
-    assert( sz + (src - ps) == strlen( ps ) + 1 );
-
     return sz + (src - ps);
 }
 #endif
@@ -70,11 +68,9 @@ aprf( char const* pzFmt, ... )
     va_end( ap );
 
     if (pz == NULL) {
-        tSCC zMsg[] = "could not allocate for or formatting failed on:\n";
-        char z[ 256 ];
-        strcpy( z, zMsg );
-        strncpy( z + sizeof( zMsg )-1, pzFmt, sizeof(z) - sizeof(zMsg));
-        z[ sizeof(z)-1 ] = NUL;
+        tSCC zMsg[] = "could not allocate for or formatting failed on:\n%s";
+        char z[ sizeof (zMsg) + SCRIBBLE_SIZE ];
+        snprintf(z, sizeof(z), zMsg, pzFmt);
         AG_ABEND( z );
     }
     return pz;

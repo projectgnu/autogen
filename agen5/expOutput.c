@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expOutput.c,v 4.32 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: expOutput.c,v 4.33 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2008-08-31 13:21:45 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 19:01:51 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This module implements the output file manipulation function
  *
@@ -764,7 +764,7 @@ ag_scm_make_header_guard(SCM name)
         static char const setvar[] =
             "(set! header-file \"%s\") "
             "(set! header-guard \"%s\")";
-        char z[sizeof(setvar) + 256];
+        char z[sizeof(setvar) + SCRIBBLE_SIZE];
         char * p = z;
         size_t cmdsz = sizeof(setvar) + gsz + osz;
         if (cmdsz > sizeof(z))
@@ -778,7 +778,7 @@ ag_scm_make_header_guard(SCM name)
 
     {
         static char const ifndef[] = "#ifndef %1$s\n#define %1$s 1";
-        char z[sizeof(ifndef) + 256];
+        char z[sizeof(ifndef) + SCRIBBLE_SIZE];
         char * p = z;
         size_t strsz = sizeof(ifndef) + (2 * gsz);
         if (strsz > sizeof(z))

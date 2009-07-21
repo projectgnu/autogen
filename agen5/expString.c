@@ -1,10 +1,10 @@
 
 /*
  *  expString.c
- *  $Id: expString.c,v 4.23 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: expString.c,v 4.24 2009/07/21 03:21:57 bkorb Exp $
  *
- *  Time-stamp:        "2008-11-16 12:28:30 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-09 19:06:44 bkorb"
+ *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -111,7 +111,7 @@ makeString( tCC*    pzText,
             tCC*    pzNewLine,
             size_t  newLineSize )
 {
-    char     z[ 256 ];
+    char     z[ SCRIBBLE_SIZE ];
     char*    pzDta;
     char*    pzFre;
     tCC*     pzScn   = pzText;
@@ -1065,8 +1065,8 @@ ag_scm_c_string( SCM str )
 SCM
 ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
 {
-    char  map[ 256 ];
-    int   i = 255;
+    unsigned char map[ 1 << 8 /* bits-per-byte */ ];
+    int   i      = sizeof(map) - 1;
     char* pzFrom = ag_scm2zchars( from_xform, "string" );
     char* pzTo   = ag_scm2zchars(   to_xform, "string" );
 
@@ -1074,7 +1074,7 @@ ag_scm_string_tr_x( SCM str, SCM from_xform, SCM to_xform )
         map[i] = i;
     } while (--i > 0);
 
-    for (;i <= 255;i++) {
+    for (;i <= sizeof(map) - 1;i++) {
         unsigned char fch = (unsigned char)*(pzFrom++);
         unsigned char tch = (unsigned char)*(pzTo++);
 
