@@ -2,13 +2,13 @@
 
 null
 
-#  Time-stamp:        "2007-07-04 09:44:23 bkorb"
-#  Last Modified:     $Date: 2007/10/07 16:54:54 $
+#  Time-stamp:        "2009-07-22 18:53:01 bkorb"
+#  Last Modified:     $Date: 2009/07/23 02:05:55 $
 #             by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the

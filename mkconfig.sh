@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2009-01-17 20:58:34 bkorb"
+  Time-stamp:        "2009-07-22 18:51:11 bkorb"
   echo ${2} | sed 's/:[0-9][0-9] .*//;s/[^0-9]//g')
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@ timestamp=$(set -- \
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 4.9 2009/01/18 05:52:31 bkorb Exp $
+# @(#) $Id: mkconfig.sh,v 4.10 2009/07/23 02:05:55 bkorb Exp $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;

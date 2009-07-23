@@ -2,8 +2,8 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-07-04 09:18:42 bkorb"
-## Copyright (c):   1992-2007 by Bruce Korb
+## Time-stamp:      "2009-07-22 18:54:21 bkorb"
+## Copyright (c):   1992-2009 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.13 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.14 2009/07/23 02:05:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns

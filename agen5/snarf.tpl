@@ -1,8 +1,8 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: snarf.tpl,v 4.15 2009/01/01 16:49:26 bkorb Exp $
-# Time-stamp:        "2009-01-01 08:45:34 bkorb"
-# Last Committed:    $Date: 2009/01/01 16:49:26 $
+# $Id: snarf.tpl,v 4.16 2009/07/23 02:05:55 bkorb Exp $
+# Time-stamp:        "2009-07-22 18:58:17 bkorb"
+# Last Committed:    $Date: 2009/07/23 02:05:55 $
 
 ##
 ## This file is part of AutoGen.

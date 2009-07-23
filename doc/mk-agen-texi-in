@@ -1,12 +1,12 @@
 #! /bin/sh
 
-# Time-stamp:        "2008-12-20 10:31:57 bkorb"
-# Last Committed:    $Date: 2008/12/20 18:35:09 $
+# Time-stamp:        "2009-07-22 19:05:11 bkorb"
+# Last Committed:    $Date: 2009/07/23 02:05:55 $
 #
 ##
 ##  This file is part of AutoGen.
 ##
-##  AutoGen copyright 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the

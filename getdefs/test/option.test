@@ -4,12 +4,12 @@
 # option.test --- test option extraction
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2007-07-04 11:40:07 bkorb"
-# Last Modified:  $Date: 2007/10/07 16:54:54 $
+# Time-stamp:        "2009-07-22 19:01:54 bkorb"
+# Last Modified:  $Date: 2009/07/23 02:05:55 $
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: option.test,v 4.3 2007/10/07 16:54:54 bkorb Exp $
+# $Id: option.test,v 4.4 2009/07/23 02:05:55 bkorb Exp $
 # ----------------------------------------------------------------------
 
 # Common definitions

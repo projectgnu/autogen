@@ -1,8 +1,8 @@
 
 dnl @synopsis  LIBOPTS_CHECK
 dnl
-dnl Time-stamp:        "2007-07-04 11:41:40 bkorb"
-dnl Last Committed:    $Date: 2007/10/07 16:54:54 $
+dnl Time-stamp:        "2009-07-22 18:50:49 bkorb"
+dnl Last Committed:    $Date: 2009/07/23 02:05:55 $
 dnl
 dnl If autoopts-config works, add the linking information to LIBS.
 dnl Otherwise, add ``libopts-${ao_rev}'' to SUBDIRS and run all
@@ -10,7 +10,7 @@ dnl the config tests that the library needs.  Invoke the
 dnl "INVOKE_LIBOPTS_MACROS" macro iff we are building libopts.
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen copyright (c) 1992-2007 Bruce Korb - all rights reserved
+dnl  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 dnl
 dnl  AutoGen is free software: you can redistribute it and/or modify it
 dnl  under the terms of the GNU General Public License as published by the

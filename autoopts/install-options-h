@@ -1,12 +1,12 @@
 #! /bin/sh
 set -x
 
-# Time-stamp:        "2008-09-21 15:42:56 bkorb"
-# Last Committed:    $Date: 2008/09/22 00:28:03 $
+# Time-stamp:        "2009-07-22 18:57:40 bkorb"
+# Last Committed:    $Date: 2009/07/23 02:05:55 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control

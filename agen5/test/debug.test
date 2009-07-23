@@ -2,13 +2,13 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2008-12-31 12:50:39 bkorb"
+# Time-stamp:        "2009-07-22 18:59:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Last Modified:     $Date: 2009/01/01 01:00:49 $
+# Last Modified:     $Date: 2009/07/23 02:05:55 $
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2007 by Bruce Korb - all rights reserved
+## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: debug.test,v 4.3 2009/01/01 01:00:49 bkorb Exp $
+# $Id: debug.test,v 4.4 2009/07/23 02:05:55 bkorb Exp $
 # ----------------------------------------------------------------------
 
 . ./defs

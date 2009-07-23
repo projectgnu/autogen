@@ -2,8 +2,8 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2007-07-04 09:20:54 bkorb"
-## Copyright (c):   1997-2007 by Bruce Korb
+## Time-stamp:      "2009-07-22 18:53:52 bkorb"
+## Copyright (c):   1997-2009 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
 ##
@@ -23,7 +23,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: Makefile.am,v 4.11 2007/10/07 16:54:54 bkorb Exp $
+## $Id: Makefile.am,v 4.12 2009/07/23 02:05:55 bkorb Exp $
 ## ---------------------------------------------------------------------
 ## Code:
 COMPAT_CSRC = pathfind.c snprintf.c strchr.c strdup.c strftime.c strsignal.c

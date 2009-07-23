@@ -1,9 +1,9 @@
 /*
- *  $Id: getdefs.c,v 4.17 2009/01/18 05:52:31 bkorb Exp $
+ *  $Id: getdefs.c,v 4.18 2009/07/23 02:05:55 bkorb Exp $
  *
- *    getdefs copyright 1999-2009 by Bruce Korb - all rights reserved
+ *  getdefs copyright (c) 1999-2009 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2009-01-17 21:27:40 bkorb"
+ *  Time-stamp:        "2009-07-22 19:05:29 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.

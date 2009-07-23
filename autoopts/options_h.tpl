@@ -2,8 +2,8 @@
 
 h=options.h
 
-# Time-stamp:      "2009-01-01 08:40:46 bkorb"
-# ID:  $Id: options_h.tpl,v 4.44 2009/01/01 16:49:26 bkorb Exp $
+# Time-stamp:      "2009-07-22 19:03:12 bkorb"
+# ID:  $Id: options_h.tpl,v 4.45 2009/07/23 02:05:55 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -34,7 +34,7 @@ h=options.h
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  *
- *  Automated Options copyright 1992-[=`date +Y`=] Bruce Korb
+ *  Automated Options copyright (c) 1992-[=`date +Y`=] by Bruce Korb
  *
 [=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
  */
