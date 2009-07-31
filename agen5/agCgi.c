@@ -1,10 +1,10 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.19 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: agCgi.c,v 4.20 2009/07/31 18:45:17 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:14:03 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-31 11:01:07 bkorb"
+ *  Last Committed:    $Date: 2009/07/31 18:45:17 $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -146,7 +146,7 @@ loadCgi( void )
             pBaseCtx->pzData = parseInput( pzCgiQuery, (int)textLen );
 
         } else {
-            AG_ABEND( aprf( "invalid CGI request method: ``%s''", pzCgiMethod ));
+            AG_ABEND( aprf("invalid CGI request method: ``%s''", pzCgiMethod));
             /* NOTREACHED */
 #ifdef  WARNING_WATCH
             pzText = NULL;

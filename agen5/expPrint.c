@@ -1,9 +1,9 @@
 
 /*
- *  $Id: expPrint.c,v 4.21 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: expPrint.c,v 4.22 2009/07/31 18:45:17 bkorb Exp $
  *
- *  Time-stamp:        "2007-12-02 12:43:09 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-31 11:08:29 bkorb"
+ *  Last Committed:    $Date: 2009/07/31 18:45:17 $
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -272,15 +272,18 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
 SCM
 ag_scm_hide_email( SCM display, SCM eaddr )
 {
-    tSCC zStrt[]  = "<script language=\"JavaScript\" type=\"text/javascript\">\n"
-                    "<!--\n"
-                    "var one = 'm&#97;';\n"
-                    "var two = 'i&#108;t';\n"
-                    "document.write('<a href=\"' + one + two );\n"
-                    "document.write('&#111;:";
+    tSCC zStrt[]  =
+        "<script language=\"JavaScript\" type=\"text/javascript\">\n"
+        "<!--\n"
+        "var one = 'm&#97;';\n"
+        "var two = 'i&#108;t';\n"
+        "document.write('<a href=\"' + one + two );\n"
+        "document.write('&#111;:";
+
     tSCC zEnd[]   = "');\n"
         "document.write('\" >%s</a>');\n"
         "//-->\n</script>";
+
     tSCC zFmt[]   = "&#%d;";
     char*  pzDisp = ag_scm2zchars( display, zFormat );
     char*  pzEadr = ag_scm2zchars( eaddr,   zFormat );

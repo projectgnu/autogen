@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.21 2009/07/21 03:21:57 bkorb Exp $
+ *  agInit.c  $Id: agInit.c,v 4.22 2009/07/31 18:45:17 bkorb Exp $
  *
- *  Time-stamp:      "2009-07-09 19:00:28 bkorb"
+ *  Time-stamp:      "2009-07-31 11:06:50 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -259,7 +259,8 @@ spawnPipe( tCC* pzFile )
         polls[0].events = POLLIN | POLLPRI;
 
         for (;;) {
-            int ct = poll( polls, 1, -1 );
+            char const * pzerr;
+            int   ct = poll( polls, 1, -1 );
             struct strrecvfd recvfd;
             pid_t child;
 
@@ -285,7 +286,8 @@ spawnPipe( tCC* pzFile )
                     continue;
 
                 case -1:
-                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, strerror(errno)));
+                    pzerr = strerror(errno);
+                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, pzerr));
 
                 case 0:
                 }
@@ -297,13 +299,16 @@ spawnPipe( tCC* pzFile )
                 recvfd.fd = fdpair.readFd;
 #endif /* ! HAVE_FATTACH */
 
-                if (dup2( recvfd.fd, STDIN_FILENO ) != STDIN_FILENO)
-                    AG_ABEND( aprf(zCannot, errno, "dup2", "stdin",
-                                   strerror(errno)));
+                if (dup2( recvfd.fd, STDIN_FILENO ) != STDIN_FILENO) {
+                    pzerr = strerror(errno);
+                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdin", pzerr);
+                }
 
-                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO)
-                    AG_ABEND( aprf(zCannot, errno, "dup2", "stdout",
-                                   strerror(errno)));
+                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO) {
+                    pzerr = strerror(errno);
+                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdout", pzerr);
+                }
+
                 return;
             }
         }
@@ -350,6 +355,7 @@ spawnPipe( tCC* pzFile )
             int ct = poll( polls, 1, -1 );
             struct strrecvfd recvfd;
             pid_t child;
+            char const * pzerr;
 
             switch (ct) {
             case -1:
@@ -373,7 +379,8 @@ spawnPipe( tCC* pzFile )
                     continue;
 
                 case -1:
-                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, strerror(errno)));
+                    pzerr = strerror(errno);
+                    AG_ABEND(aprf(zCannot, errno, "fork", zNil, pzerr));
 
                 case 0:
                 }
@@ -389,13 +396,18 @@ spawnPipe( tCC* pzFile )
 
                 polls[0].fd = fdpair.writeFd;
                 polls[0].events = POLLOUT;
-                if (poll( polls, 1, -1 ) != 1)
+                if (poll( polls, 1, -1 ) != 1) {
+                    pzerr = strerror(errno);
                     AG_ABEND( aprf(zCannot, errno, "poll", "write pipe",
-                                   strerror( errno )));
+                                   pzerr));
+                }
 
-                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO)
+                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO) {
+                    pzerr = strerror(errno);
                     AG_ABEND( aprf(zCannot, errno, "dup2", pzOut,
-                                   strerror(errno)));
+                                   pzerr));
+                }
+
                 return;
             }
         }
@@ -465,7 +477,8 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
     break;
 
     default:
-        AG_ABEND(aprf("The '%d' address family cannot be handled", addr_family));
+        AG_ABEND(aprf("The '%d' address family cannot be handled",
+                      addr_family));
     }
 
     if (bind( socket_fd, &sa.addr, addr_len ) < 0) {
@@ -512,7 +525,9 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         if (new_conns > 0) {
             switch (fork()) {
             default: continue;
-            case -1: AG_ABEND(aprf(zCannot, errno, "fork", zNil,strerror(errno)));
+            case -1:
+                AG_ABEND(aprf(zCannot, errno, "fork", zNil,strerror(errno)));
+
             case 0:  break;
             }
             break;

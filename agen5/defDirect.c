@@ -1,9 +1,9 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.30 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id: defDirect.c,v 4.31 2009/07/31 18:45:17 bkorb Exp $
  *
- *  Time-stamp:        "2008-09-23 09:06:37 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
+ *  Time-stamp:        "2009-07-31 11:07:48 bkorb"
+ *  Last Committed:    $Date: 2009/07/31 18:45:17 $
  *
  *  This module processes definition file directives.
  *
@@ -947,10 +947,11 @@ doDir_shell( char* pzArg, char* pzScan )
         return pzScan;
 
     {
+        static char const noend[] =
+            "Missing #endshell after '#shell' in %s on line %d\n";
         char* pz = strstr( pzScan, zEndShell );
         if (pz == NULL)
-            AG_ABEND( aprf("Missing #endshell after '#shell' in %s on line %d\n",
-                           pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+            AG_ABEND(aprf(noend, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
         while (pzScan < pz) {
             if (*(pzScan++) == '\n') pCurCtx->lineNo++;

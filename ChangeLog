@@ -1,3 +1,9 @@
+2009-07-31  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*.c: trim lines to 80 columns
+	* agen5/expFormat.c (dne): add autogen version to DNE function
+	* autoopts/optlib.tpl: add "(c)" symbol to copyright note.
+	
 2009-07-23  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/file.c (optionFileCheck): there may not be a DIRCH in the
@@ -18,6 +24,10 @@
 	SCRIBBLE_SIZE again
 	* autoopts/environment.c (doEnvPresets): 2 no-op vals for save_opts.
 	* autoopts/save.c (findDirName): also
+
+2009-05-17  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.8 release
 
 2009-01-17  Bruce Korb  <bkorb@gnu.org>
 

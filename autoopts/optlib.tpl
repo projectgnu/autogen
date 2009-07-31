@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-01-17 13:26:26 bkorb"
+# Time-stamp:      "2009-07-31 11:28:56 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -22,7 +22,7 @@
 ##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.37 2009/01/17 22:08:09 bkorb Exp $
+# $Id: optlib.tpl,v 4.38 2009/07/31 18:45:17 bkorb Exp $
 
 =][=
 
@@ -277,7 +277,7 @@ IF (exist? "copyright") =]
  *
  * This source file is copyrighted and licensed under the following terms:
  *
- * [=(sprintf "%s copyright %s %s - all rights reserved"
+ * [=(sprintf "%s copyright (c) %s %s - all rights reserved"
      prog-name (get "copyright.date") (get "copyright.owner") ) =][=
 
   CASE (get "copyright.type") =][=
