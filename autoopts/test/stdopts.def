@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 ## Time-stamp:      "2008-11-01 19:37:01 bkorb"
-## ident            $Id: stdopts.def,v 4.8 2009/01/01 16:49:26 bkorb Exp $
+## ident            $Id: stdopts.def,v 4.9 2009/08/01 17:43:06 bkorb Exp $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -19,8 +19,8 @@
 ##
 ##  These files have the following md5sums:
 ##
-##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
-##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 #  This is the standard set of options for testing option processing

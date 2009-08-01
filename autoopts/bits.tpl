@@ -3,37 +3,39 @@
 h
 c
 
-## Time-stamp:      "2009-07-22 18:55:50 bkorb"
-## Author:          Bruce Korb <bkorb@gnu.org>
-##
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
-##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+## Time-stamp:      "2009-08-01 10:13:57 bkorb"                                 
+## Author:          Bruce Korb <bkorb@gnu.org>                                  
+##                                                                              
+##  This file is part of AutoOpts, a companion to AutoGen.                      
+##  AutoOpts is free software.                                                  
+##  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved     
+##                                                                              
+##  AutoOpts is available under any one of two licenses.  The license           
+##  in use must be one of these two and the choice is under the control         
+##  of the user of the license.                                                 
+##                                                                              
+##   The GNU Lesser General Public License, version 3 or later                  
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"                      
+##                                                                              
+##   The Modified Berkeley Software Distribution License                        
+##      See the file "COPYING.mbsd"                                             
+##                                                                              
+##  These files have the following md5sums:                                     
+##                                                                              
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3                  
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3                 
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd                   
 
- (define base-name "")
- (define BASE-NAME "")
- (define element-type "")
- (define init-done #f)
- (define is-64-bit #f)
- (define is-array  #f)
- (define name-width 0)
- (define desc-width 0)
+ (define base-name     "")
+ (define BASE-NAME     "")
+ (define element-type  "")
+ (define init-done     #f)
+ (define is-64-bit     #f)
+ (define is-array      #f)
+ (define name-width    0)
+ (define desc-width    0)
+ (define bit-list      "")
+ (define bit-name      "")
 
  (define id-name (lambda (sfx)
     (string-append
@@ -44,8 +46,12 @@ c
     (string-append
         prefix "_" (string-upcase! (string->c-name! (get "m-name"))) sfx
  )  ))
-=]
-[= INVOKE preamble  =][=
+
+=][=
+
+INVOKE preamble
+
+=][=
 
 CASE (suffix)       =][=
 
@@ -54,8 +60,12 @@ CASE (suffix)       =][=
 == h
 
 =]
-[= (make-header-guard "bit_mask") =]
-#include <stdint.h>
+[=
+ (shell "sedcmd='s/$/_val} +/;s/^/${/'")
+ (make-header-guard "bit_mask") =]
+#include [= (if (exist? "stdint-hdr")
+                (string-append "\"" (get "stdint-hdr") "\"")
+                "<stdint.h>" ) =]
 
 typedef [=
 
@@ -66,9 +76,11 @@ typedef [=
         "uint32_t %s_bits_t")
     (if (< (high-lim "bit") 64) (begin
         (set! element-type "uint64_t")
+        (set! is-64-bit #t)
         "uint64_t %s_bits_t" )
       (begin
         (set! element-type "uint32_t")
+        (set! is-array #t)
         (sprintf "uint32_t %%s_bits_t[%s]"
                  (shellf "mask_ct=`calc '( %d + 32 ) / 32'` ; echo $mask_ct"
                          (high-lim "bit"))  ) ))  ))
@@ -80,13 +92,18 @@ typedef enum {[=
 
 FOR bit     =][=
 
-  (shellf "mask_val=`calc \"${mask_val} + ( 2 ^ %d )\"`" (for-index))
-  (set! tmp (string-length (get "b-name")))
+  (set! bit-name (string->c-name! (get "b-name")))
+  (shellf
+   "%1$s_val=`calc '2 ^ %2$d'`\nmask_val=`calc \"${mask_val} + ${%1$s_val}\"`"
+   bit-name (for-index))
+
+  (set! tmp (string-length bit-name))
   (if (> tmp name-width)
       (set! name-width tmp))
   (set! tmp (string-length (get "b-what")))
   (if (> tmp desc-width)
       (set! desc-width tmp)) =][=
+
 ENDFOR bit  =][=
 
   (define define-width (+ name-width 6 (string-length prefix)))
@@ -118,9 +135,12 @@ ELSE more than 64 bits          =][=
 
   INVOKE emit-multi-macros      =][=
 
-ENDIF  how many bits
+ENDIF  how many bits            =][=
 
-=][= IF (not (exist? "no-code")) =]
+IF (if (exist? "extra-defs")
+       (emit (string-append "\n\n" (get "extra-defs") "\n")))
+
+   (not (exist? "no-code")) =]
 /*
  *  Return a string containing the names of the bits set.
  */
@@ -153,6 +173,7 @@ extern int
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 [=
 
  (if (exist? "no-code") (out-delete))
@@ -165,17 +186,17 @@ extern int
 
 FOR bit (for-from 0) (for-by 1) =][=
 
-    (if (exist? "b-name")
-        (begin
-           (set! tmp         (get "b-name"))
-           (set! ix          (string-table-add "nm" tmp))
-           (set! offset-list (string-append offset-list (sprintf "%d\n" ix)))
-           (set! sorted-off  (string-append sorted-off
-                     (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
-        )
+  (if (exist? "b-name")
+      (begin
+         (set! tmp         (string-downcase! (string->c-name! (get "b-name"))))
+         (set! ix          (string-table-add "nm" tmp))
+         (set! offset-list (string-append offset-list (sprintf "%d\n" ix)))
+         (set! sorted-off  (string-append sorted-off
+                           (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
+      )
 
-        (set! offset-list (string-append offset-list "0\n" ))
-    )       =][=
+      (set! offset-list (string-append offset-list "0\n" ))
+  )         =][=
 
 ENDFOR bit  =][=
 
@@ -363,7 +384,7 @@ str_to_id( char const * str, char const ** p_str )
             break;
 
         /*
-         * Partial match.  Look for earlier match.  One may be a full match.
+         * Partial match.  Look for an earlier match.  One may be a full match.
          */
         lo = av;
         while (lo > 0) {
@@ -417,7 +438,6 @@ int
   IF (. is-array) =]
     [= (. element-type) =] * const bits = (void*)bits_p;[=
   ENDIF =]
-    size_t len = 0;
     int    ct  = 0;
     int    res = 0;
 
@@ -428,10 +448,13 @@ int
     while (isspace(*str) || (*str == ','))  str++;
 
     for (;;) {
-        if (isdigit(*str))
-            *bits |= ([=(. element-type) =])strtoull(str, &str, 0);
+        if (isdigit(*str)) {
+            [=(. element-type) =] num =
+                ([=(. element-type) =])strtoull(str, &str, 0);
+            *bits |= num;
+            ct += (num != 0);
 
-        else if (isalpha(*str)) {
+        } else if (isalpha(*str)) {
             res = str_to_id(str, &str);
             if (res < 0) {
                 if (res == DUP_[= (. BASE-NAME) =])
@@ -518,18 +541,18 @@ ESAC                =]
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE  preamble    =]
-[=
+DEFINE  preamble    =][=
 
  (if (not init-done) (begin
+
+     (if (not (exist? "mask-name"))
+         (error "no defined bit mask name"))
 
      (shell "calc() { bc <<_EOF_
 $*
 _EOF_
 }
          mask_val=0")
-     (if (not (exist? "mask-name"))
-         (error "no defined bit mask name"))
      (set! init-done #t)
      (set! base-name (string-downcase! (string->c-name! (get "mask-name"))))
      (set! BASE-NAME (string-upcase base-name))
@@ -545,35 +568,85 @@ ENDDEF  preamble
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
+DEFINE  emit-bit-list       =][=
+
+    (if (exist? "b-name")
+        (set! bit-list (string-append (join "\n" (stack "b-name")) "\n"))
+        (set! bit-list "")
+    )   =][=
+
+    FOR m-inc   =][=
+       (set! tmp (string->c-name! (get "m-inc")))
+       (set! bit-list (string-append bit-list
+                      (shellf "echo \"${%s}\"" tmp) "\n"))
+                =][=
+    ENDFOR m-inc=][=
+
+    (set! bit-list (string->c-name! bit-list))
+    (shellf "%s='%s'" (string->c-name! (get "m-name")) bit-list)
+
+    (emit (shell (string-append
+
+       "(sort -u | columns -I8 --spread=1 -S' |' --format=" prefix "_%s_BIT "
+                "--line=' \\'\n) <<\\_EOF_\n"
+       (string-upcase bit-list)
+       "_EOF_"
+
+    )))
+
+    (shell (string-append
+     "sum=`(sort -u | \
+	sed -e \"${sedcmd}\"\n) <<\\_EOF_\n"
+     bit-list
+     "_EOF_\n`\n"
+     "sum=`eval calc ${sum} 0`\n"
+     "printf "
+            (if (>= (high-lim "bit") 32)
+                "' \\\\\\n        /* 0x%016XULL */\\n'"
+            (if (>= (high-lim "bit") 16)
+                "' \\\\\\n        /* 0x%08XU */\\n'"
+                "' \\\\\\n        /* 0x%04XU */\\n'" ))
+        " ${sum}"
+    ))
+=][=
+
+ENDDEF  emit-bit-list
+
+= = = = = = = = = = = = = = = = = = = = =][=
+
 DEFINE  emit-word-macro     =][=
 
   (sprintf def-fmt (string-append prefix "_NO_BITS")) =]0[= one =][=
 
-  FOR bit   =][=
+  FOR bit       =][=
 
-    (sprintf def-fmt (id-name "_BIT"))  =](1[= one =] << [=(id-name "_ID")=])[=
+    (sprintf def-fmt (id-name "_BIT")) =](1[=one=] << [= (id-name "_ID") =])[=
 
-  ENDFOR    =][=
+  ENDFOR        =][=
 
   (ag-fprintf 0 def-fmt (string-append BASE-NAME "_MASK"))
   (shellf "printf 0x%s ${mask_val}" (get "mask-fmt"))
 
-=][=
+  =][=
 
   FOR mask
 
     =]
+[= (sprintf def-fmt (mask-name "_MASK")) =]( \
+[= INVOKE emit-bit-list =] )[=
+
+  ENDFOR mask   =][=
+
+  FOR un-mask
+
+    =]
 [= (sprintf def-fmt (mask-name "_MASK")) =]( [=
-    FOR b-name " |"
-       =][=
-       (string-append " \\\n        " (id-name "_BIT"))
-       =][=
-    ENDFOR b-name
-    =] )[=
+   (string-append BASE-NAME "_MASK")     =] & ~( \
+[= INVOKE emit-bit-list =] ))[=
 
-  ENDFOR mask  =][=
+  ENDFOR un-mask=][=
 
-(if (exist? "defined") (string-append "\n\n" (get "defined")))
+  (if (exist? "defined") (string-append "\n\n" (get "defined")))
 
 =]
 
@@ -608,7 +681,9 @@ DEFINE  emit-loop-macro
               [= (. iterate) =] \
               [= (sprintf tmp (get "op-code"))          =][=
 
-ENDDEF  emit-loop-macro  =][=
+ENDDEF  emit-loop-macro
+
+= = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE  emit-multi-macros
 
@@ -619,7 +694,6 @@ defined
 =]
 
 #define   SET_[=
-(define is-array #t)
 (define iterate (sprintf "do { int _ix_ = 0; for (;_ix_ < %s; _ix_++) {"
                          (shell "echo $mask_ct")  ))
 (define two-arg-op "(_d)[_ix_] = (_s1)[_ix_] %s (_s2)[_ix_]; } } while (0)")
@@ -631,9 +705,9 @@ defined
               do { (_m)[(_b)/32] &= ~(1U << ((_b) % 32)); } while (0)
 #define  TEST_[= (. BASE-NAME)   =]( _m, _b) \
               (((_m)[(_b)/32] & (1U << ((_b) % 32))) != 0)
-[= INVOKE emit-loop-macro op-code = "&"  mac-name = AND \=]
-[= INVOKE emit-loop-macro op-code = "|"  mac-name =  OR \=]
-[= INVOKE emit-loop-macro op-code = "^"  mac-name = XOR \=]
+[= INVOKE emit-loop-macro op-code = "&"  mac-name = AND  =]
+[= INVOKE emit-loop-macro op-code = "|"  mac-name =  OR  =]
+[= INVOKE emit-loop-macro op-code = "^"  mac-name = XOR  =]
 [= INVOKE emit-loop-macro op-code = "~"  mac-name = NOT  =]
 [=
 

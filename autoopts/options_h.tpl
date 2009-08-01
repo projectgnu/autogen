@@ -2,8 +2,8 @@
 
 h=options.h
 
-# Time-stamp:      "2009-07-22 19:03:12 bkorb"
-# ID:  $Id: options_h.tpl,v 4.45 2009/07/23 02:05:55 bkorb Exp $
+# Time-stamp:      "2009-08-01 10:34:41 bkorb"
+# ID:  $Id: options_h.tpl,v 4.46 2009/08/01 17:43:06 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -21,8 +21,8 @@ h=options.h
 ##
 ##  These files have the following md5sums:
 ##
-##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
-##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 =][=
@@ -143,7 +143,7 @@ typedef union {
 autogen opt-state.def || die "Cannot regen opt-state.h"
 sed -e '1,/typedef.*_bits_t/d' \
     -e 's/NO_BITS /INIT/' \
-    -e 's/_BIT / /' \
+    -e 's/_BIT / /g' \
     -e 's/_MASK     /_MASK /' \
     -e '/ SET_OPT_STATE(/,$d' opt-state.h
 rm  -f opt-state.[ch]
@@ -175,13 +175,12 @@ rm  -f opt-state.[ch]
  *  Define the processing state flags
  */
 [= `
-
 autogen proc-state.def || die 'Cannot regen proc-state.h'
 sed -e '1,/typedef.*_bits_t/d' \
     -e 's/NO_BITS /NONE/' \
-    -e 's/_BIT / /' \
+    -e 's/_BIT / /g' \
     -e 's/_MASK    /_MASK/' \
-    -e '/^ *OPTPROC_NXLAT_[A-Z_]* *)/q' proc-state.h
+    -e '/ SET_OPTPROC_STATE(/,$d' proc-state.h
 rm  -f proc-state.[ch]
 
 ` =]

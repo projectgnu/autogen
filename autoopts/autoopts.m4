@@ -22,11 +22,11 @@ dnl      See the file "COPYING.mbsd"
 dnl
 dnl  These files have the following md5sums:
 dnl
-dnl  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
-dnl  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+dnl  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+dnl  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 dnl  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.8 2009/07/23 02:05:55 bkorb Exp $
+dnl @(#) $Id: autoopts.m4,v 4.9 2009/08/01 17:43:05 bkorb Exp $
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:

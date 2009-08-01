@@ -18,11 +18,11 @@
 ##
 ##  These files have the following md5sums:
 ##
-##  239588c55c22c60ffe159946a760a33e pkg/libopts/COPYING.gplv3
-##  fa82ca978890795162346e661b47161a pkg/libopts/COPYING.lgplv3
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: optlib.tpl,v 4.38 2009/07/31 18:45:17 bkorb Exp $
+# $Id: optlib.tpl,v 4.39 2009/08/01 17:43:06 bkorb Exp $
 
 =][=
 
