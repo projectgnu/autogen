@@ -3,7 +3,7 @@
 h
 c
 
-## Time-stamp:      "2009-08-01 10:13:57 bkorb"                                 
+## Time-stamp:      "2009-08-01 11:06:49 bkorb"                                 
 ## Author:          Bruce Korb <bkorb@gnu.org>                                  
 ##                                                                              
 ##  This file is part of AutoOpts, a companion to AutoGen.                      
@@ -36,6 +36,7 @@ c
  (define desc-width    0)
  (define bit-list      "")
  (define bit-name      "")
+ (define tmp-name      "")
 
  (define id-name (lambda (sfx)
     (string-append
@@ -616,7 +617,9 @@ ENDDEF  emit-bit-list
 
 DEFINE  emit-word-macro     =][=
 
-  (sprintf def-fmt (string-append prefix "_NO_BITS")) =]0[= one =][=
+  (set! tmp-name (string-upcase! (string-append prefix "_"
+        (if (exist? "zero-name") (get "zero-name") "NO_BITS") )))
+  (sprintf def-fmt tmp-name) =]0[= one =][=
 
   FOR bit       =][=
 
@@ -648,7 +651,7 @@ DEFINE  emit-word-macro     =][=
 
   (if (exist? "defined") (string-append "\n\n" (get "defined")))
 
-=]
+=][= IF (not (exist? "omit-test-n-set")) =]
 
 #define   SET_[= (. BASE-NAME) =](_m, _b) \
               do { (_m) |= 1[= one =] << _b; } while (0)
@@ -663,7 +666,7 @@ DEFINE  emit-word-macro     =][=
               do { (_d) = (_s1) ^ (_s2); } while (0)
 #define   NOT_[= (. BASE-NAME) =](_d, _s) \
               do { (_d) = ~(_s); } while (0)
-[=
+[= ENDIF omit-test-n-set =][=
 ENDDEF  emit-word-macro
 
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
@@ -691,7 +694,7 @@ DEFINE  emit-multi-macros
 
 defined
 
-=]
+=][= IF (not (exist? "omit-test-n-set")) =]
 
 #define   SET_[=
 (define iterate (sprintf "do { int _ix_ = 0; for (;_ix_ < %s; _ix_++) {"
@@ -709,7 +712,7 @@ defined
 [= INVOKE emit-loop-macro op-code = "|"  mac-name =  OR  =]
 [= INVOKE emit-loop-macro op-code = "^"  mac-name = XOR  =]
 [= INVOKE emit-loop-macro op-code = "~"  mac-name = NOT  =]
-[=
+[= ENDIF omit-test-n-set =][=
 
 ENDDEF  emit-multi-macros   =][=
 

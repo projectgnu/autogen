@@ -22,6 +22,10 @@ AutoGen Definitions bits.tpl;
 */
 mask-name  = opt-state;
 prefix     = optst;
+zero-name  = init;
+
+no-code;
+omit-test-n-set;
 
 /*
  *  If any of these bit assignments change, the minimum version number of
@@ -60,8 +64,6 @@ bit[23] = { b-name = disable-twice; b-what = 'process disabled option twice'; };
 bit[24] = { b-name = scaled-num;    b-what = 'scaled integer value'; };
 bit[25] = { b-name = no-command;    b-what = 'disable from cmd line'; };
 bit[26] = { b-name = deprecated;    b-what = 'support is being removed'; };
-
-no-code;
 
 mask = {
   m-name  = set;

@@ -2,8 +2,8 @@
 
 h=options.h
 
-# Time-stamp:      "2009-08-01 10:34:41 bkorb"
-# ID:  $Id: options_h.tpl,v 4.46 2009/08/01 17:43:06 bkorb Exp $
+# Time-stamp:      "2009-08-01 11:05:25 bkorb"
+# ID:  $Id: options_h.tpl,v 4.47 2009/08/01 18:20:13 bkorb Exp $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -141,12 +141,10 @@ typedef union {
  */
 [= `
 autogen opt-state.def || die "Cannot regen opt-state.h"
-sed -e '1,/typedef.*_bits_t/d' \
-    -e 's/NO_BITS /INIT/' \
+sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
     -e 's/_BIT / /g' \
-    -e 's/_MASK     /_MASK /' \
-    -e '/ SET_OPT_STATE(/,$d' opt-state.h
-rm  -f opt-state.[ch]
+    -e 's/_MASK     /_MASK /' opt-state.h
+rm  -f opt-state.h
 ` =]
 
 #ifdef NO_OPTIONAL_OPT_ARGS
@@ -176,12 +174,10 @@ rm  -f opt-state.[ch]
  */
 [= `
 autogen proc-state.def || die 'Cannot regen proc-state.h'
-sed -e '1,/typedef.*_bits_t/d' \
-    -e 's/NO_BITS /NONE/' \
+sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
     -e 's/_BIT / /g' \
-    -e 's/_MASK    /_MASK/' \
-    -e '/ SET_OPTPROC_STATE(/,$d' proc-state.h
-rm  -f proc-state.[ch]
+    -e 's/_MASK    /_MASK/' proc-state.h
+rm  -f proc-state.h
 
 ` =]
 
