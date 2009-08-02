@@ -28,6 +28,11 @@ zero-name = none;
 no-code;
 omit-test-n-set;
 
+/*
+ *  If any of these bit assignments change, the minimum version number of
+ *  the autoopts interface will also have to be changed.  The result is
+ *  incompatible.
+ */
 bit[ 0] = { b-name = longopt;     b-what = 'Process long style options'; };
 bit[ 1] = { b-name = shortopt;    b-what = 'Process short style "flags"'; };
 bit[ 2] = { b-name = errstop;     b-what = 'Stop on argument errors'; };

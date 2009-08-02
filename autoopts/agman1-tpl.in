@@ -2,7 +2,7 @@
 
 ## agman1.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2009-01-17 13:37:35 bkorb"
+## Time-stamp:      "2009-08-02 13:42:18 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -27,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman1-tpl.in,v 4.23 2009/08/01 17:43:05 bkorb Exp $
+## $Id: agman1-tpl.in,v 4.24 2009/08/02 21:07:36 bkorb Exp $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1
@@ -417,7 +417,9 @@ The default [+: (. opt-arg) :+] for this option is:
 .sp
 [+:
  (if (exist? "doc")
-        (string-substitute (get "doc") "\\" "\\\\")
+        (string-substitute (get "doc")
+          '("\\"   "@{" "@}")
+          '("\\\\" "{"  "}"))
         "This option has not been fully documented." ) :+][+:
       IF (exist? "deprecated") :+]
 .sp
