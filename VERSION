@@ -5,7 +5,7 @@
 # Time-stamp:        "2009-07-31 12:04:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
-# Last Committed:    $Date: 2009/07/31 19:10:07 $
+# Last Committed:    $Date: 2009/08/02 21:07:36 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".9pre4"
+AG_PATCHLEVEL=".9pre5"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
