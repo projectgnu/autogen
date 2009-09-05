@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2007-11-10 15:55:33 bkorb"
+ * Time-stamp:        "2009-09-05 12:24:37 bkorb"
  * Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  * This file is part of AutoGen.
@@ -110,12 +110,7 @@ doStdoutTemplate( tTemplate* pTF )
         return;
 
     default:
-        if (*pzOopsPrefix != NUL) {
-            fprintf( stdout, zBadR, pzOopsPrefix );
-            pzOopsPrefix = zNil;
-        } else {
-            fprintf( pfTrace, zBadR+2 );
-        }
+        fprintf(stdout, zBadR, pzOopsPrefix);
 
     case FAILURE:
         exit( EXIT_FAILURE );

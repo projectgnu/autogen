@@ -82,46 +82,16 @@ AM_WITH_DMALLOC
 # ----------------------------------------------------------------------
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
-# =================
-# AM_PROG_CC_C_O
-# =================
 AM_PROG_CC_C_O
-# =================
-# AC_PROG_CC_STDC
-# =================
 AC_PROG_CC_STDC
-# =================
-# AC_EXEEXT
-# =================
 AC_EXEEXT
-# =================
-# AC_PROG_INSTALL
-# =================
 AC_PROG_INSTALL
-# =================
-# AC_PROG_LIBTOOL
-# =================
 AC_PROG_LIBTOOL
-# =================
-# AC_CHECK_PROG
-# =================
 AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html, :)
-# =================
-# AC_C_CONST
-# =================
 AC_C_CONST
-# =================
-# AC_C_INLINE
-# =================
 AC_C_INLINE
-
-# ----------------------------------------------------------------------
-# Check for Dynamic library stuff
 # ----------------------------------------------------------------------
 AC_CHECK_LIB(dl, dlopen)
-
-# ----------------------------------------------------------------------
-# Checks for typedefs, structures, and compiler characteristics.
 # ----------------------------------------------------------------------
 AC_TYPE_MODE_T
 AC_TYPE_PID_T
@@ -140,9 +110,6 @@ AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
 AC_CHECK_SIZEOF(short, 2)
-
-# ----------------------------------------------------------------------
-# Checks for various functions.
 # ----------------------------------------------------------------------
 AC_CHECK_FUNCS(strchr strlcpy snprintf dlopen)
 AC_SEARCH_LIBS(copysign, [m],
@@ -276,6 +243,4 @@ dnl indent-tabs-mode: nil
 dnl sh-indentation: 2
 dnl End:
 dnl
-dnl end of configure.am
-
-dnl configure.in ends here
+dnl end of configure.in

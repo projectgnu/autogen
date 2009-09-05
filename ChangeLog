@@ -1,3 +1,8 @@
+2009-09-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c: simplify the printf
+	* autoopts/makeshell.c: use "static char const"
+	
 2009-07-31  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/*.c: trim lines to 80 columns
