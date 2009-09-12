@@ -386,6 +386,8 @@ dp_do_empty_val(
 
     pDE->val.pzText = nil_pz;
     pDE->valType    = VALTYP_TEXT;
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        print_def(pDE);
     return maybe_next;
 /*  END   == EMPTY VAL == DO NOT CHANGE THIS COMMENT  */
 }
@@ -515,6 +517,9 @@ dp_do_start_block(
         yyerror( (void*)"assigning a block value to text name" );
     pCurrentEntry->valType = VALTYP_BLOCK; /* in case not yet determined */
 
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        print_def(pCurrentEntry);
+
     if (++stackDepth >= stackSize) {
         tDefEntry** ppDE;
         stackSize += stackSize / 2;
@@ -546,6 +551,9 @@ dp_do_str_value(
 
     pCurrentEntry->val.pzText = pz_token;
     pCurrentEntry->valType = VALTYP_TEXT;
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        print_def(pCurrentEntry);
 
     /*
      *  The "here string" marker is the line before where the text starts.

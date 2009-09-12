@@ -1,7 +1,7 @@
 /*
  *  $Id: defLoad.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-11-12 20:50:31 bkorb"
+ *  Time-stamp:        "2009-09-12 10:26:04 bkorb"
  *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
@@ -126,6 +126,34 @@ getEntry( void )
     return pRes;
 }
 
+/*
+ *  Append a new entry at the end of a sibling (or twin) list.
+ */
+LOCAL void
+print_def(tDefEntry * pDef)
+{
+    static char const show_fmt[] = "%s%s[%u] (%s) from %s/%d\n";
+    static char const blanks[] = "                                ";
+    char const * space = (blanks + sizeof(blanks) - 1) - (2 * stackDepth);
+
+    char const * vtyp;
+
+    if (space < blanks)
+        space = blanks;
+
+    switch (pDef->valType) {
+    case VALTYP_UNKNOWN: vtyp = "unknown"; break;
+    case VALTYP_TEXT:    vtyp = "text";    break;
+    case VALTYP_BLOCK:   vtyp = "block";   break;
+    default:             vtyp = "INVALID"; break;
+    }
+
+    fprintf(pfTrace, show_fmt,
+            space,
+            pDef->pzDefName, (unsigned int)pDef->index,
+            vtyp,
+            pDef->pzSrcFile, pDef->srcLineNum);
+}
 
 /*
  *  Append a new entry at the end of a sibling (or twin) list.
@@ -142,6 +170,7 @@ insertDef( tDefEntry* pDef )
         if (pDef->index == NO_INDEX)
             pDef->index = 0;
         pList->val.pDefEntry = pDef;
+
         return pDef;
     }
     pList = pList->val.pDefEntry;
@@ -161,6 +190,7 @@ insertDef( tDefEntry* pDef )
 
             if (pDef->index == NO_INDEX)
                 pDef->index = 0;
+
             return pDef;
         }
 
@@ -297,6 +327,9 @@ readDefines( void )
     }
 
     pzDefFile = OPT_ARG( DEFINITIONS );
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf(pfTrace, "Definition Load:\n");
 
     /*
      *  Check for stdin as the input file.  We use the current time
