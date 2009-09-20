@@ -1,7 +1,7 @@
 
 /*
  *  $Id: pgusage.c,v 4.18 2009/08/01 17:43:06 bkorb Exp $
- * Time-stamp:      "2008-07-27 21:08:42 bkorb"
+ * Time-stamp:      "2009-09-20 10:27:03 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -45,7 +45,7 @@ tePagerState pagerState = PAGER_STATE_INITIAL;
 void
 optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
 {
-#if defined(__windows__) && !defined(__CYGWIN__)
+#if ! defined(HAVE_WORKING_FORK)
     if ((pOD->fOptState & OPTST_RESET) != 0)
         return;
 

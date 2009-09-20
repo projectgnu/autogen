@@ -1,3 +1,10 @@
+2009-09-20  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def (AC_FUNC_FORK): add this test
+	* autoopts/makeshell.c (genshelloptUsage): use HAVE_WORKING_FORK
+	instead of defined(__windows__) && !defined(__CYGWIN__)
+	* autoopts/pgusage.c (optionPagedUsage): ditto
+	
 2009-09-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpProcess.c: simplify the printf
