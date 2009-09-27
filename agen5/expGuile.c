@@ -2,7 +2,7 @@
 /*
  *  $Id: expGuile.c,v 4.17 2009/01/01 16:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:19:05 bkorb"
+ *  Time-stamp:        "2009-09-27 08:32:09 bkorb"
  *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module implements the expression functions that should
@@ -143,7 +143,7 @@ ag_scm_max( SCM list )
         return SCM_UNDEFINED;
 
     while (--len >= 0) {
-        unsigned long val;
+        long val;
 
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
@@ -162,7 +162,7 @@ ag_scm_max( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2ulong( car );
+            val = gh_scm2long( car );
             break;
 
         case GH_TYPE_STRING:
@@ -203,7 +203,7 @@ ag_scm_min( SCM list )
         return SCM_UNDEFINED;
 
     while (--len >= 0) {
-        unsigned long val;
+        long val;
 
         car  = SCM_CAR( list );
         list = SCM_CDR( list );
@@ -222,7 +222,7 @@ ag_scm_min( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2ulong( car );
+            val = gh_scm2long( car );
             break;
 
         case GH_TYPE_STRING:
@@ -270,7 +270,7 @@ ag_scm_sum( SCM list )
             break;
 
         case GH_TYPE_NUMBER:
-            sum += gh_scm2ulong( car );
+            sum += gh_scm2long( car );
             break;
 
         case GH_TYPE_STRING:

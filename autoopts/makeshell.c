@@ -1,7 +1,7 @@
 
 /*
  *  $Id: makeshell.c,v 4.30 2009/08/01 17:43:06 bkorb Exp $
- * Time-stamp:      "2009-09-20 10:26:37 bkorb"
+ * Time-stamp:      "2009-09-27 10:02:15 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -483,7 +483,7 @@ textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD )
       static char const*  apzTTNames[] = { TEXTTO_TABLE };
 #   undef _TT_
 
-#if defined(__windows__) && !defined(__CYGWIN__)
+#if ! defined(HAVE_WORKING_FORK)
     printf( "%1$s_%2$s_TEXT='no %2$s text'\n",
             pOpts->pzPROGNAME, apzTTNames[ whichVar ]);
 #else

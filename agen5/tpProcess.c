@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2009-09-05 12:24:37 bkorb"
+ * Time-stamp:        "2009-09-27 08:28:28 bkorb"
  * Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  * This file is part of AutoGen.
@@ -317,6 +317,11 @@ static void
 openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
 {
     tCC*  pzDefFile;
+
+    /*
+     *  Reset the post-output control flags.
+     */
+    pStk->flags = 0;
 
     /*
      *  Figure out what to use as the base name of the output file.

@@ -1,4 +1,17 @@
-2009-09-20  Bruce Korb  <bkorb@gnu.org>
+2009-09-27  Bruce Korb  <bkorb@gnu.org>
+
+	* config/misc.def (shell): split the test in two.  If "shell" is
+	enabled, then run the does-fork()-work test.
+	(do-shell): test both that "shell" is enabled and that fork()
+	works before defining SHELL_ENABLED.
+	
+2009-09-27  Eric McDonald  <Eric_McDonald@users.sourceforge.net>
+
+	* agen5/tpProcess.c (openOutFile): Reset the post-output control flags
+	* expGuile.c (ag_scm_max), (ag_scm_min), (ag_scm_sum):
+	use signed arithmetic instead of unsigned.  Fixes "(min ...)" etc
+	
+2009-09-20  Mike Frysinger <vapier@users.sourceforge.net>
 
 	* config/libopts.def (AC_FUNC_FORK): add this test
 	* autoopts/makeshell.c (genshelloptUsage): use HAVE_WORKING_FORK

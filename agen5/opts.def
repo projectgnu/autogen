@@ -4,7 +4,7 @@ autogen definitions options;
 
 /*
  *  $Id: opts.def,v 4.32 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:        "2009-01-01 08:45:45 bkorb"
+ *  Time-stamp:        "2009-09-27 11:27:19 bkorb"
  *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This file is part of AutoGen.

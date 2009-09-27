@@ -3,7 +3,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2009-07-22 18:52:50 bkorb"
+/*  Time-stamp:        "2009-09-27 11:27:47 bkorb"
  *  Last Modified:     $Date: 2009/07/23 02:05:55 $
  *             by: bkorb
  *
@@ -34,25 +34,8 @@ output-file = ag_macros.m4;
 test = {
     name   = shell;
     type   = disable;
-    check  = 'using shell scripts';
-    action = { act-type = define; };
-
-    action = { act-type = script;
-      act-text = <<-  _EOF_
-	AC_SUBST(OPTS_TESTDIR)
-	    AC_SUBST(AGEN5_TESTS)
-	    OPTS_TESTDIR=test
-	    AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
-	_EOF_; };
-
-    action = { no; act-type = script;
-      act-text = <<-  _EOF_
-	TOP_DIRLIST='$(NOSHELL_DIRS) $(XML2AG_DIR)'
-	    OPTS_TESTDIR=
-	    AGEN5_TESTS='$(NOSHELL_TESTS)'
-	_EOF_; };
-
-    conditional = DO_SHELL_CMDS;
+    check  = 'shell scripts are desired';
+    action = { act-type = script; act-text = 'AC_FUNC_FORK'; };
 
     doc = <<-  _EOF_
 	If you wish to use AutoGen as a CGI service, template shell scripts
@@ -62,6 +45,38 @@ test = {
 	specifying, --disable-shell.  In the default, enabled state, the
 	"yes-subst[itution]" will enable the getdefs, columns and doc
 	subdirectory builds.
+	_EOF_;
+};
+
+test = {
+    name   = do-shell;
+    type   = test;
+    check  = 'using shell scripts';
+
+    code   = 'test "x$ac_cv_func_fork_works" = xyes '
+                '&& test "x$ag_cv_enable_shell" = xyes || exit 1 ; echo yes';
+    code-quoting  = asis;
+
+    action = { act-type = script; asis;
+      act-text = <<-  _EOF_
+	AC_SUBST(OPTS_TESTDIR)
+	AC_SUBST(AGEN5_TESTS)
+	AC_DEFINE([SHELL_ENABLED], [1], [Define if shell scripts are enabled])
+	OPTS_TESTDIR=test
+	AGEN5_TESTS='$(SHELL_TESTS) $(NOSHELL_TESTS)'
+	_EOF_; };
+
+    action = { no; act-type = script; asis;
+      act-text = <<-  _EOF_
+	OPTS_TESTDIR=
+	AGEN5_TESTS='$(NOSHELL_TESTS)'
+	_EOF_; };
+
+    conditional = DO_SHELL_CMDS;
+
+    doc = <<-  _EOF_
+	Make sure that shell scripts are enabled and also that fork() works
+	before actually enabling shell commands.
 	_EOF_;
 };
 
