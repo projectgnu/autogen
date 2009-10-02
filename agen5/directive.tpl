@@ -2,7 +2,6 @@
 
 # $Id: directive.tpl,v 4.20 2009/01/01 16:49:26 bkorb Exp $
 # Time-stamp:        "2009-09-27 11:28:31 bkorb"
-# Last Committed:    $Date: 2009/01/01 16:49:26 $
 
 ##
 ## This file is part of AutoGen.

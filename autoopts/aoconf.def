@@ -4,7 +4,6 @@ AutoGen Definitions aoconf.tpl;
 // checked out source files.
 
 // Time-stamp:        "2009-07-22 18:56:54 bkorb"
-// Last Committed:    $Date: 2009/08/01 17:43:05 $
 
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.

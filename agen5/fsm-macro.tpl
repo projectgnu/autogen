@@ -1,7 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
 #  Time-stamp:        "2008-12-26 09:55:46 bkorb"
-#  Last Committed:    $Date: 2009/01/01 16:49:26 $
 ##
 ## This file is part of AutoGen.
 ## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

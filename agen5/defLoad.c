@@ -2,7 +2,6 @@
  *  $Id: defLoad.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2009-09-12 10:26:04 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to

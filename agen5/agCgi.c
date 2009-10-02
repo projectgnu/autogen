@@ -4,7 +4,6 @@
  *  $Id: agCgi.c,v 4.20 2009/07/31 18:45:17 bkorb Exp $
  *
  *  Time-stamp:        "2009-07-31 11:01:07 bkorb"
- *  Last Committed:    $Date: 2009/07/31 18:45:17 $
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned

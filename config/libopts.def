@@ -3,7 +3,6 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Last Modified:     $Date: 2009/07/23 02:05:55 $
  *  Time-stamp:        "2009-09-20 10:24:31 bkorb"
  *             by: bkorb
  *

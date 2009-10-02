@@ -4,7 +4,6 @@
 ##
 ## Time-stamp:      "2009-07-22 18:56:11 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Last Modified:   $Date: 2009/08/01 17:43:06 $
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

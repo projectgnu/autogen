@@ -4,7 +4,6 @@
  *  $Id: expState.c,v 4.25 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2007-12-23 12:49:15 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.

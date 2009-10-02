@@ -4,7 +4,6 @@
  *  $Id: agUtils.c,v 4.22 2009/07/21 03:21:57 bkorb Exp $
  *
  *  Time-stamp:        "2009-07-09 20:18:45 bkorb"
- *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This is the main routine for autogen.
  *

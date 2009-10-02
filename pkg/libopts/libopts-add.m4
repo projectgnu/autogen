@@ -2,7 +2,6 @@
 dnl @synopsis  LIBOPTS_CHECK
 dnl
 dnl Time-stamp:        "2009-07-22 18:50:49 bkorb"
-dnl Last Committed:    $Date: 2009/07/23 02:05:55 $
 dnl
 dnl If autoopts-config works, add the linking information to LIBS.
 dnl Otherwise, add ``libopts-${ao_rev}'' to SUBDIRS and run all

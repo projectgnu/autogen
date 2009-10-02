@@ -3,7 +3,6 @@
  *  $Id: tpLoad.c,v 4.26 2009/01/01 16:49:26 bkorb Exp $
  *
  * Time-stamp:        "2008-12-25 11:12:48 bkorb"
- * Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module will load a template and return a template structure.
  *

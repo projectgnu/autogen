@@ -5,7 +5,6 @@
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Time-stamp:        "2009-07-22 19:04:30 bkorb"
- *  Last Modified:     $Date: 2009/07/23 02:05:55 $
  *            by: bkorb
  *
  *  This file is part of AutoGen.

@@ -3,7 +3,6 @@
  *  $Id: defLex.c,v 4.29 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2008-07-26 10:06:56 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
