@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-# Time-stamp:        "2009-07-22 18:52:56 bkorb"
+## Time-stamp:        "2009-10-02 16:16:28 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##

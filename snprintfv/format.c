@@ -29,6 +29,12 @@
 
 #include "compat.h"
 
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#else
+#include <sys/limits.h>
+#endif
+
 #ifdef WITH_DMALLOC
 #  include <dmalloc.h>
 #endif
