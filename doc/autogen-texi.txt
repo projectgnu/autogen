@@ -3307,8 +3307,10 @@ bit is set at compile time.)  Only useful if the option can be disabled.
 
 @item ifdef
 @itemx ifndef
+@itemx omitted-usage
 @vindex ifdef
 @vindex ifndef
+@vindex omitted-usage
 If an option is relevant on certain platforms or when certain features
 are enabled or disabled, you can specify the compile time flag used
 to indicate when the option should be compiled in or out.  For example,
@@ -3337,6 +3339,10 @@ is not defined, then the associated @code{VALUE_OPT_} value will not be
 that is active only if @code{WITH_MUMBLING} is @code{#define}-d, then
 @code{VALUE_OPT_MUMBLING} will be @code{#define}-d iff @code{WITH_MUMBLING}
 is @code{#define}-d.  Watch those switch statements.
+@item
+If you specify @code{omitted-usage}, then the option will be recognized
+as disabled when it is configured out of the build, but will yield the
+message, ``This option has been disabled.''
 @end itemize
 
 @item no-command

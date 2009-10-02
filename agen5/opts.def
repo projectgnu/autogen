@@ -4,7 +4,7 @@ autogen definitions options;
 
 /*
  *  $Id: opts.def,v 4.32 2009/01/01 16:49:26 bkorb Exp $
- *  Time-stamp:        "2009-09-27 11:27:19 bkorb"
+ *  Time-stamp:        "2009-10-02 12:35:18 bkorb"
  *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This file is part of AutoGen.
@@ -84,6 +84,13 @@ include = <<-  _END_INCLUDE
 	#  endif
 	# endif
 	#endif
+
+	#if HAVE_CTYPE_H
+	# include <ctype.h>
+	#else
+	# define isspace(_c)  0
+	#endif
+
 	typedef void (init_proc_t)( void );
 	tCC*    pzTemplFileName  = NULL;
 	ag_bool trace_is_to_pipe = AG_FALSE;
@@ -581,20 +588,30 @@ flag = {
 	argument begins with the @code{pipe} operator (@code{|}), a command
 	that will receive the tracing output as standard in.  For example,
 	@code{--traceout='| less'} will run the trace output through the
-	@code{less} program.
+	@code{less} program.  If it begins with a shell append redirection
+	(@code{>>}), the output file will be appended to.
 	_EOF_;
 
     flag-code = <<- FLAG_CODE_END
-	    trace_is_to_pipe = (*(pOptDesc->pzLastArg) == '|');
+	    char const * fname = pOptDesc->pzLastArg;
+	    trace_is_to_pipe = (*fname == '|');
 	    if (trace_is_to_pipe)
-	        pfTrace = popen( pOptDesc->pzLastArg + 1, "w" );
+	        pfTrace = popen(++fname, "w");
+
+	    else if ((fname[0] == '>') && (fname[1] == '>')) {
+	        fname += 2;
+	        while (isspace((int)(*fname)))  fname++;
+	        pfTrace = fopen(fname, "a");
+	        fputs("\nAutoGen starts\n", pfTrace);
+	    }
+
 	    else
-	        pfTrace = fopen( pOptDesc->pzLastArg, "w" );
+	        pfTrace = fopen(fname, "w");
 
 	    if (pfTrace == NULL) {
-	        fprintf( stderr, "Error %d (%s) opening `%s' for output",
-	                 errno, strerror( errno ), pOptDesc->pzLastArg );
-	        exit( EXIT_FAILURE );
+	        fprintf(stderr, "Error %d (%s) opening `%s' for output",
+	                errno, strerror(errno), fname);
+	        exit(EXIT_FAILURE);
 	    }
 	    setvbuf(pfTrace, NULL, _IONBF, 0);
 	FLAG_CODE_END ;
@@ -612,6 +629,8 @@ flag = {
 #ifndef XML2AG
     no-preset;
     ifdef       = DEBUG_ENABLED;
+    omitted-usage;
+
     doc = <<- _EOF_
 	This will print out the complete definition tree before processing
 	the template.

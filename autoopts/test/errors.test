@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2007-07-04 10:12:20 bkorb"
+# Time-stamp:        "2009-10-02 13:19:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -41,12 +41,15 @@ testname="${testname}" \
 test_main="${test_main}" \
 argument="arg ..." \
 long_opts="yes" \
-${SHELLX} -x ${stdopts} option second:fumble || \
+${SHELLX} -x ${stdopts} option second:fumble ignored || \
     failure "Could not run stdopts.def"
 
 echo 'reorder-args;' >> ${testname}.def
-sed '/"second"/a\
-    must-set;' ${testname}.def > ${testname}.tmp
+sed -e '/"second"/a\
+    must-set;' \
+    -e '/"ignored"/a\
+    omitted-usage; ifdef = IGNORE_THIS;' \
+    ${testname}.def > ${testname}.tmp
 mv -f ${testname}.tmp ${testname}.def
 echo "homerc = ${testname}RC;" >> ${testname}.def
 
@@ -66,6 +69,7 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s Str second         The second option descrip
+      --- ignored        This option has been disabled
    -? no  help           Display usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file
@@ -79,6 +83,23 @@ Operands and options may be intermixed.  They will be reordered.
 
 The following option preset mechanisms are supported:
  - reading file errorsRC/.test_errorsrc
+_EOF_
+
+cat > ${testname}.ignored-expected <<\_EOF_
+./errors: The ignored option has been disabled
+test_errors - Test AutoOpts for errors
+USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
+  Flg Arg Option-Name    Description
+   -o no  option         The option option descrip
+   -s Str second         The second option descrip
+   -? no  help           Display usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+   -> opt save-opts      Save the option state to a config file
+   -< Str load-opts      Load options from a config file
+
+Options are specified by doubled hyphens and their name
+or by a single hyphen and the flag character.
+Operands and options may be intermixed.  They will be reordered.
 _EOF_
 
 dir=`pwd -P` || dir=`pwd`
@@ -104,6 +125,12 @@ cmp -s ${testname}.*-help || \
 echo "second bumble" > ${testname}RC/.test_errorsrc
 ./${testname} -o mumble > /dev/null || \
   failure ${testname} did not see errorsRC/.test_errorsrc
+
+./${testname} --ignored > ${testname}.ignored 2>&1 && \
+  failure "${testname} accepted --ignored"
+
+cmp -s ${testname}.ignored* || \
+  failure "${testname}.ignored error:  `diff ${testname}.ignored*`"
 
 mv ${testname}RC/.test_errorsrc ${testname}RC/test_errors.rc
 ./${testname} --load=${testname}RC/test_errors.rc -o mumble > /dev/null || \

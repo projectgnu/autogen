@@ -3,7 +3,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2009-09-27 11:27:47 bkorb"
+/*  Time-stamp:        "2009-10-02 11:38:12 bkorb"
  *  Last Modified:     $Date: 2009/07/23 02:05:55 $
  *             by: bkorb
  *
@@ -449,7 +449,7 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
-	AC_CHECK_HEADERS(libio.h)
+	AC_CHECK_HEADERS(libio.h ctype.h)
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
 	AC_CHECK_FUNCS(fopencookie funopen, break)

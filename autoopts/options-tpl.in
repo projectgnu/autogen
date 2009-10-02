@@ -5,7 +5,7 @@
 #  is used in processing the C file.
 #
 #  $Id: options-tpl.in,v 4.10 2009/08/01 17:43:06 bkorb Exp $
-# Time-stamp:      "2009-01-12 05:01:45 bkorb"
+# Time-stamp:      "2009-10-02 09:59:54 bkorb"
 
 h
 c
@@ -283,6 +283,12 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
     (if (and (exist? "min") (exist? "must-set"))
         (error (sprintf "Option %s has both 'min' and 'must-set' attributes"
                         (get "name"))))
+
+    (if (and (exist? "omitted-usage")
+             (not (exist? "ifdef"))
+             (not (exist? "ifndef")) )
+        (error (string-append "Option " (get "name") " has 'omitted-usage' "
+               "but neither 'ifdef' nor 'ifndef'" )) )
 
     (if (exist? "lib-name")
         (set! lib-opt-ptr (string->c-name! (string-append

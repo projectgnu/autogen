@@ -1,3 +1,22 @@
+2009-10-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def (trace-out): allow trace file appending
+	* autoopts/autoopts.c (longOptionFind): print a disabled option
+	message for selecting unconfigured options.
+	(shortOptionFind): ditto
+	* autoopts/options-tpl.in (omitted-usage): make sure that if supplied,
+	then either "ifdef" or "ifndef" has been supplied.
+	* autoopts/optlib.tpl (_Name): set non-null when "omitted-usage"
+	* autoopts/usage-txt.def (DisabledErr): error message for selecting
+	a configured-out option
+	(DisabledOpt): extended usage text for de-configured option.
+	* autoopts/usage.c (printOptPreamble): new function that prints just
+	the option flags
+	(printOneUsage): call this new function
+	(printOptionUsage): when an option has been omitted, see if it
+	should be printed for extended usage.
+	* doc/autogen-texi.txt: doc the new stuff
+	
 2009-09-27  Bruce Korb  <bkorb@gnu.org>
 
 	* config/misc.def (shell): split the test in two.  If "shell" is

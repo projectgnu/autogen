@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-07-31 11:28:56 bkorb"
+# Time-stamp:      "2009-10-02 09:49:40 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -724,8 +724,15 @@ tSCC    z[=(. cap-name)=]Text[] =
 #define a[=(. cap-name)=]CantList   NULL[=
     ENDIF =]
 #define z[=(. cap-name)=]Text       NULL
-#define z[=(. cap-name)=]_NAME      NULL
+#define z[=(. cap-name)=]_NAME      NULL[=
+
+    IF (exist? "omitted-usage") =]
+tSCC z[=(. cap-name)=]_Name[] = "[= name =]";[=
+
+    ELSE  =]
 #define z[=(. cap-name)=]_Name      NULL[=
+    ENDIF =][=
+
     IF (> (len "disable") 0) =]
 #define zNot[=(. cap-name)=]_Name   NULL
 #define zNot[=(. cap-name)=]_Pfx    NULL[=
