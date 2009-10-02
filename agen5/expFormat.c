@@ -2,7 +2,6 @@
  *  expFormat.c
  *
  *  Time-stamp:        "2009-07-31 12:05:29 bkorb"
- *  Last Committed:    $Date: 2009/07/31 19:10:07 $
  *
  *  $Id: expFormat.c,v 4.27 2009/07/31 19:10:07 bkorb Exp $
  *  This module implements formatting expression functions.

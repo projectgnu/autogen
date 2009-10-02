@@ -3,7 +3,6 @@
 # $Id: functions.tpl,v 4.10 2009/01/01 16:49:26 bkorb Exp $
 
 #  Time-stamp:        "2009-01-01 08:45:58 bkorb"
-#  Last Committed:    $Date: 2009/01/01 16:49:26 $
 
 ##
 ## This file is part of AutoGen.

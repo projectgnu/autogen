@@ -5,7 +5,6 @@
   pot
 
 # Time-stamp:        "2007-07-04 13:33:38 bkorb"
-# Last Committed:    $Date: 2009/08/01 17:43:06 $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

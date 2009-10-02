@@ -4,7 +4,6 @@
  *  $Id: expString.c,v 4.24 2009/07/21 03:21:57 bkorb Exp $
  *
  *  Time-stamp:        "2009-07-09 19:06:44 bkorb"
- *  Last Committed:    $Date: 2009/07/21 03:21:57 $
  *
  *  This module implements expression functions that
  *  manipulate string values.

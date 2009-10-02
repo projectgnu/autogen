@@ -4,7 +4,6 @@
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ## Time-stamp:        "2008-12-27 16:50:28 bkorb"
-## Last Committed:    $Date: 2009/01/01 16:49:26 $
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

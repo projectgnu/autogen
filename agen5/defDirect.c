@@ -3,7 +3,6 @@
  *  $Id: defDirect.c,v 4.31 2009/07/31 18:45:17 bkorb Exp $
  *
  *  Time-stamp:        "2009-07-31 11:07:48 bkorb"
- *  Last Committed:    $Date: 2009/07/31 18:45:17 $
  *
  *  This module processes definition file directives.
  *

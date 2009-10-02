@@ -5,7 +5,6 @@
  *  Parse and process the template data descriptions
  *
  * Time-stamp:        "2009-09-27 08:28:28 bkorb"
- * Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  * This file is part of AutoGen.
  * AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

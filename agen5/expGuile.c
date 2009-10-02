@@ -3,7 +3,6 @@
  *  $Id: expGuile.c,v 4.17 2009/01/01 16:49:26 bkorb Exp $
  *
  *  Time-stamp:        "2009-09-27 08:32:09 bkorb"
- *  Last Committed:    $Date: 2009/01/01 16:49:26 $
  *
  *  This module implements the expression functions that should
  *  be part of Guile.

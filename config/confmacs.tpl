@@ -3,7 +3,6 @@
 AutoGen5 Template
 
 # Time-stamp:        "2009-07-22 18:52:56 bkorb"
-# Last Committed:    $Date: 2009/07/23 02:05:55 $
 ##
 ##  This file is part of AutoGen.
 ##
