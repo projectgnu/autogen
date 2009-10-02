@@ -2036,6 +2036,7 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 @menu
 * Features::            AutoOpts Features
 * Licensing::           AutoOpts Licensing
+* Caveats::             Cautionary Notes
 * Quick Start::         Quick Start
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
@@ -2255,6 +2256,28 @@ mv libopts-*.*.* libopts
 @end example
 
 View the @file{libopts/README} file for further integration information.
+
+@c === SECTION MARKER
+
+@page
+@node Caveats
+@section Cautionary Notes
+
+The templates used to implement AutoOpts depend heavily upon
+token pasting.  That mens that if you name an option, ``debug'', for
+example, the generated header will expect to be able to emit
+@code{#define} macros such as this:
+@example
+#define DESC(n) (autogenOptions.pOptDesc[INDEX_OPT_## n])
+@end example
+and expect @code{DESC(DEBUG)} to expand correctly into
+@code{(autogenOptions.pOptDesc[INDEX_OPT_DEBUG])}.
+If @code{DEBUG} is @code{#defined} to something else, then
+that something else will be in the above expansion.
+
+If you discover you are having strange problems like this,
+you may wish to use some variation of the @code{guard-option-names}
+@xref{program attributes}.
 
 @c === SECTION MARKER
 
