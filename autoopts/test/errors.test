@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2009-10-02 13:19:32 bkorb"
+# Time-stamp:        "2009-10-02 23:22:22 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -86,7 +86,7 @@ The following option preset mechanisms are supported:
 _EOF_
 
 cat > ${testname}.ignored-expected <<\_EOF_
-./errors: The ignored option has been disabled
+errors: The ``ignored'' option has been disabled
 test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-02 09:49:40 bkorb"
+# Time-stamp:      "2009-10-02 22:52:57 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -698,7 +698,7 @@ DEFINE   opt-strs
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
   ENDIF  ifdef-ed                       =]
 tSCC    z[=(. cap-name)=]Text[] =
-        [=(set! tmp-text (kr-string (get "descrip")))  tmp-text=];[=
+        [= (kr-string (get "descrip")) =];[=
 
   IF (exist? "documentation")           =]
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
@@ -723,13 +723,19 @@ tSCC    z[=(. cap-name)=]Text[] =
     IF (exist? "flags-cant")  =]
 #define a[=(. cap-name)=]CantList   NULL[=
     ENDIF =]
-#define z[=(. cap-name)=]Text       NULL
 #define z[=(. cap-name)=]_NAME      NULL[=
 
     IF (exist? "omitted-usage") =]
 tSCC z[=(. cap-name)=]_Name[] = "[= name =]";[=
+       IF (set! tmp-text (get "omitted-usage"))
+       (> (string-length tmp-text) 1)    =]
+tSCC z[=(. cap-name)=]Text[]  = [= (kr-string tmp-text) =];[=
+       ELSE  =]
+#define z[=(. cap-name)=]Text       NULL[=
+       ENDIF =][=
 
     ELSE  =]
+#define z[=(. cap-name)=]Text       NULL
 #define z[=(. cap-name)=]_Name      NULL[=
     ENDIF =][=
 

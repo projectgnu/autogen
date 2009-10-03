@@ -1,7 +1,7 @@
 
 /*
  *  $Id: autoopts.c,v 4.45 2009/08/01 17:43:05 bkorb Exp $
- *  Time-stamp:      "2009-10-02 12:18:40 bkorb"
+ *  Time-stamp:      "2009-10-02 23:01:05 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -350,7 +350,7 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
         pOD = pOpts->pOptDesc + matchIdx;
 
         if (SKIP_OPT(pOD)) {
-            fprintf(stderr, zDisabledErr, pOpts->pzProgPath, pOD->pz_Name);
+            fprintf(stderr, zDisabledErr, pOpts->pzProgName, pOD->pz_Name);
             (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }

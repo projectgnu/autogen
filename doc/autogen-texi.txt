@@ -3346,6 +3346,7 @@ ifdef = WITH_MUMBLING;
 
 @noindent
 Take care when using these.  There are several caveats:
+
 @itemize @bullet
 @item
 The case and spelling must match whatever is specified.
@@ -3354,7 +3355,7 @@ Do not confuse these attributes with the AutoGen directives of the
 same names, @xref{Directives}.  These cause C preprocessing directives
 to be inserted into the generated C text.
 @item
-Only one of these attributes may apply to any given option.
+Only one of @code{ifdef} and @code{ifndef} may apply to any one option.
 @item
 The @code{VALUE_OPT_} values are @code{#define}-d.  If @code{WITH_MUMBLING}
 is not defined, then the associated @code{VALUE_OPT_} value will not be
@@ -3365,7 +3366,11 @@ is @code{#define}-d.  Watch those switch statements.
 @item
 If you specify @code{omitted-usage}, then the option will be recognized
 as disabled when it is configured out of the build, but will yield the
-message, ``This option has been disabled.''
+message, ``This option has been disabled.''  You may specify an alternate
+message by giving @code{omitted-usage} a string value. e.g.:
+@example
+omitted-usage = 'you cannot do this';
+@end example
 @end itemize
 
 @item no-command
