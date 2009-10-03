@@ -1,7 +1,7 @@
 
 /*
  *  usage.c  $Id: usage.c,v 4.30 2009/08/01 17:43:06 bkorb Exp $
- * Time-stamp:      "2009-10-02 12:58:42 bkorb"
+ * Time-stamp:      "2009-10-02 23:18:50 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -572,8 +572,10 @@ printOptionUsage(
                && (pOD->pz_Name != NULL)
                && (ex_code == EXIT_SUCCESS))  {
 
+                char const * why_pz =
+                    (pOD->pzText == NULL) ? zDisabledWhy : pOD->pzText;
                 printOptPreamble(pOpts, pOD, &argTypes);
-                fprintf(option_usage_fp, zDisabledOpt, pOD->pz_Name);
+                fprintf(option_usage_fp, zDisabledOpt, pOD->pz_Name, why_pz);
             }
 
             continue;

@@ -137,11 +137,15 @@ utxt = { ut-name = Dis;
 };
 
 utxt = { ut-name = DisabledErr;
-   ut-text = "%s: The %s option has been disabled\n";
+   ut-text = "%s: The ``%s'' option has been disabled\n";
 };
 
 utxt = { ut-name = DisabledOpt;
-   ut-text = " --- %-14s This option has been disabled\n";
+   ut-text = " --- %-14s %s\n";
+};
+
+utxt = { ut-name = DisabledWhy;
+   ut-text = "This option has been disabled";
 };
 
 utxt = { ut-name = Enab;

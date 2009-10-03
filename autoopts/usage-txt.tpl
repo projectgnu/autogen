@@ -4,7 +4,7 @@
 
   pot
 
-# Time-stamp:        "2007-07-04 13:33:38 bkorb"
+# Time-stamp:        "2009-10-02 23:28:40 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -147,7 +147,7 @@ ENDFOR  utxt        =][=
 
 \=]
 # Automated Option parsing usage text.
-# copyright (c) [=`date +%Y`=] by Bruce Korb - all rights reserved
+# copyright (c) [=`date +1999-%Y`=] by Bruce Korb - all rights reserved
 # This file is distributed under the same license as the AutoOpts package.
 # Bruce Korb <bkorb@gnu.org> [=`date +%Y`=]
 #
@@ -156,7 +156,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: autogen [=`echo ${AG_VERSION}`=]\n"
 "Report-Msgid-Bugs-To: autogen-users@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-03 12:18-0700\n"
+"POT-Creation-Date: [=`date '+%Y-%m-%d %H:%M%z'`=]\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
