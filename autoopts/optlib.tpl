@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-02 22:52:57 bkorb"
+# Time-stamp:      "2009-10-10 09:21:53 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -353,11 +353,29 @@ DEFINE Option_Defines             =][=
   (define value-desc (string-append UP-prefix "DESC("
           (if (exist? "equivalence")
               (up-c-name "equivalence")
-              UP-name) ")" ))     =][=
+              UP-name) ")" ))     =]
+#define VALUE_[=
+  (set! tmp-val (for-index))
+  (sprintf "%-18s" opt-name)=] [=
 
-  IF (hash-ref ifdef-ed flg-name) =]
-#if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
-  ENDIF =][=
+  CASE  value    =][=
+  !E             =][= (get-opt-value tmp-val) =][=
+  ==  "'"        =]'\''[=
+  ==  "\\"       =]'\\'[=
+  ~~  "[ -~]"    =]'[=value=]'[=
+
+  =*  num        =][=
+      (if (>= number-opt-index 0)
+          (error "only one number option is allowed")  )
+      (set! number-opt-index tmp-val)
+      (get-opt-value tmp-val)   =][=
+
+  *              =][=(error (sprintf
+    "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
+    (get "name") (get "value")))=][=
+
+  ESAC                            =][=
+  (out-push-new)                  =][=
 
   CASE (get "arg-type")           =][=
 
@@ -392,28 +410,7 @@ typedef enum {[=
 
   ESAC  (get "arg-type")
 
-=]
-#define VALUE_[=
-  (set! tmp-val (for-index))
-  (sprintf "%-18s" opt-name)=] [=
-
-  CASE  value    =][=
-  !E             =][= (get-opt-value tmp-val) =][=
-  ==  "'"        =]'\''[=
-  ==  "\\"       =]'\\'[=
-  ~~  "[ -~]"    =]'[=value=]'[=
-
-  =*  num        =][=
-      (if (>= number-opt-index 0)
-          (error "only one number option is allowed")  )
-      (set! number-opt-index tmp-val)
-      (get-opt-value tmp-val)   =][=
-
-  *              =][=(error (sprintf
-    "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
-    (get "name") (get "value")))=][=
-
-  ESAC           =][=
+=][=
 
   CASE arg-type  =][=
 
@@ -489,9 +486,18 @@ typedef enum {[=
     ENDIF is/not equivalenced     =][=
 
   ENDIF settable                  =][=
-  IF (hash-ref ifdef-ed flg-name) =]
+
+  (define tmp-val (out-pop #t))   =][=
+  IF (defined? 'tmp-val) =][= IF (> (string-length tmp-val) 2) =][=
+    IF (hash-ref ifdef-ed flg-name) =]
+#if[=ifndef "n"=]def [= ifdef =][= ifndef =]
+[= (. tmp-val) =]
 #endif /* [= ifdef =][= ifndef =] */[=
-  ENDIF =][=
+    
+    ELSE =]
+[= (. tmp-val)                    =][=
+    ENDIF                         =][=
+  ENDIF    =][=  ENDIF            =][=
 
 ENDDEF Option_Defines
 
@@ -709,7 +715,6 @@ tSCC    z[=(. cap-name)=]Text[] =
   IF (hash-ref ifdef-ed flg-name)       =]
 
 #else   /* disable [= (. cap-name)=] */
-#define [=(string-append VALUE-pfx UP-name)=] NO_EQUIVALENT
 #define [=(. UP-name)=]_FLAGS       (OPTST_OMITTED | OPTST_NO_INIT)[=
 
     IF (exist? "arg-default") =]
@@ -761,14 +766,18 @@ DEFINE help-strs
    (if (exist? "no-libopts") "" "/More_Help")
    (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
-tSCC zHelpText[]          = "Display usage information and exit";
+tSCC zHelpText[]          = "Display extended usage information and exit";
 tSCC zHelp_Name[]         = "help";[=
 
   IF (not (exist? "no-libopts"))
 
 =]
+tSCC zMore_Help_Name[]    = "more-help";
+#ifdef HAVE_WORKING_FORK
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[]    = "more-help";[=
+#else
+#define zMore_HelpText    zHelpText
+#endif[=
 
   ENDIF (not (exist? "no-libopts"))     =][=
 

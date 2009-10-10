@@ -2,7 +2,7 @@
 
 ## agman1.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2009-08-02 13:42:18 bkorb"
+## Time-stamp:      "2009-10-03 13:43:23 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -442,7 +442,7 @@ ENDFOR flag
   ELSE   :+][+:
      IF (exist? "long-opts") :+]\--[+: ENDIF :+]help[+:
   ENDIF  :+]
-Display usage information and exit.[+:
+Display extended usage information and exit.[+:
 
   IF (not (exist? "no-libopts")) :+]
 .TP

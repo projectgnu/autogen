@@ -1,3 +1,13 @@
+2009-10-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/time.test: new test
+	* agen5/test/Makefile.am: add the test
+	* agen5/tpLoad.c (loadTemplate): output time must be later than any
+	input template.
+	* autoopts/opthead.tpl (MORE_HELP): only works if HAVE_WORKING_FORK
+	* autoopts/optlib.tpl (MORE_HELP): ditto
+	* autoopts/optmain.tpl (MORE_HELP): ditto
+	
 2009-10-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/opts.def (trace-out): allow trace file appending

@@ -59,7 +59,7 @@ USAGE:  vers [ -<flag> ]...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s no  second         The second option descrip
-   -h no  help           Display usage information and exit
+   -h no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
@@ -90,7 +90,7 @@ USAGE:  vers [ -<flag> ]...
    -o no  option         The option option descrip
    -s no  second         The second option descrip
    -V opt version        Output version information and exit
-   -h no  help           Display usage information and exit
+   -h no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_

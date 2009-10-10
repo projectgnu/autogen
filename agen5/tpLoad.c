@@ -2,7 +2,7 @@
 /*
  *  $Id: tpLoad.c,v 4.26 2009/01/01 16:49:26 bkorb Exp $
  *
- * Time-stamp:        "2008-12-25 11:12:48 bkorb"
+ * Time-stamp:        "2009-10-10 07:35:55 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -347,6 +347,24 @@ loadTemplate(tCC* pzFileName, tCC * pzReferrer)
         AG_ABEND( aprf( zCannot, ENOENT, "map data file", pzFileName,
                         strerror( ENOENT )));
 
+    /*
+     *  Make sure the specified file is a regular file.
+     *  Make sure the output time stamp is at least as recent.
+     */
+    {
+        struct stat stbf;
+        if (stat( zRealFile, &stbf ) != 0)
+            AG_ABEND( aprf( zCannot, errno, "stat template file", pzFileName,
+                            strerror(errno)));
+
+        if (! S_ISREG( stbf.st_mode ))
+            AG_ABEND( aprf( zCannot, EINVAL, "not regular file", pzFileName,
+                            strerror( EINVAL )));
+
+        if (outTime <= stbf.st_mtime)
+            outTime = stbf.st_mtime + 1;
+    }
+
     text_mmap( zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo );
     if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
         AG_ABEND( aprf( "Could not open template '%s'", zRealFile ));
@@ -355,7 +373,7 @@ loadTemplate(tCC* pzFileName, tCC * pzReferrer)
      *  Process the leading pseudo-macro.  The template proper
      *  starts immediately after it.
      */
-    pCurMacro    = NULL;
+    pCurMacro = NULL;
 
     /*
      *  Count the number of macros in the template.  Compute

@@ -266,7 +266,7 @@ USAGE:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
    -m Str msg-num        opt  message number
 				- may not be preset
 				- may appear multiple times
-   -? no  help           opt  Display usage information and exit
+   -? no  help           opt  Display extended usage information and exit
    -! no  more-help      opt  Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name

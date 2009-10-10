@@ -61,7 +61,7 @@ USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
    -o no  option         The option option descrip
    -s Str second         The second option descrip
    -t Str third          The third option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file
    -< Str load-opts      Load options from a config file

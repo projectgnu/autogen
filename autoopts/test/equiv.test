@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2008-07-31 12:01:16 bkorb"
+# Time-stamp:        "2009-10-03 13:40:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -100,7 +100,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       opt omega          omega opt
 				- an alternate for alpha
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -115,7 +115,7 @@ cmp -s ${testname}*.help || \
   failure "`diff ${testname}-base.help ${testname}.help`"
 
 cat > ${testname}-base.out <<_EOF_
-21 116 789 /tmp/use
+21 117 798 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2 # 0x2
@@ -154,7 +154,7 @@ TEST_EQUIV_OMEGA='tres'
 export TEST_EQUIV_OMEGA
 _EOF_
 
-( set -e
+( set -e +x
   PAGER=wc ./${testname} --more | \
     sed 's,/use\..*,/use,;s,[ 	][ 	]*, ,g;s/^ //'
   ./${testname} --alpha -s 2
@@ -187,7 +187,7 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       opt omega          omega opt
 				- an alternate for alpha
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file
    -< Str load-opts      Load options from a config file

@@ -1,7 +1,7 @@
 
 /*
  *  $Id: autoopts.c,v 4.45 2009/08/01 17:43:05 bkorb Exp $
- *  Time-stamp:      "2009-10-02 23:01:05 bkorb"
+ *  Time-stamp:      "2009-10-03 12:45:52 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -351,6 +351,9 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
 
         if (SKIP_OPT(pOD)) {
             fprintf(stderr, zDisabledErr, pOpts->pzProgName, pOD->pz_Name);
+            if (pOD->pzText != NULL)
+                fprintf(stderr, " -- %s", pOD->pzText);
+            fputc('\n', stderr);
             (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
             /* NOTREACHED */
         }
@@ -420,6 +423,9 @@ shortOptionFind( tOptions* pOpts, uint_t optValue, tOptState* pOptState )
             if (  (pRes->fOptState == (OPTST_OMITTED | OPTST_NO_INIT))
                && (pRes->pz_Name != NULL)) {
                 fprintf(stderr, zDisabledErr, pOpts->pzProgPath, pRes->pz_Name);
+                if (pRes->pzText != NULL)
+                    fprintf(stderr, " -- %s", pRes->pzText);
+                fputc('\n', stderr);
                 (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
             }

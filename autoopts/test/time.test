@@ -65,7 +65,7 @@ test_time - Test AutoOpts for time
 USAGE:  time [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -t Tim time           The time option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2008-07-31 11:56:48 bkorb"
+# Time-stamp:        "2009-10-10 08:17:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -71,7 +71,7 @@ cat > ${testname}.hbase <<- _EOF_
 	version and help options:
 
 	  Flg Arg Option-Name    Description
-	   -? no  help           Display usage information and exit
+	   -? no  help           Display extended usage information and exit
 	   -! no  more-help      Extended usage information passed thru pager
 
 	Options are specified by doubled hyphens and their name
@@ -87,7 +87,7 @@ cat > ${testname}.hbase <<- _EOF_
 ${GREP} -v 'run program with debugging info' ${testname}.help > ${testname}.hres
 
 cmp -s ${testname}.h[br]* || \
-  failure "`diff ${testname}.h[br]*`"
+  failure "MISCOMPARE: `diff ${testname}.h[br]*`"
 
 ./${testname} --verbose=exp > /dev/null 2>&1 && \
   failure ${testname} accepted ambiguous keyword
@@ -105,6 +105,48 @@ _EOF_
 cmp -s ${testname}.o* || \
   failure "`diff ${testname}.o??`"
 
+# # # # # # # # # # USAGE OPTION # # # # # # # # # # #
+
+( sed "s/${testname}/${testname}-2/g" ${testname}.def
+  echo 'usage-opt;'
+) > ${testname}-2.def
+
+testname=${testname}-2
+
+${AG_L} ${testname}.def || {
+    testname=${testname%-2}
+    failure AutoGen could not process
+}
+
+compile "--usage"
+
+cat > ${testname}.hbase <<- _EOF_
+	test_stdopts-2 - stdopts-2 test
+	USAGE:  stdopts-2 [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+	  Flg Arg Option-Name    Description
+	   -V KWd verbose        run program with progress info
+	   -? no  help           Display extended usage information and exit
+	   -! no  more-help      Extended usage information passed thru pager
+	   -u no  usage          Abbreviated usage to stdout
+
+	Options are specified by doubled hyphens and their name
+	or by a single hyphen and the flag character.
+	_EOF_
+
+#  When building with DEBUG set, we get an unanticipated option:
+#
+${GREP} -v 'run program with debugging info' ${testname}.help > ${testname}.hres
+
+cmp -s ${testname}.h[br]* || {
+    testname=${testname%-2}
+    failure "MISCOMPARE: `diff ${testname}-2.h[br]*`"
+}
+
+use=`./${testname} --usage 2>&1 > /dev/null`
+test $? -eq 0       || failure usage failure
+test "X${use}" = X  || failure misdirected usage
+
+testname=${testname%-2}
 cleanup
 
 ## Local Variables:

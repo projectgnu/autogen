@@ -56,7 +56,7 @@ USAGE:  argument [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
@@ -113,7 +113,7 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
 				  -1 exactly, or
 				  3 to 17, or
 				  32 to 8191
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
@@ -171,7 +171,7 @@ USAGE:  argument3 [ -<flag> [<val>] ]...
    -o Str option         The option option descrip
    -s Fil second         The second option descrip
 				- file must pre-exist
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_

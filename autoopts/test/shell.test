@@ -59,7 +59,7 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s no  second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -117,7 +117,7 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- disabled as --no-shell
 				- enabled by default
    -v opt version        Output version information and exit
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -144,7 +144,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s no  second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -167,7 +167,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s no  second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -179,7 +179,7 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s no  second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name

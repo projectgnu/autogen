@@ -63,7 +63,7 @@ USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_
@@ -82,7 +82,7 @@ USAGE:  cond [ -<flag> [<val>] ]...
    -o Str option         The option option descrip
    -s Num second         The second option descrip
    -c no  condition      cond test
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 _EOF_

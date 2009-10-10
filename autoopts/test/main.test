@@ -71,7 +71,7 @@ USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 
@@ -94,7 +94,7 @@ USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
 Flg Arg Option-Name    Description
 -o Str option         The option option descrip
 -s Num second         The second option descrip
--? no  help           Display usage information and exit
+-? no  help           Display extended usage information and exit
 -! no  more-help      Extended usage information passed thru pager
 This is some explanatory text.
 If no arguments are provided, input arguments are read from stdin,

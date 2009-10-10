@@ -2,7 +2,7 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2009-10-02 23:23:44 bkorb"
+# Time-stamp:        "2009-10-10 09:33:20 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
@@ -26,7 +26,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=9
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".10pre5"
+AG_PATCHLEVEL=".10pre9"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -42,9 +42,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=32
-AO_REVISION=2
-AO_AGE=7
+AO_CURRENT=33
+AO_REVISION=0
+AO_AGE=8
 
 GO_LIBRARY=libguileopts.la
 GO_CURRENT=0

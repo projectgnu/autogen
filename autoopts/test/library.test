@@ -152,7 +152,7 @@ zzyzx library.
 version and help options:
 
   Flg Arg Option-Name    Description
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 	_EOHelp_
