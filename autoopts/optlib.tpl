@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-02 22:52:57 bkorb"
+# Time-stamp:      "2009-10-03 13:14:05 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -761,14 +761,18 @@ DEFINE help-strs
    (if (exist? "no-libopts") "" "/More_Help")
    (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
-tSCC zHelpText[]          = "Display usage information and exit";
+tSCC zHelpText[]          = "Display extended usage information and exit";
 tSCC zHelp_Name[]         = "help";[=
 
   IF (not (exist? "no-libopts"))
 
 =]
+tSCC zMore_Help_Name[]    = "more-help";
+#ifdef HAVE_WORKING_FORK
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
-tSCC zMore_Help_Name[]    = "more-help";[=
+#else
+#define zMore_HelpText    zHelpText
+#endif[=
 
   ENDIF (not (exist? "no-libopts"))     =][=
 

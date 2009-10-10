@@ -229,7 +229,7 @@ USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
    -M         option with min ct\n\
    -2         option with min ct\n\
    -v         Output version information and exit\n\
-   -h         Display usage information and exit\n\n\n\
+   -h         Display extended usage information and exit\n\n\n\
 please send bug reports to:  bkorb@gnu.org\n"), stdout);
     }
 
@@ -472,7 +472,7 @@ USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
        --min2-val             option with min ct\n\
        --min-val              option with min ct\n\
        --version              Output version information and exit\n\
-   -h, --help                 Display usage information and exit\n\n\
+   -h, --help                 Display extended usage information and exit\n\n\
 Options are specified by doubled hyphens and their name\n\
 or by a single hyphen and the flag character.\n\n\
 please send bug reports to:  bkorb@gnu.org\n"), stdout);

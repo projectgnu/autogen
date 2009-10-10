@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2007-07-15 18:06:14 bkorb"
+# Time-stamp:        "2009-10-03 13:45:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -102,7 +102,7 @@ USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 noitpircseD    emaN-noitpO grA glF
    -o rtS noitpo         pircsed noitpo noitpo ehT
    -s muN dnoces         pircsed noitpo dnoces ehT
-   -?  on pleh           tixe dna noitamrofni egasu yalpsiD
+   -?  on pleh           tixe dna noitamrofni egasu dednetxe yalpsiD
    -!  on pleh-erom      regap urht dessap noitamrofni egasu dednetxE
 
 .retcarahc galf eht dna nehpyh elgnis a yb ro
@@ -122,7 +122,7 @@ USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option descrip
    -s Num second         The second descrip
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name
@@ -136,7 +136,7 @@ cat > ${testname}-2.hlp <<'_EOF_'
 eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 
 regap urht dessap noitamrofni egasu dednetxE      pleh-erom  on !-
-tixe dna noitamrofni egasu yalpsiD           pleh  on ?-
+tixe dna noitamrofni egasu dednetxe yalpsiD           pleh  on ?-
 pircsed dnoces ehT         dnoces muN s-
 pircsed noitpo ehT         noitpo rtS o-
 noitpircseD    emaN-noitpO grA glF

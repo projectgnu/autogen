@@ -77,7 +77,7 @@ USAGE:  guile [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 				- enabled by default
    -s Str second         The second option descrip
 				- may appear multiple times
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name

@@ -87,7 +87,7 @@ USAGE:  immediate [ <option-name>[{=| }<val>] ]...
    Str second         The second option descrip
 				- disabled as --not-second
    opt version        Output version information and exit
-   no  help           Display usage information and exit
+   no  help           Display extended usage information and exit
    no  more-help      Extended usage information passed thru pager
 
 All arguments are named options.

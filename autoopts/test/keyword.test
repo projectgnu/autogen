@@ -84,7 +84,7 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
       KWd trace          tracing level of detail
       Mbr sets           set membership testing
 				- is a set membership option
-   -X no  help           Display usage information and exit
+   -X no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file
    -< Str load-opts      Load options from a config file
@@ -236,7 +236,7 @@ The default \fImember-list\fP for this option is:
 This option has not been fully documented.
 .TP
 .BR \-X , " \--help"
-Display usage information and exit.
+Display extended usage information and exit.
 .TP
 .BR \-! , " \--more-help"
 Extended usage information passed thru pager.

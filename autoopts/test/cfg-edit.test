@@ -186,7 +186,7 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
 				- file must not pre-exist
    -T Fil test-file      a test file
    -R Str reset-option   Reset an option's state
-   -? no  help           Display usage information and exit
+   -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file
    -< Str load-opts      Load options from a config file

@@ -1,7 +1,7 @@
 [= autogen5 template -*- Mode: C -*-
 
 # $Id: opthead.tpl,v 4.40 2009/08/01 17:43:06 bkorb Exp $
-# Time-stamp:      "2009-01-17 12:58:16 bkorb"
+# Time-stamp:      "2009-10-03 14:18:44 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -41,13 +41,13 @@
   (set! max-name-len (+ max-name-len 2))
   (define index-fmt (sprintf "%%s\n    %s%%-%ds=%%3d" INDEX-pfx max-name-len))
 
-   (define add-opt-index (lambda (opt-nm) (begin
-      (set! option-ct (+ option-ct 1))
-      (ag-fprintf 0 index-fmt index-sep-str opt-nm (- option-ct 1))
-      (set! index-sep-str ",")
-   ) ) )
+  (define add-opt-index (lambda (opt-nm) (begin
+     (ag-fprintf 0 index-fmt index-sep-str opt-nm option-ct)
+     (set! option-ct (+ option-ct 1))
+     (set! index-sep-str ",")
+  ) ) )
 
-   (not (exist? "library"))          =]
+  (not (exist? "library"))          =]
 /*
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
@@ -81,8 +81,19 @@ ELSE not exists library                 =][=
 
   (if (exist? "resettable")       (add-opt-index "RESET_OPTION"))
   (if (exist? "version")          (add-opt-index "VERSION"))
-  (add-opt-index "HELP")
-  (if (not (exist? "no-libopts")) (add-opt-index "MORE_HELP"))
+  (add-opt-index "HELP") =][=
+
+  (if (not (exist? "no-libopts"))
+      (begin
+       (emit ",\n#ifdef HAVE_WORKING_FORK")
+       (set! index-sep-str "")
+       (add-opt-index "MORE_HELP")
+       (emit ",\n#else")
+       (ag-fprintf 0 index-fmt "" "MORE_HELP" (- option-ct 2))
+       (emit ", /* skip when fork() does not work */\n#endif /* fork() works */")
+       (set! index-sep-str "")
+  )   ) =][=
+
   (if (exist? "usage-opt")        (add-opt-index "USAGE"))
 
   (if (exist? "homerc") (begin

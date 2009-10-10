@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2009-01-01 08:40:25 bkorb"
+# Time-stamp:      "2009-10-03 13:35:10 bkorb"
 
 # $Id: optmain.tpl,v 4.36 2009/08/01 17:43:06 bkorb Exp $
 
@@ -524,8 +524,6 @@ DEFINE decl-callbacks
   (define decl-type "")
   (define extern-proc-list (string-append
 
-    "optionPagedUsage\n"
-
     (if (exist? "version")    "optionPrintVersion\n" "")
     (if (exist? "resettable") "optionResetOpt\n" "")
   ) )
@@ -659,8 +657,15 @@ static tOptProc
   ENDIF make-test-main
 
 =]
+#ifdef HAVE_WORKING_FORK
+extern tOptProc optionPagedUsage;
+#else
+#define optionPagedUsage doUsageOpt
+#endif[=
+  IF (> (string-length extern-proc-list) 1) =]
 extern tOptProc
 [=(emit-decl-list extern-proc-list #t)=][=
+  ENDIF =][=
 
   IF (> (string-length static-proc-list) 0)
 

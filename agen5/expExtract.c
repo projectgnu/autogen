@@ -2,7 +2,7 @@
  *  expExtract.c
  *  $Id: expExtract.c,v 4.19 2009/01/01 16:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2007-07-04 11:18:16 bkorb"
+ *  Time-stamp:        "2009-10-04 09:19:48 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -240,19 +240,30 @@ extractText( char const* pzText, char const* pzStart, char const* pzEnd,
  * macro with a Guile/scheme function, extract the text you want to keep
  * with this extract function.  Just remember you should delete it at the
  * end, too.  Here is an example from my Finite State Machine generator:
- * @end table
  *
  * @example
  * [+ AutoGen5 Template  -*- Mode: text -*-
- *    h=%s-fsm.h   c=%s-fsm.c
- *    (shellf
- *    "[ -f %1$s-fsm.h ] && mv -f %1$s-fsm.h .fsm.head
- *     [ -f %1$s-fsm.c ] && mv -f %1$s-fsm.c .fsm.code" (base-name)) +]
+ * h=%s-fsm.h   c=%s-fsm.c
+ * (shellf
+ * "test -f %1$s-fsm.h && mv -f %1$s-fsm.h .fsm.head
+ *  test -f %1$s-fsm.c && mv -f %1$s-fsm.c .fsm.code" (base-name))
+ * +]
  * @end example
  *
  * This code will move the two previously produced output files to files
  * named ".fsm.head" and ".fsm.code".  At the end of the 'c' output
  * processing, I delete them.
+ *
+ * @item also NB:
+ * This function presumes that the output file ought to be editable so
+ * that the code between the @code{START} and @code{END} marks can be edited
+ * by the template user.  Consequently, when the @code{(extract ...)} function
+ * is invoked, if the @code{writable} option has not been specified, then
+ * it will be set at that point.  If this is not the desired behavior, the
+ * @code{--not-writable} command line option will override this.
+ * Also, you may use the guile function @code{(chmod "file" mode-value)}
+ * to override whatever AutoGen is using for the result mode.
+ * @end table
 =*/
 SCM
 ag_scm_extract( SCM file, SCM marker, SCM caveat, SCM def )

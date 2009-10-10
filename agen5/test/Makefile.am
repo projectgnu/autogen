@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2009-07-22 18:59:17 bkorb"
+## Time-stamp:      "2009-10-10 07:29:43 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -29,11 +29,11 @@ SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test
 
 NOSHELL_TESTS = \
-  alist.test   case.test    debug.test   defref.test  dynref.test  \
-  endmac.test  for.test     forfrom.test forin.test   format.test  get.test   \
-  gperf.test   heredef.test html.test    in.test      license.test line.test  \
-  loop.test    make.test    match.test   pseudo.test  reorder.test stack.test \
-  stress.test  string.test  strtable.test
+  alist.test   case.test    debug.test    defref.test  dynref.test  \
+  endmac.test  for.test     forfrom.test  forin.test   format.test  get.test   \
+  gperf.test   heredef.test html.test     in.test      license.test line.test  \
+  loop.test    make.test    match.test    pseudo.test  reorder.test stack.test \
+  stress.test  string.test  strtable.test time.test
 
 UNREADY_TESTS   = daemon.test
 TESTS       	= @AGEN5_TESTS@

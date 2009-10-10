@@ -71,7 +71,7 @@ cat > ${testname}.hbase <<- _EOF_
 	version and help options:
 
 	  Flg Arg Option-Name    Description
-	   -? no  help           Display usage information and exit
+	   -? no  help           Display extended usage information and exit
 	   -! no  more-help      Extended usage information passed thru pager
 
 	Options are specified by doubled hyphens and their name
