@@ -1,7 +1,7 @@
 /*
  *  $Id: defLoad.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2009-09-12 10:26:04 bkorb"
+ *  Time-stamp:        "2009-10-10 09:37:00 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -322,6 +322,8 @@ readDefines( void )
         pBaseCtx->lineNo     = 1;
         pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
         manageAllocatedData( pBaseCtx );
+        if (! ENABLED_OPT( SOURCE_TIME ))
+            outTime = time( NULL );
         return;
     }
 

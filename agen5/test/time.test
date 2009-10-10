@@ -1,9 +1,9 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
-# stack.test --- test stack and join functionality
+# time.test --- test modification time settings
 #
-## Time-stamp:      "2009-10-10 07:32:21 bkorb"
+## Time-stamp:      "2009-10-10 09:55:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -37,7 +37,7 @@ _EOF_
 
 touch -t 200109110846.00 ${testname}.tpl
 
-${AGexe} -b ${testname} -T ${testname}.tpl --no-definitions || \
+${AGexe} --source-time -b ${testname} -T ${testname}.tpl --no-definitions || \
     failure ${AGexe} failed
 
 touch -t 200109110846.02 ${testname}.taaa
@@ -61,4 +61,4 @@ failure "wrong file time ordering:  $*"
 ## sh-indentation: 2
 ## End:
 
-# end of stack.test
+# end of time.test

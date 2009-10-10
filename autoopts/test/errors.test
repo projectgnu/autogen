@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2009-10-03 12:49:01 bkorb"
+# Time-stamp:        "2009-10-10 09:25:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -69,7 +69,7 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s Str second         The second option descrip
-      --- ignored        we have dumped this
+   -i --- ignored        we have dumped this
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
    -> opt save-opts      Save the option state to a config file

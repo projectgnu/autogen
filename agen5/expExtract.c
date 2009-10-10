@@ -2,7 +2,7 @@
  *  expExtract.c
  *  $Id: expExtract.c,v 4.19 2009/01/01 16:49:26 bkorb Exp $
  *
- *  Time-stamp:        "2009-10-04 09:19:48 bkorb"
+ *  Time-stamp:        "2009-10-10 09:28:12 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -93,9 +93,18 @@ loadExtractData( char const* pzNewFile )
      *  Suck up the file.  We must read it all.
      */
     {
+        struct stat stbf;
         FILE* fp = fopen( pzNewFile, "r" );
         if (fp == NULL)
             goto bad_return;
+
+        if (fstat(fileno(fp), &stbf) != 0) {
+            fclose(fp);
+            goto bad_return;
+        }
+
+        if (outTime <= stbf.st_mtime)
+            outTime = stbf.st_mtime + 1;
 
         do  {
             size_t sz = fread(pzIn, (size_t)1, (size_t)sbuf.st_size, fp);
@@ -110,7 +119,7 @@ loadExtractData( char const* pzNewFile )
         } while (sbuf.st_size > 0);
 
         *pzIn = NUL;
-        fclose( fp );
+        fclose(fp);
     }
 
     return pzText;
