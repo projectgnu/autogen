@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expGuile.c,v 4.17 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-09-27 08:32:09 bkorb"
  *

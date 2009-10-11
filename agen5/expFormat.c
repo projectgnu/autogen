@@ -3,7 +3,7 @@
  *
  *  Time-stamp:        "2009-07-31 12:05:29 bkorb"
  *
- *  $Id: expFormat.c,v 4.27 2009/07/31 19:10:07 bkorb Exp $
+ *  $Id$
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.

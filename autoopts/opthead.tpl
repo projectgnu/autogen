@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# $Id: opthead.tpl,v 4.40 2009/08/01 17:43:06 bkorb Exp $
+# $Id$
 # Time-stamp:      "2009-10-11 08:58:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.

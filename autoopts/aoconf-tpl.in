@@ -26,7 +26,7 @@ in=autoopts-config.in
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: aoconf-tpl.in,v 4.13 2009/08/01 17:43:05 bkorb Exp $
+## $Id$
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.

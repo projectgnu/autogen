@@ -1,7 +1,7 @@
 autogen definitions options;
 
 /*
- *  $Id: opts.def,v 4.16 2009/01/25 19:31:56 bkorb Exp $
+ *  $Id$
  *  Time-stamp:        "2009-01-25 10:13:56 bkorb"
  *
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

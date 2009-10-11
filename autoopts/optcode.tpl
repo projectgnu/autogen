@@ -1,6 +1,6 @@
 [= autogen5 template
 
-#$Id: optcode.tpl,v 4.50 2009/08/01 17:43:06 bkorb Exp $
+#$Id$
 
 # Time-stamp:      "2009-10-11 08:48:29 bkorb"
 #

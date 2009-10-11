@@ -26,7 +26,7 @@ dnl  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 dnl  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 dnl  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: autoopts.m4,v 4.9 2009/08/01 17:43:05 bkorb Exp $
+dnl @(#) $Id$
 dnl --------------------------------------------------------------------
 dnl
 dnl Code:

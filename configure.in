@@ -21,7 +21,7 @@ dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id: configure.in,v 4.34 2009/01/01 16:49:26 bkorb Exp $
+dnl Code: $Id$
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()

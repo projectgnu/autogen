@@ -1,7 +1,7 @@
 
 /*
  *  expState.c
- *  $Id: expState.c,v 4.25 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2007-12-23 12:49:15 bkorb"
  *

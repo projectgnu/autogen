@@ -26,7 +26,7 @@
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: shell.test,v 4.13 2009/01/01 16:49:26 bkorb Exp $
+# $Id$
 # ----------------------------------------------------------------------
 
 exec 9>&2

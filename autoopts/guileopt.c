@@ -1,6 +1,6 @@
 
 /*
- *  $Id: guileopt.c,v 4.17 2009/08/01 17:43:06 bkorb Exp $
+ *  $Id$
  * Time-stamp:      "2007-07-04 10:23:29 bkorb"
  *
  *  This module will export the option values to the Guile environment.

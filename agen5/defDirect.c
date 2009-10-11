@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id: defDirect.c,v 4.31 2009/07/31 18:45:17 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-07-31 11:07:48 bkorb"
  *

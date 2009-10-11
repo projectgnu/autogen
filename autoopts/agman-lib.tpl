@@ -27,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: agman-lib.tpl,v 4.7 2009/08/01 17:43:05 bkorb Exp $
+## $Id$
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included

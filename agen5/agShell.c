@@ -1,6 +1,6 @@
 /*
  *  agShell
- *  $Id: agShell.c,v 4.31 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2008-12-31 13:55:28 bkorb"
  *

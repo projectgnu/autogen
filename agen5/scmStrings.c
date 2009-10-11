@@ -1,7 +1,7 @@
 
 /*
  *  scmStrings.c
- *  $Id: scmStrings.c,v 4.9 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *  Temporary SCM strings.
  *
  * Time-stamp:        "2007-07-04 11:28:25 bkorb"

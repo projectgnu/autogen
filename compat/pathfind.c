@@ -7,7 +7,7 @@
  * Time-stamp:       "2006-09-23 19:46:16 bkorb"
  *            by: bkorb
  *
- * $Id: pathfind.c,v 4.12 2007/10/07 16:54:54 bkorb Exp $
+ * $Id$
  */
 
 /* Code: */

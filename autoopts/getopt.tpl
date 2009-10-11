@@ -60,7 +60,7 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: getopt.tpl,v 4.16 2009/08/01 17:43:06 bkorb Exp $
+ *  $Id$
  */[+
 CASE (suffix) +][+
 == h +]

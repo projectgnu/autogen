@@ -1,6 +1,6 @@
 
 /*
- *  save.c  $Id: save.c,v 4.36 2009/08/01 17:43:06 bkorb Exp $
+ *  save.c  $Id$
  * Time-stamp:      "2009-07-20 20:40:28 bkorb"
  *
  *  This module's routines will take the currently set options and

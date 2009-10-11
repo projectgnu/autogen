@@ -1,6 +1,6 @@
 
 /*
- *  $Id: defLex.c,v 4.29 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2008-07-26 10:06:56 bkorb"
  *

@@ -1,6 +1,6 @@
 
 /*
- *  $Id: funcEval.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2007-11-12 20:41:59 bkorb"
  *

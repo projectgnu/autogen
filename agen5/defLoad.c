@@ -1,5 +1,5 @@
 /*
- *  $Id: defLoad.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-10-10 09:37:00 bkorb"
  *

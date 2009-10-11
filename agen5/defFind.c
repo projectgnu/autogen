@@ -1,5 +1,5 @@
 /*
- *  $Id: defFind.c,v 4.23 2009/07/21 03:21:57 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-07-09 19:00:11 bkorb"
  *

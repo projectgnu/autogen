@@ -2,7 +2,7 @@
 
 h
 
-# $Id: strsignal.tpl,v 4.7 2009/01/01 16:49:26 bkorb Exp $
+# $Id$
 
 ##
 ##  This file is part of AutoGen.

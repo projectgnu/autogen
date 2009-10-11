@@ -1,6 +1,6 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: functions.tpl,v 4.10 2009/01/01 16:49:26 bkorb Exp $
+# $Id$
 
 #  Time-stamp:        "2009-01-01 08:45:58 bkorb"
 

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id: agUtils.c,v 4.22 2009/07/21 03:21:57 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-07-09 20:18:45 bkorb"
  *

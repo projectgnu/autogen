@@ -1,6 +1,6 @@
 
 /*
- *  $Id: tpLoad.c,v 4.26 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  * Time-stamp:        "2009-10-10 07:35:55 bkorb"
  *
