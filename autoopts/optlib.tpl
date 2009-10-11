@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-10 09:21:53 bkorb"
+# Time-stamp:      "2009-10-11 08:42:21 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -355,7 +355,7 @@ DEFINE Option_Defines             =][=
               (up-c-name "equivalence")
               UP-name) ")" ))     =]
 #define VALUE_[=
-  (set! tmp-val (for-index))
+  (define tmp-val (for-index))
   (sprintf "%-18s" opt-name)=] [=
 
   CASE  value    =][=

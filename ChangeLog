@@ -1,3 +1,10 @@
+2009-10-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl (tmp-val): define it instead of setting it.
+	Sun's Guile sometimes loses track of the name (?!?!)
+	* autoopts/optlib.tpl: ditto
+	* autoopts/opthead.tpl: ditto
+	
 2009-10-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/time.test: new test

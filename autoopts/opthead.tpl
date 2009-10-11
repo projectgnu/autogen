@@ -1,7 +1,7 @@
 [= autogen5 template -*- Mode: C -*-
 
 # $Id: opthead.tpl,v 4.40 2009/08/01 17:43:06 bkorb Exp $
-# Time-stamp:      "2009-10-03 14:18:44 bkorb"
+# Time-stamp:      "2009-10-11 08:58:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -284,7 +284,7 @@ are used identically to the user-generated VALUE defines.
 
 DEFINE set-std-value =]
 #define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
-  CASE (set! tmp-val (get "val-name"))
+  CASE (define tmp-val (get "val-name"))
        (get tmp-val)        =][=
    == ""   =][=
 

@@ -2,7 +2,7 @@
 
 #$Id: optcode.tpl,v 4.50 2009/08/01 17:43:06 bkorb Exp $
 
-# Time-stamp:      "2009-01-18 12:49:00 bkorb"
+# Time-stamp:      "2009-10-11 08:48:29 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,7 +32,7 @@
 ;;;
 ;;;  The rules are:  If any options have a "value" attribute, then
 ;;;  there are flags allowed, so include "-<flag>" on the usage line.
-;;;  If the program has the "long_opts" attribute set, then we must
+;;;  If the program has the "long-opts" attribute set, then we must
 ;;;  have "<option-name>" or "--<name>" on the line, depending on
 ;;;  whether or not there are flag options.  If any options take
 ;;;  arguments, then append "[<val>]" to the flag description and
@@ -44,10 +44,9 @@
 ;;;
 ;;;  Compute the option arguments
 ;;;
+(define tmp-val "")
 (if (exist? "flag.arg-type")
-    (set! tmp-val "[{=| }<val>]")
-    (set! tmp-val "")
-)
+    (set! tmp-val "[{=| }<val>]"))
 
 (define usage-line (string-append "USAGE:  %s "
 
