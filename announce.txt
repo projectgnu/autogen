@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: announce.txt,v 4.18 2009/07/23 02:05:55 bkorb Exp $
+# $Id$
 #
 # Time-stamp:        "2009-07-22 18:57:57 bkorb"
 ##

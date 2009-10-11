@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- * $Id: genshell.def,v 4.9 2009/01/01 16:49:26 bkorb Exp $
+ * $Id$
  * Time-stamp:      "2009-01-01 08:42:03 bkorb"
  *
  *  This module generates shell scripts with AutoOpts supported command line

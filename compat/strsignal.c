@@ -44,7 +44,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id: strsignal.c,v 4.9 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  */
 
 #include "compat.h"

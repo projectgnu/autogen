@@ -2,7 +2,7 @@
 
 # Time-stamp:      "2009-10-03 13:35:10 bkorb"
 
-# $Id: optmain.tpl,v 4.36 2009/08/01 17:43:06 bkorb Exp $
+# $Id$
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

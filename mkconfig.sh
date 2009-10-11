@@ -24,7 +24,7 @@ timestamp=$(set -- \
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: mkconfig.sh,v 4.10 2009/07/23 02:05:55 bkorb Exp $
+# @(#) $Id$
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;

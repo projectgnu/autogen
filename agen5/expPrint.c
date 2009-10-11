@@ -1,6 +1,6 @@
 
 /*
- *  $Id: expPrint.c,v 4.22 2009/07/31 18:45:17 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-07-31 11:08:29 bkorb"
  *

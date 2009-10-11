@@ -1,6 +1,6 @@
 
 /*
- *  agInit.c  $Id: agInit.c,v 4.22 2009/07/31 18:45:17 bkorb Exp $
+ *  agInit.c  $Id$
  *
  *  Time-stamp:      "2009-07-31 11:06:50 bkorb"
  *

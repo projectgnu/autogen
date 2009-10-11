@@ -4,7 +4,7 @@
 #  Header must come first.  An env variable is set that
 #  is used in processing the C file.
 #
-#  $Id: options-tpl.in,v 4.10 2009/08/01 17:43:06 bkorb Exp $
+#  $Id$
 # Time-stamp:      "2009-10-02 09:59:54 bkorb"
 
 h

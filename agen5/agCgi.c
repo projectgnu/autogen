@@ -1,7 +1,7 @@
 
 /*
  *  agCgi.c
- *  $Id: agCgi.c,v 4.20 2009/07/31 18:45:17 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2009-07-31 11:01:07 bkorb"
  *

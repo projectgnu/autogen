@@ -24,7 +24,7 @@ html
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id: gnudoc.tpl,v 4.13 2009/01/01 16:49:26 bkorb Exp $
+  ==  $Id$
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "

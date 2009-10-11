@@ -1,6 +1,6 @@
 
 /*
- *  $Id: functions.c,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2008-01-22 08:46:58 bkorb"
  *

@@ -1,7 +1,7 @@
 
 /*
  *  expMake.c
- *  $Id: expMake.c,v 4.12 2009/01/01 16:49:26 bkorb Exp $
+ *  $Id$
  *
  *  Time-stamp:        "2007-07-04 11:19:20 bkorb"
  *

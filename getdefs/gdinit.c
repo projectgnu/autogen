@@ -1,5 +1,5 @@
 /*
- *  $Id: gdinit.c,v 4.17 2009/07/23 02:05:55 bkorb Exp $
+ *  $Id$
  *
  *  getdefs copyright (c) 1999-2009 by Bruce Korb - all rights reserved
  *

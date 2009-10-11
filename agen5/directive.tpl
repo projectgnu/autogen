@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: directive.tpl,v 4.20 2009/01/01 16:49:26 bkorb Exp $
+# $Id$
 # Time-stamp:        "2009-09-27 11:28:31 bkorb"
 
 ##

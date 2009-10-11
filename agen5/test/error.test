@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: error.test,v 4.22 2009/01/09 06:34:20 bkorb Exp $
+# $Id$
 # ----------------------------------------------------------------------
 
 . ./defs

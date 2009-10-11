@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: auto_gen.tpl,v 4.36 2009/01/01 16:49:26 bkorb Exp $
+## $Id$
 ## ---------------------------------------------------------------------
 
 texi=autogen.texi

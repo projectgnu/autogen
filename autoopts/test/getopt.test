@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2009-01-01 09:01:32 bkorb"
+# Time-stamp:        "2009-10-11 09:45:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: getopt.test,v 4.28 2009/08/01 17:43:06 bkorb Exp $
+# $Id$
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -46,7 +46,7 @@ compile_getopt() {
   # Remove the variable comments so we can test against the expected result
   #
   sed '2,/and the template file/d
-      /\$Id:/d
+      /\$''Id:/d
       /Last template edit:/d' getopt-test_${testname}.c \
         > ${testname}${1}-getopt.c
 

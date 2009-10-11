@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id: columns.c,v 4.19 2009/01/25 19:31:56 bkorb Exp $
+ *  $Id$
  *  Time-stamp:        "2009-01-25 10:19:02 bkorb"
  *
  *  Columns copyright (c) 1992-2009 by Bruce Korb - all rights reserved

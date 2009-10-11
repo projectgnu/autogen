@@ -3,7 +3,7 @@
 h=options.h
 
 # Time-stamp:      "2009-08-01 11:05:25 bkorb"
-# ID:  $Id: options_h.tpl,v 4.47 2009/08/01 18:20:13 bkorb Exp $
+# ID:  $Id$
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
