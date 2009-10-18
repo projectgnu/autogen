@@ -2,7 +2,7 @@
  *  agShell
  *  $Id$
  *
- *  Time-stamp:        "2008-12-31 13:55:28 bkorb"
+ *  Time-stamp:        "2009-10-18 13:36:37 bkorb"
  *
  *  Manage a server shell process
  *
@@ -22,6 +22,8 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+static tpChar  pCurDir    = NULL;
 
 #ifndef SHELL_ENABLED
  void closeServer( void ) { }
@@ -44,7 +46,6 @@
  */
 static tpfPair serverPair = { NULL, NULL };
 static pid_t   serverId   = NULLPROCESS;
-static tpChar  pCurDir    = NULL;
 static ag_bool errClose   = AG_FALSE;
 static int     logCount   = 0;
 static tCC     logIntroFmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
@@ -373,7 +374,6 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
     pfPair->pfWrite = fdopen( fdPair.writeFd, "w" FOPEN_BINARY_FLAG );
     return chId;
 }
-#endif /* SHELL_ENABLED */
 
 
 /*
@@ -385,7 +385,7 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
 static char*
-loadData( void )
+loadData(void)
 {
     char*   pzText;
     size_t  textSize;
@@ -483,7 +483,7 @@ loadData( void )
     return AGREALOC( (void*)pzText, textSize, "resizing text output" );
 }
 
-#ifdef SHELL_ENABLED
+
 /*
  *  Run a semi-permanent server shell.  The program will be the
  *  one named by the environment variable $SHELL, or default to "sh".

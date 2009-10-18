@@ -2,7 +2,7 @@
 
 #$Id$
 
-# Time-stamp:      "2009-10-11 08:48:29 bkorb"
+# Time-stamp:      "2009-10-18 12:58:07 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -324,7 +324,11 @@ IF (not (exist? "no-libopts"))          =],
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
+#ifdef HAVE_WORKING_FORK
      /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+#else
+     /* opt state flags  */ OPTST_OMITTED | OPTST_NO_INIT, 0,
+#endif
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,

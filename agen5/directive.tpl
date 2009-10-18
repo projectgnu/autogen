@@ -1,7 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
 # $Id$
-# Time-stamp:        "2009-09-27 11:28:31 bkorb"
+# Time-stamp:        "2009-10-18 13:42:32 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -121,12 +121,13 @@ static char const zSchemeInit[= (set! tmp-txt (shell
 (emit (sprintf "[%d] =\n" (+ (string-length tmp-txt) 1)))
 (kr-string tmp-txt) =]; /* ' // " // */
 
+#if defined(SHELL_ENABLED)
 /*
  *  The shell initialization string.  It is not in "const" memory because
  *  we have to write our PID into it.
  */
 static char zShellInit[] =
-    [= #  Things this scriptlett has to do:
+[= #  Things this scriptlett has to do:
 
 1.  Open fd 8 as a duplicate of 2.  It will remain open.
     Divert 2 to /dev/null for the duration of the initialization.
@@ -178,8 +179,6 @@ exec 2>&8
 AG_pid=[=
 (kr-string (out-pop #t))=] "\000........."; /* ' // " // */
 
-
-#if defined(SHELL_ENABLED)
 /*
  *  "gperf" functionality only works if the subshell is enabled.
  */

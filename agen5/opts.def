@@ -4,7 +4,7 @@ autogen definitions options;
 
 /*
  *  $Id$
- *  Time-stamp:        "2009-10-02 12:35:18 bkorb"
+ *  Time-stamp:        "2009-10-18 13:10:00 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -499,7 +499,7 @@ flag = {
     arg-range   = "0->3600"; /* one hour limit */
     arg-name    = time-lim;
 
-    descrip     = "Time limit for servers";
+    descrip     = "Time limit for server shell";
 #ifndef XML2AG
     ifdef       = SHELL_ENABLED;
     doc = <<-  _EOF_

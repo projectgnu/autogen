@@ -1,7 +1,7 @@
 #! /bin/sh
 set -x
 
-# Time-stamp:        "2009-10-18 11:01:54 bkorb"
+# Time-stamp:        "2009-10-18 11:56:24 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -35,25 +35,45 @@ test -z "${CONFIG_SHELL}" && CONFIG_SHELL=/bin/sh
 rm -f ${destdir}/options.h
 exec 3> ${destdir}/options.h
 opthdrsrc=${srcdir}/autoopts/options.h
+cfgf=${top_builddir}/config.h
 
 sed '/^#include <stdio/q' ${opthdrsrc} >&3
 
-if egrep 'define +HAVE_STDINT_H' ${top_builddir}/config.h >/dev/null
+if egrep 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
 then echo '#include <stdint.h>' >&3
 else echo '#include <inttypes.h>' >&3 ; fi
 
-if egrep 'define +HAVE_LIMITS_H' ${top_builddir}/config.h >/dev/null
+if egrep 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
 then echo '#include <limits.h>' >&3
 else echo '#include <sys/limits>' >&3 ; fi
 
-if egrep 'define +HAVE_U_INT' ${top_builddir}/config.h >/dev/null
+if egrep 'define +HAVE_U_INT' ${cfgf} >/dev/null
 then :
 else echo 'typedef unsigned int u_int;' >&3 ; fi
 
-if egrep 'define +HAVE_SYSEXITS_H' ${top_builddir}/config.h >/dev/null
+if egrep 'define +HAVE_SYSEXITS_H' ${cfgf} >/dev/null
 then echo '#include <sysexits.h>' >&3 ; fi
 
-egrep 'define +NO_OPTIONAL_OPT_ARGS' ${top_builddir}/config.h >&3
+egrep 'define +NO_OPTIONAL_OPT_ARGS' ${cfgf} >&3
+
+if egrep 'define +HAVE_INTPTR_T' ${cfgf} >/dev/null
+then :
+else
+    sizeof_charp=`egrep 'define +SIZEOF_CHARP ' ${cfgf} | \
+        sed 's/.*SIZEOF_CHARP *//'`
+    sizeof_long=` egrep 'define +SIZEOF_LONG '  ${cfgf} | \
+        sed 's/.*SIZEOF_LONG *//'`
+    echo "#ifndef HAVE_UINTPTR_T"
+    echo "#define HAVE_UINTPTR_T 1"
+    echo "#define HAVE_INTPTR_T  1"
+    if test "X${sizeof_charp}" = "X${sizeof_long}"
+    then echo "typedef long intptr_t;"
+         echo "typedef unsigned long uintptr_t;"
+    else echo "typedef int intptr_t;"
+         echo "typedef unsigned int uintptr_t;"
+    fi
+    echo "#endif /* HAVE_UINTPTR_T */"
+fi >&3
 
 sed '1,/endif.*HAVE_SYSEXITS_H/d' ${opthdrsrc} >&3
 

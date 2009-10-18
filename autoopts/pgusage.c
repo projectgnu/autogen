@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2009-09-20 10:27:03 bkorb"
+ * Time-stamp:      "2009-10-18 12:46:57 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -41,6 +41,7 @@ tePagerState pagerState = PAGER_STATE_INITIAL;
  * doc:
  *  Run the usage output through a pager.
  *  This is very handy if it is very long.
+ *  This is disabled on platforms without a working fork() function.
 =*/
 void
 optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
