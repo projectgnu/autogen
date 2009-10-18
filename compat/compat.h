@@ -2,7 +2,7 @@
 
 /* compat.h --- fake the preprocessor into handlng portability
  *
- *  Time-stamp:      "2009-10-18 07:26:17 bkorb"
+ *  Time-stamp:      "2009-10-18 11:14:14 bkorb"
  *
  * $Id$
  *
@@ -265,75 +265,83 @@
 #endif
 
 #ifndef HAVE_INT8_T
-  typedef signed char       int8_t;
-# define  HAVE_INT8_T       1
+  typedef signed char           int8_t;
+# define  HAVE_INT8_T           1
 #endif
 #ifndef HAVE_UINT8_T
-  typedef unsigned char     uint8_t;
-# define  HAVE_UINT8_T      1
+  typedef unsigned char         uint8_t;
+# define  HAVE_UINT8_T          1
 #endif
 #ifndef HAVE_INT16_T
-  typedef signed short      int16_t;
-# define  HAVE_INT16_T      1
+  typedef signed short          int16_t;
+# define  HAVE_INT16_T          1
 #endif
 #ifndef HAVE_UINT16_T
-  typedef unsigned short    uint16_t;
-# define  HAVE_UINT16_T     1
+  typedef unsigned short        uint16_t;
+# define  HAVE_UINT16_T         1
 #endif
 
 #ifndef HAVE_INT32_T
-# if SIZEOF_INT == 4
-    typedef signed int      int32_t;
-#   define  HAVE_INT32_T    1
-# elif SIZEOF_LONG == 4
-    typedef signed long     int32_t;
-#   define  HAVE_UINT32_T   1
+# if SIZEOF_INT ==              4
+    typedef signed int          int32_t;
+# elif SIZEOF_LONG ==           4
+    typedef signed long         int32_t;
 # endif
+# define  HAVE_INT32_T          1
 #endif
 
 #ifndef HAVE_UINT32_T
-# if SIZEOF_INT == 4
-    typedef unsigned int    uint32_t;
-#   define  HAVE_INT32_T    1
-# elif SIZEOF_LONG == 4
-    typedef unsigned long   uint32_t;
-#   define  HAVE_UINT32_T   1
+# if SIZEOF_INT ==              4
+    typedef unsigned int        uint32_t;
+# elif SIZEOF_LONG ==           4
+    typedef unsigned long       uint32_t;
 # else
 #   error Cannot create a uint32_t type.
     Choke Me.
 # endif
-#endif
-
-#ifndef HAVE_UINT_T
-  typedef unsigned int      uint_t;
-# define  HAVE_UINT_T       1
+# define  HAVE_UINT32_T         1
 #endif
 
 #ifndef HAVE_INTPTR_T
-  typedef signed long       intptr_t;
-# define  HAVE_INTPTR_T     1
+# if SIZEOF_CHARP == SIZEOF_LONG
+    typedef signed long         intptr_t;
+# else
+    typedef signed int          intptr_t;
+# endif
+# define  HAVE_INTPTR_T         1
 #endif
+
 #ifndef HAVE_UINTPTR_T
-  typedef unsigned long     uintptr_t;
-# define  HAVE_UINTPTR_T    1
+# if SIZEOF_CHARP == SIZEOF_LONG
+    typedef unsigned long       intptr_t;
+# else
+    typedef unsigned int        intptr_t;
+# endif
+# define  HAVE_INTPTR_T         1
 #endif
+
+#ifndef HAVE_UINT_T
+  typedef unsigned int          uint_t;
+# define  HAVE_UINT_T           1
+#endif
+
 #ifndef HAVE_SIZE_T
-  typedef unsigned int      size_t;
-# define  HAVE_SIZE_T       1
+  typedef unsigned int          size_t;
+# define  HAVE_SIZE_T           1
 #endif
 #ifndef HAVE_WINT_T
-  typedef unsigned int      wint_t;
-# define  HAVE_WINT_T       1
+  typedef unsigned int          wint_t;
+# define  HAVE_WINT_T           1
 #endif
 #ifndef HAVE_PID_T
-  typedef signed int        pid_t;
-# define  HAVE_PID_T        1
+  typedef signed int            pid_t;
+# define  HAVE_PID_T            1
 #endif
 
 /* redefine these for BSD style string libraries */
 #ifndef HAVE_STRCHR
-#  define strchr        index
-#  define strrchr       rindex
+#  define strchr            index
+#  define strrchr           rindex
 #endif
 
 #ifdef USE_FOPEN_BINARY

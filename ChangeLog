@@ -4,7 +4,7 @@
 	Sun's Guile sometimes loses track of the name (?!?!)
 	* autoopts/optlib.tpl: ditto
 	* autoopts/opthead.tpl: ditto
-	
+
 2009-10-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/time.test: new test
@@ -14,7 +14,7 @@
 	* autoopts/opthead.tpl (MORE_HELP): only works if HAVE_WORKING_FORK
 	* autoopts/optlib.tpl (MORE_HELP): ditto
 	* autoopts/optmain.tpl (MORE_HELP): ditto
-	
+
 2009-10-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/opts.def (trace-out): allow trace file appending
@@ -33,32 +33,32 @@
 	(printOptionUsage): when an option has been omitted, see if it
 	should be printed for extended usage.
 	* doc/autogen-texi.txt: doc the new stuff
-	
+
 2009-09-27  Bruce Korb  <bkorb@gnu.org>
 
 	* config/misc.def (shell): split the test in two.  If "shell" is
 	enabled, then run the does-fork()-work test.
 	(do-shell): test both that "shell" is enabled and that fork()
 	works before defining SHELL_ENABLED.
-	
+
 2009-09-27  Eric McDonald  <Eric_McDonald@users.sourceforge.net>
 
 	* agen5/tpProcess.c (openOutFile): Reset the post-output control flags
 	* expGuile.c (ag_scm_max), (ag_scm_min), (ag_scm_sum):
 	use signed arithmetic instead of unsigned.  Fixes "(min ...)" etc
-	
+
 2009-09-20  Mike Frysinger <vapier@users.sourceforge.net>
 
 	* config/libopts.def (AC_FUNC_FORK): add this test
 	* autoopts/makeshell.c (genshelloptUsage): use HAVE_WORKING_FORK
 	instead of defined(__windows__) && !defined(__CYGWIN__)
 	* autoopts/pgusage.c (optionPagedUsage): ditto
-	
+
 2009-09-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/tpProcess.c: simplify the printf
 	* autoopts/makeshell.c: use "static char const"
-	
+
 2009-08-09  Bruce Korb  <bkorb@gnu.org>
 
 	5.9.9 release
@@ -68,14 +68,14 @@
 	* agen5/*.c: trim lines to 80 columns
 	* agen5/expFormat.c (dne): add autogen version to DNE function
 	* autoopts/optlib.tpl: add "(c)" symbol to copyright note.
-	
+
 2009-07-23  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/file.c (optionFileCheck): there may not be a DIRCH in the
 	file name.  Validate "p" before dereferencing.
 	* autoopts/numeric.c (optionNumericVal):  Also enxure the pOD
 	pointer is not NULL before dereferencing it.
-	
+
 2009-07-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h (SCRIBBLE_SIZE): define it
@@ -122,7 +122,7 @@
 
 2009-01-07  Leo Davis  <ldav1s@users.sourceforge.net>
 
-        * autoopts/usage.tpl: sometimes (on a Mac?), the option in error is
+	* autoopts/usage.tpl: sometimes (on a Mac?), the option in error is
 	not reproduced, so the sed-it-away expression doesn't match.
 	* agen5/test/error.test: cope with guile 1.6.4 error messages
 	* autoopts/configfile.c (handleStructure): correct the place where
