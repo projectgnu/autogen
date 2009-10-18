@@ -3,7 +3,7 @@
  *  expState.c
  *  $Id$
  *
- *  Time-stamp:        "2007-12-23 12:49:15 bkorb"
+ *  Time-stamp:        "2009-10-18 13:35:27 bkorb"
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
@@ -323,7 +323,7 @@ ag_scm_chdir( SCM dir )
      *  We're still here, so we have a valid argument.
      */
     if (pCurDir != NULL)
-        free( pCurDir );
+        free(pCurDir);
     {
         char* pz = ag_scm2zchars( dir, zChdirDir );
         pCurDir = malloc( AG_SCM_STRLEN( dir ) + 1 );

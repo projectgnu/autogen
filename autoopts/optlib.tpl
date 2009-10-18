@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-11 08:42:21 bkorb"
+# Time-stamp:      "2009-10-18 13:49:54 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -772,11 +772,12 @@ tSCC zHelp_Name[]         = "help";[=
   IF (not (exist? "no-libopts"))
 
 =]
-tSCC zMore_Help_Name[]    = "more-help";
 #ifdef HAVE_WORKING_FORK
+tSCC zMore_Help_Name[]    = "more-help";
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
 #else
-#define zMore_HelpText    zHelpText
+#define zMore_Help_Name   NULL
+#define zMore_HelpText    NULL
 #endif[=
 
   ENDIF (not (exist? "no-libopts"))     =][=

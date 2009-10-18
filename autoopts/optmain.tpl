@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2009-10-03 13:35:10 bkorb"
+# Time-stamp:      "2009-10-18 13:02:39 bkorb"
 
 # $Id$
 
@@ -523,7 +523,7 @@ DEFINE decl-callbacks
   (define undef-proc-names "")
   (define decl-type "")
   (define extern-proc-list (string-append
-
+    "optionPagedUsage\n"
     (if (exist? "version")    "optionPrintVersion\n" "")
     (if (exist? "resettable") "optionResetOpt\n" "")
   ) )
@@ -657,15 +657,8 @@ static tOptProc
   ENDIF make-test-main
 
 =]
-#ifdef HAVE_WORKING_FORK
-extern tOptProc optionPagedUsage;
-#else
-#define optionPagedUsage doUsageOpt
-#endif[=
-  IF (> (string-length extern-proc-list) 1) =]
 extern tOptProc
 [=(emit-decl-list extern-proc-list #t)=][=
-  ENDIF =][=
 
   IF (> (string-length static-proc-list) 0)
 

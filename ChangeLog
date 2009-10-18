@@ -1,3 +1,11 @@
+2009-10-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c (loadData): only compile if SHELL_ENABLED is defined
+	* agen5/directive.tpl (zShellInit): ditto
+	* autoopts/install-options-h (intptr_t): add this in if necessary
+	* autoopts/optcode.tpl (more-help): skip if no working fork()
+	* autoopts/optlib.tpl (more-help): no usage if no working fork()
+
 2009-10-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/optcode.tpl (tmp-val): define it instead of setting it.

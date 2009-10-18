@@ -1,7 +1,7 @@
 [= autogen5 template -*- Mode: C -*-
 
 # $Id$
-# Time-stamp:      "2009-10-11 08:58:23 bkorb"
+# Time-stamp:      "2009-10-18 13:00:05 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -81,19 +81,8 @@ ELSE not exists library                 =][=
 
   (if (exist? "resettable")       (add-opt-index "RESET_OPTION"))
   (if (exist? "version")          (add-opt-index "VERSION"))
-  (add-opt-index "HELP") =][=
-
-  (if (not (exist? "no-libopts"))
-      (begin
-       (emit ",\n#ifdef HAVE_WORKING_FORK")
-       (set! index-sep-str "")
-       (add-opt-index "MORE_HELP")
-       (emit ",\n#else")
-       (ag-fprintf 0 index-fmt "" "MORE_HELP" (- option-ct 2))
-       (emit ", /* skip when fork() does not work */\n#endif /* fork() works */")
-       (set! index-sep-str "")
-  )   ) =][=
-
+  (add-opt-index "HELP")
+  (if (not (exist? "no-libopts")) (add-opt-index "MORE_HELP"))
   (if (exist? "usage-opt")        (add-opt-index "USAGE"))
 
   (if (exist? "homerc") (begin
