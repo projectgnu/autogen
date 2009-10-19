@@ -5,6 +5,8 @@
 	* autoopts/install-options-h (intptr_t): add this in if necessary
 	* autoopts/optcode.tpl (more-help): skip if no working fork()
 	* autoopts/optlib.tpl (more-help): no usage if no working fork()
+	* autoopts/alias.c: new module to handle "aliases" attribute
+	* autoopts/opt*.tpl: implement "aliases" attribute
 
 2009-10-11  Bruce Korb  <bkorb@gnu.org>
 

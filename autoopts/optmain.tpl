@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2009-10-18 13:02:39 bkorb"
+# Time-stamp:      "2009-10-18 14:34:34 bkorb"
 
 # $Id$
 
@@ -875,6 +875,15 @@ ENDDEF   range-option-code
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE alias-option-code       \=]
+    optionAlias(pOptions, pOptDesc, [=
+        (string-append INDEX-pfx (up-c-name "aliases")) =]);
+[=
+
+ENDDEF   alias-option-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
 DEFINE   keyword-code           =][=
 
 (set! tmp-ct (count "keyword"))
@@ -1051,6 +1060,13 @@ DEFINE define-option-callbacks      =][=
 
       INVOKE callback-proc-header   =][=
       INVOKE range-option-code      =][=
+
+# # # # # # # # # # # # # # # # # # =][=
+
+    ELIF (exist? "aliases")         =][=
+
+      INVOKE callback-proc-header   =][=
+      INVOKE alias-option-code      =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 

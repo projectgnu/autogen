@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-18 13:49:54 bkorb"
+# Time-stamp:      "2009-10-18 17:06:39 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -501,7 +501,19 @@ typedef enum {[=
 
 ENDDEF Option_Defines
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE   emit-alias-option
+
+=]
+tSCC    z[=(. cap-name)=]Text[]   = "This is an alias for '[=aliases=]'";
+#define z[=(. cap-name)=]_NAME    NULL
+tSCC    z[=(. cap-name)=]_Name[]  = "[=name=]";
+#define [=(. UP-name)=]_FLAGS    [= (up-c-name "aliases") =]_FLAGS[=
+
+ENDDEF   emit-alias-option
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Define the arrays of values associated with an option (strings, etc.) =][=
 
@@ -510,10 +522,9 @@ DEFINE   emit-nondoc-option     =][=
       (string-append "\n" (shellf
 "${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_
 %s
-_EOF_" (get "translators")  ) " */" )  ) =][=
-
-  #
-  #  This is *NOT* a documentation option: =]
+_EOF_" (get "translators")  ) " */" )  ) =]
+tSCC    z[=(. cap-name)=]Text[] =
+        [= (kr-string (get "descrip")) =];
 tSCC    z[= (sprintf "%-25s" (string-append cap-name
                     "_NAME[]" )) =] = "[=(. UP-name)=]";[=
 
@@ -702,13 +713,15 @@ DEFINE   opt-strs
  */[=
   IF (hash-ref ifdef-ed flg-name)       =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =][=
-  ENDIF  ifdef-ed                       =]
-tSCC    z[=(. cap-name)=]Text[] =
-        [= (kr-string (get "descrip")) =];[=
+  ENDIF  ifdef-ed                       =][=
 
   IF (exist? "documentation")           =]
+tSCC    z[=(. cap-name)=]Text[] =
+        [= (kr-string (get "descrip")) =];
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
-  ELSE  NOT a doc option:               =][=
+  ELIF (exist? "aliases")               =][=
+     INVOKE emit-alias-option           =][=
+  ELSE                                  =][=
      INVOKE emit-nondoc-option          =][=
   ENDIF  (exist? "documentation")       =][=
 
@@ -773,9 +786,11 @@ tSCC zHelp_Name[]         = "help";[=
 
 =]
 #ifdef HAVE_WORKING_FORK
+#define OPTST_MORE_HELP_FLAGS   (OPTST_IMM | OPTST_NO_INIT)
 tSCC zMore_Help_Name[]    = "more-help";
 tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
 #else
+#define OPTST_MORE_HELP_FLAGS   (OPTST_OMITTED | OPTST_NO_INIT)
 #define zMore_Help_Name   NULL
 #define zMore_HelpText    NULL
 #endif[=
@@ -785,6 +800,13 @@ tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
   IF (exist? "version")
 
 =]
+#ifdef NO_OPTIONAL_OPT_ARGS
+#  define OPTST_VERSION_FLAGS   OPTST_IMM | OPTST_NO_INIT
+#else
+#  define OPTST_VERSION_FLAGS   OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
+                                OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT
+#endif
+
 tSCC zVersionText[]       = "Output version information and exit";
 tSCC zVersion_Name[]      = "version";[=
 

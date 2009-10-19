@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- *  Time-stamp:      "2009-10-03 12:45:52 bkorb"
+ *  Time-stamp:      "2009-10-18 14:53:31 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -240,7 +240,7 @@ handleOption( tOptions* pOpts, tOptState* pOptState )
     /*
      *  If provided a procedure to call, call it
      */
-    if (pOP != (tpOptProc)NULL)
+    if (pOP != NULL)
         (*pOP)( pOpts, pOD );
 
     return SUCCESS;
