@@ -5,7 +5,7 @@
 #  is used in processing the C file.
 #
 #  $Id$
-# Time-stamp:      "2009-10-02 09:59:54 bkorb"
+# Time-stamp:      "2009-10-18 15:32:00 bkorb"
 
 h
 c
@@ -190,6 +190,9 @@ CASE    (suffix)        =][=
    (define cap-c-name  (lambda (ag-name)
       (string-capitalize! (string->c-name! (get ag-name)))  ))
 
+   (define down-c-name  (lambda (ag-name)
+      (string-downcase! (string->c-name! (get ag-name)))  ))
+
    (define index-name (lambda (i-name)
       (string-append INDEX-pfx (up-c-name i-name))  ))
 
@@ -290,6 +293,11 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
         (error (string-append "Option " (get "name") " has 'omitted-usage' "
                "but neither 'ifdef' nor 'ifndef'" )) )
 
+    (if (and (exist? "equivalence")
+             (exist? "aliases"))
+        (error (string-append "Option " (get "name") " has both "
+               "'equivalence' and 'aliases'" )) )
+
     (if (exist? "lib-name")
         (set! lib-opt-ptr (string->c-name! (string-append
                           (get "lib-name") "_" (get "name") "_optDesc_p"))) )
@@ -304,7 +312,7 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
 
    (if (exist? "library") (out-delete))  =][=
 
-   include "optcode"    =][= ;; create the option source code
+   INCLUDE "optcode"    =][= ;; create the option source code
 
    (if (exist? "flag.extract-code")
        (shellf "test -f %1$s.c && rm -f %1$s.c.save" (base-name)))  =][=

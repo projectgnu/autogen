@@ -2,7 +2,7 @@
 
 #$Id$
 
-# Time-stamp:      "2009-10-18 12:58:07 bkorb"
+# Time-stamp:      "2009-10-18 16:55:24 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -127,7 +127,10 @@ ENDIF
 #ifdef  __cplusplus
 extern "C" {
 #endif
-
+[=
+ IF (exist? "flag.aliases") =]
+extern void optionAlias(tOptions* pOpts, tOptDesc* pOD, unsigned int alias);
+[= ENDIF =]
 /* TRANSLATORS: choose the translation for option names wisely because you
                 cannot ever change your mind. */[=
 
@@ -190,10 +193,10 @@ ENDIF "include exists"
 #  define  EXIT_FAILURE 1
 #endif[=
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =]
+[=
 
 FOR flag "\n"           =][=
-
   INVOKE opt-strs       =][=
 
   (if (exist? "lib-name") (begin
@@ -229,7 +232,7 @@ ENDIF
  *  Define the [=(. pname-cap)=] Option Descriptions.
  */
 static tOptDesc optDesc[ [=
-(define default-text "")
+(define default-text   "")
 (define default-cookie "")
 UP-prefix
 =]OPTION_CT ] = {[=
@@ -270,15 +273,8 @@ ENDIF
 
 IF (exist? "version")   =]
 
-#ifdef NO_OPTIONAL_OPT_ARGS
-#  define VERSION_OPT_FLAGS     OPTST_IMM | OPTST_NO_INIT
-#else
-#  define VERSION_OPT_FLAGS     OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | \
-                                OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT
-#endif
-
   {  /* entry idx, value */ [=
-         (set! default-text (string-append default-text
+        (set! default-text (string-append default-text
                "\n    { NULL }," ))
         (set! default-cookie (string-append default-cookie
                "\n    NULL," ))
@@ -286,7 +282,7 @@ IF (exist? "version")   =]
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ VERSION_OPT_FLAGS, 0,
+     /* opt state flags  */ OPTST_VERSION_FLAGS, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -295,7 +291,6 @@ IF (exist? "version")   =]
      /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
      /* disablement strs */ NULL, NULL },
 
-#undef VERSION_OPT_FLAGS
 [=
 
 ENDIF =]
@@ -324,11 +319,7 @@ IF (not (exist? "no-libopts"))          =],
      /* equiv idx value  */ NO_EQUIVALENT, 0,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-#ifdef HAVE_WORKING_FORK
-     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
-#else
-     /* opt state flags  */ OPTST_OMITTED | OPTST_NO_INIT, 0,
-#endif
+     /* opt state flags  */ OPTST_MORE_HELP_FLAGS, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,

@@ -80,6 +80,10 @@ utxt = { ut-name = AO_Woops;
          ut-text = "AutoOpts lib error: defaulted to option with optional arg\n";
 };
 
+utxt = { ut-name = AliasRange;
+         ut-text = "(AutoOpts bug):  Aliasing option is out of range.";
+};
+
 utxt = { ut-name = All;
          ut-text = "all";
 };

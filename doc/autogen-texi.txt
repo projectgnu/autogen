@@ -3221,6 +3221,7 @@ These option attributes do not fit well with the above categories.
 * opt-attr settable::           Program may set option
 * opt-attr no-preset::          Option cannot be pre-configured
 * opt-attr equivalence::        Option Equivalence Class
+* opt-attr aliases::            Option Aliasing
 * opt-attr default option::     Default Option
 * opt-attr documentation::      Option Sectioning Comment
 * opt-attr translators::        Translator Notes
@@ -3447,6 +3448,24 @@ case INDEX_OPT_EXTRACT:      ...
 case INDEX_OPT_PASS_THROUGH: ...
 default:    /* cannot happen */
 @}
+@end example
+
+@node opt-attr aliases
+@subsubsection Option Aliasing
+
+Sometimes, for backwards compatibility or tradition or just plain convenience,
+it works better to define one option as a pure alias for another option.
+For such situations, provide the following pieces of information:
+@example
+flag = @{
+   name  = @i{aliasing-option-name};
+   value = @i{aliasing-flag-char}; // optional !
+   aliases = @i{aliased-to-option};
+@};
+@end example
+Do not provide anything else.  The usage text for such an option will be:
+@example
+   alais for @i{aliased-to-option} option
 @end example
 
 @node opt-attr default option
