@@ -10,6 +10,7 @@ TSH  := $(DEFS:.def=.sh)
 default : gen
 
 gen     : $(SRC)
+all     : $(EXE)
 
 %.c %.h : %.def
 	autogen $<

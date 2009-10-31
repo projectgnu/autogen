@@ -7,6 +7,7 @@ TESTS           := $(SOURCES:%.def=test-%)
 HANDLERSRC      := $(SOURCES:%.def=%-hdlr.c)
 
 default     : $(TARGETS)
+all         : $(TESTS)
 
 $(TARGETS)  : %.c   : %.def dispatch.tpl
 	@-rm -f *-hdlr.c

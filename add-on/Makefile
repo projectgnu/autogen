@@ -1,6 +1,6 @@
 
 SUBDIRS := $(shell for f in */Makefile ; do dirname $$f ; done)
-SUBCMD  := for d in $(SUBDIRS);do (cd $$d;$(MAKE) $$targ) ; done
+SUBCMD  := set -e;for d in $(SUBDIRS);do cd $$d;$(MAKE) $$targ;cd ..;done
 
 default: all
 

@@ -2,7 +2,9 @@
 EXE         = allbut
 SRC         = allbut.c
 
-default     : $(EXE)
+default     : all
+
+all         : $(EXE)
 
 $(EXE)      : $(SRC)
 	$(CC) -o $@ $(SRC)

@@ -11,7 +11,7 @@ all     : check-stamp
 check   : check-stamp
 example : example-fsm.c
 
-check-stamp :
+check-stamp : sample.shar
 	@DEF=$(DEF) sh run.sh testing && \
 	touch $@ && \
 	echo all tests passed
