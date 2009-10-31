@@ -1,0 +1,78 @@
+
+DESCRIPTION:
+
+Construct a character classification table and a collection of macros
+to test a character's classification.
+
+PURPOSE:
+
+   This program will take a list of character classes and convert them
+   into bit map tests.  If all you ever need are "isspace" or "isalpha"
+   or the other tests included in <ctype.h>, then by all means use that.
+   On the other hand, if you find yourself writing code like:
+      if (isalnum(*p) || (*p == '_'))
+   Then this might be handy.
+
+EXAMPLE:
+
+Here are the character classes I use in my test (and in autogen):
+
+	lower-case      "a-z"
+	upper-case      "A-Z"
+	alphabetic      +lower-case   +upper-case
+	oct-digit       "0-7"
+	dec-digit       "89"          +oct-digit
+	hex-digit       "a-fA-F"      +dec-digit
+	alphanumeric    +alphabetic   +dec-digit
+	var-first       "_"           +alphabetic
+	variable-name   +var-first    +dec-digit
+	option-name     "^-"          +variable-name
+	value-name      ":"           +option-name
+	horiz-white     "\t "
+	compound-name   "[.]"         +value-name   +horiz-white
+	whitespace      "\v\f\r\n\b"  +horiz-white
+	unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
+	end-xml-token   "/>"          +whitespace
+	graphic         "!-~"
+	plus-n-space    "+"           +whitespace
+	punctuation     "!-~"         -alphanumeric -"_"
+	suffix          "-._"         +alphanumeric
+	suffix-fmt      "%/"          +suffix
+
+The syntax is: class-name [ literal-string ] [{+|-}another-class]...
+If a literal string is specified, then a new test bit is added.
+If a character class is named, its bits are included or removed
+from the character class set.
+
+This table produces these macros and the "is_test_cmap_char" array:
+
+#define IS_LOWER_CASE_CHAR(_c)     is_test_cmap_char((_c), 0x00001)
+#define IS_UPPER_CASE_CHAR(_c)     is_test_cmap_char((_c), 0x00002)
+#define IS_ALPHABETIC_CHAR(_c)     is_test_cmap_char((_c), 0x00003)
+#define IS_OCT_DIGIT_CHAR(_c)      is_test_cmap_char((_c), 0x00004)
+#define IS_DEC_DIGIT_CHAR(_c)      is_test_cmap_char((_c), 0x0000C)
+#define IS_HEX_DIGIT_CHAR(_c)      is_test_cmap_char((_c), 0x0001C)
+#define IS_ALPHANUMERIC_CHAR(_c)   is_test_cmap_char((_c), 0x0000F)
+#define IS_VAR_FIRST_CHAR(_c)      is_test_cmap_char((_c), 0x00023)
+#define IS_VARIABLE_NAME_CHAR(_c)  is_test_cmap_char((_c), 0x0002F)
+#define IS_OPTION_NAME_CHAR(_c)    is_test_cmap_char((_c), 0x0006F)
+#define IS_VALUE_NAME_CHAR(_c)     is_test_cmap_char((_c), 0x000EF)
+#define IS_HORIZ_WHITE_CHAR(_c)    is_test_cmap_char((_c), 0x00100)
+#define IS_COMPOUND_NAME_CHAR(_c)  is_test_cmap_char((_c), 0x003EF)
+#define IS_WHITESPACE_CHAR(_c)     is_test_cmap_char((_c), 0x00500)
+#define IS_UNQUOTABLE_CHAR(_c)     is_test_cmap_char((_c), 0x00800)
+#define IS_END_XML_TOKEN_CHAR(_c)  is_test_cmap_char((_c), 0x01500)
+#define IS_GRAPHIC_CHAR(_c)        is_test_cmap_char((_c), 0x02000)
+#define IS_PLUS_N_SPACE_CHAR(_c)   is_test_cmap_char((_c), 0x04500)
+#define IS_PUNCTUATION_CHAR(_c)    is_test_cmap_char((_c), 0x08000)
+#define IS_SUFFIX_CHAR(_c)         is_test_cmap_char((_c), 0x1000F)
+#define IS_SUFFIX_FMT_CHAR(_c)     is_test_cmap_char((_c), 0x3000F)
+
+and the code to scan over a valid variable name, for example,
+looks like this:
+
+   if (IS_VAR_FIRST_CHAR(*p)) {
+      while (IS_VARIABLE_NAME_CHAR(*(++p)))   ;
+
+and after the "while" line, "p" points to the first non-variable-name
+character following a sequence that looks like a variable name.

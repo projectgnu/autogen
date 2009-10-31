@@ -1,0 +1,45 @@
+AutoGen Definitions bits.tpl;
+
+mask-name = status;
+prefix    = sts;
+
+
+bit     = { b-name = alpha;     b-what = 'the beginning'; };
+bit     = { b-name = beta;      b-what = 'second'; };
+bit     = { b-name = gamma;     b-what = 'thirds'; };
+bit     = { b-name = delta;     b-what = 'fourth'; };
+bit     = { b-name = epsilon;   b-what = 'fifth'; };
+bit     = { b-name = zeta;      b-what = 'sixth'; };
+bit     = { b-name = eta;       b-what = 'seventh'; };
+bit     = { b-name = theta;     b-what = 'eighth'; };
+bit     = { b-name = iota;      b-what = 'ninth'; };
+bit     = { b-name = kappa;     b-what = 'tenth'; };
+bit     = { b-name = lambda;    b-what = 'eleventh'; };
+bit     = { b-name = mu;        b-what = 'twelfth'; };
+bit     = { b-name = nu;        b-what = 'thirteenth'; };
+bit     = { b-name = xi;        b-what = 'fourteenth'; };
+bit     = { b-name = omicron;   b-what = 'fifteenth'; };
+bit     = { b-name = pi;        b-what = 'sixteenth'; };
+bit     = { b-name = rho;       b-what = 'seventeenth'; };
+bit[32] = { b-name = sigma;     b-what = 'eighteenth'; };
+bit     = { b-name = tau;       b-what = 'nineteenth'; };
+bit     = { b-name = upsilon;   b-what = 'twentieth'; };
+bit     = { b-name = phi;       b-what = 'twenty-first'; };
+bit     = { b-name = chi;       b-what = 'twenty-second'; };
+bit     = { b-name = psi;       b-what = 'twenty-third'; };
+bit     = { b-name = omega;     b-what = 'the end'; };
+
+mask = {
+  m-name = first-four;
+  b-name = alpha, beta, gamma, delta;
+};
+
+un-mask = {
+  m-name = after-four;
+  m-inc  = first-four;
+};
+
+mask = {
+  m-name = smore;
+  b-name = phi, beta, kappa;
+};
