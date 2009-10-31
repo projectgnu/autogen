@@ -475,7 +475,7 @@ int
     for (;;) {
         if (isdigit(*str)) {
             [=(. element-type) =] num =
-                ([=(. element-type) =])strtoull(str, &str, 0);
+                ([=(. element-type) =])strtoull(str, (char **)&str, 0);
             *bits |= num;
             ct += (num != 0);
 

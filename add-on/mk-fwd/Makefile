@@ -2,7 +2,8 @@
 SRC         = mk-fwd.sh
 EXE         = mk-fwd
 
-default     : $(EXE)
+default     : all
+all         : $(EXE)
 
 $(EXE)      : $(SRC)
 	cp $(SRC) $@ && chmod 755 $@
