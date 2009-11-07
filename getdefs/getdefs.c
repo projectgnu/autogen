@@ -3,7 +3,7 @@
  *
  *  getdefs copyright (c) 1999-2009 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2009-07-22 19:05:29 bkorb"
+ *  Time-stamp:        "2009-11-01 10:28:11 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -1008,6 +1008,9 @@ startAutogen( void )
             tSCC   zFileFmt[] = " *      %s\n";
             FILE*  fp;
 
+            if (pzBase != NULL)
+                free(pzBase);
+
             if (strcmp( OPT_ARG( OUTPUT ), "-") == 0)
                 return stdout;
 
@@ -1028,8 +1031,12 @@ startAutogen( void )
         }
 
         case INDEX_OPT_AUTOGEN:
-            if (! ENABLED_OPT( AUTOGEN ))
+            if (! ENABLED_OPT( AUTOGEN )) {
+                if (pzBase != NULL)
+                    free(pzBase);
+
                 return stdout;
+            }
 
             if (  ( OPT_ARG( AUTOGEN ) != NULL)
                && (*OPT_ARG( AUTOGEN ) != NUL ))

@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2007-11-12 20:41:59 bkorb"
+ *  Time-stamp:        "2009-11-01 11:42:31 bkorb"
  *
  *  This module evaluates macro expressions.
  *
@@ -228,6 +228,7 @@ evalExpression( ag_bool* pMustFree )
      */
     switch (code) {
     case EMIT_VALUE:
+        assert(pDef != NULL);
         if (*pMustFree) {
             AGFREE( (void*)pzText );
             *pMustFree = AG_FALSE;

@@ -33,6 +33,12 @@
 
 #include <unistd.h>		/* for the write(2) call */
 
+#ifdef HAVE_ASSERT_H
+#  include <assert.h>
+#else
+#  define assert(_e)
+#endif
+
 #define COMPILING_PRINTF_C
 #include "printf.h"
 
@@ -656,6 +662,7 @@ stream_printfv (STREAM *stream, const char *format, snv_constpointer const *ap)
     {
       int idx;
 
+      assert(argtypes != NULL);
       args = snv_new (union printf_arg, info.argc);
 
       /* We scanned the format string to find the type of the arguments,
@@ -849,6 +856,7 @@ stream_vprintf (STREAM *stream, const char *format, va_list ap)
     {
       int idx;
 
+      assert(argtypes != NULL);
       args = snv_new (union printf_arg, info.argc);
 
       /* Scan the format string to find the type of the argument

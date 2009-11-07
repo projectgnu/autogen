@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2009-08-01 11:05:25 bkorb"
+# Time-stamp:      "2009-11-01 14:16:39 bkorb"
 # ID:  $Id$
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -226,6 +226,7 @@ typedef tOptProc*  tpOptProc;
  *  The usage procedure will never return.  It calls "exit(2)"
  *  with the "exitCode" argument passed to it.
  */
+// coverity[+kill]
 typedef void (tUsageProc)(tOptions* pOpts, int exitCode);
 typedef tUsageProc* tpUsageProc;
 
@@ -338,6 +339,7 @@ struct options {
     void*               pExtensions;
     void*               pSavedState;
 
+    // coverity[+kill]
     tpUsageProc         pUsageProc;
     tOptionXlateProc*   pTransProc;
 

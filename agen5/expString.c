@@ -3,7 +3,7 @@
  *  expString.c
  *  $Id$
  *
- *  Time-stamp:        "2009-07-09 19:06:44 bkorb"
+ *  Time-stamp:        "2009-11-01 14:05:40 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -427,7 +427,10 @@ do_multi_subs(
              *  passed-in values are freed by the caller.
              */
             if ((pzStr != pzOri) && (pzStr != pzNxt))
+                // coverity[freed_arg] -- invalid alias analysis
                 AGFREE( pzStr );
+
+            // coverity[use_after_free] -- invalid alias analysis
             pzStr = pzNxt;
         }
 
