@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2009-09-27 08:28:28 bkorb"
+ * Time-stamp:        "2009-11-01 14:09:38 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -159,17 +159,6 @@ LOCAL tOutSpec *
 nextOutSpec(tOutSpec * pOS)
 {
     tOutSpec * res = pOS->pNext;
-    /*
-     *  The format is either something inside of zFileFormat, we did not
-     *  allocate it.  If it is specifically zSuffix + strlen + 1, then
-     *  is it part of the pOS allocation.  Otherwise, we deallocate it.
-     */
-    if ((pOS->pzFileFmt < zFileFormat) ||
-        (pOS->pzFileFmt >= zFileFormat + sizeof(zFileFormat))) {
-        char const * pz = pOS->zSuffix + strlen(pOS->zSuffix) + 1;
-        if (pOS->pzFileFmt != pz)
-            AGFREE(pOS->pzFileFmt);
-    }
 
     if (pOS->deallocFmt)
         AGFREE(pOS->pzFileFmt);
@@ -336,6 +325,8 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         char   z[ AG_PATH_MAX ];
         tCC*   pS = strrchr( pzDefFile, '/' );
         char*  pE;
+
+        // coverity[dereference] -- invalid analysis -- "pS" not dereferenced.
         if (pS++ == NULL)
             pS = pzDefFile;
 

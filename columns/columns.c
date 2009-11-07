@@ -2,7 +2,7 @@
 /*
  *  columns.c
  *  $Id$
- *  Time-stamp:        "2009-01-25 10:19:02 bkorb"
+ *  Time-stamp:        "2009-11-01 10:18:50 bkorb"
  *
  *  Columns copyright (c) 1992-2009 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -409,7 +409,7 @@ writeColumns( void )
         return;
     }
 
-    pPL   = (tpPrintList)malloc_or_die( colCt * sizeof( tPrintList ));
+    pPL = (tpPrintList)malloc_or_die( colCt * sizeof( tPrintList ));
 
     /*
      *  This "loop" is normally executed half way through and exited.
@@ -534,6 +534,8 @@ writeColumns( void )
         putc( '\n', stdout );
         free( (void*)pzE );
     }
+
+    free(pPL);
 }
 
 

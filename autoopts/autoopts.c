@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- *  Time-stamp:      "2009-10-18 14:53:31 bkorb"
+ *  Time-stamp:      "2009-11-01 10:50:34 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -293,6 +293,7 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
                || (pOD->pz_Name == NULL))
                 continue;
         }
+        else assert(pOD->pz_Name != NULL);
 
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
             /*

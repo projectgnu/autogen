@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2009-09-27 10:02:15 bkorb"
+ * Time-stamp:      "2009-11-01 11:52:37 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -1033,13 +1033,13 @@ genshelloptUsage( tOptions*  pOpts, int exitCode )
     switch (fork()) {
     case -1:
         optionUsage( pOpts, EXIT_FAILURE );
-        /*NOTREACHED*/
+        /* NOTREACHED */
         _exit( EXIT_FAILURE );
 
     case 0:
         pagerState = PAGER_STATE_CHILD;
         optionUsage( pOpts, EXIT_SUCCESS );
-        /*NOTREACHED*/
+        /* NOTREACHED */
         _exit( EXIT_FAILURE );
 
     default:

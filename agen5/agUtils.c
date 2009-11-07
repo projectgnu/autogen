@@ -3,7 +3,7 @@
  *  agUtils.c
  *  $Id$
  *
- *  Time-stamp:        "2009-07-09 20:18:45 bkorb"
+ *  Time-stamp:        "2009-11-01 14:10:47 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -167,6 +167,7 @@ doOptions( int arg_ct, char** arg_vec )
          *  Point to the character after the last '/', or to the full
          *  definition file name, if there is no '/'.
          */
+        // coverity[dereference] -- invalid analysis -- "pz" not dereferenced.
         if (pz++ == NULL)
             pz = OPT_ARG( DEFINITIONS );
 

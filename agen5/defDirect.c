@@ -2,7 +2,7 @@
  *  defDirect.c
  *  $Id$
  *
- *  Time-stamp:        "2009-07-31 11:07:48 bkorb"
+ *  Time-stamp:        "2009-11-01 10:11:06 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -978,9 +978,13 @@ doDir_shell( char* pzArg, char* pzScan )
      *  "file text" that is used for more definitions.
      */
     pzText = runShell( pzText );
-    if (  (pzText == NULL)
-       || (*pzText == NUL))
+    if (pzText == NULL)
         return pzScan;
+
+    if (*pzText == NUL) {
+        AGFREE(pzText);
+        return pzScan;
+    }
 
     /*
      *  Get the space for the output data and for context overhead.

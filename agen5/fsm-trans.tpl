@@ -169,10 +169,13 @@ DEFINE machine-step  =][=
              (define trans-field "trans_proc")
              (define trans-valu (string-append pfx "_do_invalid"))  ))
 =]
+#ifndef __COVERITY__
     if (trans_evt >= [=(. PFX)=]_EV_INVALID) {
         nxtSt = [=(. PFX)=]_ST_INVALID;
         [=(. trans-name)=] = [=(. trans-valu)=];
-    } else {
+    } else
+#endif /* __COVERITY__ */
+    {
         const [= (. t-trans) =]* pTT =
             [=(. pfx)=]_trans_table[ [=(. pfx)=]_state ] + trans_evt;
 [= IF (exist? "debug-flag") \=]
@@ -260,7 +263,7 @@ DEFINE looping-machine
 [=(extract fsm-source "        /* %s == FIND TRANSITION == %s */" ""
            "        trans_evt = GET_NEXT_TRANS();" )=]
 [=  (out-push-new ".fsm.cktbl")=][=
-    machine-step =][=
+    INVOKE machine-step =][=
     (out-pop)
     (shell "sed 's/^ /     /;s/                /            /' .fsm.cktbl") =]
     }
@@ -292,7 +295,7 @@ ENDDEF make-step-proc  =][=
 
 DEFINE stepping-machine
 
-  =][= make-step-proc mode = "" =]
+  =][= INVOKE make-step-proc mode = "" =]
 {[=
     fsm-proc-variables  =]
 
@@ -302,7 +305,7 @@ DEFINE stepping-machine
   ENDIF  =]
         return [=(. PFX)=]_ST_INIT;
     }
-[=  machine-step =]
+[=  INVOKE machine-step =]
 
 [=(extract fsm-source "    /* %s == FINISH STEP == %s */")=]
 

@@ -1,7 +1,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-07-09 19:00:11 bkorb"
+ *  Time-stamp:        "2009-11-07 07:49:04 bkorb"
  *
  *  This module locates definitions.
  *
@@ -724,6 +724,11 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
+        if (*pzName == '.') {
+            noNesting = AG_TRUE;
+            pzName++;
+        }
+
         if (! IS_VAR_FIRST_CHAR(*pzName)) {
             strncpy(zDefinitionName, pzName, sizeof(zDefinitionName) - 1);
             zDefinitionName[ sizeof(zDefinitionName) - 1] = NUL;
@@ -734,11 +739,6 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
         canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
         pzName = zDefinitionName;
         defList.usedCt = 0;
-
-        if (*pzName == '.') {
-            noNesting = AG_TRUE;
-            pzName++;
-        }
     }
 
     pcBrace  = pzName + strcspn( pzName, "[." );

@@ -221,10 +221,13 @@ cgi_run_fsm(
 
         /* END   == FIND TRANSITION == DO NOT CHANGE THIS COMMENT */
 
+#ifndef __COVERITY__
         if (trans_evt >= CGI_EV_INVALID) {
             nxtSt = CGI_ST_INVALID;
             trans = CGI_TR_INVALID;
-        } else {
+        } else
+#endif /* __COVERITY__ */
+        {
             const t_cgi_transition* pTT =
             cgi_trans_table[ cgi_state ] + trans_evt;
             nxtSt = pTT->next_state;

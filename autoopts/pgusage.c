@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2009-10-18 12:46:57 bkorb"
+ * Time-stamp:      "2009-11-01 11:52:51 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -94,7 +94,7 @@ optionPagedUsage( tOptions* pOptions, tOptDesc* pOD )
          */
         (*pOptions->pUsageProc)( pOptions, EXIT_SUCCESS );
 
-        /*NOTREACHED*/
+        /* NOTREACHED */
         _exit( EXIT_FAILURE );
     }
 

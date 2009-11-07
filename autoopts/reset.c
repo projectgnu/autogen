@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- *  Time-stamp:      "2008-08-02 12:25:18 bkorb"
+ *  Time-stamp:      "2009-11-01 11:45:57 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -86,6 +86,8 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
     if ((pzArg == NULL) || (*pzArg == NUL)) {
         fputs(zNoResetArg, stderr);
         pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+        /* NOTREACHED */
+        assert(0 == 1);
     }
 
     reset_active = AG_TRUE;
@@ -101,12 +103,16 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptChr, pOpts->pzProgPath, *pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+            /* NOTREACHED */
+            assert(0 == 1);
         }
     } else {
         succ = longOptionFind(pOpts, (char *)pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptStr, pOpts->pzProgPath, pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+            /* NOTREACHED */
+            assert(0 == 1);
         }
     }
 

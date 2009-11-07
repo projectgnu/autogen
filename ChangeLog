@@ -1,3 +1,25 @@
+2009-11-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c: coverity flag
+	* agen5/cgi-fsm.c: ditto
+	* agen5/expString.c: ditto
+	* agen5/fsm-trans.tpl: ditto
+	* autoopts/options_h.tpl: ditto
+	* agen5/tpProcess.c (openOutFile): ditto
+	(nextOutSpec): remove dead code
+	* agen5/defDirect.c (doDir_shell): free empty string results, too.
+	* agen5/funcEval.c (evalExpression): add assert for Coverity
+	* autoopts/autoopts.c (longOptionFind): ditto
+	* autoopts/reset.c (optionResetOpt): ditto
+	* snprintfv/printf.c: ditto
+	* columns/columns.c (writeColumns): free allocated memory
+	* getdefs/getdefs.c (startAutogen): ditto
+
+2009-11-08  Eric McDonald  <Eric_McDonald@users.sourceforge.net>
+
+	* agen5/defFind.c (entryListSearch): strip "no nesting" marker
+	from name before testing for "does string start with name character?"
+
 2009-10-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c (loadData): only compile if SHELL_ENABLED is defined
