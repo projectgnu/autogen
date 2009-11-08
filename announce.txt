@@ -3,7 +3,7 @@
 #
 # $Id$
 #
-# Time-stamp:        "2009-07-22 18:57:57 bkorb"
+# Time-stamp:        "2009-11-08 11:17:14 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -85,9 +85,13 @@ cat >&3 <<- _EOF_
 	must be kept synchronized.
 
 	AutoOpts is both an example of that and a project in its own right.
-	It is a very powerful command line option parser consisting of a set
-	of AutoGen templates and a run time library that nearly eliminates
-	the hassle of managing, parsing and documenting program options.
+	It is a very powerful configuration file and command line option parser
+	consisting of a set of AutoGen templates and a run time library that
+	nearly eliminates the hassle of managing, parsing and documenting
+        program options.
+
+	The self-referential example:
+	http://www.gnu.org/software/${project}/man1-autogen.html
 
 	New in ${AG_VERSION} - $(date '+%B, %Y')
 	_EOF_

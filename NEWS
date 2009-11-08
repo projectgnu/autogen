@@ -1,5 +1,39 @@
 New in __CURRENT_VERSION__ November 2008
 
+* Nothing yet defined.
+
+New in 5.10 - November 2009
+
+* When an option is configured out (via ifdef or ifndef attributes), it is
+  not normally displayed in the usage text. Sometimes, users want to know
+  why the option they supplied is against the law ("illegal"). If the option
+  has the omitted-usage attribute, the extended usage (via "--help") will
+  now show the option name and the text:
+
+    This option has been disabled
+
+  Or, alternately, the text specified with the omitted-usage attribute.
+
+  If the option is specified, the error message will be:
+
+    PROGRAM: The MUMBLE option has been disabled
+
+  followed by the abbreviated usage.
+
+* Option aliasing: Several times it has been necessary to have two different
+  options mean exactly the same thing. Usually, this is a consequence of
+  some sort of historical use. However it came about, the need is
+  there. So, AutoOpts now supports a new option attribute: aliases. This
+  option will be listed in the usage text but will be handled exactly as
+  if the aliased-to option were specified. You probably shouldn't use it
+  unless you have to.
+
+* AutoGen tracing output: You may now prefix a file name with shell style
+  append redirection to indicate that the output appends to the file
+  (i.e. >>file).
+
+New in 5.9.9 - August 2009
+
 * options may now be "deprecated".  They get processed, but do not show
   in the usage output.
 
@@ -8,29 +42,3 @@ New in __CURRENT_VERSION__ November 2008
 
 * "disable-save" and "disable-load" may be used to prevent the command
   line options from loading or saving options from/to a file.
-
-New in 5.9.7 December 2008
-
-* several cleanups.
-* "more-help" is only supported with libopts is in use at run time.
-  Allow for it to be expunged from the documentation.
-* Add a #define for the configured shell to config.h
-* add --used-defines to autogen.  You can now find out all the names
-  that autogen looked up during processing.  That will include computed
-  names and values passed to macros by name and it won't include names
-  only referenced in sections of a template that were not processed.
-  But it helps in documenting a template anyway.
-
-New in 5.9.6 November 2008
-
-* Hierarchically valued options can now be stored with ``--save-opt'' option
-
-* option state may now be "reset".  This is indistinguishable from the
-  compiled state.  If option state is "saved" later, such an option will
-  not appear in the save file.
-
-* there is a new option argument type:  time.  Its argument string
-  represents years (?!), months, weeks, days, hours, minutes and seconds.
-  The value seen by the program is an integer number of seconds.
-  (This is not a date/time.)  The duration of a year is always 365 days
-  and the duration of a month is always 30 days.

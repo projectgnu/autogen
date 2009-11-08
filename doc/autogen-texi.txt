@@ -1246,9 +1246,12 @@ of the name is searched for in the current definition level.  If not
 found, higher levels will be searched until either a value is found,
 or there are no more definition levels.  Subsequent components of the
 name must be found within the context of the newly-current definition
-level.  Also, if the named value is prefixed by a dot (@code{.}), then
-the value search is started in the current context only.  No higher
-levels are searched.
+level.  Also, if the named value is prefixed by a dot (@code{.}),
+@cindex .
+then the value search is started in the current context only.
+Backtracking
+@cindex backtrack
+into other definition levels is prevented.
 
 If someone rewrites this, I'll incorporate it.  :-)
 
