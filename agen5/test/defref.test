@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2007-07-04 11:29:24 bkorb"
+# Time-stamp:        "2009-11-08 08:16:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -30,27 +30,35 @@
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-sed 's/^ *[0-9]*: //' > ${testname}.tpl <<_EOF_
+sed 's/^ *[0-9]*://;s/^ //' > ${testname}.tpl <<_EOF_
  1: <= AutoGen5 template test =>
  2: The last of each list:<=
  3: FOR list =>
  4:   list[<= (for-index) =>] -> <= val[$] =><=
  5: ENDFOR =>
- 6: 
+ 6:
  7: The first of each list:<=
  8: FOR list =>
  9:   list[<=(for-index)=>] -> <=val[]=><=
 10: ENDFOR =>
-11: 
+11:
 12: The full list:<=
 13: FOR list =>
 14:   list[<=(for-index)=>] -> <=
 15:   FOR val ", " => val[<=(for-index)=>]=<=val=><=
 16:   ENDFOR =><=
 17: ENDFOR =>
-18: 
-19: The first value is:  <= ?% list[].val[]   "val = %s (first)" "Undefined??"=>
-20: The last value is:   <= ?% list[$].val[$] "val = %s (last)" "Undefined??"=>
+18:
+19: The local global list:<=
+20: FOR list =>
+21:   list[<=(for-index)=>] == "<=
+22:   (join ", " (stack ".param.name")) =>"
+21:           .. "<=
+22:   (join ", " (stack "param.name")) =>"<=
+23: ENDFOR =>
+24:
+25: The first value is:  <= ?% list[].val[]   "val = %s (first)" "Undefined??"=>
+26: The last value is:   <= ?% list[$].val[$] "val = %s (last)" "Undefined??"=>
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -58,8 +66,11 @@ _EOF_
 # Create the files we need in the test environment
 cat > ${testname}.def <<_EOF_
 AutoGen definitions "${testname}." "tpl";
-list =    { val = L0.first, L0.second, L0.last; },
-          { val[2] = L1.second-and-last; Val[0] = L1.first;  };
+param   = { name = "global"; };
+list    = { val = L0.first, L0.second, L0.last;
+            param = { name = "first-1", "first-2"; }; },
+          { val[2] = L1.second-and-last; Val[0] = L1.first;
+            param = { name = "second-1", "second-2"; }; };
 List[3] = { val = L3.third.all; },
           { val[3] = L4.last; VAL[2] = L4.middle;  VAL[1] = L4.first; };
 _EOF_
@@ -84,6 +95,16 @@ The full list:
   list[1] ->  val[0]=L1.first,  val[2]=L1.second-and-last
   list[3] ->  val[0]=L3.third.all
   list[4] ->  val[1]=L4.first,  val[2]=L4.middle,  val[3]=L4.last
+
+The local global list:
+  list[0] == "first-1, first-2"
+          .. "first-1, first-2"
+  list[1] == "second-1, second-2"
+          .. "second-1, second-2"
+  list[3] == ""
+          .. "global"
+  list[4] == ""
+          .. "global"
 
 The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)
