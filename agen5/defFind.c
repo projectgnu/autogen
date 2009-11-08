@@ -1,7 +1,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-11-07 07:49:04 bkorb"
+ *  Time-stamp:        "2009-11-08 08:14:31 bkorb"
  *
  *  This module locates definitions.
  *
@@ -726,7 +726,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
     if (defList.nestLevel == 0) {
         if (*pzName == '.') {
             noNesting = AG_TRUE;
-            pzName++;
+            while (IS_WHITESPACE_CHAR(*++pzName)) ;
         }
 
         if (! IS_VAR_FIRST_CHAR(*pzName)) {
