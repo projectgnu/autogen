@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2009-09-12 10:26:22 bkorb"
+# Time-stamp:        "2009-11-28 20:56:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -65,6 +65,7 @@ list[3] (block) from debug.def/3
 marker ``<='' loaded
 marker ``=>'' loaded
 Starting test template
+open_output_file 'debug.test' mode wb+
 Text       (12) in debug.tpl at line 2
   The last of each list:
 FOR        ( D) in debug.tpl at line 3

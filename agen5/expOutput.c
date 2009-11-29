@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-10-04 09:34:09 bkorb"
+ *  Time-stamp:        "2009-11-28 20:47:30 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -370,6 +370,45 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
 }
 
 
+/*
+ * Some common code for creating a new file
+ */
+LOCAL void
+open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
+{
+    char *    pz;
+    tFpStack* p  = AGALOC(sizeof(*p), "out file stack");
+
+    pz = (char*)AGALOC(nmsz + 1, "file name string");
+    memcpy( pz, fname, nmsz );
+    pz[ nmsz ] = NUL;
+    memset(p, NUL, sizeof(*p));
+    p->pzOutName = pz;
+
+    /*
+     *  IF we are creating the file and we are allowed to unlink the output,
+     *  then start by unlinking the thing.
+     */
+    if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
+        if ((unlink(pz) != 0) && (errno != ENOENT))
+            AG_ABEND(aprf(zCannot, errno, "unlink", pz, strerror(errno)));
+    }
+
+    p->pFile = fopen(pz, mode);
+    if (p->pFile == NULL)
+        AG_ABEND(aprf( zCannot, errno, "open for output", pz, strerror(errno)));
+
+    p->pPrev = pCurFp;
+    pCurFp   = p;
+    p->flags = FPF_FREE | flags;
+    outputDepth++;
+
+    addWriteAccess(pz);
+
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+        fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
+}
+
 /*=gfunc out_push_add
  *
  * what:   append output to file
@@ -382,38 +421,14 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
 SCM
 ag_scm_out_push_add( SCM new_file )
 {
-    tFpStack* p;
-    char*  pzNewFile;
+    static char const append_mode[] = "a" FOPEN_BINARY_FLAG "+";
 
     if (! AG_SCM_STRING_P( new_file ))
-        return SCM_UNDEFINED;
+        AG_ABEND("No output file specified to add to");
 
-    {
-        size_t sz = AG_SCM_STRLEN( new_file );
-        pzNewFile = (char*)AGALOC( sz + 1, "append file name string" );
-        memcpy( pzNewFile, AG_SCM_CHARS( new_file ), sz );
-        pzNewFile[ sz ] = NUL;
-    }
+    open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
+                      append_mode, 0);
 
-    addWriteAccess( pzNewFile );
-
-    {
-        FILE* fp = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
-
-        if (fp == NULL)
-            AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
-                            strerror( errno )));
-        p = (tFpStack*)AGALOC( sizeof( tFpStack ), "append - out file stack" );
-        p->pFile = fp;
-    }
-
-    p->pPrev     = pCurFp;
-    p->flags     = FPF_FREE;
-    p->pzOutName = pzNewFile;
-    outputDepth++;
-    pCurFp       = p;
-    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "appending output to '%s'\n", pzNewFile);
     return SCM_UNDEFINED;
 }
 
@@ -434,25 +449,14 @@ ag_scm_out_push_add( SCM new_file )
 SCM
 ag_scm_out_push_new( SCM new_file )
 {
-    tFpStack* p;
-    char*  pzNewFile;
-
-    p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
-    p->pPrev = pCurFp;
-    p->flags = FPF_FREE;
+    static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
     if (AG_SCM_STRING_P( new_file )) {
-        size_t sz = AG_SCM_STRLEN( new_file );
-        pzNewFile = (char*)AGALOC( sz + 1, "new file name string" );
-        memcpy( pzNewFile, AG_SCM_CHARS( new_file ), sz );
-        pzNewFile[ sz ] = NUL;
-        unlink( pzNewFile );
-        addWriteAccess( pzNewFile );
-        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "creating output to '%s'\n", pzNewFile);
-        p->pFile = fopen( pzNewFile, "a" FOPEN_BINARY_FLAG "+" );
+        open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN( new_file ),
+                          write_mode, 0);
+        return SCM_UNDEFINED;
     }
-    else
+
 #if defined(ENABLE_FMEMOPEN)
     if (! HAVE_OPT( NO_FMEMOPEN ))
 #endif
@@ -463,43 +467,55 @@ ag_scm_out_push_new( SCM new_file )
          *  the block is executed when a file name is not specified *and*
          *  --no-fmemopen was *not* selected.
          */
-        static char const * pzTemp = NULL;
-        int tmpfd;
+        static char * pzTemp = NULL;
+        static size_t tmplen = 0;
 
-        if (pzTemp == NULL)
+        int     tmpfd;
+
+        if (pzTemp == NULL) {
             pzTemp = mkstempPat();
+            tmplen = strlen(pzTemp) + 1;
+        }
 
-        AGDUPSTR( pzNewFile, pzTemp, "temp file name" );
-        p->flags |= FPF_UNLINK;
-        tmpfd = mkstemp( pzNewFile );
+        memcpy(pzTemp + tmplen, pzTemp, tmplen);
+        tmpfd = mkstemp(pzTemp + tmplen);
         if (tmpfd < 0)
             AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
-        p->pFile  = fopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+" );
-        close( tmpfd );
+        open_output_file(pzTemp + tmplen, tmplen - 1, write_mode, 0);
+        close(tmpfd);
+        return SCM_UNDEFINED;
     }
 #if defined(ENABLE_FMEMOPEN)
-    else
+
     {
+        char *     pzNewFile;
+        tFpStack * p;
+
         /*
-         *  This block is a pure "else" clause that is only compiled if neither
-         *  "fopencookie" nor "funopen" is available in the local C library.
-         *  We reach here if --no-fmemopen was *not* on the command line.
+         *  This block is used IFF ENABLE_FMEMOPEN is defined and if
+         *  --no-fmemopen is selected on the command line.
          */
+        p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
+        p->pPrev  = pCurFp;
+        p->flags  = FPF_FREE;
         p->pFile  = ag_fmemopen(NULL, (size_t)0, "wb+");
         pzNewFile = (char*)"in-mem buffer";
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
+
+        if (p->pFile == NULL)
+            AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
+                            strerror( errno )));
+
+        p->pzOutName = pzNewFile;
+        outputDepth++;
+        pCurFp    = p;
+
+        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+            fprintf(pfTrace, "out-push-new on temp file\n");
+        return SCM_UNDEFINED;
     }
 #endif /* ENABLE_FMEMOPEN */
-
-    if (p->pFile == NULL)
-        AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
-                        strerror( errno )));
-
-    p->pzOutName = pzNewFile;
-    outputDepth++;
-    pCurFp    = p;
-    return SCM_UNDEFINED;
 }
 
 

@@ -1,3 +1,19 @@
+2009-11-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c (mkstempPat): provide space for copying template
+	* agen5/defParse-fsm.c (dp_run_fsm): add __COVERITY__ markers
+	* agen5/expOutput.c (open_output_file): common functionality
+	(ag_scm_out_push_add): use it
+	(ag_scm_out_push_new): use it
+	* agen5/tpProcess.c (processTemplate): tweaks to openOutFile call
+	(openOutFile): use open_output_file, too.
+	* doc/auto_gen.tpl: Use "@include" to suck in generated text.
+	* doc/mk-agen-texi-in: clean up the code
+
+2009-11-18  Bruce Korb  <bkorb@gnu.org>
+
+	5.10 release
+
 2009-11-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c: coverity flag

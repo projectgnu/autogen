@@ -2,7 +2,7 @@
  *  agShell
  *  $Id$
  *
- *  Time-stamp:        "2009-10-18 13:36:37 bkorb"
+ *  Time-stamp:        "2009-11-28 21:07:21 bkorb"
  *
  *  Manage a server shell process
  *
@@ -57,13 +57,13 @@ char const* pzLastCmd = NULL;
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by mk-fwd */
 static void
-sigHandler( int signo );
+sigHandler(int signo);
 
 static void
-serverSetup( void );
+serverSetup(void);
 
 static char*
-loadData( void );
+loadData(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -101,7 +101,7 @@ closeServer( void )
 
 
 static void
-sigHandler( int signo )
+sigHandler(int signo)
 {
     static int timeout_limit = 5;
     if ((signo == SIGALRM) && (--timeout_limit <= 0))
@@ -123,7 +123,7 @@ sigHandler( int signo )
 
 
 static void
-serverSetup( void )
+serverSetup(void)
 {
     struct sigaction  saNew;
     struct sigaction  saSave1;

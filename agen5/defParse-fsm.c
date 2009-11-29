@@ -1,7 +1,7 @@
 /*  
  *  EDIT THIS FILE WITH CAUTION  (defParse-fsm.c)
  *  
- *  It has been AutoGen-ed  Sunday December  2, 2007 at 10:33:38 AM PST
+ *  It has been AutoGen-ed  November 28, 2009 at 09:01:02 PM by AutoGen 5.10
  *  From the definitions    defParse.def
  *  and the template file   fsm
  *
@@ -610,10 +610,13 @@ dp_run_fsm( void )
         trans_evt = yylex();
         /* END   == FIND TRANSITION == DO NOT CHANGE THIS COMMENT */
 
+#ifndef __COVERITY__
         if (trans_evt >= DP_EV_INVALID) {
             nxtSt = DP_ST_INVALID;
             pT    = dp_do_invalid;
-        } else {
+        } else
+#endif /* __COVERITY__ */
+        {
             const t_dp_transition* pTT =
             dp_trans_table[ dp_state ] + trans_evt;
             nxtSt = pTT->next_state;

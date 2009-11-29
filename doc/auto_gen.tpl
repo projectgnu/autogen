@@ -3,7 +3,7 @@
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2008-12-27 16:50:28 bkorb"
+## Time-stamp:        "2009-11-28 20:42:35 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -24,7 +24,7 @@
 ## $Id$
 ## ---------------------------------------------------------------------
 
-texi=autogen.texi
+texi
 
 # Set up some global Scheme variables
 #
@@ -32,18 +32,7 @@ texi=autogen.texi
 
 (make-tmp-dir)
 
-(define texi-file-source (shell "
-    exec 2> ${tmp_dir}/ag-texi.log
-    set -x
-    if [ -f autogen-texi.txt ]
-    then
-      echo autogen-texi.txt
-    elif [ -f ${top_srcdir}/doc/autogen-texi.txt ]
-    then
-      echo ${top_srcdir}/doc/autogen-texi.txt
-    else
-      die Cannot locate original autogen-texi.txt file
-    fi" ))
+(define texi-file-source (getenv "DOC_TEXT"))
 
 (define texi-escape-encode (lambda (in-str)
    (string-substitute in-str
@@ -61,7 +50,6 @@ texi=autogen.texi
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 \=]
-\input texinfo
 @ignore
 \internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
 @end ignore
@@ -436,20 +424,13 @@ INVOKE  get-text tag = augmenting
 =]
 @ignore
 
-Invocation section from [= `
-
-f=../agen5/autogen.texi
-[ -f $f ] || f=${top_srcdir}/agen5/autogen.texi
-
-cat <<_EOF_
-${f}
+Invocation section from [= ag-texi =]
 
 @end ignore
 @page
 
-_EOF_
+@include [= ag-texi =]
 
-cat ${f}` =]
 [=
 
 INVOKE  get-text tag = installation     =][=
@@ -479,22 +460,19 @@ at all, I decided to leave it in the list of chapters.
 
 INVOKE  get-text tag = autofsm
 
-=][= `
+=][=
 
-echo
+FOR addon-texi
 
-for f in ${ADDON_TEXI}
-do
-   echo '@page'
-   echo '@ignore'
-   echo '* * * * * * * * * * * * * * * * *'
-   echo "Copy of text from $f"
-   echo '@end ignore'
-   cat $f
-done
-
-` =]
+=]
+@page
+@ignore
+* * * * * * * * * * * * * * * * *
+@end ignore
+@include [= addon-texi =]
 [=
+
+ENDFOR  =][=
 
 INVOKE  get-text tag = Future
 
