@@ -3,7 +3,7 @@
  *  agUtils.c
  *  $Id$
  *
- *  Time-stamp:        "2009-11-01 14:10:47 bkorb"
+ *  Time-stamp:        "2009-11-28 18:13:42 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -57,7 +57,7 @@ strlcpy( char* dest, tCC* src, size_t n )
 #endif
 
 
-LOCAL char*
+LOCAL char *
 aprf( char const* pzFmt, ... )
 {
     char* pz;
@@ -76,10 +76,11 @@ aprf( char const* pzFmt, ... )
 }
 
 
-LOCAL char*
+LOCAL char *
 mkstempPat( void )
 {
     static char const * pzTmpDir = NULL;
+    static size_t tmpdirlen = 0;
 
     if (pzTmpDir == NULL) {
         static char const * const envlist[] = {
@@ -94,12 +95,17 @@ mkstempPat( void )
                 break;
             }
         }
+        tmpdirlen = strlen(pzTmpDir);
     }
 
     {
-        char* pzRes = aprf("%s/agtmp.XXXXXX", pzTmpDir);
+        static char const tmp_pat[] = "/agtmp.XXXXXX";
+        size_t len = 2 * (tmpdirlen + sizeof(tmp_pat));
+        char* pzRes = AGALOC(len, "stemp pattern");
         manageAllocatedData((void*)pzRes);
         TAGMEM( pzRes, "temp file template" );
+        memcpy(pzRes, pzTmpDir, tmpdirlen);
+        memcpy(pzRes + tmpdirlen, tmp_pat, sizeof(tmp_pat));
         return pzRes;
     }
 }

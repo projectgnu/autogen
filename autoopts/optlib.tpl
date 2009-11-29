@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-10-18 17:06:39 bkorb"
+# Time-stamp:      "2009-11-28 18:23:12 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -488,16 +488,18 @@ typedef enum {[=
   ENDIF settable                  =][=
 
   (define tmp-val (out-pop #t))   =][=
-  IF (defined? 'tmp-val) =][= IF (> (string-length tmp-val) 2) =][=
-    IF (hash-ref ifdef-ed flg-name) =]
+  IF (defined? 'tmp-val) =][=
+    IF (> (string-length tmp-val) 2)  =][=
+      IF (hash-ref ifdef-ed flg-name) =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef =]
 [= (. tmp-val) =]
 #endif /* [= ifdef =][= ifndef =] */[=
     
-    ELSE =]
-[= (. tmp-val)                    =][=
-    ENDIF                         =][=
-  ENDIF    =][=  ENDIF            =][=
+      ELSE      =]
+[= (. tmp-val)  =][=
+      ENDIF     =][=
+    ENDIF       =][=
+  ENDIF         =][=
 
 ENDDEF Option_Defines
 

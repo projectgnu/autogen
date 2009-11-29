@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2009-11-01 14:09:38 bkorb"
+ * Time-stamp:        "2009-11-28 20:58:59 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -31,7 +31,7 @@ static void
 doStdoutTemplate( tTemplate* pTF );
 
 static void
-openOutFile( tOutSpec* pOutSpec, tFpStack* pStk );
+openOutFile(tOutSpec* pOutSpec);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -199,22 +199,26 @@ processTemplate( tTemplate* pTF )
          */
         switch (setjmp( fileAbort )) {
         case SUCCESS:
+            if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+                fprintf(pfTrace, "Starting %s template\n", pOS->zSuffix);
+                fflush(pfTrace);
+            }
             /*
              *  Set the output file name buffer.
              *  It may get switched inside openOutFile.
              */
-            openOutFile( pOS, &fpRoot );
-
-            pzCurSfx = pOS->zSuffix;
-            currDefCtx = rootDefCtx;
-            if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-                fprintf( pfTrace, "Starting %s template\n", pzCurSfx );
-                fflush( pfTrace );
-            }
+            openOutFile(pOS);
+            memcpy(&fpRoot, pCurFp, sizeof(fpRoot));
+            AGFREE(pCurFp);
+            pCurFp         = &fpRoot;
+            pzCurSfx       = pOS->zSuffix;
+            currDefCtx     = rootDefCtx;
+            pCurFp->flags &= ~FPF_FREE;
+            pCurFp->pPrev  = NULL;
             generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
 
             do  {
-                closeOutput( AG_FALSE );  /* keep output */
+                closeOutput(AG_FALSE);  /* keep output */
             } while (pCurFp->pPrev != NULL);
             break;
 
@@ -301,22 +305,40 @@ closeOutput( ag_bool purge )
 }
 
 
+/*
+ *  Figure out what to use as the base name of the output file.
+ *  If an argument is not provided, we use the base name of
+ *  the definitions file.
+ */
 static void
-openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
+openOutFile(tOutSpec* pOutSpec)
 {
-    tCC*  pzDefFile;
+    static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
+
+    char const * pzDefFile = OPT_ARG( BASE_NAME );
+    char const * pzOutFile = NULL;
+
+    if (strcmp( pOutSpec->zSuffix, "null" ) == 0) {
+        static int const flags = FPF_NOUNLINK;
+    null_open:
+        open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
+        return;
+    }
 
     /*
-     *  Reset the post-output control flags.
+     *  IF we are to skip the current suffix,
+     *  we will redirect the output to /dev/null and
+     *  perform all the work.  There may be side effects.
      */
-    pStk->flags = 0;
+    if (HAVE_OPT( SKIP_SUFFIX )) {
+        int     ct  = STACKCT_OPT(  SKIP_SUFFIX );
+        tCC**   ppz = STACKLST_OPT( SKIP_SUFFIX );
 
-    /*
-     *  Figure out what to use as the base name of the output file.
-     *  If an argument is not provided, we use the base name of
-     *  the definitions file.
-     */
-    pzDefFile = OPT_ARG( BASE_NAME );
+        while (--ct >= 0) {
+            if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0)
+                goto null_open;
+        }
+    }
 
     /*
      *  Remove any suffixes in the last file name
@@ -326,9 +348,10 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
         tCC*   pS = strrchr( pzDefFile, '/' );
         char*  pE;
 
-        // coverity[dereference] -- invalid analysis -- "pS" not dereferenced.
-        if (pS++ == NULL)
+        if (pS == NULL)
             pS = pzDefFile;
+        else
+            pS++;
 
         /*
          *  We allow users to specify a suffix with '-' and '_', but when
@@ -349,53 +372,13 @@ openOutFile( tOutSpec* pOutSpec, tFpStack* pStk )
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        pStk->pzOutName = aprf( pOutSpec->pzFileFmt, pS,
-                                pOutSpec->zSuffix );
-        if (pStk->pzOutName == NULL)
+        pzOutFile = aprf(pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix);
+        if (pzOutFile == NULL)
             AG_ABEND( aprf( "Cannot format file name:  ``%s''",
                             pOutSpec->pzFileFmt ));
     }
 
-    pCurFp = pStk;
-
-    if (strcmp( pOutSpec->zSuffix, "null" ) == 0) {
-      null_open:
-        /*
-         *  Make the output a no-op, but perform the operations.
-         */
-        AGFREE( (void*)pStk->pzOutName );
-        pStk->pzOutName = zDevNull;
-        pStk->flags    |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
-        pStk->pFile     = fopen( zDevNull, "w" FOPEN_BINARY_FLAG "+" );
-        if (pStk->pFile != NULL)
-            return;
-
-        goto openError;
-    }
-
-    /*
-     *  IF we are to skip the current suffix,
-     *  we will redirect the output to /dev/null and
-     *  perform all the work.  There may be side effects.
-     */
-    if (HAVE_OPT( SKIP_SUFFIX )) {
-        int     ct  = STACKCT_OPT(  SKIP_SUFFIX );
-        tCC**   ppz = STACKLST_OPT( SKIP_SUFFIX );
-
-        while (--ct >= 0) {
-            if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0)
-                goto null_open;
-        }
-    }
-
-    unlink( pStk->pzOutName );
-    pStk->pFile = fopen( pStk->pzOutName, "w+" FOPEN_BINARY_FLAG );
-
-    if (pStk->pFile == NULL) {
-    openError:
-        AG_ABEND( aprf( zCannot, errno, "create", pStk->pzOutName,
-                        strerror( errno )));
-    }
+    open_output_file(pzOutFile, strlen(pzOutFile), write_mode, 0);
 }
 /*
  * Local Variables:
