@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2009-10-18 14:34:34 bkorb"
+# Time-stamp:      "2009-12-06 15:00:57 bkorb"
 
 # $Id$
 
@@ -523,30 +523,38 @@ DEFINE decl-callbacks
   (define undef-proc-names "")
   (define decl-type "")
   (define extern-proc-list (string-append
-    "optionPagedUsage\n"
-    (if (exist? "version")    "optionPrintVersion\n" "")
-    (if (exist? "resettable") "optionResetOpt\n" "")
-  ) )
-
-  (define extern-test-list (string-append
 
     "optionPagedUsage\n"
+    "optionStackArg\n"
+    "optionUnstackArg\n"
+    "optionBooleanVal\n"
+    "optionNumericVal\n"
+    "optionTimeVal\n"
+    "optionNestedVal\n"
+    "optionVersionStderr\n"
+    "optionPrintVersion\n"
+    "optionResetOpt\n"
 
-    (if (exist? "version") "optionVersionStderr\n" "")
   ) )
+
+  (define extern-test-list "")
 
   (define emit-decl-list (lambda(txt-var is-extern)
+    (if (> (string-length txt-var) 1) (begin
 
-    (set! txt-var (shellf "
-      (egrep -v '^%s$' | sort -u | \
-      sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
-          (if is-extern "NULL" "(NULL|optionStackArg|optionUnstackArg)")
-          txt-var ))
+      (emit (if is-extern "\nextern tOptProc\n" "\nstatic tOptProc\n"))
+      (set! txt-var (shellf "
+        (egrep -v '^%s$' | sort -u | \
+        sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
+            (if is-extern "NULL" "(NULL|optionStackArg|optionUnstackArg)")
+            txt-var ))
 
-    (shellf (if (< (string-length txt-var) 72)
-                "f='%s' ; echo \"   \" $f"
-                "${CLexe} --spread=1 -I4 <<_EOProcs_\n%s\n_EOProcs_" )
-          txt-var )  ))
+      (emit (shellf (if (< (string-length txt-var) 72)
+                  "f='%s' ; echo \"   \" $f"
+                  "${CLexe} --spread=1 -I4 <<_EOProcs_\n%s\n_EOProcs_" )
+            txt-var ))
+    ))
+  ))
 
   (define static-proc-list "doUsageOpt\n")
   (define static-test-list static-proc-list)
@@ -562,6 +570,30 @@ DEFINE decl-callbacks
      (ag-fprintf 0 ifdef-fmt n-or-def ifdef-name decl-type ifdef-cb )
   )))
 
+  (define set-cb-decl (lambda() (begin
+     (if make-test-main (begin
+         (set! tmp-val (hash-ref test-proc-name flg-name))
+         (if (hash-ref is-ext-cb-proc flg-name)
+             (set! extern-test-list (string-append extern-test-list
+                   tmp-val "\n" ))
+
+             (set! static-test-list (string-append static-test-list
+                   tmp-val "\n" ))
+         )
+     )   )
+
+     (set! tmp-val (hash-ref cb-proc-name flg-name))
+
+     (if (exist? "ifdef")  (set-ifdef ""  tmp-val (get "ifdef"))
+     (if (exist? "ifndef") (set-ifdef "n" tmp-val (get "ifdef"))
+     (if (hash-ref is-ext-cb-proc flg-name)
+         (set! extern-proc-list (string-append
+               extern-proc-list tmp-val "\n" ))
+
+         (set! static-proc-list (string-append
+               static-proc-list tmp-val "\n" ))
+     )))
+  )))
   =][=
 
   FOR    flag   =][=
@@ -576,58 +608,77 @@ DEFINE decl-callbacks
     ;;  #define to NULL emitted immediately.
     ;;
     (set! flg-name (get "name"))
-    (if (hash-ref have-cb-procs flg-name)
-        (begin
-          (if make-test-main (begin
-              (set! tmp-val (hash-ref test-proc-name flg-name))
-              (if (hash-ref is-ext-cb-proc flg-name)
-                  (set! extern-test-list (string-append extern-test-list
-                        tmp-val "\n" ))
 
-                  (set! static-test-list (string-append static-test-list
-                        tmp-val "\n" ))
-              )
-          )   )
-
-          (set! tmp-val (hash-ref cb-proc-name flg-name))
-
-          (if (exist? "ifdef")  (set-ifdef ""  tmp-val (get "ifdef"))
-          (if (exist? "ifndef") (set-ifdef "n" tmp-val (get "ifdef"))
-          (if (hash-ref is-ext-cb-proc flg-name)
-              (set! extern-proc-list (string-append
-                    extern-proc-list tmp-val "\n" ))
-
-              (set! static-proc-list (string-append
-                    static-proc-list tmp-val "\n" ))
-          )))
-    )   )
-
-    ""          =][=
+    (if (and (hash-ref have-cb-procs flg-name)
+             (not (hash-ref is-lib-cb-proc flg-name)) )
+              (set-cb-decl)
+    )           =][=
 
   ENDFOR flag   =][=
 
-  IF (. make-test-main)
+  IF (. make-test-main)                         =][=
+    INVOKE emit-testing-defines                 =][=
+  ENDIF make-test-main                          =][=
+
+  (emit-decl-list extern-proc-list #t)
+  (emit-decl-list static-proc-list #f)
+  (set! static-proc-list "")                    =][=
+
+  FOR     flag                                  =][=
+
+    (set! flg-name (get "name"))
+    (if (not (= (hash-ref cb-proc-name  flg-name)
+               (hash-ref test-proc-name flg-name)))
+        (set! static-proc-list (string-append static-proc-list
+              "#define " (up-c-name "name") "_OPT_PROC "
+                     (hash-ref cb-proc-name flg-name) "\n"))  )
+    =][=
+  ENDFOR  flag                                  =][=
+
+  IF (> (string-length static-proc-list) 0) =]
+
+/*
+ *  #define map the "normal" callout procs
+ */
+[= (. static-proc-list)                         =][=
+
+  ENDIF  have some #define mappings
+
+=][=
+
+  IF (. make-test-main)                         =][=
+
+    FOR     flag                                =][=
+      IF (set! flg-name (get "name"))
+         (not (= (hash-ref cb-proc-name   flg-name)
+                 (hash-ref test-proc-name flg-name))) =]
+#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
+      ENDIF                                     =][=
+    ENDFOR  flag                                =]
+#endif /* defined([=(. main-guard)=]) */[=
+
+  ENDIF (. make-test-main)                      =][=
+
+(. undef-proc-names)                            =][=
+
+ENDDEF decl-callbacks                           =][=
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-testing-defines
 
 =]
 #if defined([=(tpl-file-line extract-fmt) main-guard =])
 /*
  *  Under test, omit argument processing, or call optionStackArg,
  *  if multiple copies are allowed.
- */
-extern tOptProc
-[=
+ */[=
 
-(emit-decl-list extern-test-list #t)  =][=
+    (emit-decl-list extern-test-list #t)
+    (emit-decl-list static-test-list #f)
+    (set! static-test-list "")                  =][=
 
-    IF (> (string-length static-test-list) 0)
-
-=]
-static tOptProc
-[=(emit-decl-list static-test-list #f)=][=
-
-    ENDIF have static test procs  =][=
-    (set! static-test-list "")    =][=
-    FOR     flag          =][=
+    FOR     flag                                =][=
 
       (set! flg-name (get "name"))
       (if (not (= (hash-ref cb-proc-name  flg-name)
@@ -635,15 +686,15 @@ static tOptProc
           (set! static-test-list (string-append static-test-list
                 "#define " (up-c-name "name") "_OPT_PROC "
                        (hash-ref test-proc-name flg-name) "\n"))  )
-    =][=
-    ENDFOR  flag          =][=
+      =][=
+    ENDFOR  flag                                =][=
 
-    IF (> (string-length static-test-list) 0) =]
+    IF (> (string-length static-test-list) 0)   =]
 
 /*
  *  #define map the "normal" callout procs to the test ones...
  */
-[= (. static-test-list) =][=
+[= (. static-test-list)                         =][=
 
     ENDIF  have some #define mappings
 
@@ -654,58 +705,7 @@ static tOptProc
  *  When not under test, there are different procs to use
  */[=
 
-  ENDIF make-test-main
-
-=]
-extern tOptProc
-[=(emit-decl-list extern-proc-list #t)=][=
-
-  IF (> (string-length static-proc-list) 0)
-
-=]
-static tOptProc
-[=(emit-decl-list static-proc-list #f)=][=
-
-  ENDIF have static test procs  =][=
-  (set! static-proc-list "")    =][=
-  FOR     flag           =][=
-
-      (set! flg-name (get "name"))
-      (if (not (= (hash-ref cb-proc-name  flg-name)
-                 (hash-ref test-proc-name flg-name)))
-          (set! static-proc-list (string-append static-proc-list
-                "#define " (up-c-name "name") "_OPT_PROC "
-                       (hash-ref cb-proc-name flg-name) "\n"))  )
-  =][=
-  ENDFOR  flag            =][=
-
-  IF (> (string-length static-proc-list) 0) =]
-
-/*
- *  #define map the "normal" callout procs
- */
-[= (. static-proc-list) =][=
-
-  ENDIF  have some #define mappings
-
-=][=
-
-  IF (. make-test-main)   =][=
-
-    FOR     flag          =][=
-      IF (set! flg-name (get "name"))
-         (not (= (hash-ref cb-proc-name   flg-name)
-                 (hash-ref test-proc-name flg-name))) =]
-#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
-      ENDIF               =][=
-    ENDFOR  flag          =]
-#endif /* defined([=(. main-guard)=]) */[=
-
-  ENDIF (. make-test-main)      =][=
-
-(. undef-proc-names)  =][=
-
-ENDDEF decl-callbacks
+ENDDEF emit-testing-defines
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
