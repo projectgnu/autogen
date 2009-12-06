@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-11-28 18:23:12 bkorb"
+# Time-stamp:      "2009-12-06 15:02:02 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -34,7 +34,7 @@
 (define test-name   "")
 (define tmp-text    "")
 (define is-extern   #t)
-(define is-priv     #t)
+(define is-lib-cb   #f)
 (define make-callback-procs #f)
 
 (define need-stacking (lambda()
@@ -75,19 +75,18 @@ DEFINE save-name-morphs
     (hash-create-handle! ifdef-ed flg-name
               (and do-ifdefs (or (exist? "ifdef") (exist? "ifndef")))  )
     (set! proc-name (string-append "doOpt" cap-name))
-    (set! is-priv   #t)
+    (set! is-lib-cb #f)
 
     (exist? "call-proc")
 
-    =][=
+    =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
     (set! have-proc #t)
     (set! is-extern #t)
-    (set! is-priv   #f)
     (set! proc-name (get "call-proc"))
     (set! test-name (if need-stacking "optionStackArg" "NULL"))
+    =][=
 
-  =][=
   ELIF (or (exist? "extract-code")
            (exist? "flag-code")
            (exist? "arg-range"))
@@ -97,17 +96,16 @@ DEFINE save-name-morphs
     (set! is-extern #f)
     (set! test-name (if (exist? "arg-range") proc-name
                         (if need-stacking "optionStackArg" "NULL")  ))
+    =][=
 
-  =][=
   ELIF (exist? "flag-proc")     =][=
 
     (set! have-proc #t)
-    (set! is-priv   #f)
     (set! proc-name (string-append "doOpt" (cap-c-name "flag-proc")))
     (set! test-name (if need-stacking "optionStackArg" "NULL"))
     (set! is-extern #f)
+    =][=
 
-  =][=
   ELIF (exist? "stack-arg")     =][=
 
     (if (not (exist? "max"))
@@ -115,42 +113,43 @@ DEFINE save-name-morphs
                " has a stacked arg, but can only appear once")) )
 
     (set! have-proc #t)
-    (set! is-priv   #f)
     (set! proc-name "optionStackArg")
+    (set! is-lib-cb #t)
     (set! test-name (if need-stacking proc-name "NULL"))
     (set! is-extern #t)
+    =][=
 
-  =][=
   ELIF (exist? "unstack-arg")   =][=
 
     (set! have-proc #t)
-    (set! is-priv   #f)
     (set! proc-name "optionUnstackArg")
+    (set! is-lib-cb #t)
     (set! test-name (if need-stacking proc-name "NULL"))
     (set! is-extern #t)
+    =][=
 
-  =][=
   ELSE =][=
+
     CASE arg-type               =][=
     =*   bool                   =][=
          (set! proc-name "optionBooleanVal")
+         (set! is-lib-cb #t)
          (set! test-name proc-name)
          (set! is-extern #t)
-         (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
     =*   num                    =][=
          (set! proc-name "optionNumericVal")
+         (set! is-lib-cb #t)
          (set! test-name proc-name)
          (set! is-extern #t)
-         (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
     =*   time                   =][=
          (set! proc-name "optionTimeVal")
+         (set! is-lib-cb #t)
          (set! test-name proc-name)
          (set! is-extern #t)
-         (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
     ~*   key|set|fil            =][=
@@ -160,9 +159,9 @@ DEFINE save-name-morphs
 
     ~*   hier|nest              =][=
          (set! proc-name "optionNestedVal")
+         (set! is-lib-cb #t)
          (set! test-name proc-name)
          (set! is-extern #t)
-         (set! is-priv   #f)
          (set! have-proc #t)    =][=
 
     *                           =][=
@@ -184,6 +183,7 @@ DEFINE save-name-morphs
         (hash-create-handle! cb-proc-name    flg-name proc-name)
         (hash-create-handle! test-proc-name  flg-name test-name)
         (hash-create-handle! is-ext-cb-proc  flg-name is-extern)
+        (hash-create-handle! is-lib-cb-proc  flg-name is-lib-cb)
         (set! make-callback-procs #t)
       )
       (begin

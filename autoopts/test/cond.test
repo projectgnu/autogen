@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2009-01-17 15:59:42 bkorb"
+# Time-stamp:        "2009-12-06 15:07:30 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -44,7 +44,16 @@ flag = {
   value = c;
   ifdef = COND;
   descrip = "cond test";
+  arg-type = number;
   doc = mumble;
+};
+
+flag = {
+  name  = interfere;
+  value = I;
+  descrip = "cond interference test";
+  arg-type = number;
+  doc = stumble;
 };
 EOF
 echo ${AG_L} ${testname}.def
@@ -63,6 +72,7 @@ USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
+   -I Num interfere      cond interference test
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
@@ -70,6 +80,9 @@ _EOF_
 
 cmp -s ${testname}-1.help ${testname}.help || \
   failure "`diff ${testname}-1.help ${testname}.help`"
+
+./${testname} -c 123 && \
+    failure "*DID* process -c option"
 
 # # # # # # # # # # SECOND TEST # # # # # # # # #
 
@@ -81,7 +94,8 @@ USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -c no  condition      cond test
+   -c Num condition      cond test
+   -I Num interfere      cond interference test
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
@@ -120,7 +134,7 @@ compile "-?"
 cmp -s ${testname}-1.help ${testname}.help || \
   failure "`diff ${testname}-1.help ${testname}.help`"
 
-./${testname} -c || \
+./${testname} -c 123 || \
     failure "could not process -c option"
 
 cleanup
