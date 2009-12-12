@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-11-01 11:42:31 bkorb"
+ *  Time-stamp:        "2009-12-10 16:13:15 bkorb"
  *
  *  This module evaluates macro expressions.
  *
@@ -306,11 +306,44 @@ ag_scm_error_source_line( void )
  * exparg: alist, list of arguments to stringify and emit, , list
  *
  * doc:  Walk the tree of arguments, displaying the values of displayable
- *       SCM types.
+ *       SCM types.  EXCEPTION: if the first argument is a number, then
+ *       that number is used to index the output stack.  "0" is the default,
+ *       the current output.
 =*/
 SCM
 ag_scm_emit( SCM val )
 {
+    static int depth = 0;
+    static FILE * fp;
+
+    switch (depth) {
+    case 1:
+    {
+        tFpStack* pSaveFp;
+        unsigned long pnum;
+
+        if (! AG_SCM_NUM_P(val))
+            break;
+
+        pSaveFp = pCurFp;
+        pnum    = gh_scm2ulong(val);
+
+        for (; pnum > 0; pnum--) {
+            pSaveFp = pSaveFp->pPrev;
+            if (pSaveFp == NULL)
+                AG_ABEND(aprf("invalid emission port: %d", gh_scm2ulong(val)));
+        }
+
+        fp = pSaveFp->pFile;
+        return SCM_UNDEFINED;
+    }
+
+    case 0:
+        fp = pCurFp->pFile; // initialize the first time through
+        break;
+    } 
+
+    depth++;
     for (;;) {
         if (val == SCM_UNDEFINED)
             break;
@@ -319,8 +352,8 @@ ag_scm_emit( SCM val )
             break;
 
         if (AG_SCM_STRING_P( val )) {
-            fputs( (char*)ag_scm2zchars( val, "emit val" ), pCurFp->pFile );
-            fflush( pCurFp->pFile );
+            fputs( (char*)ag_scm2zchars( val, "emit val" ), fp );
+            fflush( fp );
             break;
         }
 
@@ -332,14 +365,15 @@ ag_scm_emit( SCM val )
             continue;
 
         default:
-            fputs( resolveSCM( val ), pCurFp->pFile );
-            fflush( pCurFp->pFile );
+            fputs( resolveSCM( val ), fp );
+            fflush( fp );
             break;
         }
 
         break;
     }
 
+    depth--;
     return SCM_UNDEFINED;
 }
 

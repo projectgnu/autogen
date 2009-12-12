@@ -1,3 +1,12 @@
+2009-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options-tpl.in (is-lib-cb-proc): new hash table
+	* autoopts/optlib.tpl (is-lib-cb-proc): set it #t if callback proc
+	is out of optlib, set it #f if not.
+	* autoopts/optmain.tpl (decl-callbacks): always declare all library
+	callback functions and never declare or define them to something else.
+	* autoopts/test/cond.test: test this stuff.
+
 2009-11-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c (mkstempPat): provide space for copying template
