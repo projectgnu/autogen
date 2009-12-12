@@ -1,3 +1,12 @@
+2009-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am (EXTRA_DIST): distribute defParse.x
+	* agen5/defParse.def (handler-file): new attribute.  Use it.
+	* agen5/fsm-macro.tpl:
+	* agen5/fsm-trans.tpl:
+	* agen5/fsm.tpl: implement "handler-file" attribute, separating
+	generated from hand crafted code.
+
 2009-12-06  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/options-tpl.in (is-lib-cb-proc): new hash table

@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  Time-stamp:        "2008-12-26 09:55:46 bkorb"
+#  Time-stamp:        "2009-12-12 12:57:29 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -104,7 +104,9 @@ DEFINE emit-invalid-msg =][=
 
 static int [=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
   (. pfx)=]_event evt );
+[=
 
+  IF (not (exist? "handler-file")) =]
 /* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
  *
  *  Print out an invalid transition message and return EXIT_FAILURE
@@ -125,7 +127,9 @@ static int
 }
 [=
 
-ENDDEF  emit-invalid-msg  =][=
+  ENDIF  not exist handler-file =][=
+
+ENDDEF  emit-invalid-msg
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -133,7 +137,7 @@ DEFINE emit-cookie-args   =][=
   FOR cookie              =]
     [=cookie=],[=
   ENDFOR                  =][=
-ENDDEF emit-cookie-args   =][=
+ENDDEF emit-cookie-args
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -157,7 +161,24 @@ static te_[=(. pfx)=]_state
 }
 [=
   ESAC =][=
+
 ENDDEF build-callback
+
+# # # # # # # =][=
+
+DEFINE callbacks     =][=
+
+  `set -- \`sed 's/,//' .fsm.xlist\`` =][=
+
+  WHILE `echo $#`       =][=
+
+    INVOKE build-callback
+      cb_prefix = (string-append pfx "_do")
+      cb_name   = (shell "echo $1 ; shift") =][=
+
+  ENDWHILE  echo $#     =][=
+
+ENDDEF callbacks
 
 # # # # # # # =][=
 
@@ -167,7 +188,7 @@ DEFINE run-callback
     if (pT != NULL)
         nxtSt = (*pT)( [=
   FOR cookie =][=
-      (shellf "echo '%s'|sed 's,.*[ \t],,'" (get "cookie")) =], [=
+      (shellf "echo '%s'|sed 's,.*[ \t*],,'" (get "cookie")) =], [=
 
   ENDFOR     =][=(. pfx)=]_state, nxtSt, trans_evt );[=
 
@@ -365,4 +386,6 @@ ENDFOR   transition           =][=
         (string-append PFX "_TR_"))
 ) )                           =][=
 
-ENDDEF compute-transitions    =]
+ENDDEF compute-transitions
+
+=]
