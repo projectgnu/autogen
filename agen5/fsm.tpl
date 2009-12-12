@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2008-06-14 16:09:07 bkorb"
+#  Time-stamp:      "2009-12-12 14:14:47 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -59,7 +59,13 @@ CASE (suffix) =][=
  *      [=(. PFX)=]_EV_INVALID is always defined at the end.
  */
 [=(make-header-guard "autofsm")=]
+[=
 
+FOR extra-header "\n" \=]
+#include "[=extra-header=]"[=
+ENDFOR
+
+=]
 /*
  *  Finite State machine States
  *
@@ -148,12 +154,17 @@ _EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
 #include "[=(. header-file)=]"
 #include <stdio.h>
 #include <ctype.h>
-
+[=IF (exist? "handler-file")=]
+#define FSM_USER_HEADERS
+#include "[= handler-file =]"
+#undef  FSM_USER_HEADERS[=
+  ELSE =]
 /*
  *  Do not make changes to this file, except between the START/END
  *  comments, or it will be removed the next time it is generated.
  */
-[=(extract fsm-source "/* %s === USER HEADERS === %s */")=]
+[=(extract fsm-source "/* %s === USER HEADERS === %s */")=][=
+  ENDIF =]
 
 #ifndef NULL
 #  define NULL 0
@@ -170,17 +181,18 @@ static te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
 [=ENDIF=]
 [= emit-invalid-msg     =][=
 
-  IF  (=* (get "method") "call")        =][=
+  IF  (=* (get "method") "call") =][=
 
-    `set -- \`sed 's/,//' .fsm.xlist\`` =][=
+    IF (exist? "handler-file")   =]
+#define FSM_HANDLER_CODE
+#include "[= handler-file =]"
+#undef  FSM_HANDLER_CODE
+[=
+    ELSE                =][=
+      INVOKE callbacks  =][=
+    ENDIF               =][=
 
-    WHILE `echo $#`     =][=
-
-      INVOKE build-callback
-        cb_prefix = (string-append pfx "_do")
-        cb_name   = (shell "echo $1 ; shift") =][=
-
-    ENDWHILE  echo $#   =][=
+  ELSE                  =][=
   ENDIF                 =][=
 
   CASE type             =][=

@@ -1,2 +1,4 @@
 #  -*- Mode: Outline -*-
 #  $Date: 2009/02/06 23:54:30 $
+
+* ag_scm_emit: needs to be able to select output stack entry

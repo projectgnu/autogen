@@ -40,7 +40,8 @@ DEFINE state-table  =]
 
 =]
   }[=
-ENDDEF       =][=
+
+ENDDEF state-table
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -105,7 +106,7 @@ extern int
 #endif /* DEFINE_FSM */[=
   ENDIF      =][=
 
-ENDDEF       =][=
+ENDDEF  enumerate-transitions
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -155,7 +156,7 @@ static const [= (. t-trans) =]
   ENDFOR         =]
 };[=
 
-ENDDEF       =][=
+ENDDEF callback-transitions
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -195,10 +196,14 @@ DEFINE machine-step  =][=
 #endif /* [= "debug-flag =] */
 [= ENDIF \=][=
 
-  IF (=* (get "method") "case")  =][=
-    run-switch    =][=
-  ELSE            =][=
-    run-callback  =][=
+  IF (not (=* (get "method") "case"))  =][=
+    INVOKE run-callback         =][=
+  ELIF (exist? "handler-file")  =]
+#define FSM_SWITCH_CODE
+#include "[= handler-file =]"
+#undef  FSM_SWITCH_CODE[=
+  ELSE                          =][=
+    INVOKE run-switch           =][=
   ENDIF
 
 =]
@@ -214,7 +219,7 @@ DEFINE machine-step  =][=
     [=(. pfx)=]_state = nxtSt;[=
   ENDIF  =]
 [=
-ENDDEF  machine-step     =][=
+ENDDEF  machine-step
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -233,7 +238,7 @@ DEFINE fsm-proc-variables
     te_[=(. pfx)=]_trans trans;[=
     ENDIF =][=
 
-ENDDEF fsm-proc-variables    =][=
+ENDDEF fsm-proc-variables
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -248,7 +253,10 @@ DEFINE make-loop-proc  =]
     [=cookie=][=
     ENDFOR=][=
   ELSE=] void[=ENDIF=] )[=
-ENDDEF make-loop-proc  =][=
+
+ENDDEF make-loop-proc
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE looping-machine
 
@@ -259,9 +267,14 @@ DEFINE looping-machine
     INVOKE fsm-proc-variables  =]
 
     while ([=(. pfx)=]_state < [=(. PFX)=]_ST_INVALID) {
-
+[=IF (exist? "handler-file")=]
+#define FSM_FIND_TRANSITION
+#include "[= handler-file =]"
+#undef  FSM_FIND_TRANSITION[=
+  ELSE =]
 [=(extract fsm-source "        /* %s == FIND TRANSITION == %s */" ""
-           "        trans_evt = GET_NEXT_TRANS();" )=]
+           "        trans_evt = GET_NEXT_TRANS();" ) =][=
+  ENDIF =]
 [=  (out-push-new ".fsm.cktbl")=][=
     INVOKE machine-step =][=
     (out-pop)
@@ -270,8 +283,7 @@ DEFINE looping-machine
     return [=(. pfx)=]_state;
 }[=
 
-ENDDEF       =][=
-
+ENDDEF looping-machine
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -291,7 +303,9 @@ DEFINE make-step-proc  =]
     [=cookie=][=
   ENDFOR=] )[=
 
-ENDDEF make-step-proc  =][=
+ENDDEF make-step-proc
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE stepping-machine
 
@@ -305,12 +319,18 @@ DEFINE stepping-machine
   ENDIF  =]
         return [=(. PFX)=]_ST_INIT;
     }
-[=  INVOKE machine-step =]
-
-[=(extract fsm-source "    /* %s == FINISH STEP == %s */")=]
+[=INVOKE machine-step       =][=
+  IF (exist? "handler-file")=]
+#define FSM_FINISH_STEP
+#include "[= handler-file =]"
+#undef  FSM_FINISH_STEP[=
+  ELSE =]
+[=(extract fsm-source "    /* %s == FINISH STEP == %s */")=][=
+  ENDIF =]
 
     return nxtSt;
 }[=
 
+ENDDEF stepping-machine
 
-ENDDEF       =]
+=]

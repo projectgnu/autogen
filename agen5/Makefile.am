@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2009-11-28 14:52:38 bkorb"
+## Time-stamp:      "2009-12-12 14:35:03 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -52,7 +52,7 @@ csrc = \
 hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
 
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
-             bootstrap.dir schemedef.scm
+             defParse.x bootstrap.dir schemedef.scm
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la
