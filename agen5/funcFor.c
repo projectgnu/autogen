@@ -30,7 +30,6 @@ static tForState*  pFS;  /* Current "FOR" information (state) */
 tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ag_bool
 nextDefinition( ag_bool invert, tDefEntry** ppList );
 

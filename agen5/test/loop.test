@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # loop.test --- test FOR loop
 #
-# Time-stamp:        "2007-07-04 11:30:37 bkorb"
+# Time-stamp:        "2010-02-20 14:57:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -62,8 +62,8 @@ done >&3
 echo "End ${testname} Test" >&3
 exec 3>&-
 
-${AGexe} --base=${testname} --no-def --override=${testname}.tpl || \
-   failure ${AGexe} failed
+run_ag x --base=${testname} --no-def --override=${testname}.tpl || \
+   failure autogen failed
 
 cmp -s ${testname}.base ${testname}.test || \
    failure "unexpected output: `diff ${testname}.base ${testname}.test`"

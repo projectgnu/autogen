@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # match.test --- test the "match-value?" scheme
 #
-# Time-stamp:        "2007-07-04 11:30:44 bkorb"
+# Time-stamp:        "2010-02-20 14:36:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -57,7 +57,7 @@ _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
 
-${AGexe} ${testname}.def || \
+run_ag x ${testname}.def || \
    failure could not generate output
 ${EGREP} FAIL ${testname}.test && \
    failure some ${testname} tests failed

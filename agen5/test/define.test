@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # define.test --- test evalstack functionality
 #
-# Time-stamp:        "2007-07-04 11:29:21 bkorb"
+# Time-stamp:        "2010-02-20 14:47:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -144,9 +144,8 @@ level 3 iteration 1 Nested Name:  tertiary
 Done.
 _EOF_
 
-echo ${AGexe} --lib=$testname.tlib $testname.def
-${AGexe} --lib=$testname.tlib $testname.def || \
-  failure "${AGexe} failed"
+run_ag x --lib=$testname.tlib $testname.def || \
+  failure "autogen failed"
 set -x
 cmp -s $testname.test $testname.test || \
   failure "`diff $testname.samp $testname.test`"

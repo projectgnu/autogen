@@ -51,7 +51,6 @@ static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
 
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tDefEntry*
 findEntryByIndex( tDefEntry* pE, char* pzScan );
 

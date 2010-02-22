@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2009-01-08 21:58:50 bkorb"
+# Time-stamp:        "2010-02-20 15:45:54 bkorb"
 #            by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -70,9 +70,12 @@ cat > ${testname}.base1 <<'_EOF_'
 	The definitions file has a `#error' directive
 _EOF_
 
-echo ${AGexe} ${testname}.def
-${AGexe} ${testname}.def 2> ${testname}.err1 && failure unexpected success
-${GREP} -v 'Giving up in' ${testname}.err1 > ${testname}.err
+( set +x ; VERBOSE=false
+  run_ag x1 ${testname}.def 2> ${testname}.err1
+) && failure unexpected success
+
+sed '/Giving up in/d;/Failing Guile command:/,$d' ${testname}.err1 \
+    > ${testname}.err
 cmp -s ${testname}.err ${testname}.base1 || \
   failure "expected->actual `diff -c ${testname}.base1 ${testname}.err`"
 
@@ -81,7 +84,7 @@ cmp -s ${testname}.err ${testname}.base1 || \
 echo creating ${testname}.base2
 # this is the output we should expect to see
 cat > ${testname}.base2 <<'_EOF_'
-DEFINITIONS Warning in error.tpl line 8 for error.fnord:
+DEFINITIONS Warning in error.tpl line 8 for error2.fnord:
 	0 this is really okay
 Error in template error.tpl, line 13
 	DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
@@ -97,13 +100,12 @@ Failing Guile command:  = = = = =
 =================================
 _EOF_
 
-agopts="--no-def --base=${testname} --trace-out=${testname}.trc"
+agopts="--no-def --base=${testname}"
 
 # this is *supposed* to exit with a failure status
-echo autogen -T${testname}.tpl ${agopts}2 >&2
-${AGexe} -T${testname}.tpl ${agopts}2 \
-  2> ${testname}.err2 \
-  && failure Unexpected success for AutoGen
+( set +x ; VERBOSE=false
+  run_ag x2 -T${testname}.tpl ${agopts}2 2> ${testname}.err2
+) && failure Unexpected success for AutoGen
 
 if test ${GUILE_VERSION} -gt 107000
 then
@@ -131,18 +133,17 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
     < ${testname}.tpl > ${testname}2.tpl
 
 # this is *supposed* to exit with a failure status
-echo autogen -T${testname}2.tpl ${agopts}3 >&2
-${AGexe} -T${testname}2.tpl ${agopts}3 \
-  2> ${testname}.tmp3 \
-  && failure Unexpected success for AutoGen
+( set +x ; VERBOSE=false
+  run_ag x3 -T${testname}2.tpl ${agopts}3 2> ${testname}.tmp3
+) && failure Unexpected success for AutoGen
 
 sed -e 's,on signal .* in state,on signal <text-varies> in state,' \
   ${testname}.tmp3 >> ${testname}.trc3
-sed -i -e '/trapped on [1-9]/d' \
-       -e '/ signal.*Child exited/d' \
-       -e '/^Abort/d' \
-       -e '/Broken pipe/d' ${testname}.trc3
-
+sed -e '/trapped on [1-9]/d' \
+    -e '/ signal.*Child exited/d' \
+    -e '/Abort/d' \
+    -e '/Broken pipe/d' ${testname}.trc3 > XXX
+mv -f XXX ${testname}.trc3
 cmp -s ${testname}.trc3 ${testname}.base3 || \
   failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"
 
@@ -165,8 +166,9 @@ Likely causes:  a mismatched quote, a value that needs quoting,
 		or a missing semi-colon
 _EOF_
 
-echo ${AGexe} ${testname}.def
-${AGexe} ${testname}2.def 2> ${testname}.trc4 && failure unexpected success
+( set +x ; VERBOSE=false
+  run_ag x4 ${testname}2.def 2> ${testname}.trc4
+) && failure unexpected success
 ${GREP} -v 'Giving up in' ${testname}.trc4 > ${testname}.err4
 cmp -s  ${testname}.err4 ${testname}.base4 || \
   failure "expected->actual `diff -c ${testname}.base4 ${testname}.err4`"
@@ -180,9 +182,12 @@ THIS TEXT SHOULD BE DELETED!!
 <= ENDIF =>
 _EOF_
 
-${AGexe} -T ${testname}.tpl5 ${agopts}5 \
-  > /dev/null 2> ${testname}.out5
- [ $? -ne 0 ] || failure "${AGexe} was okay with bogus input"
+( set +x ; VERBOSE=false
+  run_ag x5 -T ${testname}.tpl5 ${agopts}5 > /dev/null 2> ${testname}.out5
+  res=$?
+  echo ag results: $res
+  exit $?
+) || failure "autogen was okay with bogus input"
 
 ${EGREP} -v 'Giving up in .*functions\.c' ${testname}.out5 > ${testname}.samp5
 cat > ${testname}.base5 <<'EOF'
@@ -209,7 +214,7 @@ if (exist? "nothing")
 End Of File
 _EOF_
 
-${AGexe} -T ${testname}.tpl6 ${agopts}6 \
+run_ag x6 -T ${testname}.tpl6 ${agopts}6 \
   > /dev/null 2> ${testname}.out6 && \
   failure "Your Guile lib exits 0 on failure"
 

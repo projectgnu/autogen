@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # dynref.test --- test dynamic scoping of definition values
 #
-# Time-stamp:        "2007-07-04 11:29:31 bkorb"
+# Time-stamp:        "2010-02-20 14:59:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -68,8 +68,7 @@ cat > $testname.out <<_EOF_
 The un-nested value is:  hidden value.
 _EOF_
 
-echo ${AGexe} $testname.def
-${AGexe} $testname.def || failure ${AGexe} failed
+run_ag x $testname.def || failure autogen failed
 cmp -s $testname.test $testname.out || \
   failure "`diff $testname.test $testname.out`"
 

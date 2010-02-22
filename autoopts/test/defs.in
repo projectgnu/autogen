@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2008-12-31 12:43:49 bkorb"
+# Time-stamp:     "2010-02-22 11:49:30 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -32,6 +32,7 @@
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`
 test_name=`echo ${testname} | sed 's/-/_/g'`
+PS4=">${testname}> "
 export progname testname
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -168,6 +169,12 @@ be_silent()
          mkdir testdir || exit 1
     fi
 
+    run_ag()
+    {
+        shift
+        ${AGexe} "$@"
+    }
+
     init_tests
 }
 
@@ -178,6 +185,14 @@ be_verbose()
     msg=:
     VERBOSE=true
     test -d testdir || mkdir testdir || exit 1
+
+    run_ag()
+    {
+        local tfile=${testname}-aglog-${1}-$$.log
+        shift
+        MALLOC_CHECK_=2 \
+            ${AGexe} --trace=every --trace-out=${tfile} "$@"
+    }
 
     init_tests
 }
@@ -239,13 +254,15 @@ compile()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-case "$-" in
-*x*) be_verbose ;;
-*)   case "${VERBOSE}" in
-     '' | [Nn]* | 0 | [Ff]* ) be_silent ;;
-     *)  be_verbose ;;
-     esac
-     ;;
+case "${VERBOSE}" in
+( '' | [Nn]* | 0 | [Ff]* )
+    be_silent ;;
+
+( * )
+    case "$-" in
+    ( *x* ) be_verbose ;;
+    (  *  ) be_silent ;;
+    esac
 esac
 
 cd testdir || {
@@ -269,7 +286,9 @@ stdopts=${srcdir}/stdopts.def
 
 #  All the tests will require the templates in the autoopts dir.
 #
-AG_L="${AGexe} -L`cd ${srcdir}/..;pwd`"
+AUTOGEN_TEMPL_DIRS=`cd ${top_srcdir} > /dev/null ; pwd`/autoopts
+AG_L=${AGexe}\ -L${AUTOGEN_TEMPL_DIRS}
+export AUTOGEN_TEMPL_DIRS AG_L
 
 #  In general, they will have a test main procedure, too.
 #

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # format.test --- Count format string arguments.
 #
-# Time-stamp:        "2009-07-31 12:03:05 bkorb"
+# Time-stamp:        "2010-02-20 14:58:35 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -82,7 +82,7 @@ document.write('" >Bruce Korb</a>');
 </script>
 _EOF_
 
-${AGexe} ${testname}.def || failure ${AGexe} failed
+run_ag x ${testname}.def || failure autogen failed
 cmp -s ${testname}.base ${testname}.test || \
    failure "`diff ${testname}.base ${testname}.test`"
 

@@ -26,7 +26,6 @@
 static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ag_bool
 canReadFile( tCC* pzFName );
 

@@ -45,7 +45,6 @@
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static int
 entry_length( char* pzName );
 

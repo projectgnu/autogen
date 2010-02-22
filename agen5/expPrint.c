@@ -32,7 +32,6 @@ static int        printJumpSignal = 0;
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ssize_t
 safePrintf( char** ppzBuf, char* pzFmt, void** argV );
 /* = = = END-STATIC-FORWARD = = = */

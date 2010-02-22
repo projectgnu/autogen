@@ -41,7 +41,6 @@ static tSuspendName*  pSuspended  = NULL;
 static int            outputDepth = 1;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 addWriteAccess( char* pzFileName );
 /* = = = END-STATIC-FORWARD = = = */

@@ -37,7 +37,6 @@ tSCC zTplInvoked[] = "Template macro %s invoked with %d args\n";
 static tDefList* linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static int
 orderDefList( const void* p1, const void* p2 );
 

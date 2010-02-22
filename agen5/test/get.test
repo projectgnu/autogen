@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # get.test --- test get functionality
 #
-# Time-stamp:        "2007-12-23 12:54:09 bkorb"
+# Time-stamp:        "2010-02-20 14:58:28 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -82,7 +82,7 @@ MUM_BLE
 mum_ble
 _EOF_
 
-${AGexe} $testname.def || failure ${AGexe} failed
+run_ag x $testname.def || failure autogen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

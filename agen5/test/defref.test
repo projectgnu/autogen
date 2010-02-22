@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2009-11-08 08:16:54 bkorb"
+# Time-stamp:        "2010-02-20 14:47:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -110,7 +110,7 @@ The first value is:  val = L0.first (first)
 The last value is:   val = L4.last (last)
 _EOF_
 
-${AGexe} ${testname}.def || failure AutoGen failed
+run_ag x ${testname}.def || failure AutoGen failed
 cmp -s ${testname}.test ${testname}.out || \
   failure "`diff ${testname}.test ${testname}.out`"
 

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2008-12-31 14:33:35 bkorb"
+# Time-stamp:      "2010-02-20 12:31:39 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -85,14 +85,24 @@ case "${SHELL}" in
   ;;
 esac
 
-case "$-" in
-(*x*)   setx=set\ -x dashx=-x VERBOSE=true  ;;
-(*)     setx=:       dashx=   VERBOSE=false ;;
+case "${VERBOSE}" in
+( [tTyY1]* ) VERBOSE=true ;;
+( [fFnN0]* ) VERBOSE=false ;;
+( * )
+    case "$-" in
+    ( *x* )  VERBOSE=true ;;
+    (  *  )  VERBOSE=false ;;
+    esac
 esac
-nl='
-'
 
-export setx dashx VERBOSE
+if ${VERBOSE}
+then setx=set\ -x dashx=-x
+else setx=:       dashx=
+fi
+
+nl=$'\n'
+
+export setx dashx VERBOSE nl
 
 # Figure out the absolute path to the working directory.
 #

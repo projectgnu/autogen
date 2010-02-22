@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # alist.test --- test evalstack functionality
 #
-# Time-stamp:        "2007-07-04 11:29:01 bkorb"
+# Time-stamp:        "2010-02-20 14:54:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -65,9 +65,8 @@ cat > $testname.out <<_EOF_
   2 name is last
 _EOF_
 
-AGCMD="${AGexe} -L ${srcdir}/.."
-echo ${AGCMD} $testname.def
-${AGCMD} $testname.def || failure ${AGCMD} failed
+AGCMD="-L ${srcdir}/.."
+run_ag x ${AGCMD} $testname.def || failure ${AGCMD} failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

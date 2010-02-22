@@ -76,7 +76,6 @@ static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
 static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 compile_re(regex_t* pRe, char const * pzPat, int flags);
 

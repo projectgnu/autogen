@@ -54,7 +54,6 @@ te_dp_event aKeywordTkn[] = { KEYWORD_TABLE };
 #define SET_LIT_TKN(t) lastToken = DP_EV_LIT_ ## t; *(pCurCtx->pzScan++) = NUL;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 loadScheme( void );
 

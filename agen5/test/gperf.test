@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # gperf.test --- test functionality of `for' function
 #
-# Time-stamp:        "2007-07-04 11:30:04 bkorb"
+# Time-stamp:        "2010-02-20 14:39:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -78,7 +78,7 @@ third	yields: 0x03
 fourth	yields: 0x04
 _EOF_
 
-${AGexe} --trace=server-shell ${testname}.def || failure AutoGen failed
+run_ag x --trace=server-shell ${testname}.def || failure AutoGen failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
 

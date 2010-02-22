@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # make.test --- test makefile script manufacture
 #
-# Time-stamp:        "2007-07-04 11:30:41 bkorb"
+# Time-stamp:        "2010-02-20 14:36:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -75,7 +75,7 @@ _EOF_
 
 # # # # # # # RUN AUTOGEN # # # # # #
 
-${AGexe} -T ${testname}.tpl --no-def > ${testname}.test || \
+run_ag x -T ${testname}.tpl --no-def > ${testname}.test || \
   failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # directives.test --- test definition directives
 #
-# Time-stamp:        "2007-07-04 11:29:27 bkorb"
+# Time-stamp:        "2010-02-22 12:41:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -111,27 +111,32 @@ cat > ${testname}.base <<_EOF_
 Irrelevant bar.
 _EOF_
 
-AGCMD="${AGexe} -DMUMBLE -DFOO=1"
-echo ${AGCMD} ${testname}.def
-MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD} failed
+agopts="-DMUMBLE -DFOO=1"
+MORE=DOITWRONG
+
+run_ag x1 ${agopts} ${testname}.def
+test $? -eq 0 || failure ${agopts}-1 failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
 
 echo '#assert `echo true`' >> ${testname}.inc
-MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD}-2 failed
+run_ag x2 ${agopts} ${testname}.def
+test $? -eq 0 || failure ${agopts}-2 failed
 
 echo '#assert `echo false`' >> ${testname}.inc
-MORE=DOITWRONG ${AGCMD} ${testname}.def && failure ${AGCMD}-3 failed
+run_ag x3 ${agopts} ${testname}.def
+test $? -ne 0 || failure ${agopts}-3 failed
 
 ${FGREP} -v '#assert' ${testname}.inc > ${testname}2.inc
 mv -f ${testname}2.inc ${testname}.inc
 
 echo '#assert (version-compare > autogen-version "5.8.4")' >> ${testname}.inc
-MORE=DOITWRONG ${AGCMD} ${testname}.def || failure ${AGCMD}-4 failed
+run_ag x4 ${agopts} ${testname}.def
+test $? -eq 0 || failure ${agopts}-4 failed
 
-echo '#assert (version-compare <  autogen-version "5.8.4.63")' >> ${testname}.inc
-MORE=DOITWRONG ${AGCMD} ${testname}.def && failure ${AGCMD}-5 failed
-
+echo '#assert (version-compare < autogen-version "5.8.4.63")' >> ${testname}.inc
+run_ag x5 ${agopts} ${testname}.def
+test $? -ne 0 || failure ${agopts}-5 failed
 
 cleanup
 

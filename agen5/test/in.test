@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # in.test --- Verify that the "in?" predicate works
 #
-# Time-stamp:        "2007-07-04 11:30:18 bkorb"
+# Time-stamp:        "2010-02-20 14:58:22 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -81,7 +81,7 @@ success-true
 success-false
 _EOF_
 
-${AGexe} ${testname}.def || failure ${AGexe} failed
+run_ag x ${testname}.def || failure autogen failed
 cmp -s ${testname}.ok ${testname}.out || \
   failure "`diff ${testname}.ok ${testname}.test`"
 

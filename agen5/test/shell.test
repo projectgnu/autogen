@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2007-07-04 11:31:10 bkorb"
+# Time-stamp:        "2010-02-20 14:57:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -126,10 +126,13 @@ cat > ${testname}.sample <<-  \_EOF_
 	: This is a final test
 	_EOF_
 
-trace="--trace-out=${testname}-trace.log --trace=everything"
+if ${VERBOSE}
+then trace=''
+else trace="--trace-out=${testname}-trace.log --trace=everything"
+fi
 
-${AGexe} ${trace} ${testname}.def || \
-   failure "${AGexe} ${testname}.def"
+run_ag x ${trace} ${testname}.def || \
+   failure "autogen ${testname}.def"
 
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup

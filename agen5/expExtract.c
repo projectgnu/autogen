@@ -24,7 +24,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static char const*
 loadExtractData( char const* pzNewFile );
 

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # endmac.test --- test variations on the end macro marker
 #
-# Time-stamp:        "2007-07-04 11:29:33 bkorb"
+# Time-stamp:        "2010-02-20 14:43:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -36,7 +36,7 @@ cat > ${testname}1.tpl <<EOF
 This is a test
 EOF
 
-${AGexe} -T${testname}1 --no-def 2> /dev/null && \
+run_ag x1 -T${testname}1 --no-def 2> /dev/null && \
   failure $testname failure test was successful.  Oops.
 echo $testname failure test failed correctly
 
@@ -47,7 +47,7 @@ ENDMAC 2 <=`echo print this message` =>>
 This is a test
 EOF
 
-${AGexe} -T${testname}2 --no-def || \
+run_ag x2 -T${testname}2 --no-def || \
    failure $testname success test was a failure
 echo first successful $testname test succeeded
 
@@ -59,7 +59,7 @@ ENDMAC 3 <+(define foo "print this message")  (. foo) +>>
 This is a test
 EOF
 
-${AGexe} -T${testname}3 --no-def || \
+run_ag x3 -T${testname}3 --no-def || \
    failure second $testname success test was a failure
 echo second successful $testname test succeeded
 

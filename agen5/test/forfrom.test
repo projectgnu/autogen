@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # forfrom.test --- test forfrom functionality
 #
-# Time-stamp:        "2007-07-04 11:29:51 bkorb"
+# Time-stamp:        "2010-02-20 14:58:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##
@@ -67,7 +67,7 @@ list[4] = EMPTY,
 list[7] = this is "seven"
 _EOF_
 
-${AGexe} $testname.def || failure ${AGexe} failed
+run_ag x $testname.def || failure autogen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

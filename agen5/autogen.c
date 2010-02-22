@@ -37,7 +37,6 @@ typedef void (sighandler_proc_t)( int sig );
 static sighandler_proc_t ignoreSignal, abendSignal;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 inner_main( int argc, char** argv );
 

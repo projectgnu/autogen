@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2009-10-11 09:45:05 bkorb"
+# Time-stamp:        "2010-02-20 14:24:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,11 +36,10 @@ CFLAGS=''
 INC=''
 
 compile_getopt() {
-  echo ${AGexe} -L${TMPDIR} ${testname}.def
-  ${AGexe} -L${TMPDIR} ${testname}.def || \
+  run_ag opts -L${TMPDIR} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  ${AGexe} -L${TMPDIR} -T getopt.tpl ${testname}.def || \
+  run_ag getopt -L${TMPDIR} -T getopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
 
   # Remove the variable comments so we can test against the expected result

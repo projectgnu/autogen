@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # forin.test --- test forin functionality
 #
-# Time-stamp:        "2007-07-04 11:29:55 bkorb"
+# Time-stamp:        "2010-02-20 14:58:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##
@@ -72,8 +72,8 @@ target_canonical=@target_cpu@-@target_vendor@-@target_os@
 
 _EOF_
 
-${AGexe} --no-def -T${testname}.tpl -b ${testname} || \
-  failure ${AGexe} failed
+run_ag x --no-def -T${testname}.tpl -b ${testname} || \
+  failure autogen failed
 cmp -s ${testname}.ok ${testname}.out || \
   failure "`diff ${testname}.ok ${testname}.out`"
 exit 0

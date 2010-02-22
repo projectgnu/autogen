@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stack.test --- test stack and join functionality
 #
-## Time-stamp:      "2007-07-04 11:51:55 bkorb"
+## Time-stamp:      "2010-02-20 14:57:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -78,7 +78,7 @@ m_UMB_<=
 gr_UMB_<=
 _EOF_
 
-${AGexe} ${testname}.def || failure ${AGexe} failed
+run_ag x ${testname}.def || failure autogen failed
 cmp -s ${testname}.test ${testname}.out || \
 	failure "`diff ${testname}.*t`"
 
