@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2007-11-10 17:11:07 bkorb"
+# Time-stamp:        "2010-02-20 14:56:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -223,8 +223,7 @@ _EOF_
 
 SHELL=${SHELL-/bin/sh}
 
-echo ${AGexe} $testname.def
-${AGexe} $testname.def || failure ${AGexe} failed
+run_ag x $testname.def || failure autogen failed
 
 compile
 

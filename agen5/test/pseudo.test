@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # pseudo.test --- test the select pseudo option
 #
-# Time-stamp:        "2007-11-10 15:44:15 bkorb"
+# Time-stamp:        "2010-02-20 14:57:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -80,8 +80,8 @@ srcdir=${testname}-src
 
 export incdir srcdir
 
-${AGexe} --no-def -T${testname}.tpl -b${testname} || \
-   failure ${AGexe} --no-def -T${testname}.tpl -b${testname}
+run_ag x --no-def -T${testname}.tpl -b${testname} || \
+   failure autogen --no-def -T${testname}.tpl -b${testname}
 
 f=${incdir}/${testname}-hdr.h
 test -f ${f} || \

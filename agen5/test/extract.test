@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # extract.test --- test extract functionality
 #
-# Time-stamp:        "2007-07-04 11:29:42 bkorb"
+# Time-stamp:        "2010-02-20 14:40:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -63,9 +63,9 @@ test.
 And this is the end. done
 _EOF_
 
-AGCMD="${AGexe} --no-def -L${testname}.dir -b${testname} -T${testname}.tpl"
-echo "${AGexe}"
-${AGCMD} || failure ${AGCMD} failed
+AGCMD="--no-def -L${testname}.dir -b${testname} -T${testname}.tpl"
+
+run_ag x ${AGCMD} || failure autogen ${AGCMD} failed
 
 cmp -s ${testname}.out ${testname}.dir/${testname}.sample || \
   failure "`diff -c ${testname}.out ${testname}.dir/${testname}.sample`"

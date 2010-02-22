@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # case.test --- test CASE functionality
 #
-# Time-stamp:        "2007-07-04 11:29:14 bkorb"
+# Time-stamp:        "2010-02-20 14:54:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -123,7 +123,7 @@ EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #
 
-${AGexe} $testname.def ||  failure autogen failed
+run_ag x $testname.def ||  failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
 

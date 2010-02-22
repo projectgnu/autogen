@@ -3,7 +3,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2009-10-02 16:17:45 bkorb"
+ *  Time-stamp:        "2010-02-22 10:20:43 bkorb"
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -32,8 +32,8 @@ version     = "$Revision: 4.24 $";
 output-file = libopts.m4;
 
 test   = {
-  name     = "regex_header";
-  type     = "with";
+  name     = regex_header;
+  type     = with;
   check    = "a reg expr header is specified";
 
   action   = { yes; act-type = script; asis;

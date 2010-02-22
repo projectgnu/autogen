@@ -33,7 +33,6 @@ static void*      pAllocList     = NULL;
     ((ENTRY_ALLOC_CT * sizeof( tDefEntry )) + sizeof(void*))
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tDefEntry*
 insertDef( tDefEntry* pDef );
 /* = = = END-STATIC-FORWARD = = = */

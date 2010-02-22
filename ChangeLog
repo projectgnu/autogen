@@ -1,3 +1,16 @@
+2010-02-20  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c (doOptions): clean up coverity issue
+	* agen5/tpProcess.c (openOutFile): ditto
+	* agen5/bootstrap.dir: remove dependencies on a couple of private
+	tools (mk-fwd and allbut).  Use functions to clean up code.
+	* autoopts/autoopts.c (longOptionFind): pz_Name may be NULL sometimes
+	* autoopts/environment.c (doEnvPresets): ditto
+	* autoopts/tokenize.c (alloc_token_list): new function.
+	Fix off-by-one bug.
+	(ao_string_tokenize): break out the sizing and allocation functions
+	into alloc_token_list().
+
 2009-12-12  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am (EXTRA_DIST): distribute defParse.x

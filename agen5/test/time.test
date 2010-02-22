@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # time.test --- test modification time settings
 #
-## Time-stamp:      "2009-10-10 09:55:25 bkorb"
+## Time-stamp:      "2010-02-20 14:55:50 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -37,8 +37,8 @@ _EOF_
 
 touch -t 200109110846.00 ${testname}.tpl
 
-${AGexe} --source-time -b ${testname} -T ${testname}.tpl --no-definitions || \
-    failure ${AGexe} failed
+run_ag time --source-time -b ${testname} -T ${testname}.tpl --no-definitions || \
+    failure autogen failed
 
 touch -t 200109110846.02 ${testname}.taaa
 

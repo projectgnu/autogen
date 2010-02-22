@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2007-07-04 11:30:14 bkorb"
+# Time-stamp:      "2010-02-20 14:38:37 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -82,7 +82,7 @@ CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
 export CONTENT_LENGTH REQUEST_METHOD QUERY_STRING
 
-${AGexe} | ${EGREP} -v '^in state' > ${testname}.test || \
+run_ag x1 | ${EGREP} -v '^in state' > ${testname}.test || \
   failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
@@ -93,7 +93,7 @@ cmp -s ${testname}.samp ${testname}.test || \
 QUERY_STRING="${QUERY_STRING}&break=true"
 CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
-${AGexe} > ${testname}-2.test && \
+run_ag x2 > ${testname}-2.test && \
   failure autogen unexpectedly succeeded
 
 cat > ${testname}-2.samp <<'_EOF_'

@@ -76,7 +76,6 @@ static char const zOops[] =
 "AutoGen form processing error:\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static char*
 parseInput( char* pzSrc, int len );
 /* = = = END-STATIC-FORWARD = = = */

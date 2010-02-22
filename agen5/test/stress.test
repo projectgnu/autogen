@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stress.test --- stress test
 #
-## Time-stamp:      "2007-07-04 11:52:03 bkorb"
+## Time-stamp:      "2010-02-20 14:57:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -51,8 +51,8 @@ echo "Entry Count = ${ecount}." > ${testname}.samp
     echo "entry = { value = 'val-${idx}'; depth = '${idx}'; const = xx; };"
     idx=`expr $idx + 1`
   done
-) | ${AGexe} -b ${testname} -
-test $? -eq 0 || failure ${AGexe} failed
+) | run_ag x -b ${testname} -
+test $? -eq 0 || failure autogen failed
 
 cmp -s ${testname}.test ${testname}.samp || \
 	failure "`diff ${testname}.test ${testname}.samp`"

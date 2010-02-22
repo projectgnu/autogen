@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2009-11-28 20:58:59 bkorb"
+ * Time-stamp:        "2010-02-19 16:00:19 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -26,7 +26,6 @@
 static tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 doStdoutTemplate( tTemplate* pTF );
 
@@ -345,13 +344,10 @@ openOutFile(tOutSpec* pOutSpec)
      */
     {
         char   z[ AG_PATH_MAX ];
-        tCC*   pS = strrchr( pzDefFile, '/' );
+        tCC*   pS = strrchr(pzDefFile, '/');
         char*  pE;
 
-        if (pS == NULL)
-            pS = pzDefFile;
-        else
-            pS++;
+        pS = (pS == NULL) ? pzDefFile : (pS + 1);
 
         /*
          *  We allow users to specify a suffix with '-' and '_', but when

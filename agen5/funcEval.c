@@ -26,7 +26,6 @@
 static int exprType( char* pz );
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static int
 exprType( char* pz );
 /* = = = END-STATIC-FORWARD = = = */

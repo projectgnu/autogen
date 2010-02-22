@@ -26,7 +26,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static size_t
 string_size(char const * pzScn, size_t newLineSize);
 

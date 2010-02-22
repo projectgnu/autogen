@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # line.test --- test (tpl-file-line) functionality
 #
-# Time-stamp:        "2007-07-04 11:30:33 bkorb"
+# Time-stamp:        "2010-02-20 14:58:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -53,8 +53,8 @@ cat > ${testname}.out <<- \_EOF_
 	End line Test
 	_EOF_
 
-${AGexe} --base=${testname} --no-def --override=${testname}.tpl || \
-   failure ${AGexe} failed
+run_ag x --base=${testname} --no-def --override=${testname}.tpl || \
+   failure autogen failed
 ${EGREP} -v ' of 63:  5$' ${testname}.txt > ${testname}.test
 
 cmp -s ${testname}.test ${testname}.out || failure unexpected output

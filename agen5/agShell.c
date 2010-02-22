@@ -55,7 +55,6 @@ tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s - %d\n";
 char const* pzLastCmd = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 sigHandler(int signo);
 

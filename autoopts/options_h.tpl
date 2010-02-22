@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2009-11-01 14:16:39 bkorb"
+# Time-stamp:      "2010-02-22 10:22:47 bkorb"
 # ID:  $Id$
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.

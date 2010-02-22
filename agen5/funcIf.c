@@ -37,7 +37,6 @@ static tIfStack  current_if;
 static tLoadProc mLoad_Elif, mLoad_Else;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ag_bool
 eval_true( void );
 

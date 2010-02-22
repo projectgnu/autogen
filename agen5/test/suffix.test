@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # suffix.test --- test the select suffix option
 #
-# Time-stamp:        "2007-07-04 11:31:36 bkorb"
+# Time-stamp:        "2010-02-20 14:55:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -50,15 +50,15 @@ echo "Example"   > ${testname}.Example.test
 echo "No Suffix" > ${testname}.stdout.test
 
 # # # # # # # # # # RUN TESTS # # # # # # #
-
-${AGexe} --no-def -T${testname}.tpl -oExample -b${testname} || \
-   failure ${AGexe} --no-def -T${testname}.tpl -oExample -b${testname}
+nodefopt="--no-def -T${testname}.tpl"
+run_ag ex ${nodefopt} -oExample -b${testname} || \
+   failure autogen ${nodefopt} -oExample -b${testname}
 
 cmp ${testname}.Example* || \
    failure COMPARE cmp ${testname}.Example*
 
-${AGexe} --no-def -T${testname}.tpl -o -b${testname} > ${testname}.stdout || \
-   failure ${AGexe} --no-def -T${testname}.tpl -o -b${testname}
+run_ag no ${nodefopt} -o -b${testname} > ${testname}.stdout || \
+   failure autogen ${nodefopt} -o -b${testname}
 
 cmp ${testname}.stdout* || \
    failure COMPARE cmp ${testname}.stdout*
@@ -82,7 +82,7 @@ AutoGen Definitions suffix;
 text = `cat suffix.samp`;
 EOF
 
-${AGexe} ${testname}.def | ${EGREP} -v '^in state ' > ${testname}.out
+run_ag sfx ${testname}.def | ${EGREP} -v '^in state ' > ${testname}.out
 cmp ${testname}.out ${testname}.samp || \
   failure "`diff  ${testname}.out ${testname}.samp`"
 

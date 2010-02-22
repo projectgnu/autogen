@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2009-07-20 20:12:24 bkorb"
+ * Time-stamp:      "2010-02-11 14:32:22 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -227,8 +227,11 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
     if (  (pOpts->specOptIdx.save_opts != NO_EQUIVALENT)
        && (pOpts->specOptIdx.save_opts != 0)) {
         st.pOD = pOpts->pOptDesc + pOpts->specOptIdx.save_opts + 1;
-        strcpy( pzFlagName, st.pOD->pz_NAME );
-        checkEnvOpt(&st, zEnvName, pOpts, type);
+
+        if (st.pOD->pz_NAME != NULL) {
+            strcpy(pzFlagName, st.pOD->pz_NAME);
+            checkEnvOpt(&st, zEnvName, pOpts, type);
+        }
     }
 }
 

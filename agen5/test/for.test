@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # for.test --- test functionality of `for' function
 #
-# Time-stamp:        "2007-07-04 11:29:49 bkorb"
+# Time-stamp:        "2010-02-20 14:40:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -93,12 +93,12 @@ mumble, mumble, mumble, mumble
 3:  LAST    on line 32
 _EOF_
 
-${AGexe} $testname.def || failure AutoGen failed
+run_ag x $testname.def || failure AutoGen failed
 cmp -s $testname.test $testname.sample || \
     failure "`diff -c $testname.test $testname.sample`"
 
 echo '<= FOR =><= ENDFOR =>' >> $testname.tpl
-f=`(${AGexe} $testname.def 2>&1) | ${EGREP} 'requires iterator'`
+f=`(run_ag x $testname.def 2>&1) | ${EGREP} 'requires iterator'`
 test -z "$f" && \
   failure "failed to detect missing FOR iterator"
 

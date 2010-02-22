@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2007-07-04 11:31:31 bkorb"
+# Time-stamp:        "2010-02-20 14:56:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -85,8 +85,8 @@ char const *ap[7] = {
 
 _EOF_
 
-${AGexe} -b ${testname} -T ${testname}.tpl --no-defin || \
-   failure ${AGexe} failed
+run_ag x -b ${testname} -T ${testname}.tpl --no-defin || \
+   failure autogen failed
 cmp -s ${testname}.base ${testname}.test || \
    failure "bad output: `diff -c ${testname}.base ${testname}.test`"
 

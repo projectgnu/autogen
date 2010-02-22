@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2007-07-04 11:29:40 bkorb"
+# Time-stamp:      "2010-02-20 13:48:42 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 #
 ##
@@ -27,6 +27,7 @@
 # ----------------------------------------------------------------------
 
 . ./defs
+PS4='>expr> '
 
 # # # # # # # TEMPLATE & DEFINITIONS FILES # # # # # # # # #
 #
@@ -38,21 +39,42 @@ cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
    ${top_srcdir}/agen5/func*.c ${testname}.d/.
 
 exec 3> ${testname}.d/${testname}.sh
-(
-  cat <<- _EOF_
-	AGexe=${AGexe}
+cat  >&3 <<- _EOF_
 	GDexe=${GDexe}
 	CLexe=${CLexe}
+	export GDexe CLexe
 	_EOF_
 
-  sed -n '/  expr.ini /,/date > stamp-exprini/p' \
+if ${VERBOSE}
+then
+    cat  >&3 <<- _EOF_
+	run_ag()
+	{
+	    local tfile=ag-\${1}-$$.log
+	    shift
+	    ${AGexe} --trace=every --trace-out=\${tfile} "\$@"
+	}
+	_EOF_
+else
+    cat  >&3 <<- _EOF_
+	run_ag()
+	{
+	    shift
+	    echo ${AGexe} "\$@"
+	    ${AGexe} "\$@"
+	}
+	_EOF_
+fi
+
+sed -n '/^make_exprini()/,/^[}]/p' \
     ${top_srcdir}/agen5/bootstrap.dir | \
-      sed '1d;$d'
-) > ${testname}.d/${testname}.sh
+      sed '1d' >&3
+exec 3>&-
 
 #  Remove the lines that *will* be different, always...
 #
-( cd ${testname}.d ; srcdir=. ${SHELL} -x ./${testname}.sh )
+( cd ${testname}.d ; srcdir=. PS4='>exprini> ' \
+    ${SHELL} -x ./${testname}.sh )
 sed '/DO NOT EDIT/,/and the template/d' ${testname}.d/expr.ini > expr.res
 sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
     > expr.base

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # include.test --- test include functionality
 #
-# Time-stamp:        "2007-07-04 11:30:22 bkorb"
+# Time-stamp:        "2010-02-20 14:37:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -64,10 +64,10 @@ cat > ${testname}.ok <<_EOF_
 Verify:  This is an ${testname} test
 _EOF_
 
-AGCMD="${AGexe} -L ${testname}.d/bad -L ${testname}.d/bad/good"
-echo ${AGCMD} ${testname}.d/${testname}.def
+AGCMD="-L ${testname}.d/bad -L ${testname}.d/bad/good"
 
-${AGCMD} ${testname}.d/${testname}.def || failure ${AGCMD} failed
+run_ag x ${AGCMD} ${testname}.d/${testname}.def || \
+    failure ${AGCMD} failed
 cmp -s ${testname}.test ${testname}.ok || \
     failure "`echo unexpected output
             diff -u ${testname}.test ${testname}.ok `"

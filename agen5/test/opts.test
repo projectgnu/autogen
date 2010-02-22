@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # opts.test --- Verify the handling of options
 #
-# Time-stamp:       "2008-07-27 12:34:25 bkorb"
+# Time-stamp:       "2010-02-20 14:36:19 bkorb"
 # Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -53,13 +53,12 @@ ls -l * ../VERSION > $testname.log
 echo Checking for "'define DEBUG'" options
 if ${GREP} 'define DEBUG' ${srcdir}/../opts.h
 then
-  AGCMD="${AGexe} -L ${top_srcdir}/autoopts -DDEBUG=1"
+  AGCMD="-L ${top_srcdir}/autoopts -DDEBUG=1"
 else
-  AGCMD="${AGexe} -L ${top_srcdir}/autoopts"
+  AGCMD="-L ${top_srcdir}/autoopts"
 fi
 
-echo ${AGCMD} opts.def
-${AGCMD} opts.def || {
+run_ag x ${AGCMD} opts.def || {
   rm -f ../VERSION
   failure ${AGCMD} opts.def
 }

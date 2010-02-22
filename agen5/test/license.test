@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # license.test --- test license functionality
 #
-# Time-stamp:        "2007-07-04 11:30:27 bkorb"
+# Time-stamp:        "2010-02-20 14:58:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -100,7 +100,8 @@ cat > ${testname}.out <<_EOF_
  */
 _EOF_
 
-${AGexe} -b ${testname} --no-def -T ${testname}.tpl || failure ${AGexe} failed
+run_ag x -b ${testname} --no-def -T ${testname}.tpl || \
+    failure autogen failed
 cmp -s ${testname}.test ${testname}.out || failure unexpected output
 
 cleanup

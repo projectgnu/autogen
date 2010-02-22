@@ -25,7 +25,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 addSysEnv( char* pzEnvName );
 /* = = = END-STATIC-FORWARD = = = */

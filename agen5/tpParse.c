@@ -32,7 +32,6 @@ tSCC zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static teFuncType
 whichFunc( tCC** ppzScan );
 

@@ -124,7 +124,6 @@ struct fmem_cookie_s {
 };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static int
 fmem_getmode( char const *pMode, mode_bits_t *pRes );
 

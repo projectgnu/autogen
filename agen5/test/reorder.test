@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # reorder.test --- test reorder functionality
 #
-# Time-stamp:        "2007-07-04 11:31:05 bkorb"
+# Time-stamp:        "2010-02-20 14:57:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #            by: bkorb
 ##
@@ -94,7 +94,7 @@ From start by two:
    11: absent   last loop
 _EOF_
 
-${AGexe} $testname.def || failure ${AGexe} failed
+run_ag x $testname.def || failure autogen failed
 cmp -s $testname.test $testname.out || failure unexpected output
 
 cleanup

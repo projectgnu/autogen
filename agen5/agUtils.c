@@ -3,7 +3,7 @@
  *  agUtils.c
  *  $Id$
  *
- *  Time-stamp:        "2009-11-28 18:13:42 bkorb"
+ *  Time-stamp:        "2010-02-19 16:01:30 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -25,7 +25,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tCC*
 skipQuote( tCC* pzQte );
 /* = = = END-STATIC-FORWARD = = = */
@@ -173,9 +172,7 @@ doOptions( int arg_ct, char** arg_vec )
          *  Point to the character after the last '/', or to the full
          *  definition file name, if there is no '/'.
          */
-        // coverity[dereference] -- invalid analysis -- "pz" not dereferenced.
-        if (pz++ == NULL)
-            pz = OPT_ARG( DEFINITIONS );
+        pz = (pz == NULL) ? OPT_ARG( DEFINITIONS ) : (pz + 1);
 
         /*
          *  IF input is from stdin, then use "stdin"

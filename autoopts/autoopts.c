@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- *  Time-stamp:      "2009-11-01 10:50:34 bkorb"
+ *  Time-stamp:      "2010-01-31 14:25:12 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -288,12 +288,15 @@ longOptionFind( tOptions* pOpts, char* pzOptName, tOptState* pOptState )
     } else nameLen = strlen( pzOptName );
 
     do  {
-        if (SKIP_OPT(pOD)) {
-            if (  (pOD->fOptState != (OPTST_OMITTED | OPTST_NO_INIT))
-               || (pOD->pz_Name == NULL))
-                continue;
-        }
-        else assert(pOD->pz_Name != NULL);
+        /*
+         *  If option disabled or a doc option, skip to next
+         */
+        if (pOD->pz_Name == NULL)
+            continue;
+
+        if (  SKIP_OPT(pOD)
+           && (pOD->fOptState != (OPTST_OMITTED | OPTST_NO_INIT)))
+            continue;
 
         if (strneqvcmp( pzOptName, pOD->pz_Name, nameLen ) == 0) {
             /*

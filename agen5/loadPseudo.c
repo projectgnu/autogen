@@ -36,7 +36,6 @@ tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tCC*
 doSchemeExpr( tCC* pzData, tCC* pzFileName );
 
