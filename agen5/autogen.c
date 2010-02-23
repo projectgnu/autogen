@@ -3,7 +3,7 @@
  *  autogen.c
  *  $Id$
  *
- *  Time-stamp:        "2010-02-23 12:16:02 bkorb"
+ *  Time-stamp:        "2010-02-23 12:48:26 bkorb"
  *
  *  This is the main routine for autogen.
  *
