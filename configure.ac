@@ -1,5 +1,5 @@
 dnl --------------------------------------------------------------------
-dnl configure.in --- GNU autoconf source for toplevel directory.
+dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
 dnl Time-stamp:      "2008-12-31 13:48:12 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
@@ -243,4 +243,4 @@ dnl indent-tabs-mode: nil
 dnl sh-indentation: 2
 dnl End:
 dnl
-dnl end of configure.in
+dnl end of configure.ac

@@ -82,18 +82,18 @@ CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
 export CONTENT_LENGTH REQUEST_METHOD QUERY_STRING
 
-run_ag x1 | ${EGREP} -v '^in state' > ${testname}.test || \
-  failure autogen failed
-
-# # # # # # # TEST RESULTS # # # # # #
+run_ag x1 | ${EGREP} -v '^in state' > ${testname}.test
 
 cmp -s ${testname}.samp ${testname}.test || \
   failure "`diff ${testname}.samp ${testname}.test`"
 
+# # # # # # # SECOND RUN # # # # # #
+
 QUERY_STRING="${QUERY_STRING}&break=true"
 CONTENT_LENGTH=`expr "${QUERY_STRING}" : ".*"`
 
-run_ag x2 > ${testname}-2.test && \
+run_ag x2 > ${testname}-2.test
+fgrep 'AutoGen form processing error' ${testname}-2.test || \
   failure autogen unexpectedly succeeded
 
 cat > ${testname}-2.samp <<'_EOF_'

@@ -25,7 +25,7 @@
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
-# configure.in in script, and to run the autotools programs from each
+# configure.ac in script, and to run the autotools programs from each
 # of those directories to make sure they are in a state ready to
 # 'configure; make; make install'
 #
@@ -64,8 +64,8 @@ case `set -o` in
 esac
 
 case "${SHELL}" in
-(*[akz]sh) : ;;
-(*)
+*[akz]sh) : ;;
+*)
   while : ; do
     SHELL=$(which bash 2>/dev/null)
     test -x "${SHELL}" && break
@@ -110,12 +110,10 @@ wd=$(echo $0 | sed 's,/[^/]*$,,')
 test -z "${wd}" && wd=.
 wd=$(cd ${wd} && pwd) || exit 1
 
-# Search for a configure.in
+# Search for a configure.ac
 #
 for srcdir in ${wd} ${wd}/.. .. .; do
     config_file=configure.ac
-    test ! -f ${srcdir}/${config_file} || break
-    config_file=configure.in
     test ! -f ${srcdir}/${config_file} || break
 done
 test -f "${srcdir}/${config_file}" || exit 1
@@ -135,7 +133,7 @@ set -e
 AGexe=$(type autogen 2>/dev/null | \
         sed 's@autogen is [^/]*/@/@')
 case ${AGexe} in
-/* )
+( /* )
      v=$($AGexe --version)
      case "$v" in
        *"Ver. 5."* ) : ;;
@@ -144,15 +142,13 @@ case ${AGexe} in
      esac
      ;;
 
-* )
+( * )
      echo AutoGen requires autogen to bootstrap >&2
      exit 1
      ;;
 esac
-GDexe=$(type getdefs 2>/dev/null | \
-        sed 's@getdefs is [^/]*/@/@')
-CLexe=$(type columns 2>/dev/null | \
-        sed 's@columns is [^/]*/@/@')
+GDexe=$(type getdefs 2>/dev/null | sed 's@getdefs is [^/]*/@/@')
+CLexe=$(type columns 2>/dev/null | sed 's@columns is [^/]*/@/@')
 export AGexe GDexe CLexe
 
 # Source any local scripts which add to the bootstrap procedure.

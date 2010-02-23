@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- * Time-stamp:        "2009-10-10 07:35:55 bkorb"
+ * Time-stamp:        "2010-02-22 17:06:10 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
