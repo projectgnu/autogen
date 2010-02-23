@@ -111,7 +111,7 @@ cat <<- '_EOF_' >&5
 	cd `echo $0 | sed 's;/[^/]*$;;'`
 	SRCDIR=`pwd`
 
-	if [ ! -f ./configure.in ]
+	if [ ! -f ./configure.ac ]
 	then
 	  echo cannot locate top source directory for AutoGen
 	  exit 1

@@ -26,11 +26,13 @@
 ## Code:
 ACLOCAL_AMFLAGS = -I config
 
+SUBDIRS        = compat snprintfv autoopts agen5
+
 if DO_SHELL_CMDS
 if  HAVE_XML_LIB
-SUBDIRS     = compat snprintfv autoopts agen5 columns getdefs xml2ag doc pkg
+SUBDIRS       += columns getdefs xml2ag doc pkg
 else
-SUBDIRS     = compat snprintfv autoopts agen5 columns getdefs doc pkg
+SUBDIRS       += columns getdefs doc pkg
 endif
 else
 
@@ -38,12 +40,11 @@ else
 ## columns and getdefs commands are unworkable.
 ##
 if  HAVE_XML_LIB
-SUBDIRS     = compat snprintfv autoopts agen5 xml2ag
-else
-SUBDIRS     = compat snprintfv autoopts agen5
+SUBDIRS       += xml2ag
 endif
 endif
 
+misc_extra     = VERSION NOTES
 cfg_gen        = config/ag_macros.m4 config/snprintfv.m4
 config_dist    = config/missing config/misc.def config/libopts.def $(cfg_gen)
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
@@ -51,7 +52,7 @@ aclocaldir     = $(datadir)/aclocal
 aclocal_DATA   = config/liboptschk.m4
 pkg_dist       = config/bootstrap.local
 dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
-EXTRA_DIST     = VERSION NOTES $(config_dist) $(pkg_dist) $(dist_data)
+EXTRA_DIST     = $(misc_extra) $(config_dist) $(pkg_dist) $(dist_data)
 DISTCLEANFILES = stamp-h
 
 distcleancheck_listfiles = \

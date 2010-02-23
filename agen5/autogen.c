@@ -3,7 +3,7 @@
  *  autogen.c
  *  $Id$
  *
- *  Time-stamp:        "2009-09-27 12:00:32 bkorb"
+ *  Time-stamp:        "2010-02-22 20:59:57 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -320,38 +320,38 @@ doneCheck( void )
 
     /*
      *  IF we diverted stderr, then now is the time to copy the text to stdout.
+     *  This is done for CGI mode wherein we produce an error page in case of
+     *  an error, but otherwise discard stderr.
      */
-    if (pzTmpStderr == NULL) {
-#if GUILE_VERSION >= 107000
-        if (exit_code != EXIT_SUCCESS)
-            _exit( exit_code );
-#endif
-        return;
+    if (pzTmpStderr != NULL) {
+        do {
+            long pos = ftell( stderr );
+            char* pz;
+
+            /*
+             *  Don't bother with the overhead if there is no work to do.
+             */
+            if (pos <= 0)
+                break;
+            pz = AGALOC( pos, "stderr redirected text" );
+            rewind( stderr );
+            fread(  pz, (size_t)1, (size_t)pos, stderr );
+            fwrite( pz, (size_t)1, (size_t)pos, stdout );
+            AGFREE( pz );
+        } while (0);
+
+        fclose( stderr );
+        unlink( pzTmpStderr );
+        AGFREE( pzTmpStderr );
+        pzTmpStderr = NULL;
     }
 
-    do {
-        long pos = ftell( stderr );
-        char* pz;
-
-        /*
-         *  Don't bother with the overhead if there is no work to do.
-         */
-        if (pos <= 0)
-            break;
-        pz = AGALOC( pos, "stderr redirected text" );
-        rewind( stderr );
-        fread(  pz, (size_t)1, (size_t)pos, stderr );
-        fwrite( pz, (size_t)1, (size_t)pos, stdout );
-        AGFREE( pz );
-    } while (0);
-
-    fclose( stderr );
-    unlink( pzTmpStderr );
-    AGFREE( pzTmpStderr );
-    pzTmpStderr = NULL;
 #if GUILE_VERSION >= 107000
-    if (exit_code != EXIT_SUCCESS)
-        _exit( exit_code );
+    if (exit_code != EXIT_SUCCESS) {
+        fflush(stderr);
+        fflush(stdout);
+        _exit(exit_code);
+    }
 #endif
 }
 

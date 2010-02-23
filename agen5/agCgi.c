@@ -94,7 +94,7 @@ loadCgi( void )
     pzOopsPrefix = zOops;
     {
         int tmpfd;
-        pzTmpStderr = mkstempPat();
+        AGDUPSTR(pzTmpStderr, mkstempPat(), "temp stderr file");
         tmpfd = mkstemp( pzTmpStderr );
         if (tmpfd < 0)
             AG_ABEND(aprf("failed to create temp file from `%s'", pzTmpStderr));

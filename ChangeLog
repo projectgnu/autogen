@@ -1,3 +1,11 @@
+2010-02-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (doneCheck): flush stdout/stderr before _exit() call
+	* agen5/test/html.test: test output content instead of exit code for
+	CGI service failure
+	* autoopts/test/getopt.test: cope with unexpanded $Id$
+	* config/bootstrap: configure.in renamed to configure.ac
+
 2010-02-20  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agUtils.c (doOptions): clean up coverity issue

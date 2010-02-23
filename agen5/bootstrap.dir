@@ -35,6 +35,10 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
+# If "die" is not defined, then we are being invoked directly from
+# "Makefile".  Define the infrastructure that is normally defined by
+# ../config/bootstrap.
+#
 type die 2>/dev/null 1>&2 || {
     export mainpid=$$
     export progdir=$(dirname $0)
@@ -46,6 +50,10 @@ type die 2>/dev/null 1>&2 || {
         kill -9 ${mainpid}
         exit 1
     }
+
+    # set verbosity.  $VERBOSE takes priority, otherwise check the
+    # setting of command tracing.
+    #
     case "${VERBOSE}" in
     ( [tTyY1]* ) VERBOSE=true ;;
     ( [fFnN0]* ) VERBOSE=false ;;
@@ -57,8 +65,8 @@ type die 2>/dev/null 1>&2 || {
     esac
 
     if ${VERBOSE}
-    then setx=set\ -x dashx=-x
-    else setx=:       dashx=
+    then setx=set\ -x dashx=-x ; set -x
+    else setx=:       dashx=   ; set +x
     fi
 }
 
