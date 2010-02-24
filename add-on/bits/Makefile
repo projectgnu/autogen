@@ -12,6 +12,9 @@ default : gen
 gen     : $(SRC)
 all     : $(EXE)
 
+install-local :
+	cp bit-test.tpl ../bin/.
+
 %.c %.h : %.def
 	autogen $<
 

@@ -6,6 +6,9 @@ default     : all
 
 all         : $(EXE)
 
+install-local : all
+	cp $(EXE) ../bin/.
+
 $(EXE)      : $(SRC)
 	$(CC) -o $@ $(SRC)
 

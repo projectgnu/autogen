@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 15:04:18 bkorb"
+## Time-stamp:      "2010-02-24 15:15:38 bkorb"
 ##              by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -24,7 +24,7 @@
 ## $Id$
 ## ---------------------------------------------------------------------
 ## Code:
-ACLOCAL_AMFLAGS = -I config -I m4
+ACLOCAL_AMFLAGS = -I config
 
 SUBDIRS        = compat snprintfv autoopts agen5
 
@@ -49,7 +49,7 @@ pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
 aclocaldir     = $(datadir)/aclocal
 aclocal_DATA   = config/*.m4
 bootstrap      = config/bootstrap*
-dist_data      = $(pkgdata_DATA) $(aclocal_DATA) m4/gnulib-cache.m4
+dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
 EXTRA_DIST     = $(misc_extra) $(bootstrap) $(pkg_dist) $(dist_data)
 DISTCLEANFILES = stamp-h
 

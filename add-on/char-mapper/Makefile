@@ -16,6 +16,9 @@ all         : $(EXE)
 $(EXE)      : $(OBJ)
 	$(CC) -g -o $@ $(OBJ)
 
+install-local : all
+	cp $(EXE) ../bin/.
+
 .c.o:
 	$(CC) $(DBG) $(INC) -c $*.c
 

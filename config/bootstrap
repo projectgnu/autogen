@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 13:20:12 bkorb"
+# Time-stamp:      "2010-02-24 15:14:28 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -155,7 +155,7 @@ pre_local()
     PS4='>aobs> '
     source bootstrap.dir aoconf
     cd ..
-    run_gnulib
+    # run_gnulib
 }
 
 post_local()
@@ -188,7 +188,7 @@ run_autotools()
     test -d $auxdir || auxdir=.
 
     doit $LIBTOOLIZE    --force
-    doit $ACLOCAL       -I config -I m4
+    doit $ACLOCAL       -I config
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
