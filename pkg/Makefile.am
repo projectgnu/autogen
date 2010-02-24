@@ -1,10 +1,10 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2009-07-22 18:50:17 bkorb"
+## Time-stamp:      "2010-02-24 08:38:19 bkorb"
 ##
 ## This file is part of AutoGen.
-## AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the

@@ -1,7 +1,7 @@
 /*-
- * copyright (c) 2004-2009 by Bruce Korb.  All rights reserved.
+ * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2008-04-06 15:39:52 bkorb"
+ * Time-stamp:      "2010-02-24 08:42:29 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de

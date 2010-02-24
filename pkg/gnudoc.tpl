@@ -2,11 +2,11 @@
 
 html
 
-# Time-stamp: "2009-01-01 08:34:50 bkorb"
+# Time-stamp: "2010-02-24 08:38:13 bkorb"
 # Version:    "$Revision: 4.13 $
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -137,7 +137,7 @@ Please send broken links and other corrections (or suggestions) to
 </p>
 
 <p>
-Copyright (C) 2009 Free Software Foundation, Inc.,
+Copyright (C) 2010 Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02111, USA
 <br />
 Verbatim copying and distribution of this entire article is

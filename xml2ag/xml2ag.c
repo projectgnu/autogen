@@ -2,10 +2,10 @@
 /*
  *  xml2ag.c
  *  $Id$
- *  Time-stamp:         "2009-01-01 08:33:14 bkorb"
+ *  Time-stamp:         "2010-02-24 08:37:04 bkorb"
  *
  *  This is the main routine for xml2ag.
- *  xml2ag copyright (c) 2002-2009 by Bruce Korb - all rights reserved
+ *  xml2ag Copyright (c) 2002-2010 by Bruce Korb - all rights reserved
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

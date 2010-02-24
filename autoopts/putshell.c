@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2008-07-27 12:14:38 bkorb"
+ * Time-stamp:      "2010-02-24 08:40:20 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -9,7 +9,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

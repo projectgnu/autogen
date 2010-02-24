@@ -2,11 +2,11 @@
 #  mk-opt-table.sh
 #  $Id$
 #
-#  Time-stamp:        "2009-07-31 13:55:22 bkorb"
+#  Time-stamp:        "2010-02-24 08:43:43 bkorb"
 #  Last Committed:    $Date: 2009/08/01 14:05:00 $
 #
 #  This file is part of char-mapper.
-#  char-mapper copyright (c) 1992-2008 by Bruce Korb - all rights reserved
+#  char-mapper Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 #
 # char-mapper is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the

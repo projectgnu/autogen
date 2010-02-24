@@ -1,12 +1,12 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2008-12-31 13:48:12 bkorb"
+dnl Time-stamp:      "2010-02-24 08:38:40 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+dnl  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 dnl
 dnl AutoGen is free software: you can redistribute it and/or modify it
 dnl under the terms of the GNU General Public License as published by the

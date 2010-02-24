@@ -2,13 +2,13 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2008-07-26 10:06:56 bkorb"
+ *  Time-stamp:        "2010-02-24 08:43:07 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

@@ -7,7 +7,7 @@
  *
  *  Automated Finite State Machine
  *
- *  copyright (c) 2001-2009 by Bruce Korb - all rights reserved
+ *  Copyright (c) 2001-2010 by Bruce Korb - all rights reserved
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
  *  

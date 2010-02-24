@@ -2,9 +2,9 @@
 # Common stub for a few missing GNU programs while installing.
 # Time-stamp:        "2006-09-23 19:27:18 bkorb"
 
-scriptversion=2006-09-23.19
+scriptversion=2010-02-24.08
 
-# copyright (c)  by Bruce Korb - all rights reserved
+# Copyright (c) 2006-2010 by Bruce Korb - all rights reserved
 #   Free Software Foundation, Inc.
 # Originally by Fran,cois Pinard <pinard@iro.umontreal.ca>, 1996.
 

@@ -1,14 +1,14 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-09-27 11:54:21 bkorb"
+ *  Time-stamp:        "2010-02-24 08:43:01 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

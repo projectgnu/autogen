@@ -2,14 +2,14 @@
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2009-07-22 18:51:11 bkorb"
+  Time-stamp:        "2010-02-24 08:38:22 bkorb"
   echo ${2} | sed 's/:[0-9][0-9] .*//;s/[^0-9]//g')
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##            by: bkorb
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
