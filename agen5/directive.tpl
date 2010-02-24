@@ -1,7 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
 # $Id$
-# Time-stamp:        "2009-10-18 13:42:32 bkorb"
+# Time-stamp:        "2010-02-23 21:07:42 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -20,8 +20,6 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-
-(setenv "SHELL" "/bin/sh")
 
 h =]
 [=
@@ -150,6 +148,7 @@ fi
 
 for f in 1 2 5 6 7 13 14
 do trap "echo trapped on $f >&2" $f ; done
+trap '' 0
 
 test -n "${CDPATH}" && {
   CDPATH=''

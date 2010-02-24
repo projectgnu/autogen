@@ -5,6 +5,9 @@
 	CGI service failure
 	* autoopts/test/getopt.test: cope with unexpanded $Id$
 	* config/bootstrap: configure.in renamed to configure.ac
+	* agen5/bootstrap.dir: de-duplicate some code
+	* columns/bootstrap.dir: ditto
+	* config/bootstrap.shlib: common shell library
 
 2010-02-20  Bruce Korb  <bkorb@gnu.org>
 

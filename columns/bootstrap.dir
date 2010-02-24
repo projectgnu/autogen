@@ -4,7 +4,7 @@
 # columns/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2007-07-30 11:07:28 bkorb"
+# Time-stamp:        "2010-02-23 20:09:31 bkorb"
 #            by: bkorb
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -31,43 +31,22 @@
 
 #  Dump the bootstrap recursive argument.  We're not interested.
 #
-if [ "$1" = recursive ]
-then
-  shift
-fi
+test "$1" = recursive && shift
+targets="$*"
+test -z "$targets" && targets=opts.h
 
-#  Check for a "force" option
-#
-if [ "$1" = "-f" ]
-then force=true  ; shift
-else force=false ; fi
-
-#  Name our executable in one place and disable any $HOME defaults
-#  Use the local ${AGexe}, if available.  Otherwise, look for it.
-#
-if test -z "${AGexe}" -o ! -f "${AGexe}" -o ! -x "${AGexe}"
-then
-  AGexe=`type ${AGnam:-autogen} | sed -e "s@${AGnam:-autogen} is [^/]*/@/@" `
-  if test -x "${AGexe}"
-  then
-    export AGexe
-  else
-    AGexe=""
-    unset AGexe
-  fi
-fi
-
-echo "autogen is '${AGexe}'"
-
-targets="$@"
-[ -z "$targets" ] && targets=opts.h
+test "X${mainpid}" = X && {
+    PS4='>bsl> '
+    source ${top_sourcedir}/config/bootstrap.shlib
+    PS4='>bsd> '
+}
 
 for f in $targets
 do
   case $f  in
 
   proto.h )
-    mk-fwd || { echo no working mk-fwd ; exit 1 ; }
+    make_proto
     ;;
 
   opts.h | \
@@ -82,14 +61,12 @@ do
       if [ -f opts.h ] && [ -f opts.c ]
       then exit 0 ; else exit 1 ; fi
     fi
-    echo ${AGexe} -L ../autoopts ${DEBUG_OPTS} opts.def
-    ${AGexe} -L ../autoopts ${DEBUG_OPTS} opts.def
-    date > stamp-opts
+    run_ag opts -L ../autoopts ${DEBUG_OPTS} opts.def
+    ( date > stamp-opts ) || :
     ;;
 
   * )
-    echo "Don't know how to make $f"
-    exit 1
+    die "Don't know how to make $f"
     ;;
   esac
 done

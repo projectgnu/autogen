@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2009-12-06 15:02:02 bkorb"
+# Time-stamp:      "2010-02-23 21:00:59 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -384,7 +384,9 @@ typedef enum {[=
     (if (not (exist? "arg-default"))
         (string-append " " enum-pfx "UNDEFINED = 0,")) =]
 [=(shellf
-"for f in %s ; do echo %s${f} ; done | ${CLexe} -I4 --spread=3 --sep=,"
+"for f in %s ; do echo %s${f} ; done | \
+    ${CLexe} -I4 --spread=3 --sep=,
+test $? -eq 0 || die ${CLexe} failed"
           (string-upcase! (string->c-name! (join " " (stack "keyword"))))
     enum-pfx )=]
 } te_[=(string-append Cap-prefix cap-name)=];[=
