@@ -2,14 +2,14 @@
 
 /* compat.h --- fake the preprocessor into handlng portability
  *
- *  Time-stamp:      "2009-10-18 11:14:14 bkorb"
+ *  Time-stamp:      "2010-02-24 08:39:25 bkorb"
  *
  * $Id$
  *
  *  compat.h is free software.
  *  This file is part of AutoGen.
  *
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

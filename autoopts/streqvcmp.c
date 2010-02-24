@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2008-12-26 10:15:46 bkorb"
+ * Time-stamp:      "2010-02-24 08:40:13 bkorb"
  *
  *  String Equivalence Comparison
  *
@@ -12,7 +12,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

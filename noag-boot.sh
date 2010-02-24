@@ -9,7 +9,7 @@
 ##            by: bkorb
 ##
 ##  This file is part of AutoGen.
-##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the

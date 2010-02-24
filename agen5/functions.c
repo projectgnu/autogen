@@ -2,12 +2,12 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2008-01-22 08:46:58 bkorb"
+ *  Time-stamp:        "2010-02-24 08:42:08 bkorb"
  *
  *  This module implements text functions.
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

@@ -1,7 +1,7 @@
 
 /*
  *  restore.c  $Id$
- * Time-stamp:      "2007-07-04 11:34:40 bkorb"
+ * Time-stamp:      "2010-02-24 08:40:18 bkorb"
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -9,7 +9,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

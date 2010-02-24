@@ -3,14 +3,14 @@ autogen definitions options;
 
 /*
  * $Id$
- * Time-stamp:      "2009-01-01 08:42:03 bkorb"
+ * Time-stamp:      "2010-02-24 08:41:16 bkorb"
  *
  *  This module generates shell scripts with AutoOpts supported command line
  *  option processing.  This program is licensed separately from the AutoOpts
  *  library and is _only_ available under the terms of the GNU General
  *  Public License.
  *
- *  Genshell copyright (c) 1999-2009 by Bruce Korb - all rights reserved
+ *  Genshell Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *  Genshell is free software.
  *  This file is part of AutoGen.
  *

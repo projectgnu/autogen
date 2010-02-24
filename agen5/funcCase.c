@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2009-07-09 19:01:11 bkorb"
+ *  Time-stamp:        "2010-02-24 08:42:12 bkorb"
  *
  *  This module implements the CASE text function.
  */
@@ -10,7 +10,7 @@
 
 /*
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

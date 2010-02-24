@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2008-08-03 13:06:02 bkorb"
+ * Time-stamp:      "2010-02-24 08:41:21 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -10,7 +10,7 @@
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control

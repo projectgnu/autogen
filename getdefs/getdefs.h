@@ -2,9 +2,9 @@
  *
  *  $Id$
  *
- *    getdefs copyright (c) 1999-2009 by Bruce Korb - all rights reserved
+ *    getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2009-01-17 21:02:23 bkorb"
+ *  Time-stamp:        "2010-02-24 08:38:29 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.

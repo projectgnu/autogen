@@ -2,9 +2,9 @@
 /*
  *  columns.c
  *  $Id$
- *  Time-stamp:        "2009-11-01 10:18:50 bkorb"
+ *  Time-stamp:        "2010-02-24 08:39:31 bkorb"
  *
- *  Columns copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *  Columns is free software.
  *  This file is part of AutoGen.
  *

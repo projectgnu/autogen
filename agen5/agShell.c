@@ -2,12 +2,12 @@
  *  agShell
  *  $Id$
  *
- *  Time-stamp:        "2009-11-28 21:07:21 bkorb"
+ *  Time-stamp:        "2010-02-24 08:43:37 bkorb"
  *
  *  Manage a server shell process
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

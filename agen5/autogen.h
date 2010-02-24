@@ -3,12 +3,12 @@
  *  autogen.h
  *  $Id$
  *
- *  Time-stamp:        "2009-07-09 18:56:32 bkorb"
+ *  Time-stamp:        "2010-02-24 08:43:35 bkorb"
  *
  *  Global header file for AutoGen
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

@@ -1,4 +1,5 @@
-/* copyright (c)  by Bruce Korb - all rights reserved
+/*
+   Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 
    NOTE: The canonical source of this file is maintained with the GNU C
    Library.  Bugs can be reported to bug-glibc@prep.ai.mit.edu.
@@ -14,8 +15,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   */
 
 #if HAVE_CONFIG_H
 # include <config.h>
