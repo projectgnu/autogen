@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-20 13:53:46 bkorb"
+# Time-stamp:        "2010-02-23 20:17:50 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -35,39 +35,10 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
-# If "die" is not defined, then we are being invoked directly from
-# "Makefile".  Define the infrastructure that is normally defined by
-# ../config/bootstrap.
-#
-type die 2>/dev/null 1>&2 || {
-    export mainpid=$$
-    export progdir=$(dirname $0)
-    progdir=$(cd ${progdir} > /dev/null ; pwd)
-    PS4='>ag-bs> '
-
-    die() {
-        echo "build failure:  $*" >&2
-        kill -9 ${mainpid}
-        exit 1
-    }
-
-    # set verbosity.  $VERBOSE takes priority, otherwise check the
-    # setting of command tracing.
-    #
-    case "${VERBOSE}" in
-    ( [tTyY1]* ) VERBOSE=true ;;
-    ( [fFnN0]* ) VERBOSE=false ;;
-    ( * )
-        case "$-" in
-        ( *x* )  VERBOSE=true ;;
-        (  *  )  VERBOSE=false ;;
-        esac
-    esac
-
-    if ${VERBOSE}
-    then setx=set\ -x dashx=-x ; set -x
-    else setx=:       dashx=   ; set +x
-    fi
+test "X${mainpid}" = X && {
+    PS4='>bsl> '
+    source ${top_srcdir}/config/bootstrap.shlib
+    PS4='>bsd> '
 }
 
 set_exe_var()
@@ -97,12 +68,6 @@ set_defaults()
     local PS4=">${FUNCNAME}> "
     local f
 
-    test "X${CDPATH}" = X || {
-        ( unset CDPATH ) > /dev/null 2>&1 && unset CDPATH || CDPATH=''
-    }
-
-    trap 'die "trapped exit signal"' EXIT
-
     #  If the argument is "recursive", then we are bootstrapping.
     #  Otherwise, we are being invoked from "make".
     #
@@ -110,8 +75,6 @@ set_defaults()
     ( "" ) die "Specify what you want to bootstrap" ;;
 
     ( recursive )
-        top_srcdir=$(cd .. ; pwd)
-        top_builddir=${top_srcdir}
         builddir=$(pwd)
         srcdir=${srcdir}
 
@@ -124,7 +87,7 @@ set_defaults()
         ;;
 
     ( * )
-        top_srcdir=${top_srcdir-$(cd .. ; pwd)}
+        top_srcdir=${top_srcdir-$(cd .. >/dev/null ; pwd)}
         top_builddir=${top_builddir-$(dirname ${progdir})}
         builddir=$(pwd)
         srcdir=${srcdir-${builddir}}
@@ -139,24 +102,6 @@ set_defaults()
     esac
 
     test -x "${AGexe}" || die "autogen is required"
-
-    # Setup run_ag
-    if ${VERBOSE}
-    then
-        run_ag()
-        {
-            local tfile=ag-${1}.log
-            shift
-            ${AGexe} --trace=every --trace-out=${tfile} "$@"
-        }
-    else
-        run_ag()
-        {
-            shift
-            echo ${AGexe} "$@"
-            ${AGexe} "$@"
-        }
-    fi
 
     export runAG top_srcdir top_builddir builddir srcdir arglist
 
@@ -337,88 +282,6 @@ make_man()
     rmlist=${rmlist}\ fmemopen.def
 
     date > stamp-man
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-#  Make the proto.h header & make sure the static proc declarations
-#  are all current at the top of each module.
-#
-make_proto()
-{
-    local PS4=">${FUNCNAME}> "
-    rm -f proto.h
-    exec 5> proto.h
-
-    local files=$(ls -1 *.c | grep -v 'fsm\.c$')
-    local dirname=
-    local marker=AUTOGEN_PROTO_H_GUARD
-    local ct=0
-
-    cat >&5 <<- _EOF_
-	/* -*- buffer-read-only: t -*- vi: set ro:
-	 *
-	 * Prototypes for $(basename $(pwd))
-	 * Generated $(date)
-	 */
-	#ifndef ${marker}
-	#define ${marker} 1
-
-	#ifndef LOCAL
-	#  define LOCAL extern
-	#  define REDEF_LOCAL 1
-	#else
-	#  undef  REDEF_LOCAL
-	#endif
-	_EOF_
-
-    for f in ${files}
-    do
-        test ! -f ${f} && echo "not a file:  $f" >&2 && continue
-        ct=$(echo $(egrep '(START|END)-STATIC-FORWARD' $f | wc -l) )
-
-        case ${ct} in
-        ( 2 )
-            rm -f $f.[XY]
-
-            exec 4> $f.X
-            sed '/START-STATIC-FORWARD/q' $f >&4
-            sed -n '/END-STATIC-FORWARD/,$p' $f > $f.Y
-            sed -n '/^static /,/^{/p' $f.Y | \
-                sed 's/^{.*//;s/)$/);/;$d' >&4
-            cat $f.Y >&4
-            exec 4>&-
-
-            if cmp $f.X $f > /dev/null 2>&1
-            then :
-            else echo WARNING: ${f} has been updated >&2
-                mv -f $f.X $f ; fi
-
-            rm -f $f.[XY]
-            ;;
-
-        ( 0 ) : ;;
-        ( * )
-            echo "bad marker line count:" $ct in $f >&2
-            continue
-        esac
-
-        ct=$(echo $(egrep '^LOCAL ' $f | wc -l) )
-        test $ct -eq 0 && continue
-
-        echo $'/*\n *  Extracted from '$f$'\n */' >&5
-        sed -n '/^LOCAL /,/^{/p' $f | \
-            sed 's/)$/);/;s/^{.*//' >&5
-    done
-
-    cat >&5 <<- _EOF_
-	#ifdef REDEF_LOCAL
-	#  undef LOCAL
-	#  define LOCAL
-	#endif
-	#endif /* ${marker} */
-	_EOF_
-    exec 5>&-
 }
 
 make_functions()

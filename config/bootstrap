@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-20 12:31:39 bkorb"
+# Time-stamp:      "2010-02-23 20:19:41 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -51,233 +51,107 @@
 
 # Code:
 
-mainpid=$$
-die() {
-    echo "bootstrap failure:  $*" >&2
-    kill -9 ${mainpid}
-    exit 1
-}
+PS4='>shl> '
+source config/bootstrap.shlib
+PS4='>bs> '
 
-case `set -o` in
-*posix*) set -o posix  ;;
-*) exec bash $0 ${1+"$@"} ;;
-esac
-
-case "${SHELL}" in
-*[akz]sh) : ;;
-*)
-  while : ; do
-    SHELL=$(which bash 2>/dev/null)
-    test -x "${SHELL}" && break
-
-    SHELL=$(which ksh 2>/dev/null)
-    test -x "${SHELL}" && break
-
-    SHELL=/usr/xpg4/bin/sh
-    test -x "${SHELL}" && break
-
-    SHELL=$(which sh 2>/dev/null)
-    test -x "${SHELL}" && break
-
-    echo ${0} unable to determine which shell to use. >&2
-    exit 1
-  done
-  ;;
-esac
-
-case "${VERBOSE}" in
-( [tTyY1]* ) VERBOSE=true ;;
-( [fFnN0]* ) VERBOSE=false ;;
-( * )
-    case "$-" in
-    ( *x* )  VERBOSE=true ;;
-    (  *  )  VERBOSE=false ;;
-    esac
-esac
-
-if ${VERBOSE}
-then setx=set\ -x dashx=-x
-else setx=:       dashx=
-fi
-
-nl=$'\n'
-
-export setx dashx VERBOSE nl
-
-# Figure out the absolute path to the working directory.
-#
-wd=$(echo $0 | sed 's,/[^/]*$,,')
-test -z "${wd}" && wd=.
-wd=$(cd ${wd} && pwd) || exit 1
-
-# Search for a configure.ac
-#
-for srcdir in ${wd} ${wd}/.. .. .; do
+config_tools()
+{
+    local PS4=">${FUNCNAME}> "
+    top_srcdir=$(pwd)
+    top_builddir=${top_srcdir}
+    srcdir=${top_srcdir}
     config_file=configure.ac
-    test ! -f ${srcdir}/${config_file} || break
-done
-test -f "${srcdir}/${config_file}" || exit 1
-export config_file srcdir
-srcdir=$(cd ${srcdir} && pwd) || exit 1
+    conf_dir=${top_srcdir}/config
+    test -f "${srcdir}/${config_file}" || die "${config_file} not in ${srcdir}"
 
-#  This missing function is used in many places
-#
-MISSING="${wd}/missing"
-export MISSING
-chmod +x ${MISSING} || exit 1
+    #  This missing function is used in many places
+    #
+    MISSING="${conf_dir}/missing"
+    export config_file srcdir top_srcdir top_builddir MISSING
+    chmod +x ${MISSING} || exit 1
 
-set -e
+    set -e
 
-#  Check for AutoGen version 5.
-#
-AGexe=$(type autogen 2>/dev/null | \
+    #  Check for AutoGen version 5.
+    #
+    AGexe=$(type autogen 2>/dev/null | \
         sed 's@autogen is [^/]*/@/@')
-case ${AGexe} in
-( /* )
-     v=$($AGexe --version)
-     case "$v" in
-       *"Ver. 5."* ) : ;;
-       * ) echo OUT OF DATE AutoGen: $v >&2
-           exit 1 ;;
-     esac
-     ;;
+    case ${AGexe} in
+    ( /* )
+        v=$($AGexe --version)
+        case "$v" in
+        *"Ver. 5."* ) : ;;
+        * ) echo OUT OF DATE AutoGen: $v >&2
+            exit 1 ;;
+        esac
+        ;;
 
-( * )
-     echo AutoGen requires autogen to bootstrap >&2
-     exit 1
-     ;;
-esac
-GDexe=$(type getdefs 2>/dev/null | sed 's@getdefs is [^/]*/@/@')
-CLexe=$(type columns 2>/dev/null | sed 's@columns is [^/]*/@/@')
-export AGexe GDexe CLexe
+    ( * )
+        echo AutoGen requires autogen to bootstrap >&2
+        exit 1
+        ;;
+    esac
+
+    GDexe=$(type getdefs 2>/dev/null | sed 's@getdefs is [^/]*/@/@')
+    CLexe=$(type columns 2>/dev/null | sed 's@columns is [^/]*/@/@')
+    export AGexe GDexe CLexe
+
+    # ------------------------------------------------------------------
+    # Make sure all of the maintainer tools required for bootstrap are
+    # available on the host machine.
+    # ------------------------------------------------------------------
+
+    tools="autoconf autoheader aclocal automake libtoolize"
+    for f in $tools
+    do
+        eval ${f}_reqver=$(
+            set -- $(${f} --version | sed 1q)
+            eval echo \${$#})
+        eval $(echo $f | tr a-z A-Z)=$(which ${f})
+    done
+
+    echo bootstrapping in ${PWD}
+}
 
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 #
-BOOTSTRAP=pre
-export BOOTSTRAP
-( . ${wd}/bootstrap.local ${1+"$@"} ) || exit 1
+pre_local()
+{
+    PS4=">${FUNCNAME}> "
+    BOOTSTRAP=pre
+    export BOOTSTRAP
+    PS4='>bsl> '
+    source ${conf_dir}/bootstrap.local ${1+"$@"} || \
+        die FAILED: ${conf_dir}/bootstrap.local
+}
 
-# ----------------------------------------------------------------------
-# Make sure all of the maintainer tools required for bootstrap are
-# available on the host machine.
-# ----------------------------------------------------------------------
-
-tools="autoconf autoheader aclocal automake libtoolize"
-autoconf_reqver=2.59
-autoheader_reqver=2.59
-aclocal_reqver=1.8
-automake_reqver=1.8
-libtoolize_reqver=1.5
-
-#  A version is out-of-date if it does not compare equal to the correct
-#  version and then one of its component numbers compares less
-#
-out_of_date()
+post_local()
 {
     local PS4=">${FUNCNAME}> "
-    if test "X${1}" = "X${2}"
-    then return 1 ; fi
 
-    tv=$(IFS=" .";set -- ${1};echo ${1+"$@"})
-    bv=$(IFS=" .";set -- ${2};echo ${1+"$@"})
-
-    #  FOREVER...(as long as we have version number components)
-    #
-    while :
+    for f in $(
+        find . -name bootstrap.dir | fgrep -v '/CVS/')
     do
-        #  Extract the next component.  If they are not equal,
-        #  then it is time to return 0 or 1.
-        #
-        x=$(set -- $tv;echo $1)
-        y=$(set -- $bv;echo $1)
-        if test "X$x" = "X$y" ; then :
-        else
-            set -- $( (echo $x return 0; echo $y return 1) | sort -n | sed 1q)
-            shift
-            eval ${1+"$@"}
-        fi
-
-        #  Shift off the first component of each.  If the base version is done
-        #  then the test version is more recent, otherwise the other way
-        #
-        tv=$(set -- $tv;shift;echo ${1+"$@"})
-        bv=$(set -- $bv;shift;echo ${1+"$@"})
-        [ -z "$bv" ] && return 1
-        [ -z "$tv" ] && return 0
+        (   ${setx} ; cd $(dirname $f)
+            srcdir=.
+            echo running POST-bootstrap.dir in ${PWD}
+            PS4=">$(basename ${PWD}-B)> "
+            source ./bootstrap.dir recursive || :
+        )
     done
+
+    local BOOTSTRAP=post
+    PS4='>bsl2> '
+    source ${conf_dir}/bootstrap.local ${1+"$@"}
 }
 
-# Rather than give up at the first failure, set this variable to
-# "exit 1", so that all the checks are performed before exiting.
-DIE=:
-
-for f in $tools
-do
-  v=$($f --version)
-  if test $? -ne 0
-  then
-    ${MISSING} ${f}
-    DIE="exit 1"
-  else
-    v=$(echo "$v" | sed 1q | sed 's/.* \([0-9]\)/\1/')
-    eval reqver=\$${f}_reqver
-
-    if out_of_date "${v}" "${reqver}"
-    then
-      echo ${f}-${v} is out of date \(older than ${reqver}\) >&2
-      DIE="exit 1"
-    fi
-  fi
-
-  eval $(echo $f | tr a-z A-Z)=$f
-done
-
-# If any of the above tests failed, abort at this point.
-#
-${DIE}
-
-doit ()
+run_autotools()
 {
-  if test "x$1" != x: ; then
-    echo "RUN:  $@"
-    eval "$@" || exit 1
-  fi
-}
-
-# Run through all of the required autogeneration tools in
-# each directory which contains a ${config_file} file...
-for i in $(find ${srcdir} -name ${config_file} -print | grep -v CVS/)
-do
-  # Find the top directory with respect to the current ${config_file}.
-  top=$(dirname $i)
-  case $i in
-    /* | [A-Za-z]:\\*) ;;
-    *) top=$(cd $top && pwd) ;;
-  esac
-
-  # A brief check to make sure we are not running in the wrong directory.
-  #
-  initfile=$(fgrep AC_CONFIG_SRCDIR $top/${config_file} | \
-           sed 's,^.*(,,;s,).*$,,')
-  if test -z "$initfile" -o ! -f $top/$initfile
-  then
-    cat <<- _EOF_
-        \$initfile is \`$initfile'
-        **Error**: Directory \`$top' does not look like a valid
-        top-level directory.
-_EOF_
-    exit 1
-  fi
-
-  # Execute this in a sub-shell so we don't lose our start location.
-  (
-    ${setx}
-    cd $top
-    echo bootstrapping in ${PWD}
-
+    local PS4=">${FUNCNAME}> "
     # remove any stale config.cache
     doit rm -f config.cache
 
@@ -292,25 +166,19 @@ _EOF_
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
-  ) || exit 1
-done
+}
 
-for f in $(
-    find . -name bootstrap.dir | fgrep -v '/CVS/')
-do
-  ( cd $(dirname $f)
-    srcdir=.
-    echo running POST-bootstrap.dir in ${PWD}
-    PS4=">$(basename ${PWD}-B)> " . ./bootstrap.dir recursive
-  ) || exit 1
-done
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#    M A I N
+#
+config_tools
+( pre_local )
+run_autotools
+post_local
 
-# Source any local scripts which add to the bootstrap procedure.
-# The bootstrap.local script should test the value of the BOOTSTRAP
-# environment variable to see whether it should run the sections
-# to be called before the main script, or afterwards.
-BOOTSTRAP=post
-. ${wd}/bootstrap.local ${1+"$@"} || exit 1
+trap '' 0
+( exit 0 ) ; exit
 
 # Local Variables:
 # mode: shell-script
