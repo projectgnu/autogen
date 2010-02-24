@@ -41,7 +41,6 @@ static xml_xlate_t const xml_xlate[] = {
 };
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 removeLineContinue( char* pzSrc );
 

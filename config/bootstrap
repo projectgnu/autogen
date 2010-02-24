@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 08:39:04 bkorb"
+# Time-stamp:      "2010-02-24 11:10:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -121,12 +121,16 @@ config_tools()
 #
 pre_local()
 {
-    PS4=">${FUNCNAME}> "
+    local PS4=">${FUNCNAME}> "
     BOOTSTRAP=pre
     export BOOTSTRAP
     PS4='>bsl> '
     source ${conf_dir}/bootstrap.local ${1+"$@"} || \
         die FAILED: ${conf_dir}/bootstrap.local
+
+    cd autoopts
+    PS4='>aobs> '
+    source bootstrap.dir aoconf
 }
 
 post_local()

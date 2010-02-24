@@ -29,7 +29,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 printVersion( tOptions* pOpts, tOptDesc* pOD, FILE* fp );
 /* = = = END-STATIC-FORWARD = = = */

@@ -31,7 +31,6 @@
 tOptionLoadMode option_load_mode = OPTION_LOAD_UNCOOKED;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ag_bool
 insertProgramPath(
     char*   pzBuf,

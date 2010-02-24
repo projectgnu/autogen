@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:39:03 bkorb"
+# Time-stamp:        "2010-02-24 11:01:04 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -61,91 +61,6 @@ locate_exe()
     return 1
 }
 
-make_funcs_def()
-{
-  local PS4=">${FUNCNAME}> "
-  ${VERBOSE} && set -x
-  svdir=${PWD}
-  cd ${srcdir}/autoopts
-  sed -e "s=@CONFIG_SHELL@=$(which bash)=" \
-      -e "s=@prefix@=/usr/local=" \
-      -e "s=@exec_prefix@=/usr/local/bin=" \
-      -e "s=@bindir@=$(\cd ../columns ; pwd -P)=" \
-      options-tpl.in > options.tpl
-  test -d autoopts || mkdir autoopts
-  test -d po       || mkdir po
-  ${AGexe} -L. genshell.def  || exit 1
-  ${AGexe} -L. usage-txt.def || exit 1
-  mv usage-txt.h   autoopts/.
-  mv usage-txt.pot po/.
-  files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
-      sed '/^CSRC/d;s/[=\\]//'
-      echo  ../compat/pathfind.c guileopt.c)
-  getdefs linenum srcfile template=options_h output=funcs.def $files
-  chmod u+w funcs.def
-  agvars=$(egrep '^A[GO]_' ../VERSION)
-  eval "${agvars}"
-  vers_curr=$(expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION)
-  vers_min=$( expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
-  cat >> funcs.def <<-  _END_VERS_INFO_
-	vers-curr       = "${vers_curr}";
-	vers-min        = "${vers_min}";
-	vers-min-str    = "$(expr $AO_CURRENT - $AO_AGE):0:0";
-	vers-sovers     = "${AO_SOVERS}";
-	library         = opts;
-	/*
-	 *  THIS FILE IS DISTRIBUTED
-	 *
-	 *  This file is used to construct options.h + doc files.  Because it is
-	 *  such a nuisance to get the build ordering correct, we distribute
-	 *  this.  It should be constructed after all binaries are built.
-	 */
-	_END_VERS_INFO_
-  ${AGexe} funcs.def
-  test -f options.h || exit 1
-
-  #  Regenerate the "genshell.h" 'cuz we just altered the template to
-  #  contain the header version number.
-  #
-  ${AGexe} -L. genshell.def || exit 1
-  mv options.h autoopts/.
-  ${AGexe} -Tagman3.tpl funcs.def || exit 1
-  exec 4> Makefile.new
-  sed '/^GENMAN /q' Makefile.am >&4
-  ls -1 *.3 | \
-    fgrep -v 'pathfind.3' | \
-    ${CLexe} -I4 --spread=1 --line-sep=' \' >&4  # '
-  rm -f *.3
-  echo "MAN_STAMP   = man3-stamp" >&4
-  sed '1,/^MAN_STAMP /d' Makefile.am >&4
-  exec 4>&-
-  if cmp Makefile.new Makefile.am
-  then rm -f Makefile.new
-  else mv -f Makefile.new Makefile.am
-       echo "WARNING: Makefile.am has been updated"
-  fi
-  mk-fwd -p $(egrep -l '^LOCAL |START-STATIC-FORWARD' *.c) > /dev/null 2>&1 || :
-  opts=''
-  test -f aoconf.tpl || {
-    sedcmd="s%@\(BOOTSTRAP\|CONFIG\)_SHELL@%${SHELL}%"
-    sedcmd=${sedcmd}\;"s%@bindir@%"$(dirname $(which columns))'%'
-    for f in $(echo "${agvars}" | sed 's/=.*//')
-    do
-        eval v=\${$f}
-        sedcmd=${sedcmd}";s%@${f}@%${v}%g"
-    done
-    for f in $(egrep -l '@(BOOTSTRAP|CONFIG)_SHELL@' *-tpl.in)
-    do
-      g=${f%-tpl.in}.tpl
-      sed "${sedcmd}" $f > $g
-      touch -t 199912312359 ${g} >/dev/null 2>&1 || :
-    done
-    rm -f aoconf-tpl.in
-  }
-  ${AGexe} aoconf.def
-  cd ${svdir}
-}
-
 config_configurables()
 {
     local PS4=">${FUNCNAME}> "
@@ -153,20 +68,20 @@ config_configurables()
     local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
     find ${tops} -type f -name '*-tpl.in' | \
         egrep -v '/CVS/|/SCCS/' | \
-        while read f
-        do
-        g=${f%-tpl.in}.tpl
-        printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
-    done >&4
+            while read f
+            do
+                g=${f%-tpl.in}.tpl
+                printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
+            done >&4
 
     echo "AC_CONFIG_FILES([\\" >&4
     for f in $(
         find ${tops} -name 'Makefile.am' -o -name '*.in' | \
             sed '/-tpl.in$/d;s,\.\(am\|in\)$,,;/^configure$/d' | \
             sort -u)
-        do
-            echo "    ${f}"
-        done >&4
+    do
+        echo "    ${f}"
+    done >&4
     echo '])' >&4
     exec 4>&-
 
@@ -274,16 +189,20 @@ check_tools()
 
 MISSING=${MISSING-${srcdir}/config/missing}
 
-case ${BOOTSTRAP} in
+case "${BOOTSTRAP}" in
 ( pre )
     echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
     if test -f ${srcdir}/configure
     then rm -f ${srcdir}/configure ; fi
 
     check_tools
-    make_funcs_def
     config_versions
     chmod a+x ${srcdir}/*/test/*.test
+
+    sed "/^bootstrap /s@=.*@= $(
+        echo config/bootstrap*)@" ${srcdir}/Makefile.am > XXX$$
+    mv -f XXX$$ ${srcdir}/Makefile.am
+
     exec 3> XXX$$
     sed '/^DEBIAN_FILES *=/,$d' ${srcdir}/pkg/Makefile.am >&3
 

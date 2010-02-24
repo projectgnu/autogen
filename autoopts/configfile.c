@@ -26,7 +26,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 filePreset(
     tOptions*     pOpts,

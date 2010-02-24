@@ -33,7 +33,6 @@ typedef int (compar_func)(const void *, const void *);
 static compar_func compar_text, compar_defname;
 
 /* START-STATIC-FORWARD */
-/* static forward declarations maintained by mk-fwd */
 static char*
 assignIndex( char*  pzOut,  char*  pzDef );
 

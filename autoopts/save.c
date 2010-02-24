@@ -32,7 +32,6 @@ static char const  zWarn[] = "%s WARNING:  cannot save options - ";
 static char const close_xml[] = "</%s>\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tCC*
 findDirName( tOptions* pOpts, int* p_free );
 

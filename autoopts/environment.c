@@ -30,7 +30,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 checkEnvOpt(tOptState * os, char * env_name,
             tOptions* pOpts, teEnvPresetType type);

@@ -4,7 +4,7 @@
 # getdefs/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:38:33 bkorb"
+# Time-stamp:        "2010-02-24 10:27:35 bkorb"
 #            by: bkorb
 #
 ## This file is part of AutoGen.
@@ -30,6 +30,15 @@
 #  These files are distributed, so it is not necessary to invoke
 #  AutoGen before building AutoGen.  (Like I had to do long ago :)
 
+test "X${mainpid}" = X && {
+    PS4='>bsl> '
+    source ${top_srcdir}/config/bootstrap.shlib
+    PS4='>bsd> '
+    free_trap=true
+} || {
+    free_trap=false
+}
+
 #  Dump the bootstrap recursive argument.  We're not interested.
 #
 if [ "$1" = recursive ]
@@ -37,54 +46,18 @@ then
     shift
 fi
 
-#  Check for a "force" option
-#
-if [ "$1" = "-f" ]
-then force=true  ; shift
-else force=false ; fi
-
 targets="$@"
-[ -z "$targets" ] && targets=proto.h
+if test -z "${targets}" -o "X${targets}" = Xproto.h
+then make_proto
+else die "Don't know how to make $targets"
+fi
 
-for f in $targets
-do
-  case $f  in
-
-  proto.h )
-    mk-fwd -p g*.c || { echo no working mk-fwd program ; exit 1 ; }
-    ;;
-
-  sort )
-    set -x
-    for g in *.c
-    do
-      blocksort input=$g out=$g.new \
-                pattern='^/\*$' \
-                start='END-FORWARD' \
-                key='^([a-zA-Z0-9_]+)\(' trail='^/\* emacs'
-      if [ -s $g.new ]
-      then
-        if cmp $g $g.new > /dev/null
-        then
-          rm -f $g.new
-        else
-          echo "Declarations reordered in $g"
-          mv -f $g.new $g
-        fi
-      fi
-    done
-    ;;
-
-  * )
-    echo "Don't know how to make $f"
-    exit 1
-    ;;
-  esac
-done
+${free_trap} && trap '' 0
 
 # Local Variables:
-# mode:             shell-script
-# sh-indentation:   2
+# mode:shell-script
+# sh-indentation:4
+# sh-basic-offset:4
 # indent-tabs-mode: nil
 # End:
 

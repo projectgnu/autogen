@@ -32,7 +32,6 @@
 static char const zNil[] = "";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tSuccess
 findOptDesc( tOptions* pOpts, tOptState* pOptState );
 
