@@ -27,7 +27,6 @@
 tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static char*
 compressOptionText( char* pzS, char* pzE );
 

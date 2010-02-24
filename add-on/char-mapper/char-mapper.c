@@ -1,7 +1,7 @@
 
 /*
  *  char-mapper.c
- *  $Id$
+ *  $Id:$
  *
  *  Time-stamp:        "2010-02-24 08:43:44 bkorb"
  *  Last Committed:    $Date: 2009/08/01 14:05:00 $
@@ -729,6 +729,12 @@ handle_comment(char * scan)
             die("incomplete comment section");
 
         scan = trim(buffer);
+        /*
+         *  if scan is NULL, we've got a comment
+         */
+        if (scan == NULL)
+            continue;
+
         if (*scan == '%')
             break;
         if ((*scan == NUL) && (com_scan + 3 < com_buf + com_buf_size)) {

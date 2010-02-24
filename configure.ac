@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-02-24 08:38:40 bkorb"
+dnl Time-stamp:      "2010-02-24 11:27:13 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
@@ -21,7 +21,7 @@ dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id$
+dnl Code: $Id: c5cf3f388ac9bd4340a3b1b902aa088e80870e6d $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
@@ -215,6 +215,11 @@ test ${GUILE_VERSION} -ge 108000 \
 AM_CONFIG_HEADER(config.h:config-h.in)
 AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
                 [chmod +x doc/mk-agen-texi.sh])
+AC_CONFIG_FILES([autoopts/mk-autoopts-pc:autoopts/mk-autoopts-pc.in],
+                [chmod +x autoopts/mk-autoopts.pc])
+AC_CONFIG_FILES([autoopts/autoopts-config:autoopts/autoopts-config.in],
+                [chmod +x autoopts/autoopts-config])
+
 ==ADD_CONFIG_FILES==
 
 AC_CONFIG_COMMANDS([stamp-h],

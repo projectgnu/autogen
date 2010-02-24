@@ -341,7 +341,6 @@ static char*  pzLeader  = NULL;
 static char*  pzTrailer = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 textToVariable( tOptions* pOpts, teTextTo whichVar, tOptDesc* pOD );
 

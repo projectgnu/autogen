@@ -29,7 +29,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 putQuotedStr( tCC* pzStr );
 /* = = = END-STATIC-FORWARD = = = */

@@ -27,7 +27,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  ao_string_cook_escape_char

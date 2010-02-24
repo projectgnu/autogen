@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 08:39:04 bkorb"
+# Time-stamp:      "2010-02-24 11:10:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id$
+# @(#) $Id: a3533ad04b7e20ea1ca3745d8c1abcbd7e603fdf $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -121,12 +121,16 @@ config_tools()
 #
 pre_local()
 {
-    PS4=">${FUNCNAME}> "
+    local PS4=">${FUNCNAME}> "
     BOOTSTRAP=pre
     export BOOTSTRAP
     PS4='>bsl> '
     source ${conf_dir}/bootstrap.local ${1+"$@"} || \
         die FAILED: ${conf_dir}/bootstrap.local
+
+    cd autoopts
+    PS4='>aobs> '
+    source bootstrap.dir aoconf
 }
 
 post_local()

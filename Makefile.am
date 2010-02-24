@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:43:46 bkorb"
+## Time-stamp:      "2010-02-24 11:01:22 bkorb"
 ##              by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -21,7 +21,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: 5c87946b3f603161a873d6d8d77b994882909bb9 $
 ## ---------------------------------------------------------------------
 ## Code:
 ACLOCAL_AMFLAGS = -I config
@@ -50,9 +50,9 @@ config_dist    = config/missing config/misc.def config/libopts.def $(cfg_gen)
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
 aclocaldir     = $(datadir)/aclocal
 aclocal_DATA   = config/liboptschk.m4
-pkg_dist       = $(shell cd $(srcdir) ; echo config/bootstrap*)
+bootstrap      = config/bootstrap*
 dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
-EXTRA_DIST     = $(misc_extra) $(config_dist) $(pkg_dist) $(dist_data)
+EXTRA_DIST     = $(misc_extra) $(bootstrap) $(pkg_dist) $(dist_data)
 DISTCLEANFILES = stamp-h
 
 distcleancheck_listfiles = \

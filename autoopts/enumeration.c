@@ -32,7 +32,6 @@
 tSCC*  pz_enum_err_fmt;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static void
 enumError(
     tOptions*     pOpts,

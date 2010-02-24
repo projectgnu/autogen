@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:43:33 bkorb"
+# Time-stamp:        "2010-02-24 11:30:19 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -23,7 +23,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id$
+# @(#) $Id: d15ae5550bf3d55e5d3611625e9a18401b0add80 $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -39,6 +39,9 @@ test "X${mainpid}" = X && {
     PS4='>bsl> '
     source ${top_srcdir}/config/bootstrap.shlib
     PS4='>bsd> '
+    free_trap=true
+} || {
+    free_trap=false
 }
 
 set_exe_var()
@@ -53,8 +56,7 @@ set_exe_var()
       then
         echo ${var}exe=$f export ${var}exe
       else
-        f=$(type $prog 2> /dev/null | \
-            sed -e "s;^${prog} is [^/]*/;/;")
+        f=$(which $prog 2> /dev/null)
         case ${f} in
         ( */${prog} )  echo ${var}exe=${f} export ${var}exe ;;
         ( * )          echo unset ${var}exe ;;
@@ -350,7 +352,7 @@ done
 if [ ! -z "$rmlist" ]
 then rm -f $rmlist ; fi
 
-trap 'true' EXIT
+${free_trap} && trap '' 0
 
 # Local Variables:
 # mode:shell-script

@@ -27,7 +27,6 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static tSuccess
 mustHandleArg( tOptions* pOpts, char* pzArg, tOptState* pOS,
                char** ppzOpts, int* pOptsIdx );

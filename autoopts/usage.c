@@ -43,7 +43,6 @@ static char    zOptFmtLine[ 16 ];
 static ag_bool displayEnum;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by mk-fwd */
 static ag_bool
 checkGNUUsage( tOptions* pOpts );
 
