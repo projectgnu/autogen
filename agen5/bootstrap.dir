@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 11:30:19 bkorb"
+# Time-stamp:        "2010-02-24 12:33:49 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -160,19 +160,6 @@ make_defparse()
     run_ag defparse ${opts} defParse.def
 
     date > stamp-parse
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Make the option processing files:
-#
-make_opts()
-{
-    local PS4=">${FUNCNAME}> "
-    test -z "${CLexe}" && die "Cannot locate columns"
-
-    run_ag opts -L ${top_srcdir}/autoopts ${srcdir}/opts.def
-    date > stamp-opts
 }
 
 # # # # # # # # # # # # # # # # # # #

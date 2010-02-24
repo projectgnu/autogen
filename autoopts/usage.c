@@ -60,6 +60,12 @@ printInitList(
     tCC*        pzPN );
 
 static void
+printOptPreamble(
+    tOptions*     pOptions,
+    tOptDesc*     pOD,
+    arg_types_t*  pAT );
+
+static void
 printOneUsage(
     tOptions*     pOptions,
     tOptDesc*     pOD,
@@ -67,9 +73,9 @@ printOneUsage(
 
 static void
 printOptionUsage(
-    tOptions* pOpts,
-    int       ex_code,
-    tCC*      pOptTitle );
+    tOptions *  pOpts,
+    int         ex_code,
+    tCC *       pOptTitle );
 
 static void
 printProgramDetails( tOptions* pOptions );

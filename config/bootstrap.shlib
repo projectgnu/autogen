@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:39:03 bkorb"
+# Time-stamp:        "2010-02-24 12:33:51 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -115,6 +115,26 @@ test "X${CDPATH}" = X || {
 nl=$'\n'
 
 export setx dashx VERBOSE nl
+
+# # # # # # # # # # # # # # # # # # #
+#
+# Make the option processing files:
+#
+make_opts()
+{
+    local PS4=">${FUNCNAME}> "
+    # Make the option processing files:
+    #
+    if [ -z "${AGexe}" ]
+    then
+      test "X${BOOTSTRAP}" = X \
+        && echo "Cannot locate ${AG}.  Giving up"
+      if [ -f opts.h ] && [ -f opts.c ]
+      then exit 0 ; else exit 1 ; fi
+    fi
+    run_ag opts -L ${top_srcdir}/autoopts ${DEBUG_OPTS} *opts.def
+    date > stamp-opts
+}
 
 # # # # # # # # # # # # # # # # # # #
 #

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 11:10:21 bkorb"
+# Time-stamp:      "2010-02-24 13:20:12 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -114,6 +114,29 @@ config_tools()
     echo bootstrapping in ${PWD}
 }
 
+run_gnulib()
+{
+    local modlist='
+	unlocked-io
+	extensions
+'
+
+    local gltool=$(
+        while : ; do
+            f=~gnu/proj/gnulib/gnulib-tool
+            test -x "$f" && break
+
+            f=$(which gnulib-tool)
+            test -x "$f" && break
+
+            die "cannot locate gnulib-tool"
+        done
+        echo $f
+    )
+    local glopts=''
+    ${gltool} ${glopts} --import ${modlist}
+}
+
 # Source any local scripts which add to the bootstrap procedure.
 # The bootstrap.local script should test the value of the BOOTSTRAP
 # environment variable to see whether it should run the sections
@@ -131,6 +154,8 @@ pre_local()
     cd autoopts
     PS4='>aobs> '
     source bootstrap.dir aoconf
+    cd ..
+    run_gnulib
 }
 
 post_local()
@@ -159,14 +184,11 @@ run_autotools()
     # remove any stale config.cache
     doit rm -f config.cache
 
-    # Use auxdir if set in ${config_file}.
-    auxdir=${auxdir-$(fgrep CONFIG_AUX_DIR ${config_file} | \
-        sed 's,^.*(,,;s,).*$,,')}
     test -n "$auxdir" || auxdir=${srcdir}
     test -d $auxdir || auxdir=.
 
     doit $LIBTOOLIZE    --force
-    doit $ACLOCAL       -I $auxdir
+    doit $ACLOCAL       -I config -I m4
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
