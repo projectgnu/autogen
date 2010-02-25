@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 11:01:22 bkorb"
+## Time-stamp:      "2010-02-24 15:15:38 bkorb"
 ##              by: bkorb
 ##
 ## This file is part of AutoGen.
@@ -45,11 +45,9 @@ endif
 endif
 
 misc_extra     = VERSION NOTES
-cfg_gen        = config/ag_macros.m4 config/snprintfv.m4
-config_dist    = config/missing config/misc.def config/libopts.def $(cfg_gen)
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
 aclocaldir     = $(datadir)/aclocal
-aclocal_DATA   = config/liboptschk.m4
+aclocal_DATA   = config/*.m4
 bootstrap      = config/bootstrap*
 dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
 EXTRA_DIST     = $(misc_extra) $(bootstrap) $(pkg_dist) $(dist_data)

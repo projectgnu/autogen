@@ -2,7 +2,7 @@
 /*
  *  agInit.c  $Id$
  *
- *  Time-stamp:      "2010-02-24 08:43:39 bkorb"
+ *  Time-stamp:      "2010-02-25 14:17:32 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -54,7 +54,7 @@ initialize( int arg_ct, char** arg_vec )
             "(add-hook! before-error-hook error-source-line)\n"
             "(use-modules (ice-9 stack-catch))";
         pzLastScheme = zInitRest;
-        ag_scm_c_eval_string_from_file_line( zInitRest, __FILE__, __LINE__-3 );
+        ag_scm_c_eval_string_from_file_line(zInitRest, __FILE__, __LINE__-3);
     }
 #endif
 
@@ -65,8 +65,8 @@ initialize( int arg_ct, char** arg_vec )
      *  The lowest of the low is the config time install data dir.
      *  Next is the *current* directory of this executable.
      */
-    SET_OPT_TEMPL_DIRS( "$@" );
-    SET_OPT_TEMPL_DIRS( "$$/../share/autogen" );
+    SET_OPT_TEMPL_DIRS("$@");
+    SET_OPT_TEMPL_DIRS("$$/../share/autogen");
 
     {
         char z[ SCRIBBLE_SIZE ] = "__autogen__";

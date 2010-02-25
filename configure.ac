@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-02-24 11:27:13 bkorb"
+dnl Time-stamp:      "2010-02-24 17:18:46 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
@@ -33,6 +33,7 @@ d=`dirname $0`
 ag_top_srcdir=`cd $d && pwd`
 ag_top_builddir=`pwd`]
 AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
+AC_USE_SYSTEM_EXTENSIONS
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL
 ifdef([AC_REVISION],AC_REVISION($Revision: 4.34 $),)dnl
@@ -84,6 +85,7 @@ AM_WITH_DMALLOC
 # ----------------------------------------------------------------------
 AM_PROG_CC_C_O
 AC_PROG_CC_STDC
+gl_FUNC_GLIBC_UNLOCKED_IO
 AC_EXEEXT
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
@@ -213,11 +215,16 @@ test ${GUILE_VERSION} -ge 108000 \
        -fno-strict-aliasing`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
+
+AH_TOP([#ifndef AUTOGEN_CONFIG_H])
+AH_TOP([#define AUTOGEN_CONFIG_H 1])
+AH_BOTTOM([#endif /* AUTOGEN_CONFIG_H */])
+
 AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
                 [chmod +x doc/mk-agen-texi.sh])
-AC_CONFIG_FILES([autoopts/mk-autoopts-pc:autoopts/mk-autoopts-pc.in],
-                [chmod +x autoopts/mk-autoopts.pc])
-AC_CONFIG_FILES([autoopts/autoopts-config:autoopts/autoopts-config.in],
+AC_CONFIG_FILES([autoopts/mk-autoopts-pc],
+                [chmod +x autoopts/mk-autoopts-pc])
+AC_CONFIG_FILES([autoopts/autoopts-config],
                 [chmod +x autoopts/autoopts-config])
 
 ==ADD_CONFIG_FILES==

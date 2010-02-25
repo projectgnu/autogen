@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 11:10:21 bkorb"
+# Time-stamp:      "2010-02-24 17:37:41 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -75,26 +75,25 @@ config_tools()
 
     #  Check for AutoGen version 5.
     #
-    AGexe=$(type autogen 2>/dev/null | \
-        sed 's@autogen is [^/]*/@/@')
+    AGexe=$(which autogen)
     case ${AGexe} in
     ( /* )
         v=$($AGexe --version)
         case "$v" in
         *"Ver. 5."* ) : ;;
-        * ) echo OUT OF DATE AutoGen: $v >&2
-            exit 1 ;;
+        * ) die "OUT OF DATE AutoGen: $v" ;;
         esac
         ;;
 
     ( * )
-        echo AutoGen requires autogen to bootstrap >&2
-        exit 1
+        die "AutoGen requires autogen to bootstrap"
         ;;
     esac
 
-    GDexe=$(type getdefs 2>/dev/null | sed 's@getdefs is [^/]*/@/@')
-    CLexe=$(type columns 2>/dev/null | sed 's@columns is [^/]*/@/@')
+    GDexe=$(which getdefs)
+    CLexe=$(which columns)
+    test -x "${GDexe}" -a -x "${CLexe}" || \
+        die "autogen support programs are missing"
     export AGexe GDexe CLexe
 
     # ------------------------------------------------------------------
@@ -105,13 +104,46 @@ config_tools()
     tools="autoconf autoheader aclocal automake libtoolize"
     for f in $tools
     do
+        tool=$(which ${f}) > /dev/null || die "No $f found"
         eval ${f}_reqver=$(
-            set -- $(${f} --version | sed 1q)
+            set -- $(${tool} --version | sed 1q)
             eval echo \${$#})
-        eval $(echo $f | tr a-z A-Z)=$(which ${f})
+        eval $(echo $f | tr a-z A-Z)=${tool}
     done
 
+    char_mapper=$(which char-mapper) 2>/dev/null
+    test -x "${char_mapper}" || {
+        char_mapper=$(
+            cd add-on/char-mapper >&2
+            make char-mapper >&2 || die "cannot make char-mapper"
+            echo ${PWD}/char-mapper)
+    }
+    export char_mapper
+
     echo bootstrapping in ${PWD}
+}
+
+run_gnulib()
+{
+    local modlist='
+	unlocked-io
+	extensions
+'
+
+    local gltool=$(
+        while : ; do
+            f=~gnu/proj/gnulib/gnulib-tool
+            test -x "$f" && break
+
+            f=$(which gnulib-tool)
+            test -x "$f" && break
+
+            die "cannot locate gnulib-tool"
+        done
+        echo $f
+    )
+    local glopts=''
+    ${gltool} ${glopts} --import ${modlist}
 }
 
 # Source any local scripts which add to the bootstrap procedure.
@@ -131,6 +163,8 @@ pre_local()
     cd autoopts
     PS4='>aobs> '
     source bootstrap.dir aoconf
+    cd ..
+    # run_gnulib
 }
 
 post_local()
@@ -159,14 +193,11 @@ run_autotools()
     # remove any stale config.cache
     doit rm -f config.cache
 
-    # Use auxdir if set in ${config_file}.
-    auxdir=${auxdir-$(fgrep CONFIG_AUX_DIR ${config_file} | \
-        sed 's,^.*(,,;s,).*$,,')}
     test -n "$auxdir" || auxdir=${srcdir}
     test -d $auxdir || auxdir=.
 
     doit $LIBTOOLIZE    --force
-    doit $ACLOCAL       -I $auxdir
+    doit $ACLOCAL       -I config
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF

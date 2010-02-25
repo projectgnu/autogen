@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
-
    NOTE: The canonical source of this file is maintained with the GNU C
    Library.  Bugs can be reported to bug-glibc@prep.ai.mit.edu.
 

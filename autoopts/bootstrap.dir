@@ -38,7 +38,7 @@ make_funcs_def()
 {
     local PS4=">${FUNCNAME}> "
 
-    char-mapper autogen.map || die "FAILED: char-mapper"
+    ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
 
     mk-str2enum --base-name=xat-attribute -n \
         type words members cooked uncooked keep || \

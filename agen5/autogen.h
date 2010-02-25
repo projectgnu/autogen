@@ -3,7 +3,7 @@
  *  autogen.h
  *  $Id$
  *
- *  Time-stamp:        "2010-02-24 08:43:35 bkorb"
+ *  Time-stamp:        "2010-02-24 14:50:07 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "compat/compat.h"
+#include "compat/unlocked-io.h"
 
 #include REGEX_HEADER
 #include <libguile/scmconfig.h>

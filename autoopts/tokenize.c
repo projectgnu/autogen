@@ -35,6 +35,9 @@ copy_cooked( ch_t** ppDest, char const ** ppSrc );
 
 static void
 copy_raw( ch_t** ppDest, char const ** ppSrc );
+
+static token_list_t *
+alloc_token_list(char const * str);
 /* = = = END-STATIC-FORWARD = = = */
 
 static void

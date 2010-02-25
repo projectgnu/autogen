@@ -4,7 +4,7 @@
 # columns/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:39:32 bkorb"
+# Time-stamp:        "2010-02-24 12:32:55 bkorb"
 #            by: bkorb
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -33,12 +33,15 @@
 #
 test "$1" = recursive && shift
 targets="$*"
-test -z "$targets" && targets=opts.h
+test -z "$targets" && targets='opts.h proto.h'
 
 test "X${mainpid}" = X && {
     PS4='>bsl> '
-    source ${top_sourcedir}/config/bootstrap.shlib
+    source ${top_srcdir}/config/bootstrap.shlib
     PS4='>bsd> '
+    free_trap=true
+} || {
+    free_trap=false
 }
 
 for f in $targets
@@ -52,17 +55,7 @@ do
   opts.h | \
   opts.c | \
   stamp-opts )
-    # Make the option processing files:
-    #
-    if [ -z "${AGexe}" ]
-    then
-      test "X${BOOTSTRAP}" = X \
-        && echo "Cannot locate ${AG}.  Giving up"
-      if [ -f opts.h ] && [ -f opts.c ]
-      then exit 0 ; else exit 1 ; fi
-    fi
-    run_ag opts -L ../autoopts ${DEBUG_OPTS} opts.def
-    ( date > stamp-opts ) || :
+    make_opts
     ;;
 
   * )
@@ -70,6 +63,8 @@ do
     ;;
   esac
 done
+
+${free_trap} && trap '' 0
 
 # Local Variables:
 # mode:             shell-script

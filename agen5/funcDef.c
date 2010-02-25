@@ -2,7 +2,7 @@
 /*
  *  $Id$
  *
- *  Time-stamp:        "2010-02-24 08:42:11 bkorb"
+ *  Time-stamp:        "2010-02-25 14:00:45 bkorb"
  *
  *  This module implements the DEFINE text function.
  *
@@ -42,6 +42,15 @@ orderDefList( const void* p1, const void* p2 );
 
 static tDefList*
 linkTwins( tDefList* pDL, tDefList* pNext, int* pCt );
+
+static u_int
+count_named_values(tTemplate* pT, tMacro* pMac);
+
+static char *
+gather_assigned_value(char * pzScan, tDefList * pDL);
+
+static void
+fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac);
 
 static void
 prepInvokeArgs( tMacro* pMac );
@@ -103,33 +112,12 @@ linkTwins( tDefList* pDL, tDefList* pNext, int* pCt )
 }
 
 
-/*
- *  parseMacroArgs
- *
- *  This routine is called just before the first call to mFunc_Define
- *  for a particular macro invocation.  It scans the text of the invocation
- *  for name-value assignments that are only to live for the duration
- *  of the processing of the user defined macro.
- */
-LOCAL void
-parseMacroArgs( tTemplate* pT, tMacro* pMac )
+static u_int
+count_named_values(tTemplate* pT, tMacro* pMac)
 {
-    char*        pzScan = pT->pzTemplText + pMac->ozText;
-    u_int        ct     = 0;
-    tDefList*    pDL;
-    tDefList*    pN;
+    char * pzScan = pT->pzTemplText + pMac->ozText;
+    u_int  ct = 0;
 
-    /*
-     *  If there is no argument text, then the arg count is zero.
-     */
-    if (pMac->ozText == 0) {
-        pMac->res = 0;
-        return;
-    }
-
-    /*
-     *  Count the number of named values in the argument list
-     */
     while (*pzScan != NUL) {
         ct++;
         if (! IS_VAR_FIRST_CHAR( *pzScan )) {
@@ -145,6 +133,152 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
         pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
         while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
     }
+
+    return ct;
+}
+
+
+static char *
+gather_assigned_value(char * pzScan, tDefList * pDL)
+{
+    while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
+    strtransform( pDL->de.pzDefName, pDL->de.pzDefName );
+    pDL->pzExpr = pzScan;
+    pDL->de.valType = VALTYP_TEXT;
+    pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
+
+    /*
+     *  Figure out what kind of expression we have
+     */
+    switch (*pDL->pzExpr) {
+    case ';':
+    case '(':
+        /*
+         *  These expressions will need evaluation
+         */
+        break;
+
+    case '`':
+    {
+        char* pz;
+        /*
+         *  Process the quoted string, but leave a '`' marker, too
+         */
+        AGDUPSTR( pz, pDL->pzExpr, "macro arg expr" );
+        spanQuote( pz );
+        strcpy( pDL->pzExpr+1, pz );
+        AGFREE( (void*)pz );
+        break;
+    }
+    case '"':
+    case '\'':
+        /*
+         *  Process the quoted strings now
+         */
+        if ((pzScan - pDL->pzExpr) < 24) {
+            char* pz = (char*)AGALOC( 24, "quoted string" );
+            memcpy((void*)pz, pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
+            pDL->pzExpr = pz;
+            manageAllocatedData( pz );
+        }
+        spanQuote( pDL->pzExpr );
+        /* FALLTHROUGH */
+
+    default:
+        /*
+         *  Default:  the raw sequence of characters is the value
+         */
+        pDL->de.val.pzText = pDL->pzExpr;
+        pDL->pzExpr        = NULL;
+    }
+
+    return pzScan;
+}
+
+
+static void
+fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
+{
+    for (;; pDL++ ) {
+        pDL->de.pzDefName = pzScan;
+        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
+
+        switch (*pzScan) {
+        case NUL:
+            pDL->de.val.pzText = (char*)zNil;
+            return;
+
+        default:
+            AG_ABEND_IN( pT, pMac, "name not followed by '='" );
+
+        case ' ': case '\t': case '\n': case '\f':
+            *(pzScan++) = NUL;
+            while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
+
+            /*
+             *  The name was separated by space, but has no value
+             */
+            if (*pzScan != '=') {
+                pDL->de.val.pzText = (char*)zNil;
+                if (*pzScan == NUL)
+                    return;
+                continue;
+            }
+            /* FALLTHROUGH */
+
+        case '=':
+            *(pzScan++) = NUL;
+        }
+
+        /*
+         *  When we arrive here, we have just clobbered a '=' char.
+         *  Now we have gather up the assigned value.
+         */
+        pzScan = gather_assigned_value(pzScan, pDL);
+
+        /*
+         *  IF the next char is NUL, we are done.
+         *  OTHERWISE, the next character must be a space
+         */
+        if (*pzScan == NUL)
+            break;
+
+        if (! IS_WHITESPACE_CHAR(*pzScan))
+            AG_ABEND_IN( pT, pMac, "no space separating entries" );
+
+        /*
+         *  Terminate the string value and skip over any additional space
+         */
+        *(pzScan++) = NUL;
+        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
+    }
+}
+
+/*
+ *  parseMacroArgs
+ *
+ *  This routine is called just before the first call to mFunc_Define
+ *  for a particular macro invocation.  It scans the text of the invocation
+ *  for name-value assignments that are only to live for the duration
+ *  of the processing of the user defined macro.
+ */
+LOCAL void
+parseMacroArgs(tTemplate* pT, tMacro* pMac)
+{
+    char *      pzScan = pT->pzTemplText + pMac->ozText;
+    u_int       ct;
+    tDefList *  pDL;
+    tDefList *  pN;
+
+    /*
+     *  If there is no argument text, then the arg count is zero.
+     */
+    if (pMac->ozText == 0) {
+        pMac->res = 0;
+        return;
+    }
+
+    ct = count_named_values(pT, pMac);
 
     /*
      *  The result is zero if we don't have any
@@ -167,107 +301,7 @@ parseMacroArgs( tTemplate* pT, tMacro* pMac )
     /*
      *  Fill in the array of value assignments
      */
-    for (;; pDL++ ) {
-        pDL->de.pzDefName = pzScan;
-        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
-
-        switch (*pzScan) {
-        case NUL:
-            pDL->de.val.pzText = (char*)zNil; goto fill_in_array_done;
-
-        default:
-            AG_ABEND_IN( pT, pMac, "name not followed by '='" );
-
-        case ' ': case '\t': case '\n': case '\f':
-            *(pzScan++) = NUL;
-            while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
-
-            /*
-             *  The name was separated by space, but has no value
-             */
-            if (*pzScan != '=') {
-                pDL->de.val.pzText = (char*)zNil;
-                if (*pzScan == NUL)
-                    goto fill_in_array_done;
-                goto fill_in_array_continue;
-            }
-            /* FALLTHROUGH */
-        case '=':
-            *(pzScan++) = NUL;
-        }
-
-        /*
-         *  When we arrive here, we have just clobbered a '=' char.
-         *  Now we have gather up the assigned value.
-         */
-        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
-        strtransform( pDL->de.pzDefName, pDL->de.pzDefName );
-        pDL->pzExpr = pzScan;
-        pDL->de.valType = VALTYP_TEXT;
-        pzScan = (char*)skipExpression( pzScan, strlen( pzScan ));
-
-        /*
-         *  Figure out what kind of expression we have
-         */
-        switch (*pDL->pzExpr) {
-        case ';':
-        case '(':
-            /*
-             *  These expressions will need evaluation
-             */
-            break;
-
-        case '`':
-        {
-            char* pz;
-            /*
-             *  Process the quoted string, but leave a '`' marker, too
-             */
-            AGDUPSTR( pz, pDL->pzExpr, "macro arg expr" );
-            spanQuote( pz );
-            strcpy( pDL->pzExpr+1, pz );
-            AGFREE( (void*)pz );
-            break;
-        }
-        case '"':
-        case '\'':
-            /*
-             *  Process the quoted strings now
-             */
-            if ((pzScan - pDL->pzExpr) < 24) {
-                char* pz = (char*)AGALOC( 24, "quoted string" );
-                memcpy((void*)pz, pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
-                pDL->pzExpr = pz;
-                manageAllocatedData( pz );
-            }
-            spanQuote( pDL->pzExpr );
-            /* FALLTHROUGH */
-
-        default:
-            /*
-             *  Default:  the raw sequence of characters is the value
-             */
-            pDL->de.val.pzText = pDL->pzExpr;
-            pDL->pzExpr        = NULL;
-        }
-
-        /*
-         *  IF the next char is NUL, we are done.
-         *  OTHERWISE, the next character must be a space
-         */
-        if (*pzScan == NUL)
-            break;
-
-        if (! IS_WHITESPACE_CHAR(*pzScan))
-            AG_ABEND_IN( pT, pMac, "no space separating entries" );
-
-        /*
-         *  Terminate the string value and skip over any additional space
-         */
-        *(pzScan++) = NUL;
-        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
-    fill_in_array_continue:;
-    } fill_in_array_done:;
+    fill_in_values(pDL, pzScan, pT, pMac);
 
     if (ct > 1) {
         /*

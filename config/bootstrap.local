@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 11:01:04 bkorb"
+# Time-stamp:        "2010-02-24 15:04:37 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -200,7 +200,8 @@ case "${BOOTSTRAP}" in
     chmod a+x ${srcdir}/*/test/*.test
 
     sed "/^bootstrap /s@=.*@= $(
-        echo config/bootstrap*)@" ${srcdir}/Makefile.am > XXX$$
+        echo config/bootstrap*)@;/^aclocal_DATA /s@=.*@= $(
+        echo config/*.m4)@" ${srcdir}/Makefile.am > XXX$$
     mv -f XXX$$ ${srcdir}/Makefile.am
 
     exec 3> XXX$$

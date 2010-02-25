@@ -13,6 +13,9 @@ $(TARGETS)  : %.c   : %.def dispatch.tpl
 	@-rm -f *-hdlr.c
 	autogen $<
 
+install-local :
+	cp dispatch.tpl ../bin/.
+
 clean       :
 	rm -f $(OBJECTS) $(TESTS) $(INTERMEDIATE) $(TARGETS)
 	bash ./test-all.sh -cleanup

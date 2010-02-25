@@ -11,6 +11,9 @@ all     : check-stamp
 check   : check-stamp
 example : example-fsm.c
 
+install-local : all
+	@:
+
 check-stamp : sample.shar
 	@DEF=$(DEF) sh run.sh testing && \
 	touch $@ && \
