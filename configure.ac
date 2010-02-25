@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-02-24 14:46:05 bkorb"
+dnl Time-stamp:      "2010-02-24 17:18:46 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
@@ -215,11 +215,16 @@ test ${GUILE_VERSION} -ge 108000 \
        -fno-strict-aliasing`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
+
+AH_TOP([#ifndef AUTOGEN_CONFIG_H])
+AH_TOP([#define AUTOGEN_CONFIG_H 1])
+AH_BOTTOM([#endif /* AUTOGEN_CONFIG_H */])
+
 AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
                 [chmod +x doc/mk-agen-texi.sh])
-AC_CONFIG_FILES([autoopts/mk-autoopts-pc:autoopts/mk-autoopts-pc.in],
-                [chmod +x autoopts/mk-autoopts.pc])
-AC_CONFIG_FILES([autoopts/autoopts-config:autoopts/autoopts-config.in],
+AC_CONFIG_FILES([autoopts/mk-autoopts-pc],
+                [chmod +x autoopts/mk-autoopts-pc])
+AC_CONFIG_FILES([autoopts/autoopts-config],
                 [chmod +x autoopts/autoopts-config])
 
 ==ADD_CONFIG_FILES==
