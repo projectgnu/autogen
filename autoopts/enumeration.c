@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2010-02-24 08:41:18 bkorb"
+ * Time-stamp:      "2010-02-25 15:58:39 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -154,7 +154,6 @@ enumError(
         (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
         /* NOTREACHED */
     }
-
 
     if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP) {
         fprintf(option_usage_fp, zLowerBits, name_ct);
