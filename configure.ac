@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-02-24 17:18:46 bkorb"
+dnl Time-stamp:      "2010-02-27 16:10:03 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl            by: bkorb
 dnl
@@ -212,7 +212,7 @@ test ${GUILE_VERSION} -ge 108000 \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
        -Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-       -fno-strict-aliasing`
+       -fno-strict-aliasing -O4`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
 

@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2010-02-24 08:41:07 bkorb"
+# Time-stamp:      "2010-02-25 16:03:27 bkorb"
 # ID:  $Id$
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -70,10 +70,10 @@ h=options.h
  *  to an option descriptor must be obtained.  There are two ways:
  *
  *  1. inside an option processing procedure, it is the second argument,
- *  conventionally "tOptDesc* pOD".
+ *     conventionally "tOptDesc* pOD".
  *
- *  2.  Outside of an option procedure (or to reference a different option
- *  descriptor), use either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".
+ *  2. Outside of an option procedure (or to reference a different option
+ *     descriptor), use either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".
  *
  *  See the relevant generated header file to determine which and what
  *  values for "opt_name" are available.
@@ -96,15 +96,19 @@ mv -f XXXX opthead.tpl"
 #define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
 
 typedef enum {
-    OPARG_TYPE_NONE             = 0,
-    OPARG_TYPE_STRING           = 1,    /* default type/ vanilla string      */
-    OPARG_TYPE_ENUMERATION      = 2,    /* opt arg is an enum (keyword list) */
-    OPARG_TYPE_BOOLEAN          = 3,    /* opt arg is boolean-valued         */
-    OPARG_TYPE_MEMBERSHIP       = 4,    /* opt arg sets set membership bits  */
-    OPARG_TYPE_NUMERIC          = 5,    /* opt arg has numeric value         */
-    OPARG_TYPE_HIERARCHY        = 6,    /* option arg is hierarchical value  */
-    OPARG_TYPE_FILE             = 7,    /* option arg names a file           */
-    OPARG_TYPE_TIME             = 8     /* opt arg is a time duration        */
+    OPARG_TYPE_NONE             =  0,
+    OPARG_TYPE_STRING           =  1,    /* default type/ vanilla string      */
+    OPARG_TYPE_ENUMERATION      =  2,    /* opt arg is an enum (keyword list) */
+    OPARG_TYPE_BOOLEAN          =  3,    /* opt arg is boolean-valued         */
+    OPARG_TYPE_MEMBERSHIP       =  4,    /* opt arg sets set membership bits  */
+    OPARG_TYPE_NUMERIC          =  5,    /* opt arg is a long int             */
+    OPARG_TYPE_HIERARCHY        =  6,    /* option arg is hierarchical value  */
+    OPARG_TYPE_FILE             =  7,    /* option arg names a file           */
+    OPARG_TYPE_TIME             =  8,    /* opt arg is a time duration        */
+    OPARG_TYPE_FLOAT            =  9,    /* opt arg is a floating point num   */
+    OPARG_TYPE_DOUBLE           = 10,    /* opt arg is a double prec. float   */
+    OPARG_TYPE_LONG_DOUBLE      = 11,    /* opt arg is a long double prec.    */
+    OPARG_TYPE_LONG_LONG        = 12     /* opt arg is a long long int        */
 } teOptArgType;
 
 typedef struct optionValue {

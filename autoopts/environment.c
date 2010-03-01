@@ -1,7 +1,7 @@
 
 /*
  *  $Id$
- * Time-stamp:      "2010-02-24 08:41:17 bkorb"
+ * Time-stamp:      "2010-02-25 15:59:00 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -156,7 +156,7 @@ checkEnvOpt(tOptState * os, char * env_name,
         if (OPTST_GET_ARGTYPE(os->pOD->fOptState) == OPARG_TYPE_NONE) {
             os->pzOptArg = NULL;
         } else if (  (os->pOD->fOptState & OPTST_ARG_OPTIONAL)
-                     && (*os->pzOptArg == NUL)) {
+                  && (*os->pzOptArg == NUL)) {
             os->pzOptArg = NULL;
         } else if (*os->pzOptArg == NUL) {
             os->pzOptArg = zNil;
