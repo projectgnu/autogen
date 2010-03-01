@@ -1,3 +1,14 @@
+2010-03-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/Makefile.am: strip out libguile
+	* autoopts/bootstrap.dir: remove guileopt.c processing
+	* autoopts/options_h.tpl (teOptArgType): add float, double, long double
+	and long long in preparation for future work
+	* autoopts/test/Makefile.am: remove libguile testing
+	* autoopts/test/defs.in: remove libguile testing
+	* config/libopts.def: improve quoting of macro arguments.
+	search for inttypes.h before stdint.h.
+
 2010-02-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (doneCheck): flush stdout/stderr before _exit() call

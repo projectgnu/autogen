@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-02-24 08:41:30 bkorb"
+## Time-stamp:      "2010-02-25 16:05:14 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -105,11 +105,6 @@ libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
-libguileopts_la_SOURCES   = guileopt.c
-libguileopts_la_CFLAGS    = $(LIBGUILE_CFLAGS)
-libguileopts_la_LIBADD    = libopts.la
-libguileopts_la_LDFLAGS   = -version-info $(LGUILE_VER)
-
 EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
@@ -118,7 +113,7 @@ INST_M4DATA               = autoopts.m4
 INST_ND_PKGDATA           = $(libsrc)
 INST_PKGCFG               = autoopts.pc
 INST_PKGDATA              = autoopts.m4 $(TPL_FILES)
-INST_LIBS                 = libopts.la libguileopts.la
+INST_LIBS                 = libopts.la
 INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
 INST_SH                   = autoopts-config
 

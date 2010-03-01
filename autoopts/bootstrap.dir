@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-02-24 11:13:51 bkorb"
+# Time-stamp:      "2010-02-25 16:18:16 bkorb"
 # $Id$
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -62,7 +62,7 @@ make_funcs_def()
     mv usage-txt.pot po/.
     files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
         sed '/^CSRC/d;s/[=\\]//'
-        echo  ../compat/pathfind.c guileopt.c)
+        echo  ../compat/pathfind.c)
     getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
     agvars=$(egrep '^A[GO]_' ../VERSION)

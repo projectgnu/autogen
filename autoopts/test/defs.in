@@ -133,7 +133,7 @@ init_tests() {
     test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
     test "X${LD_LIBRARY_PATH}" = X || LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}
     LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}${LD_LIBRARY_PATH}
-    LIB=`echo ${lo_dir}/libopts.a ${lo_dir}/libguileopts.a ${LIB}`
+    LIB=`echo ${lo_dir}/libopts.a`
     export LD_LIBRARY_PATH
 
     if test ${GUILE_VERSION} -gt 107000

@@ -31,10 +31,10 @@
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
 TESTS      = nested.test cfg-edit.test alias.test \
-    argument.test cond.test    config.test enums.test   equiv.test \
-    errors.test   getopt.test  guile.test  handler.test immediate.test \
-    keyword.test  library.test main.test   nls.test     rc.test \
-    shell.test    stdopts.test time.test   usage.test   vers.test
+    argument.test cond.test    config.test  enums.test   equiv.test \
+    errors.test   getopt.test  handler.test immediate.test \
+    keyword.test  library.test main.test    nls.test     rc.test \
+    shell.test    stdopts.test time.test    usage.test   vers.test
 
 testsubdir = ./testdir
 
