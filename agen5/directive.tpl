@@ -1,7 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id$
-# Time-stamp:        "2010-02-24 08:43:03 bkorb"
+# $Id: 7222da5c06f75a8a398e634b16e5c6ff3f2c29a0 $
+# Time-stamp:        "2010-03-01 15:58:53 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -135,8 +135,8 @@ static char zShellInit[] =
 5.  Set up a macro that prints a message, kills autogen and exits
 6.  Restore stderr to whereever it used to be.
 
-=][= (out-push-new)
-=]exec 8>&2 2>/dev/null
+=][= (out-push-new) \=]
+exec 8>&2 2>/dev/null
 
 if test -n "${ZSH_VERSION+set}" && (emulate sh) 1>&2
 then
@@ -145,9 +145,17 @@ then
 
 else case `set -o` in *posix*) set -o posix ;; esac
 fi
-
+trap_exit() {
+  echo trapped on signal ${1} >&2
+  if test -d "${tmp_dir}" ; then
+    if test ${1} -eq 0
+    then rm -rf ${tmp_dir}
+    else echo "temp directory has been retained:  ${tmp_dir}"
+    fi
+  fi
+}
 for f in 1 2 5 6 7 13 14
-do trap "echo trapped on $f >&2" $f ; done
+do trap "trap_exit ${f}" $f ; done
 trap '' 0
 
 test -n "${CDPATH}" && {

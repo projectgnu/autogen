@@ -3,7 +3,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2010-03-01 12:12:02 bkorb"
+ *  Time-stamp:        "2010-03-01 13:07:55 bkorb"
  *             by: bkorb
  *
  *  This file is part of AutoGen.
@@ -23,7 +23,7 @@ author =           "Bruce Korb <bkorb@gnu.org>";
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  -------------------------------------------------------------------
- *  $Id$
+ *  $Id: a07593dd1f1a2d123205504316ac26d3a6f6a2ff $
  *  -------------------------------------------------------------------
  */
 
@@ -255,47 +255,28 @@ do-first = <<-_EOF_
 	# =================
 	# AC_CHECK_HEADERS
 	# =================
-	AC_CHECK_HEADERS([
-	    dlfcn.h       errno.h       fcntl.h       libgen.h \
-	    memory.h      netinet/in.h  setjmp.h      sys/mman.h \
-	    sys/param.h   sys/poll.h    sys/procset.h sys/select.h \
-	    sys/socket.h  sys/stropts.h sys/time.h    sys/un.h \
-	    sys/wait.h    unistd.h      utime.h       sysexits.h ])
+	AC_CHECK_HEADERS([ \
+	    dlfcn.h      errno.h       fcntl.h       libgen.h     \
+	    memory.h     netinet/in.h  setjmp.h      sys/mman.h   \
+	    sys/param.h  sys/poll.h    sys/procset.h sys/select.h \
+	    sys/socket.h sys/stropts.h sys/time.h    sys/un.h     \
+	    sys/wait.h   unistd.h      utime.h       sysexits.h ])
 
-	# --------------------------------------------
-	# Verify certain entries from AC_CHECK_HEADERS
-	# --------------------------------------------
-	[for f in sys_types sys_mman sys_param sys_stat sys_wait \
-	         string errno stdlib memory setjmp
-	do eval as_ac_var=\${ac_cv_header_${f}_h+set}
-	   test "${as_ac_var}" = set] || \
-	     AC_MSG_ERROR([You must have ${f}.h on your system])
-	done
+	AC_CHECK_HEADERS([stdarg.h     varargs.h],
+	    [lo_have_arg_hdr=true;break],
+	    [lo_have_arg_hdr=false])
 
-	# ================================================
-	# AC_CHECK_HEADERS: stdarg.h is present define HAVE_STDARG_H, otherwise
-	# if varargs.h is present define HAVE_VARARGS_H.
-	# ================================================
-	AC_CHECK_HEADERS([stdarg.h varargs.h], [break])
-	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
-	  AC_MSG_ERROR([You must have stdarg.h or varargs.h on your system])
-	fi
+	AC_CHECK_HEADERS([string.h     strings.h],
+	    [lo_have_str_hdr=true;break],
+	    [lo_have_str_hdr=false])
 
-	# ================================================
-	# Similarly for the string.h and strings.h headers
-	# ================================================
-	AC_CHECK_HEADERS([string.h strings.h], [break])
-	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
-	  AC_MSG_ERROR([You must have string.h or strings.h on your system])
-	fi
+	AC_CHECK_HEADERS([limits.h     sys/limits.h  values.h],
+	    [lo_have_lim_hdr=true;break],
+	    [lo_have_lim_hdr=false])
 
-	# =====================
-	# ...and limits headers
-	# =====================
-	AC_CHECK_HEADERS([limits.h sys/limits.h values.h], [break])
-	[if test `eval echo '${'$as_ac_Header'}'` != yes; then]
-	  AC_MSG_ERROR([You must have one of limits.h, sys/limits.h or values.h])
-	fi
+	AC_CHECK_HEADERS([inttypes.h   stdint.h],
+	    [lo_have_typ_hdr=true;break],
+	    [lo_have_typ_hdr=false])
 
 	# ----------------------------------------------------------------------
 	# check for various programs used during the build.
@@ -307,6 +288,30 @@ do-first = <<-_EOF_
 	# include <runetype.h>
 	#endif
 	])
+
+	# --------------------------------------------
+	# Verify certain entries from AC_CHECK_HEADERS
+	# --------------------------------------------
+	[for f in sys_types sys_mman sys_param sys_stat sys_wait \
+	         string errno stdlib memory setjmp
+	do eval as_ac_var=\${ac_cv_header_${f}_h+set}
+	   test "${as_ac_var}" = set || {
+	     ]AC_MSG_ERROR([You must have ${f}.h on your system])[
+	   }
+	done
+
+	${lo_have_arg_hdr} || \
+	  ]AC_MSG_ERROR([You must have stdarg.h or varargs.h on your system])[
+
+	${lo_have_str_hdr} || \
+	  ]AC_MSG_ERROR([You must have string.h or strings.h on your system])[
+
+	${lo_have_lim_hdr} || \
+	  ]AC_MSG_ERROR(
+	    [You must have one of limits.h, sys/limits.h or values.h])[
+
+	${lo_have_typ_hdr} || \
+	  ]AC_MSG_ERROR([You must have inttypes.h or stdint.h on your system])
 
 	# ----------------------------------------------------------------------
 	# Checks for typedefs
@@ -321,11 +326,6 @@ do-first = <<-_EOF_
 	# include <wchar.h>
 	#endif
 	])
-
-	# ========================
-	# ...and int types headers
-	# ========================
-	AC_CHECK_HEADERS([inttypes.h stdint.h], break)
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
 	   intptr_t, uintptr_t, uint_t, pid_t, size_t])
 

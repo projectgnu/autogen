@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-02-24 08:38:34 bkorb"
+# Time-stamp:        "2010-03-01 17:06:32 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -27,21 +27,27 @@ parent_pid=$$
 
 die()
 {
-   exec 2>&8 1>&2 8>&-
-   echo "mk-agen-texi FAILED: $*"
-   echo
-   cat ${LOG_FILE}
-   trap : EXIT
-   kill -TERM ${parent_pid}
-   exit 1
+  exec 2>&8 1>&2 8>&-
+  echo "mk-agen-texi FAILED: $*"
+  echo
+  cat ${LOG_FILE}
+  trap : EXIT
+  kill -TERM ${parent_pid}
+  exit 1
 }
 
 set_config_values()
 {
-  tmp_dir=ag-texi-$$.d
+  local PS4=">$FUNCNAME> "
+  tmp_dir=$(pwd)/ag-texi-$$.d
   rm -rf ag-texi-*.d
   mkdir ${tmp_dir} || die "cannot make ${tmp_dir} directory"
-  trap "rm -rf $(pwd)/${tmp_dir}" EXIT
+  case "$-" in
+  *x* ) trap "echo 'saved tmp dir:  ${tmp_dir}';chmod 777 ${tmp_dir}" EXIT
+        VERBOSE=true ;;
+  *   ) trap "rm -rf ${tmp_dir}" EXIT
+        VERBOSE=false ;;
+  esac
   LOG_FILE=${tmp_dir}/texi.log
   exec 8>&2 2> ${LOG_FILE}
 
@@ -74,6 +80,7 @@ set_config_values()
 
 setup_exports()
 {
+  local PS4=">$FUNCNAME> "
   # Now auto-export variables:
   #
   set -a
@@ -135,6 +142,7 @@ setup_exports()
 #
 run_getdefs()
 {
+  local PS4=">$FUNCNAME> "
   gd_cfg=${tmp_dir}/getdefs.cfg
   exec 3> ${gd_cfg}
   cat >&3 <<-  EOCat
@@ -143,12 +151,15 @@ run_getdefs()
 	srcfile
 	linenum
 	template    auto_gen.tpl
-	assign      ag-texi = ${AGEN_TEXI}
+	assign      ag-texi = invoke-$(basename ${AGEN_TEXI})
 	EOCat
+
+  ln -s ${AGEN_TEXI} invoke-$(basename ${AGEN_TEXI})
 
   for f in ${ADDON_TEXI}
   do
-    echo "assign      addon-texi = ${f}"
+    ln -s ${f} ./invoke-$(basename ${f})
+    echo "assign      addon-texi = invoke-$(basename ${f})"
   done >&3
 
   for f in ${GETDEF_SRC}
@@ -162,6 +173,7 @@ run_getdefs()
 
 sanity_check()
 {
+  local PS4=">$FUNCNAME> "
   # Make sure the executables are there
   #
   test -x ${AGexe} || (cd $(dirname ${AGexe}) ; ${MAKE}) || exit 0
@@ -186,7 +198,8 @@ sanity_check()
   do test -f ${f} || die cannot find doc file: ${f}
   done
 
-  cmd=${AGexe} # \ "--trace=every --trace-out=>>${tmp_dir}/ag.log"
+  cmd=${AGexe}
+  ${VERBOSE} && cmd=${cmd}" --trace=every --trace-out=>>${tmp_dir}/ag.log"
 }
 
 #  Validate everything:
@@ -203,7 +216,7 @@ run_getdefs
 env >&2
 opts="-t${timer} -L${srcdir} -L${top_srcdir} -L${top_srcdir}/autoopts"
 cmd=$(echo "${cmd}" --base=${GEN_BASE} ${opts} ${tmp_dir}/${GEN_BASE}.def)
-echo + ${cmd} >&8
+echo "${PS4:-+} " ${cmd} >&8
 
 ${cmd} || die could not regenerate doc
 
