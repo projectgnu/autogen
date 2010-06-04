@@ -1,6 +1,6 @@
 /*
  *  defDirect.c
- *  $Id$
+ *  $Id: 10b71032978907924d1725b0b4f3c9d95e83498c $
  *
  *  Time-stamp:        "2010-02-24 08:43:08 bkorb"
  *

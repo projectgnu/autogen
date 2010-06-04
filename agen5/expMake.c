@@ -1,7 +1,7 @@
 
 /*
  *  expMake.c
- *  $Id$
+ *  $Id: 78f6082a2fe501d72cbf0d7e1ef643e83b9fbd76 $
  *
  *  Time-stamp:        "2010-02-24 08:42:59 bkorb"
  *

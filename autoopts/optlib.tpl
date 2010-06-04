@@ -22,7 +22,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id$
+# $Id: dd15840a244326beacc63cf66af55ffd008d1359 $
 
 =][=
 

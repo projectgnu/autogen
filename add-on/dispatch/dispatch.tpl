@@ -227,7 +227,7 @@ typedef enum { [= (. INVALID) =] = 0,
  ;;
  (shell (string-append
     "( tr a-z A-Z | "
-    "  columns -I4 --spread=1 --sep=, --format='" TYPE "_%s' "
+    "  columns -I4 --spread=1 --sep=, --format='" TYPE "_%s'\n"
     ") <<_EOCmds_\n" clist "\n_EOCmds_" ))
 
 =]
@@ -499,7 +499,7 @@ static struct [=(. tp-nm)=]_index const [= (. table-name) =][] = {
     ENDFOR          =][=
 
     (shell (string-append
-    "( sort | sed '$s/,$/ };/' ) <<_EOF_\n"
+    "( sort | sed '$s/,$/ };/'\n) <<_EOF_\n"
     (out-pop #t)
     "_EOF_" ))      =]
 [=

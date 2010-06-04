@@ -3,8 +3,8 @@
 autogen definitions options;
 
 /*
- *  $Id$
- *  Time-stamp:        "2010-02-24 08:42:07 bkorb"
+ *  $Id: c93b7a1c853ff5e1d4538a2e472a6fda4c7794ea $
+ *  Time-stamp:        "2010-04-29 22:13:55 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -154,7 +154,7 @@ flag = {
 	This option will override that name and expand a different template.
 	_EOF_;
 
-    flag-code = "    pzTemplFileName = pOptDesc->pzLastArg;";
+    flag-code = "    pzTemplFileName = pOptDesc->optArg.argString;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -177,7 +177,7 @@ flag = {
     flag-code = <<- _EOCode_
 	    tTemplate* pT;
 	    procState = PROC_STATE_LIB_LOAD;
-	    pT = loadTemplate(pOptDesc->pzLastArg, NULL);
+	    pT = loadTemplate(pOptDesc->optArg.argString, NULL);
 	    unloadTemplate( pT );
 	    procState = PROC_STATE_OPTIONS;
 	_EOCode_;
@@ -261,10 +261,11 @@ flag = {
 	    tSCC* apzSfx[] = { "scm", NULL };
 
 	    if (! SUCCESSFUL(
-	            findFile( pOptDesc->pzLastArg, zPath, apzSfx, NULL))) {
-	        fprintf( stderr, "Cannot locate scheme file `%s'\n",
-	                 pOptDesc->pzLastArg );
-	        USAGE( EXIT_FAILURE );
+	        findFile(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {
+
+	        fprintf(stderr, "Cannot locate scheme file `%s'\n",
+	                pOptDesc->optArg.argString);
+	        USAGE(EXIT_FAILURE);
 	    }
 
 	    pz = aprf( "(load \"%s\")", zPath );
@@ -323,20 +324,21 @@ flag = {
 	_EOF_;
 
     flag-code = <<-  _EOF_
-	    void* hdl = dlopen( pOptDesc->pzLastArg, RTLD_NOW|RTLD_GLOBAL );
+	    void* hdl = dlopen(
+	        pOptDesc->optArg.argString, RTLD_NOW|RTLD_GLOBAL);
 	    init_proc_t* proc;
 
 	    if (hdl == NULL) {
 	        char const* pzErr = dlerror();
-	        fprintf( stderr, "dlopen(%s) error %d\n%s\n",
-	                 pOptDesc->pzLastArg, errno, pzErr );
-	        exit( EXIT_FAILURE );
+	        fprintf(stderr, "dlopen(%s) error %d\n%s\n",
+	                pOptDesc->optArg.argString, errno, pzErr);
+	        exit(EXIT_FAILURE);
 	    }
 	    proc = (init_proc_t*)dlsym( hdl, "scm_init" );
 	    if (proc == NULL) {
-	        fprintf( stderr, "dlsym(scm_init) not found in %s\n"
-	                 "\tyou must initialize the library yourself\n",
-	                 pOptDesc->pzLastArg );
+	        fprintf(stderr, "dlsym(scm_init) not found in %s\n"
+	                "\tyou must initialize the library yourself\n",
+	                pOptDesc->optArg.argString);
 	    }
 	    else (*proc)();
 	_EOF_;
@@ -382,9 +384,9 @@ flag = {
 	specification in the @ref{pseudo macro} section of the info doc.
 	_EOF_;
     flag-code = <<- _EOF_
-	    if (  (pOptDesc->pzLastArg != NULL)
-	       && (*(pOptDesc->pzLastArg) != NUL))
-	        (void)doSuffixSpec( pOptDesc->pzLastArg, NULL, -1 );
+	    if (  (pOptDesc->optArg.argString != NULL)
+	       && (*(pOptDesc->optArg.argString) != NUL))
+	        (void)doSuffixSpec( pOptDesc->optArg.argString, NULL, -1 );
 	_EOF_;
 #else
     stack-arg;
@@ -592,7 +594,7 @@ flag = {
 	_EOF_;
 
     flag-code = <<- FLAG_CODE_END
-	    char const * fname = pOptDesc->pzLastArg;
+	    char const * fname = pOptDesc->optArg.argString;
 	    trace_is_to_pipe = (*fname == '|');
 	    if (trace_is_to_pipe)
 	        pfTrace = popen(++fname, "w");

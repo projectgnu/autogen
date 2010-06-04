@@ -22,7 +22,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: 2327efd536d312fb8d09d83ee28f868b3fba810b $
 ## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test

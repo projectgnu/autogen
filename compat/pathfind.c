@@ -7,7 +7,7 @@
  * Time-stamp:       "2006-09-23 19:46:16 bkorb"
  *            by: bkorb
  *
- * $Id$
+ * $Id: 8ce7ddfe2378f0b75c91c0ab348a6ad81634fb01 $
  */
 
 /* Code: */

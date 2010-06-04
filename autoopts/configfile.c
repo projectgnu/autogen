@@ -1,6 +1,6 @@
 /*
- *  $Id$
- *  Time-stamp:      "2010-02-24 08:41:20 bkorb"
+ *  $Id: f1650b45a91ec95af830ff76041cc4f0048e60f0 $
+ *  Time-stamp:      "2010-04-24 12:57:03 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -416,6 +416,7 @@ filePreset(
 {
     tmap_info_t   cfgfile;
     tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
+    tAoUL         st_flags = optst.flags;
     char*         pzFileText =
         text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
 
@@ -423,7 +424,7 @@ filePreset(
         return;
 
     if (direction == DIRECTION_CALLED) {
-        optst.flags = OPTST_DEFINED;
+        st_flags = OPTST_DEFINED;
         direction   = DIRECTION_PROCESS;
     }
 
@@ -434,9 +435,10 @@ filePreset(
      *  and we consider stuff set herein to be "set" by the client program.
      */
     if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
-        optst.flags = OPTST_SET;
+        st_flags = OPTST_SET;
 
     do  {
+        optst.flags = st_flags;
         while (IS_WHITESPACE_CHAR(*pzFileText))  pzFileText++;
 
         if (IS_VAR_FIRST_CHAR(*pzFileText)) {

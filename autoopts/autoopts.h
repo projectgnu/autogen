@@ -1,8 +1,8 @@
 
 /*
- *  Time-stamp:      "2010-02-24 08:41:24 bkorb"
+ *  Time-stamp:      "2010-04-24 14:17:25 bkorb"
  *
- *  autoopts.h  $Id$
+ *  autoopts.h  $Id: d5e30331d37ca10ec88c592d24d8615dd6c1f0ee $
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -114,6 +114,9 @@ typedef int tSuccess;
 #define SUCCESSFUL( p )         SUCCEEDED( p )
 #define FAILED( p )             ((p) <  SUCCESS)
 #define HADGLITCH( p )          ((p) >  SUCCESS)
+
+#define ShellAsString(_s)  #_s
+#define DEFAULT_SHELL ShellAsString(CONFIG_SHELL)
 
 /*
  *  When loading a line (or block) of text as an option, the value can

@@ -2,7 +2,7 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2010-02-24 08:41:26 bkorb"
+## Time-stamp:      "2010-04-24 13:59:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@ in=autoopts-config.in
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: c3e5163c239a3a3daf6cbae2d646539907b92d85 $
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.
@@ -237,7 +237,7 @@ MACROS:
 DEFINE script-preamble
 
 \=]
-#! @BOOTSTRAP_SHELL@
+#! @CONFIG_SHELL@
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##

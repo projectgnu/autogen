@@ -1,9 +1,9 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id$
+# $Id: 7db8b4b6535be82d284d01fa24deb5844d86f022 $
 #
-# Time-stamp:        "2010-02-24 08:41:31 bkorb"
+# Time-stamp:        "2010-03-03 15:52:26 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -86,9 +86,9 @@ cat >&3 <<- _EOF_
 
 	AutoOpts is both an example of that and a project in its own right.
 	It is a very powerful configuration file, environment variable and
-	command line option parser consisting of a set of AutoGen templates
-	and a run time library that nearly eliminates the hassle of managing,
-	parsing and documenting program options.
+	command line option management tool consisting of a set of AutoGen
+	templates and a run time library that nearly eliminates the hassle
+	of managing, parsing and documenting program options.
 
 	The self-referential example:
 	http://www.gnu.org/software/${project}/man1-autogen.html

@@ -1,6 +1,6 @@
 
 /*
- *  $Id$
+ *  $Id: f0ececd5fec43bacb417d7b50294accc2121923f $
  *  Time-stamp:      "2010-02-24 08:41:13 bkorb"
  *
  *  This file contains the routines that deal with processing text strings

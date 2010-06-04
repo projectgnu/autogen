@@ -1,6 +1,6 @@
 
 /*
- *  usage.c  $Id$
+ *  usage.c  $Id: f611ee45aa9aa8dc102b8acf6b4bc568c60fa99f $
  * Time-stamp:      "2010-02-24 08:39:39 bkorb"
  *
  *  This module implements the default usage procedure for

@@ -23,7 +23,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id$
+# $Id: 7f83efb793b8d3a1e0207ff08d7fd9ca904049c1 $
 # ----------------------------------------------------------------------
 
 if gperf --version > /dev/null 2>&1

@@ -28,7 +28,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id$
+# $Id: 3c2120736ffdeed375debd13da0deca0fc58d480 $
 # ----------------------------------------------------------------------
 
 . ./defs

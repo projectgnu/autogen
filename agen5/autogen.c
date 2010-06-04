@@ -1,7 +1,7 @@
 
 /*
  *  autogen.c
- *  $Id$
+ *  $Id: 039dc46983b320ee9be6d2c102aaa3d4e350caee $
  *
  *  Time-stamp:        "2010-02-24 08:43:36 bkorb"
  *

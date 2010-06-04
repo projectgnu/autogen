@@ -1,6 +1,6 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
 # Time-stamp:      "2010-02-25 16:18:16 bkorb"
-# $Id$
+# $Id: 8e48c8e585077124e82975c1ea5d3d939f73f32b $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

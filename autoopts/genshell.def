@@ -2,7 +2,7 @@
 autogen definitions options;
 
 /*
- * $Id$
+ * $Id: 94a36fe43eb99bbf1b50c52f452a77602da77466 $
  * Time-stamp:      "2010-02-24 08:41:16 bkorb"
  *
  *  This module generates shell scripts with AutoOpts supported command line

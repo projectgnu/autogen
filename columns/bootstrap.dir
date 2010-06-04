@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id$
+# @(#) $Id: 8c4943587f025840126cdb9e90ffb867f57543a8 $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.

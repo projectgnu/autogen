@@ -2,7 +2,7 @@
 
 ## agman3.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-02-24 08:41:27 bkorb"
+## Time-stamp:      "2010-04-04 11:10:59 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##              by: bkorb
 ##
@@ -27,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: b6ec415b453f06e5e1218b74bc047b11f33ffde6 $
 ## ---------------------------------------------------------------------
 
 null
@@ -66,7 +66,6 @@ FOR export_func                +}{+
 (dne ".\\\"  ")
 
 +}
-.\"
 .SH NAME
 {+name+} - {+what+}
 .sp 1

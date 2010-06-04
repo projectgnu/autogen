@@ -1,7 +1,7 @@
 
 /*
  *  scmStrings.c
- *  $Id$
+ *  $Id: 89d3f09e74297c6d10003a58d8d8e5b50cda518e $
  *  Temporary SCM strings.
  *
  * Time-stamp:        "2010-02-24 08:42:04 bkorb"

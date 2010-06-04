@@ -23,7 +23,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id$
+# $Id: 5721aaf7547dd90db4a32cee1f0ff9c906afdbb7 $
 # ----------------------------------------------------------------------
 
 # Make sure srcdir is an absolute path.  Supply the variable

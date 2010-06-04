@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 12:33:49 bkorb"
+# Time-stamp:        "2010-04-24 14:26:52 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -133,11 +133,13 @@ set_defaults()
         while read var prog dir
         do
             test -n ${#dir} && set_exe_var
-        done ) <<- EOF
-		AG  ${AGnam-autogen}  ${builddir}
-		GD  ${GDnam-getdefs}  ${builddir}/../getdefs
-		CL  ${CLnam-columns}  ${builddir}/../columns
-		EOF
+        done <<- EOF
+
+	AG  ${AGnam-autogen}  ${builddir}
+	GD  ${GDnam-getdefs}  ${builddir}/../getdefs
+	CL  ${CLnam-columns}  ${builddir}/../columns
+	EOF
+    )
 
     ${VERBOSE:-false} && set -x || :
     #  Ensure complete success or a noticable failure

@@ -19,7 +19,7 @@ set -x
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: 590362bb5b584e47642d9cd27b21f57a5cb44477 $
 ## ---------------------------------------------------------------------
 ## Code:
 

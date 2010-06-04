@@ -1,6 +1,6 @@
 
 /*
- *  $Id$
+ *  $Id: 4d5a608655c544c41dfdbfda992be307942f7cf4 $
  *
  *  Time-stamp:        "2010-02-24 08:42:07 bkorb"
  *

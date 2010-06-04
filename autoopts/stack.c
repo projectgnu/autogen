@@ -1,7 +1,7 @@
 
 /*
  *  stack.c
- *  $Id$
+ *  $Id: 9d4a7c1c6ae364a6134dc5ff01f58f08b52f1a16 $
  *  Time-stamp:      "2010-02-24 08:40:15 bkorb"
  *
  *  This is a special option processing routine that will save the

@@ -1,7 +1,7 @@
 
 /*
  *  agUtils.c
- *  $Id$
+ *  $Id: c2b939af0e5d78a17956ed485b79d6d2be85100e $
  *
  *  Time-stamp:        "2010-02-24 08:43:36 bkorb"
  *

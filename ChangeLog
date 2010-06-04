@@ -1,3 +1,18 @@
+2010-06-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c (openServer): initialize chId.
+	* agen5/bootstrap.dir (set_defaults): some shells do not handle here doc
+	input to a subshell very well.
+	* agen5/opts.def: use "optArg.argString" in preference to pzLastArg
+	* agen5/tpProcess.c (openOutFile): if output is being redirected to "null",
+	then be sure to not remove write permissions.  An unwritable /dev/null is bad.
+	* columns/opts.def: also
+	* xml2ag/xmlopts.def: also
+	* autoopts/autoopts.h (DEFAULT_SHELL): Just default to /bin/sh.
+	* autoopts/makeshell.c (optionParseShell): ditto -- rest of work
+	* autoopts/configfile.c (filePreset): make sure the flags get reset
+	on each iteration.
+
 2010-03-01  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/Makefile.am: strip out libguile

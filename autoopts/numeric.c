@@ -1,6 +1,6 @@
 
 /*
- *  $Id$
+ *  $Id: 52d772d69bed7f2911d88ff17b9a44308d6ca0b1 $
  *  Time-stamp:      "2010-02-24 08:41:11 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.

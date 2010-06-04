@@ -26,7 +26,7 @@
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id$
+# $Id: 2ff1cb5e6269c26d1cae751b09217f12a39efac2 $
 # ----------------------------------------------------------------------
 
 exec 9>&2

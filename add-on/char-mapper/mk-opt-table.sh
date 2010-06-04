@@ -1,6 +1,6 @@
 #! /bin/bash
 #  mk-opt-table.sh
-#  $Id$
+#  $Id:$
 #
 #  Time-stamp:        "2010-02-24 08:43:43 bkorb"
 #  Last Committed:    $Date: 2009/08/01 14:05:00 $

@@ -23,7 +23,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id$
+# $Id: 281e00f0f785690a1ed5e6db3c74769e05493e5d $
 # ----------------------------------------------------------------------
 
 tdir=$( (mktemp -d $PWD/.daemon-XXXXXX.d) 2>/dev/null)

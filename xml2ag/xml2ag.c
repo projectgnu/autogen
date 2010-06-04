@@ -1,7 +1,7 @@
 
 /*
  *  xml2ag.c
- *  $Id$
+ *  $Id: 42a2b364bc9b7c67c66fc0b4e327b86dde82decb $
  *  Time-stamp:         "2010-02-24 08:37:04 bkorb"
  *
  *  This is the main routine for xml2ag.

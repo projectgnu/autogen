@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id$
+# @(#) $Id: 6a84c9d1bdb7c92ad4db66c3b5c2f9f55b3a7dd3 $
 # ----------------------------------------------------------------------
 
 # This file contains various utility functions for the "bootstrap" scripts

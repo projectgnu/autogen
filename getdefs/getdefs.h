@@ -1,6 +1,6 @@
 /*  -*- Mode: C -*-
  *
- *  $Id$
+ *  $Id: 49f72e416065ebd9b410d5a43e13c22514761482 $
  *
  *    getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *

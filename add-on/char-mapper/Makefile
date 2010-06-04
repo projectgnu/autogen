@@ -1,7 +1,7 @@
 
 # char-mapper Makefile
 #
-# $Id$
+# $Id:$
 
            TOP = ../..
            SRC = char-mapper.c cm-opt.c

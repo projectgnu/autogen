@@ -3,7 +3,7 @@
  *
  *  Time-stamp:        "2010-02-24 08:43:01 bkorb"
  *
- *  $Id$
+ *  $Id: 7ddd5da070a94192b70d904243228ab6b5915e61 $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.

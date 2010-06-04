@@ -24,7 +24,7 @@ html
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
 
-  ==  $Id$
+  ==  $Id: 6bce3c50dcdc6d22985286fe89a7ebcb54919b37 $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "

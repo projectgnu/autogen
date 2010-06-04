@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id$
+ *  agInit.c  $Id: 3f9ebdee71c3b4b4df7d66ca617e124586188b27 $
  *
- *  Time-stamp:      "2010-02-25 14:17:32 bkorb"
+ *  Time-stamp:      "2010-04-20 07:21:20 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -129,13 +129,10 @@ initialize( int arg_ct, char** arg_vec )
         return;
 
     if (0) {
-        tSCC zDevNull[] =
-#ifndef DEBUG_ENABLED
-            "/dev/null";
-#else
-            "/tmp/AutoGenDebug.txt";
+#ifdef DEBUG_ENABLED
+        tSCC zDevNull[] = "/tmp/AutoGenDebug.txt";
 #endif /* DEBUG_ENABLED */
-        becomeDaemon( "/", zDevNull, zDevNull, zDevNull );
+        becomeDaemon("/", zDevNull, zDevNull, zDevNull);
     }
 
     {

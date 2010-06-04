@@ -1,5 +1,5 @@
 /*
- *  $Id$
+ *  $Id: 6d52e6abaefa9e965f3e09dcf94c4efd98f4b44a $
  *
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *

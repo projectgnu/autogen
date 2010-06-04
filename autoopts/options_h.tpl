@@ -2,8 +2,8 @@
 
 h=options.h
 
-# Time-stamp:      "2010-02-25 16:03:27 bkorb"
-# ID:  $Id$
+# Time-stamp:      "2010-03-04 16:13:57 bkorb"
+# ID:  $Id: 76a42e5e31432fc6841d7e720693f708ebd236b5 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -269,6 +269,8 @@ typedef union {
     int             argFd;
 } optArgBucket_t;
 
+#define             pzLastArg   optArg.argString
+
 /*
  *  Descriptor structure for each option.
  *  Only the fields marked "PUBLIC" are for public use.
@@ -287,7 +289,6 @@ struct optDesc {
     tAoUI           fOptState;        /* PUBLIC */
     tAoUI           reserved;
     optArgBucket_t  optArg;           /* PUBLIC */
-#   define          pzLastArg   optArg.argString
     void*           optCookie;        /* PUBLIC */
 
     int const * const   pOptMust;

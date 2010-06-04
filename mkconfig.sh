@@ -24,7 +24,7 @@ timestamp=$(set -- \
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id$
+# @(#) $Id: 5f0abc8edac7b2420ce9a536ca4c235716e5f47f $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;

@@ -1,10 +1,10 @@
 /*
  *  agTempl.c
- *  $Id$
+ *  $Id: 3ba9563a24d217b0f13ef2d4466a3dae57a57e7e $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-02-24 08:41:32 bkorb"
+ * Time-stamp:        "2010-04-20 07:14:09 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -318,7 +318,7 @@ openOutFile(tOutSpec* pOutSpec)
     char const * pzOutFile = NULL;
 
     if (strcmp( pOutSpec->zSuffix, "null" ) == 0) {
-        static int const flags = FPF_NOUNLINK;
+        static int const flags = FPF_NOUNLINK | FPF_NOCHMOD;
     null_open:
         open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
         return;

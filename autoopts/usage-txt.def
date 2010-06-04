@@ -30,7 +30,7 @@ AutoGen Definitions usage-txt.tpl; /* -*- Mode: C -*- */
 
    IF okay:  mv -f usage-txt.sort usage-txt.def
 
-   $Id$
+   $Id: 62ede0b8edf2a443713310754f64f9a941669c49 $
  */
 
 /*

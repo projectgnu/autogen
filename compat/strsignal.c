@@ -44,7 +44,7 @@
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
  *
- *  $Id$
+ *  $Id: 9eb8fc7fa93d9ec85e61670a1b3d899809df2d91 $
  */
 
 #include "compat.h"

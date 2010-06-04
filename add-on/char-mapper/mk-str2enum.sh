@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#  $Id$
+#  $Id:$
 #  Time-stamp:        "2010-02-24 08:43:42 bkorb"
 #  Last Committed:    $Date: 2009/08/01 14:05:00 $
 #

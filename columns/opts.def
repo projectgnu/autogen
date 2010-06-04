@@ -1,8 +1,8 @@
 autogen definitions options;
 
 /*
- *  $Id$
- *  Time-stamp:        "2010-02-24 08:39:30 bkorb"
+ *  $Id: 4bf0b296e197fc69081911927872602eb7ad6183 $
+ *  Time-stamp:        "2010-03-04 16:29:47 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
@@ -241,13 +241,16 @@ flag = {
     arg-type    = string;
     arg-name    = file;
     descrip     = "Input file (if not stdin)";
-    flag-code   =
-'    FILE* fp = freopen( pOptDesc->pzLastArg, "r" FOPEN_BINARY_FLAG, stdin );
-    if (fp == (FILE*)NULL) {
-        fprintf( stderr, "Error %d (%s) opening %s\n",
-                 errno, strerror( errno ), pOptDesc->pzLastArg );
-        USAGE( EXIT_FAILURE );
-    }';
+    flag-code   = <<- _EODoc_
+	    FILE* fp = freopen(
+	        pOptDesc->optArg.argString, "r" FOPEN_BINARY_FLAG, stdin);
+
+	    if (fp == (FILE*)NULL) {
+	        fprintf(stderr, "Error %d (%s) opening %s\n",
+	                errno, strerror(errno), pOptDesc->optArg.argString);
+	        USAGE(EXIT_FAILURE);
+	    }
+	_EODoc_;
     doc         = <<- _EODoc_
 	This program normally runs as a @code{filter}, reading from standard
 	input, columnizing and writing to standard out.  This option redirects

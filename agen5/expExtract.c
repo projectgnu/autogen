@@ -1,6 +1,6 @@
 /*
  *  expExtract.c
- *  $Id$
+ *  $Id: b0aa043fd2b6e059b32d38f6fb79b02503e9ccf6 $
  *
  *  Time-stamp:        "2010-02-24 08:43:02 bkorb"
  *

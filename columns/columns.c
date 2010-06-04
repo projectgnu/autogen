@@ -1,7 +1,7 @@
 
 /*
  *  columns.c
- *  $Id$
+ *  $Id: 4c61808f04105af6eb01ca5bfd13678cd6754969 $
  *  Time-stamp:        "2010-02-24 08:39:31 bkorb"
  *
  *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved

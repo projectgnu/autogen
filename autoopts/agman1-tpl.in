@@ -2,7 +2,7 @@
 
 ## agman1.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-02-24 08:41:28 bkorb"
+## Time-stamp:      "2010-04-04 11:11:04 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##              by: bkorb
 ##
@@ -27,7 +27,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id$
+## $Id: 203cabc252a022d3ca3ed1fd5a8720f3bb832fc2 $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1

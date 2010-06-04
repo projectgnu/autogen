@@ -2,7 +2,7 @@
 
 autogen definitions options;
 
-// Time-stamp:        "2010-02-24 08:36:48 bkorb"
+// Time-stamp:        "2010-03-04 16:19:54 bkorb"
 
 /*
  *  This file is part of AutoGen.
@@ -61,13 +61,13 @@ flag = {
     "However, you may save the definitions to a file instead.";
 
     flag_code = <<- FLAG_CODE_END
-	    if (strcmp( pOptDesc->pzLastArg, "-" ) == 0)
+	    if (strcmp(pOptDesc->optArg.argString, "-") == 0)
 	        return;
 
-	    if (freopen( pOptDesc->pzLastArg, "w", stdout ) == NULL) {
-	        fprintf( stderr, "Error %d (%s) opening `%s' for output",
-	                 errno, strerror( errno ), pOptDesc->pzLastArg );
-	        exit( EXIT_FAILURE );
+	    if (freopen(pOptDesc->optArg.argString, "w", stdout) == NULL) {
+	        fprintf(stderr, "Error %d (%s) opening `%s' for output",
+	                errno, strerror(errno), pOptDesc->optArg.argString);
+	        exit(EXIT_FAILURE);
 	    }
 	FLAG_CODE_END ;
 };
