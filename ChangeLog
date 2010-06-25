@@ -1,3 +1,8 @@
+2010-06-23  Bruce Korb  <bkorb@gnu.org>
+
+	* add-on/char-mapper/mk-str2enum.sh: add fallback in case mktemp
+	is not available.
+
 2010-06-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c (openServer): initialize chId.
@@ -29,7 +34,7 @@
 	* agen5/autogen.c (doneCheck): flush stdout/stderr before _exit() call
 	* agen5/test/html.test: test output content instead of exit code for
 	CGI service failure
-	* autoopts/test/getopt.test: cope with unexpanded $Id$
+	* autoopts/test/getopt.test: cope with unexpanded $Id: d600bfdda7644eaadc2144a36f01c4c5200793cb $
 	* config/bootstrap: configure.in renamed to configure.ac
 	* agen5/bootstrap.dir: de-duplicate some code
 	* columns/bootstrap.dir: ditto

@@ -1,7 +1,7 @@
 #! /bin/bash
 
-#  $Id:$
-#  Time-stamp:        "2010-02-24 08:43:42 bkorb"
+#  $Id: 4149e7b722c281c5495476c4b74d684cb3a87852 $
+#  Time-stamp:        "2010-06-25 12:58:34 bkorb"
 #  Last Committed:    $Date: 2009/08/01 14:05:00 $
 #
 #  This file is part of char-mapper.
@@ -172,8 +172,15 @@ init() {
         tr A-Z- a-z_ | sed 's/[^a-z0-9_].*//')
     base_file_name=$(echo ${base_name} | sed 's/_/-/g')
 
-    tmpdir=$(/bin/mktemp -d ${TMPDIR:-/tmp}/${base_file_name}-XXXXXX) || \
-        die "cannot make temp dir"
+    if which mktemp > /dev/null 2>&1
+    then
+        tmpdir=$(mktemp -d ${TMPDIR:-/tmp}/${base_file_name}-XXXXXX) || \
+            die "cannot make temp dir"
+    else
+        tmpdir=${TMPDIR:-/tmp}/${base_file_name}-$$
+        mkdir ${tmpdir}
+    fi
+
     test -d ${tmpdir} || die "did not make temp directory ${tmpdir}"
 
     case "$-" in

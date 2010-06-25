@@ -1,7 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: 7222da5c06f75a8a398e634b16e5c6ff3f2c29a0 $
-# Time-stamp:        "2010-03-01 15:58:53 bkorb"
+# $Id: a2b9e8eaa800a413f9001a69c45d77f6be51f7d7 $
+# Time-stamp:        "2010-06-25 13:31:42 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -117,7 +117,7 @@ static char const zSchemeInit[= (set! tmp-txt (shell
      -e '/^;/d;/^$/d' ${srcdir}/schemedef.scm" ))
 
 (emit (sprintf "[%d] =\n" (+ (string-length tmp-txt) 1)))
-(kr-string tmp-txt) =]; /* ' // " // */
+(kr-string tmp-txt) =]; /* # ' // " // */
 
 #if defined(SHELL_ENABLED)
 /*
