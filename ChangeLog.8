@@ -1,3 +1,70 @@
+
+2009-07-31  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/*.c: trim lines to 80 columns
+	* agen5/expFormat.c (dne): add autogen version to DNE function
+	* autoopts/optlib.tpl: add "(c)" symbol to copyright note.
+
+2009-07-23  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/file.c (optionFileCheck): there may not be a DIRCH in the
+	file name.  Validate "p" before dereferencing.
+	* autoopts/numeric.c (optionNumericVal):  Also enxure the pOD
+	pointer is not NULL before dereferencing it.
+
+2009-07-22  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h (SCRIBBLE_SIZE): define it
+	* agen5/agInit.c (SCRIBBLE_SIZE): use #define for size of scribble space
+	* agen5/agUtils.c: ditto
+	* agen5/defFind.c: again
+	* agen5/expOutput.c: again
+	* agen5/expString.c: again
+	* agen5/funcCase.c: again
+	* agen5/expFormat.c (ag_scm_dne): get correct file name, and
+	SCRIBBLE_SIZE again
+	* autoopts/environment.c (doEnvPresets): 2 no-op vals for save_opts.
+	* autoopts/save.c (findDirName): also
+
+2009-05-17  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.8 release
+
+2009-01-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (nextOption): too large, split it up.
+	* autoopts/environment.c (doPrognameEnv): remove redundant test,
+	clarify the processing for the various settings of "type".
+	* autoopts/numeric.c (optionShowRange): clean up indentation
+	* autoopts/opt-state.def (deprecated): new option attribute
+	(no-usage): three flag bits now suppress option description.
+	* autoopts/optcode.tpl (disable-load): suppress stuff when present
+	(disable-save): similar
+	* autoopts/opthead.tpl: ditto, plus code cleanup
+	* autoopts/optlib.tpl: more of same
+	* autoopts/proc-state.def (has-immed): removed.  Not used.
+	* getdefs/*.c: add "die()" function and use it throughout.
+	* autoopts/configfile.c (internalFileLoad): turn off error stops when
+	processing config files.
+	* autoopts/optcode.tpl (save-opts): no value with disable-save attr.
+	(load-opts): no value with disable-load attr.
+	* autoopts/test/rc.test: test these disable-load/save things.
+	* columns/columns.c: clean up error messages
+
+2009-01-08  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def (wchar_t): someone says they still need this for
+	the libopts tear-off library.  wchar_t is no longer used there. ???
+
+2009-01-07  Leo Davis  <ldav1s@users.sourceforge.net>
+
+	* autoopts/usage.tpl: sometimes (on a Mac?), the option in error is
+	not reproduced, so the sed-it-away expression doesn't match.
+	* agen5/test/error.test: cope with guile 1.6.4 error messages
+	* autoopts/configfile.c (handleStructure): correct the place where
+	the argument type is found.
+	* autoopts/usage.tpl: sometimes (when?) the bad option is not printed.
+
 2008-12-31  Bruce Korb  <bkorb@gnu.org>
 
 	5.9.7 release
@@ -5,9 +72,9 @@
 2008-12-29  Leo Davis  <ldav1s@users.sourceforge.net>
 
         * autoopts/test/nested.test: Mac OS/X requires ``-e'' with its sed.
-	
+
 2008-12-28  Bruce Korb  <bkorb@gnu.org>
-	
+
 	* agen5/defFind.c (hash_name_t): new structure for hashing the looked
 	up define names
 	(hash_string): new
@@ -26,7 +93,7 @@
 
 2008-12-20  Leo Davis  <ldav1s@users.sourceforge.net>
             Bruce Korb  <bkorb@gnu.org>
-	
+
 	* autoopts/getopt.tpl(more-help): thoroughly expunged
 	* autoopts/optcode.tpl(no-libopts): make expunging --more-help possible
 	* autoopts/opthead.tpl: ditto
