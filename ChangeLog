@@ -1,7 +1,44 @@
+2010-06-24  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agInit.c (config_dep): implement code to handle --make-dep opt.
+	Refactor some code.
+	* agen5/agUtils.c: Refactor some code.
+	* agen5/autogen.h: add new variables for emitting make-dep text.
+	* agen5/defDirect.c (doDir_include): add included file name to source list
+	when --make-dep is active
+	* agen5/defLoad.c (readDefines): ditto.
+	* agen5/expExtract.c (loadExtractData): ditto.
+	* agen5/expFormat.c (ag_scm_license): also.
+	* agen5/expGuile.c (ag_scm_string_to_camelcase): new scheme function
+	* agen5/expOutput.c (open_output_file): print output file names to the
+	output dependency file when --make-dep is active.  Add a new flag to
+	suppress this output when the file being created is a temporary.
+	* agen5/opts.def (make-dep): define and document this new option.
+	* agen5/tpLoad.c (append_source_name): new function to add a source file
+	name to a string.
+	(cleanup): add code to print this accreted string and finish the
+	dependency file (when --make-dep is active).
+	* agen5/tpProcess.c (processTemplate): create the dependency file when
+	--make-dep is active.  Start the target file list entry.
+	(closeOutput): make sure our "start time" is one second earlier than
+	the earliest target file we create.
+	* autoopts/autoopts.c (ao_realloc): make sure it is NULL tolerant.
+	* autoopts/bootstrap.dir (source): use "." instead of "source".
+	* columns/bootstrap.dir: ditto
+	* config/bootstrap: ditto
+	* columns/Makefile.am (RUNAG): use new -MF$@ feature for stamp files.
+	* config/bootstrap.shlib (run_ag): ditto
+	* xml2ag/Makefile.am (run_AG): ditto
+	* columns/columns.c (ENDING): implement new option to emit a final
+	string at the end of output, but before final newline.
+	* columns/opts.def (ending): define and document this option
+
 2010-06-23  Bruce Korb  <bkorb@gnu.org>
 
 	* add-on/char-mapper/mk-str2enum.sh: add fallback in case mktemp
 	is not available.
+
+	5.10.2 release
 
 2010-06-03  Bruce Korb  <bkorb@gnu.org>
 

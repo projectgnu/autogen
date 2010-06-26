@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 12:33:51 bkorb"
+# Time-stamp:        "2010-06-26 09:25:03 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: 6a84c9d1bdb7c92ad4db66c3b5c2f9f55b3a7dd3 $
+# @(#) $Id: 47de4aeacc22b6cc829bd0df349aff2f59f79fe7 $
 # ----------------------------------------------------------------------
 
 # This file contains various utility functions for the "bootstrap" scripts
@@ -90,19 +90,22 @@ if ${VERBOSE}
 then
     run_ag()
     {
+        tag=${1} ; shift
         PS4='>run-ag> '
-        tfile='>>'ag-${1}-$$.log
-        shift
+        tfile='>>'ag-${tag}-$$.log
+        tag="-MFstamp-${tag} --trace=every --trace-out=${tfile}"
+
         MALLOC_CHECK_=2 \
-            ${AGexe} --trace=every --trace-out=${tfile} "$@" || \
+            ${AGexe} ${tag} "$@" || \
                 die "FAILED: ${AGexe} $*"
     }
 else
     run_ag()
     {
-        shift
-        echo ${AGexe} "$@"
-        ${AGexe} "$@" || die "FAILED: ${AGexe} $*"
+        tag="-MFstamp-${1}" ; shift
+
+        echo ${AGexe} ${tag} "$@"
+        ${AGexe} ${tag} "$@" || die "FAILED: ${AGexe} $*"
     }
 fi
 
@@ -133,7 +136,6 @@ make_opts()
       then exit 0 ; else exit 1 ; fi
     fi
     run_ag opts -L ${top_srcdir}/autoopts ${DEBUG_OPTS} *opts.def
-    date > stamp-opts
 }
 
 # # # # # # # # # # # # # # # # # # #

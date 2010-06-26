@@ -1,8 +1,8 @@
 
 /*
  *  columns.c
- *  $Id: 4c61808f04105af6eb01ca5bfd13678cd6754969 $
- *  Time-stamp:        "2010-02-24 08:39:31 bkorb"
+ *  $Id: 479628e7d91912f6c7c43b6eb3abacb48274c90f $
+ *  Time-stamp:        "2010-06-26 10:05:13 bkorb"
  *
  *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -246,8 +246,8 @@ readLines(void)
 {
     int   sepLen;
 
-    if (HAVE_OPT( SEPARATION ))
-         sepLen = strlen( OPT_ARG( SEPARATION ));
+    if (HAVE_OPT(SEPARATION))
+         sepLen = strlen(OPT_ARG(SEPARATION));
     else sepLen = 0;
 
 
@@ -312,7 +312,7 @@ readLines(void)
          *  the entries may get reordered.
          */
         if (sepLen > 0)
-            strcat( pzL, OPT_ARG(SEPARATION));
+            strcat(pzL, OPT_ARG(SEPARATION));
 
         if (len > maxEntryWidth)
             maxEntryWidth = len;
@@ -491,10 +491,9 @@ writeColumns( void )
          *  FOR every column except the last,
          *     print the entry with the width format
          *
-         *  No need to worry about referring to a non-existent
-         *  entry.  Only the last column might have that problem,
-         *  and we addressed it above where the column count got
-         *  decremented.
+         *  No need to worry about referring to a non-existent entry.  Only
+         *  the last column might have that problem, and we addressed it above
+         *  where the column count got decremented.
          */
         while (++col < colCt) {
             pzL = *(pPL[col-1].papz++);
@@ -503,9 +502,8 @@ writeColumns( void )
         }
 
         /*
-         *  See if we are on the last row.  If so, then
-         *  this is the last entry.  Strip any separation
-         *  characters, emit the entry and break out.
+         *  See if we are on the last row. If so, then this is the last entry.
+         *  Strip any separation characters, emit the entry and break out.
          */
         if (++row == rowCt) {
             /*
@@ -514,10 +512,14 @@ writeColumns( void )
              */
             if (HAVE_OPT( SEPARATION )) {
                 char* pz = pzE + strlen( pzE )
-                         - strlen( OPT_ARG( SEPARATION ));
+                         - strlen( OPT_ARG(SEPARATION));
                 *pz = NUL;
             }
-            fputs( pzE, stdout );
+
+            fputs(pzE, stdout);
+            if (HAVE_OPT(ENDING))
+                fputs(OPT_ARG(ENDING), stdout);
+
             putc( '\n', stdout );
             break;
         }
@@ -538,25 +540,25 @@ writeColumns( void )
     free(pPL);
 }
 
+static void
+trim_last_separation(void)
+{
+    char* pz = papzLines[ usedCt-1 ];
+    pz += strlen(pz) - strlen( OPT_ARG(SEPARATION));
+    *pz = NUL;
+}
 
 static void
 writeRows( void )
 {
-    char zFmt[ 12 ];
+    char zFmt[32];
     int  colCt;
 
     colCt = columnCt;
     snprintf(zFmt, sizeof(zFmt), "%%-%ds", (int)columnSz);
 
-    /*
-     *  IF we have a separator,
-     *  THEN remove it from the last entry.
-     */
-    if (HAVE_OPT( SEPARATION )) {
-        char* pz = papzLines[ usedCt-1 ];
-        pz += strlen( pz ) - strlen( OPT_ARG( SEPARATION ));
-        *pz = NUL;
-    }
+    if (HAVE_OPT( SEPARATION ))
+        trim_last_separation();
 
     if (pzFirstPfx != NULL) {
         fputs( pzFirstPfx, stdout );
@@ -579,9 +581,12 @@ writeRows( void )
              *  THEN emit it and a new line and break out
              */
             if (--left <= 0) {
-                fputs( pzL, stdout );
-                putc( '\n', stdout );
-                free( (void*)pzL );
+                fputs(pzL, stdout);
+                if (HAVE_OPT(ENDING))
+                    fputs(OPT_ARG(ENDING), stdout);
+
+                putc('\n', stdout);
+                free((void*)pzL);
                 break;
             }
 
@@ -649,13 +654,19 @@ emitWord(char const * word, size_t len, int col)
     return col;
 }
 
-
+/*
+ *  writeFill -- fill the output.  Pack together as much as will fit
+ *  on each line.
+ */
 static void
 writeFill( void )
 {
     char**  ppzLL = papzLines;
     size_t  left  = usedCt;
     int     colNo = 0;
+
+    if (HAVE_OPT( SEPARATION ))
+        trim_last_separation();
 
     if (pzFirstPfx != NULL)
         fputs(pzFirstPfx, stdout);
@@ -672,10 +683,13 @@ writeFill( void )
          *  Blank lines are magical and trigger a blank line in output.
          */
         if (*pzL == NUL) {
-            if (colNo > 0) /* guard against multiple blank lines */
+            if (! HAVE_OPT(SORT)) {
+                if (colNo > 0) /* guard against multiple blank lines */
+                    putc('\n', stdout);
                 putc('\n', stdout);
-            putc('\n', stdout);
-            colNo = -2;
+                colNo = -2;
+            }
+
             free(*(ppzLL++));
             continue;
         }
@@ -702,7 +716,11 @@ writeFill( void )
 
         free(*(ppzLL++));
     }
-    putc( '\n', stdout );
+
+    if (HAVE_OPT(ENDING) && (left == 0))
+        fputs(OPT_ARG(ENDING), stdout);
+
+    putc('\n', stdout);
 }
 
 
@@ -714,7 +732,7 @@ compProc( const void* p1, const void* p2 )
 {
     char const* pz1 = *(char* const*)p1;
     char const* pz2 = *(char* const*)p2;
-    return strcmp( pz1, pz2 );
+    return strcmp(pz1, pz2);
 }
 /*
  * Local Variables:

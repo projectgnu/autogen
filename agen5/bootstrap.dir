@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-04-24 14:26:52 bkorb"
+# Time-stamp:        "2010-06-26 08:25:03 bkorb"
 #            by: bkorb
 ##
 ##  This file is part of AutoGen.
@@ -23,7 +23,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: d15ae5550bf3d55e5d3611625e9a18401b0add80 $
+# @(#) $Id: ba49972b9b07ada80a70d6bdb40ee2edaed34d73 $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -37,7 +37,7 @@
 
 test "X${mainpid}" = X && {
     PS4='>bsl> '
-    source ${top_srcdir}/config/bootstrap.shlib
+    . ${top_srcdir}/config/bootstrap.shlib
     PS4='>bsd> '
     free_trap=true
 } || {
@@ -151,7 +151,7 @@ set_defaults()
 #
 # Make the definition parser
 #
-make_defparse()
+make_parse()
 {
     local PS4=">${FUNCNAME}> "
     local opts=''
@@ -159,9 +159,7 @@ make_defparse()
     test ${#DEBUG_ENABLED} -gt 0 && \
         opts=-DDEBUG_ENABLED
 
-    run_ag defparse ${opts} defParse.def
-
-    date > stamp-parse
+    run_ag parse ${opts} defParse.def
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -175,7 +173,6 @@ make_fsm()
     run_ag pseudo pseudo.def
     run_ag cgi    cgi.def
     rm -f .fsm.*
-    date > stamp-fsm
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -214,10 +211,9 @@ make_exprini()
       egrep -v 'no copies of pattern' >&2
     set -e
     rm -f expr.cfg
-    run_ag expr expr.def
+    run_ag exprini expr.def
     test ${#DEBUGGING_AUTOGEN} -eq 0 -a "$t" != "expr.def" && \
-        rm -f expr.def
-    date > stamp-exprini
+        rm -f expr.def stamp-exprini
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -239,7 +235,6 @@ make_directive()
     ${GDexe} load=directive.cfg ${srcdir}/defDirect.c
     run_ag directive -t30 directive.def
     rm -f directive.def directive.cfg
-    date > stamp-directive
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -253,7 +248,6 @@ make_texi()
 
     eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter -bautogen"
     run_ag texi ${eopt} ${srcdir}/opts.def
-    date > stamp-texi
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -266,16 +260,14 @@ make_man()
     test -z "${CLexe}" && die "Cannot locate columns"
 
     eopt="-L ${top_srcdir}/autoopts"
-    run_ag opts ${eopt} -Tagman1 -bautogen ${srcdir}/opts.def
+    run_ag man ${eopt} -Tagman1 -bautogen ${srcdir}/opts.def
 
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
-    run_ag fmemopen ${eopt} fmemopen.def
+    run_ag fmem ${eopt} fmemopen.def
     rmlist=${rmlist}\ fmemopen.def
-
-    date > stamp-man
 }
 
-make_functions()
+make_func()
 {
     local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" -o -z "${GDexe}" && \
@@ -285,7 +277,7 @@ make_functions()
     local opts='srcfile linenum defs=macfunc listattr=alias'
 
     ${GDexe} output=functions.def template=functions.tpl ${opts} ${files}
-    run_ag functions functions.def
+    run_ag func functions.def
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -303,7 +295,7 @@ do
   case "$t" in
   ( stamp-parse     | \
     defParse-fsm.c  | \
-    defParse-fsm.h  )           make_defparse ;;
+    defParse-fsm.h  )           make_parse ;;
 
   ( stamp-opts      | \
     opts.[ch]       )           make_opts ;;
@@ -329,7 +321,7 @@ do
 
   ( proto.h         )           make_proto ;;
 
-  ( functions.h     )           make_functions ;;
+  ( functions.h     )           make_func ;;
 
   (*) die "Don't know how to make $t" ;;
   esac

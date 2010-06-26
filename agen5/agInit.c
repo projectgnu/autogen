@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: 3f9ebdee71c3b4b4df7d66ca617e124586188b27 $
+ *  agInit.c  $Id: 19ea39febcb6ba18916f499115aba9f49c749593 $
  *
- *  Time-stamp:      "2010-04-20 07:21:20 bkorb"
+ *  Time-stamp:      "2010-06-25 21:17:13 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -25,8 +25,17 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
+static char const *
+make_quote_str(char const * str);
+
 static void
-addSysEnv( char* pzEnvName );
+dep_usage(char const * fmt, ...);
+
+static void
+add_sys_env(char* pzEnvName);
+
+static void
+add_env_vars(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef DAEMON_ENABLED
@@ -60,60 +69,7 @@ initialize( int arg_ct, char** arg_vec )
 
     pzLastScheme = NULL;
     procState = PROC_STATE_OPTIONS;
-    /*
-     *  Set the last resort search directories first (lowest priority)
-     *  The lowest of the low is the config time install data dir.
-     *  Next is the *current* directory of this executable.
-     */
-    SET_OPT_TEMPL_DIRS("$@");
-    SET_OPT_TEMPL_DIRS("$$/../share/autogen");
-
-    {
-        char z[ SCRIBBLE_SIZE ] = "__autogen__";
-#if defined( HAVE_SOLARIS_SYSINFO )
-        static const int nm[] = {
-            SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
-#ifdef      SI_PLATFORM
-            SI_PLATFORM,
-#endif
-            SI_MACHINE };
-        int  ix;
-        long sz;
-
-        addSysEnv( z );
-        for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
-            sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
-            if (sz > 0) {
-                sz += 2;
-                while (z[sz-1] == NUL)  sz--;
-                strcpy( z + sz, "__" );
-                addSysEnv( z );
-            }
-        }
-
-#elif defined( HAVE_UNAME_SYSCALL )
-        struct utsname unm;
-
-        addSysEnv( z );
-        if (uname( &unm ) != 0) {
-            fprintf( stderr, "Error %d (%s) making uname(2) call\n",
-                     errno, strerror( errno ));
-            exit( EXIT_FAILURE );
-        }
-
-        sprintf( z+2, "%s__", unm.sysname );
-        addSysEnv( z );
-
-        sprintf( z+2, "%s__", unm.machine );
-        addSysEnv( z );
-
-        sprintf( z+2, "%s__", unm.nodename );
-        addSysEnv( z );
-#else
-
-        addSysEnv( z );
-#endif
-    }
+    add_env_vars();
 
     doOptions(arg_ct, arg_vec);
 
@@ -147,9 +103,122 @@ initialize( int arg_ct, char** arg_vec )
 #endif /* DAEMON_ENABLED */
 }
 
+static char const *
+make_quote_str(char const * str)
+{
+    size_t sz = strlen(str) + 1;
+    char const * scan = str;
+    char * res;
+
+    for (;;) {
+        char * p = strchr(scan, '$');
+        if (p == NULL)
+            break;
+        sz++;
+        scan = scan + 1;
+    }
+
+    res  = AGALOC(sz, "make target name");
+    scan = res;
+
+    for (;;) {
+        char * p = strchr(str, '$');
+
+        if (p == NULL)
+            break;
+        sz = (p - str) + 1;
+        memcpy(res, str, sz);
+        res += sz;
+        str += sz;
+        *(res++) = '$';
+    }
+
+    strcpy(res, str);
+    return scan;
+}
 
 static void
-addSysEnv( char* pzEnvName )
+dep_usage(char const * fmt, ...)
+{
+    char * msg;
+
+    {
+        va_list ap;
+        va_start(ap, fmt);
+        (void)vasprintf(&msg, fmt, ap);
+        va_end(ap);
+    }
+
+    fprintf(stderr, "invalid make dependency option:  %s", msg);
+    USAGE(EXIT_FAILURE);
+}
+
+LOCAL void
+config_dep(tOptions* pOptions, tOptDesc* pOptDesc)
+{
+    static char const dup_targ[] = "duplicate make target";
+
+    char const * popt = pOptDesc->optArg.argString;
+
+    /*
+     *  The option argument is optional.  Make sure we have one.
+     */
+    if (popt == NULL)
+        return;
+
+    while (*popt == 'M')  popt++;
+
+retry:
+
+    switch (*popt) {
+    case ' ': case '\t': case '\r': case '\n':
+        while (isspace((int)*(++popt)))  ;
+        goto retry;
+
+    case 'Q':
+        if (pzDepTarget != NULL)
+            dep_usage(dup_targ);
+
+        while (isspace((int)*(++popt)))  ;
+        pzDepTarget = make_quote_str(popt);
+        break;
+
+    case 'T':
+        if (pzDepTarget != NULL)
+            dep_usage(dup_targ);
+
+        while (isspace((int)*(++popt)))  ;
+        AGDUPSTR(pzDepTarget, popt, "make target name");
+        break;
+
+    case 'D':
+    case 'G':
+    case NUL:
+        /*
+         *  'D' and 'G' make sense to GCC, not us.  Ignore 'em.  If we
+         *  found a NUL byte, then we found -MM on the command line.
+         */
+        break;
+
+    case 'F':
+        if (pzDepFile != NULL)
+            dep_usage(dup_targ);
+
+        while (isspace((int)*(++popt)))  ;
+        AGDUPSTR(pzDepFile, popt, "dep file");
+        break;
+
+    case 'P':
+        dep_phonies = AG_TRUE;
+        break;
+
+    default:
+        dep_usage("unknown dependency type:  %s", popt);
+    }
+}
+
+static void
+add_sys_env(char* pzEnvName)
 {
     tSCC zFmt[] = "%s=1";
     int i = 2;
@@ -179,6 +248,64 @@ addSysEnv( char* pzEnvName )
     }
 }
 
+static void
+add_env_vars(void)
+{
+    /*
+     *  Set the last resort search directories first (lowest priority)
+     *  The lowest of the low is the config time install data dir.
+     *  Next is the *current* directory of this executable.
+     */
+    SET_OPT_TEMPL_DIRS("$@");
+    SET_OPT_TEMPL_DIRS("$$/../share/autogen");
+
+    {
+        char z[ SCRIBBLE_SIZE ] = "__autogen__";
+#if defined( HAVE_SOLARIS_SYSINFO )
+        static const int nm[] = {
+            SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
+#ifdef      SI_PLATFORM
+            SI_PLATFORM,
+#endif
+            SI_MACHINE };
+        int  ix;
+        long sz;
+
+        add_sys_env( z );
+        for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
+            sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
+            if (sz > 0) {
+                sz += 2;
+                while (z[sz-1] == NUL)  sz--;
+                strcpy( z + sz, "__" );
+                add_sys_env( z );
+            }
+        }
+
+#elif defined( HAVE_UNAME_SYSCALL )
+        struct utsname unm;
+
+        add_sys_env( z );
+        if (uname( &unm ) != 0) {
+            fprintf( stderr, "Error %d (%s) making uname(2) call\n",
+                     errno, strerror( errno ));
+            exit( EXIT_FAILURE );
+        }
+
+        sprintf( z+2, "%s__", unm.sysname );
+        add_sys_env( z );
+
+        sprintf( z+2, "%s__", unm.machine );
+        add_sys_env( z );
+
+        sprintf( z+2, "%s__", unm.nodename );
+        add_sys_env( z );
+#else
+
+        add_sys_env( z );
+#endif
+    }
+}
 
 #ifdef DAEMON_ENABLED
 

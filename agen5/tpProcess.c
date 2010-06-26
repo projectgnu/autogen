@@ -1,10 +1,10 @@
 /*
  *  agTempl.c
- *  $Id: 3ba9563a24d217b0f13ef2d4466a3dae57a57e7e $
+ *  $Id: 70e4ba8738e0ec5d0395ad0f17dc79ba9a116a2c $
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-04-20 07:14:09 bkorb"
+ * Time-stamp:        "2010-06-25 20:31:58 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -182,6 +182,28 @@ processTemplate( tTemplate* pTF )
         return;
     }
 
+    if (pfDepends != NULL) {
+        static char const tfmt[] = "%s_%s";
+        #define agnm autogenOptions.pzPROGNAME
+
+        char * pz = (char*)(void*)OPT_ARG(BASE_NAME);
+        size_t sz = strlen(agnm) + strlen(pz) + sizeof(tfmt) - 4;
+
+        pzTargetList = AGALOC(sz, "mk targ list");
+        sprintf((char *)pzTargetList, tfmt, agnm, pz);
+
+        pz = (char *)pzTargetList;
+        for (;;) {
+            unsigned int ch = (unsigned int)*(pz++);
+            if (ch == NUL)
+                break;
+            if (! isalnum(ch))
+                pz[-1] = '_';
+        }
+        fprintf(pfDepends, "%s_TList :=", pzTargetList);
+        #undef agnm
+    }
+
     do  {
         tOutSpec*  pOS    = pOutSpecList;
 
@@ -280,8 +302,15 @@ closeOutput( ag_bool purge )
         else {
             struct utimbuf tbuf;
 
-            tbuf.actime  = time( NULL );
+            tbuf.actime  = time(NULL);
             tbuf.modtime = outTime;
+
+            /*
+             *  The putative start time is one second earlier than the
+             *  earliest output file time, regardless of when that is.
+             */
+            if (outTime <= startTime)
+                startTime = outTime - 1;
 
             utime( pCurFp->pzOutName, &tbuf );
         }

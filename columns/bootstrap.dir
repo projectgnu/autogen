@@ -4,7 +4,7 @@
 # columns/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 12:32:55 bkorb"
+# Time-stamp:        "2010-06-25 21:42:55 bkorb"
 #            by: bkorb
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -22,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: 8c4943587f025840126cdb9e90ffb867f57543a8 $
+# @(#) $Id: db16c84318579d4fc9973a0a9775118cc6b3f8cf $
 # ----------------------------------------------------------------------
 
 #  This script rebuilds sources not kept in the CVS repository.
@@ -37,7 +37,7 @@ test -z "$targets" && targets='opts.h proto.h'
 
 test "X${mainpid}" = X && {
     PS4='>bsl> '
-    source ${top_srcdir}/config/bootstrap.shlib
+    . ${top_srcdir}/config/bootstrap.shlib
     PS4='>bsd> '
     free_trap=true
 } || {

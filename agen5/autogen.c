@@ -1,9 +1,9 @@
 
 /*
  *  autogen.c
- *  $Id: 039dc46983b320ee9be6d2c102aaa3d4e350caee $
+ *  $Id: b79cff256c2fdad57fdb50dfac73721c1cfd20fb $
  *
- *  Time-stamp:        "2010-02-24 08:43:36 bkorb"
+ *  Time-stamp:        "2010-06-26 08:05:26 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -38,27 +38,27 @@ static sighandler_proc_t ignoreSignal, abendSignal;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-inner_main( int argc, char** argv );
+inner_main(int argc, char ** argv);
 
 static void
-signalExit( int sig );
+signalExit(int sig);
 
 static void
-abendSignal( int sig );
+abendSignal(int sig);
 
 static void
-ignoreSignal( int sig );
+ignoreSignal(int sig);
 
 static void
-doneCheck( void );
+doneCheck(void);
 
 static void
-signalSetup( sighandler_proc_t* chldHandler,
-             sighandler_proc_t* dfltHandler );
+signalSetup(sighandler_proc_t* chldHandler,
+            sighandler_proc_t* dfltHandler);
 /* = = = END-STATIC-FORWARD = = = */
 
 static void
-inner_main( int argc, char** argv )
+inner_main(int argc, char ** argv)
 {
     atexit(doneCheck);
     initialize( argc, argv );
@@ -89,7 +89,7 @@ inner_main( int argc, char** argv )
 }
 
 int
-main(int argc, char** argv)
+main(int argc, char ** argv)
 {
     optionSaveState(&autogenOptions);
     pfTrace = stderr;
@@ -115,7 +115,7 @@ main(int argc, char** argv)
 }
 
 static void
-signalExit( int sig )
+signalExit(int sig)
 {
     tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
 
@@ -180,7 +180,7 @@ signalExit( int sig )
  *  to the real "main()" procedure and it will call "signalExit()", above.
  */
 static void
-abendSignal( int sig )
+abendSignal(int sig)
 {
     switch (procState) {
     case PROC_STATE_DONE:
@@ -201,7 +201,7 @@ abendSignal( int sig )
  *  The "wait(3)" call will do magical things, but will not override SIGIGN.
  */
 static void
-ignoreSignal( int sig )
+ignoreSignal(int sig)
 {
 #ifdef DEBUG_ENABLED
     fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
@@ -214,7 +214,7 @@ ignoreSignal( int sig )
  *  This is called during normal exit processing.
  */
 static void
-doneCheck( void )
+doneCheck(void)
 {
     tSCC zErr[] =
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
@@ -401,8 +401,8 @@ ag_abend_at( tCC* pzMsg
 
 
 static void
-signalSetup( sighandler_proc_t* chldHandler,
-             sighandler_proc_t* dfltHandler )
+signalSetup(sighandler_proc_t* chldHandler,
+            sighandler_proc_t* dfltHandler)
 {
     struct sigaction  sa;
     int    sigNo  = 1;
@@ -515,7 +515,7 @@ ao_malloc (size_t sz)
 LOCAL void *
 ao_realloc (void *p, size_t sz)
 {
-    void * res = realloc(p, sz);
+    void * res = (p == NULL) ? malloc(sz) : realloc(p, sz);
     if (res == NULL) {
         fprintf(stderr, "realloc of %zd bytes at 0x%p failed\n", sz, p);
         exit( EXIT_FAILURE );

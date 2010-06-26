@@ -1,8 +1,8 @@
 
 /*
- *  $Id: 894017c5ed9c76c4c797d6d60cb977c575f946d5 $
+ *  $Id: 7b5b6a3152ab87de9785082d2d8c5c6590e98383 $
  *
- *  Time-stamp:        "2010-02-24 08:43:00 bkorb"
+ *  Time-stamp:        "2010-06-26 10:36:38 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -498,6 +498,60 @@ ag_scm_string_downcase( SCM str )
     res = AG_SCM_STR2SCM( AG_SCM_CHARS( str ), AG_SCM_STRLEN( str ));
     ag_scm_string_downcase_x( res );
     return res;
+}
+
+
+/*=gfunc string_to_camelcase
+ *
+ * what:   make a string be CamelCase
+ * general_use:
+ *
+ * exparg: str , input/output string
+ *
+ * doc:  Capitalize the first letter of each block of letters and
+ *       strip out characters that are not alphanumerics.
+=*/
+SCM
+ag_scm_string_to_camelcase(SCM str)
+{
+    int   len;
+    char* pzd, * res;
+    char* pzs;
+    ag_bool cap_done = AG_FALSE;
+
+    if (! AG_SCM_STRING_P(str))
+        return SCM_UNDEFINED;
+
+    len = AG_SCM_STRLEN(str);
+    res = pzd = ag_scribble(len + 1);
+    pzs = (char*)(void*)AG_SCM_CHARS(str);
+
+    while (--len >= 0) {
+        unsigned int ch = *(pzs++);
+        if (islower(ch)) {
+            if (! cap_done) {
+                ch = toupper(ch);
+                cap_done = AG_TRUE;
+            }
+
+        } else if (isupper(ch)) {
+            if (cap_done)
+                ch = tolower(ch);
+            else
+                cap_done = AG_TRUE;
+
+        } else if (isdigit(ch)) {
+            cap_done = AG_FALSE;
+
+        } else {
+            cap_done = AG_FALSE;
+            continue;
+        }
+
+        *(pzd++) = ch;
+    }
+
+    return AG_SCM_STR2SCM(res, (pzd - res));
 }
 /*
  * Local Variables:

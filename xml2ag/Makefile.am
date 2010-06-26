@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:37:11 bkorb"
+## Time-stamp:      "2010-06-26 10:18:29 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##              by: bkorb
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 0d576297fe4d92b49cdcb4a70eef1d5f42a45420 $
+## $Id: 8bca9f3f5f0c543e02cf63fd5426daaafeda3b53 $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
@@ -37,13 +37,14 @@ EXTRA_DIST      = xmlopts.def fork.tpl fork.c xml2ag.c
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
-DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) *-stamp
+DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) stamp-*
 INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 AG_ENV          = top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
   PATH=`cd ../columns;pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 
-run_AG = $(AGexe) -L$(top_srcdir)/autoopts --definition=$(srcdir)/xmlopts.def
+run_AG = $(AGexe) -MF$@ -L$(top_srcdir)/autoopts \
+	--definition=$(srcdir)/xmlopts.def
 
 all : gen
 gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
@@ -51,26 +52,27 @@ gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
 x.c : $(csrcs)
 	for f in config.h $(csrcs) ; do echo "#include \"$$f\"" ; done > $@
 
-xmlopts.c $(xml2ag_OBJECTS) : xmlopts.h
-
-xmlopts.h : xmlopts.def $(CLexe)
+xmlopts.c xmlopts.h : stamp-opts
+stamp-opts  : xmlopts.def $(CLexe)
 	$(AG_ENV) ; $(run_AG)
 
-fork.c : fork.tpl xmlopts.def $(CLexe)
-	top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) ; \
-	export top_builddir top_srcdir ; \
-	CLexe=$(CLexe) \
+fork.c      : stamp-fork
+stamp-fork  : fork.tpl xmlopts.def $(CLexe)
+	$(AG_ENV) ; CLexe=$(CLexe) ; export CLexe ; \
 	$(run_AG) -L$(srcdir) -Tfork.tpl
 
-$(DOCFILES) : doc-stamp
-$(CLexe) :
-	cd ../columns ; $(MAKE) $(CLnam)
-
-doc-stamp : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
+$(TARG).texi $(TARG).menu : stamp-texi
+stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(AG_ENV) ; \
-	$(run_AG) -Tagman1 -b$(TARG) ; \
 	$(run_AG) -Taginfo -b$(TARG) -DLEVEL=section
-	@touch $@
+
+$(TARG).1   : stamp-man
+stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
+	$(AG_ENV) ; \
+	$(run_AG) -Tagman1 -b$(TARG)
+
+$(CLexe)    :
+	cd ../columns ; $(MAKE) $(CLnam)
 
 .NOTPARALLEL:
 

@@ -1,7 +1,7 @@
 /*
- *  $Id: 326ac167ad093e03314b60dce5f3b8c43a20555e $
+ *  $Id: 5994903d71d2c9a95c8b890e4aed03e71d09ace0 $
  *
- *  Time-stamp:        "2010-02-24 08:43:06 bkorb"
+ *  Time-stamp:        "2010-06-25 20:29:07 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -321,8 +321,9 @@ readDefines( void )
         pBaseCtx->lineNo     = 1;
         pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
         manageAllocatedData( pBaseCtx );
+
         if (! ENABLED_OPT( SOURCE_TIME ))
-            outTime = time( NULL );
+            outTime = time(NULL);
         return;
     }
 
@@ -347,7 +348,7 @@ readDefines( void )
         }
 
     accept_fifo:
-        outTime  = time( NULL );
+        outTime  = time(NULL);
         dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
         useStdin = AG_TRUE;
     }
@@ -369,7 +370,7 @@ readDefines( void )
 
             errno = EINVAL;
             AG_ABEND( aprf( zCannot, errno, "open non-regular file",
-                            pzDefFile, strerror( errno )));
+                            pzDefFile, strerror(errno)));
         }
 
         /*
@@ -382,7 +383,7 @@ readDefines( void )
 
         if (ENABLED_OPT( SOURCE_TIME ))
              outTime = stbf.st_mtime + 1;
-        else outTime = time( NULL );
+        else outTime = time(NULL);
 
         useStdin = AG_FALSE;
     }
@@ -415,8 +416,11 @@ readDefines( void )
     else {
         fp = fopen( pzDefFile, "r" FOPEN_TEXT_FLAG );
         if (fp == NULL)
-            AG_ABEND( aprf( zCannot, errno, "open",
-                            pzDefFile, strerror( errno )));
+            AG_ABEND(aprf(zCannot, errno, "open",
+                          pzDefFile, strerror( errno )));
+
+        if (pfDepends != NULL)
+            append_source_name(pzDefFile);
     }
 
     /*

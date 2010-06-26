@@ -1,8 +1,8 @@
 /*
  *  defDirect.c
- *  $Id: 10b71032978907924d1725b0b4f3c9d95e83498c $
+ *  $Id: 38e5fb90f04ab3f39e09c70163b943c449c36ecc $
  *
- *  Time-stamp:        "2010-02-24 08:43:08 bkorb"
+ *  Time-stamp:        "2010-06-25 20:32:42 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -756,6 +756,7 @@ doDir_include( char* pzArg, char* pzScan )
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;
     }
+
     if (inclSize == 0)
         return pzScan;
 
@@ -794,6 +795,9 @@ doDir_include( char* pzArg, char* pzScan )
         if (fp == NULL)
             AG_ABEND( aprf( zCannot, errno, "open file", zFullName,
                             strerror( errno )));
+
+        if (pfDepends != NULL)
+            append_source_name(zFullName);
 
         do  {
             size_t rdct = fread((void*)pz, (size_t)1, inclSize, fp);
@@ -935,7 +939,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  The output time will always be the current time.
      *  The dynamic content is always current :)
      */
-    outTime = time( NULL );
+    outTime = time(NULL);
 
     /*
      *  IF there are no data after the '#shell' directive,

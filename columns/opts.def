@@ -1,8 +1,8 @@
 autogen definitions options;
 
 /*
- *  $Id: 4bf0b296e197fc69081911927872602eb7ad6183 $
- *  Time-stamp:        "2010-03-04 16:29:47 bkorb"
+ *  $Id: cd763ad29d4d60e0e71d2b6ebcbbae4f83302e71 $
+ *  Time-stamp:        "2010-06-26 10:01:30 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
@@ -113,12 +113,12 @@ flag = {
 flag = {
     name        = fill;
     descrip     = "Fill lines with input";
-    flags-cant  = spread, col_width, separation, line_separation, by_columns,
-                  sort;
+    flags-cant  = spread, col_width, by_columns;
     doc         = <<- _EODoc_
 	Instead of columnizing the input text, fill the output lines
 	with the input lines.  Blank lines on input will cause a
-	blank line in the output.
+	blank line in the output, unless the output is sorted.
+	With sorted output, blank lines are ignored.
 	_EODoc_;
 };
 
@@ -208,6 +208,16 @@ flag = {
     doc         = <<- _EODoc_
 	Use this option if, for example, you wish a backslash to appear at
 	the end of every line, except the last.
+	_EODoc_;
+};
+
+flag = {
+    name        = ending;
+    arg-type    = string;
+    arg-name    = end-str;
+    descrip     = "string at end of last line";
+    doc         = <<- _EODoc_
+	This option puts the specified string at the end of the output.
 	_EODoc_;
 };
 

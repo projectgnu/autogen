@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:39:36 bkorb"
+## Time-stamp:      "2010-06-26 10:11:05 bkorb"
 ## Copyright (c):   1992-2010 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -24,7 +24,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 332564f2b1921589ad230af5d66d9dc6a6d6f9dd $
+## $Id: a5e1f445e668e0f9f052a46099ea76eba5c7704c $
 ## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
@@ -37,12 +37,12 @@ columns_LDADD   = $(LO_LIB) $(LIBGUILE_LIBS)
 BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
 
-RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts -bcolumns
+RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts -bcolumns -MF$@
 man_MANS        = columns.1
 
 INCLUDES        = @INCLIST@
 
-CONFIG_CLEAN_FILES = columns.texi columns.menu columns.1 gen-stamp
+CONFIG_CLEAN_FILES = $(BUILT_SOURCES) stamp-*
 MAINTAINERCLEANFILES = $(CONFIG_CLEAN_FILES)
 DISTCLEANFILES  = cols.c
 
@@ -52,16 +52,19 @@ all : gen
 
 ## opts.h cannot be built until columns is built, so no rules for it.
 
-columns.1 columns.menu columns.texi : gen-stamp
+columns.menu columns.texi : stamp-aginfo
+columns.1                 : stamp-agman
 
 cols.c : Makefile
 	for f in config.h $(csrc) ; do echo "#include \"$$f\"" ; done > $@
 
-gen-stamp : opts.def columns$(EXEEXT)
+stamp-aginfo : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
 	$(RUNAG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+
+stamp-agman  : opts.def columns$(EXEEXT)
+	top_builddir=$(top_builddir) \
 	$(RUNAG) -Tagman1 $(srcdir)/opts.def
-	@touch $@
 
 .NOTPARALLEL:
 

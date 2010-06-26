@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-02-24 17:37:41 bkorb"
+# Time-stamp:      "2010-06-25 21:40:51 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +21,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: a3533ad04b7e20ea1ca3745d8c1abcbd7e603fdf $
+# @(#) $Id: cfe1a952443c69ca32ad787ed4bb8e90700d8cef $
 # ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
@@ -52,7 +52,7 @@
 # Code:
 
 PS4='>shl> '
-source config/bootstrap.shlib
+. config/bootstrap.shlib
 PS4='>bs> '
 
 config_tools()
@@ -157,12 +157,12 @@ pre_local()
     BOOTSTRAP=pre
     export BOOTSTRAP
     PS4='>bsl> '
-    source ${conf_dir}/bootstrap.local ${1+"$@"} || \
+    . ${conf_dir}/bootstrap.local ${1+"$@"} || \
         die FAILED: ${conf_dir}/bootstrap.local
 
     cd autoopts
     PS4='>aobs> '
-    source bootstrap.dir aoconf
+    . bootstrap.dir aoconf
     cd ..
     # run_gnulib
 }
@@ -178,13 +178,13 @@ post_local()
             srcdir=.
             echo running POST-bootstrap.dir in ${PWD}
             PS4=">$(basename ${PWD}-B)> "
-            source ./bootstrap.dir recursive || :
+            . ./bootstrap.dir recursive || :
         )
     done
 
     local BOOTSTRAP=post
     PS4='>bsl2> '
-    source ${conf_dir}/bootstrap.local ${1+"$@"}
+    . ${conf_dir}/bootstrap.local ${1+"$@"}
 }
 
 run_autotools()

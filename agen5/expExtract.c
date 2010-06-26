@@ -1,8 +1,8 @@
 /*
  *  expExtract.c
- *  $Id: b0aa043fd2b6e059b32d38f6fb79b02503e9ccf6 $
+ *  $Id: 95d6829ea112c9836ccbf3cf15be2efc38f8c1cd $
  *
- *  Time-stamp:        "2010-02-24 08:43:02 bkorb"
+ *  Time-stamp:        "2010-06-25 18:28:01 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -101,6 +101,9 @@ loadExtractData( char const* pzNewFile )
             fclose(fp);
             goto bad_return;
         }
+
+        if (pfDepends != NULL)
+            append_source_name(pzNewFile);
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;

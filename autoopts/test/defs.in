@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-02-24 08:40:07 bkorb"
+# Time-stamp:     "2010-06-26 08:41:59 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: b5c8c2132776afbd7db2120888ec3ea0641b9d10 $
+# $Id: bb10618168ef46a07de8b1e551b7b98750e0ed0b $
 # ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
@@ -69,6 +69,9 @@ test -z "${PAGER}"      && PAGER=more
 nl='
 '
 test -z "${BASH_VERSION}" && local() { : ; }
+
+vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
+unset $vars
 
 #  If only the "rm(1)" command could be relied upon....
 #
@@ -188,7 +191,7 @@ be_verbose()
 
     run_ag()
     {
-        local tfile=${testname}-aglog-${1}-$$.log
+        tfile=${testname}-aglog-${1}-$$.log
         shift
         MALLOC_CHECK_=2 \
             ${AGexe} --trace=every --trace-out=${tfile} "$@"

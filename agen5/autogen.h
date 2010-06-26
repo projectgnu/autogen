@@ -1,9 +1,9 @@
 
 /*
  *  autogen.h
- *  $Id: 851456692b738b0ee9c943bbba6f5c2b9fd7fe43 $
+ *  $Id: 7575d602f5cb2199810b8bd517192126c8cfaa82 $
  *
- *  Time-stamp:        "2010-02-24 14:50:07 bkorb"
+ *  Time-stamp:        "2010-06-25 20:15:40 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -260,6 +260,7 @@ struct outSpec {
 #define FPF_NOUNLINK   0x0004   /* do not unlink file      */
 #define FPF_STATIC_NM  0x0008   /* name statically alloced */
 #define FPF_NOCHMOD    0x0010   /* do not chmod(2) file    */
+#define FPF_TEMPFILE   0x0020   /* the file is a temp      */
 
 struct fpStack {
     int         flags;
@@ -318,7 +319,14 @@ MODE tCC*        pzOopsPrefix     VALUE( "" );
  *  Template Processing Globals
  */
 MODE tCC*        pzCurSfx         VALUE( NULL );
+/**
+ * The time to set for the modification times of the output files.
+ */
 MODE time_t      outTime          VALUE( 0 );
+/**
+ * The original time autogen started
+ */
+MODE time_t      startTime        VALUE( 0 );
 MODE tFpStack*   pCurFp           VALUE( NULL );
 MODE tOutSpec*   pOutSpecList     VALUE( NULL );
 MODE jmp_buf     fileAbort;
@@ -326,6 +334,30 @@ MODE char*       pzCurStart       VALUE( NULL );
 MODE uintptr_t   curStartOff      VALUE( 0 );
 MODE tForInfo    forInfo          VALUE( { 0 } );
 MODE FILE*       pfTrace          VALUE( NULL );
+/**
+ * dependency file file pointer.
+ */
+MODE FILE*       pfDepends        VALUE( NULL );
+/**
+ * name of target of rule
+ */
+MODE char const* pzDepTarget      VALUE( NULL );
+/**
+ * name of dependency file
+ */
+MODE char const* pzDepFile        VALUE( NULL );
+/**
+ * base name of both source and derived files.
+ * Either "_TList" or "_SList" gets put on the end.
+ */
+MODE char const* pzTargetList     VALUE( NULL );
+/**
+ * The actual list of input (source) files.
+ */
+MODE char const* pzSourceList     VALUE( NULL );
+MODE size_t      source_size      VALUE( 0 );
+MODE size_t      source_used      VALUE( 0 );
+MODE ag_bool     dep_phonies      VALUE( AG_FALSE );
 MODE char*       pzTmpStderr      VALUE( NULL );
 
 MODE tCC*        serverArgs[2]    VALUE( { NULL } );

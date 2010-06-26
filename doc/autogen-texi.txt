@@ -3314,7 +3314,7 @@ the command line, then specify this attribute for the option.
 @vindex deprecated
 There are two effects to this attribute:  the usage text will not
 show the option, and the generated documentation will mark it with:
-``@strong{NOTE: THIS OPTION IS DEPRECATED}''.
+``@emph{NOTE: THIS OPTION IS DEPRECATED}''.
 
 @item disable
 @vindex disable

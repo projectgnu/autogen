@@ -1,9 +1,9 @@
 
 /*
  *  agUtils.c
- *  $Id: c2b939af0e5d78a17956ed485b79d6d2be85100e $
+ *  $Id: e7f6399909780ee7de5deb0e5b32e3dbc0b2afff $
  *
- *  Time-stamp:        "2010-02-24 08:43:36 bkorb"
+ *  Time-stamp:        "2010-06-25 20:16:25 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -25,6 +25,12 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
+static void
+define_base_name(void);
+
+static void
+put_defines_into_env(void);
+
 static tCC*
 skipQuote( tCC* pzQte );
 /* = = = END-STATIC-FORWARD = = = */
@@ -109,6 +115,72 @@ mkstempPat( void )
     }
 }
 
+static void
+define_base_name(void)
+{
+    tCC*  pz;
+    char* pzD;
+
+    if (! ENABLED_OPT( DEFINITIONS )) {
+        OPT_ARG( BASE_NAME ) = "baseless";
+        return;
+    }
+
+    pz = strrchr( OPT_ARG( DEFINITIONS ), '/' );
+    /*
+     *  Point to the character after the last '/', or to the full
+     *  definition file name, if there is no '/'.
+     */
+    pz = (pz == NULL) ? OPT_ARG( DEFINITIONS ) : (pz + 1);
+
+    /*
+     *  IF input is from stdin, then use "stdin"
+     */
+    if ((pz[0] == '-') && (pz[1] == NUL)) {
+        OPT_ARG( BASE_NAME ) = "stdin";
+        return;
+    }
+
+    /*
+     *  Otherwise, use the basename of the definitions file
+     */
+    OPT_ARG( BASE_NAME ) = \
+        pzD = AGALOC( strlen( pz )+1, "derived base name" );
+
+    while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
+    *pzD = NUL;
+}
+
+static void
+put_defines_into_env(void)
+{
+    int     ct  = STACKCT_OPT(  DEFINE );
+    tCC**   ppz = STACKLST_OPT( DEFINE );
+
+    do  {
+        tCC* pz = *(ppz++);
+        /*
+         *  IF there is no associated value,  THEN set it to '1'.
+         *  There are weird problems with empty defines.
+         *  FIXME:  we loose track of this memory.  Don't know what to do,
+         *  really, there is no good recovery mechanism for environment
+         *  data.
+         */
+        if (strchr( pz, '=' ) == NULL) {
+            size_t siz = strlen( pz )+3;
+            char*  p   = AGALOC( siz, "env define" );
+
+            strcpy( p, pz );
+            strcpy( p+siz-3, "=1" );
+            pz = p;
+        }
+
+        /*
+         *  Now put it in the environment
+         */
+        putenv( (char*)pz );
+    } while (--ct > 0);
+}
 
 LOCAL void
 doOptions( int arg_ct, char** arg_vec )
@@ -144,6 +216,8 @@ doOptions( int arg_ct, char** arg_vec )
         }
     }
 
+    startTime = time(NULL);
+
     if (! HAVE_OPT( TIMEOUT ))
         OPT_ARG(TIMEOUT) = (char const *)AG_DEFAULT_TIMEOUT;
 
@@ -158,75 +232,23 @@ doOptions( int arg_ct, char** arg_vec )
     /*
      *  IF we do not have a base-name option, then we compute some value
      */
-    if (! HAVE_OPT( BASE_NAME )) do {
-        tCC*  pz;
-        char* pzD;
+    if (! HAVE_OPT( BASE_NAME ))
+        define_base_name();
 
-        if (! ENABLED_OPT( DEFINITIONS )) {
-            OPT_ARG( BASE_NAME ) = "baseless";
-            break;
-        }
-
-        pz = strrchr( OPT_ARG( DEFINITIONS ), '/' );
-        /*
-         *  Point to the character after the last '/', or to the full
-         *  definition file name, if there is no '/'.
-         */
-        pz = (pz == NULL) ? OPT_ARG( DEFINITIONS ) : (pz + 1);
-
-        /*
-         *  IF input is from stdin, then use "stdin"
-         */
-        if ((pz[0] == '-') && (pz[1] == NUL)) {
-            OPT_ARG( BASE_NAME ) = "stdin";
-            break;
-        }
-
-        /*
-         *  Otherwise, use the basename of the definitions file
-         */
-        OPT_ARG( BASE_NAME ) = \
-        pzD = AGALOC( strlen( pz )+1, "derived base name" );
-
-        while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
-        *pzD = NUL;
-    } while (AG_FALSE);
+    if (HAVE_OPT(MAKE_DEP)) {
+        if (pzDepFile == NULL)
+            pzDepFile = aprf("%s.d", (char*)(void*)OPT_ARG(BASE_NAME));
+        pfDepends = fopen(pzDepFile, "w");
+    }
 
     strequate( OPT_ARG( EQUATE ));
 
     /*
      *  IF we have some defines to put in our environment, ...
      */
-    if (HAVE_OPT( DEFINE )) {
-        int     ct  = STACKCT_OPT(  DEFINE );
-        tCC**   ppz = STACKLST_OPT( DEFINE );
-
-        do  {
-            tCC* pz = *(ppz++);
-            /*
-             *  IF there is no associated value,  THEN set it to '1'.
-             *  There are weird problems with empty defines.
-             *  FIXME:  we loose track of this memory.  Don't know what to do,
-             *  really, there is no good recovery mechanism for environment
-             *  data.
-             */
-            if (strchr( pz, '=' ) == NULL) {
-                size_t siz = strlen( pz )+3;
-                char*  p   = AGALOC( siz, "env define" );
-
-                strcpy( p, pz );
-                strcpy( p+siz-3, "=1" );
-                pz = p;
-            }
-
-            /*
-             *  Now put it in the environment
-             */
-            putenv( (char*)pz );
-        } while (--ct > 0);
-    }
+    if (HAVE_OPT( DEFINE ))
+        put_defines_into_env();
 }
-
 
 LOCAL tCC*
 getDefine( tCC* pzDefName, ag_bool check_env )

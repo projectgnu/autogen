@@ -1,9 +1,9 @@
 /*
  *  expFormat.c
  *
- *  Time-stamp:        "2010-02-24 08:43:01 bkorb"
+ *  Time-stamp:        "2010-06-25 18:25:32 bkorb"
  *
- *  $Id: 7ddd5da070a94192b70d904243228ab6b5915e61 $
+ *  $Id: cb8cc25ddb647e1f45a6ca5250e1f791867c9301 $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.
@@ -585,6 +585,9 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
             text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi);
             if (TEXT_MMAP_FAILED_ADDR(lic.mi.txt_data))
                 AG_ABEND( aprf( "Could not open license file '%s'", pzLicense));
+
+            if (pfDepends != NULL)
+                append_source_name(pzLicense);
 
             AGDUPSTR( lic.pzFN, zRealFile, "license file name" );
         }

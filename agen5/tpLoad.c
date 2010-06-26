@@ -1,8 +1,8 @@
 
 /*
- *  $Id: f437d17591d8b28b9740a6e8a64947213da9b72f $
+ *  $Id: 4fcea46dd8e7132daec1489fd9643bba8df32867 $
  *
- * Time-stamp:        "2010-02-24 08:41:33 bkorb"
+ * Time-stamp:        "2010-06-25 21:10:36 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -323,6 +323,32 @@ loadMacros( tTemplate* pT,
 #endif
 }
 
+LOCAL void
+append_source_name(char const * pz)
+{
+    static char const fmt[] = " \\\n\t%s\n";
+    size_t ln = strlen(pz) + sizeof(fmt) - 2 /* one for '%' and one for 's' */;
+
+    if (source_used + ln >= source_size) {
+        pzSourceList =
+            AGREALOC(pzSourceList, source_size + ln + 2048, "srclist");
+        source_size += ln + 2048;
+    }
+
+    ln = sprintf((char *)pzSourceList + source_used, fmt, pz);
+
+    /*
+     *  See if we've done this file before
+     */
+    {
+        char * p = strstr(pzSourceList, pzSourceList + source_used);
+        if (p == pzSourceList + source_used)
+            source_used += ln - 1;
+        p  = (char *)pzSourceList + source_used;
+        *p = NUL;
+    }
+}
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -367,6 +393,9 @@ loadTemplate(tCC* pzFileName, tCC * pzReferrer)
     text_mmap( zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo );
     if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
         AG_ABEND( aprf( "Could not open template '%s'", zRealFile ));
+
+    if (pfDepends != NULL)
+        append_source_name(zRealFile);
 
     /*
      *  Process the leading pseudo-macro.  The template proper
@@ -448,6 +477,26 @@ cleanup( tTemplate* pTF )
 {
     if (HAVE_OPT(USED_DEFINES))
         print_used_defines();
+
+    if (pfDepends != NULL) {
+        static char const fmt[] =
+            "\n\n%1$s_SList :=%2$s\n"
+            "\n%3$s : $(%1$s_SList)\n"
+            "\n$(%1$s_TList) : %3$s\n";
+
+        struct utimbuf tbuf;
+
+        if (pzDepTarget == NULL)
+            pzDepTarget = pzDepFile;
+
+        fprintf(pfDepends, fmt, pzTargetList, pzSourceList, pzDepTarget);
+
+        tbuf.actime  = time(NULL);
+        tbuf.modtime = startTime;
+
+        utime( pCurFp->pzOutName, &tbuf );
+        
+    }
 
     optionFree(&autogenOptions);
 

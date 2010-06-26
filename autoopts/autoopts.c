@@ -1,7 +1,7 @@
 
 /*
- *  $Id: 56abb301f50605ec5bae137ded730e330d8d7735 $
- *  Time-stamp:      "2010-02-24 08:41:24 bkorb"
+ *  $Id: f525372dd31bcaf29a2726e01d2ab7066b99fdb5 $
+ *  Time-stamp:      "2010-06-25 18:54:18 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -68,9 +68,9 @@ ao_malloc( size_t sz )
 #define malloc(_s) ao_malloc(_s)
 
 LOCAL void *
-ao_realloc( void *p, size_t sz )
+ao_realloc(void *p, size_t sz)
 {
-    void * res = realloc(p, sz);
+    void * res = (p == NULL) ? malloc(sz) : realloc(p, sz);
     if (res == NULL) {
         fprintf( stderr, "realloc of %d bytes at 0x%p failed\n", (int)sz, p );
         exit( EXIT_FAILURE );

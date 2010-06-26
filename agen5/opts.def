@@ -3,8 +3,8 @@
 autogen definitions options;
 
 /*
- *  $Id: c93b7a1c853ff5e1d4538a2e472a6fda4c7794ea $
- *  Time-stamp:        "2010-04-29 22:13:55 bkorb"
+ *  $Id: 0149822d6755df20bcdcd477e45e7df5593e3903 $
+ *  Time-stamp:        "2010-06-25 21:33:28 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -774,6 +774,63 @@ flag = {
 	Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing
 	directives.  This option will cause the matching names to be
 	removed from the list of defined values.
+	_EOF_ ;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+#ifndef XML2AG
+flag = {
+    name        = doc-dependencies;
+    documentation;
+    descrip = <<-  _EODoc_
+	These options can be used to automate dependency tracking.
+	_EODoc_;
+};
+#endif
+
+flag = {
+    name        = make-dep;
+    value       = M;
+    arg-type    = string;
+    arg-name    = type;
+    arg-optional;
+    max         = NOLIMIT;
+    descrip     = "emit make dependency file";
+
+#ifndef XML2AG
+    call-proc   = config_dep;
+    no-preset;
+    doc = <<- _EOF_
+	This option behaves fairly closely to the way the @code{-M} series of
+	options work with the gcc compiler, except that instead of emitting
+	the predecessor dependencies, this emits the successor dependencies
+	(output files).  By default, the output dependency information will be
+	placed in @code{<base-name>.d}, but may also be specified with
+	@code{-MF<file>}.  The target will be the dependency file name, but
+	may also be overridden with @code{-MT<targ-name>}.  That is not,
+	however, recommended.  AutoGen will set the time stamp correctly on
+	the dependency file, but it will not mess with this specified target.
+
+	@strong{NOTE:} these second letters are part of the option argument,
+	so @code{-MF <file>} must have the space character quoted or omitted, and
+	@code{-M  "F <file>"} is acceptable because the @code{F} is part of
+	the option argument.
+
+	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or G.
+	They are not all meaningful and one has a somewhat different meaning:
+	@code{-MT<name>} This is interpreted as meaning @code{<name>} is a
+	sentinel file that will depend on all inputs (templates and definition
+	files) and all the output files will depend on this sentinel file.
+
+	This is the recommended usage:
+	@example
+	-MFwhatever-you-like.dep
+	@end example
+
+        The modification time on the dependency file is adjusted to be one
+	second before the earliest time stamp of any output file.
 	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";

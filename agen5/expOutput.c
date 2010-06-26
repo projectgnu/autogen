@@ -1,8 +1,8 @@
 
 /*
- *  $Id: 1c97dc5ed8495653af850423a4c24b7105aac1df $
+ *  $Id: b8b8df6a207ecfa04caf4e277e3bfd8be06c2d2e $
  *
- *  Time-stamp:        "2010-02-24 08:42:59 bkorb"
+ *  Time-stamp:        "2010-06-25 19:02:41 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -406,6 +406,9 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
+
+    if ((pfDepends != NULL) && ((flags & FPF_TEMPFILE) == 0))
+        fprintf(pfDepends, " \\\n\t%s", fname);
 }
 
 /*=gfunc out_push_add
@@ -418,7 +421,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
  *  purged, but appended to.  @xref{output controls}.
 =*/
 SCM
-ag_scm_out_push_add( SCM new_file )
+ag_scm_out_push_add(SCM new_file)
 {
     static char const append_mode[] = "a" FOPEN_BINARY_FLAG "+";
 
@@ -450,8 +453,8 @@ ag_scm_out_push_new( SCM new_file )
 {
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
-    if (AG_SCM_STRING_P( new_file )) {
-        open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN( new_file ),
+    if (AG_SCM_STRING_P(new_file)) {
+        open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
                           write_mode, 0);
         return SCM_UNDEFINED;
     }
@@ -481,7 +484,7 @@ ag_scm_out_push_new( SCM new_file )
         if (tmpfd < 0)
             AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
-        open_output_file(pzTemp + tmplen, tmplen - 1, write_mode, 0);
+        open_output_file(pzTemp + tmplen, tmplen - 1, write_mode, FPF_TEMPFILE);
         close(tmpfd);
         return SCM_UNDEFINED;
     }
