@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2010-02-24 08:41:06 bkorb"
+# Time-stamp:      "2010-07-03 10:44:04 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -22,6 +22,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
+# $Id: 2ed5d924d0fd72036f72141b69a78aba0bb83bc3 $
 
 =][=
 
@@ -509,9 +510,9 @@ ENDDEF Option_Defines
 DEFINE   emit-alias-option
 
 =]
-tSCC    z[=(. cap-name)=]Text[]   = "This is an alias for '[=aliases=]'";
+static char const z[=(. cap-name)=]Text[]   = "This is an alias for '[=aliases=]'";
 #define z[=(. cap-name)=]_NAME    NULL
-tSCC    z[=(. cap-name)=]_Name[]  = "[=name=]";
+static char const z[=(. cap-name)=]_Name[]  = "[=name=]";
 #define [=(. UP-name)=]_FLAGS    [= (up-c-name "aliases") =]_FLAGS[=
 
 ENDDEF   emit-alias-option
@@ -526,16 +527,16 @@ DEFINE   emit-nondoc-option     =][=
 "${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_
 %s
 _EOF_" (get "translators")  ) " */" )  ) =]
-tSCC    z[=(. cap-name)=]Text[] =
+static char const z[=(. cap-name)=]Text[] =
         [= (kr-string (get "descrip")) =];
-tSCC    z[= (sprintf "%-25s" (string-append cap-name
+static char const z[= (sprintf "%-25s" (string-append cap-name
                     "_NAME[]" )) =] = "[=(. UP-name)=]";[=
 
   #  IF this option can be disabled,
   #  THEN we must create the string for the disabled version
   #  =][=
   IF (> (len "disable") 0) =]
-tSCC    [=
+static char const [=
 
     (hash-create-handle! disable-name   flg-name (string-append
         "zNot" cap-name "_Name" ))
@@ -546,14 +547,14 @@ tSCC    [=
 
        (string-tr! (string-append (get "disable") "-" flg-name)
                    optname-from optname-to) =]";
-tSCC    [= (sprintf "zNot%-23s" (string-append cap-name "_Pfx[]"))
+static char const [= (sprintf "zNot%-23s" (string-append cap-name "_Pfx[]"))
              =]= "[=(string-downcase! (get "disable"))=]";[=
 
 
       #  See if we can use a substring for the option name:
       #  =][=
       IF (> (len "enable") 0) =]
-tSCC    [=(sprintf "z%-26s" (string-append cap-name "_Name[]")) =]= "[=
+static char const [=(sprintf "z%-26s" (string-append cap-name "_Name[]")) =]= "[=
         (string-tr! (string-append (get "enable") "-" flg-name)
                     optname-from optname-to) =]";[=
       ELSE =]
@@ -568,7 +569,7 @@ tSCC    [=(sprintf "z%-26s" (string-append cap-name "_Name[]")) =]= "[=
     (hash-create-handle! disable-name   flg-name "NULL")
     (hash-create-handle! disable-prefix flg-name "NULL") ""
   =]
-tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
+static char const z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
              =]= "[= (string-tr! (string-append
         (if (exist? "enable") (string-append (get "enable") "-") "")
         (get "name"))   optname-from optname-to) =]";[=
@@ -616,10 +617,10 @@ tSCC    z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
          ENDIF =])[=
 
        =* str                   =]
-tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
+static char const [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
 
        =* file                  =]
-tSCC    [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
+static char const [=(. def-arg-array)=]= [=(kr-string (get "arg-default"))=];[=
 
        *                        =][=
           (error (string-append cap-name
@@ -719,7 +720,7 @@ DEFINE   opt-strs
   ENDIF  ifdef-ed                       =][=
 
   IF (exist? "documentation")           =]
-tSCC    z[=(. cap-name)=]Text[] =
+static char const z[=(. cap-name)=]Text[] =
         [= (kr-string (get "descrip")) =];
 #define [=(. UP-name)=]_FLAGS       (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ELIF (exist? "aliases")               =][=
@@ -747,10 +748,10 @@ tSCC    z[=(. cap-name)=]Text[] =
 #define z[=(. cap-name)=]_NAME      NULL[=
 
     IF (exist? "omitted-usage") =]
-tSCC z[=(. cap-name)=]_Name[] = "[= name =]";[=
+static char const z[=(. cap-name)=]_Name[] = "[= name =]";[=
        IF (set! tmp-text (get "omitted-usage"))
        (> (string-length tmp-text) 1)    =]
-tSCC z[=(. cap-name)=]Text[]  = [= (kr-string tmp-text) =];[=
+static char const z[=(. cap-name)=]Text[]  = [= (kr-string tmp-text) =];[=
        ELSE  =]
 #define z[=(. cap-name)=]Text       NULL[=
        ENDIF =][=
@@ -782,16 +783,16 @@ DEFINE help-strs
    (if (exist? "no-libopts") "" "/More_Help")
    (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
-tSCC zHelpText[]          = "Display extended usage information and exit";
-tSCC zHelp_Name[]         = "help";[=
+static char const zHelpText[]          = "Display extended usage information and exit";
+static char const zHelp_Name[]         = "help";[=
 
   IF (not (exist? "no-libopts"))
 
 =]
 #ifdef HAVE_WORKING_FORK
 #define OPTST_MORE_HELP_FLAGS   (OPTST_IMM | OPTST_NO_INIT)
-tSCC zMore_Help_Name[]    = "more-help";
-tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
+static char const zMore_Help_Name[]    = "more-help";
+static char const zMore_HelpText[]     = "Extended usage information passed thru pager";
 #else
 #define OPTST_MORE_HELP_FLAGS   (OPTST_OMITTED | OPTST_NO_INIT)
 #define zMore_Help_Name   NULL
@@ -810,40 +811,40 @@ tSCC zMore_HelpText[]     = "Extended usage information passed thru pager";
                                 OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT
 #endif
 
-tSCC zVersionText[]       = "Output version information and exit";
-tSCC zVersion_Name[]      = "version";[=
+static char const zVersionText[]       = "Output version information and exit";
+static char const zVersion_Name[]      = "version";[=
 
   ENDIF (exist? "version")              =][=
 
   IF (exist? "resettable")
 
 =]
-tSCC zResetText[]         = "Reset an option's state";
-tSCC zReset_Name[]        = "reset-option";[=
+static char const zResetText[]         = "Reset an option's state";
+static char const zReset_Name[]        = "reset-option";[=
 
   ENDIF (exist? "resettable")           =][=
 
   IF (exist? "usage-opt")
 
 =]
-tSCC zUsageText[]         = "Abbreviated usage to stdout";
-tSCC zUsage_Name[]        = "usage";[=
+static char const zUsageText[]         = "Abbreviated usage to stdout";
+static char const zUsage_Name[]        = "usage";[=
 
   ENDIF (exist? "usage-opt")            =][=
 
   IF (exist? "homerc")                  =][=
 
     IF (not (exist? "disable-save"))    =]
-tSCC zSave_OptsText[]     = "Save the option state to a config file";
-tSCC zSave_Opts_Name[]    = "save-opts";[=
+static char const zSave_OptsText[]     = "Save the option state to a config file";
+static char const zSave_Opts_Name[]    = "save-opts";[=
 
     ENDIF no disable-save               =][=
 
     IF (not (exist? "disable-load"))    =]
-tSCC zLoad_OptsText[]     = "Load options from a config file";
-tSCC zLoad_Opts_NAME[]    = "LOAD_OPTS";
-tSCC zNotLoad_Opts_Name[] = "no-load-opts";
-tSCC zNotLoad_Opts_Pfx[]  = "no";
+static char const zLoad_OptsText[]     = "Load options from a config file";
+static char const zLoad_Opts_NAME[]    = "LOAD_OPTS";
+static char const zNotLoad_Opts_Name[] = "no-load-opts";
+static char const zNotLoad_Opts_Pfx[]  = "no";
 #define zLoad_Opts_Name   (zNotLoad_Opts_Name + 3)[=
 
     ENDIF no disable-load               =][=

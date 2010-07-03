@@ -1,6 +1,7 @@
 
-/*
- *  Time-stamp:      "2010-02-24 08:41:13 bkorb"
+/**
+ *  \file load.c
+ *  Time-stamp:      "2010-07-03 10:50:52 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -31,18 +32,12 @@ tOptionLoadMode option_load_mode = OPTION_LOAD_UNCOOKED;
 
 /* = = = START-STATIC-FORWARD = = = */
 static ag_bool
-insertProgramPath(
-    char*   pzBuf,
-    int     bufSize,
-    tCC*    pzName,
-    tCC*    pzProgPath );
+insertProgramPath(char * pzBuf, int bufSize, char const * pzName,
+                  char const * pzProgPath);
 
 static ag_bool
-insertEnvVal(
-    char*   pzBuf,
-    int     bufSize,
-    tCC*    pzName,
-    tCC*    pzProgPath );
+insertEnvVal(char * pzBuf, int bufSize, char const * pzName,
+             char const * pzProgPath);
 
 static char*
 assembleArgValue( char* pzTxt, tOptionLoadMode mode );
@@ -100,11 +95,8 @@ assembleArgValue( char* pzTxt, tOptionLoadMode mode );
  *                 errors (cannot resolve the resulting path).
 =*/
 ag_bool
-optionMakePath(
-    char*   pzBuf,
-    int     bufSize,
-    tCC*    pzName,
-    tCC*    pzProgPath )
+optionMakePath(char * pzBuf, int bufSize, char const * pzName,
+               char const * pzProgPath)
 {
     size_t  name_len = strlen( pzName );
 
@@ -112,7 +104,7 @@ optionMakePath(
 #     define PKGDATADIR ""
 #   endif
 
-    tSCC    pkgdatadir[] = PKGDATADIR;
+    static char const pkgdatadir[] = PKGDATADIR;
 
     ag_bool res = AG_TRUE;
 
@@ -123,7 +115,7 @@ optionMakePath(
      *  IF not an environment variable, just copy the data
      */
     if (*pzName != '$') {
-        tCC*  pzS = pzName;
+        char const*  pzS = pzName;
         char* pzD = pzBuf;
         int   ct  = bufSize;
 
@@ -193,14 +185,11 @@ optionMakePath(
 
 
 static ag_bool
-insertProgramPath(
-    char*   pzBuf,
-    int     bufSize,
-    tCC*    pzName,
-    tCC*    pzProgPath )
+insertProgramPath(char * pzBuf, int bufSize, char const * pzName,
+                  char const * pzProgPath)
 {
-    tCC*    pzPath;
-    tCC*    pz;
+    char const*    pzPath;
+    char const*    pz;
     int     skip = 2;
 
     switch (pzName[2]) {
@@ -258,11 +247,8 @@ insertProgramPath(
 
 
 static ag_bool
-insertEnvVal(
-    char*   pzBuf,
-    int     bufSize,
-    tCC*    pzName,
-    tCC*    pzProgPath )
+insertEnvVal(char * pzBuf, int bufSize, char const * pzName,
+             char const * pzProgPath)
 {
     char* pzDir = pzBuf;
 
@@ -336,7 +322,7 @@ mungeString( char* pzTxt, tOptionLoadMode mode )
 static char*
 assembleArgValue( char* pzTxt, tOptionLoadMode mode )
 {
-    tSCC zBrk[] = " \t\n:=";
+    static char const zBrk[] = " \t\n:=";
     char* pzEnd = strpbrk( pzTxt, zBrk );
     int   space_break;
 
@@ -519,9 +505,7 @@ loadOptionLine(
  *        will cause a warning to print, but the function should return.
 =*/
 void
-optionLoadLine(
-    tOptions*  pOpts,
-    tCC*       pzLine )
+optionLoadLine(tOptions * pOpts, char const * pzLine)
 {
     tOptState st = OPTSTATE_INITIALIZER(SET);
     char* pz;
