@@ -1,5 +1,5 @@
 
-/*  $Id: e21e2bf9958c54e440efbdc7c1026e46ac589f66 $
+/*
  * Time-stamp:      "2010-02-24 08:39:37 bkorb"
  *
  *  This module implements the default usage procedure for

@@ -1,5 +1,4 @@
 /*
- *  $Id: f1650b45a91ec95af830ff76041cc4f0048e60f0 $
  *  Time-stamp:      "2010-04-24 12:57:03 bkorb"
  *
  *  configuration/rc/ini file handling.

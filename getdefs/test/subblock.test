@@ -5,7 +5,6 @@
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
 # Time-stamp:        "2010-02-24 08:38:23 bkorb"
-#            by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: 69dd6573ebefd1ccf77295d5ac405604422d2021 $
+# $Id: 7899991c152e47482d470fcff19c54b3d0b7dc20 $
 # ----------------------------------------------------------------------
 
 # Common definitions

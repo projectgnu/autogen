@@ -3,7 +3,6 @@
 null
 
 ##  Time-stamp:        "2010-02-24 08:39:01 bkorb"
-##            by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##

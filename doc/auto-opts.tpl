@@ -246,13 +246,16 @@ INVOKE get-text tag = "ao-data1"
 @example[=
 (out-push-new (string-append tmp-dir "/hello.c"))
 
-=]
+\=]
 
+#include <config.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <pwd.h>
 #include <string.h>
+#ifdef   HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <autoopts/options.h>
 int main(int argc, char ** argv) {
   char const * greeting = "Hello";
@@ -294,7 +297,7 @@ echo personalize > hello.conf
 @end example
 
 @noindent
-will produce the following output (for me):
+will produce the following output:
 
 @example
 [= (texi-escape-encode (shell "

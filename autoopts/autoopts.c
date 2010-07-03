@@ -1,6 +1,5 @@
 
 /*
- *  $Id: f525372dd31bcaf29a2726e01d2ab7066b99fdb5 $
  *  Time-stamp:      "2010-06-25 18:54:18 bkorb"
  *
  *  This file contains all of the routines that must be linked into

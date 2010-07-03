@@ -1,9 +1,8 @@
 
 /*
- *  autogen.c
- *  $Id: b79cff256c2fdad57fdb50dfac73721c1cfd20fb $
+ *  \file autogen.c
  *
- *  Time-stamp:        "2010-06-26 08:05:26 bkorb"
+ *  Time-stamp:        "2010-07-03 08:57:41 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -23,17 +22,20 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef HAVE_SYS_RESOURCE_H
+#include <sys/resource.h>
+#endif
 
-tSCC zClientInput[] = "client-input";
+static char const zClientInput[] = "client-input";
 
 #define _State_(n)  #n,
-tSCC* apzStateName[] = { STATE_TABLE };
+static char const * const apzStateName[] = { STATE_TABLE };
 #undef _State_
 
 static sigjmp_buf  abendJumpEnv;
 static int         abendJumpSignal = 0;
 
-typedef void (sighandler_proc_t)( int sig );
+typedef void (sighandler_proc_t)(int sig);
 static sighandler_proc_t ignoreSignal, abendSignal;
 
 /* = = = START-STATIC-FORWARD = = = */
@@ -61,7 +63,7 @@ static void
 inner_main(int argc, char ** argv)
 {
     atexit(doneCheck);
-    initialize( argc, argv );
+    initialize(argc, argv);
 
     procState = PROC_STATE_LOAD_DEFS;
     ag_scmStrings_init();
@@ -77,15 +79,15 @@ inner_main(int argc, char ** argv)
         tTemplate* pTF = loadTemplate(pzTemplFileName, NULL);
 
         procState = PROC_STATE_EMITTING;
-        processTemplate( pTF );
+        processTemplate(pTF);
 
         procState = PROC_STATE_CLEANUP;
-        cleanup( pTF );
+        cleanup(pTF);
     }
 
     procState = PROC_STATE_DONE;
-    signalSetup( SIG_DFL, SIG_DFL );
-    exit( EXIT_SUCCESS );
+    signalSetup(SIG_DFL, SIG_DFL);
+    exit(EXIT_SUCCESS);
 }
 
 int
@@ -99,17 +101,17 @@ main(int argc, char ** argv)
      *  THEN you cannot capture the value portably.  So, the jumper has
      *  stashed it for use now.
      */
-    if (sigsetjmp( abendJumpEnv, 0 ) != 0)
-        signalExit( abendJumpSignal );
+    if (sigsetjmp(abendJumpEnv, 0) != 0)
+        signalExit(abendJumpSignal);
 
     signalSetup(ignoreSignal, abendSignal);
 
 #if GUILE_VERSION >= 107000
-    if (getenv( "GUILE_WARN_DEPRECATED" ) == NULL)
-        putenv( (char*)(void*)"GUILE_WARN_DEPRECATED=no" );
+    if (getenv("GUILE_WARN_DEPRECATED") == NULL)
+        putenv((char*)(void*)"GUILE_WARN_DEPRECATED=no");
 #endif
 
-    gh_enter( argc, argv, inner_main );
+    gh_enter(argc, argv, inner_main);
     /* NOT REACHED */
     return EXIT_FAILURE;
 }
@@ -117,24 +119,25 @@ main(int argc, char ** argv)
 static void
 signalExit(int sig)
 {
-    tSCC zErr[] = "AutoGen aborting on signal %d (%s) in state %s\n";
+    static char const zErr[] =
+        "AutoGen aborting on signal %d (%s) in state %s\n";
 
     if (*pzOopsPrefix != NUL) {
-        fputs( pzOopsPrefix, stderr );
+        fputs(pzOopsPrefix, stderr);
         pzOopsPrefix = zNil;
     }
 
-    fprintf( stderr, zErr, sig, strsignal( sig ),
-             ((unsigned)procState <= PROC_STATE_DONE)
-             ? apzStateName[ procState ] : "** BOGUS **" );
+    fprintf(stderr, zErr, sig, strsignal(sig),
+            ((unsigned)procState <= PROC_STATE_DONE)
+            ? apzStateName[ procState ] : "** BOGUS **");
 
-    fflush( stderr );
-    fflush( stdout );
+    fflush(stderr);
+    fflush(stdout);
     if (pfTrace != stderr )
-        fflush( pfTrace );
+        fflush(pfTrace);
 
     if (procState == PROC_STATE_ABORTING)
-        _exit( sig + 128 );
+        _exit(sig + 128);
 
     procState = PROC_STATE_ABORTING;
 
@@ -143,15 +146,17 @@ signalExit(int sig)
      *  so that the template writer knows where to look for their problem.
      */
     if (pCurTemplate != NULL) {
-        tSCC zAt[]  = "processing template %s\n"
-                      "            on line %d\n"
-                      "       for function %s (%d)\n";
+        static char const zAt[] =
+            "processing template %s\n"
+            "            on line %d\n"
+            "       for function %s (%d)\n";
+
         int line;
         teFuncType fnCd;
-        tCC* pzFn;
-        tCC* pzFl;
+        char const * pzFn;
+        char const * pzFl;
 
-        if ( pCurMacro == NULL ) {
+        if (pCurMacro == NULL) {
             pzFn = "pseudo-macro";
             line = 0;
             fnCd = -1;
@@ -167,10 +172,20 @@ signalExit(int sig)
         pzFl = pCurTemplate->pzTplFile;
         if (pzFl == NULL)
             pzFl = "NULL file name";
-        fprintf( stderr, zAt, pzFl, line, pzFn, fnCd );
+        fprintf(stderr, zAt, pzFl, line, pzFn, fnCd);
     }
 
-    signalSetup( SIG_DFL, SIG_DFL );
+    signalSetup(SIG_DFL, SIG_DFL);
+
+#ifdef HAVE_SYS_RESOURCE_H
+    if (HAVE_OPT(CORE)) {
+        struct rlimit rlim;
+        getrlimit(RLIMIT_CORE, &rlim);
+        rlim.rlim_cur = rlim.rlim_max;
+        setrlimit(RLIMIT_CORE, &rlim);
+    }
+#endif
+
     abort();
 }
 
@@ -189,7 +204,7 @@ abendSignal(int sig)
 
     default:
         abendJumpSignal = sig;
-        siglongjmp( abendJumpEnv, sig );
+        siglongjmp(abendJumpEnv, sig);
     }
 }
 
@@ -204,7 +219,7 @@ static void
 ignoreSignal(int sig)
 {
 #ifdef DEBUG_ENABLED
-    fprintf( pfTrace, "Ignored signal %d (%s)\n", sig, strsignal( sig ));
+    fprintf(pfTrace, "Ignored signal %d (%s)\n", sig, strsignal(sig));
 #endif
     return;
 }
@@ -216,7 +231,7 @@ ignoreSignal(int sig)
 static void
 doneCheck(void)
 {
-    tSCC zErr[] =
+    static char const zErr[] =
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
         "\t%s on line %d\n";
 #if GUILE_VERSION >= 107000
@@ -240,17 +255,17 @@ doneCheck(void)
     closeServer();
 #endif
 
-    fflush( stdout );
-    fflush( stderr );
+    fflush(stdout);
+    fflush(stderr);
 
     if (pfTrace != stderr ) {
         if (trace_is_to_pipe) {
             int status;
 
-            pclose( pfTrace );
-            while (wait( &status ) > 0)  ;
+            pclose(pfTrace);
+            while (wait(&status) > 0)  ;
         }
-        else fclose( pfTrace );
+        else fclose(pfTrace);
     }
 
     switch (procState) {
@@ -265,23 +280,23 @@ doneCheck(void)
              *  Emit the CGI page header for an error message.  We will rewind
              *  stderr and write the contents to stdout momentarily.
              */
-            fputs( pzOopsPrefix, stdout );
+            fputs(pzOopsPrefix, stdout);
             pzOopsPrefix = zNil;
         }
 
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
             scm_backtrace();
 
-        fprintf( stderr, zErr, pCurTemplate->pzTplFile, pCurMacro->lineNo );
+        fprintf(stderr, zErr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
 
         /*
          *  We got here because someone called exit early.
          */
         do  {
 #ifndef DEBUG_ENABLED
-            closeOutput( AG_FALSE );
+            closeOutput(AG_FALSE);
 #else
-            closeOutput( AG_TRUE );
+            closeOutput(AG_TRUE);
 #endif
         } while (pCurFp->pPrev != NULL);
 
@@ -291,7 +306,7 @@ doneCheck(void)
         break; /* continue failure exit */
 
     default:
-        fprintf( stderr, "ABEND-ing in %s state\n", apzStateName[procState] );
+        fprintf(stderr, "ABEND-ing in %s state\n", apzStateName[procState]);
         /* FALLTHROUGH */
 
     case PROC_STATE_ABORTING:
@@ -300,7 +315,7 @@ doneCheck(void)
              *  Emit the CGI page header for an error message.  We will rewind
              *  stderr and write the contents to stdout momentarily.
              */
-            fputs( pzOopsPrefix, stdout );
+            fputs(pzOopsPrefix, stdout);
             pzOopsPrefix = zNil;
         }
         break; /* continue failure exit */
@@ -312,10 +327,10 @@ doneCheck(void)
     }
 
     if (pzLastScheme != NULL) {
-        tSCC zGuileFail[] =
+        static char const zGuileFail[] =
             "Failing Guile command:  = = = = =\n\n%s\n\n"
             "=================================\n";
-        fprintf( stderr, zGuileFail, pzLastScheme );
+        fprintf(stderr, zGuileFail, pzLastScheme);
     }
 
     /*
@@ -325,7 +340,7 @@ doneCheck(void)
      */
     if (pzTmpStderr != NULL) {
         do {
-            long pos = ftell( stderr );
+            long pos = ftell(stderr);
             char* pz;
 
             /*
@@ -333,16 +348,16 @@ doneCheck(void)
              */
             if (pos <= 0)
                 break;
-            pz = AGALOC( pos, "stderr redirected text" );
-            rewind( stderr );
-            fread(  pz, (size_t)1, (size_t)pos, stderr );
-            fwrite( pz, (size_t)1, (size_t)pos, stdout );
-            AGFREE( pz );
+            pz = AGALOC(pos, "stderr redirected text");
+            rewind(stderr);
+            fread( pz, (size_t)1, (size_t)pos, stderr);
+            fwrite(pz, (size_t)1, (size_t)pos, stdout);
+            AGFREE(pz);
         } while (0);
 
-        fclose( stderr );
-        unlink( pzTmpStderr );
-        AGFREE( pzTmpStderr );
+        fclose(stderr);
+        unlink(pzTmpStderr);
+        AGFREE(pzTmpStderr);
         pzTmpStderr = NULL;
     }
 
@@ -357,30 +372,30 @@ doneCheck(void)
 
 
 LOCAL void
-ag_abend_at( tCC* pzMsg
+ag_abend_at(char const * pzMsg
 #ifdef DEBUG_ENABLED
-    , tCC* pzFile, int line
+            , char const * pzFile, int line
 #endif
     )
 {
     if (*pzOopsPrefix != NUL) {
-        fputs( pzOopsPrefix, stderr );
+        fputs(pzOopsPrefix, stderr);
         pzOopsPrefix = zNil;
     }
 
 #ifdef DEBUG_ENABLED
-    fprintf( stderr, "Giving up in %s line %d\n", pzFile, line );
+    fprintf(stderr, "Giving up in %s line %d\n", pzFile, line);
 #endif
 
     if ((procState >= PROC_STATE_LIB_LOAD) && (pCurTemplate != NULL)) {
         int l_no = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
-        fprintf( stderr, "Error in template %s, line %d\n\t",
-                 pCurTemplate->pzTplFile, l_no );
+        fprintf(stderr, "Error in template %s, line %d\n\t",
+                pCurTemplate->pzTplFile, l_no);
     }
-    fputs( pzMsg, stderr );
-    pzMsg += strlen( pzMsg );
+    fputs(pzMsg, stderr);
+    pzMsg += strlen(pzMsg);
     if (pzMsg[-1] != '\n')
-        fputc( '\n', stderr );
+        fputc('\n', stderr);
 
     {
         teProcState oldState = procState;
@@ -390,7 +405,7 @@ ag_abend_at( tCC* pzMsg
         case PROC_STATE_EMITTING:
         case PROC_STATE_INCLUDING:
         case PROC_STATE_CLEANUP:
-            longjmp( fileAbort, FAILURE );
+            longjmp(fileAbort, FAILURE);
             /* NOTREACHED */
         default:
             exit(EXIT_FAILURE);
@@ -413,7 +428,7 @@ signalSetup(sighandler_proc_t* chldHandler,
 #endif
 
     sa.sa_flags   = 0;
-    sigemptyset( &sa.sa_mask );
+    sigemptyset(&sa.sa_mask);
 
     do  {
         switch (sigNo) {
@@ -478,7 +493,7 @@ signalSetup(sighandler_proc_t* chldHandler,
 # error DAEMON-ization of AutoGen is not ready for prime time
   Choke Me.
         case SIGHUP:
-            if (HAVE_OPT( DAEMON )) {
+            if (HAVE_OPT(DAEMON)) {
                 sa.sa_handler = handleSighup;
                 break;
             }
@@ -488,7 +503,7 @@ signalSetup(sighandler_proc_t* chldHandler,
         default:
             sa.sa_handler = dfltHandler;
         }
-        sigaction( sigNo,  &sa, NULL );
+        sigaction(sigNo,  &sa, NULL);
     } while (++sigNo < maxSig);
 }
 
@@ -506,7 +521,7 @@ ao_malloc (size_t sz)
     void * res = malloc(sz);
     if (res == NULL) {
         fprintf(stderr, "malloc of %zd bytes failed\n", sz);
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
     return res;
 }
@@ -518,7 +533,7 @@ ao_realloc (void *p, size_t sz)
     void * res = (p == NULL) ? malloc(sz) : realloc(p, sz);
     if (res == NULL) {
         fprintf(stderr, "realloc of %zd bytes at 0x%p failed\n", sz, p);
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
     return res;
 }
@@ -538,7 +553,7 @@ ao_strdup (char const * str)
     char * res = strdup(str);
     if (res == NULL) {
         fprintf(stderr, "strdup of %d byte string failed\n", (int)strlen(str));
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
     return res;
 }

@@ -3,8 +3,7 @@
 autogen definitions options;
 
 /*
- *  $Id: 0149822d6755df20bcdcd477e45e7df5593e3903 $
- *  Time-stamp:        "2010-06-25 21:33:28 bkorb"
+ *  Time-stamp:        "2010-07-03 08:24:29 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -674,31 +673,30 @@ flag = {
     no-preset;
     flag-code   = '    SET_OPT_DEFINITIONS("-");';
     doc = <<-  _EODoc_
-
 	If you wish to be able to run AutoGen as a daemon process, specify
 	this option.  The resulting daemon will be able to receive requests on
 	either a socket or over a named pipe.  The syntax of the connect-type
 	argument determines the kind of connection:
 
-        @table @samp
-        @item is a number
-        The address family will default to AF_INET and the number must
+	@table @samp
+	@item is a number
+	The address family will default to AF_INET and the number must
 	represent the port number AutoGen will listen on.
 
 	@item contains a colon
 	The string up to the colon will be looked up.  If it matches an
-        address family, the string after the colon is presumed to be an
-        address of the appropriate kind. "unix:" addresses should be a
-        path name with existing directory names, but a non-existent base
-        file name.  "inet:" and "inet6" should be followed by a port number.
+	address family, the string after the colon is presumed to be an
+	address of the appropriate kind. "unix:" addresses should be a
+	path name with existing directory names, but a non-existent base
+	file name.  "inet:" and "inet6" should be followed by a port number.
 
-        @item some other string
+	@item some other string
 	The string represents a named pipe.  If your system supports
 	@code{fattach} and @code{connld}, then that will be the name of the
-        bi-directional pipe that any number of processes can open and
-        communicate over.  If your system does @strong{not} support such things,
-        then the input pipe will be suffixed with "-in" and the output pipe
-        suffixed with "-out" and only one client may connect at a time.
+	bi-directional pipe that any number of processes can open and
+	communicate over.  If your system does @strong{not} support such things,
+	then the input pipe will be suffixed with "-in" and the output pipe
+	suffixed with "-out" and only one client may connect at a time.
 	@end table
 
 	_EODoc_;
@@ -804,19 +802,20 @@ flag = {
     no-preset;
     doc = <<- _EOF_
 	This option behaves fairly closely to the way the @code{-M} series of
-	options work with the gcc compiler, except that instead of emitting
-	the predecessor dependencies, this emits the successor dependencies
-	(output files).  By default, the output dependency information will be
-	placed in @code{<base-name>.d}, but may also be specified with
-	@code{-MF<file>}.  The target will be the dependency file name, but
-	may also be overridden with @code{-MT<targ-name>}.  That is not,
-	however, recommended.  AutoGen will set the time stamp correctly on
-	the dependency file, but it will not mess with this specified target.
+	options work with the gcc compiler, except that instead of emitting the
+	predecessor dependencies, this emits both the predecessor and the
+	successor dependencies (output files).  By default, the output
+	dependency information will be placed in @code{<base-name>.d}, but may
+	also be specified with @code{-MF<file>}.  The target will be the
+	dependency file name, but may also be overridden with
+	@code{-MT<targ-name>}.  That is not, however, recommended.  AutoGen
+	will set the time stamp correctly on the dependency file, but it will
+	not mess with this specified target.
 
-	@strong{NOTE:} these second letters are part of the option argument,
-	so @code{-MF <file>} must have the space character quoted or omitted, and
-	@code{-M  "F <file>"} is acceptable because the @code{F} is part of
-	the option argument.
+	@strong{NOTE:} these second letters are part of the option argument, so
+	@code{-MF <file>} must have the space character quoted or omitted, and
+	@code{-M "F <file>"} is acceptable because the @code{F} is part of the
+	option argument.
 
 	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or G.
 	They are not all meaningful and one has a somewhat different meaning:
@@ -829,12 +828,28 @@ flag = {
 	-MFwhatever-you-like.dep
 	@end example
 
-        The modification time on the dependency file is adjusted to be one
-	second before the earliest time stamp of any output file.
+	The modification time on the dependency file is adjusted to be one
+	second before the earliest time stamp of any other output file.
 	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
+};
+
+flag = {
+    name        = core;
+    value       = C;
+    descrip     = 'Leave a core dump on a failure exit';
+    ifdef       = HAVE_SYS_RESOURCE_H;
+
+    doc = <<- _EOF_
+	Many systems default to a zero sized core limit.  If the system
+	has the sys/resource.h header and if this option is supplied,
+	then in the failure exit path, autogen will attempt to set the
+	soft core limit to whatever the hard core limit is.  If that
+	does not work, then an administrator must raise the hard core
+	size limit.
+	_EOF_;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

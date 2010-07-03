@@ -2,7 +2,6 @@
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
 ## Time-stamp:      "2010-02-24 15:15:38 bkorb"
-##              by: bkorb
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +20,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 5c87946b3f603161a873d6d8d77b994882909bb9 $
+## $Id: c66b68b48083e35f3d7db5daf81e71062c7ccad8 $
 ## ---------------------------------------------------------------------
 ## Code:
 ACLOCAL_AMFLAGS = -I config

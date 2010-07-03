@@ -3,9 +3,8 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2010-02-24 08:41:56 bkorb"
+# Time-stamp:      "2010-06-26 16:11:19 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
-#
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +22,6 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: 32e2c33cf602928240c517d9c993d76baa8f4b5a $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -50,18 +48,20 @@ then
     cat  >&3 <<- _EOF_
 	run_ag()
 	{
-	    local tfile=ag-\${1}-$$.log
+	    tfile=ag-\${1}-$$.log
+	    tag="-MF${testname}-stamp-\${1} --trace=every --trace-out=\${tfile}"
 	    shift
-	    ${AGexe} --trace=every --trace-out=\${tfile} "\$@"
+	    ${AGexe} \${tag} "\$@"
 	}
 	_EOF_
 else
     cat  >&3 <<- _EOF_
 	run_ag()
 	{
+	    tag="-MF${testname}-stamp-\${1}"
 	    shift
 	    echo ${AGexe} "\$@"
-	    ${AGexe} "\$@"
+	    ${AGexe} \${tag} "\$@"
 	}
 	_EOF_
 fi

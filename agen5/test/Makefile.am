@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:42:03 bkorb"
+## Time-stamp:      "2010-06-26 16:35:23 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,18 +22,19 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 95ecddb67143ac934ee020a1233cac0c26599795 $
+## $Id: a7ae1761866edfb81186f5315bc7d7790c39eaf8 $
 ## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test
 
 NOSHELL_TESTS = \
-  alist.test   case.test    debug.test    defref.test  dynref.test  \
-  endmac.test  for.test     forfrom.test  forin.test   format.test  get.test   \
-  gperf.test   heredef.test html.test     in.test      license.test line.test  \
-  loop.test    make.test    match.test    pseudo.test  reorder.test stack.test \
-  stress.test  string.test  strtable.test time.test
+    alist.test    case.test     debug.test   defref.test dynref.test \
+    endmac.test   for.test      forfrom.test forin.test  format.test \
+    get.test      gperf.test    heredef.test html.test   in.test \
+    license.test  line.test     loop.test    make.test   match.test \
+    pseudo.test   reorder.test  stack.test   stress.test string.test \
+    strtable.test strxform.test time.test
 
 UNREADY_TESTS   = daemon.test
 TESTS       	= @AGEN5_TESTS@

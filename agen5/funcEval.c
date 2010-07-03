@@ -1,8 +1,7 @@
 
 /*
- *  $Id: 9701e2c63d3aee77b514f5800d7a576ad0ae154d $
  *
- *  Time-stamp:        "2010-02-24 08:42:11 bkorb"
+ *  Time-stamp:        "2010-07-03 09:58:53 bkorb"
  *
  *  This module evaluates macro expressions.
  *
@@ -199,7 +198,8 @@ evalExpression( ag_bool* pMustFree )
                 }
 
                 *pMustFree = AG_TRUE;
-                pzText = aprf(pT->pzTemplText + pMac->ozText, pDef->val.pzText);
+                pzText =
+                    aprf(pT->pzTemplText + pMac->ozText, pDef->val.pzText);
             }
 
             else if (pMac->ozText != 0)

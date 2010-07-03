@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2010-02-24 08:42:13 bkorb"
+#  Time-stamp:      "2010-06-30 20:52:29 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -209,4 +209,4 @@ ESAC (suffix)
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of [=(out-name)=] */
+ * end of [= (out-name) ;; agen5/fsm.tpl =] */

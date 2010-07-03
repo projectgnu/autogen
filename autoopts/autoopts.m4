@@ -4,7 +4,6 @@ dnl autoopts.m4 --- Configure paths for autoopts
 dnl
 dnl Author:            Gary V. Vaughan <gvaughan@localhost>
 dnl Time-stamp:        "2010-02-24 08:41:23 bkorb"
-dnl            by: bkorb
 dnl
 dnl  This file is part of AutoOpts, a companion to AutoGen.
 dnl  AutoOpts is free software.
@@ -26,9 +25,6 @@ dnl  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 dnl  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 dnl  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 dnl --------------------------------------------------------------------
-dnl @(#) $Id: 64f32894fb694eaeba37bdee0ec91d8a50252702 $
-dnl --------------------------------------------------------------------
-dnl
 dnl Code:
 
 # serial 1

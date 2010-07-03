@@ -1,6 +1,5 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# $Id: a2b9e8eaa800a413f9001a69c45d77f6be51f7d7 $
 # Time-stamp:        "2010-06-25 13:31:42 bkorb"
 
 ##

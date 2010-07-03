@@ -4,7 +4,6 @@
 ##
 ## Time-stamp:      "2010-04-04 11:11:04 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-##              by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: 203cabc252a022d3ca3ed1fd5a8720f3bb832fc2 $
+## $Id: fcd3bd34d3a255a75080df41a8490ca409b57354 $
 ## ---------------------------------------------------------------------
 
 AutoGen5 template man=%s.1

@@ -3,7 +3,6 @@ dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
 dnl Time-stamp:      "2010-02-27 16:10:03 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
-dnl            by: bkorb
 dnl
 dnl  This file is part of AutoGen.
 dnl  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +20,7 @@ dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl --------------------------------------------------------------------
-dnl Code: $Id: c5cf3f388ac9bd4340a3b1b902aa088e80870e6d $
+dnl Code: $Id: 17cabd1504b13d3593e1a80703580ed3dc3ec868 $
 dnl --------------------------------------------------------------------
 dnl
 AC_INIT()

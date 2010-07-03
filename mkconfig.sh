@@ -6,7 +6,6 @@ timestamp=$(set -- \
   echo ${2} | sed 's/:[0-9][0-9] .*//;s/[^0-9]//g')
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-##            by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -24,7 +23,7 @@ timestamp=$(set -- \
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: 5f0abc8edac7b2420ce9a536ca4c235716e5f47f $
+# @(#) $Id: 43ebff8aac5b89cef691e1f5b02596d038714472 $
 # ----------------------------------------------------------------------
 case "$1" in
 -CVS ) update_cvs=true  ;;

@@ -1,8 +1,8 @@
 
 /*
- *  columns.c
- *  $Id: 479628e7d91912f6c7c43b6eb3abacb48274c90f $
- *  Time-stamp:        "2010-06-26 10:05:13 bkorb"
+ *  \file columns.c
+ *
+ *  Time-stamp:        "2010-06-30 17:23:57 bkorb"
  *
  *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -51,7 +51,6 @@ size_t  columnSz   = 0;
 size_t  indentSize = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
-/* static forward declarations maintained by :mkfwd */
 static void
 fserr_die(char const * fmt, ...);
 
@@ -59,19 +58,25 @@ static inline void *
 malloc_or_die(size_t sz);
 
 static uint32_t
-handleIndent( tCC* pzIndentArg );
+handleIndent(tCC* pzIndentArg);
 
 static void
-readLines( void );
+readLines(void);
 
 static void
-writeColumns( void );
+writeColumns(void);
 
 static void
-writeRows( void );
+trim_last_separation(void);
 
 static void
-writeFill( void );
+writeRows(void);
+
+static int
+emitWord(char const * word, size_t len, int col);
+
+static void
+writeFill(void);
 
 static int
 compProc( const void* p1, const void* p2 );
@@ -174,7 +179,7 @@ malloc_or_die(size_t sz)
 
 
 static uint32_t
-handleIndent( tCC* pzIndentArg )
+handleIndent(tCC* pzIndentArg)
 {
     char* pz;
     unsigned int colCt = (unsigned int)strtoul(pzIndentArg, &pz, 0);
@@ -395,7 +400,7 @@ readLines(void)
 
 
 static void
-writeColumns( void )
+writeColumns(void)
 {
     char zFmt[ 12 ];
     int  colCt, rowCt, col, row;
@@ -549,7 +554,7 @@ trim_last_separation(void)
 }
 
 static void
-writeRows( void )
+writeRows(void)
 {
     char zFmt[32];
     int  colCt;
@@ -659,7 +664,7 @@ emitWord(char const * word, size_t len, int col)
  *  on each line.
  */
 static void
-writeFill( void )
+writeFill(void)
 {
     char**  ppzLL = papzLines;
     size_t  left  = usedCt;

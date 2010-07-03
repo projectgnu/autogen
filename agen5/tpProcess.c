@@ -1,10 +1,9 @@
 /*
- *  agTempl.c
- *  $Id: 70e4ba8738e0ec5d0395ad0f17dc79ba9a116a2c $
+ *  \file tpProcess.c
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-06-25 20:31:58 bkorb"
+ * Time-stamp:        "2010-06-30 19:25:29 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -180,28 +179,6 @@ processTemplate( tTemplate* pTF )
     if (pOutSpecList == NULL) {
         doStdoutTemplate( pTF );
         return;
-    }
-
-    if (pfDepends != NULL) {
-        static char const tfmt[] = "%s_%s";
-        #define agnm autogenOptions.pzPROGNAME
-
-        char * pz = (char*)(void*)OPT_ARG(BASE_NAME);
-        size_t sz = strlen(agnm) + strlen(pz) + sizeof(tfmt) - 4;
-
-        pzTargetList = AGALOC(sz, "mk targ list");
-        sprintf((char *)pzTargetList, tfmt, agnm, pz);
-
-        pz = (char *)pzTargetList;
-        for (;;) {
-            unsigned int ch = (unsigned int)*(pz++);
-            if (ch == NUL)
-                break;
-            if (! isalnum(ch))
-                pz[-1] = '_';
-        }
-        fprintf(pfDepends, "%s_TList :=", pzTargetList);
-        #undef agnm
     }
 
     do  {
@@ -399,8 +376,8 @@ openOutFile(tOutSpec* pOutSpec)
          */
         pzOutFile = aprf(pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix);
         if (pzOutFile == NULL)
-            AG_ABEND( aprf( "Cannot format file name:  ``%s''",
-                            pOutSpec->pzFileFmt ));
+            AG_ABEND(aprf("Cannot format file name:  ``%s''",
+                          pOutSpec->pzFileFmt));
     }
 
     open_output_file(pzOutFile, strlen(pzOutFile), write_mode, 0);

@@ -4,7 +4,6 @@
 ##
 ## Time-stamp:      "2010-02-24 08:41:28 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-##              by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: fa1a09bc1e95846510d089038426ea55837a3265 $
+## $Id: dc0e4a2a918990f0b16e68a410204e9a9da77ca2 $
 ## ---------------------------------------------------------------------
 ##
 ## This "library" converts texi-isms into man-isms.  It gets included

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:43:41 bkorb"
+## Time-stamp:      "2010-07-03 09:38:04 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -20,8 +20,6 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-## ---------------------------------------------------------------------
-## $Id: ac34bfc50bd677ddc73746a48974444f296ab623 $
 ## ---------------------------------------------------------------------
 
 SUBDIRS         = test
@@ -138,4 +136,4 @@ $(CLexe) :
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# end of agen5/Makefile.am

@@ -1,3 +1,16 @@
+2010-07-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defFind.c (entryListSearch): rewrite the search children
+	loop to simply ignore any text-type nodes that are found.
+	* doc/auto-opts.tpl (hello.c): #include unistd.h only if we have it.
+	* doc/mk-agen-texi-in (INCLUDES): append to CFLAGS so it is actually used.
+	(globally): remove POSIX-isms
+
+2010-06-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c (start_dep_file): new function.  Clean up code.
+	* agen5/tpLoad.c (wrap_up_depends): new function.  Clean up code.
+
 2010-06-24  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agInit.c (config_dep): implement code to handle --make-dep opt.
@@ -32,6 +45,7 @@
 	* columns/columns.c (ENDING): implement new option to emit a final
 	string at the end of output, but before final newline.
 	* columns/opts.def (ending): define and document this option
+	* agen5/test/strxform.test: add test for string transform functions
 
 2010-06-23  Bruce Korb  <bkorb@gnu.org>
 

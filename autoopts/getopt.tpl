@@ -60,7 +60,6 @@ ENDDEF
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]
- *  $Id: 4a1e92c0ae93f7db159036eaf113bb64f3bb6708 $
  */[+
 CASE (suffix) +][+
 == h +]

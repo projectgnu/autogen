@@ -1,8 +1,8 @@
 
-/*
- *  $Id: b8b8df6a207ecfa04caf4e277e3bfd8be06c2d2e $
+/**
+ * \file expOutput.c
  *
- *  Time-stamp:        "2010-06-25 19:02:41 bkorb"
+ *  Time-stamp:        "2010-07-03 09:57:02 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -337,9 +337,10 @@ ag_scm_ag_fprintf( SCM port, SCM fmt, SCM alist )
     }
 
     /*
-     *  If "port" is a number, it is an index into the output stack with
-     *  "0" (zero) representing the current output and "1" the last suspended
-     *  output.  If the number is out of range, we'll fall through to the abend.
+     *  If "port" is a number, it is an index into the output stack with "0"
+     *  (zero) representing the current output and "1" the last suspended
+     *  output.  If the number is out of range, we'll fall through to the
+     *  abend.
      */
     else if (AG_SCM_NUM_P(port)) {
         tFpStack* pSaveFp = pCurFp;
@@ -395,7 +396,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 
     p->pFile = fopen(pz, mode);
     if (p->pFile == NULL)
-        AG_ABEND(aprf( zCannot, errno, "open for output", pz, strerror(errno)));
+        AG_ABEND(aprf(zCannot, errno, "open for output", pz, strerror(errno)));
 
     p->pPrev = pCurFp;
     pCurFp   = p;
@@ -475,7 +476,7 @@ ag_scm_out_push_new( SCM new_file )
         int     tmpfd;
 
         if (pzTemp == NULL) {
-            pzTemp = mkstempPat();
+            pzTemp = mkstemp_pat();
             tmplen = strlen(pzTemp) + 1;
         }
 
@@ -484,7 +485,8 @@ ag_scm_out_push_new( SCM new_file )
         if (tmpfd < 0)
             AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
 
-        open_output_file(pzTemp + tmplen, tmplen - 1, write_mode, FPF_TEMPFILE);
+        open_output_file(
+            pzTemp + tmplen, tmplen - 1, write_mode, FPF_TEMPFILE);
         close(tmpfd);
         return SCM_UNDEFINED;
     }

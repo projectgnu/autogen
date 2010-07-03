@@ -6,7 +6,6 @@
 ## Copyright (c):   1992-2010 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
-##            by: bkorb
 ##
 ## This file is part of AutoGen.
 ##

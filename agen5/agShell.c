@@ -1,6 +1,5 @@
 /*
  *  agShell
- *  $Id: ebe99060592d10ca2d73056373c0fa778c7773af $
  *
  *  Time-stamp:        "2010-04-04 10:39:46 bkorb"
  *

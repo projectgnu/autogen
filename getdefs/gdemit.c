@@ -1,11 +1,10 @@
 /*
- *  $Id: fa63ebad9c3b38aedc813a77a64d2b629b6795f9 $
+ *  $Id: ddba125726f5257e4c3200633e1b7e3952d70bcb $
  *
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Time-stamp:        "2010-02-24 08:38:32 bkorb"
- *            by: bkorb
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

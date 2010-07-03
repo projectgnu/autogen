@@ -1,8 +1,8 @@
 
 /*
- *  agInit.c  $Id: 19ea39febcb6ba18916f499115aba9f49c749593 $
+ *  \file agInit.c
  *
- *  Time-stamp:      "2010-06-25 21:17:13 bkorb"
+ *  Time-stamp:      "2010-07-03 09:39:13 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -39,27 +39,28 @@ add_env_vars(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef DAEMON_ENABLED
- static ag_bool evalProto( tCC** ppzS, uint16_t* pProto );
- static void spawnPipe( char const* pzFile );
- static void spawnListens( tCC* pzPort, sa_family_t af );
- static void becomeDaemon( tCC*, tCC*, tCC*, tCC* );
+ static ag_bool evalProto(char const ** ppzS, uint16_t* pProto);
+ static void spawnPipe(char const* pzFile);
+ static void spawnListens(char const * pzPort, sa_family_t af);
+ static void becomeDaemon(char const *, char const *, char const *,
+                          char const *);
 #endif
 
 #include "expr.ini"
 
 LOCAL void
-initialize( int arg_ct, char** arg_vec )
+initialize(int arg_ct, char** arg_vec)
 {
     /*
      *  Initialize all the Scheme functions.
      */
     ag_init();
     pzLastScheme = zSchemeInit;
-    ag_scm_c_eval_string_from_file_line( zSchemeInit, SCHEME_INIT_FILE,
-                                         schemeLine );
+    ag_scm_c_eval_string_from_file_line(zSchemeInit, SCHEME_INIT_FILE,
+                                        schemeLine);
 #ifndef scm_t_port
     {
-        tSCC zInitRest[] =
+        static char const zInitRest[] =
             "(add-hook! before-error-hook error-source-line)\n"
             "(use-modules (ice-9 stack-catch))";
         pzLastScheme = zInitRest;
@@ -74,31 +75,31 @@ initialize( int arg_ct, char** arg_vec )
     doOptions(arg_ct, arg_vec);
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tSCC zBT[] = "(debug-enable 'backtrace)";
+        static char const zBT[] = "(debug-enable 'backtrace)";
         pzLastScheme = zBT;
-        ag_scm_c_eval_string_from_file_line( zBT, __FILE__, __LINE__ - 2 );
+        ag_scm_c_eval_string_from_file_line(zBT, __FILE__, __LINE__ - 2);
     }
 
 #ifdef DAEMON_ENABLED
 
-    if (! HAVE_OPT( DAEMON ))
+    if (! HAVE_OPT(DAEMON))
         return;
 
     if (0) {
 #ifdef DEBUG_ENABLED
-        tSCC zDevNull[] = "/tmp/AutoGenDebug.txt";
+        static char const zDevNull[] = "/tmp/AutoGenDebug.txt";
 #endif /* DEBUG_ENABLED */
         becomeDaemon("/", zDevNull, zDevNull, zDevNull);
     }
 
     {
-        sa_family_t af = AF_INET;
-        tCC*  pzS = OPT_ARG( DAEMON );
+        sa_family_t  af  = AF_INET;
+        char const * pzS = OPT_ARG(DAEMON);
 
-        if (evalProto( &pzS, &af ))
-            spawnListens( pzS, af );
+        if (evalProto(&pzS, &af))
+            spawnListens(pzS, af);
         else
-            spawnPipe( pzS );
+            spawnPipe(pzS);
     }
 #endif /* DAEMON_ENABLED */
 }
@@ -205,7 +206,7 @@ retry:
             dep_usage(dup_targ);
 
         while (isspace((int)*(++popt)))  ;
-        AGDUPSTR(pzDepFile, popt, "dep file");
+        pzDepFile = aprf("%s-XXXXXX", popt);
         break;
 
     case 'P':
@@ -220,7 +221,7 @@ retry:
 static void
 add_sys_env(char* pzEnvName)
 {
-    tSCC zFmt[] = "%s=1";
+    static char const zFmt[] = "%s=1";
     int i = 2;
 
     for (;;) {
@@ -237,14 +238,14 @@ add_sys_env(char* pzEnvName)
      *  If the user already has something in the environment, do not
      *  override it.
      */
-    if (getenv( pzEnvName ) == NULL) {
+    if (getenv(pzEnvName) == NULL) {
         char* pz;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf( pfTrace, "Adding ``%s'' to environment\n", pzEnvName );
-        pz = aprf( zFmt, pzEnvName );
-        TAGMEM( pz, "Added environment var" );
-        putenv( pz );
+            fprintf(pfTrace, "Adding ``%s'' to environment\n", pzEnvName);
+        pz = aprf(zFmt, pzEnvName);
+        TAGMEM(pz, "Added environment var");
+        putenv(pz);
     }
 }
 
@@ -261,7 +262,7 @@ add_env_vars(void)
 
     {
         char z[ SCRIBBLE_SIZE ] = "__autogen__";
-#if defined( HAVE_SOLARIS_SYSINFO )
+#if defined(HAVE_SOLARIS_SYSINFO)
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
 #ifdef      SI_PLATFORM
@@ -271,58 +272,65 @@ add_env_vars(void)
         int  ix;
         long sz;
 
-        add_sys_env( z );
+        add_sys_env(z);
         for (ix = 0; ix < sizeof(nm)/sizeof(nm[0]); ix++) {
-            sz = sysinfo( nm[ix], z+2, sizeof( z ) - 2);
+            sz = sysinfo(nm[ix], z+2, sizeof(z) - 2);
             if (sz > 0) {
                 sz += 2;
                 while (z[sz-1] == NUL)  sz--;
-                strcpy( z + sz, "__" );
-                add_sys_env( z );
+                strcpy(z + sz, "__");
+                add_sys_env(z);
             }
         }
 
-#elif defined( HAVE_UNAME_SYSCALL )
+#elif defined(HAVE_UNAME_SYSCALL)
         struct utsname unm;
 
-        add_sys_env( z );
-        if (uname( &unm ) != 0) {
-            fprintf( stderr, "Error %d (%s) making uname(2) call\n",
-                     errno, strerror( errno ));
-            exit( EXIT_FAILURE );
+        add_sys_env(z);
+        if (uname(&unm) != 0) {
+            fprintf(stderr, "Error %d (%s) making uname(2) call\n",
+                    errno, strerror(errno));
+            exit(EXIT_FAILURE);
         }
 
-        sprintf( z+2, "%s__", unm.sysname );
-        add_sys_env( z );
+        sprintf(z+2, "%s__", unm.sysname);
+        add_sys_env(z);
 
-        sprintf( z+2, "%s__", unm.machine );
-        add_sys_env( z );
+        sprintf(z+2, "%s__", unm.machine);
+        add_sys_env(z);
 
-        sprintf( z+2, "%s__", unm.nodename );
-        add_sys_env( z );
+        sprintf(z+2, "%s__", unm.nodename);
+        add_sys_env(z);
 #else
 
-        add_sys_env( z );
+        add_sys_env(z);
 #endif
     }
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  T H E   F O L L O W I N G   I S   D E A D   C O D E
+ *
+ *  Someday, I want to enable daemon code, but need lotsa time.....
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifdef DAEMON_ENABLED
 
   static ag_bool
-evalProto( tCC** ppzS, uint16_t* pProto )
+evalProto(char const ** ppzS, uint16_t* pProto)
 {
-    tCC* pzS = *ppzS;
+    char const * pzS = *ppzS;
 
     if (IS_ALPHABETIC_CHAR(*pzS)) {
         inet_family_map_t* pMap = inet_family_map;
         do  {
-            if (strncmp( pzS, pMap->pz_name, pMap->nm_len ) == 0) {
+            if (strncmp(pzS, pMap->pz_name, pMap->nm_len) == 0) {
                 *pProto = pMap->family;
                 *ppzS += pMap->nm_len;
                 return AG_TRUE;
             }
-        } while ( (++pMap)->pz_name != NULL );
+        } while ((++pMap)->pz_name != NULL);
     }
 
     return IS_DEC_DIGIT_CHAR(*pzS);
@@ -330,14 +338,14 @@ evalProto( tCC** ppzS, uint16_t* pProto )
 
 
   LOCAL void
-handleSighup( int sig )
+handleSighup(int sig)
 {
     redoOptions = AG_TRUE;
 }
 
 
   static void
-spawnPipe( tCC* pzFile )
+spawnPipe(char const * pzFile)
 {
 #   define S_IRW_ALL \
         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
@@ -347,34 +355,34 @@ spawnPipe( tCC* pzFile )
     tFdPair fdpair;
     ag_bool removeDaemonFile = AG_FALSE;
 
-    if (pipe( (int*)&fdpair ) != 0)
-        AG_ABEND( aprf( zCannot, errno, "create", "a pipe", strerror(errno)));
+    if (pipe((int*)&fdpair) != 0)
+        AG_ABEND(aprf(zCannot, errno, "create", "a pipe", strerror(errno)));
 
     {
         struct stat sb;
 
-        if (stat( pzFile, &sb ) != 0) {
+        if (stat(pzFile, &sb) != 0) {
             int fd;
             if (errno != ENOENT)
-                AG_ABEND( aprf( zCannot, errno, "stat",
-                                pzFile, strerror( errno )));
-            fd = creat( pzFile, S_IRW_ALL );
+                AG_ABEND(aprf(zCannot, errno, "stat",
+                              pzFile, strerror(errno)));
+            fd = creat(pzFile, S_IRW_ALL);
             if (fd < 0)
-                AG_ABEND( aprf( zCannot, errno, "creat(e)",
-                                pzFile, strerror( errno )));
-            close( fd );
+                AG_ABEND(aprf(zCannot, errno, "creat(e)",
+                              pzFile, strerror(errno)));
+            close(fd);
             removeDaemonFile = AG_TRUE;
         }
     }
 
 #ifdef HAVE_CONNLD
-    (void)ioctl( fdpair.writeFd, I_PUSH, "connld" );
+    (void)ioctl(fdpair.writeFd, I_PUSH, "connld");
 #endif /* HAVE_CONNLD */
 
-    if (fattach( fdpair.writeFd, pzFile ) != 0)
-        AG_ABEND( aprf( zCannot, errno, "fattach", pzFile, strerror(errno)));
+    if (fattach(fdpair.writeFd, pzFile) != 0)
+        AG_ABEND(aprf(zCannot, errno, "fattach", pzFile, strerror(errno)));
 
-    close( fdpair.writeFd );
+    close(fdpair.writeFd);
 
     {
         struct pollfd polls[1];
@@ -383,7 +391,7 @@ spawnPipe( tCC* pzFile )
 
         for (;;) {
             char const * pzerr;
-            int   ct = poll( polls, 1, -1 );
+            int   ct = poll(polls, 1, -1);
             struct strrecvfd recvfd;
             pid_t child;
 
@@ -392,9 +400,9 @@ spawnPipe( tCC* pzFile )
                 if ((errno != EINTR) || (! redoOptions))
                     goto finish_with_fattach;
 
-                optionRestore( &autogenOptions );
-                doOptions( autogenOptions.origArgCt,
-                           autogenOptions.origArgVect );
+                optionRestore(&autogenOptions);
+                doOptions(autogenOptions.origArgCt,
+                          autogenOptions.origArgVect);
                 SET_OPT_DEFINITIONS("-");
                 break;
 
@@ -405,7 +413,7 @@ spawnPipe( tCC* pzFile )
                 child = fork();
                 switch (child) {
                 default:
-                    waitpid( child, &ct, 0 );
+                    waitpid(child, &ct, 0);
                     continue;
 
                 case -1:
@@ -415,21 +423,21 @@ spawnPipe( tCC* pzFile )
                 case 0:
                 }
 #ifdef HAVE_CONNLD
-                if (ioctl( fdpair.readFd, I_RECVFD, &recvfd ) != 0)
-                    AG_ABEND( aprf(zCannot, errno, "I_RECVFD", "on a pipe",
-                                   strerror(errno)));
+                if (ioctl(fdpair.readFd, I_RECVFD, &recvfd) != 0)
+                    AG_ABEND(aprf(zCannot, errno, "I_RECVFD", "on a pipe",
+                                  strerror(errno)));
 #else
                 recvfd.fd = fdpair.readFd;
 #endif /* ! HAVE_FATTACH */
 
-                if (dup2( recvfd.fd, STDIN_FILENO ) != STDIN_FILENO) {
+                if (dup2(recvfd.fd, STDIN_FILENO) != STDIN_FILENO) {
                     pzerr = strerror(errno);
-                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdin", pzerr);
+                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdin", pzerr));
                 }
 
-                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO) {
+                if (dup2(fdpair.writeFd, STDOUT_FILENO) != STDOUT_FILENO) {
                     pzerr = strerror(errno);
-                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdout", pzerr);
+                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdout", pzerr));
                 }
 
                 return;
@@ -439,7 +447,7 @@ spawnPipe( tCC* pzFile )
 
  finish_with_fattach:
     if (removeDaemonFile)
-        unlink( pzFile );
+        unlink(pzFile);
 #   undef S_IRW_ALL
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
@@ -451,22 +459,22 @@ spawnPipe( tCC* pzFile )
 
     {
         size_t len = 2 * (strlen(pzFile) + 5);
-        pzIn = AGALOC( len + 5, "fifo file name" );
-        pzOut = pzIn + sprintf( pzIn, "%s-in", pzFile ) + 1;
+        pzIn = AGALOC(len + 5, "fifo file name");
+        pzOut = pzIn + sprintf(pzIn, "%s-in", pzFile) + 1;
     }
 
-    unlink( pzIn );
-    if ((mkfifo( pzIn, S_IRW_ALL ) != 0) && (errno != EEXIST))
-        AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzIn, strerror(errno)));
+    unlink(pzIn);
+    if ((mkfifo(pzIn, S_IRW_ALL) != 0) && (errno != EEXIST))
+        AG_ABEND(aprf(zCannot, errno, "mkfifo",    pzIn, strerror(errno)));
 
-    (void)sprintf( pzOut, "%s-out", pzFile );
-    unlink( pzOut );
-    if ((mkfifo( pzOut, S_IRW_ALL ) != 0) && (errno != EEXIST))
-        AG_ABEND( aprf( zCannot, errno, "mkfifo",    pzOut, strerror(errno)));
+    (void)sprintf(pzOut, "%s-out", pzFile);
+    unlink(pzOut);
+    if ((mkfifo(pzOut, S_IRW_ALL) != 0) && (errno != EEXIST))
+        AG_ABEND(aprf(zCannot, errno, "mkfifo",    pzOut, strerror(errno)));
 
-    fdpair.readFd = open( pzIn, O_RDONLY );
+    fdpair.readFd = open(pzIn, O_RDONLY);
     if (fdpair.readFd < 0)
-        AG_ABEND( aprf( zCannot, errno, "open fifo", pzIn, strerror(errno)));
+        AG_ABEND(aprf(zCannot, errno, "open fifo", pzIn, strerror(errno)));
 
 
     {
@@ -475,7 +483,7 @@ spawnPipe( tCC* pzFile )
         polls[0].events = POLLIN | POLLPRI;
 
         for (;;) {
-            int ct = poll( polls, 1, -1 );
+            int ct = poll(polls, 1, -1);
             struct strrecvfd recvfd;
             pid_t child;
             char const * pzerr;
@@ -485,9 +493,9 @@ spawnPipe( tCC* pzFile )
                 if ((errno != EINTR) || (! redoOptions))
                     goto no_fattach_finish;
 
-                optionRestore( &autogenOptions );
-                doOptions( autogenOptions.origArgCt,
-                           autogenOptions.origArgVect );
+                optionRestore(&autogenOptions);
+                doOptions(autogenOptions.origArgCt,
+                          autogenOptions.origArgVect);
                 SET_OPT_DEFINITIONS("-");
                 break;
 
@@ -498,7 +506,7 @@ spawnPipe( tCC* pzFile )
                 child = fork();
                 switch (child) {
                 default:
-                    waitpid( child, &ct, 0 );
+                    waitpid(child, &ct, 0);
                     continue;
 
                 case -1:
@@ -508,27 +516,26 @@ spawnPipe( tCC* pzFile )
                 case 0:
                 }
 
-                if (dup2( fdpair.readFd, STDIN_FILENO ) != STDIN_FILENO)
-                    AG_ABEND( aprf(zCannot, errno, "dup2", "stdin",
-                                   strerror(errno)));
+                if (dup2(fdpair.readFd, STDIN_FILENO) != STDIN_FILENO)
+                    AG_ABEND(aprf(zCannot, errno, "dup2", "stdin",
+                                  strerror(errno)));
 
-                fdpair.writeFd = open( pzOut, O_WRONLY );
+                fdpair.writeFd = open(pzOut, O_WRONLY);
                 if (fdpair.writeFd < 0)
-                    AG_ABEND( aprf( zCannot, errno, "open fifo", pzOut,
-                                    strerror(errno)));
+                    AG_ABEND(aprf(zCannot, errno, "open fifo", pzOut,
+                                  strerror(errno)));
 
                 polls[0].fd = fdpair.writeFd;
                 polls[0].events = POLLOUT;
-                if (poll( polls, 1, -1 ) != 1) {
+                if (poll(polls, 1, -1) != 1) {
                     pzerr = strerror(errno);
-                    AG_ABEND( aprf(zCannot, errno, "poll", "write pipe",
-                                   pzerr));
+                    AG_ABEND(aprf(zCannot, errno, "poll", "write pipe",
+                                  pzerr));
                 }
 
-                if (dup2( fdpair.writeFd, STDOUT_FILENO ) != STDOUT_FILENO) {
+                if (dup2(fdpair.writeFd, STDOUT_FILENO) != STDOUT_FILENO) {
                     pzerr = strerror(errno);
-                    AG_ABEND( aprf(zCannot, errno, "dup2", pzOut,
-                                   pzerr));
+                    AG_ABEND(aprf(zCannot, errno, "dup2", pzOut, pzerr));
                 }
 
                 return;
@@ -537,21 +544,21 @@ spawnPipe( tCC* pzFile )
     }
 
  no_fattach_finish:
-    unlink( pzIn );
-    unlink( pzOut );
-    AGFREE( pzIn );
+    unlink(pzIn);
+    unlink(pzOut);
+    AGFREE(pzIn);
 #endif /* ! HAVE_FATTACH */
 #   undef S_IRW_ALL
 
-    exit( EXIT_SUCCESS );
+    exit(EXIT_SUCCESS);
 }
 
 
   static void
-spawnListens( tCC* pzPort, sa_family_t addr_family )
+spawnListens(char const * pzPort, sa_family_t addr_family)
 {
-    tSCC zPortFmt[] = "to port %s with %d type address";
-    int socket_fd = socket( addr_family, SOCK_STREAM, 0 );
+    static char const zPortFmt[] = "to port %s with %d type address";
+    int socket_fd = socket(addr_family, SOCK_STREAM, 0);
     union {
         struct sockaddr     addr;
         struct sockaddr_in  in_addr;
@@ -561,20 +568,20 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
     uint32_t        addr_len;
 
     if (socket_fd < 0)
-        AG_ABEND( aprf( zCannot, errno, "socket", "AF_INET/SOCK_STREAM",
-                        strerror( errno )));
+        AG_ABEND(aprf(zCannot, errno, "socket", "AF_INET/SOCK_STREAM",
+                      strerror(errno)));
 
     switch (addr_family) {
 
     case AF_UNIX:
     {
-        uint32_t p_len = strlen( pzPort );
+        uint32_t p_len = strlen(pzPort);
 
         if (p_len > sizeof(sa.un_addr.sun_path))
-            AG_ABEND( aprf( "AF_UNIX path exceeds %d", p_len ));
+            AG_ABEND(aprf("AF_UNIX path exceeds %d", p_len));
         sa.un_addr.sun_family  = AF_UNIX;
-        strncpy( sa.un_addr.sun_path, pzPort, p_len );
-        addr_len = sizeof( sa.un_addr ) - sizeof( sa.un_addr.sun_path ) + p_len;
+        strncpy(sa.un_addr.sun_path, pzPort, p_len);
+        addr_len = sizeof(sa.un_addr) - sizeof(sa.un_addr.sun_path) + p_len;
     }
     break;
 
@@ -587,15 +594,15 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         sa.in_addr.sin_addr.s_addr = INADDR_ANY;
 
         errno = 0;
-        if ((unlink( pzPort ) != 0) && (errno != ENOENT))
-            AG_ABEND(aprf( zCannot, errno, "unlink", pzPort, strerror(errno)));
+        if ((unlink(pzPort) != 0) && (errno != ENOENT))
+            AG_ABEND(aprf(zCannot, errno, "unlink", pzPort, strerror(errno)));
 
-        port = (uint16_t)strtol( pzPort, &pz, 0 );
+        port = (uint16_t)strtol(pzPort, &pz, 0);
         if ((errno != 0) || (*pz != NUL))
-            AG_ABEND( aprf( "Invalid port number:  '%s'", pzPort ));
+            AG_ABEND(aprf("Invalid port number:  '%s'", pzPort));
 
-        sa.in_addr.sin_port = htons( (short)port );
-        addr_len = sizeof( sa.in_addr );
+        sa.in_addr.sin_port = htons((short)port);
+        addr_len = sizeof(sa.in_addr);
     }
     break;
 
@@ -604,19 +611,19 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
                       addr_family));
     }
 
-    if (bind( socket_fd, &sa.addr, addr_len ) < 0) {
-        char* pz = aprf( zPortFmt, pzPort, addr_family );
-        AG_ABEND( aprf( zCannot, errno, "bind", pz, strerror( errno )));
+    if (bind(socket_fd, &sa.addr, addr_len) < 0) {
+        char* pz = aprf(zPortFmt, pzPort, addr_family);
+        AG_ABEND(aprf(zCannot, errno, "bind", pz, strerror(errno)));
     }
 
-    if (fcntl( socket_fd, F_SETFL, O_NONBLOCK ) < 0) {
-        AG_ABEND( aprf( zCannot, errno, "socket-fcntl", "FNDELAY",
-                        strerror( errno )));
+    if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0) {
+        AG_ABEND(aprf(zCannot, errno, "socket-fcntl", "FNDELAY",
+                      strerror(errno)));
     }
 
-    if (listen( socket_fd, 5 ) < 0) {
-        char* pz = aprf( zPortFmt, pzPort );
-        AG_ABEND( aprf( zCannot, errno, "listen", pz, strerror( errno )));
+    if (listen(socket_fd, 5) < 0) {
+        char* pz = aprf(zPortFmt, pzPort);
+        AG_ABEND(aprf(zCannot, errno, "listen", pz, strerror(errno)));
     }
 
     for (;;) {
@@ -624,22 +631,22 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         int    max_fd = socket_fd;
         int    new_conns;
 
-        FD_ZERO( &fds );
-        FD_SET( socket_fd, &fds );
+        FD_ZERO(&fds);
+        FD_SET(socket_fd, &fds);
 
-        new_conns = select( max_fd, &fds, NULL, NULL, NULL );
+        new_conns = select(max_fd, &fds, NULL, NULL, NULL);
         if (new_conns < 0) {
             if (errno == EINTR)
                 continue;
 
             if (! redoOptions) {
-                unlink( pzPort );
-                exit( EXIT_SUCCESS );
+                unlink(pzPort);
+                exit(EXIT_SUCCESS);
             }
 
-            optionRestore( &autogenOptions );
-            doOptions( autogenOptions.origArgCt,
-                       autogenOptions.origArgVect );
+            optionRestore(&autogenOptions);
+            doOptions(autogenOptions.origArgCt,
+                      autogenOptions.origArgVect);
             SET_OPT_DEFINITIONS("-");
 
             continue;
@@ -661,7 +668,7 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         static int try_ct = 0;
         struct sockaddr addr;
         socklen_t addr_len;
-        int fd = accept( socket_fd, &addr, &addr_len );
+        int fd = accept(socket_fd, &addr, &addr_len);
         if (fd < 0)
             switch (errno) {
             case EINTR:
@@ -678,22 +685,20 @@ spawnListens( tCC* pzPort, sa_family_t addr_family )
         break;
     }
 
-    if (dup2( socket_fd, STDOUT_FILENO ) != STDOUT_FILENO)
-        AG_ABEND( aprf(zCannot, errno, "dup2", "out on socket_fd",
+    if (dup2(socket_fd, STDOUT_FILENO) != STDOUT_FILENO)
+        AG_ABEND(aprf(zCannot, errno, "dup2", "out on socket_fd",
                        strerror(errno)));
-    if (dup2( socket_fd, STDIN_FILENO ) != STDIN_FILENO)
-        AG_ABEND( aprf(zCannot, errno, "dup2", "in on socket_fd",
-                       strerror(errno)));
+    if (dup2(socket_fd, STDIN_FILENO) != STDIN_FILENO)
+        AG_ABEND(aprf(zCannot, errno, "dup2", "in on socket_fd",
+                      strerror(errno)));
 }
 
 
   static void
-becomeDaemon( tCC* pzStdin,
-              tCC* pzStdout,
-              tCC* pzStderr,
-              tCC* pzDaemonDir )
+becomeDaemon(char const * pzStdin, char const * pzStdout, char const * pzStderr,
+             char const * pzDaemonDir)
 {
-    tSCC zNoFork[] = "Error %d while forking:  %s\n";
+    static char const zNoFork[] = "Error %d while forking:  %s\n";
     /*
      *  Become a daemon process by exiting the current process
      *  and allowing the child to continue.  Also, change stdin,
@@ -705,9 +710,9 @@ becomeDaemon( tCC* pzStdin,
 
         switch (ret) {
         case -1:
-            fprintf( stderr, zNoFork, errno, strerror( errno ));
+            fprintf(stderr, zNoFork, errno, strerror(errno));
         default:
-            exit( ret );
+            exit(ret);
 
         case 0:
             break;
@@ -718,9 +723,9 @@ becomeDaemon( tCC* pzStdin,
      *  Now, become a process group and session group leader.
      */
     if (setsid() == -1) {
-        fprintf( stderr, "Error %d setting session ID:  %s\n",
-                 errno, strerror( errno ));
-        exit( 99 );
+        fprintf(stderr, "Error %d setting session ID:  %s\n",
+                errno, strerror(errno));
+        exit(99);
     }
 
     /*
@@ -731,33 +736,33 @@ becomeDaemon( tCC* pzStdin,
      */
     switch (fork()) {
     case -1:
-        fprintf( stderr, zNoFork, errno, strerror( errno ));
-        exit( 99 );
+        fprintf(stderr, zNoFork, errno, strerror(errno));
+        exit(99);
 
     case 0:
         break;
 
     default:
-        exit( 0 );  /* parent process - silently go away */
+        exit(0);  /* parent process - silently go away */
     }
 
-    umask( 0 );
+    umask(0);
     if (pzDaemonDir == (char*)NULL)
         pzDaemonDir = "/";
 
-    chdir( pzDaemonDir );
+    chdir(pzDaemonDir);
 
     /*
      *  Reopen the input, output and error files, unless we were told not to
      */
     if (pzStdin != (char*)NULL)
-        freopen( pzStdin,  "r", stdin );
+        freopen(pzStdin,  "r", stdin);
 
     if (pzStdout != (char*)NULL)
-        freopen( pzStdout, "w", stdout );
+        freopen(pzStdout, "w", stdout);
 
     if (pzStderr != (char*)NULL)
-        freopen( pzStderr, "w", stderr );
+        freopen(pzStderr, "w", stderr);
 
     /* We are a daemon now */
 }

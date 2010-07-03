@@ -1,6 +1,7 @@
 
 /*
- *  sort.c  $Id: aac1bf81481f4bb149a72129fbd11fe54db7fa35 $
+ * \file sort.c
+ *
  * Time-stamp:      "2010-02-24 08:40:16 bkorb"
  *
  *  This module implements argument sorting.

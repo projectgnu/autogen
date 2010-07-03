@@ -1,7 +1,6 @@
 
 /*
  *  expString.c
- *  $Id: abe96753939787ee59fb6bebac66f346cc0c5e70 $
  *
  *  Time-stamp:        "2010-02-24 08:42:56 bkorb"
  *

@@ -4,7 +4,6 @@
 ##
 ## Time-stamp:      "2010-02-24 08:38:39 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-##            by: bkorb
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +22,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 0c27333d3b870a3413623a88b5ff92fd459643f4 $
+## $Id: 9fdefada12812d944f85afaa296762ea80dea0f4 $
 ## ---------------------------------------------------------------------
 ## Code:
 

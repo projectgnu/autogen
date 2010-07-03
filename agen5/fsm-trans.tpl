@@ -333,4 +333,4 @@ DEFINE stepping-machine
 
 ENDDEF stepping-machine
 
-=]
+# end of agen5/fsm-trans.tpl =]

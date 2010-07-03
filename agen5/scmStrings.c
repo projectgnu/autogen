@@ -1,10 +1,10 @@
 
-/*
- *  scmStrings.c
- *  $Id: 89d3f09e74297c6d10003a58d8d8e5b50cda518e $
+/**
+ *  \file scmStrings.c
+ *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2010-02-24 08:42:04 bkorb"
+ * Time-stamp:        "2010-06-30 20:50:32 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -128,4 +128,4 @@ ag_scm2zchars( SCM s, tCC* type )
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of agen5/autogen.h */
+ * end of agen5/scmStrings.c */

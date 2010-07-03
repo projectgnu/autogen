@@ -1,9 +1,7 @@
-
 /*
- *  agUtils.c
- *  $Id: e7f6399909780ee7de5deb0e5b32e3dbc0b2afff $
+ *  \file agUtils.c
  *
- *  Time-stamp:        "2010-06-25 20:16:25 bkorb"
+ *  Time-stamp:        "2010-06-30 21:28:12 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -31,16 +29,19 @@ define_base_name(void);
 static void
 put_defines_into_env(void);
 
-static tCC*
-skipQuote( tCC* pzQte );
+static void
+start_dep_file(void);
+
+static char const *
+skipQuote(char const * pzQte);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifndef HAVE_STRLCPY
 size_t
-strlcpy( char* dest, tCC* src, size_t n )
+strlcpy(char* dest, char const * src, size_t n)
 {
     char* pz = dest;
-    tCC* ps = src;
+    char const * ps = src;
     size_t sz = 0;
 
     for (;;) {
@@ -52,7 +53,7 @@ strlcpy( char* dest, tCC* src, size_t n )
          */
         if (--n <= 0) {
             pz[-1] = NUL;
-            sz = strlen( src ) + 1; /* count of chars not copied out */
+            sz = strlen(src) + 1; /* count of chars not copied out */
             break;
         }
     }
@@ -63,26 +64,26 @@ strlcpy( char* dest, tCC* src, size_t n )
 
 
 LOCAL char *
-aprf( char const* pzFmt, ... )
+aprf(char const * pzFmt, ...)
 {
     char* pz;
     va_list ap;
-    va_start( ap, pzFmt );
-    (void)vasprintf( &pz, pzFmt, ap );
-    va_end( ap );
+    va_start(ap, pzFmt);
+    (void)vasprintf(&pz, pzFmt, ap);
+    va_end(ap);
 
     if (pz == NULL) {
         tSCC zMsg[] = "could not allocate for or formatting failed on:\n%s";
         char z[ sizeof (zMsg) + SCRIBBLE_SIZE ];
         snprintf(z, sizeof(z), zMsg, pzFmt);
-        AG_ABEND( z );
+        AG_ABEND(z);
     }
     return pz;
 }
 
 
 LOCAL char *
-mkstempPat( void )
+mkstemp_pat(void)
 {
     static char const * pzTmpDir = NULL;
     static size_t tmpdirlen = 0;
@@ -108,7 +109,7 @@ mkstempPat( void )
         size_t len = 2 * (tmpdirlen + sizeof(tmp_pat));
         char* pzRes = AGALOC(len, "stemp pattern");
         manageAllocatedData((void*)pzRes);
-        TAGMEM( pzRes, "temp file template" );
+        TAGMEM(pzRes, "temp file template");
         memcpy(pzRes, pzTmpDir, tmpdirlen);
         memcpy(pzRes + tmpdirlen, tmp_pat, sizeof(tmp_pat));
         return pzRes;
@@ -118,34 +119,34 @@ mkstempPat( void )
 static void
 define_base_name(void)
 {
-    tCC*  pz;
+    char const *  pz;
     char* pzD;
 
-    if (! ENABLED_OPT( DEFINITIONS )) {
-        OPT_ARG( BASE_NAME ) = "baseless";
+    if (! ENABLED_OPT(DEFINITIONS)) {
+        OPT_ARG(BASE_NAME) = "baseless";
         return;
     }
 
-    pz = strrchr( OPT_ARG( DEFINITIONS ), '/' );
+    pz = strrchr(OPT_ARG(DEFINITIONS), '/');
     /*
      *  Point to the character after the last '/', or to the full
      *  definition file name, if there is no '/'.
      */
-    pz = (pz == NULL) ? OPT_ARG( DEFINITIONS ) : (pz + 1);
+    pz = (pz == NULL) ? OPT_ARG(DEFINITIONS) : (pz + 1);
 
     /*
      *  IF input is from stdin, then use "stdin"
      */
     if ((pz[0] == '-') && (pz[1] == NUL)) {
-        OPT_ARG( BASE_NAME ) = "stdin";
+        OPT_ARG(BASE_NAME) = "stdin";
         return;
     }
 
     /*
      *  Otherwise, use the basename of the definitions file
      */
-    OPT_ARG( BASE_NAME ) = \
-        pzD = AGALOC( strlen( pz )+1, "derived base name" );
+    OPT_ARG(BASE_NAME) = \
+        pzD = AGALOC(strlen(pz)+1, "derived base name");
 
     while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
     *pzD = NUL;
@@ -154,11 +155,11 @@ define_base_name(void)
 static void
 put_defines_into_env(void)
 {
-    int     ct  = STACKCT_OPT(  DEFINE );
-    tCC**   ppz = STACKLST_OPT( DEFINE );
+    int     ct  = STACKCT_OPT(DEFINE);
+    char const **   ppz = STACKLST_OPT(DEFINE);
 
     do  {
-        tCC* pz = *(ppz++);
+        char const * pz = *(ppz++);
         /*
          *  IF there is no associated value,  THEN set it to '1'.
          *  There are weird problems with empty defines.
@@ -166,24 +167,93 @@ put_defines_into_env(void)
          *  really, there is no good recovery mechanism for environment
          *  data.
          */
-        if (strchr( pz, '=' ) == NULL) {
-            size_t siz = strlen( pz )+3;
-            char*  p   = AGALOC( siz, "env define" );
+        if (strchr(pz, '=') == NULL) {
+            size_t siz = strlen(pz)+3;
+            char*  p   = AGALOC(siz, "env define");
 
-            strcpy( p, pz );
-            strcpy( p+siz-3, "=1" );
+            strcpy(p, pz);
+            strcpy(p+siz-3, "=1");
             pz = p;
         }
 
         /*
          *  Now put it in the environment
          */
-        putenv( (char*)pz );
+        putenv((char*)pz);
     } while (--ct > 0);
 }
 
+static void
+start_dep_file(void)
+{
+    static char const mkdep_fmt[] =
+        "# Makefile dependency file created by %s\n"
+        "# with the following command:\n";
+
+    char * pz;
+
+    if (pzDepFile == NULL)
+        pzDepFile = aprf("%s.d-XXXXXX", OPT_ARG(BASE_NAME));
+    mkstemp((char *)pzDepFile);
+    pfDepends = fopen(pzDepFile, "w");
+
+    if (pfDepends == NULL)
+        AG_ABEND(aprf(zCannot, errno, "fopen for write", pzDepFile,
+                      strerror(errno)));
+
+    fprintf(pfDepends, mkdep_fmt, autogenOptions.pzProgName);
+
+    {
+        int     ac = autogenOptions.origArgCt;
+        char ** av = autogenOptions.origArgVect;
+
+        while (ac-- > 0) {
+            char * arg = *(av++);
+            fprintf(pfDepends, "#   %s\n", arg);
+        }
+    }
+
+    if (pzDepTarget == NULL) {
+        char * p;
+        AGDUPSTR(pzDepTarget, pzDepFile, "targ name");
+        p  = (char *)pzDepTarget + strlen(pzDepTarget) - 7;
+        *p = NUL;
+    }
+
+    {
+        static char const tfmt[] = "%s_%s";
+        char const * pnm = autogenOptions.pzPROGNAME;
+        char const * bnm = strchr(pzDepTarget, '/');
+
+        if (bnm != NULL)
+            bnm++;
+        else
+            bnm = pzDepTarget;
+
+        {
+            size_t sz = strlen(pnm) + strlen(bnm) + sizeof(tfmt) - 4;
+
+            pz_targ_base = pz = AGALOC(sz, "mk targ list");
+            sprintf(pz, tfmt, pnm, bnm);
+        }
+    }
+
+    /*
+     * Now scan over the characters in "pz_targ_base".  Anything that
+     * is not a legal name character gets replaced with an underscore.
+     */
+    for (;;) {
+        unsigned int ch = (unsigned int)*(pz++);
+        if (ch == NUL)
+            break;
+        if (! isalnum(ch))
+            pz[-1] = '_';
+    }
+    fprintf(pfDepends, "%s_TList =", pz_targ_base);
+}
+
 LOCAL void
-doOptions( int arg_ct, char** arg_vec )
+doOptions(int arg_ct, char ** arg_vec)
 {
     /*
      *  Advance the argument counters and pointers past any
@@ -191,57 +261,54 @@ doOptions( int arg_ct, char** arg_vec )
      */
     {
         tSCC zOnlyOneSrc[] = "%s ERROR:  Too many definition files\n";
-        int  optCt = optionProcess( &autogenOptions, arg_ct, arg_vec );
+        int  optCt = optionProcess(&autogenOptions, arg_ct, arg_vec);
 
         /*
          *  Make sure we have a source file, even if it is "-" (stdin)
          */
         switch (arg_ct - optCt) {
         case 1:
-            if (! HAVE_OPT( DEFINITIONS )) {
-                OPT_ARG( DEFINITIONS ) = *(arg_vec + optCt);
+            if (! HAVE_OPT(DEFINITIONS)) {
+                OPT_ARG(DEFINITIONS) = *(arg_vec + optCt);
                 break;
             }
             /* FALLTHROUGH */
 
         default:
-            fprintf( stderr, zOnlyOneSrc, pzProg );
-            USAGE( EXIT_FAILURE );
+            fprintf(stderr, zOnlyOneSrc, pzProg);
+            USAGE(EXIT_FAILURE);
             /* NOTREACHED */
 
         case 0:
-            if (! HAVE_OPT( DEFINITIONS ))
-                OPT_ARG( DEFINITIONS ) = "-";
+            if (! HAVE_OPT(DEFINITIONS))
+                OPT_ARG(DEFINITIONS) = "-";
             break;
         }
     }
 
     startTime = time(NULL);
 
-    if (! HAVE_OPT( TIMEOUT ))
+    if (! HAVE_OPT(TIMEOUT))
         OPT_ARG(TIMEOUT) = (char const *)AG_DEFAULT_TIMEOUT;
 
     /*
      *  IF the definitions file has been disabled,
      *  THEN a template *must* have been specified.
      */
-    if (  (! ENABLED_OPT( DEFINITIONS ))
-       && (! HAVE_OPT( OVERRIDE_TPL )) )
+    if (  (! ENABLED_OPT(DEFINITIONS))
+       && (! HAVE_OPT(OVERRIDE_TPL)) )
         AG_ABEND( "no template was specified" );
 
     /*
      *  IF we do not have a base-name option, then we compute some value
      */
-    if (! HAVE_OPT( BASE_NAME ))
+    if (! HAVE_OPT(BASE_NAME))
         define_base_name();
 
-    if (HAVE_OPT(MAKE_DEP)) {
-        if (pzDepFile == NULL)
-            pzDepFile = aprf("%s.d", (char*)(void*)OPT_ARG(BASE_NAME));
-        pfDepends = fopen(pzDepFile, "w");
-    }
+    if (HAVE_OPT(MAKE_DEP))
+        start_dep_file();
 
-    strequate( OPT_ARG( EQUATE ));
+    strequate(OPT_ARG(EQUATE));
 
     /*
      *  IF we have some defines to put in our environment, ...
@@ -250,24 +317,24 @@ doOptions( int arg_ct, char** arg_vec )
         put_defines_into_env();
 }
 
-LOCAL tCC*
-getDefine( tCC* pzDefName, ag_bool check_env )
+LOCAL char const *
+getDefine(char const * pzDefName, ag_bool check_env)
 {
-    tCC**   ppz;
+    char const **   ppz;
     int     ct;
-    if (HAVE_OPT( DEFINE )) {
-        ct  = STACKCT_OPT(  DEFINE );
-        ppz = STACKLST_OPT( DEFINE );
+    if (HAVE_OPT(DEFINE)) {
+        ct  = STACKCT_OPT( DEFINE);
+        ppz = STACKLST_OPT(DEFINE);
 
         while (ct-- > 0) {
-            tCC*  pz   = *(ppz++);
-            char* pzEq = strchr( pz, '=' );
+            char const *  pz   = *(ppz++);
+            char* pzEq = strchr(pz, '=');
             int   res;
 
             if (pzEq != NULL)
                 *pzEq = NUL;
 
-            res = strcmp( pzDefName, pz );
+            res = strcmp(pzDefName, pz);
             if (pzEq != NULL)
                 *pzEq = '=';
 
@@ -275,7 +342,7 @@ getDefine( tCC* pzDefName, ag_bool check_env )
                 return (pzEq != NULL) ? pzEq+1 : zNil;
         }
     }
-    return check_env ? getenv( pzDefName ) : NULL;
+    return check_env ? getenv(pzDefName) : NULL;
 }
 
 
@@ -288,7 +355,7 @@ getDefine( tCC* pzDefName, ag_bool check_env )
  *  is pointing at when this procedure is called.
  */
 LOCAL char*
-spanQuote( char* pzQte )
+spanQuote(char* pzQte)
 {
     char  q = *pzQte;          /*  Save the quote character type */
     char* p = pzQte++;         /*  Destination pointer           */
@@ -328,8 +395,8 @@ spanQuote( char* pzQte )
  *  The quote character is whatever character the argument
  *  is pointing at when this procedure is called.
  */
-static tCC*
-skipQuote( tCC* pzQte )
+static char const *
+skipQuote(char const * pzQte)
 {
     char  q = *pzQte++;        /*  Save the quote character type */
 
@@ -353,7 +420,7 @@ skipQuote( tCC* pzQte )
 
             } else {
                 char p[10];  /* provide a scratch pad for escape processing */
-                int ct = ao_string_cook_escape_char( pzQte, p, 0x7F );
+                int ct = ao_string_cook_escape_char(pzQte, p, 0x7F);
                 pzQte += ct;
             } /* if (q == '\'')      */
         }     /* switch (*pzQte++)   */
@@ -363,8 +430,8 @@ skipQuote( tCC* pzQte )
 }
 
 
-LOCAL tCC*
-skipScheme( tCC* pzSrc,  tCC* pzEnd )
+LOCAL char const *
+skipScheme(char const * pzSrc,  char const * pzEnd)
 {
     int  level = 0;
 
@@ -382,7 +449,7 @@ skipScheme( tCC* pzSrc,  tCC* pzEnd )
             break;
 
         case '"':
-            pzSrc = skipQuote( pzSrc-1 );
+            pzSrc = skipQuote(pzSrc-1);
         }
     }
 }
@@ -403,10 +470,10 @@ count_nl(char const * pz)
 }
 
 
-LOCAL tCC*
-skipExpression( tCC* pzSrc, size_t len )
+LOCAL char const *
+skipExpression(char const * pzSrc, size_t len)
 {
-    tCC* pzEnd = pzSrc + len;
+    char const * pzEnd = pzSrc + len;
 
  guess_again:
 
@@ -415,18 +482,18 @@ skipExpression( tCC* pzSrc, size_t len )
         return pzEnd;
     switch (*pzSrc) {
     case ';':
-        pzSrc = strchr( pzSrc, '\n' );
+        pzSrc = strchr(pzSrc, '\n');
         if (pzSrc == NULL)
             return pzEnd;
         goto guess_again;
 
     case '(':
-        return skipScheme( pzSrc, pzEnd );
+        return skipScheme(pzSrc, pzEnd);
 
     case '"':
     case '\'':
     case '`':
-        pzSrc = skipQuote( pzSrc );
+        pzSrc = skipQuote(pzSrc);
         return (pzSrc > pzEnd) ? pzEnd : pzSrc;
 
     default:

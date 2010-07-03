@@ -2,9 +2,8 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2010-06-25 19:11:52 bkorb"
+# Time-stamp:        "2010-07-03 09:39:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Ident:             $Id: 10c00c6b1497f2ec5c1256a1c56e80c45915ec30 $
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
 ##  This file is part of AutoGen.
@@ -27,7 +26,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=11
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL="pre2"
+AG_PATCHLEVEL="pre4"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

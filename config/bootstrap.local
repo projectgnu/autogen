@@ -3,7 +3,6 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Time-stamp:        "2010-02-24 15:04:37 bkorb"
-#            by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +20,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: 6a84c9d1bdb7c92ad4db66c3b5c2f9f55b3a7dd3 $
+# @(#) $Id: 2d136e2884f031057f51a7cd5cba0c2c5c44a3aa $
 # ----------------------------------------------------------------------
 
 locate_exe()

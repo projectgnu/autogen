@@ -1,7 +1,6 @@
 
 /*
  * Time-stamp:        "2010-02-24 08:39:04 bkorb"
- *             by: bkorb
  *
  *  This file is part of AutoGen.
  *

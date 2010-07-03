@@ -1,8 +1,7 @@
 
 /*
- *  $Id: 7b5b6a3152ab87de9785082d2d8c5c6590e98383 $
  *
- *  Time-stamp:        "2010-06-26 10:36:38 bkorb"
+ *  Time-stamp:        "2010-06-30 17:21:35 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -508,8 +507,9 @@ ag_scm_string_downcase( SCM str )
  *
  * exparg: str , input/output string
  *
- * doc:  Capitalize the first letter of each block of letters and
- *       strip out characters that are not alphanumerics.
+ * doc:  Capitalize the first letter of each block of letters and numbers,
+ *       and stripping out characters that are not alphanumerics.
+ *       For example, "alpha-beta0gamma" becomes "AlphaBeta0gamma".
 =*/
 SCM
 ag_scm_string_to_camelcase(SCM str)

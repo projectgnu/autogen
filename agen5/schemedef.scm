@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2010-02-24 08:42:05 bkorb"
+;;; Time-stamp:        "2010-06-30 21:09:46 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -145,10 +145,10 @@
 ;;;  *   emit-string-table}) will insert text and emit the populated table,
 ;;;  *   respectively.
 ;;;  *
-;;;  *   With these functions, it should be much easier to construct structures
-;;;  *   containing string offsets instead of string pointers.  That can be very
-;;;  *   useful when transmitting, storing or sharing data with different address
-;;;  *   spaces.
+;;;  *   With these functions, it should be much easier to construct
+;;;  *   structures containing string offsets instead of string pointers.
+;;;  *   That can be very useful when transmitting, storing or sharing data
+;;;  *   with different address spaces.
 ;;;  *
 ;;;  *   @noindent
 ;;;  *   Here is a brief example copied from the strtable.test test:
@@ -178,17 +178,17 @@
 ;;;  *
 ;;;  *   @noindent
 ;;;  *   I added the @code{(out-push-new)} because the string table text is
-;;;  *   diverted into an output stream named, ``scribble'' and I want to have
-;;;  *   the string table emitted before the string table references.  The string
-;;;  *   table references are also emitted inside the @code{FOR} loop.  So, when
-;;;  *   the loop is done, the current output is suspended under the
-;;;  *   name, ``main'' and the ``scribble'' table is then emitted into the
-;;;  *   primary output.  (@code{emit-string-table} inserts its output directly
-;;;  *   into the current output stream.  It does not need to be the last
-;;;  *   function in an AutoGen macro block.)  Next I @code{ag-fprintf} the
-;;;  *   array-of-pointer declaration directly into the current output.
-;;;  *   Finally I restore the ``main'' output stream and @code{(out-pop #t)}-it
-;;;  *   into the main output stream.
+;;;  *   diverted into an output stream named, ``scribble'' and I want to
+;;;  *   have the string table emitted before the string table references.
+;;;  *   The string table references are also emitted inside the @code{FOR}
+;;;  *   loop.  So, when the loop is done, the current output is suspended
+;;;  *   under the name, ``main'' and the ``scribble'' table is then emitted
+;;;  *   into the primary output.  (@code{emit-string-table} inserts its
+;;;  *   output directly into the current output stream.  It does not need to
+;;;  *   be the last function in an AutoGen macro block.)  Next I
+;;;  *   @code{ag-fprintf} the array-of-pointer declaration directly into the
+;;;  *   current output.  Finally I restore the ``main'' output stream and
+;;;  *   @code{(out-pop #t)}-it into the main output stream.
 ;;;  *
 ;;;  *   Here is the result.  Note that duplicate strings are not repeated
 ;;;  *   in the string table:

@@ -1,7 +1,5 @@
 [= autogen5 template
 
-#$Id: 8cd5fce6e3cb1487f373005d74c59ce41842f838 $
-
 # Time-stamp:      "2010-02-24 08:41:09 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.

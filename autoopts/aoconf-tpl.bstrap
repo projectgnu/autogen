@@ -26,7 +26,6 @@ in=autoopts-config.in
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
 ## ---------------------------------------------------------------------
-## $Id: c3e5163c239a3a3daf6cbae2d646539907b92d85 $
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.

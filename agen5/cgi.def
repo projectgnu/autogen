@@ -1,6 +1,6 @@
 
 /*
- *  Time-stamp:        "2010-02-24 08:43:09 bkorb"
+ *  Time-stamp:        "2010-06-30 20:53:21 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -51,3 +51,5 @@ transition  =
  { tst = value; tev = escape; },
  { tst = value; tev = end;       next = done; ttype = separate; },
  { tst = value; tev = separator; next = init; ttype = separate; };
+
+/* end of agen5/cgi.def */

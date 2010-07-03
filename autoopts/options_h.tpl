@@ -3,7 +3,6 @@
 h=options.h
 
 # Time-stamp:      "2010-03-04 16:13:57 bkorb"
-# ID:  $Id: 76a42e5e31432fc6841d7e720693f708ebd236b5 $
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

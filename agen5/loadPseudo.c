@@ -1,8 +1,7 @@
 
 /*
- *  $Id: 4d5a608655c544c41dfdbfda992be307942f7cf4 $
  *
- *  Time-stamp:        "2010-02-24 08:42:07 bkorb"
+ *  Time-stamp:        "2010-06-30 21:22:48 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -36,14 +35,14 @@ tSCC zAgName[] = "autogen5";
 tSCC zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
-static tCC*
-doSchemeExpr( tCC* pzData, tCC* pzFileName );
+static char const *
+doSchemeExpr(char const * pzData, char const * pzFileName);
 
 static te_pm_event
-findTokenType( tCC**  ppzData, te_pm_state fsm_state );
+findTokenType(char const **  ppzData, te_pm_state fsm_state);
 
-static tCC*
-copyMarker( tCC* pzData, char* pzMark, size_t * pCt );
+static char const *
+copyMarker(char const * pzData, char* pzMark, size_t * pCt);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -53,16 +52,16 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt );
  *
  *  Process a scheme specification
  */
-static tCC*
-doSchemeExpr( tCC* pzData, tCC* pzFileName )
+static char const *
+doSchemeExpr(char const * pzData, char const * pzFileName)
 {
-    char*   pzEnd = (char*)pzData + strlen( pzData );
+    char*   pzEnd = (char*)pzData + strlen(pzData);
     char    ch;
     tMacro* pCM = pCurMacro;
     tMacro  mac = { (teFuncType)~0, 0, 0, 0, 0, 0, 0, NULL };
 
     mac.lineNo  = templLineNo;
-    pzEnd       = (char*)skipScheme( pzData, pzEnd );
+    pzEnd       = (char*)skipScheme(pzData, pzEnd);
     ch          = *pzEnd;
     *pzEnd      = NUL;
     pCurMacro   = &mac;
@@ -75,7 +74,7 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName )
     while (pzData < pzEnd)
         if (*(pzData++) == '\n')
             templLineNo++;
-    return (tCC*)pzEnd;
+    return (char const *)pzEnd;
 }
 
 
@@ -85,8 +84,8 @@ doSchemeExpr( tCC* pzData, tCC* pzFileName )
  *
  *  Process a suffix specification
  */
-LOCAL tCC*
-doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
+LOCAL char const *
+doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
 {
     /*
      *  The following is the complete list of POSIX required-to-be-legal
@@ -98,8 +97,8 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
     tSCC zEmptySpec[] = "Empty suffix format";
 
     tOutSpec*  pOS;
-    tCC*       pzSfxFmt;
-    tCC*       pzResult;
+    char const *       pzSfxFmt;
+    char const *       pzResult;
     size_t     spn;
     static tOutSpec**  ppOSList = &pOutSpecList;
 
@@ -117,8 +116,8 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
         pzSfxFmt++;
 
         if (*pzSfxFmt == '(') {
-            tCC *pe  = pzSfxFmt + strlen( pzSfxFmt );
-            pzResult = skipScheme( pzSfxFmt, pe );
+            char const *pe  = pzSfxFmt + strlen(pzSfxFmt);
+            pzResult = skipScheme(pzSfxFmt, pe);
 
         } else {
             pzResult = pzSfxFmt;
@@ -134,9 +133,9 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
      *  Otherwise, the suffix construct is saved only for the main template,
      *  and only when the --select-suffix option was not specified.
      */
-    if (  (pzFileName != NULL)
+    if ( (pzFileName != NULL)
        && (  (procState != PROC_STATE_LOAD_TPL)
-          || HAVE_OPT( SELECT_SUFFIX )))
+          || HAVE_OPT(SELECT_SUFFIX)))
         return pzResult;
 
     /*
@@ -173,7 +172,7 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
             size_t str_length;
             char const * pz;
 
-            pzSfxFmt = pz = resolveSCM( str );
+            pzSfxFmt = pz = resolveSCM(str);
             str_length = strlen(pzSfxFmt);
 
             if (str_length == 0)
@@ -217,9 +216,9 @@ doSuffixSpec(tCC * const pzData, tCC* pzFileName, int lineNo)
  *  the scan pointer (pzData).
  */
 static te_pm_event
-findTokenType( tCC**  ppzData, te_pm_state fsm_state )
+findTokenType(char const **  ppzData, te_pm_state fsm_state)
 {
-    tCC* pzData = *ppzData;
+    char const * pzData = *ppzData;
 
     /*
      *  At the start of processing in this function, we can never be at
@@ -247,9 +246,9 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
     }
 
     if (line_start && (*pzData == '#')) {
-        pzData = strchr( pzData, '\n' );
+        pzData = strchr(pzData, '\n');
         if (pzData == NULL)
-            AG_ABEND( "Invalid template file" );
+            AG_ABEND("Invalid template file");
         goto skipWhiteSpace;
     }
 
@@ -267,8 +266,8 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
     if (IS_VAR_FIRST_CHAR(*pzData)) {
-        if (strneqvcmp( pzData, zAgName, (int)sizeof(zAgName)-1 ) == 0) {
-            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zAgName)-1 ])) {
+        if (strneqvcmp(pzData, zAgName, (int)sizeof(zAgName) - 1) == 0) {
+            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zAgName) - 1 ])) {
                 *ppzData = pzData + sizeof(zAgName);
                 return PM_EV_AUTOGEN;
             }
@@ -276,7 +275,7 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
             return PM_EV_SUFFIX;
         }
 
-        if (strneqvcmp( pzData, zTpName, (int)sizeof(zTpName)-1 ) == 0) {
+        if (strneqvcmp(pzData, zTpName, (int)sizeof(zTpName)-1) == 0) {
             if (IS_WHITESPACE_CHAR(pzData[ sizeof(zTpName)-1 ])) {
                 *ppzData = pzData + sizeof(zTpName)-1;
                 return PM_EV_TEMPLATE;
@@ -314,13 +313,13 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    if (IS_PUNCTUATION_CHAR( *pzData ))
+    if (IS_PUNCTUATION_CHAR(*pzData))
         return PM_EV_MARKER;
 
     /*
      *  Otherwise, it is just junk.
      */
-    AG_ABEND( "Invalid template file" );
+    AG_ABEND("Invalid template file");
     /* NOTREACHED */
     return PM_EV_INVALID;
 }
@@ -333,8 +332,8 @@ findTokenType( tCC**  ppzData, te_pm_state fsm_state )
  *  Some sort of marker is under the scan pointer.  Copy it for as long
  *  as we find punctuation characters.
  */
-static tCC*
-copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
+static char const *
+copyMarker(char const * pzData, char* pzMark, size_t * pCt)
 {
     int ct = 0;
 
@@ -343,7 +342,7 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
         if (! IS_PUNCTUATION_CHAR(ch))
             break;
         *(pzMark++) = ch;
-        if (++ct >= sizeof( zStartMac ))
+        if (++ct >= sizeof(zStartMac))
             return NULL;
 
         pzData++;
@@ -366,20 +365,20 @@ copyMarker( tCC* pzData, char* pzMark, size_t * pCt )
  *  Using a finite state machine, scan over the tokens that make up the
  *  "pseudo macro" at the start of every template.
  */
-LOCAL tCC*
-loadPseudoMacro( tCC* pzData, tCC* pzFileName )
+LOCAL char const *
+loadPseudoMacro(char const * pzData, char const * pzFileName)
 {
     tSCC zMarkErr[] = "start/end macro mark too long";
     tSCC zBadMark[] = "bad template marker in %s on line %d:\n\t%s";
-    tCC* pzBadness;
-#   define BAD_MARKER( t ) { pzBadness = t; goto abort_load; }
+    char const * pzBadness;
+#   define BAD_MARKER(t) { pzBadness = t; goto abort_load; }
 
     te_pm_state fsm_state  = PM_ST_INIT;
 
     templLineNo  = 1;
 
     while (fsm_state != PM_ST_DONE) {
-        te_pm_event fsm_tkn = findTokenType( &pzData, fsm_state );
+        te_pm_event fsm_tkn = findTokenType(&pzData, fsm_state);
         te_pm_state nxt_state;
         te_pm_trans trans;
 
@@ -394,26 +393,26 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
         switch (trans) {
         case PM_TR_SKIP_ED_MODE:
         {
-            char* pzEnd = strstr( pzData + 3, "-*-" );
-            char* pzNL  = strchr( pzData + 3, '\n' );
+            char* pzEnd = strstr(pzData + 3, "-*-");
+            char* pzNL  = strchr(pzData + 3, '\n');
             if ((pzEnd == NULL) || (pzNL < pzEnd))
-                BAD_MARKER( "invalid edit mode marker" );
+                BAD_MARKER("invalid edit mode marker");
 
             pzData = pzEnd + 3;
             break;
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copyMarker( pzData, zStartMac, &startMacLen );
+            pzData = copyMarker(pzData, zStartMac, &startMacLen);
             if (pzData == NULL)
-                BAD_MARKER( zMarkErr );
+                BAD_MARKER(zMarkErr);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copyMarker( pzData, zEndMac, &endMacLen );
+            pzData = copyMarker(pzData, zEndMac, &endMacLen);
             if (pzData == NULL)
-                BAD_MARKER( zMarkErr );
+                BAD_MARKER(zMarkErr);
 
             /*
              *  IF the end macro seems to end with the start macro and
@@ -421,42 +420,42 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
              *  presume that someone ran the two markers together.
              */
             if (  (endMacLen == 2 * startMacLen)
-               && (strcmp( zStartMac, zEndMac + startMacLen ) == 0))  {
+               && (strcmp(zStartMac, zEndMac + startMacLen) == 0))  {
                 pzData -= startMacLen;
                 zEndMac[ startMacLen ] = NUL;
                 endMacLen = startMacLen;
             }
 
-            if (strstr( zEndMac, zStartMac ) != NULL)
-                BAD_MARKER( "start marker contained in end marker" );
-            if (strstr( zStartMac, zEndMac ) != NULL)
-                BAD_MARKER( "end marker contained in start marker" );
+            if (strstr(zEndMac, zStartMac) != NULL)
+                BAD_MARKER("start marker contained in end marker");
+            if (strstr(zStartMac, zEndMac) != NULL)
+                BAD_MARKER("end marker contained in start marker");
             break;
 
         case PM_TR_TEMPL_SUFFIX:
-            pzData = doSuffixSpec( pzData, pzFileName, templLineNo );
+            pzData = doSuffixSpec(pzData, pzFileName, templLineNo);
             break;
 
         case PM_TR_TEMPL_SCHEME:
-            pzData = doSchemeExpr( pzData, pzFileName );
+            pzData = doSchemeExpr(pzData, pzFileName);
             break;
 
         case PM_TR_INVALID:
-            pm_invalid_transition( fsm_state, fsm_tkn );
+            pm_invalid_transition(fsm_state, fsm_tkn);
             switch (fsm_state) {
-            case PM_ST_INIT:     BAD_MARKER( "need start marker" );
-            case PM_ST_ST_MARK:  BAD_MARKER( "need autogen5 marker" );
-            case PM_ST_AGEN:     BAD_MARKER( "need template marker" );
-            case PM_ST_TEMPL:    BAD_MARKER( "need end marker" );
-            case PM_ST_END_MARK: BAD_MARKER( "need end of line" );
-            default:             BAD_MARKER( "BROKEN FSM STATE" );
+            case PM_ST_INIT:     BAD_MARKER("need start marker");
+            case PM_ST_ST_MARK:  BAD_MARKER("need autogen5 marker");
+            case PM_ST_AGEN:     BAD_MARKER("need template marker");
+            case PM_ST_TEMPL:    BAD_MARKER("need end marker");
+            case PM_ST_END_MARK: BAD_MARKER("need end of line");
+            default:             BAD_MARKER("BROKEN FSM STATE");
             }
 
         case PM_TR_NOOP:
             break;
 
         default:
-            BAD_MARKER( "broken pseudo-macro FSM" );
+            BAD_MARKER("broken pseudo-macro FSM");
         }
 
         fsm_state = nxt_state;
@@ -470,7 +469,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
      */
     if (serverArgs[0] != NULL) {
         char* pz = getenv(zShellEnv);
-        if ((pz != NULL) && (strcmp( pz, serverArgs[0] ) != 0)) {
+        if ((pz != NULL) && (strcmp(pz, serverArgs[0]) != 0)) {
             fprintf(pfTrace, "Changing server shell from %s to %s\n",
                     serverArgs[0], pz);
             closeServer();
@@ -482,7 +481,7 @@ loadPseudoMacro( tCC* pzData, tCC* pzFileName )
     return pzData;
 
  abort_load:
-    AG_ABEND( aprf( zBadMark, pzFileName, templLineNo, pzBadness ));
+    AG_ABEND(aprf(zBadMark, pzFileName, templLineNo, pzBadness));
 #   undef BAD_MARKER
     return NULL;
 }

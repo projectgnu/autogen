@@ -1,8 +1,7 @@
 
 /*
- *  $Id: 5e1823e63e10c684b904c64a9db0dc4cf48e97a3 $
  *
- *  Time-stamp:        "2010-02-24 08:42:10 bkorb"
+ *  Time-stamp:        "2010-07-03 09:49:59 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -31,20 +30,16 @@ tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static ag_bool
-nextDefinition( ag_bool invert, tDefEntry** ppList );
+nextDefinition(ag_bool invert, tDefEntry** ppList);
 
 static int
-doForByStep( tTemplate* pT,
-             tMacro*    pMac,
-             tDefEntry* pFoundDef );
+doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef);
 
 static int
-doForEach( tTemplate*   pT,
-           tMacro*      pMac,
-           tDefEntry*   pFoundDef );
+doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef);
 
 static void
-load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac );
+load_ForIn(tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -61,22 +56,22 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac );
  *          @xref{FOR}.
 =*/
 SCM
-ag_scm_first_for_p( SCM which )
+ag_scm_first_for_p(SCM which)
 {
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! AG_SCM_STRING_P( which ))
+    if (! AG_SCM_STRING_P(which))
         return (pFS->for_firstFor) ? SCM_BOOL_T : SCM_BOOL_F;
 
     {
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars( which, "which for" );
+        char*      pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp( p->for_pzName, pz ) == 0) {
+            if (strcmp(p->for_pzName, pz) == 0) {
                 res = (p->for_firstFor ? SCM_BOOL_T : SCM_BOOL_F);
                 break;
             }
@@ -98,22 +93,22 @@ ag_scm_first_for_p( SCM which )
  *          @xref{FOR}.
 =*/
 SCM
-ag_scm_last_for_p( SCM which )
+ag_scm_last_for_p(SCM which)
 {
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! AG_SCM_STRING_P( which ))
+    if (! AG_SCM_STRING_P(which))
         return (pFS->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
 
     {
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars( which, "which for" );
+        char*      pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp( p->for_pzName, pz ) == 0) {
+            if (strcmp(p->for_pzName, pz) == 0) {
                 res = (p->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
                 break;
             }
@@ -135,23 +130,23 @@ ag_scm_last_for_p( SCM which )
  *          @xref{FOR}.
 =*/
 SCM
-ag_scm_for_index( SCM which )
+ag_scm_for_index(SCM which)
 {
     if (forInfo.fi_depth <= 0)
         return SCM_UNDEFINED;
 
-    if (! AG_SCM_STRING_P( which ))
-        return AG_SCM_INT2SCM( pFS->for_index );
+    if (! AG_SCM_STRING_P(which))
+        return AG_SCM_INT2SCM(pFS->for_index);
 
     {
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars( which, "which for" );
+        char*      pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp( p->for_pzName, pz ) == 0) {
-                res = AG_SCM_INT2SCM( p->for_index );
+            if (strcmp(p->for_pzName, pz) == 0) {
+                res = AG_SCM_INT2SCM(p->for_index);
                 break;
             }
             p--;
@@ -173,11 +168,11 @@ ag_scm_for_index( SCM which )
  *       @xref{FOR}.
 =*/
 SCM
-ag_scm_for_from( SCM from )
+ag_scm_for_from(SCM from)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( from )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(from)))
         return SCM_UNDEFINED;
-    pFS->for_from = AG_SCM_SCM2INT( from );
+    pFS->for_from = AG_SCM_SCM2INT(from);
     return SCM_BOOL_T;
 }
 
@@ -193,11 +188,11 @@ ag_scm_for_from( SCM from )
  *       @xref{FOR}.
 =*/
 SCM
-ag_scm_for_to( SCM to )
+ag_scm_for_to(SCM to)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( to )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(to)))
         return SCM_UNDEFINED;
-    pFS->for_to = AG_SCM_SCM2INT( to );
+    pFS->for_to = AG_SCM_SCM2INT(to);
     return SCM_BOOL_T;
 }
 
@@ -213,11 +208,11 @@ ag_scm_for_to( SCM to )
  *       @xref{FOR}.
 =*/
 SCM
-ag_scm_for_by( SCM by )
+ag_scm_for_by(SCM by)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P( by )))
+    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(by)))
         return SCM_UNDEFINED;
-    pFS->for_by = AG_SCM_SCM2INT( by );
+    pFS->for_by = AG_SCM_SCM2INT(by);
     return SCM_BOOL_T;
 }
 
@@ -234,17 +229,17 @@ ag_scm_for_by( SCM by )
  *       Outside of the FOR macro itself, this function will emit an error.
 =*/
 SCM
-ag_scm_for_sep( SCM obj )
+ag_scm_for_sep(SCM obj)
 {
     if (! pFS->for_loading)
         return SCM_UNDEFINED;
-    AGDUPSTR( pFS->for_pzSep, ag_scm2zchars( obj, "sep str" ), "sep str" );
+    AGDUPSTR(pFS->for_pzSep, ag_scm2zchars(obj, "sep str"), "sep str");
     return SCM_BOOL_T;
 }
 
 
 static ag_bool
-nextDefinition( ag_bool invert, tDefEntry** ppList )
+nextDefinition(ag_bool invert, tDefEntry** ppList)
 {
     ag_bool     haveMatch = AG_FALSE;
     tDefEntry*  pList     = *ppList;
@@ -297,9 +292,7 @@ nextDefinition( ag_bool invert, tDefEntry** ppList )
 
 
 static int
-doForByStep( tTemplate* pT,
-             tMacro*    pMac,
-             tDefEntry* pFoundDef )
+doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
 {
     int         loopCt    = 0;
     tDefEntry   textDef;
@@ -353,16 +346,16 @@ doForByStep( tTemplate* pT,
      */
     for (;;) {
         int     nextIdx;
-        ag_bool gotNewDef = nextDefinition( invert, &pFoundDef );
+        ag_bool gotNewDef = nextDefinition(invert, &pFoundDef);
 
         if (loopLimit-- < 0) {
-            fprintf( pfTrace, "too many FOR iterations in %s line %d\n",
-                     pT->pzTplName, pMac->lineNo );
-            fprintf( pfTrace, "\texiting FOR %s from %d to %d by %d:\n"
-                     "\tmore than %d iterations\n",
-                     pT->pzTemplText + pMac->ozText,
-                     pFS->for_from, pFS->for_to, pFS->for_by,
-                     (int)OPT_VALUE_LOOP_LIMIT );
+            fprintf(pfTrace, "too many FOR iterations in %s line %d\n",
+                    pT->pzTplName, pMac->lineNo);
+            fprintf(pfTrace, "\texiting FOR %s from %d to %d by %d:\n"
+                    "\tmore than %d iterations\n",
+                    pT->pzTemplText + pMac->ozText,
+                    pFS->for_from, pFS->for_to, pFS->for_by,
+                    (int)OPT_VALUE_LOOP_LIMIT);
             break;
         }
 
@@ -411,15 +404,15 @@ doForByStep( tTemplate* pT,
             ? ((nextIdx < pFS->for_to) ? AG_TRUE : AG_FALSE)
             : ((nextIdx > pFS->for_to) ? AG_TRUE : AG_FALSE);
 
-        generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex );
+        generateBlock(pT, pMac+1, pT->aMacros + pMac->endIndex);
         loopCt++;
         pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
 
         if (pFS->for_lastFor)
             break;
 
-        fputs( pFS->for_pzSep, pCurFp->pFile );
-        fflush( pCurFp->pFile );
+        fputs(pFS->for_pzSep, pCurFp->pFile);
+        fflush(pCurFp->pFile);
         pFS->for_firstFor = AG_FALSE;
         pFS->for_index = nextIdx;
     }
@@ -429,9 +422,7 @@ doForByStep( tTemplate* pT,
 }
 
 static int
-doForEach( tTemplate*   pT,
-           tMacro*      pMac,
-           tDefEntry*   pFoundDef )
+doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef)
 {
     int     loopCt = 0;
     tDefCtx ctx    = currDefCtx;
@@ -469,7 +460,7 @@ doForEach( tTemplate*   pT,
         if (pFoundDef == NULL)
             pFS->for_lastFor = AG_TRUE;
 
-        generateBlock( pT, pMac+1, pT->aMacros + pMac->endIndex );
+        generateBlock(pT, pMac+1, pT->aMacros + pMac->endIndex);
 
         loopCt++;
         pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
@@ -481,8 +472,8 @@ doForEach( tTemplate*   pT,
         /*
          *  Emit the iteration separation
          */
-        fputs( pFS->for_pzSep, pCurFp->pFile );
-        fflush( pCurFp->pFile );
+        fputs(pFS->for_pzSep, pCurFp->pFile);
+        fflush(pCurFp->pFile);
     }
 
     currDefCtx = ctx;  /* Restore the def context */
@@ -492,7 +483,7 @@ doForEach( tTemplate*   pT,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
+load_ForIn(tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
 {
     char* pzName = pT->pzTemplText + pMac->ozName;
     int   ix     = 0;
@@ -506,19 +497,19 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
     srcLen -= 3;
     while (IS_WHITESPACE_CHAR(*++pzSrc))  srcLen--;
     if (*pzSrc == NUL)
-        AG_ABEND_IN( pT, pMac, "FOR x IN ... has no list" );
+        AG_ABEND_IN(pT, pMac, "FOR x IN ... has no list");
 
     {
-        size_t nmlen = strlen( pzName );
+        size_t nmlen = strlen(pzName);
 
-        pz = AGALOC( srcLen + 2 + nmlen, "copy of FOR x IN ... text" );
-        strcpy( pz, pzName );
+        pz = AGALOC(srcLen + 2 + nmlen, "copy of FOR x IN ... text");
+        strcpy(pz, pzName);
         pzName = pz;
         manageAllocatedData(pz);
         pz += nmlen + 1;
     }
 
-    memcpy( pz, pzSrc, srcLen );
+    memcpy(pz, pzSrc, srcLen);
     pz[ srcLen ] = NUL;
 
     do  {
@@ -532,7 +523,7 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
         switch (*pz) {
         case '\'':
         case '"':
-            pz = spanQuote( pz );
+            pz = spanQuote(pz);
             /*
              *  Clean up trailing commas
              */
@@ -680,7 +671,7 @@ load_ForIn( tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac )
  *    For a complete description @xref{FOR}.
 =*/
 tMacro*
-mFunc_For( tTemplate* pT, tMacro* pMac )
+mFunc_For(tTemplate* pT, tMacro* pMac)
 {
     tMacro*     pMRet = pT->aMacros + pMac->endIndex;
     ag_bool     isIndexed;
@@ -697,14 +688,14 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
     if (pMac->funcPrivate != NULL)
         pDef = pMac->funcPrivate;
     else {
-        pDef = findDefEntry( pT->pzTemplText + pMac->ozName, &isIndexed );
+        pDef = findDefEntry(pT->pzTemplText + pMac->ozName, &isIndexed);
         if (pDef == NULL) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf( pfTrace, "FOR loop skipped - no definition for `%s'\n",
-                         pT->pzTemplText + pMac->ozName );
+                fprintf(pfTrace, "FOR loop skipped - no definition for `%s'\n",
+                        pT->pzTemplText + pMac->ozName);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
+                    fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
             }
 
             return pMRet;
@@ -718,22 +709,22 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
         forInfo.fi_alloc += 5;
         if (forInfo.fi_data == NULL)
              forInfo.fi_data = (tForState*)
-                 AGALOC( 5 * sizeof( tForState ), "Initial FOR sate");
+                 AGALOC(5 * sizeof(tForState), "Initial FOR sate");
         else forInfo.fi_data = (tForState*)
-                 AGREALOC( (void*)forInfo.fi_data,
-                           forInfo.fi_alloc * sizeof( tForState ),
-                           "Expansion of FOR state" );
+                 AGREALOC((void*)forInfo.fi_data,
+                          forInfo.fi_alloc * sizeof(tForState),
+                          "Expansion of FOR state");
     }
 
     pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
-    memset( (void*)pFS, 0, sizeof( tForState ));
+    memset((void*)pFS, 0, sizeof(tForState));
     pFS->for_firstFor = AG_TRUE;
     pFS->for_pzName   = pT->pzTemplText + pMac->ozName;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf( pfTrace, "FOR %s loop in %s on line %d begins:\n",
-                 pT->pzTemplText + pMac->ozName, pT->pzTplFile,
-                 pMac->lineNo );
+        fprintf(pfTrace, "FOR %s loop in %s on line %d begins:\n",
+                pT->pzTemplText + pMac->ozName, pT->pzTplFile,
+                pMac->lineNo);
 
     /*
      *  Check for a FOR iterating based on scheme macros
@@ -743,26 +734,26 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
         pFS->for_to    = 0x7BAD0BAD;
 
         pFS->for_loading = AG_TRUE;
-        (void) eval( pT->pzTemplText + pMac->ozText );
+        (void) eval(pT->pzTemplText + pMac->ozText);
         pFS->for_loading = AG_FALSE;
-        loopCt = doForByStep( pT, pMac, pDef );
+        loopCt = doForByStep(pT, pMac, pDef);
     }
     else {
         /*
          *  The FOR iterates over a list of definitions
          */
         pFS->for_pzSep = pT->pzTemplText + pMac->ozText;
-        loopCt = doForEach( pT, pMac, pDef );
+        loopCt = doForEach(pT, pMac, pDef);
     }
 
     forInfo.fi_depth--;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf( pfTrace, "FOR %s repeated %d times\n",
-                 pT->pzTemplText + pMac->ozName, loopCt );
+        fprintf(pfTrace, "FOR %s repeated %d times\n",
+                pT->pzTemplText + pMac->ozName, loopCt);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
+            fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
     }
 
     return pMRet;
@@ -770,7 +761,7 @@ mFunc_For( tTemplate* pT, tMacro* pMac )
 
 
 tMacro*
-mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_For(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
     char*   pzCopy = pT->pNext; /* next text dest   */
     tCC*    pzSrc  = (char const*)pMac->ozText; /* macro text */
@@ -786,7 +777,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
     papLoadProc = apForLoad;
     if (srcLen == 0)
-        AG_ABEND_IN( pT, pMac, "FOR macro requires iterator name" );
+        AG_ABEND_IN(pT, pMac, "FOR macro requires iterator name");
 
     /*
      *  IF this is the first time here,
@@ -796,7 +787,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  a FOR macro
      */
     if (apForLoad[0] == NULL) {
-        memcpy( (void*)apForLoad, apLoadProc, sizeof( apLoadProc ));
+        memcpy((void*)apForLoad, apLoadProc, sizeof(apLoadProc));
         apForLoad[ FTYP_ENDFOR ] = &mLoad_Ending;
     }
 
@@ -816,7 +807,7 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     *(pzCopy++) = NUL;
 
     if (pT->pzTemplText[ pMac->ozName ] == NUL)
-        AG_ABEND_IN( pT, pMac, "invalid FOR loop variable" );
+        AG_ABEND_IN(pT, pMac, "invalid FOR loop variable");
 
     /*
      *  Skip space to the start of the text following the iterator name
@@ -836,9 +827,9 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *
      *  FOR foo IN ...  -> no text, but we create an array of text values
      */
-    else if (   (strneqvcmp( pzSrc, "in", 2 ) == 0)
-             && IS_WHITESPACE_CHAR(pzSrc[2])) {
-        load_ForIn( pzSrc, srcLen, pT, pMac );
+    else if (  (strneqvcmp(pzSrc, "in", 2) == 0)
+            && IS_WHITESPACE_CHAR(pzSrc[2])) {
+        load_ForIn(pzSrc, srcLen, pT, pMac);
     }
 
     /* * * * *
@@ -854,16 +845,16 @@ mLoad_For( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
         } while (--srcLen > 0);
         *(pzCopy++) = NUL;
         if ((*pzCopied == '"') || (*pzCopied == '\''))
-            spanQuote( pzCopied );
+            spanQuote(pzCopied);
     }
     /*
      * * * * */
 
     pT->pNext = pzCopy;
 
-    pEndMac = parseTemplate( pMac + 1, ppzScan );
+    pEndMac = parseTemplate(pMac + 1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN( pT, pMac, "ENDFOR not found" );
+        AG_ABEND_IN(pT, pMac, "ENDFOR not found");
 
     pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;
 

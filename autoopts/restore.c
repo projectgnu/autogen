@@ -1,6 +1,7 @@
 
 /*
- *  restore.c  $Id: 6f5237ba2586755d8ca354f325fc00e7fa1395ec $
+ * \file restore.c
+ *
  * Time-stamp:      "2010-02-24 08:40:18 bkorb"
  *
  *  This module's routines will save the current option state to memory

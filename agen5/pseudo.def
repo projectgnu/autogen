@@ -1,10 +1,9 @@
 /* -*- Mode: C -*- */
 
-/*  pseudo.def
+/**
+ * \file pseudo.def
  *
- *  $Id: ebf48e002b9329729f3e6e1ac7ef488efe9acb24 $
- *
- *  Time-stamp:        "2010-02-24 08:42:06 bkorb"
+ *  Time-stamp:        "2010-07-03 09:51:09 bkorb"
  *
  * This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -59,12 +58,12 @@ transition = { tst = end_mark;  tev = ed_mode;    ttype = invalid;   };
 /*
  *  Meaningful transitions
  */
-transition = { tst = init;      tev = marker;     next = st_mark;  };
-transition = { tst = st_mark;   tev = "autogen";  next = agen;  ttype = noop; };
-transition = { tst = agen;      tev = template;   next = templ; ttype = noop; };
-transition = { tst = templ;     tev = suffix; };
-transition = { tst = templ;     tev = scheme; };
-transition = { tst = templ;     tev = marker;     next = end_mark; };
-transition = { tst = end_mark;  tev = end_pseudo; next = done;  ttype = noop; };
+transition = { tst = init;     tev = marker;     next = st_mark;  };
+transition = { tst = st_mark;  tev = "autogen";  next = agen;  ttype = noop; };
+transition = { tst = agen;     tev = template;   next = templ; ttype = noop; };
+transition = { tst = templ;    tev = suffix; };
+transition = { tst = templ;    tev = scheme; };
+transition = { tst = templ;    tev = marker;     next = end_mark; };
+transition = { tst = end_mark; tev = end_pseudo; next = done;  ttype = noop; };
 
-/* pseudo.def ends here */
+/* end of agen5/pseudo.def */

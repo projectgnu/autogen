@@ -1,5 +1,5 @@
 /*
- *  Time-stamp:        "2010-02-24 08:43:05 bkorb"
+ *  Time-stamp:        "2010-06-30 20:53:06 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -106,3 +106,4 @@ transition =
                       ttype = noop; },
 { tst  = have_value;  tev   = lit_comma;       next  = need_value;
                       ttype = next_val; };
+/* end of agen5/defParse.def */

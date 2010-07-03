@@ -1,6 +1,5 @@
 
 /*
- *  $Id: cb437d22b0c48960c9e1c23501fba6e3291fecd8 $
  * Time-stamp:      "2010-02-24 08:40:13 bkorb"
  *
  *  String Equivalence Comparison

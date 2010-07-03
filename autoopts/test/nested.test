@@ -5,7 +5,6 @@
 #
 # Time-stamp:        "2010-02-24 08:39:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-#            by: bkorb
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -27,7 +26,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: d5ca83a0ea32de9865c2da1e5f033f150264d407 $
+# $Id: 54bf5f6c86300f366b7c325b4b7ecf27b95ce574 $
 # ----------------------------------------------------------------------
 
 . ./defs

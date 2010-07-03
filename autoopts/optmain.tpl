@@ -2,7 +2,6 @@
 
 # Time-stamp:      "2010-02-24 08:41:04 bkorb"
 
-# $Id: 5dbe78f79fc9567f634fc877c86704ff65168412 $
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

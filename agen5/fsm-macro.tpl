@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  Time-stamp:        "2010-02-24 08:42:15 bkorb"
+#  Time-stamp:        "2010-06-30 20:52:49 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -388,4 +388,4 @@ ENDFOR   transition           =][=
 
 ENDDEF compute-transitions
 
-=]
+# end of agen5/fsm-macro.tpl =]

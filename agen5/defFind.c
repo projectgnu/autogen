@@ -1,7 +1,6 @@
 /*
- *  $Id: 6251568fe58fba1cd06f0a27d758c0f3b75f563e $
  *
- *  Time-stamp:        "2010-02-24 08:43:07 bkorb"
+ *  Time-stamp:        "2010-07-03 08:44:24 bkorb"
  *
  *  This module locates definitions.
  *
@@ -43,25 +42,25 @@ static int hash_table_ct = 0;
 
 static char zDefinitionName[ AG_PATH_MAX ];
 
-static tDefEntry* findEntryByIndex( tDefEntry* pE, char* pzScan );
+static tDefEntry* findEntryByIndex(tDefEntry* pE, char* pzScan);
 
 #define ILLFORMEDNAME() \
-    AG_ABEND( aprf( zNameRef, zDefinitionName, \
-              pCurTemplate->pzTplFile, pCurMacro->lineNo ));
+    AG_ABEND(aprf(zNameRef, zDefinitionName, \
+              pCurTemplate->pzTplFile, pCurMacro->lineNo));
 
 
 /* = = = START-STATIC-FORWARD = = = */
 static tDefEntry*
-findEntryByIndex( tDefEntry* pE, char* pzScan );
+findEntryByIndex(tDefEntry* pE, char* pzScan);
 
 static void
-addResult( tDefEntry* pDE, tDefEntryList* pDEL );
+addResult(tDefEntry* pDE, tDefEntryList* pDEL);
 
 static size_t
-badName( char* pzD, char const* pzS, size_t srcLen );
+badName(char* pzD, char const* pzS, size_t srcLen);
 
 static tDefEntry*
-defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed );
+defEntrySearch(char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed);
 
 static int
 hash_string(unsigned char const * pz);
@@ -70,11 +69,11 @@ static void
 stringAdd(char const * pz);
 
 static tDefEntry**
-entryListSearch( char* pzName, tDefCtx* pDefCtx );
+entryListSearch(char* pzName, tDefCtx* pDefCtx);
 /* = = = END-STATIC-FORWARD = = = */
 
 static tDefEntry*
-findEntryByIndex( tDefEntry* pE, char* pzScan )
+findEntryByIndex(tDefEntry* pE, char* pzScan)
 {
     int  idx;
 
@@ -103,7 +102,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
      */
     if (IS_DEC_DIGIT_CHAR(*pzScan)) {
         char* pz;
-        idx = strtol( pzScan, &pz, 0 );
+        idx = strtol(pzScan, &pz, 0);
 
         /*
          *  Skip over any trailing space and make sure we have a closer
@@ -132,7 +131,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         {
             char  svch = *pzScan;
             *pzScan = NUL;
-            pzVal   = getDefine( pzDef, AG_TRUE );
+            pzVal   = getDefine(pzDef, AG_TRUE);
             *pzScan = svch;
         }
 
@@ -149,7 +148,7 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
         if ((pzVal == NULL) || (*pzVal == NUL))
             return NULL;
 
-        idx = strtol( pzVal, &pzDef, 0 );
+        idx = strtol(pzVal, &pzDef, 0);
 
         /*
          *  Make sure we got a legal number
@@ -180,13 +179,13 @@ findEntryByIndex( tDefEntry* pE, char* pzScan )
  *              list of found definitions (reallocating list size as needed).
  */
 static void
-addResult( tDefEntry* pDE, tDefEntryList* pDEL )
+addResult(tDefEntry* pDE, tDefEntryList* pDEL)
 {
     if (++(pDEL->usedCt) > pDEL->allocCt) {
         pDEL->allocCt += pDEL->allocCt + 8; /* 8, 24, 56, ... */
         pDEL->papDefEntry = (tDefEntry**)
-            AGREALOC( (void*)pDEL->papDefEntry, pDEL->allocCt * sizeof( void* ),
-                      "added find result" );
+            AGREALOC((void*)pDEL->papDefEntry, pDEL->allocCt * sizeof(void*),
+                     "added find result");
     }
 
     pDEL->papDefEntry[ pDEL->usedCt-1 ] = pDE;
@@ -194,12 +193,12 @@ addResult( tDefEntry* pDE, tDefEntryList* pDEL )
 
 
 static size_t
-badName( char* pzD, char const* pzS, size_t srcLen )
+badName(char* pzD, char const* pzS, size_t srcLen)
 {
-    memcpy( (void*)pzD, (void*)pzS, srcLen );
-    pzD[ srcLen ] = NUL;
-    fprintf( pfTrace, zNameRef, pzD,
-             pCurTemplate->pzTplFile, pCurMacro->lineNo );
+    memcpy((void*)pzD, (void*)pzS, srcLen);
+    pzD[srcLen] = NUL;
+    fprintf(pfTrace, zNameRef, pzD,
+             pCurTemplate->pzTplFile, pCurMacro->lineNo);
     return srcLen + 1;
 }
 
@@ -215,7 +214,7 @@ badName( char* pzD, char const* pzS, size_t srcLen )
  *  We start in CN_START.
  */
 LOCAL int
-canonicalizeName( char* pzD, char const* pzS, int srcLen )
+canonicalizeName(char* pzD, char const* pzS, int srcLen)
 {
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
@@ -265,7 +264,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
     switch (state) {
     case CN_START_NAME:
         if (! IS_VAR_FIRST_CHAR(*pzS))
-            return badName( pzDst, pzOri, stLen );
+            return badName(pzDst, pzOri, stLen);
         state = CN_NAME_ENDED;  /* we found the start of our first name */
         break;  /* fall through to name/number consumption code */
 
@@ -288,7 +287,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
         }
 
         if (--srcLen <= 0)
-            return badName( pzDst, pzOri, stLen );
+            return badName(pzDst, pzOri, stLen);
         goto nextSegment;
 
     case CN_INDEX:
@@ -319,7 +318,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
          */
         if (*pzS == '$') {
             if (--srcLen < 0)
-                return badName( pzDst, pzOri, stLen );
+                return badName(pzDst, pzOri, stLen);
 
             *(pzD++) = *(pzS++);
             goto nextSegment;
@@ -331,7 +330,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
          *  Nothing else is okay.
          */
         if ((*(pzD++) = *(pzS++)) != ']')
-            return badName( pzDst, pzOri, stLen );
+            return badName(pzDst, pzOri, stLen);
 
         if (--srcLen <= 0) {
             *pzD = NUL;
@@ -357,7 +356,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
      *  Whatever, the next token must be a name or a number.
      */
     assert((state == CN_NAME_ENDED) || (state == CN_INDEX_CLOSE));
-    assert( IS_ALPHANUMERIC_CHAR(*pzS));
+    assert(IS_ALPHANUMERIC_CHAR(*pzS));
 
     /*
      *  Copy the name/number.  We already know the first character is valid.
@@ -366,9 +365,9 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
     while (IS_VALUE_NAME_CHAR(*pzS)) {
         char ch = *(pzS++);
         if ((state != CN_INDEX_CLOSE) && IS_UPPER_CASE_CHAR(ch))
-            *(pzD++) = tolower( ch );
+            *(pzD++) = tolower(ch);
 
-        else switch ( ch ) { /* force the separator chars to be '_' */
+        else switch (ch) { /* force the separator chars to be '_' */
         case '-':
         case '^':
             *(pzD++) = '_';
@@ -399,7 +398,7 @@ canonicalizeName( char* pzD, char const* pzS, int srcLen )
  *  to traverse the list of twins).
  */
 static tDefEntry*
-defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
+defEntrySearch(char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
 {
     char*        pcBrace;
     char         breakCh;
@@ -416,7 +415,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
      *  an index yet).
      */
     if (nestingDepth == 0) {
-        canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
+        canonicalizeName(zDefinitionName, pzName, (int)strlen(pzName));
         pzName = zDefinitionName;
 
         if (pIsIndexed != NULL)
@@ -429,7 +428,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
         }
     }
 
-    pcBrace  = pzName + strcspn( pzName, "[." );
+    pcBrace  = pzName + strcspn(pzName, "[.");
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
@@ -449,7 +448,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp( pE->pzDefName, pzName ) == 0)
+            if (strcmp(pE->pzDefName, pzName) == 0)
                 goto found_def_entry;
 
             pE = pE->pNext;
@@ -487,14 +486,14 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
          */
         while (IS_WHITESPACE_CHAR(*++pcBrace )) ;
 
-        pE = findEntryByIndex( pE, pcBrace );
+        pE = findEntryByIndex(pE, pcBrace);
         if (pE == NULL)
             return pE;
 
         /*
          *  We must find the closing brace, or there is an error
          */
-        pcBrace = strchr( pcBrace, ']' );
+        pcBrace = strchr(pcBrace, ']');
         if (pcBrace == NULL)
             ILLFORMEDNAME();
 
@@ -547,7 +546,7 @@ defEntrySearch( char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed )
         for (;;) {
             tDefEntry* res;
 
-            res = defEntrySearch( pzName, &ctx, pIsIndexed );
+            res = defEntrySearch(pzName, &ctx, pIsIndexed);
             if ((res != NULL) || (breakCh == '[')) {
                 nestingDepth--;
                 return res;
@@ -660,11 +659,11 @@ stringAdd(char const * pz)
 }
 
 LOCAL tDefEntry*
-findDefEntry( char* pzName, ag_bool* pIsIndexed )
+findDefEntry(char* pzName, ag_bool* pIsIndexed)
 {
     if (HAVE_OPT(USED_DEFINES))
         stringAdd(pzName);
-    return defEntrySearch( pzName, &currDefCtx, pIsIndexed );
+    return defEntrySearch(pzName, &currDefCtx, pIsIndexed);
 }
 
 
@@ -707,7 +706,7 @@ print_used_defines(void)
  *  not try to traverse the list of twins).
  */
 static tDefEntry**
-entryListSearch( char* pzName, tDefCtx* pDefCtx )
+entryListSearch(char* pzName, tDefCtx* pDefCtx)
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
 
@@ -735,12 +734,12 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
             return NULL;
         }
 
-        canonicalizeName( zDefinitionName, pzName, (int)strlen( pzName ));
+        canonicalizeName(zDefinitionName, pzName, (int)strlen(pzName));
         pzName = zDefinitionName;
         defList.usedCt = 0;
     }
 
-    pcBrace  = pzName + strcspn( pzName, "[." );
+    pcBrace  = pzName + strcspn(pzName, "[.");
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
@@ -770,7 +769,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
              *  IF the name matches
              *  THEN go add it, plus all its twins
              */
-            if (strcmp( pE->pzDefName, pzName ) == 0)
+            if (strcmp(pE->pzDefName, pzName) == 0)
                 goto found_def_entry;
 
             pE = pE->pNext;
@@ -801,7 +800,7 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
     switch (breakCh) {
     case NUL:
         do  {
-            addResult( pE, &defList );
+            addResult(pE, &defList);
             pE = pE->pTwin;
         } while (pE != NULL);
         goto returnResult;
@@ -812,14 +811,14 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
          */
         while (IS_WHITESPACE_CHAR(*++pcBrace)) ;
 
-        pE = findEntryByIndex( pE, pcBrace );
+        pE = findEntryByIndex(pE, pcBrace);
         if (pE == NULL)
             goto returnResult;
 
         /*
          *  We must find the closing brace, or there is an error
          */
-        pcBrace = strchr( pcBrace, ']' );
+        pcBrace = strchr(pcBrace, ']');
         if (pcBrace == NULL)
             ILLFORMEDNAME();
 
@@ -853,45 +852,37 @@ entryListSearch( char* pzName, tDefCtx* pDefCtx )
     }
 
     /*
-     *  We cannot find a member of a non-block type macro definition.
-     */
-    if (pE->valType != VALTYP_BLOCK)
-        return NULL;
-
-    /*
-     *  Loop through all the twins of the entry.  We ignore twins if we just
-     *  used a subscript.
+     *  Loop through all the twins of the entry.  We only look once if we used
+     *  a subscript.  Ignore any entry types that are not "Blocks" because
+     *  text entries won't have any children.
      */
     defList.nestLevel++;
-    {
-        tDefCtx ctx = { NULL, &currDefCtx };
+    do  {
+        tDefCtx ctx = { pE->val.pDefEntry, &currDefCtx };
 
-        ctx.pDefs = pE->val.pDefEntry;
+        if (pE->valType == VALTYP_BLOCK)
+            (void)entryListSearch(pzName, &ctx);
 
-        for (;;) {
-            (void)entryListSearch( pzName, &ctx );
-            if (breakCh == '[')
-                break;
-            pE = pE->pTwin;
-            if (pE == NULL)
-                break;
-            ctx.pDefs = pE->val.pDefEntry;
-        }
-    }
+        if (breakCh == '[')
+            break;
+
+        pE = pE->pTwin;
+    } while (pE != NULL);
+
     defList.nestLevel--;
 
  returnResult:
     if (defList.nestLevel == 0)
-        addResult( NULL, &defList );
+        addResult(NULL, &defList);
 
     return defList.papDefEntry;
 }
 
 
 LOCAL tDefEntry**
-findEntryList( char* pzName )
+findEntryList(char* pzName)
 {
-    return entryListSearch( pzName, &currDefCtx );
+    return entryListSearch(pzName, &currDefCtx);
 }
 /*
  * Local Variables:

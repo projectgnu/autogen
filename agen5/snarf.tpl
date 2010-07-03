@@ -1,6 +1,5 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# $Id: abf03a954c380052f82844b1bc342ad47223cab6 $
 # Time-stamp:        "2010-02-24 08:42:03 bkorb"
 
 ##

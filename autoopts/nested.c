@@ -1,6 +1,5 @@
 
 /*
- *  $Id: 43877d3ade0b626b4bec87f2f340a8358c118333 $
  *  Time-stamp:      "2010-02-24 08:41:12 bkorb"
  *
  *   Automated Options Nested Values module.

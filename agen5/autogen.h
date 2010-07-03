@@ -1,9 +1,8 @@
 
 /*
- *  autogen.h
- *  $Id: 7575d602f5cb2199810b8bd517192126c8cfaa82 $
+ *  \file autogen.h
  *
- *  Time-stamp:        "2010-06-25 20:15:40 bkorb"
+ *  Time-stamp:        "2010-06-27 17:10:12 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -350,7 +349,7 @@ MODE char const* pzDepFile        VALUE( NULL );
  * base name of both source and derived files.
  * Either "_TList" or "_SList" gets put on the end.
  */
-MODE char const* pzTargetList     VALUE( NULL );
+MODE char const* pz_targ_base     VALUE( NULL );
 /**
  * The actual list of input (source) files.
  */

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-03-01 17:06:32 bkorb"
+# Time-stamp:        "2010-07-03 09:35:24 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -20,9 +20,9 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-d=$(dirname $0)
-d=$(cd $d ; pwd)
-prog=${d}/$(basename $0)
+d=`dirname $0`
+d=`cd $d ; pwd`
+prog=${d}/`basename $0`
 parent_pid=$$
 
 die()
@@ -38,8 +38,7 @@ die()
 
 set_config_values()
 {
-  local PS4=">$FUNCNAME> "
-  tmp_dir=$(pwd)/ag-texi-$$.d
+  tmp_dir=`pwd`/ag-texi-$$.d
   rm -rf ag-texi-*.d
   mkdir ${tmp_dir} || die "cannot make ${tmp_dir} directory"
   case "$-" in
@@ -52,87 +51,86 @@ set_config_values()
   exec 8>&2 2> ${LOG_FILE}
 
   test -z "${CC}"     && CC="@CC@"
-  test -z "${CC}"     && $(which cc)
+  test -z "${CC}"     && `which cc`
   test -z "${CFLAGS}" && CFLAGS="@CFLAGS@"
   test -z "${LIBS}"   && LIBS="@LIBS@"
-  test -z "${MAKE}"   && MAKE=$(which make)
+  test -z "${MAKE}"   && MAKE=`which make`
 
-  INCLUDES="@DEFS@ "$(
+  INCLUDES="@DEFS@ "`
 
-    for d in . @srcdir@ @top_builddir@ @top_srcdir@ \
+    for d in @top_builddir@ @top_srcdir@ \
              @top_builddir@/autoopts @top_srcdir@/autoopts
     do
-      (\cd ${d} ; pwd)
+      (\cd ${d} && pwd) 2>/dev/null
     done | \
       sort -u | \
-      sed s/^/-I/ )
+      sed s/^/-I/ `
+
+  CFLAGS="${INCLUDES} ${CFLAGS}"
 
   # Give preference to configured SHELL
   #
-  d=@SHELL@
-  test -n "${d}" && SHELL=$d
-  test -z "${SHELL}" && {
-    SHELL=$(which bash)
-    test -z "${SHELL}" && SHELL=$(which sh)
-  }
-  export CC CFLAGS LIBS MAKE SHELL INCLUDES LOG_FILE tmp_dir
+  for SHELL in @CONFIG_SHELL@ @SHELL@ `which bash` `which sh` /bin/sh
+  do test -x ${SHELL} && break ; done
+  export CC CFLAGS LIBS MAKE SHELL LOG_FILE tmp_dir
 }
 
 setup_exports()
 {
-  local PS4=">$FUNCNAME> "
   # Now auto-export variables:
   #
   set -a
 
-  top_builddir=$(cd @top_builddir@ ; pwd)
-  top_srcdir=$(cd @top_srcdir@ ; pwd)
-  srcdir=$(cd @srcdir@ ; pwd)
+  top_builddir=`cd @top_builddir@ ; pwd`
+  top_srcdir=`cd @top_srcdir@ ; pwd`
+  srcdir=`cd @srcdir@ ; pwd`
   PATH=${top_builddir}/columns:${PATH}
-  timer=$(expr @AG_TIMEOUT@ '*' 5)
+  timer=`expr @AG_TIMEOUT@ '*' 5`
+  d=`find ${top_builddir}/autoopts -type f -name libopts.a`
+  LIBS="$d ${LIBS}"
 
-  eval $(egrep '^AG_[A-Z_]*' ${top_srcdir}/VERSION)
+  eval `egrep '^AG_[A-Z_]*' ${top_srcdir}/VERSION`
 
   AGsrc=${top_srcdir}/agen5
   AGexe=@AGexe@
   GDexe=@GDexe@
   CLexe=@CLexe@
 
-  LIBS=${LIBS}\ $(find ${top_builddir}/autoopts -name libopts.a -print)
+  LIBS=${LIBS}\ `find ${top_builddir}/autoopts -name libopts.a -print`
   OPTIONS_DEF=${AGsrc}/opts.def
   DIRECTIVESRC=${AGsrc}/defDirect.c
-  GETDEF_SRC=$(
+  GETDEF_SRC=`
     echo ${AGsrc}/func*.c \
       ${AGsrc}/exp*.c \
       ${AGsrc}/schemedef.scm \
-      ${DIRECTIVESRC} )
+      ${DIRECTIVESRC} `
 
   AGEN_TEXI=${top_builddir}/agen5/autogen.texi
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt
 
-  ADDON_MENU=$(
+  ADDON_MENU=`
     for f in columns getdefs xml2ag
     do
       echo ${top_builddir}/${f}/${f}.menu
-    done)\ ${top_srcdir}/doc/snprintfv.menu
+    done`\ ${top_srcdir}/doc/snprintfv.menu
 
-  ADDON_TEXI=$(
+  ADDON_TEXI=`
     for f in columns getdefs xml2ag
     do
       echo ${top_builddir}/${f}/${f}.texi
     done
-    echo ${top_srcdir}/doc/snprintfv.texi)
+    echo ${top_srcdir}/doc/snprintfv.texi`
 
-  DOC_INCLUDES=$(
+  DOC_INCLUDES=`
     echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h
     echo ${top_builddir}/agen5/autogen.menu ${top_builddir}/agen5/autogen.texi
-    echo ${top_builddir}/autoopts/libopts.texi )
+    echo ${top_builddir}/autoopts/libopts.texi `
 
   DOC_TEMPLATE=${srcdir}/auto_gen.tpl
 
-  DOC_DEPENDS=$(
+  DOC_DEPENDS=`
     echo ${DOC_TEMPLATE} ${OPTIONS_DEF} ${ADDON_MENU} ${ADDON_TEXI} \
-         ${DOC_INCLUDES} ${GETDEF_SRC}  ${DOC_TEXT})
+         ${DOC_INCLUDES} ${GETDEF_SRC}  ${DOC_TEXT}`
 
   GEN_BASE=agdoc
   set +a
@@ -142,7 +140,6 @@ setup_exports()
 #
 run_getdefs()
 {
-  local PS4=">$FUNCNAME> "
   gd_cfg=${tmp_dir}/getdefs.cfg
   exec 3> ${gd_cfg}
   cat >&3 <<-  EOCat
@@ -151,15 +148,15 @@ run_getdefs()
 	srcfile
 	linenum
 	template    auto_gen.tpl
-	assign      ag-texi = invoke-$(basename ${AGEN_TEXI})
+	assign      ag-texi = invoke-`basename ${AGEN_TEXI}`
 	EOCat
 
-  ln -s ${AGEN_TEXI} invoke-$(basename ${AGEN_TEXI})
+  ln -s ${AGEN_TEXI} invoke-`basename ${AGEN_TEXI}`
 
   for f in ${ADDON_TEXI}
   do
-    ln -s ${f} ./invoke-$(basename ${f})
-    echo "assign      addon-texi = invoke-$(basename ${f})"
+    ln -s ${f} ./invoke-`basename ${f}`
+    echo "assign      addon-texi = invoke-`basename ${f}`"
   done >&3
 
   for f in ${GETDEF_SRC}
@@ -173,12 +170,11 @@ run_getdefs()
 
 sanity_check()
 {
-  local PS4=">$FUNCNAME> "
   # Make sure the executables are there
   #
-  test -x ${AGexe} || (cd $(dirname ${AGexe}) ; ${MAKE}) || exit 0
-  test -x ${GDexe} || (cd $(dirname ${GDexe}) ; ${MAKE}) || exit 0
-  test -x ${CLexe} || (cd $(dirname ${CLexe}) ; ${MAKE}) || exit 0
+  test -x ${AGexe} || (cd `dirname ${AGexe}` ; ${MAKE}) || exit 0
+  test -x ${GDexe} || (cd `dirname ${GDexe}` ; ${MAKE}) || exit 0
+  test -x ${CLexe} || (cd `dirname ${CLexe}` ; ${MAKE}) || exit 0
 
   # See to it that the .texi files have been generated, too.
   #
@@ -186,8 +182,8 @@ sanity_check()
            ${top_builddir}/autoopts/libopts.texi
   do
     test -f ${f} || (
-      cd $(dirname ${f})
-      ${MAKE} $(basename ${f}) >&2
+      cd `dirname ${f}`
+      ${MAKE} `basename ${f}` >&2
       test $? -ne 0 && die MAKE of ${f} failed.
     )
   done
@@ -215,7 +211,7 @@ run_getdefs
 
 env >&2
 opts="-t${timer} -L${srcdir} -L${top_srcdir} -L${top_srcdir}/autoopts"
-cmd=$(echo "${cmd}" --base=${GEN_BASE} ${opts} ${tmp_dir}/${GEN_BASE}.def)
+cmd=`echo "${cmd}" --base=${GEN_BASE} ${opts} ${tmp_dir}/${GEN_BASE}.def`
 echo "${PS4:-+} " ${cmd} >&8
 
 ${cmd} || die could not regenerate doc

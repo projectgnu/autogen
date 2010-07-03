@@ -1,6 +1,7 @@
 
 /*
- *  save.c  $Id: 5a69234fab4c2d8d7eaf4aed4dbb3052ce6be5b6 $
+ * \file save.c
+ *
  * Time-stamp:      "2010-02-24 08:40:17 bkorb"
  *
  *  This module's routines will take the currently set options and

@@ -5,9 +5,8 @@
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
  * Time-stamp:       "2006-09-23 19:46:16 bkorb"
- *            by: bkorb
  *
- * $Id: 8ce7ddfe2378f0b75c91c0ab348a6ad81634fb01 $
+ * $Id: 9e813178aaa710579193c8a92e10a378fafe08a5 $
  */
 
 /* Code: */

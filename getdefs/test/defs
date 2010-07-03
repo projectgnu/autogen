@@ -5,7 +5,6 @@
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
 # Time-stamp:        "2010-02-24 08:38:26 bkorb"
-#            by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +22,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# $Id: 5721aaf7547dd90db4a32cee1f0ff9c906afdbb7 $
+# $Id: 3368d723f2e0ecc6d595d839040f4e77d23ec6ad $
 # ----------------------------------------------------------------------
 
 # Make sure srcdir is an absolute path.  Supply the variable

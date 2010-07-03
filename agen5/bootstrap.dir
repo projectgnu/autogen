@@ -4,8 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-06-26 08:25:03 bkorb"
-#            by: bkorb
+# Time-stamp:        "2010-06-30 20:53:48 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,9 +22,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
-# @(#) $Id: ba49972b9b07ada80a70d6bdb40ee2edaed34d73 $
-# ----------------------------------------------------------------------
-
+#
 #  This script rebuilds sources not kept in the CVS repository.
 #  These files are distributed, so it is not necessary to invoke
 #  AutoGen before building AutoGen.  (Like I had to do long ago :)
@@ -342,4 +339,4 @@ ${free_trap} && trap '' 0
 # indent-tabs-mode: nil
 # End:
 
-# bootstrap.dir ends here
+# end of agen5/bootstrap.dir

@@ -1,6 +1,5 @@
 
 /*
- *  $Id: 7226344c6486a4eda395f893881080b7d80a2003 $
  * Time-stamp:      "2010-04-24 14:03:12 bkorb"
  *
  *  This module will interpret the options set in the tOptions

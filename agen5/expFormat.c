@@ -1,9 +1,8 @@
-/*
- *  expFormat.c
+/**
+ *  \file expFormat.c
  *
- *  Time-stamp:        "2010-06-25 18:25:32 bkorb"
+ *  Time-stamp:        "2010-07-03 09:55:12 bkorb"
  *
- *  $Id: cb8cc25ddb647e1f45a6ca5250e1f791867c9301 $
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.
@@ -44,8 +43,8 @@ static char const zAgpl[] =
 "%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
 "%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 "%2$sSee the GNU Affero General Public License for more details.\n%2$s\n"
-"%2$sYou should have received a copy of the GNU Affero General Public License\n"
-"%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
+"%2$sYou should have received a copy of the GNU Affero General Public License"
+"\n%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 static char const zLgpl[] =
 "%2$s%1$s is free software: you can redistribute it and/or modify it\n"
@@ -56,8 +55,8 @@ static char const zLgpl[] =
 "%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
 "%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 "%2$sSee the GNU Lesser General Public License for more details.\n%2$s\n"
-"%2$sYou should have received a copy of the GNU Lesser General Public License\n"
-"%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
+"%2$sYou should have received a copy of the GNU Lesser General Public License"
+"\n%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
 
 static char const zBsd[] =
 "%2$s%1$s is free software copyrighted by %3$s.\n%2$s\n"
@@ -118,30 +117,32 @@ tSCC zFmtAlloc[] = "asprintf allocation";
  * exparg: first_prefix, for the first output line, opt
  * exparg: optpfx,       shifted prefix, opt
  *
- * doc:  Generate a "DO NOT EDIT" or "EDIT WITH CARE" warning string.
- *       Which depends on whether or not the @code{--writable} command line
- *       option was set.
+ * doc:
+ *  Generate a "DO NOT EDIT" or "EDIT WITH CARE" warning string.
+ *  Which depends on whether or not the @code{--writable} command line
+ *  option was set.
  *
- *       The first argument may be an option:  -d
- *       This will suppress the variable text (date and version information).
- *       If specified, then the "prefix" and "first" arguments are shifted
- *       to the next arguments.
+ *  The first argument may be an option:  -d
  *
- *       The first argument is a per-line string prefix.
- *       The optional second argument is a prefix for the first-line and,
- *       in read-only mode, activates the editor hints.
- *       @*
- *       @example
- *       -*- buffer-read-only: t -*- vi: set ro:
- *       @end example
- *       @noindent
- *       The warning string also includes information about the template used
- *       to construct the file and the definitions used in its instantiation.
+ *  This will suppress the variable text (date and version information).
+ *  If specified, then the "prefix" and "first" arguments are shifted
+ *  to the next arguments.
  *
- *       The optional third argument is used when the first argument is actually
- *       an invocation option and the prefix arguments get shifted.
- *       The first argument must be, specifically, "@code{-d}".  That is used
- *       to signify that the date stamp should not be inserted into the output.
+ *  The first argument is a per-line string prefix.  The optional second
+ *  argument is a prefix for the first-line and, in read-only mode, activates
+ *  the editor hints.
+ *  @*
+ *  @example
+ *  -*- buffer-read-only: t -*- vi: set ro:
+ *  @end example
+ *  @noindent
+ *  The warning string also includes information about the template used
+ *  to construct the file and the definitions used in its instantiation.
+ *
+ *  The optional third argument is used when the first argument is actually an
+ *  invocation option and the prefix arguments get shifted.  The first
+ *  argument must be, specifically, "@code{-d}".  That is used to signify that
+ *  the date stamp should not be inserted into the output.
 =*/
 SCM
 ag_scm_dne( SCM prefix, SCM first, SCM opt )

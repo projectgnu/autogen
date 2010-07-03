@@ -4,7 +4,6 @@
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ## Time-stamp:      "2010-02-24 08:38:27 bkorb"
-##            by: bkorb
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
@@ -22,7 +21,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: 2327efd536d312fb8d09d83ee28f868b3fba810b $
+## $Id: 41cf4454bd4da22a40389f8b70db35637f07167c $
 ## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test

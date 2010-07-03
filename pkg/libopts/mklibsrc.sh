@@ -3,7 +3,6 @@
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
 ## Time-stamp:      "2010-02-24 08:37:19 bkorb"
-##              by: bkorb
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,7 +20,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## ---------------------------------------------------------------------
-## $Id: 8362d58242318970db5c052f9b99111c837fc0ca $
+## $Id: 4b08886997cbf78d85ec053f5fb3027c781831bb $
 ## ---------------------------------------------------------------------
 ## Code:
 

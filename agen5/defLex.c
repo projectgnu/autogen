@@ -1,8 +1,7 @@
 
 /*
- *  $Id: c52675c053ab8d4afc6af169d3eca0ad63f2fcae $
  *
- *  Time-stamp:        "2010-02-24 08:43:07 bkorb"
+ *  Time-stamp:        "2010-06-30 22:02:27 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -55,24 +54,177 @@ te_dp_event aKeywordTkn[] = { KEYWORD_TABLE };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-loadScheme( void );
+pop_context(void);
 
 static void
-alist_to_autogen_def( void );
+trim_whitespace(void);
+
+static void
+lex_escaped_char(void);
+
+static tSuccess
+lex_backquote(void);
+
+static tSuccess
+lex_comment(void);
+
+static tSuccess
+lex_here_string(void);
+
+static void
+loadScheme(void);
+
+static void
+alist_to_autogen_def(void);
 
 static char*
-assembleName( char* pzScan, te_dp_event* pRetVal );
+assembleName(char * pzScan, te_dp_event * pRetVal);
 
 static char*
 assembleHereString( char* pzScan );
 /* = = = END-STATIC-FORWARD = = = */
+
+/**
+ *  Pop off an include context and resume from the including file.
+ */
+static void
+pop_context(void)
+{
+    tScanCtx* pCX = pCurCtx;
+    pCurCtx   = pCurCtx->pCtx;
+    pCX->pCtx = pDoneCtx;
+    pDoneCtx  = pCX;
+}
+
+static void
+trim_whitespace(void)
+{
+    char* pz = pCurCtx->pzScan;
+    if (*pz == '\n')
+        pCurCtx->lineNo++;
+    *(pz++) = NUL;
+
+    /*
+     *  This ensures that any names found previously
+     *  are NUL terminated.
+     */
+    while (IS_WHITESPACE_CHAR(*pz)) {
+        if (*pz == '\n')
+            pCurCtx->lineNo++;
+        pz++;
+    }
+    pCurCtx->pzScan = pz;
+}
+
+static void
+lex_escaped_char(void)
+{
+    char* pz = strchr(pCurCtx->pzScan, ';');
+
+    for (;;) {
+        if (pz == NULL) {
+            pz = pCurCtx->pzScan + strlen(pCurCtx->pzScan);
+            break;
+        }
+        if (IS_WHITESPACE_CHAR(pz[1])) {
+            *pz = NUL;
+            pz[1] = ';';
+            break;
+        }
+        pz = strchr( pz+1, ';' );
+    }
+
+    lastToken = DP_EV_STRING;
+    pz_token = pz;
+}
+
+static tSuccess
+lex_backquote(void)
+{
+    int line_no = pCurCtx->lineNo;
+    char* pz = ao_string_cook( pCurCtx->pzScan, &line_no);
+
+    if (pz == NULL)
+        return FAILURE;
+
+    pz_token = pCurCtx->pzScan;
+
+    pCurCtx->pzScan = pz;
+
+    lastToken = DP_EV_STRING;
+    pz = runShell( (char const*)pz_token );
+    pCurCtx->lineNo = line_no;
+
+    if (pz == NULL)
+        return PROBLEM;
+    TAGMEM( pz, "shell definition string" );
+    pz_token = pz;
+    manageAllocatedData(pz);
+    return SUCCESS;
+}
+
+static tSuccess
+lex_comment(void)
+{
+    /*
+     *  Allow for a comment, C or C++ style
+     */
+    switch (pCurCtx->pzScan[1]) {
+    case '*':
+    {
+        char* pz = strstr( pCurCtx->pzScan+2, "*/" );
+        if (pz != NULL) {
+            char* p = pCurCtx->pzScan+1;
+            for (;;) {
+                p = strchr( p+1, '\n' );
+                if ((p == NULL) || (p > pz))
+                    break;
+                pCurCtx->lineNo++;
+            }
+            pCurCtx->pzScan = pz+2;
+            return SUCCESS;
+        }
+        break;
+    }
+    case '/':
+    {
+        char* pz = strchr( pCurCtx->pzScan+2, '\n' );
+        if (pz != NULL) {
+            pCurCtx->pzScan = pz+1;
+            pCurCtx->lineNo++;
+            return SUCCESS;
+        }
+        break;
+    }
+    }
+
+    return FAILURE;
+}
+
+static tSuccess
+lex_here_string(void)
+{
+    char* pz;
+    if (pCurCtx->pzScan[1] != '<')
+        return FAILURE;
+
+    pz = assembleHereString(pCurCtx->pzScan + 2);
+    if (pz == NULL) {
+        lastToken = DP_EV_INVALID;
+        return PROBLEM;
+    }
+
+    lastToken = DP_EV_HERE_STRING;
+    pCurCtx->pzScan = pz;
+    return SUCCESS;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *   LEXICAL SCANNER
  */
 LOCAL te_dp_event
-yylex( void )
+yylex(void)
 {
     lastToken = DP_EV_INVALID;
 
@@ -82,23 +234,8 @@ scanAgain:
      *  We branch here after skipping over a comment
      *  or processing a directive (which may change our context).
      */
-    if (IS_WHITESPACE_CHAR( *pCurCtx->pzScan )) {
-        char* pz = pCurCtx->pzScan;
-        if (*pz == '\n')
-            pCurCtx->lineNo++;
-        *(pz++) = NUL;
-
-        /*
-         *  This ensures that any names found previously
-         *  are NUL terminated.
-         */
-        while (IS_WHITESPACE_CHAR(*pz)) {
-            if (*pz == '\n')
-                pCurCtx->lineNo++;
-            pz++;
-        }
-        pCurCtx->pzScan = pz;
-    }
+    if (IS_WHITESPACE_CHAR(*pCurCtx->pzScan))
+        trim_whitespace();
 
     switch (*pCurCtx->pzScan) {
     case NUL:
@@ -109,22 +246,13 @@ scanAgain:
         if (pCurCtx->pCtx == NULL)
             goto lex_done;
 
-        /*
-         *  Pop off an include context and resume
-         *  from the including file.
-         */
-        {
-            tScanCtx* pCX = pCurCtx;
-            pCurCtx = pCurCtx->pCtx;
-            pCX->pCtx = pDoneCtx;
-            pDoneCtx  = pCX;
-        }
+        pop_context();
         goto scanAgain;
 
     case '#':
     {
-        extern char* processDirective( char* );
-        char* pz = processDirective( pCurCtx->pzScan+1 );
+        extern char * processDirective(char*);
+        char * pz = processDirective(pCurCtx->pzScan+1);
         /*
          *  Ensure that the compiler doesn't try to save a copy of
          *  "pCurCtx" in a register.  It must be reloaded from memory.
@@ -133,13 +261,13 @@ scanAgain:
         goto scanAgain;
     }
 
-    case '{': SET_LIT_TKN( O_BRACE );   break;
-    case '=': SET_LIT_TKN( EQ );        break;
-    case '}': SET_LIT_TKN( C_BRACE );   break;
-    case '[': SET_LIT_TKN( OPEN_BKT );  break;
-    case ']': SET_LIT_TKN( CLOSE_BKT ); break;
-    case ';': SET_LIT_TKN( SEMI );      break;
-    case ',': SET_LIT_TKN( COMMA );     break;
+    case '{': SET_LIT_TKN(O_BRACE);   break;
+    case '=': SET_LIT_TKN(EQ);        break;
+    case '}': SET_LIT_TKN(C_BRACE);   break;
+    case '[': SET_LIT_TKN(OPEN_BKT);  break;
+    case ']': SET_LIT_TKN(CLOSE_BKT); break;
+    case ';': SET_LIT_TKN(SEMI);      break;
+    case ',': SET_LIT_TKN(COMMA);     break;
 
     case '\'':
     case '"':
@@ -156,21 +284,12 @@ scanAgain:
     }
 
     case '<':
-    {
-        char* pz;
-        if (pCurCtx->pzScan[1] != '<')
-            goto BrokenToken;
-
-        pz = assembleHereString(pCurCtx->pzScan + 2);
-        if (pz == NULL) {
-            lastToken = DP_EV_INVALID;
-            return DP_EV_INVALID;
+        switch (lex_here_string()) {
+        case SUCCESS: break;
+        case FAILURE: goto BrokenToken;
+        case PROBLEM: return DP_EV_INVALID;
         }
-
-        lastToken = DP_EV_HERE_STRING;
-        pCurCtx->pzScan = pz;
         break;
-    }
 
     case '(':
         loadScheme();
@@ -180,89 +299,28 @@ scanAgain:
         if (strncmp( pCurCtx->pzScan+1, "'(", (size_t)2) == 0) {
             alist_to_autogen_def();
             goto scanAgain;
-
-        } else {
-            char* pz = strchr( pCurCtx->pzScan, ';' );
-
-            for (;;) {
-                if (pz == NULL) {
-                    pz = pCurCtx->pzScan + strlen( pCurCtx->pzScan );
-                    break;
-                }
-                if (IS_WHITESPACE_CHAR( pz[1] )) {
-                    *pz = NUL;
-                    pz[1] = ';';
-                    break;
-                }
-                pz = strchr( pz+1, ';' );
-            }
-
-            lastToken = DP_EV_STRING;
-            pz_token = pz;
-            break;
         }
+        lex_escaped_char();
+        break;
 
     case '`':
-    {
-        int line_no = pCurCtx->lineNo;
-        char* pz = ao_string_cook( pCurCtx->pzScan, &line_no);
-
-        if (pz == NULL)
-            goto NUL_error;
-
-        pz_token = pCurCtx->pzScan;
-
-        pCurCtx->pzScan = pz;
-
-        lastToken = DP_EV_STRING;
-        pz = runShell( (char const*)pz_token );
-        pCurCtx->lineNo = line_no;
-
-        if (pz == NULL)
-            goto scanAgain;
-        TAGMEM( pz, "shell definition string" );
-        pz_token = pz;
-        manageAllocatedData( pz );
+        switch (lex_backquote()) {
+        case FAILURE: goto NUL_error;
+        case PROBLEM: goto scanAgain;
+        case SUCCESS: break;
+        }
         break;
-    }
 
     case '/':
-        /*
-         *  Allow for a comment, C or C++ style
-         */
-        switch (pCurCtx->pzScan[1]) {
-        case '*':
-        {
-            char* pz = strstr( pCurCtx->pzScan+2, "*/" );
-            if (pz != NULL) {
-                char* p = pCurCtx->pzScan+1;
-                for (;;) {
-                    p = strchr( p+1, '\n' );
-                    if ((p == NULL) || (p > pz))
-                        break;
-                    pCurCtx->lineNo++;
-                }
-                pCurCtx->pzScan = pz+2;
-                goto scanAgain;
-            }
-            break;
-        }
-        case '/':
-        {
-            char* pz = strchr( pCurCtx->pzScan+2, '\n' );
-            if (pz != NULL) {
-                pCurCtx->pzScan = pz+1;
-                pCurCtx->lineNo++;
-                goto scanAgain;
-            }
-            break;
-        }
+        switch (lex_comment()) {
+        case SUCCESS: goto scanAgain;
+        default: break;
         }
         /* FALLTHROUGH */ /* to Invalid input char */
 
     default:
     BrokenToken:
-        pCurCtx->pzScan = assembleName( pCurCtx->pzScan, &lastToken );
+        pCurCtx->pzScan = assembleName(pCurCtx->pzScan, &lastToken);
         break;
     }   /* switch (*pCurCtx->pzScan) */
 
@@ -270,8 +328,8 @@ scanAgain:
 
 NUL_error:
 
-    AG_ABEND( aprf( zErrMsg, pzProg, "unterminated quote in definition",
-                    pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+    AG_ABEND(aprf(zErrMsg, pzProg, "unterminated quote in definition",
+                  pCurCtx->pzCtxFname, pCurCtx->lineNo));
     return DP_EV_INVALID;
 
 lex_done:
@@ -292,14 +350,21 @@ lex_done:
 
 
 LOCAL void
-yyerror( char* s )
+yyerror(char* s)
 {
-    tSCC zErrTkn[] = "%s:  ``%s''\n";
-    tSCC zDf[] = "`%s'\n";
+    static char const yyerr_fmt[] =
+        "%s:  in %s on line %d\n"
+        "\ttoken in error:  %s\n"
+        "\t[[...<error-text>]] %s\n\n"
+        "Likely causes:  a mismatched quote, a value that needs "
+        "quoting,\n\t\tor a missing semi-colon\n";
+
+    static char const zErrTkn[] = "%s:  ``%s''\n";
+    static char const zDf[] = "`%s'\n";
 
     char* pz;
 
-    if (strlen( pCurCtx->pzScan ) > 64 )
+    if (strlen(pCurCtx->pzScan) > 64 )
         pCurCtx->pzScan[64] = NUL;
 
     switch (lastToken) {
@@ -307,27 +372,22 @@ yyerror( char* s )
     case DP_EV_OTHER_NAME:
     case DP_EV_STRING:
     case DP_EV_NUMBER:
-        if (strlen( pz_token ) > 64 )
+        if (strlen(pz_token) > 64 )
             pz_token[64] = NUL;
 
-        pz = aprf( zErrTkn, DP_EVT_NAME( lastToken ), pz_token );
+        pz = aprf(zErrTkn, DP_EVT_NAME( lastToken ), pz_token);
         break;
 
     default:
-        pz = aprf( zDf, DP_EVT_NAME( lastToken ));
+        pz = aprf(zDf, DP_EVT_NAME(lastToken));
     }
-    AG_ABEND( aprf( "%s:  in %s on line %d\n"
-                    "\ttoken in error:  %s\n"
-                    "\t[[...<error-text>]] %s\n\n"
-                    "Likely causes:  a mismatched quote, a value that needs "
-                    "quoting,\n\t\tor a missing semi-colon\n",
-                    s, pCurCtx->pzCtxFname, pCurCtx->lineNo, pz,
-                    pCurCtx->pzScan ));
+    AG_ABEND(aprf(yyerr_fmt, s, pCurCtx->pzCtxFname, pCurCtx->lineNo, pz,
+                  pCurCtx->pzScan));
 }
 
 
 static void
-loadScheme( void )
+loadScheme(void)
 {
     char*    pzText    = pCurCtx->pzScan;
     char*    pzEnd     = (char*)skipScheme( pzText, pzText + strlen( pzText ));
@@ -381,7 +441,7 @@ loadScheme( void )
  *  into AutoGen definitions.
  */
 static void
-alist_to_autogen_def( void )
+alist_to_autogen_def(void)
 {
     tSCC   zSchemeText[] = "Scheme Computed Definitions";
     tSCC   zWrap[] = "(alist->autogen-def %s)";
@@ -456,7 +516,7 @@ alist_to_autogen_def( void )
  *  Figure out which.
  */
 static char*
-assembleName( char* pzScan, te_dp_event* pRetVal )
+assembleName(char * pzScan, te_dp_event * pRetVal)
 {
     /*
      *  Check for a number.

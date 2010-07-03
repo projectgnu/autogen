@@ -5,7 +5,6 @@
 ## Time-stamp:      "2010-02-24 14:49:29 bkorb"
 ## Copyright (c):   1997-2010 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
-##            by: bkorb
 ##
 ## This file is part of AutoGen.
 ##
@@ -23,7 +22,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## ---------------------------------------------------------------------
-## $Id: a2c2aae531026f424bb647e597b2b08306dbd94c $
+## $Id: a87171f6ae2d418238eb90180c4bf08bb0f12a72 $
 ## ---------------------------------------------------------------------
 ## Code:
 COMPAT_CSRC = pathfind.c snprintf.c strchr.c strdup.c strftime.c strsignal.c

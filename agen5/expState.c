@@ -1,7 +1,6 @@
 
 /*
  *  expState.c
- *  $Id: 8e11fd154042f6dfa8f2123a4b52be9f568482c6 $
  *
  *  Time-stamp:        "2010-02-24 08:42:57 bkorb"
  *

@@ -1,5 +1,4 @@
 /*
- *  $Id: 3da9a5fc88c904673b3b95d0c9667b2bcbccfc80 $
  *  Time-stamp:      "2010-02-24 08:41:19 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings

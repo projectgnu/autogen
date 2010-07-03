@@ -1,6 +1,5 @@
 
 /*
- *  $Id: da09fc943da953195b243b7697fdbf5127f5b6c2 $
  * Time-stamp:      "2010-02-24 08:40:21 bkorb"
  *
  *   Automated Options Paged Usage module.

@@ -1,5 +1,4 @@
 /*
- *  $Id: 5994903d71d2c9a95c8b890e4aed03e71d09ace0 $
  *
  *  Time-stamp:        "2010-06-25 20:29:07 bkorb"
  *

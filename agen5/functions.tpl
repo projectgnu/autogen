@@ -1,8 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-# $Id: 3466885426597eb37bb598064255295c295bf8d7 $
 
-#  Time-stamp:        "2010-02-24 08:42:08 bkorb"
+#  Time-stamp:        "2010-06-30 21:10:28 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -233,9 +232,9 @@ ENDFOR macfunc
 
 =][=
 
-   (shellf "file=%s.tmp ; cat > ${file} <<\\_EOF_\n%s_EOF_" (out-name) decl-list)
-   (emit (sprintf "\ntSCC zFnStrg[%d] =\n" func-str-off))
-   (shellf "columns -I4 --spread=1<<\\_EOF_\n%s_EOF_" func-name)
+ (shellf "file=%s.tmp ; cat > ${file} <<\\_EOF_\n%s_EOF_" (out-name) decl-list)
+ (emit (sprintf "\ntSCC zFnStrg[%d] =\n" func-str-off))
+ (shellf "columns -I4 --spread=1<<\\_EOF_\n%s_EOF_" func-name)
 
 =];
 
