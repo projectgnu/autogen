@@ -36,10 +36,10 @@ tSCC zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
 static char const *
-doSchemeExpr(char const * pzData, char const * pzFileName);
+do_scheme_expr(char const * pzData, char const * pzFileName);
 
 static te_pm_event
-findTokenType(char const **  ppzData, te_pm_state fsm_state);
+next_pm_token(char const **  ppzData, te_pm_state fsm_state);
 
 static char const *
 copyMarker(char const * pzData, char* pzMark, size_t * pCt);
@@ -48,12 +48,12 @@ copyMarker(char const * pzData, char* pzMark, size_t * pCt);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  doSchemeExpr
+ *  do_scheme_expr
  *
  *  Process a scheme specification
  */
 static char const *
-doSchemeExpr(char const * pzData, char const * pzFileName)
+do_scheme_expr(char const * pzData, char const * pzFileName)
 {
     char*   pzEnd = (char*)pzData + strlen(pzData);
     char    ch;
@@ -210,13 +210,13 @@ doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  findTokenType
+ *  next_pm_token
  *
  *  Skiping leading white space, figure out what sort of token is under
  *  the scan pointer (pzData).
  */
 static te_pm_event
-findTokenType(char const **  ppzData, te_pm_state fsm_state)
+next_pm_token(char const **  ppzData, te_pm_state fsm_state)
 {
     char const * pzData = *ppzData;
 
@@ -378,7 +378,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
     templLineNo  = 1;
 
     while (fsm_state != PM_ST_DONE) {
-        te_pm_event fsm_tkn = findTokenType(&pzData, fsm_state);
+        te_pm_event fsm_tkn = next_pm_token(&pzData, fsm_state);
         te_pm_state nxt_state;
         te_pm_trans trans;
 
@@ -437,7 +437,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
             break;
 
         case PM_TR_TEMPL_SCHEME:
-            pzData = doSchemeExpr(pzData, pzFileName);
+            pzData = do_scheme_expr(pzData, pzFileName);
             break;
 
         case PM_TR_INVALID:

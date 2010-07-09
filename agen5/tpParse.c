@@ -32,13 +32,13 @@ tSCC zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static teFuncType
-whichFunc(char const ** ppzScan);
+func_code(char const ** ppzScan);
 
 static char const *
-findMacroEnd(char const ** ppzMark);
+find_mac_end(char const ** ppzMark);
 
 static char const *
-nextMacroStart(char const * pz, tMacro** ppM, tTemplate* pTpl);
+find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -46,7 +46,7 @@ nextMacroStart(char const * pz, tMacro** ppM, tTemplate* pTpl);
  *  to a name pointed to by the input argument.
  */
 static teFuncType
-whichFunc(char const ** ppzScan)
+func_code(char const ** ppzScan)
 {
     char const *   pzFuncName = *ppzScan;
     int           hi, lo, av;
@@ -139,7 +139,7 @@ whichFunc(char const ** ppzScan)
 
 
 static char const *
-findMacroEnd(char const ** ppzMark)
+find_mac_end(char const ** ppzMark)
 {
     char const * pzMark = *ppzMark + startMacLen;
     char const * pzFunc;
@@ -155,7 +155,7 @@ findMacroEnd(char const ** ppzMark)
     }
 
     pzFunc              = pzMark;
-    pCurMacro->funcCode = whichFunc(&pzMark);
+    pCurMacro->funcCode = func_code(&pzMark);
     pCurMacro->lineNo   = templLineNo;
     *ppzMark            = pzMark;
 
@@ -193,7 +193,7 @@ findMacroEnd(char const ** ppzMark)
 
 
 static char const *
-nextMacroStart(char const * pz, tMacro** ppM, tTemplate* pTpl)
+find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl)
 {
     char*   pzCopy;
     char const *    pzEnd;
@@ -263,7 +263,7 @@ parseTemplate(tMacro* pM, char const ** ppzText)
 #endif
 
     for (;;) {
-        char const * pzMark = nextMacroStart(pzScan, &pM, pTpl);
+        char const * pzMark = find_mac_start(pzScan, &pM, pTpl);
 
         /*
          *  IF no more macro marks are found,
@@ -276,7 +276,7 @@ parseTemplate(tMacro* pM, char const ** ppzText)
          *  Find the macro code and the end of the macro invocation
          */
         pCurMacro = pM;
-        pzScan = findMacroEnd(&pzMark);
+        pzScan = find_mac_end(&pzMark);
 
         /*
          *  Count the lines in the macro text and advance the

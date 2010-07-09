@@ -2,7 +2,7 @@
 /*
  *  agCgi.c
  *
- *  Time-stamp:        "2010-06-30 18:04:40 bkorb"
+ *  Time-stamp:        "2010-07-08 19:24:46 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -93,7 +93,7 @@ loadCgi( void )
     pzOopsPrefix = zOops;
     {
         int tmpfd;
-        AGDUPSTR(pzTmpStderr, mkstemp_pat(), "temp stderr file");
+        AGDUPSTR(pzTmpStderr, "/tmp/ag-stderr-XXXXXX", "temp stderr file");
         tmpfd = mkstemp( pzTmpStderr );
         if (tmpfd < 0)
             AG_ABEND(aprf("failed to create temp file from `%s'", pzTmpStderr));
@@ -129,8 +129,7 @@ loadCgi( void )
 
             pzText  = AGALOC( textLen + 1, "CGI POST text" );
             if (fread(pzText, (size_t)1, textLen, stdin) != textLen)
-                AG_ABEND( aprf( zCannot, errno, "read", "CGI text",
-                                strerror( errno )));
+                AG_CANT("read", "CGI text");
 
             pzText[ textLen ] = NUL;
 

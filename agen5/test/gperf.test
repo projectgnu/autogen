@@ -1,8 +1,8 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# gperf.test --- test functionality of `for' function
+# gperf.test --- test functionality of `gperf'
 #
-# Time-stamp:        "2010-02-24 08:41:51 bkorb"
+# Time-stamp:        "2010-06-26 16:05:30 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -20,9 +20,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-#
-# $Id: 7f83efb793b8d3a1e0207ff08d7fd9ca904049c1 $
 # ----------------------------------------------------------------------
 
 if gperf --version > /dev/null 2>&1
@@ -77,7 +74,12 @@ third	yields: 0x03
 fourth	yields: 0x04
 _EOF_
 
-run_ag x --trace=server-shell ${testname}.def || failure AutoGen failed
+if ${VERBOSE:-false}
+then opts="x ${testname}.def"
+else opts="x --trace=server-shell ${testname}.def"
+fi
+
+run_ag ${opts} || failure AutoGen failed
 cmp -s ${testname}.base ${testname}.test || \
   failure "`diff ${testname}.base ${testname}.test`"
 

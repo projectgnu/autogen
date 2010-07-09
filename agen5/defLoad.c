@@ -1,6 +1,7 @@
-/*
+/**
+ * \file defLoad.c
  *
- *  Time-stamp:        "2010-06-25 20:29:07 bkorb"
+ *  Time-stamp:        "2010-07-08 22:09:30 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -23,22 +24,28 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+typedef enum {
+    INPUT_DONE,
+    INPUT_STDIN,
+    INPUT_FILE
+} def_input_mode_t;
+
 static tDefEntry* pFreeEntryList = NULL;
 static void*      pAllocList     = NULL;
 
 #define ENTRY_SPACE        (4096 - sizeof(void*))
 #define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(tDefEntry))
 #define ENTRY_ALLOC_SIZE   \
-    ((ENTRY_ALLOC_CT * sizeof( tDefEntry )) + sizeof(void*))
+    ((ENTRY_ALLOC_CT * sizeof(tDefEntry)) + sizeof(void*))
 
 /* = = = START-STATIC-FORWARD = = = */
 static tDefEntry*
-insertDef( tDefEntry* pDef );
+insertDef(tDefEntry* pDef);
 /* = = = END-STATIC-FORWARD = = = */
 
 #if defined(DEBUG_ENABLED)
 void
-manageAllocatedData( void* pd )
+manageAllocatedData(void* pd)
 {
     static int    allocPtrCt   = 0;
     static int    usedPtrCt    = 0;
@@ -59,11 +66,8 @@ manageAllocatedData( void* pd )
         if (++usedPtrCt > allocPtrCt) {
             allocPtrCt += 16;
             papAllocData = (usedPtrCt > 1)
-                ? AGREALOC( papAllocData, allocPtrCt * sizeof(void*),
-                            "alloc table" )
-                : AGALOC( allocPtrCt * sizeof(void*), "new alloc table" );
-            if (papAllocData == NULL)
-                AG_ABEND( "failed alloc of papAllocData" );
+                ? AGREALOC(papAllocData, allocPtrCt * sizeof(void*), "atbl")
+                : AGALOC(allocPtrCt * sizeof(void*), "atbl");
         }
         papAllocData[usedPtrCt-1] = pd;
     }
@@ -71,7 +75,7 @@ manageAllocatedData( void* pd )
 #endif
 
 LOCAL void
-freeEntry( tDefEntry* pDE )
+freeEntry(tDefEntry* pDE)
 {
     pDE->pNext = pFreeEntryList;
     pFreeEntryList = pDE;
@@ -79,7 +83,7 @@ freeEntry( tDefEntry* pDE )
 
 
 LOCAL tDefEntry*
-getEntry( void )
+getEntry(void)
 {
     tDefEntry*  pRes = pFreeEntryList;
 
@@ -88,7 +92,7 @@ getEntry( void )
 
     } else {
         int   ct = ENTRY_ALLOC_CT-1;
-        void* p  = AGALOC( ENTRY_ALLOC_SIZE, "definition headers" );
+        void* p  = AGALOC(ENTRY_ALLOC_SIZE, "definition headers");
 
         manageAllocatedData(p);
 
@@ -119,7 +123,7 @@ getEntry( void )
         pRes[-1].pNext = NULL;
     }
 
-    memset( (void*)pRes, 0, sizeof( *pRes ));
+    memset((void*)pRes, 0, sizeof(*pRes));
     return pRes;
 }
 
@@ -156,7 +160,7 @@ print_def(tDefEntry * pDef)
  *  Append a new entry at the end of a sibling (or twin) list.
  */
 static tDefEntry*
-insertDef( tDefEntry* pDef )
+insertDef(tDefEntry* pDef)
 {
     tDefEntry* pList = ppParseStack[ stackDepth ];
 
@@ -175,7 +179,7 @@ insertDef( tDefEntry* pDef )
     /*
      *  Scan the list looking for a "twin" (same-named entry).
      */
-    while (strcmp( pDef->pzDefName, pList->pzDefName ) != 0) {
+    while (strcmp(pDef->pzDefName, pList->pzDefName) != 0) {
         /*
          *  IF we are at the end of the list,
          *  THEN put the new entry at the end of the list.
@@ -220,11 +224,11 @@ insertDef( tDefEntry* pDef )
          */
         tDefEntry def = *pDef;
 
-        memcpy( &(pDef->pzDefName), &(pList->pzDefName),
-                sizeof( def ) - ag_offsetof(tDefEntry, pzDefName) );
+        memcpy(&(pDef->pzDefName), &(pList->pzDefName),
+               sizeof(def) - ag_offsetof(tDefEntry, pzDefName));
 
-        memcpy( &(pList->pzDefName), &(def.pzDefName),
-                sizeof( def ) - ag_offsetof(tDefEntry, pzDefName) );
+        memcpy(&(pList->pzDefName), &(def.pzDefName),
+               sizeof(def) - ag_offsetof(tDefEntry, pzDefName));
 
         /*
          *  Contents are swapped.  Link "pDef" after "pList" and return "pList".
@@ -271,9 +275,11 @@ insertDef( tDefEntry* pDef )
     return pDef; /* sometimes will change */
 }
 
-
+/**
+ * Figure out where to insert an entry in a list of twins.
+ */
 LOCAL tDefEntry*
-findPlace( char* name, tCC* pzIndex )
+findPlace(char* name, tCC* pzIndex)
 {
     tDefEntry* pE = getEntry();
 
@@ -283,50 +289,43 @@ findPlace( char* name, tCC* pzIndex )
         pE->index = NO_INDEX;
 
     else if (IS_DEC_DIGIT_CHAR(*pzIndex) || (*pzIndex == '-'))
-        pE->index = strtol( pzIndex, NULL, 0 );
+        pE->index = strtol(pzIndex, NULL, 0);
 
     else {
-        pzIndex = getDefine( pzIndex, AG_TRUE );
+        pzIndex = getDefine(pzIndex, AG_TRUE);
         if (pzIndex != NULL)
-             pE->index = strtol( pzIndex, NULL, 0 );
+             pE->index = strtol(pzIndex, NULL, 0);
         else pE->index = NO_INDEX;
     }
 
-    strtransform( pE->pzDefName, pE->pzDefName );
+    strtransform(pE->pzDefName, pE->pzDefName);
     pE->valType     = VALTYP_UNKNOWN;
     pE->pzSrcFile   = (char*)pCurCtx->pzCtxFname;
     pE->srcLineNum  = pCurCtx->lineNo;
-    return (pCurrentEntry = insertDef( pE ));
+    return (pCurrentEntry = insertDef(pE));
 }
 
-/*
- *  readDefines
- *
- *  Suck in the entire definitions file and parse it.
+/**
+ * figure out which file descriptor to use for reading definitions.
  */
-LOCAL void
-readDefines( void )
+static def_input_mode_t
+ready_input(char const ** ppzfile, size_t * psz)
 {
-    tCC*     pzDefFile;
-    char*    pzData;
-    size_t   dataSize;
-    size_t   sizeLeft;
-    ag_bool  useStdin;
-    FILE*    fp;
+    struct stat stbf;
 
-    if (! ENABLED_OPT( DEFINITIONS )) {
-        pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "scan context" );
-        memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
+    if (! ENABLED_OPT(DEFINITIONS)) {
+        pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "scan context");
+        memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
         pBaseCtx->lineNo     = 1;
         pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
-        manageAllocatedData( pBaseCtx );
+        manageAllocatedData(pBaseCtx);
 
-        if (! ENABLED_OPT( SOURCE_TIME ))
+        if (! ENABLED_OPT(SOURCE_TIME))
             outTime = time(NULL);
-        return;
+        return INPUT_DONE;
     }
 
-    pzDefFile = OPT_ARG( DEFINITIONS );
+    *ppzfile = OPT_ARG(DEFINITIONS);
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf(pfTrace, "Definition Load:\n");
@@ -337,63 +336,74 @@ readDefines( void )
      *  do not try to open it and we try to allocate more memory if
      *  the stdin input exceeds our initial allocation of 16K.
      */
-    if (strcmp( pzDefFile, "-" ) == 0) {
-        pzDefFile = OPT_ARG( DEFINITIONS ) = "stdin";
-        if (getenv( "REQUEST_METHOD" ) != NULL) {
+    if (strcmp(*ppzfile, "-") == 0) {
+        *ppzfile = OPT_ARG(DEFINITIONS) = "stdin";
+        if (getenv("REQUEST_METHOD") != NULL) {
             loadCgi();
             pCurCtx = pBaseCtx;
             dp_run_fsm();
-            return;
+            return INPUT_DONE;
         }
 
     accept_fifo:
         outTime  = time(NULL);
-        dataSize = 0x4000 - (4+sizeof( *pBaseCtx ));
-        useStdin = AG_TRUE;
+        *psz = 0x4000 - (4+sizeof(*pBaseCtx));
+        return INPUT_STDIN;
     }
 
     /*
      *  This, then, must be a regular file.  Make sure of that and
      *  find out how big it was and when it was last modified.
      */
-    else {
-        struct stat stbf;
+    if (stat(*ppzfile, &stbf) != 0)
+        AG_CANT("stat", *ppzfile);
 
-        if (stat( pzDefFile, &stbf ) != 0)
-            AG_ABEND( aprf( zCannot, errno, "stat",
-                            pzDefFile, strerror( errno )));
+    if (! S_ISREG(stbf.st_mode)) {
+        if (S_ISFIFO(stbf.st_mode))
+            goto accept_fifo;
 
-        if (! S_ISREG( stbf.st_mode )) {
-            if (S_ISFIFO(stbf.st_mode))
-                goto accept_fifo;
-
-            errno = EINVAL;
-            AG_ABEND( aprf( zCannot, errno, "open non-regular file",
-                            pzDefFile, strerror(errno)));
-        }
-
-        /*
-         *  IF the source-time option has been enabled, then
-         *  our output file mod time will start as one second after
-         *  the mod time on this file.  If any of the template files
-         *  are more recent, then it will be adjusted.
-         */
-        dataSize = stbf.st_size;
-
-        if (ENABLED_OPT( SOURCE_TIME ))
-             outTime = stbf.st_mtime + 1;
-        else outTime = time(NULL);
-
-        useStdin = AG_FALSE;
+        errno = EINVAL;
+        AG_CANT("open non-regular file", *ppzfile);
     }
+
+    /*
+     *  IF the source-time option has been enabled, then
+     *  our output file mod time will start as one second after
+     *  the mod time on this file.  If any of the template files
+     *  are more recent, then it will be adjusted.
+     */
+    *psz = stbf.st_size;
+
+    if (ENABLED_OPT(SOURCE_TIME))
+         outTime = stbf.st_mtime + 1;
+    else outTime = time(NULL);
+
+    return INPUT_FILE;
+}
+
+/**
+ *  Suck in the entire definitions file and parse it.
+ */
+LOCAL void
+readDefines(void)
+{
+    tCC*     pzDefFile;
+    char*    pzData;
+    size_t   dataSize;
+    size_t   sizeLeft;
+    def_input_mode_t in_mode = ready_input(&pzDefFile, &dataSize);
+    FILE*    fp;
+
+    if (in_mode == INPUT_DONE)
+        return;
 
     /*
      *  Allocate the space we need for our definitions.
      */
-    sizeLeft = dataSize+4+sizeof( *pBaseCtx );
-    pBaseCtx = (tScanCtx*)AGALOC( sizeLeft, "file buffer" );
-    memset( (void*)pBaseCtx, 0, sizeLeft );
-    pBaseCtx->lineNo     = 1;
+    sizeLeft = dataSize+4+sizeof(*pBaseCtx);
+    pBaseCtx = (tScanCtx*)AGALOC(sizeLeft, "file buffer");
+    memset((void*)pBaseCtx, 0, sizeLeft);
+    pBaseCtx->lineNo = 1;
     sizeLeft = dataSize;
 
     /*
@@ -410,13 +420,13 @@ readDefines( void )
     /*
      *  Set the input file pointer, as needed
      */
-    if (useStdin)
+    if (in_mode == INPUT_STDIN)
         fp = stdin;
+
     else {
-        fp = fopen( pzDefFile, "r" FOPEN_TEXT_FLAG );
+        fp = fopen(pzDefFile, "r" FOPEN_TEXT_FLAG);
         if (fp == NULL)
-            AG_ABEND(aprf(zCannot, errno, "open",
-                          pzDefFile, strerror( errno )));
+            AG_CANT("open", pzDefFile);
 
         if (pfDepends != NULL)
             append_source_name(pzDefFile);
@@ -436,11 +446,10 @@ readDefines( void )
              *  IF it is because we are at EOF, then break out
              *  ELSE abend.
              */
-            if (feof( fp ) || useStdin)
+            if (feof(fp) || (in_mode == INPUT_STDIN))
                 break;
 
-            AG_ABEND( aprf( zCannot, errno, "read",
-                            pzDefFile, strerror( errno )));
+            AG_CANT("read", pzDefFile);
         }
 
         /*
@@ -459,7 +468,7 @@ readDefines( void )
             /*
              *  IF it is a regular file, then we are done
              */
-            if (! useStdin)
+            if (in_mode != INPUT_STDIN)
                 break;
 
             /*
@@ -468,8 +477,8 @@ readDefines( void )
              */
             dataSize += (sizeLeft = 0x1000);
             dataOff = pzData - pBaseCtx->pzData;
-            p = AGREALOC( (void*)pBaseCtx, dataSize+4+sizeof( *pBaseCtx ),
-                          "expanded file buffer" );
+            p = AGREALOC((void*)pBaseCtx, dataSize+4+sizeof(*pBaseCtx),
+                         "expanded file buffer");
 
             /*
              *  The buffer may have moved.  Set the data pointer at an
@@ -478,7 +487,7 @@ readDefines( void )
              */
             if (p != pBaseCtx) {
                 p->pzScan = \
-                p->pzData = (char*)(p+1);
+                    p->pzData = (char*)(p+1);
                 pzData = p->pzData + dataOff;
                 pBaseCtx = p;
             }
@@ -486,19 +495,19 @@ readDefines( void )
     }
 
     if (pzData == pBaseCtx->pzData)
-        AG_ABEND( "No definition data were read" );
+        AG_ABEND("No definition data were read");
 
     *pzData = NUL;
-    AGDUPSTR( pBaseCtx->pzCtxFname, pzDefFile, "def file name" );
-    manageAllocatedData( pBaseCtx );
-    manageAllocatedData( (void*)pBaseCtx->pzCtxFname );
+    AGDUPSTR(pBaseCtx->pzCtxFname, pzDefFile, "def file name");
+    manageAllocatedData(pBaseCtx);
+    manageAllocatedData((void*)pBaseCtx->pzCtxFname);
 
     /*
      *  Close the input file, parse the data
      *  and alphabetically sort the definition tree contents.
      */
-    if (! useStdin)
-        fclose( fp );
+    if (in_mode != INPUT_STDIN)
+        fclose(fp);
 
     pCurCtx = pBaseCtx;
     dp_run_fsm();
@@ -506,7 +515,7 @@ readDefines( void )
 
 
 LOCAL void
-unloadDefs( void )
+unloadDefs(void)
 {
     return;
 }

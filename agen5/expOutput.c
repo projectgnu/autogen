@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-03 09:57:02 bkorb"
+ *  Time-stamp:        "2010-07-08 22:34:17 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -166,23 +166,23 @@ ag_scm_out_move( SCM new_file )
  *  are returned by the function.
 =*/
 SCM
-ag_scm_out_pop( SCM ret_contents )
+ag_scm_out_pop(SCM ret_contents)
 {
     SCM res = SCM_UNDEFINED;
 
     if (pCurFp->pPrev == NULL)
-        AG_ABEND( "ERROR:  Cannot pop output with no output pushed\n" );
+        AG_ABEND("ERROR:  Cannot pop output with no output pushed\n");
 
-    if (AG_SCM_BOOL_P( ret_contents ) && SCM_NFALSEP( ret_contents )) {
-        unsigned long pos = ftell( pCurFp->pFile );
+    if (AG_SCM_BOOL_P(ret_contents) && SCM_NFALSEP(ret_contents)) {
+        unsigned long pos = ftell(pCurFp->pFile);
 
         if (pos != 0) {
-            char* pz = ag_scribble( (size_t)pos );
-            rewind( pCurFp->pFile );
-            if (fread( pz, (size_t)pos, (size_t)1, pCurFp->pFile ) != 1)
-                AG_ABEND( aprf( "Error %d (%s) rereading output\n",
-                                errno, strerror( errno )));
-            res = AG_SCM_STR2SCM( pz, pos );
+            char* pz = ag_scribble((size_t)pos);
+            rewind(pCurFp->pFile);
+            if (fread(pz, (size_t)pos, (size_t)1, pCurFp->pFile) != 1)
+                AG_ABEND(aprf("Error %d (%s) rereading output\n",
+                              errno, strerror(errno)));
+            res = AG_SCM_STR2SCM(pz, pos);
         }
     }
 
@@ -190,7 +190,7 @@ ag_scm_out_pop( SCM ret_contents )
         fputs("out-pop\n", pfTrace);
 
     outputDepth--;
-    closeOutput( AG_FALSE );
+    closeOutput(AG_FALSE);
     return res;
 }
 
@@ -391,12 +391,12 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
      */
     if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
         if ((unlink(pz) != 0) && (errno != ENOENT))
-            AG_ABEND(aprf(zCannot, errno, "unlink", pz, strerror(errno)));
+            AG_CANT("unlink", pz);
     }
 
     p->pFile = fopen(pz, mode);
     if (p->pFile == NULL)
-        AG_ABEND(aprf(zCannot, errno, "open for output", pz, strerror(errno)));
+        AG_CANT("open for output", pz);
 
     p->pPrev = pCurFp;
     pCurFp   = p;
@@ -429,8 +429,8 @@ ag_scm_out_push_add(SCM new_file)
     if (! AG_SCM_STRING_P( new_file ))
         AG_ABEND("No output file specified to add to");
 
-    open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
-                      append_mode, 0);
+    open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
+                     append_mode, 0);
 
     return SCM_UNDEFINED;
 }
@@ -464,6 +464,9 @@ ag_scm_out_push_new( SCM new_file )
     if (! HAVE_OPT( NO_FMEMOPEN ))
 #endif
     {
+        static char const mk_tmp_dir[] = "(make-tmp-dir)";
+        static int  const line_no      = __LINE__ - 1;
+
         /*
          *  IF we do not have fopencookie(3GNU) or funopen(3BSD), then this
          *  block is a pure "else" clause.  If we do have one of those, then
@@ -473,20 +476,22 @@ ag_scm_out_push_new( SCM new_file )
         static char * pzTemp = NULL;
         static size_t tmplen = 0;
 
+        char *  tmp_fnm;
         int     tmpfd;
 
         if (pzTemp == NULL) {
-            pzTemp = mkstemp_pat();
+            ag_scm_c_eval_string_from_file_line(mk_tmp_dir, __FILE__, line_no);
+            pzTemp = runShell("echo ${tmp_dir}/ag-XXXXXX");
             tmplen = strlen(pzTemp) + 1;
         }
 
-        memcpy(pzTemp + tmplen, pzTemp, tmplen);
-        tmpfd = mkstemp(pzTemp + tmplen);
+        tmp_fnm = ag_scribble(tmplen);
+        memcpy(tmp_fnm, pzTemp, tmplen);
+        tmpfd = mkstemp(tmp_fnm);
         if (tmpfd < 0)
-            AG_ABEND( aprf( "failed to create temp file from `%s'", pzTemp ));
+            AG_CANT("mkstemp", pzTemp);
 
-        open_output_file(
-            pzTemp + tmplen, tmplen - 1, write_mode, FPF_TEMPFILE);
+        open_output_file(tmp_fnm, tmplen - 1, write_mode, FPF_TEMPFILE);
         close(tmpfd);
         return SCM_UNDEFINED;
     }
@@ -500,16 +505,15 @@ ag_scm_out_push_new( SCM new_file )
          *  This block is used IFF ENABLE_FMEMOPEN is defined and if
          *  --no-fmemopen is selected on the command line.
          */
-        p = (tFpStack*)AGALOC( sizeof( tFpStack ), "new - out file stack" );
+        p = (tFpStack*)AGALOC(sizeof(tFpStack), "out file stack");
         p->pPrev  = pCurFp;
         p->flags  = FPF_FREE;
         p->pFile  = ag_fmemopen(NULL, (size_t)0, "wb+");
-        pzNewFile = (char*)"in-mem buffer";
+        pzNewFile = (char*)zMemFile;
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
 
         if (p->pFile == NULL)
-            AG_ABEND( aprf( zCannot, errno, "open for write", pzNewFile,
-                            strerror( errno )));
+            AG_CANT("open 'wb+'", pzNewFile);
 
         p->pzOutName = pzNewFile;
         outputDepth++;
@@ -517,9 +521,10 @@ ag_scm_out_push_new( SCM new_file )
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
             fprintf(pfTrace, "out-push-new on temp file\n");
-        return SCM_UNDEFINED;
     }
 #endif /* ENABLE_FMEMOPEN */
+
+    return SCM_UNDEFINED;
 }
 
 
@@ -565,11 +570,10 @@ ag_scm_out_switch( SCM new_file )
      *  and try to ensure nothing is in the way.
      */
     unlink( pzNewFile );
-    if (   freopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+", pCurFp->pFile )
-        != pCurFp->pFile)
+    if (  freopen( pzNewFile, "w" FOPEN_BINARY_FLAG "+", pCurFp->pFile )
+       != pCurFp->pFile)
 
-        AG_ABEND( aprf( zCannot, errno, "freopen", pzNewFile,
-                        strerror( errno )));
+        AG_CANT("freopen", pzNewFile);
 
     /*
      *  Set the mod time on the old file.
@@ -634,7 +638,7 @@ ag_scm_out_line( void )
         if (pos == 0)
             break;
 
-        rewind( pCurFp->pFile );
+        rewind(pCurFp->pFile);
         do {
             int ich = fgetc( pCurFp->pFile );
             unsigned char ch = ich;
@@ -643,7 +647,7 @@ ag_scm_out_line( void )
             if (ch == (unsigned char)'\n')
                 lineNum++;
         } while (--pos > 0);
-        fseek( pCurFp->pFile, svpos, SEEK_SET );
+        fseek(pCurFp->pFile, svpos, SEEK_SET);
     } while(0);
 
     return AG_SCM_INT2SCM( lineNum );

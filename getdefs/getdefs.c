@@ -3,7 +3,7 @@
  *
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2010-07-03 10:41:22 bkorb"
+ *  Time-stamp:        "2010-07-03 12:45:34 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -61,7 +61,16 @@ static void
 processFile(char const * pzFile);
 
 static void
-setFirstIndex(void);
+set_first_idx(void);
+
+static FILE*
+open_ag_file(char ** pzBase);
+
+static FILE*
+open_ag_proc_pipe(char ** pzBase);
+
+static void
+exec_autogen(char ** pzBase);
 
 static FILE*
 startAutogen(void);
@@ -108,7 +117,7 @@ main(int argc, char ** argv)
      */
     if ((pzIndexText == NULL) && HAVE_OPT(FIRST_INDEX)) {
         qsort((void*)papzBlocks, blkUseCt, sizeof(char*), compar_defname);
-        setFirstIndex();
+        set_first_idx();
     }
 
     else if (ENABLED_OPT(ORDERING) && (blkUseCt > 1))
@@ -848,14 +857,14 @@ processFile(char const * pzFile)
 
 
 /*
- *  setFirstIndex
+ *  set_first_idx
  *
  *  Go through all our different kinds of defines.  On the first occurrence
  *  of each different name, check for an index value.  If not supplied,
  *  then insert ``[OPT_VALUE_FIRST_INDEX]'' after the object name.
  */
 static void
-setFirstIndex(void)
+set_first_idx(void)
 {
     char    zNm[ 128 ] = { NUL };
     int     nmLn = 1;
@@ -903,6 +912,149 @@ setFirstIndex(void)
     }
 }
 
+static FILE*
+open_ag_file(char ** pzBase)
+{
+    switch (WHICH_IDX_AUTOGEN) {
+    case INDEX_OPT_OUTPUT:
+    {
+        static char const zFileFmt[] = " *      %s\n";
+        FILE*  fp;
+
+        if (*pzBase != NULL)
+            free(*pzBase);
+
+        if (strcmp(OPT_ARG(OUTPUT), "-") == 0)
+            return stdout;
+
+        unlink(OPT_ARG(OUTPUT));
+        fp = fopen(OPT_ARG(OUTPUT), "w" FOPEN_BINARY_FLAG);
+        fprintf(fp, zDne, OPT_ARG(OUTPUT));
+
+        if (HAVE_OPT(INPUT)) {
+            int    ct  = STACKCT_OPT(INPUT);
+            char const ** ppz = STACKLST_OPT(INPUT);
+            do  {
+                fprintf(fp, zFileFmt, *ppz++);
+            } while (--ct > 0);
+        }
+
+        fputs(" */\n", fp);
+        return fp;
+    }
+
+    case INDEX_OPT_AUTOGEN:
+        if (! ENABLED_OPT(AUTOGEN)) {
+            if (*pzBase != NULL)
+                free(*pzBase);
+
+            return stdout;
+        }
+
+        if (  ( OPT_ARG(AUTOGEN) != NULL)
+              && (*OPT_ARG(AUTOGEN) != NUL ))
+            pzAutogen = OPT_ARG(AUTOGEN);
+
+        break;
+    }
+
+    return NULL;
+}
+
+static FILE*
+open_ag_proc_pipe(char ** pzBase)
+{
+    FILE * agFp;
+
+    int  pfd[2];
+
+    if (pipe(pfd) != 0)
+        fserr_die("creating pipe\n");
+
+    agPid = fork();
+
+    switch (agPid) {
+    case 0:
+        /*
+         *  We are the child.  Close the write end of the pipe
+         *  and force STDIN to become the read end.
+         */
+        close(pfd[1]);
+        if (dup2(pfd[0], STDIN_FILENO) != 0)
+            fserr_die("dup pipe[0]\n");
+        break;
+
+    case -1:
+        fserr_die("on fork()\n");
+
+    default:
+        /*
+         *  We are the parent.  Close the read end of the pipe
+         *  and get a FILE* pointer for the write file descriptor
+         */
+        close(pfd[0]);
+        agFp = fdopen(pfd[1], "w" FOPEN_BINARY_FLAG);
+        if (agFp == (FILE*)NULL)
+            fserr_die("fdopening pipe[1]\n");
+        free(*pzBase);
+        return agFp;
+    }
+
+    return NULL;
+}
+
+static void
+exec_autogen(char ** pzBase)
+{
+    char const ** paparg;
+    char const ** pparg;
+    int    argCt = 5;
+
+    /*
+     *  IF we don't have template search directories,
+     *  THEN allocate the default arg counter of pointers and
+     *       set the program name into it.
+     *  ELSE insert each one into the arg list.
+     */
+    if (! HAVE_OPT(AGARG)) {
+        paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
+        *pparg++ = pzAutogen;
+
+    } else {
+        int    ct  = STACKCT_OPT(AGARG);
+        char const ** ppz = STACKLST_OPT(AGARG);
+
+        argCt += ct;
+        paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
+        *pparg++ = pzAutogen;
+
+        do  {
+            *pparg++ = *ppz++;
+        } while (--ct > 0);
+    }
+
+    *pparg++ = *pzBase;
+    *pparg++ = "--";
+    *pparg++ = "-";
+    *pparg++ = NULL;
+
+#ifdef DEBUG
+    fputc('\n', stderr);
+    pparg = paparg;
+    for (;;) {
+        fputs(*pparg++, stderr);
+        if (*pparg == NULL)
+            break;
+        fputc(' ', stderr);
+    }
+    fputc('\n', stderr);
+    fputc('\n', stderr);
+#endif
+
+    execvp(pzAutogen, (char**)(void*)paparg);
+    fserr_die("exec of %s %s %s %s\n", paparg[0], paparg[1], paparg[2],
+              paparg[3]);
+}
 
 /*
  *  startAutogen
@@ -982,137 +1134,17 @@ startAutogen(void)
      *  If the option was not supplied, we default to
      *  whatever we set the "pzAutogen" pointer to above.
      */
-    if (HAVE_OPT(AUTOGEN))
-        switch (WHICH_IDX_AUTOGEN) {
-        case INDEX_OPT_OUTPUT:
-        {
-            static char const zFileFmt[] = " *      %s\n";
-            FILE*  fp;
-
-            if (pzBase != NULL)
-                free(pzBase);
-
-            if (strcmp(OPT_ARG(OUTPUT), "-") == 0)
-                return stdout;
-
-            unlink(OPT_ARG(OUTPUT));
-            fp = fopen(OPT_ARG(OUTPUT), "w" FOPEN_BINARY_FLAG);
-            fprintf(fp, zDne, OPT_ARG(OUTPUT));
-
-            if (HAVE_OPT(INPUT)) {
-                int    ct  = STACKCT_OPT(INPUT);
-                char const ** ppz = STACKLST_OPT(INPUT);
-                do  {
-                    fprintf(fp, zFileFmt, *ppz++);
-                } while (--ct > 0);
-            }
-
-            fputs(" */\n", fp);
-            return fp;
-        }
-
-        case INDEX_OPT_AUTOGEN:
-            if (! ENABLED_OPT(AUTOGEN)) {
-                if (pzBase != NULL)
-                    free(pzBase);
-
-                return stdout;
-            }
-
-            if (  ( OPT_ARG(AUTOGEN) != NULL)
-               && (*OPT_ARG(AUTOGEN) != NUL ))
-                pzAutogen = OPT_ARG(AUTOGEN);
-
-            break;
-        }
-
-    {
-        int  pfd[2];
-
-        if (pipe(pfd) != 0)
-            fserr_die("creating pipe\n");
-
-        agPid = fork();
-
-        switch (agPid) {
-        case 0:
-            /*
-             *  We are the child.  Close the write end of the pipe
-             *  and force STDIN to become the read end.
-             */
-            close(pfd[1]);
-            if (dup2(pfd[0], STDIN_FILENO) != 0)
-                fserr_die("dup pipe[0]\n");
-            break;
-
-        case -1:
-            fserr_die("on fork()\n");
-
-        default:
-            /*
-             *  We are the parent.  Close the read end of the pipe
-             *  and get a FILE* pointer for the write file descriptor
-             */
-            close(pfd[0]);
-            agFp = fdopen(pfd[1], "w" FOPEN_BINARY_FLAG);
-            if (agFp == (FILE*)NULL)
-                fserr_die("fdopening pipe[1]\n");
-            free(pzBase);
+    if (HAVE_OPT(AUTOGEN)) {
+        agFp = open_ag_file(&pzBase);
+        if (agFp != NULL)
             return agFp;
-        }
     }
 
-    {
-        char const ** paparg;
-        char const ** pparg;
-        int    argCt = 5;
+    agFp = open_ag_proc_pipe(&pzBase);
+    if (agFp != NULL)
+        return agFp;
 
-        /*
-         *  IF we don't have template search directories,
-         *  THEN allocate the default arg counter of pointers and
-         *       set the program name into it.
-         *  ELSE insert each one into the arg list.
-         */
-        if (! HAVE_OPT(AGARG)) {
-            paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
-            *pparg++ = pzAutogen;
-
-        } else {
-            int    ct  = STACKCT_OPT(AGARG);
-            char const ** ppz = STACKLST_OPT(AGARG);
-
-            argCt += ct;
-            paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
-            *pparg++ = pzAutogen;
-
-            do  {
-                *pparg++ = *ppz++;
-            } while (--ct > 0);
-        }
-
-        *pparg++ = pzBase;
-        *pparg++ = "--";
-        *pparg++ = "-";
-        *pparg++ = NULL;
-
-#ifdef DEBUG
-        fputc('\n', stderr);
-        pparg = paparg;
-        for (;;) {
-            fputs(*pparg++, stderr);
-            if (*pparg == NULL)
-                break;
-            fputc(' ', stderr);
-        }
-        fputc('\n', stderr);
-        fputc('\n', stderr);
-#endif
-
-        execvp(pzAutogen, (char**)(void*)paparg);
-        fserr_die("exec of %s %s %s %s\n",
-                  paparg[0], paparg[1], paparg[2], paparg[3]);
-    }
-
+    exec_autogen(&pzBase);
     return (FILE*)NULL;
 }
 

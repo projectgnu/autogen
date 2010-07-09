@@ -55,13 +55,13 @@ char const* pzLastCmd = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-sigHandler(int signo);
+handle_signal(int signo);
 
 static void
-serverSetup(void);
+server_setup(void);
 
 static char*
-loadData(void);
+load_data(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -71,7 +71,13 @@ closeServer( void )
     if (serverId == NULLPROCESS)
         return;
 
-    (void)kill( serverId, SIGKILL );
+    (void)kill(serverId, SIGTERM);
+#ifdef HAVE_USLEEP
+    usleep(100000); /* 1/10 of a second */
+#else
+    sleep(1);
+#endif
+    (void)kill(serverId, SIGKILL);
     serverId = NULLPROCESS;
 
     /*
@@ -97,9 +103,12 @@ closeServer( void )
     serverPair.pfRead = serverPair.pfWrite = NULL;
 }
 
-
+/**
+ * handle SIGALRM and SIGPIPE signals while waiting for server shell
+ * responses.
+ */
 static void
-sigHandler(int signo)
+handle_signal(int signo)
 {
     static int timeout_limit = 5;
     if ((signo == SIGALRM) && (--timeout_limit <= 0))
@@ -121,15 +130,11 @@ sigHandler(int signo)
 
 
 static void
-serverSetup(void)
+server_setup(void)
 {
-    struct sigaction  saNew;
-    struct sigaction  saSave1;
-    struct sigaction  saSave2;
-
     {
-        static int doneOnce = 0;
-        if (doneOnce++ == 0) {
+        static int do_once = 0;
+        if (do_once == 0) {
             char* p = malloc( AG_PATH_MAX );
             if (p == NULL)
                 AG_ABEND( "cannot allocate path name" );
@@ -138,18 +143,21 @@ serverSetup(void)
 
             if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
                 fputs( "\nServer First Start\n", pfTrace );
+
+            do_once = 1;
         }
-        else {
-            if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-                fputs( "\nServer Restart\n", pfTrace );
-        }
+        else if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+            fputs( "\nServer Restart\n", pfTrace );
     }
 
-    saNew.sa_handler = sigHandler;
-    saNew.sa_flags   = 0;
-    (void)sigemptyset( &saNew.sa_mask );
-    (void)sigaction( SIGPIPE, &saNew, &saSave1 );
-    (void)sigaction( SIGALRM, &saNew, &saSave2 );
+    {
+        struct sigaction new_sa;
+        new_sa.sa_handler = handle_signal;
+        new_sa.sa_flags   = 0;
+        (void)sigemptyset( &new_sa.sa_mask );
+        (void)sigaction(SIGPIPE, &new_sa, NULL);
+        (void)sigaction(SIGALRM, &new_sa, NULL);
+    }
 
     errClose = AG_FALSE;
 
@@ -169,7 +177,7 @@ serverSetup(void)
         }
 
         (void)fflush( serverPair.pfWrite );
-        pz = loadData();
+        pz = load_data();
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
             fputs( "(result discarded)\n", pfTrace );
         AGFREE( (void*)pz );
@@ -191,7 +199,7 @@ serverSetup(void)
         }
 
         (void)fflush( serverPair.pfWrite );
-        pz = loadData();
+        pz = load_data();
         if (pfTrace != stderr)
             fputs( "(result discarded)\n", pfTrace );
         fprintf( pfTrace, "Trap state:\n%s\n", pz );
@@ -201,9 +209,7 @@ serverSetup(void)
 }
 
 
-/*
- *  chainOpen
- *
+/**
  *  Given an FD for an inferior process to use as stdin,
  *  start that process and return a NEW FD that that process
  *  will use for its stdout.  Requires the argument vector
@@ -322,9 +328,7 @@ chainOpen( int       stdinFd,
 }
 
 
-/*
- *  openServer
- *
+/**
  *  Given a pointer to an argument vector, start a process and
  *  place its stdin and stdout file descriptors into an fd pair
  *  structure.  The "writeFd" connects to the inferior process
@@ -353,9 +357,7 @@ openServer( tFdPair* pPair, tCC** ppArgs )
 }
 
 
-/*
- *  openServerFP
- *
+/**
  *  Identical to "openServer()", except that the "fd"'s are "fdopen(3)"-ed
  *  into file pointers instead.
  */
@@ -374,16 +376,14 @@ openServerFP( tpfPair* pfPair, tCC** ppArgs )
 }
 
 
-/*
- *  loadData
- *
+/**
  *  Read data from a file pointer (a pipe to a process in this context)
  *  until we either get EOF or we get a marker line back.
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
 static char*
-loadData(void)
+load_data(void)
 {
     char*   pzText;
     size_t  textSize;
@@ -482,7 +482,7 @@ loadData(void)
 }
 
 
-/*
+/**
  *  Run a semi-permanent server shell.  The program will be the
  *  one named by the environment variable $SHELL, or default to "sh".
  *  If one of the commands we send to it takes too long or it dies,
@@ -502,7 +502,7 @@ runShell( char const*  pzCmd )
         putenv(pz4_z);
         serverId = openServerFP( &serverPair, serverArgs );
         if (serverId > 0)
-            serverSetup();
+            server_setup();
     }
 
     /*
@@ -542,7 +542,7 @@ runShell( char const*  pzCmd )
      *  a sigpipe or sigalrm (timeout), we will return the nil string.
      */
     {
-        char* pz = loadData();
+        char* pz = load_data();
         if (pz == NULL) {
             fprintf( pfTrace, zCmdFail, pzCmd );
             closeServer();

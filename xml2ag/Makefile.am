@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-06-26 10:18:29 bkorb"
+## Time-stamp:      "2010-07-08 21:52:15 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -21,16 +21,14 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: 8bca9f3f5f0c543e02cf63fd5426daaafeda3b53 $
 ## ---------------------------------------------------------------------
 TARG = xml2ag
 
 bin_PROGRAMS    = xml2ag
-csrcs           = xmlopts.h xml2ag.c xmlopts.c fork.c
-nodist_xml2ag_SOURCES = x.c
-BUILT_SOURCES   = x.c xmlopts.c xmlopts.h
+csrcs           = xml2ag.c
+gsrcs           = xmlopts.c fork.c
+BUILT_SOURCES   = x.c
+nodist_xml2ag_SOURCES = $(BUILT_SOURCES)
 SUBDIRS         = test
 EXTRA_DIST      = xmlopts.def fork.tpl fork.c xml2ag.c
 xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
@@ -45,13 +43,14 @@ AG_ENV          = top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
 run_AG = $(AGexe) -MF$@ -L$(top_srcdir)/autoopts \
 	--definition=$(srcdir)/xmlopts.def
 
-all : gen
-gen : $(nodist_xml2ag_SOURCES) $(DOCFILES)
+all 	    : gen
+gen 	    : $(gsrcs) $(DOCFILES)
 
-x.c : $(csrcs)
-	for f in config.h $(csrcs) ; do echo "#include \"$$f\"" ; done > $@
+x.c 	    : $(gsrcs) $(csrcs)
+	for f in config.h $(gsrcs) $(csrcs) ; \
+	do echo "#include \"$$f\"" ; done > $@
 
-xmlopts.c xmlopts.h : stamp-opts
+$(getdefs_OBJECTS) xmlopts.c xmlopts.h : stamp-opts
 stamp-opts  : xmlopts.def $(CLexe)
 	$(AG_ENV) ; $(run_AG)
 

@@ -1,8 +1,8 @@
 
-/*
+/**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-07-03 09:50:35 bkorb"
+ * Time-stamp:        "2010-07-08 22:32:37 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -27,16 +27,14 @@ static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
 
 /* = = = START-STATIC-FORWARD = = = */
 static ag_bool
-canReadFile(char const * pzFName);
+read_okay(char const * pzFName);
 
 static size_t
-countMacros(char const * pz);
+cnt_macros(char const * pz);
 
 static void
-loadMacros(tTemplate  * pT,
-           char const * pzF,
-           char const * pzN,
-           char const * pzData);
+load_macs(tTemplate * pT, char const * pzF, char const * pzN,
+          char const * pzData);
 
 static tTemplate *
 digest_pseudo_macro(tmap_info_t * minfo, char * real_file);
@@ -59,7 +57,7 @@ findTemplate(char const * pzTemplName)
 }
 
 static ag_bool
-canReadFile(char const * pzFName)
+read_okay(char const * pzFName)
 {
     struct stat stbf;
     if (stat(pzFName, &stbf) != 0)
@@ -180,7 +178,7 @@ findFile(char const * pzFName,
                                zDirFmt, pzDir, pzFName);
             }
 
-            if (canReadFile(pzFullName))
+            if (read_okay(pzFullName))
                 goto findFileReturn;
 
             /*
@@ -193,7 +191,7 @@ findFile(char const * pzFName,
 
                 do  {
                     strcpy(pzEnd, *(papSL++)); /* must fit */
-                    if (canReadFile(pzFullName))
+                    if (read_okay(pzFullName))
                         goto findFileReturn;
 
                 } while (*papSL != NULL);
@@ -210,8 +208,8 @@ findFile(char const * pzFName,
              *  never again when ct is STACKCT_OPT(TEMPL_DIRS)
              */
             if (  (pzReferrer != NULL)
-                && (pzDir == curdir)
-                && (ct == STACKCT_OPT(TEMPL_DIRS))) {
+               && (pzDir == curdir)
+               && (ct == STACKCT_OPT(TEMPL_DIRS))) {
 
                 pzDir = pzReferrer;
                 ct++;
@@ -231,15 +229,14 @@ findFile(char const * pzFName,
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  countMacros
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Figure out how many macros there are in the template
  *  so that we can allocate the right number of pointers.
  */
 static size_t
-countMacros(char const * pz)
+cnt_macros(char const * pz)
 {
     size_t  ct = 2;
     for (;;) {
@@ -255,17 +252,14 @@ countMacros(char const * pz)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  fillTemplate
+/**
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Load the macro array and file name.
  */
 static void
-loadMacros(tTemplate  * pT,
-           char const * pzF,
-           char const * pzN,
-           char const * pzData)
+load_macs(tTemplate * pT, char const * pzF, char const * pzN,
+          char const * pzData)
 {
     tMacro* pMac   = pT->aMacros;
 
@@ -380,7 +374,7 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
     char const * pzData =
         loadPseudoMacro((char const *)minfo->txt_data, real_file);
 
-    size_t macroCt  = countMacros(pzData);
+    size_t macroCt  = cnt_macros(pzData);
     size_t alocSize = (sizeof(*pRes) + (macroCt * sizeof(tMacro))
                        + minfo->txt_size
                        - (pzData - (char const *)minfo->txt_data)
@@ -398,7 +392,7 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
 
     strcpy(pRes->zStartMac, zStartMac); /* must fit */
     strcpy(pRes->zEndMac, zEndMac);     /* must fit */
-    loadMacros(pRes, real_file, "*template file*", pzData);
+    load_macs(pRes, real_file, "*template file*", pzData);
 
     pRes->pzTplName   -= (long)pRes;
     pRes->pzTemplText -= (long)pRes;
@@ -415,8 +409,8 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-LOCAL tTemplate*
-loadTemplate(char const * pzFileName, char const * pzReferrer)
+LOCAL tTemplate *
+loadTemplate(char const * pzFileName, char const * referrer)
 {
     static tmap_info_t mapInfo;
     static char        zRealFile[ AG_PATH_MAX ];
@@ -426,9 +420,10 @@ loadTemplate(char const * pzFileName, char const * pzReferrer)
      */
     {
         static char const * const apzSfx[] = { "tpl", "agl", NULL };
-        if (! SUCCESSFUL(findFile(pzFileName, zRealFile, apzSfx, pzReferrer)))
-            AG_ABEND(aprf(zCannot, ENOENT, "map data file", pzFileName,
-                          strerror(ENOENT)));
+        if (! SUCCESSFUL(findFile(pzFileName, zRealFile, apzSfx, referrer))) {
+            errno = ENOENT;
+            AG_CANT("map data file", pzFileName);
+        }
     }
 
     /*
@@ -438,12 +433,12 @@ loadTemplate(char const * pzFileName, char const * pzReferrer)
     {
         struct stat stbf;
         if (stat(zRealFile, &stbf) != 0)
-            AG_ABEND(aprf(zCannot, errno, "stat template file", pzFileName,
-                          strerror(errno)));
+            AG_CANT("stat file", pzFileName);
 
-        if (! S_ISREG(stbf.st_mode))
-            AG_ABEND(aprf(zCannot, EINVAL, "not regular file", pzFileName,
-                          strerror(EINVAL)));
+        if (! S_ISREG(stbf.st_mode)) {
+            errno = EINVAL;
+            AG_CANT("not regular file", pzFileName);
+        }
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;

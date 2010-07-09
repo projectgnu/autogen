@@ -1,5 +1,5 @@
 
-/*
+/**
  *  \file autogen.c
  *
  *  Time-stamp:        "2010-07-03 08:57:41 bkorb"
@@ -26,43 +26,51 @@
 #include <sys/resource.h>
 #endif
 
+typedef enum {
+    EXIT_PCLOSE_WAIT,
+    EXIT_PCLOSE_NOWAIT
+} wait_for_pclose_enum_t;
+
 static char const zClientInput[] = "client-input";
 
 #define _State_(n)  #n,
-static char const * const apzStateName[] = { STATE_TABLE };
+static char const * const state_names[] = { STATE_TABLE };
 #undef _State_
 
 static sigjmp_buf  abendJumpEnv;
 static int         abendJumpSignal = 0;
 
 typedef void (sighandler_proc_t)(int sig);
-static sighandler_proc_t ignoreSignal, abendSignal;
+static sighandler_proc_t ignore_signal, catch_sig_and_bail;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
 inner_main(int argc, char ** argv);
 
 static void
-signalExit(int sig);
+cleanup_and_abort(int sig);
 
 static void
-abendSignal(int sig);
+catch_sig_and_bail(int sig);
 
 static void
-ignoreSignal(int sig);
+ignore_signal(int sig);
 
 static void
-doneCheck(void);
+done_check(void);
 
 static void
-signalSetup(sighandler_proc_t* chldHandler,
-            sighandler_proc_t* dfltHandler);
+setup_signals(sighandler_proc_t* chldHandler,
+              sighandler_proc_t* dfltHandler);
 /* = = = END-STATIC-FORWARD = = = */
 
+/**
+ * main routine under Guile guidance
+ */
 static void
 inner_main(int argc, char ** argv)
 {
-    atexit(doneCheck);
+    atexit(done_check);
     initialize(argc, argv);
 
     procState = PROC_STATE_LOAD_DEFS;
@@ -86,10 +94,13 @@ inner_main(int argc, char ** argv)
     }
 
     procState = PROC_STATE_DONE;
-    signalSetup(SIG_DFL, SIG_DFL);
+    setup_signals(SIG_DFL, SIG_DFL);
     exit(EXIT_SUCCESS);
 }
 
+/**
+ * main() called from _start()
+ */
 int
 main(int argc, char ** argv)
 {
@@ -102,9 +113,9 @@ main(int argc, char ** argv)
      *  stashed it for use now.
      */
     if (sigsetjmp(abendJumpEnv, 0) != 0)
-        signalExit(abendJumpSignal);
+        cleanup_and_abort(abendJumpSignal);
 
-    signalSetup(ignoreSignal, abendSignal);
+    setup_signals(ignore_signal, catch_sig_and_bail);
 
 #if GUILE_VERSION >= 107000
     if (getenv("GUILE_WARN_DEPRECATED") == NULL)
@@ -116,8 +127,53 @@ main(int argc, char ** argv)
     return EXIT_FAILURE;
 }
 
+/**
+ *  This code must run regardless of which exit path is taken
+ */
 static void
-signalExit(int sig)
+exit_cleanup(wait_for_pclose_enum_t cl_wait)
+{
+    /*
+     *  There are contexts wherein this function can get run twice.
+     */
+    {
+        static int exit_cleanup_done = 0;
+        if (exit_cleanup_done)
+            return;
+        exit_cleanup_done = 1;
+    }
+
+#ifdef SHELL_ENABLED
+    ag_scm_c_eval_string_from_file_line(
+        "(if (> (string-length shell-cleanup) 0)"
+        " (shell shell-cleanup) )", __FILE__, __LINE__ - 1 );
+    closeServer();
+#endif
+
+    fflush(stdout);
+    fflush(stderr);
+
+    if (pfTrace == stderr)
+        return;
+
+    if (! trace_is_to_pipe) {
+        fclose(pfTrace);
+        return;
+    }
+
+    fflush(pfTrace);
+    pclose(pfTrace);
+    if (cl_wait == EXIT_PCLOSE_WAIT) {
+        int status;
+        while (wait(&status) > 0)  ;
+    }
+}
+
+/**
+ *  A signal was caught, siglongjmp called and main() has called this.
+ */
+static void
+cleanup_and_abort(int sig)
 {
     static char const zErr[] =
         "AutoGen aborting on signal %d (%s) in state %s\n";
@@ -129,12 +185,9 @@ signalExit(int sig)
 
     fprintf(stderr, zErr, sig, strsignal(sig),
             ((unsigned)procState <= PROC_STATE_DONE)
-            ? apzStateName[ procState ] : "** BOGUS **");
+            ? state_names[ procState ] : "** BOGUS **");
 
-    fflush(stderr);
-    fflush(stdout);
-    if (pfTrace != stderr )
-        fflush(pfTrace);
+    exit_cleanup(EXIT_PCLOSE_NOWAIT);
 
     if (procState == PROC_STATE_ABORTING)
         _exit(sig + 128);
@@ -175,9 +228,13 @@ signalExit(int sig)
         fprintf(stderr, zAt, pzFl, line, pzFn, fnCd);
     }
 
-    signalSetup(SIG_DFL, SIG_DFL);
+    setup_signals(SIG_DFL, SIG_DFL);
 
 #ifdef HAVE_SYS_RESOURCE_H
+    /*
+     *  If `--core' has been specified and if we have get/set rlimit,
+     *  then try to set the core limit to the "hard" maximum before aborting.
+     */
     if (HAVE_OPT(CORE)) {
         struct rlimit rlim;
         getrlimit(RLIMIT_CORE, &rlim);
@@ -190,12 +247,12 @@ signalExit(int sig)
 }
 
 
-/*
- *  abendSignal catches signals we abend on.  The "siglongjmp" goes back
- *  to the real "main()" procedure and it will call "signalExit()", above.
+/**
+ *  catch_sig_and_bail catches signals we abend on.  The "siglongjmp" goes back
+ *  to the real "main()" procedure and it will call "cleanup_and_abort()", above.
  */
 static void
-abendSignal(int sig)
+catch_sig_and_bail(int sig)
 {
     switch (procState) {
     case PROC_STATE_DONE:
@@ -209,31 +266,36 @@ abendSignal(int sig)
 }
 
 
-/*
- *  ignoreSignal is the handler for SIGCHLD.  If we set it to default,
+/**
+ *  ignore_signal is the handler for SIGCHLD.  If we set it to default,
  *  it will kill us.  If we set it to ignore, it will be inherited.
  *  Therefore, always in all programs set it to call a procedure.
  *  The "wait(3)" call will do magical things, but will not override SIGIGN.
  */
 static void
-ignoreSignal(int sig)
+ignore_signal(int sig)
 {
 #ifdef DEBUG_ENABLED
+    /*
+     *  This is not signal safe, but it is no big deal if we get
+     *  scrambled output.
+     */
     fprintf(pfTrace, "Ignored signal %d (%s)\n", sig, strsignal(sig));
 #endif
     return;
 }
 
 
-/*
+/**
  *  This is called during normal exit processing.
  */
 static void
-doneCheck(void)
+done_check(void)
 {
     static char const zErr[] =
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
         "\t%s on line %d\n";
+
 #if GUILE_VERSION >= 107000
     int exit_code = EXIT_SUCCESS;
 #endif
@@ -242,31 +304,13 @@ doneCheck(void)
      *  There are contexts wherein this function can get registered twice.
      */
     {
-        static int doneCheckDone = 0;
-        if (doneCheckDone)
+        static int done_check_done = 0;
+        if (done_check_done)
             return;
-        doneCheckDone = 1;
+        done_check_done = 1;
     }
 
-#ifdef SHELL_ENABLED
-    ag_scm_c_eval_string_from_file_line(
-        "(if (> (string-length shell-cleanup) 0)"
-        " (shell shell-cleanup) )", __FILE__, __LINE__ - 1 );
-    closeServer();
-#endif
-
-    fflush(stdout);
-    fflush(stderr);
-
-    if (pfTrace != stderr ) {
-        if (trace_is_to_pipe) {
-            int status;
-
-            pclose(pfTrace);
-            while (wait(&status) > 0)  ;
-        }
-        else fclose(pfTrace);
-    }
+    exit_cleanup(EXIT_PCLOSE_WAIT);
 
     switch (procState) {
     case PROC_STATE_EMITTING:
@@ -306,7 +350,7 @@ doneCheck(void)
         break; /* continue failure exit */
 
     default:
-        fprintf(stderr, "ABEND-ing in %s state\n", apzStateName[procState]);
+        fprintf(stderr, "ABEND-ing in %s state\n", state_names[procState]);
         /* FALLTHROUGH */
 
     case PROC_STATE_ABORTING:
@@ -327,10 +371,10 @@ doneCheck(void)
     }
 
     if (pzLastScheme != NULL) {
-        static char const zGuileFail[] =
+        static char const fail_fmt[] =
             "Failing Guile command:  = = = = =\n\n%s\n\n"
             "=================================\n";
-        fprintf(stderr, zGuileFail, pzLastScheme);
+        fprintf(stderr, fail_fmt, pzLastScheme);
     }
 
     /*
@@ -416,8 +460,8 @@ ag_abend_at(char const * pzMsg
 
 
 static void
-signalSetup(sighandler_proc_t* chldHandler,
-            sighandler_proc_t* dfltHandler)
+setup_signals(sighandler_proc_t* chldHandler,
+              sighandler_proc_t* dfltHandler)
 {
     struct sigaction  sa;
     int    sigNo  = 1;

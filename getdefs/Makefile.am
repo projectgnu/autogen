@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:38:34 bkorb"
+## Time-stamp:      "2010-07-08 21:42:17 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -20,23 +20,19 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: 65d61dc1ba6425c6e681f996b502c676efb8e868 $
 ## ---------------------------------------------------------------------
 TARG = getdefs
 
 bin_PROGRAMS    = getdefs
-gdsrcs          = getdefs.h proto.h getdefs.c gdemit.c gdinit.c opts.c
+gdsrcs          = getdefs.h proto.h getdefs.c gdemit.c gdinit.c
 getdefs_SOURCES = proto.h
-nodist_getdefs_SOURCES = gd.c opts.h
+BUILT_SOURCES   = gd.c
+nodist_getdefs_SOURCES = $(BUILT_SOURCES)
 
 SUBDIRS         = test
-BUILT_SOURCES   = opts.c opts.h gd.c
 EXTRA_DIST      = opts.def $(gdsrcs)
-## RUNAG        = valgrind $(AGexe)
 RUNAG           = $(AGexe)
-AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts
+AGEXE_LIB       = $(RUNAG) -MF$@ -L$(top_srcdir)/autoopts
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
@@ -49,15 +45,14 @@ AG_ENV          = top_builddir=$(top_builddir) \
 all : gen
 gen : $(BUILT_SOURCES) $(DOCFILES)
 
-opts.c $(getdefs_OBJECTS) : opts.h
 gd.c : $(gdsrcs)
 	( echo '#define DEFINE' ; \
-	  for f in $(gdsrcs) ; do echo "#include \"$$f\"" ; done ) > $@
+	  for f in config.h opts.c $(gdsrcs) ; \
+	  do echo "#include \"$$f\"" ; done ) > $@
 
-opts.h : opts.def $(CLexe) $(AGexe)
+$(getdefs_OBJECTS) opts.h opts.c : stamp-opts
+stamp-opts : opts.def $(CLexe) $(AGexe)
 	$(AG_ENV) ; $(AGEXE_LIB) $(srcdir)/opts.def
-
-$(DOCFILES) : doc-stamp
 
 $(AGexe) :
 	@cd ../agen5 ; $(MAKE) $(AGnam)
@@ -65,10 +60,10 @@ $(AGexe) :
 $(CLexe) :
 	@cd ../columns ; $(MAKE) $(CLnam)
 
-doc-stamp : opts.def $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
+$(DOCFILES) : stamp-doc
+stamp-doc : $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
 	$(AG_ENV) ; $(AGEXE_LIB) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
 	$(AGEXE_LIB) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
-	@touch $@
 
 .NOTPARALLEL:
 

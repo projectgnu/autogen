@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-07-03 09:35:24 bkorb"
+# Time-stamp:        "2010-07-08 21:12:12 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -41,6 +41,9 @@ set_config_values()
   tmp_dir=`pwd`/ag-texi-$$.d
   rm -rf ag-texi-*.d
   mkdir ${tmp_dir} || die "cannot make ${tmp_dir} directory"
+  TMPDIR=${tmp_dir}
+  export TMPDIR
+
   case "$-" in
   *x* ) trap "echo 'saved tmp dir:  ${tmp_dir}';chmod 777 ${tmp_dir}" EXIT
         VERBOSE=true ;;

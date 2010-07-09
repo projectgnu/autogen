@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-06-27 17:10:12 bkorb"
+ *  Time-stamp:        "2010-07-08 20:40:57 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -431,37 +431,39 @@ MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
  *
  *  GLOBAL STRINGS
  */
-#define MKSTRING( name, val ) \
-        MODE char const z ## name[ sizeof( val )] VALUE( val )
+#define MKSTRING(_n, _v) \
+        MODE char const z ## _n[sizeof(_v)] VALUE(_v)
 
-MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n" );
-MKSTRING( AllocErr,   "Allocation Failure" );
-MKSTRING( Cannot,     "fserr %d: cannot %s %s:  %s\n" );
-MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n" );
-MKSTRING( FileLine,   "\tfrom %s line %d\n" );
-MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd" );
-MKSTRING( NotStr,     "ERROR: %s is not a string\n" );
-MKSTRING( DevNull,    "/dev/null" );
-MKSTRING( ShellEnv,   "SHELL" );
-MKSTRING( Format,     "format" );
-MKSTRING( FileFormat, "%s%s\0%s.%s" );
-MKSTRING( Nil,        "" );
+MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n");
+MKSTRING( AllocErr,   "Allocation Failure");
+MKSTRING( Cannot,     "fserr %d: cannot %s %s:  %s\n");
+MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n");
+MKSTRING( FileLine,   "\tfrom %s line %d\n");
+MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
+MKSTRING( NotStr,     "ERROR: %s is not a string\n");
+MKSTRING( DevNull,    "/dev/null");
+MKSTRING( ShellEnv,   "SHELL");
+MKSTRING( Format,     "format");
+MKSTRING( FileFormat, "%s%s\0%s.%s");
+MKSTRING( Nil,        "");
+MKSTRING( MemFile,    "in-mem file");
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  GLOBAL PROCEDURES
  */
 #ifndef HAVE_STRLCPY
-extern size_t strlcpy( char* dest, char const* src, size_t n );
+extern size_t strlcpy( char* dest, char const* src, size_t n);
 #endif
-#ifdef ENABLE_FMEMOPEN
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  IF we have fopencookie or funopen, then we also have our own fmemopen
  */
-
-extern FILE * ag_fmemopen (void *buf, ssize_t len, char const *mode);
+#ifdef ENABLE_FMEMOPEN
+extern FILE * ag_fmemopen(void *buf, ssize_t len, char const *mode);
 #endif
+
 #include "proto.h"
 
 typedef union {
@@ -475,6 +477,9 @@ MODE v2c_t p2p VALUE( { NULL } );
 #else
 # define AG_ABEND(s)  ag_abend_at(s)
 #endif
+#define  AG_CANT(_op, _wh) \
+    AG_ABEND(aprf(zCannot, errno, _op, _wh, strerror(errno)))
+
 #ifdef DEBUG_FSM
 # define DEBUG
 #else
@@ -484,13 +489,13 @@ MODE v2c_t p2p VALUE( { NULL } );
 #define AG_ABEND_IN(t,m,s) \
     STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
 
-extern void  ag_scmStrings_init(   void );
-extern void  ag_scmStrings_deinit( void );
-extern void  ag_scmStrings_free(   void );
-extern char* ag_scribble( size_t size );
+extern void  ag_scmStrings_init(   void);
+extern void  ag_scmStrings_deinit( void);
+extern void  ag_scmStrings_free(   void);
+extern char* ag_scribble( size_t size);
 
 #if defined(DEBUG_ENABLED)
-  extern void manageAllocatedData( void* pd );
+  extern void manageAllocatedData(void* pd);
 #else
 # define manageAllocatedData(_ptr)
 #endif
@@ -535,7 +540,7 @@ extern char* ag_scribble( size_t size );
         AG_ABEND( aprf( zNotStr, type ));
 
     if (SCM_SUBSTRP(s))
-        s = scm_makfromstr( SCM_CHARS(s), SCM_LENGTH(s), 0 );
+        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
     return SCM_CHARS(s);
   }
 
@@ -544,7 +549,7 @@ extern char* ag_scribble( size_t size );
 
 #else /* Guile 1.7 and following */
 
-  extern char* ag_scm2zchars( SCM s, tCC* type );
+  extern char* ag_scm2zchars(SCM s, tCC* type);
 
 # if GUILE_VERSION < 108000
 #   define AG_SCM_STRLEN(_s)            SCM_STRING_LENGTH(_s)
@@ -583,7 +588,7 @@ static inline SCM ag_eval( tCC* pzStr )
     pzLastScheme = pzStr;
 
     res = ag_scm_c_eval_string_from_file_line(
-        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo );
+        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
 
     pzLastScheme = pzSaveScheme;
     return res;

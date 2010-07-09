@@ -1,9 +1,9 @@
-/*
+/**
  *  \file tpProcess.c
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-06-30 19:25:29 bkorb"
+ * Time-stamp:        "2010-07-08 20:52:57 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -26,7 +26,7 @@ static tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-doStdoutTemplate( tTemplate* pTF );
+do_stdout_tpl(tTemplate * pTF);
 
 static void
 openOutFile(tOutSpec* pOutSpec);
@@ -38,9 +38,7 @@ openOutFile(tOutSpec* pOutSpec);
  *  must point to the first entry that is *not* to be emitted.
  */
 LOCAL void
-generateBlock( tTemplate*   pT,
-               tMacro*      pMac,
-               tMacro*      pEnd )
+generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
 {
     tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
     int  fc;
@@ -59,33 +57,33 @@ generateBlock( tTemplate*   pT,
 
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
 
-            fprintf( pfTrace, zFmt, apzFuncNames[ fc ], pMac->funcCode,
-                     pT->pzTplFile, pMac->lineNo );
+            fprintf(pfTrace, zFmt, apzFuncNames[ fc ], pMac->funcCode,
+                    pT->pzTplFile, pMac->lineNo);
             if (pMac->ozText > 0) {
                 int   ct;
                 char* pz = pT->pzTemplText + pMac->ozText;
-                fputs( "  ", pfTrace );
+                fputs("  ", pfTrace);
                 for (ct=0; ct < 32; ct++) {
                     char ch = *(pz++);
                     if (ch == NUL)
                         break;
                     if (ch == '\n')
                         break;
-                    putc( ch, pfTrace );
+                    putc(ch, pfTrace);
                 }
-                putc( '\n', pfTrace );
+                putc('\n', pfTrace);
             }
         }
 
         pCurMacro = pMac;
-        pMac = (*(apHdlrProc[ fc ]))( pT, pMac );
+        pMac = (*(apHdlrProc[ fc ]))(pT, pMac);
         ag_scmStrings_free();
     }
 }
 
 
 static void
-doStdoutTemplate( tTemplate* pTF )
+do_stdout_tpl(tTemplate * pTF)
 {
     tSCC zNoSfx[] = "* NONE *";
     tSCC zBadR[]  = "%sBogus return from setjmp\n";
@@ -100,17 +98,17 @@ doStdoutTemplate( tTemplate* pTF )
 
     case PROBLEM:
         if (*pzOopsPrefix != NUL) {
-            fprintf( stdout, "%soutput was abandoned\n", pzOopsPrefix );
+            fprintf(stdout, "%soutput was abandoned\n", pzOopsPrefix);
             pzOopsPrefix = zNil;
         }
-        fclose( stdout );
+        fclose(stdout);
         return;
 
     default:
         fprintf(stdout, zBadR, pzOopsPrefix);
 
     case FAILURE:
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
 
     pzCurSfx      = zNoSfx;
@@ -120,7 +118,7 @@ doStdoutTemplate( tTemplate* pTF )
     fpRoot.pzOutName = "stdout";
     fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-        fputs( "Starting stdout template\n", pfTrace );
+        fputs("Starting stdout template\n", pfTrace);
 
     /*
      *  IF there is a CGI prefix for error messages,
@@ -128,28 +126,28 @@ doStdoutTemplate( tTemplate* pTF )
      *  the output will be clean for any error messages we have to emit.
      */
     if (*pzOopsPrefix == NUL)
-        generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
+        generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
     else {
         tSCC zCont[]  = "content-type:";
-        (void)ag_scm_out_push_new( SCM_UNDEFINED );
+        (void)ag_scm_out_push_new(SCM_UNDEFINED);
 
-        generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
+        generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
         /*
          *  Read back in the spooled output.  Make sure it starts with
          *  a content-type: prefix.  If not, we supply our own HTML prefix.
          */
-        res   = ag_scm_out_pop( SCM_BOOL_T );
-        pzRes = AG_SCM_CHARS( res );
+        res   = ag_scm_out_pop(SCM_BOOL_T);
+        pzRes = AG_SCM_CHARS(res);
 
-        if (strneqvcmp( pzRes, zCont, (int)sizeof(zCont) - 1) != 0)
-            fputs( "Content-Type: text/html\n\n", stdout );
+        if (strneqvcmp(pzRes, zCont, (int)sizeof(zCont) - 1) != 0)
+            fputs("Content-Type: text/html\n\n", stdout);
 
-        fwrite( pzRes, AG_SCM_STRLEN(res), (size_t)1, stdout );
+        fwrite(pzRes, AG_SCM_STRLEN(res), (size_t)1, stdout);
     }
 
-    fclose( stdout );
+    fclose(stdout);
 }
 
 
@@ -167,7 +165,7 @@ nextOutSpec(tOutSpec * pOS)
 
 
 LOCAL void
-processTemplate( tTemplate* pTF )
+processTemplate(tTemplate* pTF)
 {
     forInfo.fi_depth = 0;
 
@@ -177,7 +175,7 @@ processTemplate( tTemplate* pTF )
      *  With output going to stdout, we don't try to remove output on errors.
      */
     if (pOutSpecList == NULL) {
-        doStdoutTemplate( pTF );
+        do_stdout_tpl(pTF);
         return;
     }
 
@@ -195,7 +193,7 @@ processTemplate( tTemplate* pTF )
         /*
          *  HOW was that we got here?
          */
-        switch (setjmp( fileAbort )) {
+        switch (setjmp(fileAbort)) {
         case SUCCESS:
             if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
                 fprintf(pfTrace, "Starting %s template\n", pOS->zSuffix);
@@ -213,7 +211,7 @@ processTemplate( tTemplate* pTF )
             currDefCtx     = rootDefCtx;
             pCurFp->flags &= ~FPF_FREE;
             pCurFp->pPrev  = NULL;
-            generateBlock( pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt );
+            generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
             do  {
                 closeOutput(AG_FALSE);  /* keep output */
@@ -231,7 +229,7 @@ processTemplate( tTemplate* pTF )
             break;
 
         default:
-            fprintf( pfTrace, "%sBogus return from setjmp\n", pzOopsPrefix );
+            fprintf(pfTrace, "%sBogus return from setjmp\n", pzOopsPrefix);
             pzOopsPrefix = zNil;
             /* FALLTHROUGH */
 
@@ -258,12 +256,12 @@ processTemplate( tTemplate* pTF )
 
 
 LOCAL void
-closeOutput( ag_bool purge )
+closeOutput(ag_bool purge)
 {
     if ((pCurFp->flags & FPF_NOCHMOD) == 0)
-        removeWriteAccess( fileno( pCurFp->pFile ));
+        removeWriteAccess(fileno(pCurFp->pFile));
 
-    fclose( pCurFp->pFile );
+    fclose(pCurFp->pFile);
 
     /*
      *  Only stdout and /dev/null are marked, "NOUNLINK"
@@ -274,7 +272,7 @@ closeOutput( ag_bool purge )
          *  file, then get rid of the output.
          */
         if (purge || ((pCurFp->flags & FPF_UNLINK) != 0))
-            unlink( pCurFp->pzOutName );
+            unlink(pCurFp->pzOutName);
 
         else {
             struct utimbuf tbuf;
@@ -289,7 +287,7 @@ closeOutput( ag_bool purge )
             if (outTime <= startTime)
                 startTime = outTime - 1;
 
-            utime( pCurFp->pzOutName, &tbuf );
+            utime(pCurFp->pzOutName, &tbuf);
         }
     }
 
@@ -297,7 +295,7 @@ closeOutput( ag_bool purge )
      *  Do not deallocate statically allocated names
      */
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
-        AGFREE( (void*)pCurFp->pzOutName );
+        AGFREE((void*)pCurFp->pzOutName);
 
     /*
      *  Do not deallocate the root entry.  It is not allocated!!
@@ -305,7 +303,7 @@ closeOutput( ag_bool purge )
     if ((pCurFp->flags & FPF_FREE) != 0) {
         tFpStack* p = pCurFp;
         pCurFp = p->pPrev;
-        AGFREE( (void*)p );
+        AGFREE((void*)p);
     }
 }
 
@@ -320,10 +318,10 @@ openOutFile(tOutSpec* pOutSpec)
 {
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
-    char const * pzDefFile = OPT_ARG( BASE_NAME );
+    char const * pzDefFile = OPT_ARG(BASE_NAME);
     char const * pzOutFile = NULL;
 
-    if (strcmp( pOutSpec->zSuffix, "null" ) == 0) {
+    if (strcmp(pOutSpec->zSuffix, "null") == 0) {
         static int const flags = FPF_NOUNLINK | FPF_NOCHMOD;
     null_open:
         open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
@@ -335,12 +333,12 @@ openOutFile(tOutSpec* pOutSpec)
      *  we will redirect the output to /dev/null and
      *  perform all the work.  There may be side effects.
      */
-    if (HAVE_OPT( SKIP_SUFFIX )) {
-        int     ct  = STACKCT_OPT(  SKIP_SUFFIX );
-        tCC**   ppz = STACKLST_OPT( SKIP_SUFFIX );
+    if (HAVE_OPT(SKIP_SUFFIX)) {
+        int     ct  = STACKCT_OPT(SKIP_SUFFIX);
+        tCC**   ppz = STACKLST_OPT(SKIP_SUFFIX);
 
         while (--ct >= 0) {
-            if (strcmp( pOutSpec->zSuffix, *ppz++ ) == 0)
+            if (strcmp(pOutSpec->zSuffix, *ppz++) == 0)
                 goto null_open;
         }
     }
@@ -359,11 +357,11 @@ openOutFile(tOutSpec* pOutSpec)
          *  We allow users to specify a suffix with '-' and '_', but when
          *  stripping a suffix from the "base name", we do not recognize 'em.
          */
-        pE = strchr( pS, '.' );
+        pE = strchr(pS, '.');
         if (pE != NULL) {
             size_t len = (unsigned)(pE - pS);
             if (len >= sizeof(z))
-                AG_ABEND( "--base-name name is too long" );
+                AG_ABEND("--base-name name is too long");
 
             memcpy(z, pS, len);
             z[ pE - pS ] = NUL;

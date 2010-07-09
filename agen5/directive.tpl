@@ -167,13 +167,14 @@ die() {
   kill -TERM ${AG_pid}
   exit 1
 }
+test -z "${TMPDIR}" && TMPDIR=/tmp
 tmp_dir=''
 mk_tmp_dir() {
   test -d "${tmp_dir}" && return 0
   tmp_dir=`
-    t=\`mktemp -d ${TMPDIR:-.}/.ag-XXXXXX\`
+    t=\`mktemp -d ${TMPDIR}/.ag-XXXXXX\`
     test -d "${t}" || {
-      t=${TMPDIR:-.}/.ag-$$
+      t=${TMPDIR}/.ag-$$
       rm -rf ${t}
       mkdir ${t} || die cannot mkdir ${t}
     }

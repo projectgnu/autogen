@@ -111,7 +111,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 
 
 LOCAL SCM
-run_printf( char* pzFmt, int len, SCM alist )
+run_printf(char* pzFmt, int len, SCM alist)
 {
     SCM     res;
     void*   args[8];
@@ -122,7 +122,7 @@ run_printf( char* pzFmt, int len, SCM alist )
         arglist = argp = args;
     else
         arglist =
-        argp    = (void**)malloc( (len+1) * sizeof(void*));
+        argp    = (void**)malloc((len+1) * sizeof(void*));
 
     while (len-- > 0) {
         SCM  car = SCM_CAR( alist );
@@ -171,13 +171,13 @@ run_printf( char* pzFmt, int len, SCM alist )
      */
     {
         char*   pzBuf;
-        size_t  bfSize = safePrintf( &pzBuf, pzFmt, arglist );
-        res = AG_SCM_STR2SCM( pzBuf, bfSize );
-        free( pzBuf );
+        size_t  bfSize = safePrintf(&pzBuf, pzFmt, arglist);
+        res = AG_SCM_STR2SCM(pzBuf, bfSize);
+        free(pzBuf);
     }
 
     if (arglist != args)
-        AGFREE( (void*)arglist );
+        AGFREE((void*)arglist);
 
     return res;
 }

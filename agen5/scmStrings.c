@@ -23,24 +23,34 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ROUND_SCRIBBLE(_v, _sz)    (((_v) + ((_sz) - 1)) & ~((_sz) - 1))
+
 typedef struct string_buf_s string_buf_t;
 
 struct string_buf_s {
     string_buf_t*   next_p;
-    size_t          sb_size;
+    size_t  const   sb_size;
     size_t          sb_off;
     unsigned char   sb_buf[1];
 };
 
-static string_buf_t* ag_strbufs = NULL;
+static string_buf_t *  ag_strbufs  = NULL;
+static string_buf_t ** next_strbuf = &ag_strbufs;
 
-void  ag_scmStrings_init( void )
+/**
+ * Initialize the scribble string library
+ */
+LOCAL void
+ag_scmStrings_init(void)
 {
     ag_strbufs = NULL;
 }
 
-
-void  ag_scmStrings_deinit( void )
+/**
+ * Free up the scribble strings
+ */
+LOCAL void
+ag_scmStrings_deinit(void)
 {
     string_buf_t* sb = ag_strbufs;
     ag_strbufs = NULL;
@@ -52,8 +62,11 @@ void  ag_scmStrings_deinit( void )
     }
 }
 
-
-void  ag_scmStrings_free(   void )
+/**
+ *  Free up the scribble strings used during the processing of one macro.
+ */
+LOCAL void
+ag_scmStrings_free(void)
 {
     string_buf_t* sb = ag_strbufs;
 
@@ -63,43 +76,77 @@ void  ag_scmStrings_free(   void )
     }
 }
 
+/**
+ * allocate a new scribble block.  Multiple of 8K bytes.
+ */
+static string_buf_t *
+new_scribble_block(size_t min_size)
+{
+    string_buf_t * res = NULL;
 
+    /* allow space for allocation header */
+    min_size += ((char *)&(res->sb_buf)) - (char *)res;
+
+    /* some multiple of 8K.  Probably exactly 8K */
+    min_size  = ROUND_SCRIBBLE(min_size, 0x2000);
+
+    *next_strbuf = res = AGALOC(min_size, "SCM String Buffer");
+    next_strbuf  = &(res->next_p);
+    *next_strbuf = NULL;
+    res->sb_off  = 0;
+    {
+        size_t * psz = (void *)&(res->sb_size);
+        *psz = min_size - sizeof(*res);
+    }
+
+    return res;
+}
+
+/**
+ *  Allocate a scribble string.  It will be deallocated when a macro finishes.
+ *  Therefore, *DO NOT* use these at the start of a block macro expecting
+ *  the space to still be usable at the end of the block macro.
+ *  These allocations are intended for temporary space needs that cannot
+ *  be kept on the stack.  Expression processing.
+ */
 char*
-ag_scribble( size_t size )
+ag_scribble(size_t size)
 {
     string_buf_t* sb = ag_strbufs;
-    string_buf_t** sb_p = &(ag_strbufs);
     char* buf;
+
+    size += 1;  // allow for NUL byte & round to word boundary
+    size  = ROUND_SCRIBBLE(size, sizeof(void *));
 
     for (;;) {
         if (sb == NULL) {
-            size_t a_size = size + 1 + sizeof(*sb) + 0x2000;
-            a_size &= ~0x1FFF;
-            *sb_p = sb  = AGALOC( a_size, "SCM String Buffer" );
-            sb->next_p  = NULL;
-            sb->sb_size = a_size - sizeof(*sb);
-            sb->sb_off  = 0;
+            sb = new_scribble_block(size);
             break;
         }
 
-        if ((sb->sb_size - sb->sb_off) > size)
+        if ((sb->sb_size - sb->sb_off) >= size)
             break;
 
-        sb_p = &(sb->next_p);
         sb   = sb->next_p;
     }
 
     buf = (char*)(sb->sb_buf + sb->sb_off);
-    sb->sb_off += size + 1;
+    sb->sb_off += size;
     return buf;
 }
 
 
 #if GUILE_VERSION >= 107000
-
+/**
+ *  As of Guile 1.7.x, access to the NUL terminated string referenced by
+ *  an SCM is no longer guaranteed.  Therefore, we must extract the string
+ *  into one of our "scribble" buffers.
+ */
 char*
-ag_scm2zchars( SCM s, tCC* type )
+ag_scm2zchars(SCM s, tCC* type)
 {
+    static char const bad_val[] =
+        "scm_string_length returned wrong value: %d != %d\n";
     size_t len = scm_c_string_length(s);
     char* buf;
 
@@ -108,16 +155,15 @@ ag_scm2zchars( SCM s, tCC* type )
         return &z;
     }
 
-    buf = ag_scribble( len+2 );
+    buf = ag_scribble(len);
 
     {
-        size_t buflen = scm_to_locale_stringbuf( s, buf, len );
+        size_t buflen = scm_to_locale_stringbuf(s, buf, len);
         if (buflen != len)
-            AG_ABEND( aprf("scm_string_length returned wrong value: "
-                           "%d != %d\n", buflen, len));
-        buf[ len ] = NUL;
+            AG_ABEND(aprf(bad_val, buflen, len));
     }
 
+    buf[len] = NUL;
     return buf;
 }
 #endif

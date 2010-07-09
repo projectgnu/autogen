@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-02-24 08:39:57 bkorb"
+# Time-stamp:        "2010-07-08 22:12:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,10 +26,16 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: 0551096f85e7e2bb86df6a3557a16032062e74f8 $
+# $Id: c3fb660d4c2641d2d1ab367195a9d3a8950843a7 $
 # ----------------------------------------------------------------------
 
 . ./defs
+
+AUTOOPTS_TRACE=every
+AUTOOPTS_TRACE_OUT=">>`pwd`/${testname}-ag-trace.txt"
+export AUTOOPTS_TRACE AUTOOPTS_TRACE_OUT
+exec 2> ${testname}-stderr.txt
+set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
@@ -50,7 +56,7 @@ environrc;
 _EOF_
 
 ${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+  failure AutoGen could not process A
 
 # # # # # # # # # # VALIDATE HELP # # # # # # # # #
 
@@ -207,7 +213,7 @@ cd ${testsubdir}
 echo 'disable-save;' >> ${testname}.def
 
 ${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+  failure AutoGen could not process B
 
 compile "--help"
 sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
@@ -220,7 +226,7 @@ cmp ${testname}-*2.help || \
 echo 'disable-load;' >> ${testname}.def
 
 ${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+  failure AutoGen could not process B
 
 compile "--help"
 sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \

@@ -1,7 +1,7 @@
 /*
  *  \file agUtils.c
  *
- *  Time-stamp:        "2010-06-30 21:28:12 bkorb"
+ *  Time-stamp:        "2010-07-08 19:23:24 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -79,41 +79,6 @@ aprf(char const * pzFmt, ...)
         AG_ABEND(z);
     }
     return pz;
-}
-
-
-LOCAL char *
-mkstemp_pat(void)
-{
-    static char const * pzTmpDir = NULL;
-    static size_t tmpdirlen = 0;
-
-    if (pzTmpDir == NULL) {
-        static char const * const envlist[] = {
-            "TMPDIR", "TEMP", "TMP", NULL };
-        char const * const * penv = envlist;
-        for (;;) {
-            pzTmpDir = getenv(*penv);
-            if (pzTmpDir != NULL)
-                break;
-            if (*(++penv) == NULL) {
-                pzTmpDir = "/tmp";
-                break;
-            }
-        }
-        tmpdirlen = strlen(pzTmpDir);
-    }
-
-    {
-        static char const tmp_pat[] = "/agtmp.XXXXXX";
-        size_t len = 2 * (tmpdirlen + sizeof(tmp_pat));
-        char* pzRes = AGALOC(len, "stemp pattern");
-        manageAllocatedData((void*)pzRes);
-        TAGMEM(pzRes, "temp file template");
-        memcpy(pzRes, pzTmpDir, tmpdirlen);
-        memcpy(pzRes + tmpdirlen, tmp_pat, sizeof(tmp_pat));
-        return pzRes;
-    }
 }
 
 static void
@@ -198,8 +163,7 @@ start_dep_file(void)
     pfDepends = fopen(pzDepFile, "w");
 
     if (pfDepends == NULL)
-        AG_ABEND(aprf(zCannot, errno, "fopen for write", pzDepFile,
-                      strerror(errno)));
+        AG_CANT("fopen for write", pzDepFile);
 
     fprintf(pfDepends, mkdep_fmt, autogenOptions.pzProgName);
 

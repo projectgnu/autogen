@@ -3,7 +3,7 @@
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2010-07-03 09:25:04 bkorb"
+## Time-stamp:        "2010-07-08 21:13:09 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -510,7 +510,7 @@ You may copy this manual under the terms of the FDL
 @page
 @contents
 @bye
-[= `chmod -r 555 ${tmp_dir} ; echo TEMP DIR IS ${tmp_dir} >/dev/tty` =][=
+[=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

@@ -1,7 +1,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-07-03 09:55:12 bkorb"
+ *  Time-stamp:        "2010-07-08 19:22:12 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -551,9 +551,9 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
 SCM
 ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 {
-    char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
-    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
-    char*   pzOwner = ag_scm2zchars( owner, "owner" );
+    char*   pzPfx   = ag_scm2zchars(prefix,    "GPL line prefix");
+    char*   pzPrg   = ag_scm2zchars(prog_name, "program name");
+    char*   pzOwner = ag_scm2zchars(owner,     "owner");
     static struct {
         tCC*    pzFN;
         tmap_info_t mi;
@@ -572,9 +572,10 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         /*
          *  Find the template file somewhere
          */
-        if (! SUCCESSFUL( findFile( pzLicense, zRealFile, apzSfx, NULL )))
-            AG_ABEND( aprf( zCannot, ENOENT, "map license file", pzLicense,
-                            strerror( ENOENT )));
+        if (! SUCCESSFUL(findFile(pzLicense, zRealFile, apzSfx, NULL))) {
+            errno = ENOENT;
+            AG_CANT("map license file", pzLicense);
+        }
 
         if ((lic.pzFN != NULL) && (strcmp( zRealFile, lic.pzFN ) != 0)) {
             text_munmap( &lic.mi );

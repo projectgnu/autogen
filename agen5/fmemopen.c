@@ -1,7 +1,10 @@
-/*-
+
+/**
+ * \file fmemopen.c
+ *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-02-24 08:42:29 bkorb"
+ * Time-stamp:      "2010-07-08 22:25:16 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -125,33 +128,33 @@ struct fmem_cookie_s {
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
-fmem_getmode( char const *pMode, mode_bits_t *pRes );
+fmem_getmode(char const *pMode, mode_bits_t *pRes);
 
 static int
-fmem_extend( fmem_cookie_t *pFMC, size_t new_size );
+fmem_extend(fmem_cookie_t *pFMC, size_t new_size);
 
 static ssize_t
-fmem_read( void *cookie, void *pBuf, size_t sz );
+fmem_read(void *cookie, void *pBuf, size_t sz);
 
 static ssize_t
-fmem_write( void *cookie, const void *pBuf, size_t sz );
+fmem_write(void *cookie, const void *pBuf, size_t sz);
 
 static seek_pos_t
-fmem_seek( void *cookie, fmem_off_t *p_offset, int dir);
+fmem_seek(void *cookie, fmem_off_t *p_offset, int dir);
 
 static int
-fmem_close( void *cookie );
+fmem_close(void *cookie);
 /* = = = END-STATIC-FORWARD = = = */
-
-FILE * ag_fmemopen(void *buf, ssize_t len, char const *pMode);
-int fmem_ioctl( FILE* fp, int req, void* ptr );
 
 #ifdef TEST_FMEMOPEN
   static fmem_cookie_t* saved_cookie = NULL;
 #endif
 
+/**
+ * Convert a mode string into mode bits.
+ */
 static int
-fmem_getmode( char const *pMode, mode_bits_t *pRes )
+fmem_getmode(char const *pMode, mode_bits_t *pRes)
 {
     if (pMode == NULL)
         return 1;
@@ -186,8 +189,11 @@ fmem_getmode( char const *pMode, mode_bits_t *pRes )
     return 0;
 }
 
+/**
+ * Extend the space associated with an fmem file.
+ */
 static int
-fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
+fmem_extend(fmem_cookie_t *pFMC, size_t new_size)
 {
     size_t ns = (new_size + (pFMC->pg_size - 1)) & (~(pFMC->pg_size - 1));
 
@@ -202,16 +208,16 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
          *  Previously, this was a user supplied buffer.  We now move to one
          *  of our own.  The user is responsible for the earlier memory.
          */
-        void* bf = malloc( ns );
+        void* bf = malloc(ns);
         if (bf == NULL)
             goto no_space;
 
-        memcpy( bf, pFMC->buffer, pFMC->buf_size );
+        memcpy(bf, pFMC->buffer, pFMC->buf_size);
         pFMC->buffer = bf;
         pFMC->mode  |= FLAG_BIT(allocated);
     }
     else {
-        void* bf = realloc( pFMC->buffer, ns );
+        void* bf = realloc(pFMC->buffer, ns);
         if (bf == NULL)
             goto no_space;
 
@@ -221,7 +227,7 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
     /*
      *  Unallocated file space is set to zeros.  Emulate that.
      */
-    memset( pFMC->buffer + pFMC->buf_size, 0, ns - pFMC->buf_size );
+    memset(pFMC->buffer + pFMC->buf_size, 0, ns - pFMC->buf_size);
     pFMC->buf_size = ns;
     return 0;
 
@@ -230,8 +236,11 @@ fmem_extend( fmem_cookie_t *pFMC, size_t new_size )
     return -1;
 }
 
+/**
+ * Handle file system callback to read data from our string.
+ */
 static ssize_t
-fmem_read( void *cookie, void *pBuf, size_t sz )
+fmem_read(void *cookie, void *pBuf, size_t sz)
 {
     fmem_cookie_t *pFMC = cookie;
 
@@ -248,9 +257,11 @@ fmem_read( void *cookie, void *pBuf, size_t sz )
     return sz;
 }
 
-
+/**
+ * Handle file system callback to write data to our string
+ */
 static ssize_t
-fmem_write( void *cookie, const void *pBuf, size_t sz )
+fmem_write(void *cookie, const void *pBuf, size_t sz)
 {
     fmem_cookie_t *pFMC = cookie;
     int add_nul_char;
@@ -276,7 +287,7 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
     {
         size_t next_pos = pFMC->next_ix + sz + add_nul_char;
         if (next_pos > pFMC->buf_size) {
-            if (fmem_extend( pFMC, next_pos ) != 0) {
+            if (fmem_extend(pFMC, next_pos) != 0) {
                 /*
                  *  We could not extend the memory.  Try to write some data.
                  *  Fail if we are either at the end or not writing data.
@@ -294,7 +305,7 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
         }
     }
 
-    memcpy( pFMC->buffer + pFMC->next_ix, pBuf, sz);
+    memcpy(pFMC->buffer + pFMC->next_ix, pBuf, sz);
 
     pFMC->next_ix += sz;
 
@@ -315,9 +326,11 @@ fmem_write( void *cookie, const void *pBuf, size_t sz )
     return sz;
 }
 
-
+/**
+ * Handle file system callback to set a new current position
+ */
 static seek_pos_t
-fmem_seek( void *cookie, fmem_off_t *p_offset, int dir)
+fmem_seek(void * cookie, fmem_off_t * p_offset, int dir)
 {
     size_t new_pos;
     fmem_cookie_t *pFMC = cookie;
@@ -335,7 +348,7 @@ fmem_seek( void *cookie, fmem_off_t *p_offset, int dir)
         goto seek_oops;
 
     if (new_pos > pFMC->buf_size) {
-        if (fmem_extend( pFMC, new_pos ))
+        if (fmem_extend(pFMC, new_pos))
             return -1; /* errno is set */
     }
 
@@ -349,72 +362,14 @@ fmem_seek( void *cookie, fmem_off_t *p_offset, int dir)
 
 
 static int
-fmem_close( void *cookie )
+fmem_close(void *cookie)
 {
     fmem_cookie_t *pFMC = cookie;
 
     if (pFMC->mode & FLAG_BIT(allocated))
-        free( pFMC->buffer );
-    free( pFMC );
+        free(pFMC->buffer);
+    free(pFMC);
 
-    return 0;
-}
-
-/*=export_func fmem_ioctl
- *
- *  what:  get information about a string stream
- *
- *  arg: + FILE* + fptr  + the string stream
- *  arg: + int   + req   + the requested data
- *  arg: + void* + ptr   + ptr to result area
- *
- *  ret-type:  int
- *  ret-desc:  zero on success
- *
- *  err: non-zero is returned and @code{errno} is set to @code{EINVAL}.
- *
- *  doc:
- *
- *  This routine surreptitiously slips in a special request.
- *  The commands supported are:
- *
- *  @table @code
- *  @item FMEM_IOCTL_BUF_ADDR
- *
- *    Retrieve the address of the buffer.  Future output to the stream might
- *    cause this buffer to be freed and the contents copied to another buffer.
- *    You must ensure that either you have saved the buffer (see
- *    @code{FMEM_IOCTL_SAVE_BUF} below), or do not do any more I/O to it while
- *    you are using this address.
- *
- *    "ptr" must point to a @code{char*} pointer.
- *
- *  @item FMEM_IOCTL_SAVE_BUF
- *
- *    Do not deallocate the buffer on close.  You would likely want to use
- *    this after writing all the output data and just before closing.
- *    Otherwise, the buffer might get relocated.  Once you have specified
- *    this, the current buffer becomes the client program's resposibility to
- *    @code{free()}.  If more I/O operations are performed, a new buffer
- *    @i{may} get allocated.  @code{fmem_close} will free that new buffer
- *    and the user will remain responsible for @code{free()}-ing this buffer.
- *
- *    "ptr" must point to a @code{char*} pointer.
- *
- *  @end table
- *
- *  The third argument is never optional and must be a pointer to where data
- *  are to be retrieved or stored.  It may be NULL if there are no data to
- *  transfer, but both of these functions currently return the address of the
- *  buffer.  This is implemented as a wrapper around @code{fseek(3C)}, so
- *  the "req" argument must not conflict with @code{SEEK_SET}, @code{SEEK_CUR}
- *  or @code{SEEK_END}.
-=*/
-int
-fmem_ioctl( FILE* fp, int req, void* ptr )
-{
-    if (fseek( fp, (long)ptr, req ) < 0)
-        return -1;
     return 0;
 }
 
@@ -529,7 +484,7 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
          *  User allocated buffer.  User responsible for disposal.
          */
         if (len == 0) {
-            free( pFMC );
+            free(pFMC);
             errno = EINVAL;
             return NULL;
         }
@@ -576,7 +531,7 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
          *  We also have no user supplied buffer.  Nonsense.
          */
         errno = EINVAL;
-        free( pFMC );
+        free(pFMC);
         return NULL;
     }
 
@@ -594,7 +549,7 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         pFMC->buffer = calloc((size_t)1, (size_t)len);
         if (pFMC->buffer == NULL) {
             errno = ENOMEM;
-            free( pFMC );
+            free(pFMC);
             return NULL;
         }
 
@@ -624,11 +579,11 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         iof.seek  = (cookie_seek_function_t* )fmem_seek;
         iof.close = (cookie_close_function_t*)fmem_close;
 
-        return fopencookie( pFMC, pMode, iof );
+        return fopencookie(pFMC, pMode, iof);
 #elif defined(HAVE_FUNOPEN)
-        return funopen( pFMC, pRd, pWr,
-                        (cookie_seek_function_t* )fmem_seek,
-                        (cookie_close_function_t*)fmem_close );
+        return funopen(pFMC, pRd, pWr,
+                       (cookie_seek_function_t* )fmem_seek,
+                       (cookie_close_function_t*)fmem_close);
 #else
 #       include "We have neither fopencookie(3GNU) nor funopen(3BSD)"
 #endif

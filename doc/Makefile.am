@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:38:39 bkorb"
+## Time-stamp:      "2010-07-08 21:12:51 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -20,11 +20,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
 ## ---------------------------------------------------------------------
-## $Id: 9fdefada12812d944f85afaa296762ea80dea0f4 $
-## ---------------------------------------------------------------------
-## Code:
 
 # This variable is needed to subvert automake's info rules.
 # They don't work for generated texi files:
