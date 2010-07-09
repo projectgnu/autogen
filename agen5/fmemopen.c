@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-07-08 22:25:16 bkorb"
+ * Time-stamp:      "2010-07-08 23:38:46 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -117,7 +117,7 @@ typedef unsigned char buf_bytes_t;
 typedef struct fmem_cookie_s fmem_cookie_t;
 struct fmem_cookie_s {
     mode_bits_t    mode;
-    buf_bytes_t   *buffer;
+    buf_bytes_t *  buffer;
     size_t         buf_size;    /* Full size of buffer */
     size_t         next_ix;     /* Current position */
     size_t         eof;         /* End Of File */
@@ -353,6 +353,7 @@ fmem_seek(void * cookie, fmem_off_t * p_offset, int dir)
     }
 
     pFMC->next_ix = new_pos;
+    *p_offset     = (fmem_off_t)new_pos;
     return new_pos;
 
  seek_oops:
@@ -360,17 +361,110 @@ fmem_seek(void * cookie, fmem_off_t * p_offset, int dir)
     return -1;
 }
 
-
+/**
+ * Free up the memory associated with an fmem file.
+ * If the user is managing the space, then the allocated bit is set.
+ */
 static int
-fmem_close(void *cookie)
+fmem_close(void * cookie)
 {
-    fmem_cookie_t *pFMC = cookie;
+    fmem_cookie_t * pFMC = cookie;
 
     if (pFMC->mode & FLAG_BIT(allocated))
         free(pFMC->buffer);
     free(pFMC);
 
     return 0;
+}
+
+/**
+ * Configure the user supplied buffer.
+ */
+static ag_bool
+fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
+{
+    /*
+     *  User allocated buffer.  User responsible for disposal.
+     */
+    if (len == 0) {
+        free(pFMC);
+        errno = EINVAL;
+        return AG_FALSE;
+    }
+
+    pFMC->buffer = (buf_bytes_t*)buf;
+
+    /*  Figure out where our "next byte" and EOF are.
+     *  Truncated files start at the beginning.
+     */
+    if (pFMC->mode & FLAG_BIT(truncate)) {
+        /*
+         *  "write" mode
+         */
+        pFMC->eof = \
+            pFMC->next_ix = 0;
+    }
+
+    else if (pFMC->mode & FLAG_BIT(binary)) {
+        pFMC->eof = len;
+        pFMC->next_ix    = (pFMC->mode & FLAG_BIT(append)) ? len : 0;
+
+    } else {
+        /*
+         * append or read text mode -- find the end of the buffer
+         * (the first NUL character)
+         */
+        buf_bytes_t *p = (buf_bytes_t*)buf;
+
+        pFMC->eof = 0;
+        while ((*p != NUL) && (++(pFMC->eof) < len))  p++;
+        pFMC->next_ix =
+            (pFMC->mode & FLAG_BIT(append)) ? pFMC->eof : 0;
+    }
+
+    /*
+     *  text mode - NUL terminate buffer, if it fits.
+     */
+    if (  ((pFMC->mode & FLAG_BIT(binary)) == 0)
+       && (pFMC->next_ix < len)) {
+        pFMC->buffer[pFMC->next_ix] = NUL;
+    }
+
+    pFMC->buf_size = len;
+    return AG_TRUE;
+}
+
+/**
+ * Allocate an initial buffer for fmem.
+ */
+static ag_bool
+fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
+{
+    /*
+     *  We must allocate the buffer.  If "len" is zero, set it to page size.
+     */
+    pFMC->mode |= FLAG_BIT(allocated);
+    if (len == 0)
+        len = pFMC->pg_size;
+
+    /*
+     *  Unallocated file space is set to NULs.  Emulate that.
+     */
+    pFMC->buffer = calloc((size_t)1, (size_t)len);
+    if (pFMC->buffer == NULL) {
+        errno = ENOMEM;
+        free(pFMC);
+        return AG_FALSE;
+    }
+
+    /*
+     *  We've allocated the buffer.  The end of file and next entry
+     *  are both zero.
+     */
+    pFMC->next_ix  = 0;
+    pFMC->eof      = 0;
+    pFMC->buf_size = len;
+    return AG_TRUE;
 }
 
 /*=export_func ag_fmemopen
@@ -480,52 +574,10 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         pFMC->pg_size = getpagesize();
 
     if (buf != NULL) {
-        /*
-         *  User allocated buffer.  User responsible for disposal.
-         */
-        if (len == 0) {
-            free(pFMC);
-            errno = EINVAL;
+        if (! fmem_config_user_buf(pFMC, buf, len))
             return NULL;
-        }
 
-        /*  Figure out where our "next byte" and EOF are.
-         *  Truncated files start at the beginning.
-         */
-        if (pFMC->mode & FLAG_BIT(truncate)) {
-            /*
-             *  "write" mode
-             */
-            pFMC->eof = \
-            pFMC->next_ix = 0;
-        }
-
-        else if (pFMC->mode & FLAG_BIT(binary)) {
-            pFMC->eof = len;
-            pFMC->next_ix    = (pFMC->mode & FLAG_BIT(append)) ? len : 0;
-
-        } else {
-            /*
-             * append or read text mode -- find the end of the buffer
-             * (the first NUL character)
-             */
-            buf_bytes_t *p = pFMC->buffer = (buf_bytes_t*)buf;
-            pFMC->eof = 0;
-            while ((*p != NUL) && (++(pFMC->eof) < len))  p++;
-            pFMC->next_ix =
-                (pFMC->mode & FLAG_BIT(append)) ? pFMC->eof : 0;
-        }
-
-        /*
-         *  text mode - NUL terminate buffer, if it fits.
-         */
-        if (  ((pFMC->mode & FLAG_BIT(binary)) == 0)
-           && (pFMC->next_ix < len)) {
-            pFMC->buffer[pFMC->next_ix] = NUL;
-        }
-    }
-
-    else if ((pFMC->mode & (FLAG_BIT(append) | FLAG_BIT(truncate))) == 0) {
+    } else if ((pFMC->mode & (FLAG_BIT(append) | FLAG_BIT(truncate))) == 0) {
         /*
          *  Not appending and not truncating.  We must be reading.
          *  We also have no user supplied buffer.  Nonsense.
@@ -535,33 +587,8 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         return NULL;
     }
 
-    else {
-        /*
-         *  We must allocate the buffer.  If "len" is zero, set it to page size.
-         */
-        pFMC->mode |= FLAG_BIT(allocated);
-        if (len == 0)
-            len = pFMC->pg_size;
-
-        /*
-         *  Unallocated file space is set to NULs.  Emulate that.
-         */
-        pFMC->buffer = calloc((size_t)1, (size_t)len);
-        if (pFMC->buffer == NULL) {
-            errno = ENOMEM;
-            free(pFMC);
-            return NULL;
-        }
-
-        /*
-         *  We've allocated the buffer.  The end of file and next entry
-         *  are both zero.
-         */
-        pFMC->next_ix = 0;
-        pFMC->eof = 0;
-    }
-
-    pFMC->buf_size   = len;
+    else if (! fmem_alloc_buf(pFMC, len))
+        return NULL;
 
 #ifdef TEST_FMEMOPEN
     saved_cookie = pFMC;
@@ -572,6 +599,9 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
             ?  (cookie_read_function_t*)fmem_read  : NULL;
         cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
             ? (cookie_write_function_t*)fmem_write : NULL;
+
+        FILE * res;
+
 #if defined(HAVE_FOPENCOOKIE)
         cookie_io_functions_t iof;
         iof.read  = pRd;
@@ -579,14 +609,16 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         iof.seek  = (cookie_seek_function_t* )fmem_seek;
         iof.close = (cookie_close_function_t*)fmem_close;
 
-        return fopencookie(pFMC, pMode, iof);
+        res = fopencookie(pFMC, pMode, iof);
 #elif defined(HAVE_FUNOPEN)
-        return funopen(pFMC, pRd, pWr,
-                       (cookie_seek_function_t* )fmem_seek,
-                       (cookie_close_function_t*)fmem_close);
+        res = funopen(pFMC, pRd, pWr,
+                      (cookie_seek_function_t* )fmem_seek,
+                      (cookie_close_function_t*)fmem_close);
 #else
 #       include "We have neither fopencookie(3GNU) nor funopen(3BSD)"
 #endif
+
+        return res;
     }
 }
 

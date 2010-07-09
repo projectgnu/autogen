@@ -1,3 +1,13 @@
+2010-07-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/defLoad.c (ready_input): new function.  Make readDefines()
+	smaller.
+	* agen5/expOutput.c (ag_scm_out_pop) return an empty string when
+	there is no output instead of "undefined".  Guile doesn't cope well.
+	(ag_scm_out_push_new) Use the temp directory for temp files.
+	* agen5/fmemopen.c (fmem_seek): return the seek position
+	(fmem_config_user_buf, fmem_alloc_buf) break these out of ag_fmemopen
+
 2010-07-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defFind.c (entryListSearch): rewrite the search children

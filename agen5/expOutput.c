@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-08 22:34:17 bkorb"
+ *  Time-stamp:        "2010-07-08 23:41:52 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -176,7 +176,10 @@ ag_scm_out_pop(SCM ret_contents)
     if (AG_SCM_BOOL_P(ret_contents) && SCM_NFALSEP(ret_contents)) {
         unsigned long pos = ftell(pCurFp->pFile);
 
-        if (pos != 0) {
+        if (pos == 0)
+            res = AG_SCM_STR2SCM("", pos);
+
+        else {
             char* pz = ag_scribble((size_t)pos);
             rewind(pCurFp->pFile);
             if (fread(pz, (size_t)pos, (size_t)1, pCurFp->pFile) != 1)
@@ -450,18 +453,17 @@ ag_scm_out_push_add(SCM new_file)
  *  @xref{output controls}.
 =*/
 SCM
-ag_scm_out_push_new( SCM new_file )
+ag_scm_out_push_new(SCM new_file)
 {
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
     if (AG_SCM_STRING_P(new_file)) {
-        open_output_file( AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
-                          write_mode, 0);
-        return SCM_UNDEFINED;
+        open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
+                         write_mode, 0);
     }
 
 #if defined(ENABLE_FMEMOPEN)
-    if (! HAVE_OPT( NO_FMEMOPEN ))
+    else if (HAVE_OPT(NO_FMEMOPEN))
 #endif
     {
         static char const mk_tmp_dir[] = "(make-tmp-dir)";
@@ -473,29 +475,30 @@ ag_scm_out_push_new( SCM new_file )
          *  the block is executed when a file name is not specified *and*
          *  --no-fmemopen was *not* selected.
          */
-        static char * pzTemp = NULL;
+        static char * temp_pat = NULL;
         static size_t tmplen = 0;
-
         char *  tmp_fnm;
         int     tmpfd;
 
-        if (pzTemp == NULL) {
+        if (temp_pat == NULL) {
             ag_scm_c_eval_string_from_file_line(mk_tmp_dir, __FILE__, line_no);
-            pzTemp = runShell("echo ${tmp_dir}/ag-XXXXXX");
-            tmplen = strlen(pzTemp) + 1;
+            temp_pat = runShell("echo ${tmp_dir}/ag-XXXXXX");
+            tmplen   = strlen(temp_pat);
         }
 
-        tmp_fnm = ag_scribble(tmplen);
-        memcpy(tmp_fnm, pzTemp, tmplen);
+        tmp_fnm = ag_scribble(tmplen + 1);
+        memcpy(tmp_fnm, temp_pat, tmplen + 1);
         tmpfd = mkstemp(tmp_fnm);
-        if (tmpfd < 0)
-            AG_CANT("mkstemp", pzTemp);
 
-        open_output_file(tmp_fnm, tmplen - 1, write_mode, FPF_TEMPFILE);
+        if (tmpfd < 0)
+            AG_ABEND(aprf("failed to create temp file from `%s'", temp_pat));
+
+        open_output_file(tmp_fnm, tmplen, write_mode, FPF_TEMPFILE);
         close(tmpfd);
-        return SCM_UNDEFINED;
     }
 #if defined(ENABLE_FMEMOPEN)
+
+    else
 
     {
         char *     pzNewFile;
