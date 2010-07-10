@@ -1125,33 +1125,32 @@ a single period will separate the suffix from the base name in constructing
 the output file name.
 
 @item
-Comments:  blank lines, lines starting with a hash mark [@code{#}]),
-and edit mode comments (text between pairs of @code{-*-} strings).
+Shell specification: to specify that the template was written expecting a
+particular shell to run the shell commands.  By default, the shell used is the
+autoconf-ed @code{CONFIG_SHELL}.  This will usually be @file{/bin/sh}.  The
+shell is specified by a hash mark (@code{#}) followed by an exclamation mark
+(@code{!}) followed by a full-path file name (e.g. @file{/usr/xpg4/bin/sh} on
+Solaris):
+@example
+[= Autogen5 Template c
+#!/usr/xpg4/bin/sh
+=]
+@end example
+
+@item
+Comments: blank lines, lines starting with a hash mark (@code{#}) and not
+specifying a shell, and edit mode markers (text between pairs of @code{-*-}
+strings) are all treated as comments.
 
 @item
 Some scheme expressions may be inserted in order to make configuration
-changes before template processing begins.  ``@code{before template
+changes before template processing begins.  ``@i{before template
 processing begins}'' means that there is no current output file, no current
 suffix and, basically, none of the AutoGen specific functions
 (@pxref{AutoGen Functions}) may be invoked.
 
-It is used, for example, to allow the template writer to specify
-the shell program that must be used to interpret the shell commands in
-the template.  It can have no effect on any shell commands in the
-definitions file, as that file will have been processed by the time
-the pseudo macro is interpreted.
-
-@example
-(setenv "SHELL" "/bin/sh")
-@end example
-
-@noindent
-This is extremely useful to ensure that the shell used is the one the
-template was written to use.  By default, AutoGen determines the shell
-to use by user preferences.  Sometimes, that can be the "csh", though.
-
-The scheme expression can also be used to save a pre-existing output
-file for later text extraction (@pxref{SCM extract}).
+The scheme expression can also be used, for example, to save a pre-existing
+output file for later text extraction (@pxref{SCM extract}).
 
 @example
 (shellf "mv -f %1$s.c %1$s.sav" (base-name))

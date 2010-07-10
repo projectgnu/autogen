@@ -1,5 +1,7 @@
-/*
- *  Time-stamp:      "2010-04-24 12:57:03 bkorb"
+/**
+ * \file configfile.c
+ *
+ *  Time-stamp:      "2010-07-09 11:01:44 bkorb"
  *
  *  configuration/rc/ini file handling.
  *

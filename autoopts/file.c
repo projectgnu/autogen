@@ -1,6 +1,8 @@
 
-/*
- *  Time-stamp:      "2010-02-24 08:41:17 bkorb"
+/**
+ * \file file.c
+ *
+ *  Time-stamp:      "2010-07-09 11:00:59 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.

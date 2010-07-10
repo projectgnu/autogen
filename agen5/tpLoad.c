@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-07-08 22:32:37 bkorb"
+ * Time-stamp:        "2010-07-10 16:38:34 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -43,11 +43,13 @@ static void
 wrap_up_depends(void);
 /* = = = END-STATIC-FORWARD = = = */
 
-
-LOCAL tTemplate*
+/**
+ * Return the template structure matching the name passed in.
+ */
+LOCAL tTemplate *
 findTemplate(char const * pzTemplName)
 {
-    tTemplate* pT = pNamedTplList;
+    tTemplate * pT = pNamedTplList;
     while (pT != NULL) {
         if (streqvcmp(pzTemplName, pT->pzTplName) == 0)
             break;
@@ -56,6 +58,9 @@ findTemplate(char const * pzTemplName)
     return pT;
 }
 
+/**
+ * the name is a regular file with read access
+ */
 static ag_bool
 read_okay(char const * pzFName)
 {
@@ -68,8 +73,7 @@ read_okay(char const * pzFName)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
+/**
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */

@@ -1,8 +1,8 @@
 
-/*
- *  agCgi.c
+/**
+ * \file agCgi.c
  *
- *  Time-stamp:        "2010-07-08 19:24:46 bkorb"
+ *  Time-stamp:        "2010-07-10 16:23:45 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned

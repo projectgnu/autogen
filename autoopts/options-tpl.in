@@ -1,13 +1,9 @@
 [= Autogen5 Template -*- Mode: scheme -*-
 
-#  List the output suffixes that are to be generated.
-#  Header must come first.  An env variable is set that
-#  is used in processing the C file.
-#
-# Time-stamp:      "2010-02-24 08:41:08 bkorb"
-
 h
 c
+
+# Time-stamp:      "2010-07-10 11:26:03 bkorb"
 
 # This file contains the templates used to generate the
 # option descriptions for client programs, and it declares
@@ -43,9 +39,8 @@ c
 (define ifdef-ed          (make-hash-table 31))
 (define tmp-ct            0)
 
+(setenv "SHELL"           "@CONFIG_SHELL@")
 (define extract-fmt       "\n/* extracted from %s near line %d */\n")
-
-(setenv "SHELL" "@CONFIG_SHELL@")
 
 =][=
 
@@ -69,17 +64,26 @@ c
      (if (exist? "library") (out-delete))
  )
 
- (dne " *  " "/*  ")    =]
- *
- * Generated from AutoOpts @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ templates.
- */[=
+ (dne " *  " "/*  ")        =][=
 
-  INCLUDE "optlib.tpl"  =]
-[= INVOKE Option_Copyright =][=
+CASE    (suffix)            =][=
 
-CASE    (suffix)        =][=
+== c                        =][=
 
-== h                    =][=
+   (if (exist? "library") (out-delete))  =][=
+
+   INVOKE Option_Copyright  =][=
+
+   INCLUDE "optcode"        =][= ;; create the option source code
+
+   (if (exist? "flag.extract-code")
+       (shellf "test -f %1$s.c && rm -f %1$s.c.save" (base-name)))  =][=
+
+== h                        =][=
+
+  INCLUDE "optlib.tpl"      =][=
+
+  INVOKE Option_Copyright   =][=
 
   `tried=""
    test_exe() {
@@ -304,18 +308,7 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
   =][=
   ENDFOR flag           =][=
 
-  include "opthead"     =][= # create the option header
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
-
-== c                    =][=
-
-   (if (exist? "library") (out-delete))  =][=
-
-   INCLUDE "optcode"    =][= ;; create the option source code
-
-   (if (exist? "flag.extract-code")
-       (shellf "test -f %1$s.c && rm -f %1$s.c.save" (base-name)))  =][=
+  include "opthead"     =][=
 
 ESAC =]
 /* [= (out-name) =] ends here */[=

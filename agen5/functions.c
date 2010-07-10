@@ -2,7 +2,7 @@
 /**
  *  \file functions.c
  *
- *  Time-stamp:        "2010-07-08 20:05:23 bkorb"
+ *  Time-stamp:        "2010-07-10 16:34:36 bkorb"
  *
  *  This module implements text functions.
  *
@@ -333,9 +333,7 @@ mLoad_Unknown(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 }
 
 
-/*
- *  mLoad_Bogus
- *
+/**
  *  Some functions are known to AutoGen, but invalid out of context.
  *  For example, ELIF, ELSE and ENDIF are all known to AutoGen.
  *  However, the load function pointer for those functions points

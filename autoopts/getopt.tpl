@@ -2,6 +2,14 @@
 
    h=%s-temp.h
    c=%s-temp.c
++][+
+
+`stamp=\`sed 's,.*stamp:,,' <<\_EOF_
+  Time-stamp:        "2010-07-09 14:38:38 bkorb"
+_EOF_
+\` `
+
++][+
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -22,12 +30,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-+][+
-
-`stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2007-05-28 18:05:40 bkorb"
-_EOF_
-\` `
 +][+
 
 DEFINE emit-usage-string    +][+

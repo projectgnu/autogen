@@ -1,8 +1,12 @@
-[+:   -*- nroff -*-
+[+:  AutoGen5 template -*- shell-script -*-
+
+null
+
+:+][+:
 
 ## agman-lib.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-02-24 08:41:28 bkorb"
+## Time-stamp:      "2010-07-09 14:28:52 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -25,18 +29,9 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 ##
-## ---------------------------------------------------------------------
-## $Id: dc0e4a2a918990f0b16e68a410204e9a9da77ca2 $
-## ---------------------------------------------------------------------
-##
 ## This "library" converts texi-isms into man-isms.  It gets included
 ## by the man page template at the point where texi-isms might start appearing
 ## and then "emit-man-text" is invoked when all the text has been assembled.
-##
-
-AutoGen5 template null
-
-:+][+:
 
     ;; * * * * * * * * * * * * * * * * * * * * * * * * *
     ;;
@@ -45,6 +40,8 @@ AutoGen5 template null
     ;;
     ;;  And run the entire output through "sed" to convert texi-isms
     ;;
+:+][+:
+
     (out-push-new)
 
 :+]sed \

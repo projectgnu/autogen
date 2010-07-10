@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-07-08 23:38:46 bkorb"
+ * Time-stamp:      "2010-07-10 16:33:59 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -140,10 +140,16 @@ static ssize_t
 fmem_write(void *cookie, const void *pBuf, size_t sz);
 
 static seek_pos_t
-fmem_seek(void *cookie, fmem_off_t *p_offset, int dir);
+fmem_seek(void * cookie, fmem_off_t * p_offset, int dir);
 
 static int
-fmem_close(void *cookie);
+fmem_close(void * cookie);
+
+static ag_bool
+fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len);
+
+static ag_bool
+fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef TEST_FMEMOPEN
@@ -610,12 +616,10 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         iof.close = (cookie_close_function_t*)fmem_close;
 
         res = fopencookie(pFMC, pMode, iof);
-#elif defined(HAVE_FUNOPEN)
+#else
         res = funopen(pFMC, pRd, pWr,
                       (cookie_seek_function_t* )fmem_seek,
                       (cookie_close_function_t*)fmem_close);
-#else
-#       include "We have neither fopencookie(3GNU) nor funopen(3BSD)"
 #endif
 
         return res;

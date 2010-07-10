@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:41:57 bkorb"
+# Time-stamp:        "2010-07-10 11:33:04 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +23,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 69403d9499b4cc3adae4c047c10ab9b5d488ab4d $
 # ----------------------------------------------------------------------
 
 . ./defs
@@ -31,25 +30,28 @@
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating ${testname}.tpl
-cat > ${testname}.tpl <<'_EOF_'
-<= AutoGen5 template fnord null =>
-THIS TEXT SHOULD BE DELETED!!
-<=
-CASE (suffix) =><=
-
-  ==  fnord  =><=
-
-    (error "0 this is really okay")
-    =>this is never seen<=
-
-  * =><=
-
-    (error "This is a multi-line
-	error to show how to exit
-	your template") =><=
-
-ESAC =>
-this is never seen
+sed 's/[ 0-9]*=//' > ${testname}.tpl <<'_EOF_'
+  1 =<= AutoGen5 template fnord null =>
+  2 =THIS TEXT SHOULD BE DELETED!!
+  3 =<=
+  4 =CASE (suffix) =><=
+  5 =
+  6 =  ==  fnord  =><=
+  7 =
+  8 =    ;; (out-push-new)
+  9 =    ;; (error (string-append "0 this is really okay" (out-pop #t))
+ 10 =    (error "0 this is really okay")
+ 11 =
+ 12 =    =>this is never seen<=
+ 13 =
+ 14 =  * =><=
+ 15 =
+ 16 =    (error "This is a multi-line
+ 17 =	error to show how to exit
+ 18 =	your template") =><=
+ 19 =
+ 20 =ESAC =>
+ 21 =this is never seen
 _EOF_
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -85,8 +87,8 @@ echo creating ${testname}.base2
 cat > ${testname}.base2 <<'_EOF_'
 DEFINITIONS Warning in error.tpl line 8 for error2.fnord:
 	0 this is really okay
-Error in template error.tpl, line 13
-	DEFINITIONS ERROR in error.tpl line 13 for /dev/null:
+Error in template error.tpl, line 16
+	DEFINITIONS ERROR in error.tpl line 16 for /dev/null:
 	This is a multi-line
 	error to show how to exit
 	your template
@@ -133,16 +135,25 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
 
 # this is *supposed* to exit with a failure status
 ( set +x ; VERBOSE=false
+  unset AUTOGEN_TRACE AUTOGEN_TRACE_OUT
   run_ag x3 -T${testname}2.tpl ${agopts}3 2> ${testname}.tmp3
 ) && failure Unexpected success for AutoGen
 
-sed -e 's,on signal .* in state,on signal <text-varies> in state,' \
-  ${testname}.tmp3 >> ${testname}.trc3
-sed -e '/trapped on [1-9]/d' \
-    -e '/ signal.*Child exited/d' \
-    -e '/Abort/d' \
-    -e '/Broken pipe/d' ${testname}.trc3 > XXX
-mv -f XXX ${testname}.trc3
+# Lots of variations happen based on timing.
+# Remove the variations and verify the basic.
+#
+sedcmd=`
+    cat <<- _EOF_
+	s,on signal .* in state,on signal <text-varies> in state,
+	/trapped on [0-9]/d
+	/ signal.*Child exited/d
+	/Abort/d
+	/Broken pipe/d
+	/Last command issued:/,/ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd/d
+	/^[ 	]*$/d
+	_EOF_
+`
+sed -e "${sedcmd}" ${testname}.tmp3 > ${testname}.trc3
 cmp -s ${testname}.trc3 ${testname}.base3 || \
   failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"
 

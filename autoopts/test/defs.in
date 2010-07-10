@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-06-26 08:41:59 bkorb"
+# Time-stamp:     "2010-07-10 16:41:22 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -25,9 +25,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-#
-# $Id: bb10618168ef46a07de8b1e551b7b98750e0ed0b $
-# ----------------------------------------------------------------------
 
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`
@@ -43,6 +40,7 @@ export progname testname
 # if it does not exist.  We want to be able to run the tests
 # stand-alone!!
 #
+set -a
 srcdir=`cd "@srcdir@" && pwd `
 top_srcdir=`cd "@top_srcdir@" && pwd`
 top_builddir=`cd @top_builddir@ && pwd`
@@ -59,6 +57,7 @@ GDexe="@GDexe@"
 INC="@LIBGUILE_CFLAGS@"
 LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
 DEBUG_ENABLED='@DEBUG_ENABLED@'
+ulimit -c unlimited
 
 test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
 test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
@@ -66,6 +65,9 @@ test -z "${testsubdir}" && testsubdir='@testsubdir@'
 test -z "${CC}"         && CC='@CC@'
 test -z "${CC}"         && echo "No CC configured" && exit 1
 test -z "${PAGER}"      && PAGER=more
+
+set +a
+
 nl='
 '
 test -z "${BASH_VERSION}" && local() { : ; }
@@ -194,7 +196,7 @@ be_verbose()
         tfile=${testname}-aglog-${1}-$$.log
         shift
         MALLOC_CHECK_=2 \
-            ${AGexe} --trace=every --trace-out=${tfile} "$@"
+            ${AGexe} --trace=every --trace-out=">>${tfile}" "$@"
     }
 
     init_tests
@@ -211,8 +213,7 @@ failure()
   then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
   else mkdir ../FAILURES ; fi
 
-  set +x
-  exec > /dev/null 2>&8
+  exec > /dev/tty 2>&8
   cat ${logfile} >&2
 
   ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
@@ -290,7 +291,7 @@ stdopts=${srcdir}/stdopts.def
 #  All the tests will require the templates in the autoopts dir.
 #
 AUTOGEN_TEMPL_DIRS=`cd ${top_srcdir} > /dev/null ; pwd`/autoopts
-AG_L=${AGexe}\ -L${AUTOGEN_TEMPL_DIRS}
+AG_L=${AGexe}\ -L${AUTOGEN_TEMPL_DIRS}\ -m
 export AUTOGEN_TEMPL_DIRS AG_L
 
 #  In general, they will have a test main procedure, too.

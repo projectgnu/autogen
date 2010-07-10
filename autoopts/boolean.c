@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-02-24 08:41:21 bkorb"
+/**
+ * \file boolean.c
+ *
+ * Time-stamp:      "2010-07-09 11:02:10 bkorb"
  *
  *   Automated Options Paged Usage module.
  *

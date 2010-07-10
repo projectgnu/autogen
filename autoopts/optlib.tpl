@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2010-07-03 10:44:04 bkorb"
+# Time-stamp:      "2010-07-10 10:11:43 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -21,8 +21,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-#
-# $Id: 2ed5d924d0fd72036f72141b69a78aba0bb83bc3 $
 
 =][=
 
@@ -263,15 +261,17 @@ ENDDEF set-defines
 Emit the copyright comment  =][=
 
 DEFINE Option_Copyright =]
-/*
- *  This file was produced by an AutoOpts template.  AutoOpts is a
- *  copyrighted work.  This [=
- (if (= "h" (suffix)) "header" "source") =] file is not encumbered by AutoOpts
- *  licensing, but is provided under the licensing terms chosen by the
- *  [= prog-name =] author or copyright holder.  AutoOpts is licensed under
- *  the terms of the LGPL.  The redistributable library (``libopts'') is
- *  licensed under the terms of either the LGPL or, at the users discretion,
- *  the BSD license.  See the AutoOpts and/or libopts sources for details.[=
+ *
+ * Generated from AutoOpts @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ templates.
+ *
+ *  AutoOpts is a copyrighted work.  This [=
+ (if (= "h" (suffix)) "header" "source") =] file is not encumbered
+ *  by AutoOpts licensing, but is provided under the licensing terms chosen
+ *  by the [= prog-name =] author or copyright holder.  AutoOpts is
+ *  licensed under the terms of the LGPL.  The redistributable library
+ *  (``libopts'') is licensed under the terms of either the LGPL or, at the
+ *  users discretion, the BSD license.  See the AutoOpts and/or libopts sources
+ *  for details.[=
 
 IF (exist? "copyright") =]
  *

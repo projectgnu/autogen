@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-06-25 13:31:42 bkorb"
+# Time-stamp:        "2010-07-09 15:04:08 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -145,17 +145,21 @@ then
 else case `set -o` in *posix*) set -o posix ;; esac
 fi
 trap_exit() {
-  echo trapped on signal ${1} >&2
-  if test -d "${tmp_dir}" ; then
-    if test ${1} -eq 0
-    then rm -rf ${tmp_dir}
-    else echo "temp directory has been retained:  ${tmp_dir}"
-    fi
-  fi
+    case "$1" in
+    0 | 10 | 15 )
+        exec 1>&- 2>&-
+        test -d "${tmp_dir}" && rm -rf "${tmp_dir}"
+        ;;
+
+    * )
+        exec 1>&2
+        echo "trapped on signal ${1}"
+        test -d "${tmp_dir}" && \
+            echo "temp directory has been retained:  ${tmp_dir}"
+    esac
 }
-for f in 1 2 5 6 7 13 14
+for f in 0 1 2 5 6 7 10 13 14 15
 do trap "trap_exit ${f}" $f ; done
-trap '' 0
 
 test -n "${CDPATH}" && {
   CDPATH=''

@@ -1,4 +1,4 @@
-2010-07-08  Bruce Korb  <bkorb@gnu.org>
+2010-07-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/defLoad.c (ready_input): new function.  Make readDefines()
 	smaller.
@@ -7,6 +7,20 @@
 	(ag_scm_out_push_new) Use the temp directory for temp files.
 	* agen5/fmemopen.c (fmem_seek): return the seek position
 	(fmem_config_user_buf, fmem_alloc_buf) break these out of ag_fmemopen
+	* agen5/autogen.c (setup_signals): add a special handler parameter
+	for SIGABRT.  Make sure our dying child shell won't shoot us.
+	(done_check): make sure we exit-fail when called outside of DONE state.
+	Also, call _exit() to bypass all of Guile's broken cleanup.
+	* agen5/loadPseudo.c (handle_hash_line): new function to handle
+	hash-marked comments -- in case a ``#!/path/to/shell'' comment is found
+	* agen5/test/expr.test (DEBUG_ENABLED): export this for testing when
+	we are in a debug build environment.
+	* agen5/test/opts.test (unstamp): sometimes the template version info
+	varies, too.  Remove this, too.
+	* autoopts/autogen.map (file-name): we need to scan over characters in
+	a file name for the /path/to/shell stuff.
+	* autoopts/bootstrap.dir: burn the library version into optlib.tpl
+	* */*.c: add many ``/** \file'' marks.
 
 2010-07-03  Bruce Korb  <bkorb@gnu.org>
 

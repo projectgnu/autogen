@@ -1,7 +1,8 @@
+
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-07-08 19:22:12 bkorb"
+ *  Time-stamp:        "2010-07-10 16:29:20 bkorb"
  *
  *  This module implements formatting expression functions.
  *

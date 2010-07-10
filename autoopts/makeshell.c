@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-04-24 14:03:12 bkorb"
+/**
+ * \file makeshell.c
+ *
+ * Time-stamp:      "2010-07-09 10:57:30 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.

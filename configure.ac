@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-02-27 16:10:03 bkorb"
+dnl Time-stamp:      "2010-07-10 16:45:16 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -19,9 +19,6 @@ dnl See the GNU General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU General Public License along
 dnl with this program.  If not, see <http://www.gnu.org/licenses/>.
-dnl --------------------------------------------------------------------
-dnl Code: $Id: 17cabd1504b13d3593e1a80703580ed3dc3ec868 $
-dnl --------------------------------------------------------------------
 dnl
 AC_INIT()
 AC_CONFIG_SRCDIR(agen5/autogen.c)
@@ -211,7 +208,7 @@ test ${GUILE_VERSION} -ge 108000 \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
        -Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-       -fno-strict-aliasing -O4`
+       -fno-strict-aliasing`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
 

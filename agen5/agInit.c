@@ -2,7 +2,7 @@
 /**
  *  \file agInit.c
  *
- *  Time-stamp:      "2010-07-08 20:19:47 bkorb"
+ *  Time-stamp:      "2010-07-10 16:28:10 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -48,6 +48,9 @@ add_env_vars(void);
 
 #include "expr.ini"
 
+/**
+ * Various initializations
+ */
 LOCAL void
 initialize(int arg_ct, char** arg_vec)
 {
@@ -104,6 +107,9 @@ initialize(int arg_ct, char** arg_vec)
 #endif /* DAEMON_ENABLED */
 }
 
+/**
+ * make a name resilient to machinations made by 'make'.
+ */
 static char const *
 make_quote_str(char const * str)
 {
@@ -138,6 +144,9 @@ make_quote_str(char const * str)
     return scan;
 }
 
+/**
+ * Error in dependency specification
+ */
 static void
 dep_usage(char const * fmt, ...)
 {
@@ -154,6 +163,9 @@ dep_usage(char const * fmt, ...)
     USAGE(EXIT_FAILURE);
 }
 
+/**
+ * Configure dependency option
+ */
 LOCAL void
 config_dep(tOptions* pOptions, tOptDesc* pOptDesc)
 {
@@ -287,11 +299,8 @@ add_env_vars(void)
         struct utsname unm;
 
         add_sys_env(z);
-        if (uname(&unm) != 0) {
-            fprintf(stderr, "Error %d (%s) making uname(2) call\n",
-                    errno, strerror(errno));
-            exit(EXIT_FAILURE);
-        }
+        if (uname(&unm) != 0)
+            AG_CANT("uname(2)", "syscall");
 
         sprintf(z+2, "%s__", unm.sysname);
         add_sys_env(z);
@@ -622,7 +631,7 @@ becomeDaemon(char const * pzStdin, char const * pzStdout, char const * pzStderr,
         break;
 
     default:
-        exit(0);  /* parent process - silently go away */
+        exit(EXIT_SUCCESS);  /* parent process - silently go away */
     }
 
     umask(0);

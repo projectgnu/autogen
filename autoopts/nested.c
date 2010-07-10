@@ -1,6 +1,8 @@
 
-/*
- *  Time-stamp:      "2010-02-24 08:41:12 bkorb"
+/**
+ * \file nested.c
+ *
+ *  Time-stamp:      "2010-07-09 10:57:19 bkorb"
  *
  *   Automated Options Nested Values module.
  *

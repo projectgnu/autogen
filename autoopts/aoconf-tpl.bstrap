@@ -2,7 +2,9 @@
 
 in=autoopts-config.in
 
-## Time-stamp:      "2010-04-24 13:59:34 bkorb"
+#!/bin/sh
+
+## Time-stamp:      "2010-07-09 10:52:11 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -24,8 +26,6 @@ in=autoopts-config.in
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-##
-## ---------------------------------------------------------------------
 ##
 ## This file is used for bootstrapping only.  Useful _only_ for
 ## checked out source files.

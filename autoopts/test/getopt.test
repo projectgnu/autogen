@@ -36,6 +36,7 @@ CFLAGS=''
 INC=''
 
 compile_getopt() {
+  local PS4='>cgo> '
   run_ag opts -L${TMPDIR} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
@@ -68,12 +69,11 @@ compile_getopt() {
 #
 mkdir -p ${TMPDIR}/autoopts
 
-CFLAGS="-I${TMPDIR} ${CFLAGS} ${INC}"
+CFLAGS="-I${TMPDIR}"
 LDFLAGS="${LDFLAGS} ${LIB}"
 export CFLAGS LDFLAGS TMPDIR
 
-aolib=${top_builddir}/autoopts/.libs/libopts.a
-test -f ${aolib} || aolib=${top_builddir}/autoopts/libopts.a
+aolib=`find ${top_builddir}/autoopts -type f -name libopts.a`
 case " ${LDFLAGS} " in
 *' -lgen '* ) aolib=${aolib}\ -lgen ;;
 esac

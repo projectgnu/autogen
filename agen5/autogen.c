@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-03 08:57:41 bkorb"
+ *  Time-stamp:        "2010-07-10 11:28:16 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -48,6 +48,9 @@ static void
 inner_main(int argc, char ** argv);
 
 static void
+exit_cleanup(wait_for_pclose_enum_t cl_wait);
+
+static void
 cleanup_and_abort(int sig);
 
 static void
@@ -60,8 +63,9 @@ static void
 done_check(void);
 
 static void
-setup_signals(sighandler_proc_t* chldHandler,
-              sighandler_proc_t* dfltHandler);
+setup_signals(sighandler_proc_t * chldHandler,
+              sighandler_proc_t * abrtHandler,
+              sighandler_proc_t * dfltHandler);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
@@ -70,11 +74,11 @@ setup_signals(sighandler_proc_t* chldHandler,
 static void
 inner_main(int argc, char ** argv)
 {
+    ag_scmStrings_init();
     atexit(done_check);
     initialize(argc, argv);
 
     procState = PROC_STATE_LOAD_DEFS;
-    ag_scmStrings_init();
     readDefines();
 
     /*
@@ -94,8 +98,9 @@ inner_main(int argc, char ** argv)
     }
 
     procState = PROC_STATE_DONE;
-    setup_signals(SIG_DFL, SIG_DFL);
-    exit(EXIT_SUCCESS);
+    setup_signals(SIG_DFL, SIG_IGN, SIG_DFL);
+    done_check();
+    /* NOTREACHED */
 }
 
 /**
@@ -115,7 +120,7 @@ main(int argc, char ** argv)
     if (sigsetjmp(abendJumpEnv, 0) != 0)
         cleanup_and_abort(abendJumpSignal);
 
-    setup_signals(ignore_signal, catch_sig_and_bail);
+    setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
 
 #if GUILE_VERSION >= 107000
     if (getenv("GUILE_WARN_DEPRECATED") == NULL)
@@ -144,10 +149,14 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
     }
 
 #ifdef SHELL_ENABLED
-    ag_scm_c_eval_string_from_file_line(
-        "(if (> (string-length shell-cleanup) 0)"
-        " (shell shell-cleanup) )", __FILE__, __LINE__ - 1 );
-    closeServer();
+    {
+        static char const form[] =
+            "(if (> (string-length shell-cleanup) 0)"
+            " (shellf \"( (set -x;%s) & )\" "
+                     "shell-cleanup) )";
+        ag_scm_c_eval_string_from_file_line(form, __FILE__, __LINE__ - 3);
+        closeServer();
+    }
 #endif
 
     fflush(stdout);
@@ -228,7 +237,7 @@ cleanup_and_abort(int sig)
         fprintf(stderr, zAt, pzFl, line, pzFn, fnCd);
     }
 
-    setup_signals(SIG_DFL, SIG_DFL);
+    setup_signals(SIG_DFL, SIG_DFL, SIG_DFL);
 
 #ifdef HAVE_SYS_RESOURCE_H
     /*
@@ -297,7 +306,8 @@ done_check(void)
         "\t%s on line %d\n";
 
 #if GUILE_VERSION >= 107000
-    int exit_code = EXIT_SUCCESS;
+    int exit_code = (procState != PROC_STATE_DONE)
+        ? EXIT_FAILURE : EXIT_SUCCESS;
 #endif
 
     /*
@@ -309,8 +319,6 @@ done_check(void)
             return;
         done_check_done = 1;
     }
-
-    exit_cleanup(EXIT_PCLOSE_WAIT);
 
     switch (procState) {
     case PROC_STATE_EMITTING:
@@ -399,19 +407,13 @@ done_check(void)
             AGFREE(pz);
         } while (0);
 
-        fclose(stderr);
         unlink(pzTmpStderr);
         AGFREE(pzTmpStderr);
         pzTmpStderr = NULL;
     }
 
-#if GUILE_VERSION >= 107000
-    if (exit_code != EXIT_SUCCESS) {
-        fflush(stderr);
-        fflush(stdout);
-        _exit(exit_code);
-    }
-#endif
+    exit_cleanup(EXIT_PCLOSE_WAIT);
+    _exit(exit_code);
 }
 
 
@@ -460,8 +462,9 @@ ag_abend_at(char const * pzMsg
 
 
 static void
-setup_signals(sighandler_proc_t* chldHandler,
-              sighandler_proc_t* dfltHandler)
+setup_signals(sighandler_proc_t * chldHandler,
+              sighandler_proc_t * abrtHandler,
+              sighandler_proc_t * dfltHandler)
 {
     struct sigaction  sa;
     int    sigNo  = 1;
@@ -490,6 +493,10 @@ setup_signals(sighandler_proc_t* chldHandler,
 #endif
         case SIGCHLD:
             sa.sa_handler = chldHandler;
+            break;
+
+        case SIGABRT:
+            sa.sa_handler = abrtHandler;
             break;
 
             /*

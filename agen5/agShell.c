@@ -1,7 +1,7 @@
-/*
- *  agShell
+/**
+ * \file agShell
  *
- *  Time-stamp:        "2010-04-04 10:39:46 bkorb"
+ *  Time-stamp:        "2010-07-09 14:58:56 bkorb"
  *
  *  Manage a server shell process
  *
@@ -87,7 +87,7 @@ closeServer( void )
      *  are aborting, we just let the OS close these file descriptors.
      */
     if (procState != PROC_STATE_ABORTING) {
-        (void)fclose( serverPair.pfRead );
+        (void)fclose(serverPair.pfRead);
         /*
          *  This is _completely_ wrong, but sometimes there are data left
          *  hanging about that gets sucked up by the _next_ server shell
@@ -96,8 +96,8 @@ closeServer( void )
          *  the initialization string twice.  It must be a broken timing
          *  issue in the Linux stdio code.  I have no other explanation.
          */
-        fflush( serverPair.pfWrite );
-        (void)fclose( serverPair.pfWrite );
+        fflush(serverPair.pfWrite);
+        (void)fclose(serverPair.pfWrite);
     }
 
     serverPair.pfRead = serverPair.pfWrite = NULL;
@@ -320,9 +320,9 @@ chainOpen( int       stdinFd,
         fflush( pfTrace );
     }
 
-    execvp( (char*)pzShell, (char**)ppArgs );
-    AG_ABEND( aprf( "Could not execvp( '%s', ... ):  %d - %s\n",
-                    pzShell, errno, strerror( errno )));
+    execvp((char*)pzShell, (char**)ppArgs);
+    AG_ABEND(aprf("Could not execvp( '%s', ... ):  %d - %s\n",
+                  pzShell, errno, strerror(errno)));
     /* NOTREACHED */
     return -1;
 }

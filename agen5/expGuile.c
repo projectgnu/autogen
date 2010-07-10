@@ -2,7 +2,7 @@
 /**
  *  \file expGuile.c
  *
- *  Time-stamp:        "2010-07-08 20:03:16 bkorb"
+ *  Time-stamp:        "2010-07-10 16:29:48 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -27,15 +27,15 @@
 LOCAL teGuileType
 gh_type_e(SCM typ)
 {
-    if (AG_SCM_BOOL_P(   typ))   return GH_TYPE_BOOLEAN;
-    if (AG_SCM_SYM_P(    typ))   return GH_TYPE_SYMBOL;
-    if (AG_SCM_STRING_P( typ))   return GH_TYPE_STRING;
-    if (AG_SCM_IS_PROC(  typ))   return GH_TYPE_PROCEDURE;
-    if (AG_SCM_CHAR_P(   typ))   return GH_TYPE_CHAR;
-    if (AG_SCM_VEC_P(    typ))   return GH_TYPE_VECTOR;
-    if (AG_SCM_PAIR_P(   typ))   return GH_TYPE_PAIR;
-    if (AG_SCM_NUM_P(    typ))   return GH_TYPE_NUMBER;
-    if (AG_SCM_LIST_P(   typ))   return GH_TYPE_LIST;
+    if (AG_SCM_BOOL_P(  typ)) return GH_TYPE_BOOLEAN;
+    if (AG_SCM_SYM_P(   typ)) return GH_TYPE_SYMBOL;
+    if (AG_SCM_STRING_P(typ)) return GH_TYPE_STRING;
+    if (AG_SCM_IS_PROC( typ)) return GH_TYPE_PROCEDURE;
+    if (AG_SCM_CHAR_P(  typ)) return GH_TYPE_CHAR;
+    if (AG_SCM_VEC_P(   typ)) return GH_TYPE_VECTOR;
+    if (AG_SCM_PAIR_P(  typ)) return GH_TYPE_PAIR;
+    if (AG_SCM_NUM_P(   typ)) return GH_TYPE_NUMBER;
+    if (AG_SCM_LIST_P(  typ)) return GH_TYPE_LIST;
 
     return GH_TYPE_UNDEFINED;
 }

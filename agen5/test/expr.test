@@ -35,6 +35,11 @@ PS4='>expr> '
 mkdir ${testname}.d
 cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
    ${top_srcdir}/agen5/func*.c ${testname}.d/.
+f=`fgrep '#ifdef DEBUG_ENABLED' ${top_srcdir}/agen5/expr.ini`
+test -n "$f" && {
+    DEBUG_ENABLED=true
+    export DEBUG_ENABLED
+}
 
 exec 3> ${testname}.d/${testname}.sh
 cat  >&3 <<- _EOF_
@@ -68,12 +73,13 @@ fi
 
 sed -n '/^make_exprini()/,/^[}]/p' \
     ${top_srcdir}/agen5/bootstrap.dir | \
-      sed '1d' >&3
+      sed '1,/local PS4=/d;/^[}]$/d' >&3
 exec 3>&-
 
 #  Remove the lines that *will* be different, always...
 #
-( cd ${testname}.d ; srcdir=. PS4='>exprini> ' \
+( 
+ cd ${testname}.d ; srcdir=. PS4=">${testname}-x> " \
     ${SHELL} -x ./${testname}.sh )
 sed '/DO NOT EDIT/,/and the template/d' ${testname}.d/expr.ini > expr.res
 sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \

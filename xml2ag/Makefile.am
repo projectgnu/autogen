@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-08 21:52:15 bkorb"
+## Time-stamp:      "2010-07-10 16:47:54 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -21,7 +21,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-## ---------------------------------------------------------------------
+##
 TARG = xml2ag
 
 bin_PROGRAMS    = xml2ag

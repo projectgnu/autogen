@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 15:04:37 bkorb"
+# Time-stamp:        "2010-07-10 10:42:10 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -87,8 +87,7 @@ config_configurables()
     sed="-e 's/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/'"
     case "${AG_PATCHLEVEL}" in
     ( *[0-9]pre[1-9]* ) : ;;
-    ( * ) sed="${sed} -e '/^case .*GCC.* in/,/^esac/d'"
-    ;;
+    ( * ) sed="${sed} -e '/^case .*GCC.* in/,/^esac/d'" ;;
     esac
     sed="${sed} -e '/==ADD_CONFIG_FILES==/{${nl}s/.*//${nl}"
     sed="${sed}r configure.files${nl}}'"

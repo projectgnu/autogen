@@ -1,7 +1,6 @@
 #! /bin/sh
-#
-## Time-stamp:      "2010-02-24 08:39:54 bkorb"
-## ident            $Id: f3d41aac1c74575607f3cc7a2144af65739482ed $
+
+## Time-stamp:      "2010-07-10 16:44:43 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.

@@ -3,7 +3,9 @@
 h
 c
 
-## Time-stamp:      "2010-02-24 08:41:22 bkorb"                                 
+#!/bin/sh
+
+## Time-stamp:      "2010-07-09 10:51:55 bkorb"                                 
 ## Author:          Bruce Korb <bkorb@gnu.org>                                  
 ##                                                                              
 ##  This file is part of AutoOpts, a companion to AutoGen.                      

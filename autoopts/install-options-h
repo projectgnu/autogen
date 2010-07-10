@@ -1,7 +1,6 @@
 #! /bin/sh
-set -x
 
-# Time-stamp:        "2010-02-24 08:41:14 bkorb"
+# Time-stamp:        "2010-07-09 10:59:28 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -78,3 +77,16 @@ fi >&3
 sed '1,/endif.*HAVE_SYSEXITS_H/d' ${opthdrsrc} >&3
 
 exec 3>&-
+
+sedcmd='1,20{
+  /^#!\//s@.*@#!'${CONFIG_SHELL}'@
+}'
+
+cd ${pkgdatadir}
+for f in *.tpl
+do  txt=`egrep '^#!/' $f` 2>/dev/null
+    test -z "$txt" && continue
+    sed "${sedcmd}" $f > $f.tmp
+    touch -r $f $f.tmp
+    mv -f $f.tmp $f
+done

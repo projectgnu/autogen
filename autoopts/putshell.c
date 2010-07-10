@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-02-25 14:19:47 bkorb"
+/**
+ * \file putshell.c
+ *
+ * Time-stamp:      "2010-07-09 10:56:47 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that

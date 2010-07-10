@@ -1,7 +1,8 @@
+
 /**
  * \file defLoad.c
  *
- *  Time-stamp:        "2010-07-08 22:09:30 bkorb"
+ *  Time-stamp:        "2010-07-10 16:28:51 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -41,6 +42,9 @@ static void*      pAllocList     = NULL;
 /* = = = START-STATIC-FORWARD = = = */
 static tDefEntry*
 insertDef(tDefEntry* pDef);
+
+static def_input_mode_t
+ready_input(char const ** ppzfile, size_t * psz);
 /* = = = END-STATIC-FORWARD = = = */
 
 #if defined(DEBUG_ENABLED)

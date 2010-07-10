@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-07-08 21:12:12 bkorb"
+# Time-stamp:        "2010-07-10 16:47:09 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -207,8 +207,6 @@ set_config_values
 setup_exports
 printf '\n\n\n\n' >&2
 
-set -x
-
 sanity_check
 run_getdefs
 
@@ -224,7 +222,7 @@ cat > autogen.texi <<- _EOF_
 	@include ${GEN_BASE}.texi
 	_EOF_
 test -f ${GEN_BASE}.texi || die "MISSING: ${GEN_BASE}.texi"
-set +x
+
 exec 2>&8 8>&-
 
 exit 0

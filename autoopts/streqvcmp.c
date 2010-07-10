@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-02-24 08:40:13 bkorb"
+/**
+ * \file streqvcmp.c
+ *
+ * Time-stamp:      "2010-07-09 10:56:09 bkorb"
  *
  *  String Equivalence Comparison
  *

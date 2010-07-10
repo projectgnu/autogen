@@ -1,7 +1,11 @@
 
-/*
+/**
+ * \file loadPseudo.c
  *
- *  Time-stamp:        "2010-06-30 21:22:48 bkorb"
+ *  Find the start and end macro markers.  In btween we must find the
+ *  "autogen" and "template" keywords, followed by any suffix specs.
+ *
+ *  Time-stamp:        "2010-07-10 16:35:39 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -22,12 +26,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- *  loadPseudoMacro
- *
- *  Find the start and end macro markers.  In btween we must find the
- *  "autogen" and "template" keywords, followed by any suffix specs.
- */
 #define DEFINE_FSM
 #include "pseudo-fsm.h"
 
@@ -38,11 +36,14 @@ tSCC zTpName[] = "template";
 static char const *
 do_scheme_expr(char const * pzData, char const * pzFileName);
 
+static char const *
+handle_hash_line(char const * pz);
+
 static te_pm_event
 next_pm_token(char const **  ppzData, te_pm_state fsm_state);
 
 static char const *
-copyMarker(char const * pzData, char* pzMark, size_t * pCt);
+copy_mark(char const * pzData, char* pzMark, size_t * pCt);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -133,7 +134,7 @@ doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
      *  Otherwise, the suffix construct is saved only for the main template,
      *  and only when the --select-suffix option was not specified.
      */
-    if ( (pzFileName != NULL)
+    if (  (pzFileName != NULL)
        && (  (procState != PROC_STATE_LOAD_TPL)
           || HAVE_OPT(SELECT_SUFFIX)))
         return pzResult;
@@ -207,6 +208,44 @@ doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
     return pzResult;
 }
 
+static char const *
+handle_hash_line(char const * pz)
+{
+    char const * res = strchr(pz, '\n');
+    if (res == NULL)
+        AG_ABEND("Invalid template file");
+
+    /*
+     *  If the comment starts with "#!/", then see if it names
+     *  an executable.  If it does, it is specifying a shell to use.
+     */
+    if ((pz[1] == '!') && (pz[2] == '/')) {
+        char const * pzScn = pz + 3;
+        char * nmbuf;
+        size_t len;
+
+        while (IS_FILE_NAME_CHAR(*pzScn))   pzScn++;
+
+        len   = pzScn - (pz + 2);
+        nmbuf = ag_scribble(len);
+        memcpy(nmbuf, pz+2, len);
+        nmbuf[len] = NUL;
+
+        /*
+         *  If we find the executable, then change the configured shell and
+         *  the SHELL environment variable to this executable.
+         */
+        if (access(nmbuf, X_OK) == 0) {
+            char * sp = malloc(sizeof(zShellEnv) + 1 + len);
+            sprintf(sp, "%s=%s", zShellEnv, nmbuf);
+            putenv(sp);
+            AGDUPSTR(pzShellProgram, nmbuf, "shell name");
+            AGDUPSTR(serverArgs[0],  nmbuf, "shell name");
+        }
+    }
+
+    return res;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -246,9 +285,7 @@ next_pm_token(char const **  ppzData, te_pm_state fsm_state)
     }
 
     if (line_start && (*pzData == '#')) {
-        pzData = strchr(pzData, '\n');
-        if (pzData == NULL)
-            AG_ABEND("Invalid template file");
+        pzData = handle_hash_line(pzData);
         goto skipWhiteSpace;
     }
 
@@ -275,13 +312,10 @@ next_pm_token(char const **  ppzData, te_pm_state fsm_state)
             return PM_EV_SUFFIX;
         }
 
-        if (strneqvcmp(pzData, zTpName, (int)sizeof(zTpName)-1) == 0) {
-            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zTpName)-1 ])) {
-                *ppzData = pzData + sizeof(zTpName)-1;
-                return PM_EV_TEMPLATE;
-            }
-
-            return PM_EV_SUFFIX;
+        if (  (strneqvcmp(pzData, zTpName, (int)sizeof(zTpName)-1) == 0)
+           && (IS_WHITESPACE_CHAR(pzData[ sizeof(zTpName)-1 ])) ) {
+            *ppzData = pzData + sizeof(zTpName)-1;
+            return PM_EV_TEMPLATE;
         }
 
         return PM_EV_SUFFIX;
@@ -325,15 +359,13 @@ next_pm_token(char const **  ppzData, te_pm_state fsm_state)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  copyMarker
- *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  *  Some sort of marker is under the scan pointer.  Copy it for as long
  *  as we find punctuation characters.
  */
 static char const *
-copyMarker(char const * pzData, char* pzMark, size_t * pCt)
+copy_mark(char const * pzData, char* pzMark, size_t * pCt)
 {
     int ct = 0;
 
@@ -358,10 +390,8 @@ copyMarker(char const * pzData, char* pzMark, size_t * pCt)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  loadPseudoMacro
- *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  *  Using a finite state machine, scan over the tokens that make up the
  *  "pseudo macro" at the start of every template.
  */
@@ -403,14 +433,14 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copyMarker(pzData, zStartMac, &startMacLen);
+            pzData = copy_mark(pzData, zStartMac, &startMacLen);
             if (pzData == NULL)
                 BAD_MARKER(zMarkErr);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copyMarker(pzData, zEndMac, &endMacLen);
+            pzData = copy_mark(pzData, zEndMac, &endMacLen);
             if (pzData == NULL)
                 BAD_MARKER(zMarkErr);
 

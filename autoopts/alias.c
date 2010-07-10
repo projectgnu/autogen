@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-02-24 08:41:27 bkorb"
+/**
+ * \file alias.c
+ *
+ * Time-stamp:      "2010-07-09 11:02:31 bkorb"
  *
  *   Automated Options Paged Usage module.
  *

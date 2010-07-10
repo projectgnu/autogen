@@ -1,9 +1,9 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-07-08 22:12:05 bkorb"
+# Time-stamp:        "2010-07-10 16:42:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -25,9 +25,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-#
-# $Id: c3fb660d4c2641d2d1ab367195a9d3a8950843a7 $
-# ----------------------------------------------------------------------
 
 . ./defs
 

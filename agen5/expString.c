@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2010-07-03 10:59:46 bkorb"
+ *  Time-stamp:        "2010-07-09 18:03:29 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -29,7 +29,7 @@ static size_t
 string_size(char const * pzScn, size_t newLineSize);
 
 static SCM
-makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
+makeString(char const * pzText, char const * pzNewLine, size_t newLineSize);
 
 static size_t
 stringify_for_shell(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize);
@@ -39,12 +39,12 @@ shell_stringify(SCM obj, u_int qt);
 
 static void
 do_substitution(
-    tCC*        pzStr,
-    scm_sizet   strLen,
-    SCM         match,
-    SCM         repl,
-    char**      ppzRes,
-    scm_sizet*  pResLen );
+    char const * pzStr,
+    scm_sizet    strLen,
+    SCM          match,
+    SCM          repl,
+    char **      ppzRes,
+    scm_sizet *  pResLen );
 
 static void
 do_multi_subs(

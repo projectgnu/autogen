@@ -1,6 +1,8 @@
 
-/*
- * Time-stamp:      "2010-02-24 08:40:21 bkorb"
+/**
+ * \file pgusage.c
+ *
+ * Time-stamp:      "2010-07-09 10:57:00 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
