@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2010-06-30 20:50:32 bkorb"
+ * Time-stamp:        "2010-07-16 14:33:23 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -41,23 +41,24 @@ static string_buf_t ** next_strbuf = &ag_strbufs;
  * Initialize the scribble string library
  */
 LOCAL void
-ag_scmStrings_init(void)
+ag_scribble_init(void)
 {
     ag_strbufs = NULL;
+    next_strbuf = &ag_strbufs;
 }
 
 /**
- * Free up the scribble strings
+ * Free up the scribble strings memory pool.
  */
 LOCAL void
-ag_scmStrings_deinit(void)
+ag_scribble_deinit(void)
 {
     string_buf_t* sb = ag_strbufs;
-    ag_strbufs = NULL;
+    ag_scribble_init();
 
     while (sb != NULL) {
         string_buf_t* sb_next_p = sb->next_p;
-        free( sb );
+        free(sb);
         sb = sb_next_p;
     }
 }
@@ -66,7 +67,7 @@ ag_scmStrings_deinit(void)
  *  Free up the scribble strings used during the processing of one macro.
  */
 LOCAL void
-ag_scmStrings_free(void)
+ag_scribble_free(void)
 {
     string_buf_t* sb = ag_strbufs;
 
@@ -109,7 +110,7 @@ new_scribble_block(size_t min_size)
  *  These allocations are intended for temporary space needs that cannot
  *  be kept on the stack.  Expression processing.
  */
-char*
+LOCAL char*
 ag_scribble(size_t size)
 {
     string_buf_t* sb = ag_strbufs;
@@ -141,15 +142,23 @@ ag_scribble(size_t size)
  *  As of Guile 1.7.x, access to the NUL terminated string referenced by
  *  an SCM is no longer guaranteed.  Therefore, we must extract the string
  *  into one of our "scribble" buffers.
+ *
+ * @param s the string to convert
+ * @param type a string describing the string
+ * @returns a NUL terminated string, or it aborts.
  */
-char*
-ag_scm2zchars(SCM s, tCC* type)
+char *
+ag_scm2zchars(SCM s, const char * type)
 {
     static char const bad_val[] =
         "scm_string_length returned wrong value: %d != %d\n";
-    size_t len = scm_c_string_length(s);
-    char* buf;
+    size_t len;
+    char * buf;
 
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf("%s is not a string", type));
+
+    len = scm_c_string_length(s);
     if (len == 0) {
         static char z = NUL;
         return &z;

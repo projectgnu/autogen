@@ -2,10 +2,6 @@
 autogen definitions options;
 
 /*
- *   $Id: 63b4b5d10745b2f4f4910d3670cc2bb33f5fb2ac $
- */
-
-/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *

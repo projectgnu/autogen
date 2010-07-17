@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-07-08 20:40:57 bkorb"
+ *  Time-stamp:        "2010-07-16 16:08:17 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -184,7 +184,7 @@ struct macro_desc {
 
     uintptr_t   ozName;    /* macro name (sometimes) */
     uintptr_t   ozText;    /* associated text        */
-    long        res;       /* some sort of result    */
+    uintptr_t   res;       /* some sort of result    */
     void*       funcPrivate;
 };
 
@@ -434,19 +434,20 @@ MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
 #define MKSTRING(_n, _v) \
         MODE char const z ## _n[sizeof(_v)] VALUE(_v)
 
-MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n");
 MKSTRING( AllocErr,   "Allocation Failure");
+MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n");
 MKSTRING( Cannot,     "fserr %d: cannot %s %s:  %s\n");
-MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n");
-MKSTRING( FileLine,   "\tfrom %s line %d\n");
-MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
-MKSTRING( NotStr,     "ERROR: %s is not a string\n");
 MKSTRING( DevNull,    "/dev/null");
-MKSTRING( ShellEnv,   "SHELL");
-MKSTRING( Format,     "format");
+MKSTRING( Empty,      "");
 MKSTRING( FileFormat, "%s%s\0%s.%s");
-MKSTRING( Nil,        "");
+MKSTRING( FileLine,   "\tfrom %s line %d\n");
+MKSTRING( Format,     "format");
 MKSTRING( MemFile,    "in-mem file");
+MKSTRING( Nil,        "");
+MKSTRING( NotStr,     "ERROR: %s is not a string\n");
+MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
+MKSTRING( ShellEnv,   "SHELL");
+MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n");
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -488,11 +489,6 @@ MODE v2c_t p2p VALUE( { NULL } );
 
 #define AG_ABEND_IN(t,m,s) \
     STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
-
-extern void  ag_scmStrings_init(   void);
-extern void  ag_scmStrings_deinit( void);
-extern void  ag_scmStrings_free(   void);
-extern char* ag_scribble( size_t size);
 
 #if defined(DEBUG_ENABLED)
   extern void manageAllocatedData(void* pd);

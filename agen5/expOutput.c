@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-10 16:32:51 bkorb"
+ *  Time-stamp:        "2010-07-11 12:52:19 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -255,7 +255,7 @@ SCM
 ag_scm_out_resume(SCM suspName)
 {
     int  ix  = 0;
-    tCC* pzName = ag_scm2zchars(suspName, "resume name");
+    char const * pzName = ag_scm2zchars(suspName, "resume name");
 
     for (; ix < suspendCt; ix++) {
         if (strcmp(pSuspended[ ix ].pzSuspendName, pzName) == 0) {
@@ -317,7 +317,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
 {
     static char const invalid_z[] = "ag-fprintf: 'port' is invalid";
     int   list_len = scm_ilength(alist);
-    char* pzFmt    = ag_scm2zchars(fmt, zFormat);
+    char const * pzFmt = ag_scm2zchars(fmt, zFormat);
     SCM   res      = run_printf(pzFmt, list_len, alist);
 
     /*
@@ -326,7 +326,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      */
     if (AG_SCM_STRING_P(port)) {
         int  ix  = 0;
-        tCC* pzName = ag_scm2zchars(port, "resume name");
+        char const * pzName = ag_scm2zchars(port, "resume name");
 
         for (; ix < suspendCt; ix++) {
             if (strcmp(pSuspended[ ix ].pzSuspendName, pzName) == 0) {
@@ -553,7 +553,7 @@ ag_scm_out_switch(SCM new_file)
         return SCM_UNDEFINED;
     {
         size_t sz = AG_SCM_STRLEN(new_file);
-        pzNewFile = (char*)AGALOC(sz + 1, "new file name string");
+        pzNewFile = AGALOC(sz + 1, "new file name");
         memcpy(pzNewFile, AG_SCM_CHARS(new_file), sz);
         pzNewFile[ sz ] = NUL;
     }

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ## mkpkg.debian --  create a native package
-## Time-stamp:      "2010-02-24 08:37:16 bkorb"
+## Time-stamp:      "2010-07-16 15:22:32 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,10 +18,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-## ---------------------------------------------------------------------
-## $Id: 2a509a8ca4545f31c0be0538988d59b0e20f5561 $
-## ---------------------------------------------------------------------
-## Code:
 
 if test -z "${top_builddir}"
 then

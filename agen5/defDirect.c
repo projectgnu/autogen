@@ -1,7 +1,7 @@
 /*
  *  defDirect.c
  *
- *  Time-stamp:        "2010-07-08 19:23:12 bkorb"
+ *  Time-stamp:        "2010-07-10 19:23:12 bkorb"
  *
  *  This module processes definition file directives.
  *

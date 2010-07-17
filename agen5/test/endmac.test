@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # endmac.test --- test variations on the end macro marker
 #
-# Time-stamp:        "2010-02-24 08:41:57 bkorb"
+# Time-stamp:        "2010-06-26 16:06:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 450f787316abf705c8f62cef91d22e8c7c7f3e7a $
 # ----------------------------------------------------------------------
 
 . ./defs

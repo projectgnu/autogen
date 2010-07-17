@@ -1,8 +1,8 @@
 
-/*
- *  strsignal is free software.
+/**
+ * \file strsignal.c
  *
- * Time-stamp:        "2010-02-24 08:39:24 bkorb"
+ * Time-stamp:        "2010-07-16 15:12:27 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -43,8 +43,6 @@
  *  If you write modifications of your own for strsignal, it is your choice
  *  whether to permit this exception to apply to your modifications.
  *  If you do not wish that, delete this exception notice.
- *
- *  $Id: 9eb8fc7fa93d9ec85e61670a1b3d899809df2d91 $
  */
 
 #include "compat.h"

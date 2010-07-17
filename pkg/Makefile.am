@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 08:38:19 bkorb"
+## Time-stamp:      "2010-07-16 15:21:58 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,11 +18,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: 38116465f4b63d574e3a60f7a95e2da5a3a873b4 $
-## ---------------------------------------------------------------------
-## Code:
 
 DISTCLEANFILES = autogen.lsm
 

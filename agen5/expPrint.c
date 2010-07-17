@@ -1,7 +1,8 @@
 
-/*
+/**
+ * \file expPrint.c
  *
- *  Time-stamp:        "2010-02-24 08:42:58 bkorb"
+ *  Time-stamp:        "2010-07-16 15:17:19 bkorb"
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -32,19 +33,19 @@ static int        printJumpSignal = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 static ssize_t
-safePrintf( char** ppzBuf, char* pzFmt, void** argV );
+safePrintf(char** ppzBuf, char const * pzFmt, void** argV);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifndef DEBUG_ENABLED
- static void printFault( int sig )
+ static void printFault(int sig)
 {
     printJumpSignal = sig;
-    siglongjmp( printJumpEnv, sig );
+    siglongjmp(printJumpEnv, sig);
 }
 #endif
 
 static ssize_t
-safePrintf( char** ppzBuf, char* pzFmt, void** argV )
+safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
 {
 #if ! defined(DEBUG_ENABLED)
     /*
@@ -97,9 +98,9 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 #endif /* ! defined(DEBUG_ENABLED) */
 
     {
-        int printSize = asprintfv( ppzBuf, pzFmt, (snv_constpointer*)argV );
+        int printSize = asprintfv(ppzBuf, pzFmt, (snv_constpointer*)argV);
         if ((printSize & ~0xFFFFFU) != 0) /* 1MB max */
-            AG_ABEND( aprf( "asprintfv returned 0x%08X\n", printSize ));
+            AG_ABEND(aprf("asprintfv returned 0x%08X\n", printSize));
 
 #if ! defined(DEBUG_ENABLED)
         sigaction( SIGBUS,  &saSave1, NULL );
@@ -111,7 +112,7 @@ safePrintf( char** ppzBuf, char* pzFmt, void** argV )
 
 
 LOCAL SCM
-run_printf(char* pzFmt, int len, SCM alist)
+run_printf(char const * pzFmt, int len, SCM alist)
 {
     SCM     res;
     void*   args[8];

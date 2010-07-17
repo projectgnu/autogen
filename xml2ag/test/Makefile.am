@@ -3,7 +3,7 @@
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Time-stamp:      "2010-02-24 08:37:08 bkorb"
+## Time-stamp:      "2010-07-16 15:29:30 bkorb"
 ##
 ## This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -20,10 +20,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: 39d4d118e5c65b60618c4fb305cb09b85c0125b5 $
-## ---------------------------------------------------------------------
 
 TESTS      = convert.test
 EXTRA_DIST = $(TESTS)

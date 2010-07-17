@@ -1,9 +1,7 @@
 #! /bin/bash
 #  mk-opt-table.sh
-#  $Id:$
 #
-#  Time-stamp:        "2010-02-24 08:43:43 bkorb"
-#  Last Committed:    $Date: 2009/08/01 14:05:00 $
+#  Time-stamp:        "2010-07-16 13:52:04 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2010 by Bruce Korb - all rights reserved

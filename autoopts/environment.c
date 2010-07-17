@@ -2,7 +2,7 @@
 /**
  * \file environment.c
  *
- * Time-stamp:      "2010-07-09 11:01:10 bkorb"
+ * Time-stamp:      "2010-07-10 11:01:10 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional

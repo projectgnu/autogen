@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ## mkgnudoc.sh --   create a native package
-## Time-stamp:      "2010-02-24 08:37:17 bkorb"
+## Time-stamp:      "2010-07-16 15:20:50 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,10 +18,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-## ---------------------------------------------------------------------
-## $Id: e092e67103e5441f7ae72b30382d29770e2b2579 $
-## ---------------------------------------------------------------------
-## Code:
 
 scriptdir=`dirname $0`
 test -f ${scriptdir}/pkg-env && . ${scriptdir}/pkg-env

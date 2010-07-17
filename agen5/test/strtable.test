@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2010-02-24 08:41:36 bkorb"
+# Time-stamp:        "2010-06-26 16:04:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -21,7 +21,6 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: e03294774c466f08507148aec2935a0a8c5aa249 $
 # ----------------------------------------------------------------------
 
 . ./defs

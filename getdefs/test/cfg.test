@@ -1,9 +1,8 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
 # cfg.test --- test config file processing
 #
-## Time-stamp:      "2010-02-24 08:38:26 bkorb"
+## Time-stamp:      "2010-07-16 15:19:27 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -21,11 +20,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: aebc7f84f1d081e9dd5e7325f5f1fa2572feab65 $
-# ----------------------------------------------------------------------
 
-# Common definitions
 if test -z "$srcdir"; then
     srcdir=`echo "$0" | sed 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.

@@ -2,7 +2,7 @@
 /**
  *  \file functions.c
  *
- *  Time-stamp:        "2010-07-10 16:34:36 bkorb"
+ *  Time-stamp:        "2010-07-11 13:27:33 bkorb"
  *
  *  This module implements text functions.
  *
@@ -127,7 +127,7 @@ mLoad_Include(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 tMacro*
 mFunc_Unknown(tTemplate* pT, tMacro* pMac)
 {
-    tTemplate* pInv = findTemplate(pT->pzTemplText + pMac->ozName);
+    tTemplate * pInv = findTemplate(pT->pzTemplText + pMac->ozName);
     if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
             fprintf(pfTrace, zTrcFmt, "remapped to 'Invoke'", pMac->funcCode,

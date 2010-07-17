@@ -1,9 +1,10 @@
 
-/*
- *
- *  Time-stamp:        "2010-02-25 14:00:45 bkorb"
+/**
+ * \file funcDef.c
  *
  *  This module implements the DEFINE text function.
+ *
+ *  Time-stamp:        "2010-07-16 14:00:27 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -293,9 +294,9 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
      *  Allocate the array of definition descriptors
      */
     pzScan = pT->pzTemplText + pMac->ozText;
-    pDL = (tDefList*)AGALOC( ct * sizeof( tDefList ), "array of def desc" );
-    memset( (void*)pDL, 0, ct * sizeof( tDefList ));
-    pMac->res = (long)pDL;
+    pDL = (tDefList*)AGALOC(ct * sizeof(tDefList), "array of def desc");
+    memset((void*)pDL, 0, ct * sizeof(tDefList));
+    pMac->res = (uintptr_t)pDL;
 
     /*
      *  Fill in the array of value assignments

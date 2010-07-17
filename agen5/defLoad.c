@@ -2,7 +2,7 @@
 /**
  * \file defLoad.c
  *
- *  Time-stamp:        "2010-07-10 16:28:51 bkorb"
+ *  Time-stamp:        "2010-07-11 13:13:07 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -77,14 +77,6 @@ manageAllocatedData(void* pd)
     }
 }
 #endif
-
-LOCAL void
-freeEntry(tDefEntry* pDE)
-{
-    pDE->pNext = pFreeEntryList;
-    pFreeEntryList = pDE;
-}
-
 
 LOCAL tDefEntry*
 getEntry(void)

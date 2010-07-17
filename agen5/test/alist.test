@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # alist.test --- test evalstack functionality
 #
-# Time-stamp:        "2010-02-24 08:42:02 bkorb"
+# Time-stamp:        "2010-06-26 16:06:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 2968cf3150a0af4a83211ea5e354e0e5e663a1a9 $
 # ----------------------------------------------------------------------
 
 . ./defs

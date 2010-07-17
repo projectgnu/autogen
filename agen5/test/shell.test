@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2010-02-24 08:41:39 bkorb"
+# Time-stamp:        "2010-06-26 16:04:28 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -25,7 +25,6 @@
 #  The test will verify that a real shell processes the declarations
 #  and our weirdo shell handles the template.
 #
-# $Id: 2ff1cb5e6269c26d1cae751b09217f12a39efac2 $
 # ----------------------------------------------------------------------
 
 exec 9>&2

@@ -1,10 +1,9 @@
 /*  -*- Mode: C -*-  */
 
-/* compat.h --- fake the preprocessor into handlng portability
+/**
+ * \file compat.h --- fake the preprocessor into handlng portability
  *
- *  Time-stamp:      "2010-02-24 08:39:25 bkorb"
- *
- * $Id: 27c1eb45f171295ab6176280aeca742cfdbe9fed $
+ *  Time-stamp:      "2010-07-16 15:11:57 bkorb"
  *
  *  compat.h is free software.
  *  This file is part of AutoGen.

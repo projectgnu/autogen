@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-07-10 16:38:34 bkorb"
+ * Time-stamp:        "2010-07-11 13:43:52 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -544,6 +544,7 @@ wrap_up_depends(void)
         AGDUPSTR(pzn, pzDepFile, "dep file");
         *pze = '-';
         rename(pzDepFile, pzn);
+        AGFREE(pzn);
     }
 }
 
@@ -572,9 +573,6 @@ cleanup(tTemplate* pTF)
     AGFREE(forInfo.fi_data);
     unloadTemplate(pTF);
     unloadDefs();
-    ag_scmStrings_deinit();
-
-    manageAllocatedData(NULL);
 }
 
 /*

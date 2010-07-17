@@ -5,7 +5,7 @@
 +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2010-07-09 14:38:38 bkorb"
+  Time-stamp:        "2010-07-10 14:38:38 bkorb"
 _EOF_
 \` `
 

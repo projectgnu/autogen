@@ -2,7 +2,7 @@
 
 html
 
-# Time-stamp: "2010-02-24 08:38:13 bkorb"
+# Time-stamp: "2010-07-16 15:21:34 bkorb"
 # Version:    "$Revision: 4.13 $
 ##
 ##  This file is part of AutoGen.
@@ -23,8 +23,6 @@ html
 =]
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
-
-  ==  $Id: 6bce3c50dcdc6d22985286fe89a7ebcb54919b37 $
 
   ***  THEREFORE  *** if you make changes to this file, please
   email the author so it will not be overwritten  :-) "

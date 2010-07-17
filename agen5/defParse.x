@@ -1,10 +1,10 @@
-/*  -*- Mode: C -*-
+
+/**
+ * \file defParse.x
  *
- *  defParse.x
+ * Definition parser functions.
  *
- *  Time-stamp:        "2010-02-24 08:43:04 bkorb"
- *
- *  This is the main routine for autogen.
+ *  Time-stamp:        "2010-07-16 16:26:38 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -36,7 +36,7 @@ trans_evt = yylex();
  *  Print out an invalid transition message and return EXIT_FAILURE
  */
 static int
-dp_invalid_transition( te_dp_state st, te_dp_event evt )
+dp_invalid_transition(te_dp_state st, te_dp_event evt)
 {
     char const * fmt_pz = zDpStrings + DpFsmErr_off;
     fprintf(stderr, fmt_pz, st, DP_STATE_NAME(st), evt, DP_EVT_NAME(evt));
@@ -50,19 +50,13 @@ dp_do_empty_val(
     te_dp_state maybe_next,
     te_dp_event trans_evt )
 {
-    static char * nil_pz = NULL;
-
     /*
      *  Our state is either "have-name" or "indx-name" and we found a ';',
      *  end of statement.  It is a string value with an empty string.
      */
-    tDefEntry* pDE = findPlace( pz_new_name, NULL );
-    if (nil_pz == NULL) {
-        nil_pz = AGALOC( 1, "NUL byte" );
-        *nil_pz = NUL;
-    }
+    tDefEntry * pDE = findPlace(pz_new_name, NULL);
 
-    pDE->val.pzText = nil_pz;
+    pDE->val.pzText = (char *)zEmpty;
     pDE->valType    = VALTYP_TEXT;
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         print_def(pDE);
@@ -76,7 +70,7 @@ dp_do_end_block(
     te_dp_event trans_evt )
 {
     if (stackDepth <= 0)
-        yyerror( (void*)"Too many close braces" );
+        yyerror((void*)"Too many close braces");
 
     pCurrentEntry = ppParseStack[ stackDepth-- ];
     return maybe_next;
@@ -92,7 +86,7 @@ dp_do_have_name_lit_eq(
      *  Create a new entry but defer "makeMacro" call until we have the
      *  assigned value.
      */
-    findPlace( pz_new_name, NULL );
+    findPlace(pz_new_name, NULL);
     return maybe_next;
 }
 
@@ -106,7 +100,7 @@ dp_do_indexed_name(
      *  Create a new entry with a specified indes, but defer "makeMacro" call
      *  until we have the assigned value.
      */
-    findPlace( pz_new_name, pz_token );
+    findPlace(pz_new_name, pz_token);
     return maybe_next;
 }
 
@@ -116,8 +110,8 @@ dp_do_invalid(
     te_dp_state maybe_next,
     te_dp_event trans_evt )
 {
-    dp_invalid_transition( initial, trans_evt );
-    yyerror( (void*)"invalid transition" );
+    dp_invalid_transition(initial, trans_evt);
+    yyerror((void*)"invalid transition");
     /* NOTREACHED */
     return DP_ST_INVALID;
 }
@@ -129,14 +123,14 @@ dp_do_need_name_end(
     te_dp_event trans_evt )
 {
     if (stackDepth != 0)
-        yyerror( (void*)"definition blocks were left open" );
+        yyerror((void*)"definition blocks were left open");
 
     /*
      *  We won't be using the parse stack any more.
      *  We only process definitions once.
      */
     if (ppParseStack != parseStack)
-        AGFREE( ppParseStack );
+        AGFREE(ppParseStack);
 
     /*
      *  The seed has now done its job.  The real root of the
@@ -165,7 +159,7 @@ dp_do_next_val(
     /*
      *  Clone the entry name of the current entry.
      */
-    findPlace( pCurrentEntry->pzDefName, NULL );
+    findPlace(pCurrentEntry->pzDefName, NULL);
     return maybe_next;
 }
 
@@ -176,7 +170,7 @@ dp_do_start_block(
     te_dp_event trans_evt )
 {
     if (pCurrentEntry->valType == VALTYP_TEXT)
-        yyerror( (void*)"assigning a block value to text name" );
+        yyerror((void*)"assigning a block value to text name");
     pCurrentEntry->valType = VALTYP_BLOCK; /* in case not yet determined */
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
@@ -187,11 +181,11 @@ dp_do_start_block(
         stackSize += stackSize / 2;
 
         if (ppParseStack == parseStack) {
-            ppDE = AGALOC( stackSize * sizeof(void*), "def stack" );
-            memcpy( ppDE, parseStack, sizeof( parseStack ));
+            ppDE = AGALOC(stackSize * sizeof(void*), "def stack");
+            memcpy(ppDE, parseStack, sizeof(parseStack));
         } else {
-            ppDE = AGREALOC( ppParseStack, stackSize * sizeof(void*),
-                             "stretch def stack" );
+            ppDE = AGREALOC(ppParseStack, stackSize * sizeof(void*),
+                            "stretch def stack");
         }
         ppParseStack = ppDE;
     }
@@ -207,7 +201,7 @@ dp_do_str_value(
     te_dp_event trans_evt )
 {
     if (pCurrentEntry->valType == VALTYP_BLOCK)
-        yyerror( (void*)"assigning a block value to text name" );
+        yyerror((void*)"assigning a block value to text name");
 
     pCurrentEntry->val.pzText = pz_token;
     pCurrentEntry->valType = VALTYP_TEXT;

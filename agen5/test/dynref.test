@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # dynref.test --- test dynamic scoping of definition values
 #
-# Time-stamp:        "2010-02-24 08:41:58 bkorb"
+# Time-stamp:        "2010-06-26 16:06:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 75334291a9d10a2fba2b871ac1a7976dd6a9b3fa $
 # ----------------------------------------------------------------------
 
 . ./defs

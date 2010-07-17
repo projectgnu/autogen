@@ -2,9 +2,6 @@
 
 h
 
-# $Id: a0ab55af7a34717958b72771d4000400277832ad $
-
-##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##

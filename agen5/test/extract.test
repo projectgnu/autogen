@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # extract.test --- test extract functionality
 #
-# Time-stamp:        "2010-02-24 08:41:56 bkorb"
+# Time-stamp:        "2010-06-26 16:05:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: f9f76932edac0b1135bbb06d7f493216e6011b47 $
 # ----------------------------------------------------------------------
 
 . ./defs

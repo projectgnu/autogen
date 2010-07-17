@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # fmemopen.test --- fmemopen code
 #
-# Time-stamp:        "2010-02-24 08:41:55 bkorb"
+# Time-stamp:        "2010-06-26 16:05:54 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: d267dc4474dd5bd974a176aab23d65146056b57b $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -1,8 +1,8 @@
 
-/*
- *  xml2ag.c
- *  $Id: 42a2b364bc9b7c67c66fc0b4e327b86dde82decb $
- *  Time-stamp:         "2010-02-24 08:37:04 bkorb"
+/**
+ * \file xml2ag.c
+ *
+ *  Time-stamp:         "2010-07-16 15:28:40 bkorb"
  *
  *  This is the main routine for xml2ag.
  *  xml2ag Copyright (c) 2002-2010 by Bruce Korb - all rights reserved

@@ -4,7 +4,7 @@ null
 
 ## agman3.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-07-09 14:29:54 bkorb"
+## Time-stamp:      "2010-07-10 14:29:54 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

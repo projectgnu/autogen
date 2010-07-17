@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2010-02-24 08:42:00 bkorb"
+# Time-stamp:        "2010-06-26 16:06:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: cd183a90a107968768c73c29eab905a077e58238 $
 # ----------------------------------------------------------------------
 
 . ./defs

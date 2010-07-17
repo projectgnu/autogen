@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # case.test --- test CASE functionality
 #
-# Time-stamp:        "2010-02-24 08:42:02 bkorb"
+# Time-stamp:        "2010-06-26 16:06:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 594b1434983d8a5f2d2bc99bf1d4045dc6691469 $
 # ----------------------------------------------------------------------
 
 . ./defs

@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-07-09 15:04:08 bkorb"
+# Time-stamp:        "2010-07-10 15:04:08 bkorb"
 
 ##
 ## This file is part of AutoGen.

@@ -5,7 +5,7 @@ c
 
 #!/bin/sh
 
-## Time-stamp:      "2010-07-09 10:51:55 bkorb"                                 
+## Time-stamp:      "2010-07-10 10:51:55 bkorb"                                 
 ## Author:          Bruce Korb <bkorb@gnu.org>                                  
 ##                                                                              
 ##  This file is part of AutoOpts, a companion to AutoGen.                      

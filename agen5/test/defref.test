@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2010-02-24 08:41:59 bkorb"
+# Time-stamp:        "2010-06-26 16:06:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: c4812c242e24c1888fac2256ba7c0b35c5d26760 $
 # ----------------------------------------------------------------------
 
 . ./defs

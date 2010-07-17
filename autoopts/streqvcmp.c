@@ -2,7 +2,7 @@
 /**
  * \file streqvcmp.c
  *
- * Time-stamp:      "2010-07-09 10:56:09 bkorb"
+ * Time-stamp:      "2010-07-10 10:56:09 bkorb"
  *
  *  String Equivalence Comparison
  *

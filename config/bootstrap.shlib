@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-06-26 09:25:03 bkorb"
+# Time-stamp:        "2010-07-16 16:39:34 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -19,9 +19,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-# ----------------------------------------------------------------------
-# @(#) $Id: 47de4aeacc22b6cc829bd0df349aff2f59f79fe7 $
-# ----------------------------------------------------------------------
 
 # This file contains various utility functions for the "bootstrap" scripts
 # that are scattered about.
@@ -84,24 +81,36 @@ then setx=set\ -x dashx=-x ; set -x
 else setx=:       dashx=   ; set +x
 fi
 
+test -n "${BASH_VERSION}" || {
+    local() {
+        "$@"
+    }
+}
+
+test -z "${BASH_VERSION}" && local() { : ; }
 # Setup run_ag
 if ${VERBOSE}
 then
+    # vgopts='--suppressions=/old-home/bkorb/ag/valgrind.conf --leak-check=yes'
+    # valgrind ${vgopts} --log-file=${vgfile} \
+
     run_ag()
     {
-        tag=${1} ; shift
-        PS4='>run-ag> '
-        tfile='>>'ag-${tag}-$$.log
+        local tag=${1} ; shift
+        # local vgfile=/tmp/vglog/${tag}-%p.txt
+        local PS4='>run-ag> '
+        local tfile='>>'ag-${tag}-$$.log
         tag="-MFstamp-${tag} --trace=every --trace-out=${tfile}"
 
         MALLOC_CHECK_=2 \
             ${AGexe} ${tag} "$@" || \
-                die "FAILED: ${AGexe} $*"
+            die "FAILED: ${AGexe} $*"
     }
 else
     run_ag()
     {
-        tag="-MFstamp-${1}" ; shift
+        # local vgfile=/tmp/vglog/${1}-%p.txt
+        local tag="-MFstamp-${1}" ; shift
 
         echo ${AGexe} ${tag} "$@"
         ${AGexe} ${tag} "$@" || die "FAILED: ${AGexe} $*"

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2010-02-24 08:40:04 bkorb"
+# Time-stamp:        "2010-07-10 12:23:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,6 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 #
-# $Id: 50c09eb05b5ebb61203a0d89603912948c2b29f0 $
 # ----------------------------------------------------------------------
 
 . ./defs

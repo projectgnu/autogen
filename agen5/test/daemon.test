@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # daemon.test --- test functionality of `for' function
 #
-# Time-stamp:        "2010-02-24 08:42:01 bkorb"
+# Time-stamp:        "2010-06-26 16:06:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 281e00f0f785690a1ed5e6db3c74769e05493e5d $
 # ----------------------------------------------------------------------
 
 tdir=$( (mktemp -d $PWD/.daemon-XXXXXX.d) 2>/dev/null)

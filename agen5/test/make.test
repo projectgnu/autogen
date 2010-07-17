@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # make.test --- test makefile script manufacture
 #
-# Time-stamp:        "2010-02-24 08:41:45 bkorb"
+# Time-stamp:        "2010-06-26 16:04:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: f3767e0f88e32e6aa096953b4f49c820addac50e $
 # ----------------------------------------------------------------------
 
 . ./defs

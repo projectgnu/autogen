@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # include.test --- test include functionality
 #
-# Time-stamp:        "2010-02-24 08:41:42 bkorb"
+# Time-stamp:        "2010-06-26 16:04:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 856f6da48de816f90f9576ba04b520368be83915 $
 # ----------------------------------------------------------------------
 
 . ./defs

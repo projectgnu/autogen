@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-07-10 16:29:20 bkorb"
+ *  Time-stamp:        "2010-07-11 12:54:17 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -146,40 +146,40 @@ tSCC zFmtAlloc[] = "asprintf allocation";
  *  the date stamp should not be inserted into the output.
 =*/
 SCM
-ag_scm_dne( SCM prefix, SCM first, SCM opt )
+ag_scm_dne(SCM prefix, SCM first, SCM opt)
 {
     int      noDate   = 0;
     char     zScribble[ SCRIBBLE_SIZE ];
     char*    pzRes;
     tCC*     pzFirst  = zNil;
     SCM      res;
-    size_t   pfxLen   = AG_SCM_STRLEN( prefix );
-    tCC*     pzPrefix = ag_scm2zchars( prefix, "dne-prefix" );
+    size_t   pfxLen   = AG_SCM_STRLEN(prefix);
+    tCC*     pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
 
     /*
      *  Check for the ``-d'' option
      */
     if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
         noDate   = 1;
-        pfxLen   = AG_SCM_STRLEN( first );
-        pzPrefix = ag_scm2zchars( first, "dne-prefix" );
+        pfxLen   = AG_SCM_STRLEN(first);
+        pzPrefix = ag_scm2zchars(first, "dne-prefix");
         first    = opt;
     }
 
     if (pfxLen > SCRIBBLE_SIZE )
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
+        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
 
     /*
      *  IF we also have a 'first' prefix string,
      *  THEN we set it to something other than ``zNil'' and deallocate later.
      */
-    if (AG_SCM_STRING_P( first )) {
-        int len = AG_SCM_STRLEN( first );
+    if (AG_SCM_STRING_P(first)) {
+        int len = AG_SCM_STRLEN(first);
         if (len >= SCRIBBLE_SIZE)
-            AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
+            AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
 
-        pzFirst = aprf( ENABLED_OPT( WRITABLE ) ? "%s\n" : zDne1,
-                        ag_scm2zchars( first, "first-prefix" ), pzPrefix );
+        pzFirst = aprf(ENABLED_OPT(WRITABLE) ? "%s\n" : zDne1,
+                       ag_scm2zchars(first, "first-prefix"), pzPrefix);
     }
 
     if (noDate) {
@@ -187,8 +187,8 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
     } else {
         static char const tim_fmt[] =
             "  %B %e, %Y at %r by AutoGen " AUTOGEN_VERSION;
-        time_t    curTime = time( NULL );
-        struct tm*  pTime = localtime( &curTime );
+        time_t    curTime = time(NULL);
+        struct tm*  pTime = localtime(&curTime);
         strftime(zScribble, (size_t)SCRIBBLE_SIZE, tim_fmt, pTime);
     }
 
@@ -197,35 +197,35 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
         tFpStack*   pfp = pCurFp;
 
         while (pfp->flags & FPF_UNLINK)  pfp = pfp->pPrev;
-        if (! ENABLED_OPT( DEFINITIONS ))
+        if (! ENABLED_OPT(DEFINITIONS))
             pz = "<<no definitions>>";
 
         else if (*pzOopsPrefix != NUL)
             pz = "<<CGI-definitions>>";
 
         else {
-            pz = OPT_ARG( DEFINITIONS );
-            if (strcmp( pz, "-" ) == 0)
+            pz = OPT_ARG(DEFINITIONS);
+            if (strcmp(pz, "-") == 0)
                 pz = "stdin";
         }
 
-        pzRes = aprf(ENABLED_OPT( WRITABLE ) ? zDne2 : zDne,
+        pzRes = aprf(ENABLED_OPT(WRITABLE) ? zDne2 : zDne,
                      pzPrefix, pfp->pzOutName, zScribble,
                      pz, pzTemplFileName, pzFirst);
     }
 
     if (pzRes == NULL)
-        AG_ABEND( "Allocating Do-Not-Edit string" );
+        AG_ABEND("Allocating Do-Not-Edit string");
 
-    res = AG_SCM_STR02SCM( pzRes );
+    res = AG_SCM_STR02SCM(pzRes);
 
     /*
      *  Deallocate any temporary buffers.  pzFirst either points to
      *  the zNil string, or to an allocated buffer.
      */
-    AGFREE( (void*)pzRes );
+    AGFREE((void*)pzRes);
     if (pzFirst != zNil)
-        AGFREE( (void*)pzFirst );
+        AGFREE((void*)pzFirst);
 
     return res;
 }
@@ -256,7 +256,7 @@ ag_scm_dne( SCM prefix, SCM first, SCM opt )
  *  empty string, then processing continues with the next suffix.
 =*/
 SCM
-ag_scm_error( SCM res )
+ag_scm_error(SCM res)
 {
     tSCC      zFmt[]    = "DEFINITIONS %s in %s line %d for %s:\n\t%s\n";
     tSCC      zErr[]    = "ERROR";
@@ -267,25 +267,25 @@ ag_scm_error( SCM res )
     char      zNum[16];
     int       msgLen;
 
-    switch (gh_type_e( res )) {
+    switch (gh_type_e(res)) {
     case GH_TYPE_BOOLEAN:
-        if (SCM_FALSEP( res ))
+        if (SCM_FALSEP(res))
             abrt = PROBLEM;
         pzMsg = zNil;
         break;
 
     case GH_TYPE_NUMBER:
     {
-        unsigned long val = gh_scm2ulong( res );
+        unsigned long val = gh_scm2ulong(res);
         if (val == 0)
             abrt = PROBLEM;
-        snprintf( zNum, sizeof( zNum ), "%d", (int)val );
+        snprintf(zNum, sizeof(zNum), "%d", (int)val);
         pzMsg = zNum;
         break;
     }
 
     case GH_TYPE_CHAR:
-        zNum[0] = gh_scm2char( res );
+        zNum[0] = gh_scm2char(res);
         if ((zNum[0] == NUL) || (zNum[0] == '0'))
             abrt = PROBLEM;
         zNum[1] = NUL;
@@ -293,8 +293,8 @@ ag_scm_error( SCM res )
         break;
 
     case GH_TYPE_STRING:
-        pzMsg  = ag_scm2zchars( res, "error string" );
-        msgLen = AG_SCM_STRLEN( res );
+        pzMsg  = ag_scm2zchars(res, "error string");
+        msgLen = AG_SCM_STRLEN(res);
         while (IS_WHITESPACE_CHAR(*pzMsg) && (--msgLen > 0)) pzMsg++;
 
         /*
@@ -317,20 +317,44 @@ ag_scm_error( SCM res )
      *  THEN print it.
      */
     if (*pzMsg != NUL) {
-        char* pz = aprf( zFmt, (abrt != PROBLEM) ? zErr : zWarn,
-                         pCurTemplate->pzTplFile, pCurMacro->lineNo,
-                         pCurFp->pzOutName, pzMsg );
+        char* pz = aprf(zFmt, (abrt != PROBLEM) ? zErr : zWarn,
+                        pCurTemplate->pzTplFile, pCurMacro->lineNo,
+                        pCurFp->pzOutName, pzMsg);
         if (abrt != PROBLEM)
-            AG_ABEND( pz );
-        fputs( pz, pfTrace );
-        AGFREE( (void*)pz );
+            AG_ABEND(pz);
+        fputs(pz, pfTrace);
+        AGFREE((void*)pz);
     }
 
-    longjmp( fileAbort, abrt );
+    longjmp(fileAbort, abrt);
     /* NOTREACHED */
     return SCM_UNDEFINED;
 }
 
+static SCM
+mk_license(SCM prog, SCM pfx, char const * lic, char const * owner)
+{
+    /*
+     *  Get the addresses of the program name prefix and owner strings.
+     *  Make sure they are reasonably sized (less than
+     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
+     */
+    if (AG_SCM_STRLEN(prog) >= SCRIBBLE_SIZE)
+        AG_ABEND(aprf(zPfxMsg, zProgLen, SCRIBBLE_SIZE));
+
+    if (AG_SCM_STRLEN(pfx) >= SCRIBBLE_SIZE)
+        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
+
+    {
+        char const * pzPfx = ag_scm2zchars(pfx,  "lic prefix");
+        char const * pzPrg = ag_scm2zchars(prog, "prog name");
+        char const * pzRes = aprf(lic, pzPrg, pzPfx);
+        SCM res = AG_SCM_STR02SCM(pzRes);
+
+        AGFREE((void*)pzRes);
+        return res;
+    }
+}
 
 /*=gfunc gpl
  *
@@ -349,32 +373,9 @@ ag_scm_error( SCM res )
  *  about.
 =*/
 SCM
-ag_scm_gpl( SCM prog_name, SCM prefix )
+ag_scm_gpl(SCM prog_name, SCM prefix)
 {
-    char*   pzPfx  = ag_scm2zchars( prefix, "GPL line prefix" );
-    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
-    char*   pzRes;
-    SCM     res;
-
-    /*
-     *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (less than
-     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
-     */
-    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
-
-    /*
-     *  Allocate-sprintf the result string, then put it in a new SCM.
-     */
-    pzRes = aprf( zGpl, pzPrg, pzPfx );
-
-    res = AG_SCM_STR02SCM( pzRes );
-    AGFREE( (void*)pzRes );
-    return res;
+    return mk_license(prog_name, prefix, zGpl, zNil);
 }
 
 
@@ -395,32 +396,9 @@ ag_scm_gpl( SCM prog_name, SCM prefix )
  *  about.
 =*/
 SCM
-ag_scm_agpl( SCM prog_name, SCM prefix )
+ag_scm_agpl(SCM prog_name, SCM prefix)
 {
-    char*   pzPfx  = ag_scm2zchars( prefix, "AGPL line prefix" );
-    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
-    char*   pzRes;
-    SCM     res;
-
-    /*
-     *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (less than
-     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
-     */
-    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
-
-    /*
-     *  Allocate-sprintf the result string, then put it in a new SCM.
-     */
-    pzRes = aprf( zAgpl, pzPrg, pzPfx );
-
-    res = AG_SCM_STR02SCM( pzRes );
-    AGFREE( (void*)pzRes );
-    return res;
+    return mk_license(prog_name, prefix, zAgpl, zNil);
 }
 
 
@@ -441,36 +419,10 @@ ag_scm_agpl( SCM prog_name, SCM prefix )
  *  @code{prog_name} contains the name of the program the copyright is about.
 =*/
 SCM
-ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
+ag_scm_lgpl(SCM prog_name, SCM owner, SCM prefix)
 {
-    char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
-    char*   pzPrg  = ag_scm2zchars( prog_name, "program name" );
-    char*   pzOwner = ag_scm2zchars( owner, "owner" );
-    char*   pzRes;
-    SCM     res;
-
-    /*
-     *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (less than
-     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
-     */
-    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
-
-    /*
-     *  Allocate-sprintf the result string, then put it in a new SCM.
-     */
-    pzRes = aprf( zLgpl, pzPrg, pzPfx, pzOwner );
-
-    res = AG_SCM_STR02SCM( pzRes );
-    AGFREE( (void*)pzRes );
-    return res;
+    char const * own = ag_scm2zchars(owner, "owner");
+    return mk_license(prog_name, prefix, zLgpl, own);
 }
 
 
@@ -493,41 +445,10 @@ ag_scm_lgpl( SCM prog_name, SCM owner, SCM prefix )
  *
 =*/
 SCM
-ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
+ag_scm_bsd(SCM prog_name, SCM owner, SCM prefix)
 {
-    char*   pzPfx   = ag_scm2zchars( prefix, "GPL line prefix" );
-    char*   pzPrg   = ag_scm2zchars( prog_name, "program name" );
-    char*   pzOwner = ag_scm2zchars( owner, "owner" );
-    char*   pzRes;
-    SCM     res;
-
-    if (! (   AG_SCM_STRING_P( prog_name )
-           && AG_SCM_STRING_P( owner )
-           && AG_SCM_STRING_P( prefix )))
-        return SCM_UNDEFINED;
-
-    /*
-     *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (less than
-     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
-     */
-    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
-
-    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
-
-    /*
-     *  Allocate-sprintf the result string, then put it in a new SCM.
-     */
-    pzRes = aprf( zBsd, pzPrg, pzPfx, pzOwner );
-
-    res = AG_SCM_STR02SCM( pzRes );
-    AGFREE( (void*)pzRes );
-    return res;
+    char const * own = ag_scm2zchars(owner, "owner");
+    return mk_license(prog_name, prefix, zBsd, own);
 }
 
 
@@ -550,11 +471,11 @@ ag_scm_bsd( SCM prog_name, SCM owner, SCM prefix )
  *  prefixed with the string @code{prefix}.
 =*/
 SCM
-ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
+ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
 {
-    char*   pzPfx   = ag_scm2zchars(prefix,    "GPL line prefix");
-    char*   pzPrg   = ag_scm2zchars(prog_name, "program name");
-    char*   pzOwner = ag_scm2zchars(owner,     "owner");
+    char const * pzPfx   = ag_scm2zchars(prefix,    "GPL line prefix");
+    char const * pzPrg   = ag_scm2zchars(prog_name, "program name");
+    char const * pzOwner = ag_scm2zchars(owner,     "owner");
     static struct {
         tCC*    pzFN;
         tmap_info_t mi;
@@ -562,13 +483,13 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
 
     char*     pzRes;
 
-    if (! AG_SCM_STRING_P( license ))
+    if (! AG_SCM_STRING_P(license))
         return SCM_UNDEFINED;
 
     {
         tSCC*  apzSfx[] = { "lic", NULL };
         static char zRealFile[ AG_PATH_MAX ];
-        char* pzLicense = ag_scm2zchars( license, "license file name" );
+        char const * pzLicense = ag_scm2zchars(license, "license file");
 
         /*
          *  Find the template file somewhere
@@ -578,21 +499,21 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
             AG_CANT("map license file", pzLicense);
         }
 
-        if ((lic.pzFN != NULL) && (strcmp( zRealFile, lic.pzFN ) != 0)) {
-            text_munmap( &lic.mi );
-            AGFREE( (void*)lic.pzFN );
+        if ((lic.pzFN != NULL) && (strcmp(zRealFile, lic.pzFN) != 0)) {
+            text_munmap(&lic.mi);
+            AGFREE((void*)lic.pzFN);
             lic.pzFN = NULL;
         }
 
         if (lic.pzFN == NULL) {
             text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi);
             if (TEXT_MMAP_FAILED_ADDR(lic.mi.txt_data))
-                AG_ABEND( aprf( "Could not open license file '%s'", pzLicense));
+                AG_ABEND(aprf("Could not open license file '%s'", pzLicense));
 
             if (pfDepends != NULL)
                 append_source_name(pzLicense);
 
-            AGDUPSTR( lic.pzFN, zRealFile, "license file name" );
+            AGDUPSTR(lic.pzFN, zRealFile, "license file name");
         }
     }
 
@@ -611,21 +532,21 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
      *  Make sure they are reasonably sized (less than
      *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN( prog_name ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zProgLen, SCRIBBLE_SIZE ));
+    if (AG_SCM_STRLEN(prog_name) >= SCRIBBLE_SIZE)
+        AG_ABEND(aprf(zPfxMsg, zProgLen, SCRIBBLE_SIZE));
 
-    if (AG_SCM_STRLEN( prefix ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zPfxLen, SCRIBBLE_SIZE ));
+    if (AG_SCM_STRLEN(prefix) >= SCRIBBLE_SIZE)
+        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
 
-    if (AG_SCM_STRLEN( owner ) >= SCRIBBLE_SIZE)
-        AG_ABEND( aprf( zPfxMsg, zOwnLen, SCRIBBLE_SIZE ));
+    if (AG_SCM_STRLEN(owner) >= SCRIBBLE_SIZE)
+        AG_ABEND(aprf(zPfxMsg, zOwnLen, SCRIBBLE_SIZE));
 
     /*
      *  Reformat the string with the given arguments
      */
-    pzRes = aprf( (char*)lic.mi.txt_data, pzPrg, pzOwner );
+    pzRes = aprf((char*)lic.mi.txt_data, pzPrg, pzOwner);
     {
-        int     pfx_size = strlen( pzPfx );
+        int     pfx_size = strlen(pzPfx);
         char*   pzScan   = pzRes;
         char*   pzOut;
         char*   pzSaveRes;
@@ -650,9 +571,9 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
         /*
          *  Create our output buffer and insert the first prefix
          */
-        pzOut = pzSaveRes = ag_scribble( out_size );
+        pzOut = pzSaveRes = ag_scribble(out_size);
 
-        strcpy( pzOut, pzPfx );
+        strcpy(pzOut, pzPfx);
         pzOut += pfx_size;
         pzScan = pzRes;
 
@@ -662,7 +583,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
                 goto exit_copy;
 
             case '\n':
-                strcpy( pzOut, pzPfx );
+                strcpy(pzOut, pzPfx);
                 pzOut += pfx_size;
                 break;
 
@@ -676,7 +597,7 @@ ag_scm_license( SCM license, SCM prog_name, SCM owner, SCM prefix )
          *  We allocated a temporary buffer that has all the
          *  formatting done, but need the prefixes on each line.
          */
-        AGFREE( (void*)pzRes );
+        AGFREE((void*)pzRes);
 
         return AG_SCM_STR2SCM(pzSaveRes, (size_t)((pzOut - pzSaveRes) - 1));
     }

@@ -1,7 +1,7 @@
 /**
  * \file cook.c
  *
- *  Time-stamp:      "2010-07-09 11:01:32 bkorb"
+ *  Time-stamp:      "2010-07-10 11:01:32 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.

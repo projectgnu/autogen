@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-07-10 16:41:22 bkorb"
+# Time-stamp:     "2010-07-16 17:05:14 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -160,6 +160,8 @@ init_tests() {
     export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
 }
 
+vgopts='--suppressions=/old-home/bkorb/ag/valgrind.conf --leak-check=yes'
+
 be_silent()
 {
     setx=:
@@ -176,8 +178,10 @@ be_silent()
 
     run_ag()
     {
+        local tfile=${testname}-aglog-${1}-$$.log
         shift
-        ${AGexe} "$@"
+
+        ${AGexe} -m "$@"
     }
 
     init_tests
@@ -193,10 +197,13 @@ be_verbose()
 
     run_ag()
     {
-        tfile=${testname}-aglog-${1}-$$.log
+        # local vgfile=/tmp/vglog/${1}-%p.txt
+        # valgrind ${vgopts} --log-file=${vgfile} \
+        local tfile=${testname}-aglog-${1}-$$.log
         shift
+
         MALLOC_CHECK_=2 \
-            ${AGexe} --trace=every --trace-out=">>${tfile}" "$@"
+            ${AGexe} -m --trace=every --trace-out=">>${tfile}" "$@"
     }
 
     init_tests
@@ -291,7 +298,7 @@ stdopts=${srcdir}/stdopts.def
 #  All the tests will require the templates in the autoopts dir.
 #
 AUTOGEN_TEMPL_DIRS=`cd ${top_srcdir} > /dev/null ; pwd`/autoopts
-AG_L=${AGexe}\ -L${AUTOGEN_TEMPL_DIRS}\ -m
+AG_L=run_ag\ ao\ -L${AUTOGEN_TEMPL_DIRS}
 export AUTOGEN_TEMPL_DIRS AG_L
 
 #  In general, they will have a test main procedure, too.

@@ -1,6 +1,7 @@
-/*
+/**
+ * \file defFind.c
  *
- *  Time-stamp:        "2010-07-03 08:44:24 bkorb"
+ *  Time-stamp:        "2010-07-11 12:45:27 bkorb"
  *
  *  This module locates definitions.
  *
@@ -60,7 +61,7 @@ static size_t
 badName(char* pzD, char const* pzS, size_t srcLen);
 
 static tDefEntry*
-defEntrySearch(char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed);
+find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed);
 
 static int
 hash_string(unsigned char const * pz);
@@ -387,9 +388,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
 }
 
 
-/*
- *  findDefEntry
- *
+/**
  *  Find the definition entry for the name passed in.
  *  It is okay to find block entries IFF they are found on the
  *  current level.  Once you start traversing up the tree,
@@ -398,7 +397,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
  *  to traverse the list of twins).
  */
 static tDefEntry*
-defEntrySearch(char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
+find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
 {
     char*        pcBrace;
     char         breakCh;
@@ -546,7 +545,7 @@ defEntrySearch(char* pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
         for (;;) {
             tDefEntry* res;
 
-            res = defEntrySearch(pzName, &ctx, pIsIndexed);
+            res = find_def(pzName, &ctx, pIsIndexed);
             if ((res != NULL) || (breakCh == '[')) {
                 nestingDepth--;
                 return res;
@@ -659,11 +658,11 @@ stringAdd(char const * pz)
 }
 
 LOCAL tDefEntry*
-findDefEntry(char* pzName, ag_bool* pIsIndexed)
+findDefEntry(char * pzName, ag_bool* pIsIndexed)
 {
     if (HAVE_OPT(USED_DEFINES))
         stringAdd(pzName);
-    return defEntrySearch(pzName, &currDefCtx, pIsIndexed);
+    return find_def(pzName, &currDefCtx, pIsIndexed);
 }
 
 

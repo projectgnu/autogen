@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # loop.test --- test FOR loop
 #
-# Time-stamp:        "2010-02-24 08:41:46 bkorb"
+# Time-stamp:        "2010-06-26 16:04:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 1a4be8c06ff77585df60336d82d5750ac4d9d042 $
 # ----------------------------------------------------------------------
 
 . ./defs

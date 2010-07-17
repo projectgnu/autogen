@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # reorder.test --- test reorder functionality
 #
-# Time-stamp:        "2010-02-24 08:41:40 bkorb"
+# Time-stamp:        "2010-06-26 16:04:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -22,7 +22,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: d3406a5412a44e9c19684dbf746ad1f47e64614e $
 # ----------------------------------------------------------------------
 
 . ./defs

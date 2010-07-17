@@ -1,9 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# $Id: 7db8b4b6535be82d284d01fa24deb5844d86f022 $
-#
-# Time-stamp:        "2010-03-03 15:52:26 bkorb"
+# Time-stamp:        "2010-07-16 15:04:06 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved

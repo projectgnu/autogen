@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2010-02-24 08:41:36 bkorb"
+# Time-stamp:        "2010-06-26 16:04:12 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -21,7 +21,6 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-# $Id: c889ab678a0a41bfed0f24b26287604932541d16 $
 # ----------------------------------------------------------------------
 
 . ./defs

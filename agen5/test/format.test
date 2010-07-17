@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # format.test --- Count format string arguments.
 #
-# Time-stamp:        "2010-02-24 08:41:52 bkorb"
+# Time-stamp:        "2010-06-26 16:05:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -23,7 +23,6 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 #
-# $Id: 63a89c0c9531964c7e8d949654d92fd1736d03ea $
 # ----------------------------------------------------------------------
 
 . ./defs

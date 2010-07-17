@@ -1,10 +1,8 @@
 
-/*
- *  char-mapper.c
- *  $Id:$
+/**
+ * \file char-mapper.c
  *
- *  Time-stamp:        "2010-02-24 08:43:44 bkorb"
- *  Last Committed:    $Date: 2009/08/01 14:05:00 $
+ *  Time-stamp:        "2010-07-16 13:52:39 bkorb"
  *
  *  This is the main routine for char-mapper.
  *

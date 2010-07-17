@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-02-25 16:05:14 bkorb"
+## Time-stamp:      "2010-07-10 11:02:43 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

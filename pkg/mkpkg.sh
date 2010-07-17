@@ -1,7 +1,7 @@
 #! /bin/sh
 set -x
 ## mkpkg.sh --      create a native package
-## Time-stamp:      "2010-02-24 08:37:13 bkorb"
+## Time-stamp:      "2010-07-16 15:22:13 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,10 +18,6 @@ set -x
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-## ---------------------------------------------------------------------
-## $Id: 590362bb5b584e47642d9cd27b21f57a5cb44477 $
-## ---------------------------------------------------------------------
-## Code:
 
 test -f pkg-env && . pkg-env
 

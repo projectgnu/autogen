@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # convert.test --- test XML -> AutoGen conversion
 #
-## Time-stamp:      "2010-02-24 08:37:07 bkorb"
+## Time-stamp:      "2010-07-16 15:29:12 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoGen.
@@ -21,11 +21,7 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: fb0390c7de018fdd98e478253bf485610c2daf0b $
-# ----------------------------------------------------------------------
 
-# Common definitions
 case "X${VERBOSE}" in
 X | X[nNfF]* ) VERBOSE=false ;;
 * ) set -x ;   VERBOSE=true ;;

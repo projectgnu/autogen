@@ -1,9 +1,10 @@
 
-/*
- *
- *  Time-stamp:        "2010-07-03 09:58:23 bkorb"
+/**
+ * \file funcCase.c
  *
  *  This module implements the CASE text function.
+ *
+ *  Time-stamp:        "2010-07-16 17:09:55 bkorb"
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 
@@ -40,7 +41,7 @@
 
 tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
 
-typedef tSuccess (tSelectProc)(char const * pzText, char const * pzMatch);
+typedef tSuccess (tSelectProc)(char const * sample, char const * pattern);
 static tSelectProc
     Select_Compare,
     Select_Compare_End,
@@ -82,52 +83,52 @@ static void
 upString(char* pz);
 
 static tSuccess
-Select_Compare(char const * pzText, char const * pzMatch);
+Select_Compare(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Compare_End(char const * pzText, char const * pzMatch);
+Select_Compare_End(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Compare_Start(char const * pzText, char const * pzMatch);
+Select_Compare_Start(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Compare_Full(char const * pzText, char const * pzMatch);
+Select_Compare_Full(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Equivalent(char const * pzText, char const * pzMatch);
+Select_Equivalent(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Equivalent_End(char const * pzText, char const * pzMatch);
+Select_Equivalent_End(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Equivalent_Start(char const * pzText, char const * pzMatch);
+Select_Equivalent_Start(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Equivalent_Full(char const * pzText, char const * pzMatch);
+Select_Equivalent_Full(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match(char const * pzText, char const * pzMatch);
+Select_Match(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_End(char const * pzText, char const * pzMatch);
+Select_Match_End(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_Start(char const * pzText, char const * pzMatch);
+Select_Match_Start(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_Full(char const * pzText, char const * pzMatch);
+Select_Match_Full(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_Always(char const * pzText, char const * pzMatch);
+Select_Match_Always(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_Existence(char const * pzText, char const * pzMatch);
+Select_Match_Existence(char const * sample, char const * pattern);
 
 static tSuccess
-Select_Match_NonExistence(char const * pzText, char const * pzMatch);
+Select_Match_NonExistence(char const * sample, char const * pattern);
 
 static tMacro*
-mLoad_Select(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
+mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -168,9 +169,9 @@ upString(char* pz)
  *       will find an address.
 =*/
 static tSuccess
-Select_Compare(char const * pzText, char const * pzMatch)
+Select_Compare(char const * sample, char const * pattern)
 {
-    return (strstr(pzText, pzMatch)) ? SUCCESS : FAILURE;
+    return (strstr(sample, pattern)) ? SUCCESS : FAILURE;
 }
 
 SCM
@@ -197,15 +198,15 @@ ag_scm_string_contains_p(SCM text, SCM substr)
  *       strcmp(3) returns zero for comparing the string ends.
 =*/
 static tSuccess
-Select_Compare_End(char const * pzText, char const * pzMatch)
+Select_Compare_End(char const * sample, char const * pattern)
 {
-    size_t   vlen = strlen(pzMatch);
-    size_t   tlen = strlen(pzText);
+    size_t   vlen = strlen(pattern);
+    size_t   tlen = strlen(sample);
     tSuccess res;
 
     if (tlen < vlen)
         res = FAILURE;
-    else if (strcmp(pzText + (tlen - vlen), pzMatch) == 0)
+    else if (strcmp(sample + (tlen - vlen), pattern) == 0)
          res = SUCCESS;
     else res = FAILURE;
 
@@ -236,12 +237,12 @@ ag_scm_string_ends_with_p(SCM text, SCM substr)
  * doc:  Test to see if a string starts with a substring.
 =*/
 static tSuccess
-Select_Compare_Start(char const * pzText, char const * pzMatch)
+Select_Compare_Start(char const * sample, char const * pattern)
 {
-    size_t  vlen = strlen(pzMatch);
+    size_t  vlen = strlen(pattern);
     tSuccess res;
 
-    if (strncmp(pzText, pzMatch, vlen) == 0)
+    if (strncmp(sample, pattern, vlen) == 0)
          res = SUCCESS;
     else res = FAILURE;
 
@@ -272,9 +273,9 @@ ag_scm_string_starts_with_p(SCM text, SCM substr)
  * doc:  Test to see if two strings exactly match.
 =*/
 static tSuccess
-Select_Compare_Full(char const * pzText, char const * pzMatch)
+Select_Compare_Full(char const * sample, char const * pattern)
 {
-    return (strcmp(pzText, pzMatch) == 0) ? SUCCESS : FAILURE;
+    return (strcmp(sample, pattern) == 0) ? SUCCESS : FAILURE;
 }
 
 SCM
@@ -304,13 +305,13 @@ ag_scm_string_equals_p(SCM text, SCM substr)
  *       Viz., '-', '_' and '^' are equivalent.
 =*/
 static tSuccess
-Select_Equivalent(char const * pzText, char const * pzMatch)
+Select_Equivalent(char const * sample, char const * pattern)
 {
     char*    pz;
     tSuccess res = SUCCESS;
-    AGDUPSTR(pz, pzText, "equiv chars");
+    AGDUPSTR(pz, sample, "equiv chars");
     upString(pz);
-    if (strstr(pz, pzMatch) == NULL)
+    if (strstr(pz, pattern) == NULL)
         res = FAILURE;
     AGFREE((void*)pz);
 
@@ -350,15 +351,15 @@ ag_scm_string_contains_eqv_p(SCM text, SCM substr)
  * doc:  Test to see if a string ends with an equivalent string.
 =*/
 static tSuccess
-Select_Equivalent_End(char const * pzText, char const * pzMatch)
+Select_Equivalent_End(char const * sample, char const * pattern)
 {
-    size_t   vlen = strlen(pzMatch);
-    size_t   tlen = strlen(pzText);
+    size_t   vlen = strlen(pattern);
+    size_t   tlen = strlen(sample);
 
     if (tlen < vlen)
         return FAILURE;
 
-    return (streqvcmp(pzText + (tlen - vlen), pzMatch) == 0)
+    return (streqvcmp(sample + (tlen - vlen), pattern) == 0)
            ? SUCCESS
            : FAILURE;
 }
@@ -387,11 +388,11 @@ ag_scm_string_ends_eqv_p(SCM text, SCM substr)
  * doc:  Test to see if a string starts with an equivalent string.
 =*/
 static tSuccess
-Select_Equivalent_Start(char const * pzText, char const * pzMatch)
+Select_Equivalent_Start(char const * sample, char const * pattern)
 {
-    size_t   vlen = strlen(pzMatch);
+    size_t   vlen = strlen(pattern);
 
-    return (strneqvcmp(pzText, pzMatch, (int)vlen) == 0)
+    return (strneqvcmp(sample, pattern, (int)vlen) == 0)
            ? SUCCESS
            : FAILURE;
 }
@@ -427,9 +428,9 @@ ag_scm_string_starts_eqv_p(SCM text, SCM substr)
  *       strings, then the query is passed through to @code{scm_num_eq_p()}.
 =*/
 static tSuccess
-Select_Equivalent_Full(char const * pzText, char const * pzMatch)
+Select_Equivalent_Full(char const * sample, char const * pattern)
 {
-    return (streqvcmp(pzText, pzMatch) == 0) ? SUCCESS : FAILURE;
+    return (streqvcmp(sample, pattern) == 0) ? SUCCESS : FAILURE;
 }
 
 SCM
@@ -480,19 +481,19 @@ ag_scm_string_eqv_p(SCM text, SCM substr)
  *       Case is not significant.
 =*/
 static tSuccess
-Select_Match(char const * pzText, char const * pzMatch)
+Select_Match(char const * sample, char const * pattern)
 {
     /*
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
-        void *    mat = (void *)pzMatch;
+        void *    mat = (void *)pattern;
         regex_t*  pRe = AGALOC(sizeof(*pRe), "select match re");
         compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)0,
+    if (regexec((regex_t*)pCurMacro->funcPrivate, sample, (size_t)0,
                  NULL, 0) != 0)
         return FAILURE;
     return SUCCESS;
@@ -562,23 +563,23 @@ ag_scm_string_has_eqv_match_p(SCM text, SCM substr)
  *       Case is not significant.
 =*/
 static tSuccess
-Select_Match_End(char const * pzText, char const * pzMatch)
+Select_Match_End(char const * sample, char const * pattern)
 {
     regmatch_t m[2];
     /*
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
-        void *    mat = (void *)pzMatch;
+        void *    mat = (void *)pattern;
         regex_t*  pRe = AGALOC(sizeof(*pRe), "select match end re");
         compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
-    if (m[0].rm_eo != strlen(pzText))
+    if (m[0].rm_eo != strlen(sample))
         return FAILURE;
     return SUCCESS;
 }
@@ -656,20 +657,20 @@ ag_scm_string_end_eqv_match_p(SCM text, SCM substr)
  *       Case is not significant.
 =*/
 static tSuccess
-Select_Match_Start(char const * pzText, char const * pzMatch)
+Select_Match_Start(char const * sample, char const * pattern)
 {
     regmatch_t m[2];
     /*
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
-        void *    mat = (void *)pzMatch;
+        void *    mat = (void *)pattern;
         regex_t*  pRe = AGALOC(sizeof(*pRe), "select match start re");
         compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = (void*)pRe;
     }
 
-    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
     if (m[0].rm_so != 0)
@@ -751,7 +752,7 @@ ag_scm_string_start_eqv_match_p(SCM text, SCM substr)
  *       must be expressed in your regular expression.
 =*/
 static tSuccess
-Select_Match_Full(char const * pzText, char const * pzMatch)
+Select_Match_Full(char const * sample, char const * pattern)
 {
     regmatch_t m[2];
 
@@ -759,22 +760,22 @@ Select_Match_Full(char const * pzText, char const * pzMatch)
      *  On the first call for this macro, compile the expression
      */
     if (pCurMacro->funcPrivate == NULL) {
-        void *    mat = (void *)pzMatch;
+        void *    mat = (void *)pattern;
         regex_t*  pRe = AGALOC(sizeof(*pRe), "select match full re");
 
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
             fprintf(pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
-                     pzMatch, pCurMacro->res);
+                     pattern, pCurMacro->res);
         }
         compile_re(pRe, mat, (int)pCurMacro->res);
         pCurMacro->funcPrivate = pRe;
     }
 
-    if (regexec((regex_t*)pCurMacro->funcPrivate, pzText, (size_t)2, m, 0)
+    if (regexec((regex_t*)pCurMacro->funcPrivate, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
 
-    if (  (m[0].rm_eo != strlen( pzText ))
+    if (  (m[0].rm_eo != strlen( sample ))
        || (m[0].rm_so != 0))
         return FAILURE;
     return SUCCESS;
@@ -828,30 +829,35 @@ ag_scm_string_eqv_match_p(SCM text, SCM substr)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/*
+/**
  *  We don't bother making a Guile function for any of these :)
  */
 static tSuccess
-Select_Match_Always(char const * pzText, char const * pzMatch)
+Select_Match_Always(char const * sample, char const * pattern)
 {
     return SUCCESS;
 }
 
-/*
- *  If the "pzText" addresses "zNil", then we couldn't find a value
- *  and defaulted to an empty string.  So, the result exists if
- *  the pzText address is anything except "zNil".
+/**
+ *  If the "sample" addresses "zNil", then we couldn't find a value and
+ *  defaulted to an empty string.  So, the result is true if the sample
+ *  address is anything except "zNil".
  */
 static tSuccess
-Select_Match_Existence(char const * pzText, char const * pzMatch)
+Select_Match_Existence(char const * sample, char const * pattern)
 {
-    return (pzText != zNil) ? SUCCESS : FAILURE;
+    return (sample != zNil) ? SUCCESS : FAILURE;
 }
 
+/**
+ *  If the "sample" addresses "zUndefined", then we couldn't find a value and
+ *  defaulted to an empty string.  So, the result false if the sample address
+ *  is anything except "zUndefined".
+ */
 static tSuccess
-Select_Match_NonExistence(char const * pzText, char const * pzMatch)
+Select_Match_NonExistence(char const * sample, char const * pattern)
 {
-    return (pzText == zNil) ? SUCCESS : FAILURE;
+    return (sample == zNil) ? SUCCESS : FAILURE;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -941,7 +947,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
      *  get mapped into the previous four.  The last three are "match always",
      *  "match if a value was found" "match if no value found".
      */
-    static t_match_proc* match_procs[] = {
+    static t_match_proc * const match_procs[] = {
         &Select_Compare_Full,
         &Select_Compare_End,
         &Select_Compare_Start,
@@ -962,7 +968,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
         &Select_Match_NonExistence
     };
 
-    tSCC* apzMatchName[] = {
+    static char const * const apzMatchName[] = {
         "COMPARE_FULL",
         "COMPARE_END",
         "COMPARE_START",
@@ -1011,7 +1017,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
          *  The current macro becomes the selected selection macro
          */
         pCurMacro = pMac;
-        mRes = (*(match_procs[ pMac->funcCode & 0x0F ])
+        mRes = (*(match_procs[pMac->funcCode & 0x0F])
                )(pzSampleText, pT->pzTemplText + pMac->ozText);
 
         /*
@@ -1021,7 +1027,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf(pfTrace, "CASE string `%s' %s matched `%s'\n",
                         pzSampleText,
-                        apzMatchName[ pMac->funcCode & 0x0F ],
+                        apzMatchName[pMac->funcCode & 0x0F],
                         pT->pzTemplText + pMac->ozText);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
@@ -1035,7 +1041,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
         else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
             fprintf(pfTrace, "CASE no match: `%s' %s vs. `%s'\n",
                     pzSampleText,
-                    apzMatchName[ pMac->funcCode & 0x0F ],
+                    apzMatchName[pMac->funcCode & 0x0F],
                     pT->pzTemplText + pMac->ozText);
         }
     }
@@ -1162,7 +1168,7 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
  *    the @code{CASE} macro description.
 =*/
 static tMacro*
-mLoad_Select(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
 {
     char const *    pzScan = *ppzScan;  /* text after macro */
     char*          pzCopy = pT->pNext; /* next text dest   */

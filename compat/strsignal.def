@@ -3,8 +3,6 @@ autogen definitions strsignal;
 /*
  *  Dynamic definitions for creating the strsignal.h header file
  *
- *  $Id: 082ad66779635182b82edff6efa2b835ef4ea891 $
- *
  *  This file is part of AutoGen.
  *
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved

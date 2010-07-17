@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-07-10 16:38:48 bkorb"
+ * Time-stamp:        "2010-07-16 15:01:06 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -30,7 +30,7 @@ static void
 do_stdout_tpl(tTemplate * pTF);
 
 static void
-openOutFile(tOutSpec* pOutSpec);
+open_output(tOutSpec* pOutSpec);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -42,7 +42,6 @@ LOCAL void
 generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
 {
     tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
-    int  fc;
 
     /*
      *  Set up the processing context for this block of macros.
@@ -52,7 +51,7 @@ generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
     pCurTemplate = pT;
 
     while ((pMac != NULL) && (pMac < pEnd)) {
-        fc = pMac->funcCode;
+        int fc = pMac->funcCode;
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
@@ -78,7 +77,7 @@ generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
 
         pCurMacro = pMac;
         pMac = (*(apHdlrProc[ fc ]))(pT, pMac);
-        ag_scmStrings_free();
+        ag_scribble_free();
     }
 }
 
@@ -202,9 +201,9 @@ processTemplate(tTemplate* pTF)
             }
             /*
              *  Set the output file name buffer.
-             *  It may get switched inside openOutFile.
+             *  It may get switched inside open_output.
              */
-            openOutFile(pOS);
+            open_output(pOS);
             memcpy(&fpRoot, pCurFp, sizeof(fpRoot));
             AGFREE(pCurFp);
             pCurFp         = &fpRoot;
@@ -315,12 +314,11 @@ closeOutput(ag_bool purge)
  *  the definitions file.
  */
 static void
-openOutFile(tOutSpec* pOutSpec)
+open_output(tOutSpec* pOutSpec)
 {
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
-    char const * pzDefFile = OPT_ARG(BASE_NAME);
-    char const * pzOutFile = NULL;
+    char const * out_file = NULL;
 
     if (strcmp(pOutSpec->zSuffix, "null") == 0) {
         static int const flags = FPF_NOUNLINK | FPF_NOCHMOD;
@@ -348,11 +346,15 @@ openOutFile(tOutSpec* pOutSpec)
      *  Remove any suffixes in the last file name
      */
     {
-        char   z[ AG_PATH_MAX ];
-        tCC*   pS = strrchr(pzDefFile, '/');
+        static char const bad_fmt[] =
+            "Cannot format file name:  \"%s\", %s, %s";
+
+        char const * def_file = OPT_ARG(BASE_NAME);
+        char   z[AG_PATH_MAX];
+        tCC*   pS = strrchr(def_file, '/');
         char*  pE;
 
-        pS = (pS == NULL) ? pzDefFile : (pS + 1);
+        pS = (pS == NULL) ? def_file : (pS + 1);
 
         /*
          *  We allow users to specify a suffix with '-' and '_', but when
@@ -373,13 +375,13 @@ openOutFile(tOutSpec* pOutSpec)
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        pzOutFile = aprf(pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix);
-        if (pzOutFile == NULL)
-            AG_ABEND(aprf("Cannot format file name:  ``%s''",
-                          pOutSpec->pzFileFmt));
+        out_file = aprf(pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix);
+        if (out_file == NULL)
+            AG_ABEND(aprf(bad_fmt, pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix));
     }
 
-    open_output_file(pzOutFile, strlen(pzOutFile), write_mode, 0);
+    open_output_file(out_file, strlen(out_file), write_mode, 0);
+    free((void *)out_file);
 }
 /*
  * Local Variables:

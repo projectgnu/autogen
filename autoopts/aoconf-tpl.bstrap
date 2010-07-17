@@ -4,7 +4,7 @@ in=autoopts-config.in
 
 #!/bin/sh
 
-## Time-stamp:      "2010-07-09 10:52:11 bkorb"
+## Time-stamp:      "2010-07-10 10:52:11 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

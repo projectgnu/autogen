@@ -2,7 +2,7 @@
 /**
  * \file numeric.c
  *
- *  Time-stamp:      "2010-07-09 10:57:10 bkorb"
+ *  Time-stamp:      "2010-07-10 10:57:10 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.

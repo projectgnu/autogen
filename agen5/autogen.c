@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-10 11:28:16 bkorb"
+ *  Time-stamp:        "2010-07-11 11:30:42 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -74,7 +74,7 @@ setup_signals(sighandler_proc_t * chldHandler,
 static void
 inner_main(int argc, char ** argv)
 {
-    ag_scmStrings_init();
+    ag_scribble_init();
     atexit(done_check);
     initialize(argc, argv);
 
@@ -180,6 +180,7 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
 
 /**
  *  A signal was caught, siglongjmp called and main() has called this.
+ *  We do not deallocate stuff so it can be found in the core dump.
  */
 static void
 cleanup_and_abort(int sig)
@@ -411,6 +412,8 @@ done_check(void)
         AGFREE(pzTmpStderr);
         pzTmpStderr = NULL;
     }
+
+    ag_scribble_deinit();
 
     exit_cleanup(EXIT_PCLOSE_WAIT);
     _exit(exit_code);

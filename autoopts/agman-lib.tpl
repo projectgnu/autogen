@@ -6,7 +6,7 @@ null
 
 ## agman-lib.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-07-09 14:28:52 bkorb"
+## Time-stamp:      "2010-07-10 14:28:52 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
