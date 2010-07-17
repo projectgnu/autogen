@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-07-16 15:01:06 bkorb"
+ * Time-stamp:        "2010-07-16 17:35:09 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -27,13 +27,16 @@ static tFpStack fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
+trace_macro(tTemplate * pT, tMacro * pMac);
+
+static void
 do_stdout_tpl(tTemplate * pTF);
 
 static void
 open_output(tOutSpec* pOutSpec);
 /* = = = END-STATIC-FORWARD = = = */
 
-/*
+/**
  *  Generate all the text within a block.  The caller must
  *  know the exact bounds of the block.  "pEnd" actually
  *  must point to the first entry that is *not* to be emitted.
@@ -41,8 +44,6 @@ open_output(tOutSpec* pOutSpec);
 LOCAL void
 generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
 {
-    tSCC zFmt[] = "%-10s (%2X) in %s at line %d\n";
-
     /*
      *  Set up the processing context for this block of macros.
      *  It is used by the Guile callback routines and the exception
@@ -51,29 +52,12 @@ generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
     pCurTemplate = pT;
 
     while ((pMac != NULL) && (pMac < pEnd)) {
-        int fc = pMac->funcCode;
+        teFuncType fc = pMac->funcCode;
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
-        if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-
-            fprintf(pfTrace, zFmt, apzFuncNames[ fc ], pMac->funcCode,
-                    pT->pzTplFile, pMac->lineNo);
-            if (pMac->ozText > 0) {
-                int   ct;
-                char* pz = pT->pzTemplText + pMac->ozText;
-                fputs("  ", pfTrace);
-                for (ct=0; ct < 32; ct++) {
-                    char ch = *(pz++);
-                    if (ch == NUL)
-                        break;
-                    if (ch == '\n')
-                        break;
-                    putc(ch, pfTrace);
-                }
-                putc('\n', pfTrace);
-            }
-        }
+        if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
+            trace_macro(pT, pMac);
 
         pCurMacro = pMac;
         pMac = (*(apHdlrProc[ fc ]))(pT, pMac);
@@ -81,7 +65,42 @@ generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
     }
 }
 
+/**
+ *  Print out information about the invocation of a macro
+ */
+static void
+trace_macro(tTemplate * pT, tMacro * pMac)
+{
+    static char const zFmt[] = "%-10s (%2X) in %s at line %d\n";
 
+    teFuncType fc = pMac->funcCode;
+    if (fc >= FUNC_CT)
+        fc = FTYP_BOGUS;
+
+    fprintf(pfTrace, zFmt, apzFuncNames[fc], pMac->funcCode,
+            pT->pzTplFile, pMac->lineNo);
+
+    if (pMac->ozText > 0) {
+        int   ct;
+        char* pz = pT->pzTemplText + pMac->ozText;
+        fputs("  ", pfTrace);
+        for (ct=0; ct < 32; ct++) {
+            char ch = *(pz++);
+            if (ch == NUL)
+                break;
+            if (ch == '\n')
+                break;
+            putc(ch, pfTrace);
+        }
+        putc('\n', pfTrace);
+    }
+}
+
+/**
+ *  The template output goes to stdout.  Perhaps because output
+ *  is for a CGI script.  In any case, this case must be handled
+ *  specially.
+ */
 static void
 do_stdout_tpl(tTemplate * pTF)
 {
@@ -150,7 +169,10 @@ do_stdout_tpl(tTemplate * pTF)
     fclose(stdout);
 }
 
-
+/**
+ * pop the current output spec structure.  Deallocate it and the
+ * file name, too, if necessary.
+ */
 LOCAL tOutSpec *
 nextOutSpec(tOutSpec * pOS)
 {

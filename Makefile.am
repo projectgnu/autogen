@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 15:15:38 bkorb"
+## Time-stamp:      "2010-07-17 09:45:44 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,11 +18,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: c66b68b48083e35f3d7db5daf81e71062c7ccad8 $
-## ---------------------------------------------------------------------
-## Code:
+
 ACLOCAL_AMFLAGS = -I config
 
 SUBDIRS        = compat snprintfv autoopts agen5

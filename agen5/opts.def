@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-07-03 08:24:29 bkorb"
+ *  Time-stamp:        "2010-07-16 17:44:36 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -584,12 +584,12 @@ flag = {
 #ifndef XML2AG
 
     doc = <<-  _EOF_
-	The output specified may be either a file name, or, if the option
-	argument begins with the @code{pipe} operator (@code{|}), a command
-	that will receive the tracing output as standard in.  For example,
-	@code{--traceout='| less'} will run the trace output through the
-	@code{less} program.  If it begins with a shell append redirection
-	(@code{>>}), the output file will be appended to.
+	The output specified may be a file name, a file that is appended to,
+	or, if the option argument begins with the @code{pipe} operator
+	(@code{|}), a command that will receive the tracing output as standard
+	in.  For example, @code{--traceout='| less'} will run the trace output
+	through the @code{less} program.  Appending to a file is specified by
+	preceeding the file name with two greater-than characters (@code{>>}).
 	_EOF_;
 
     flag-code = <<- FLAG_CODE_END

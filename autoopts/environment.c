@@ -2,7 +2,7 @@
 /**
  * \file environment.c
  *
- * Time-stamp:      "2010-07-10 11:01:10 bkorb"
+ * Time-stamp:      "2010-07-17 10:39:52 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -43,9 +43,9 @@ checkEnvOpt(tOptState * os, char * env_name,
  *  doImmediateOpts and/or doRegularOpts.
  */
 LOCAL void
-doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
+doPrognameEnv(tOptions* pOpts, teEnvPresetType type)
 {
-    char const*   pczOptStr = getenv( pOpts->pzPROGNAME );
+    char const*   pczOptStr = getenv(pOpts->pzPROGNAME);
     token_list_t* pTL;
     int           sv_argc;
     tAoUI         sv_flag;
@@ -61,7 +61,7 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
      *  Tokenize the string.  If there's nothing of interest, we'll bail
      *  here immediately.
      */
-    pTL = ao_string_tokenize( pczOptStr );
+    pTL = ao_string_tokenize(pczOptStr);
     if (pTL == NULL)
         return;
 
@@ -87,23 +87,23 @@ doPrognameEnv( tOptions* pOpts, teEnvPresetType type )
 
     switch (type) {
     case ENV_IMM:
-        (void)doImmediateOpts( pOpts );
+        (void)doImmediateOpts(pOpts);
         break;
 
     case ENV_ALL:
-        (void)doImmediateOpts( pOpts );
+        (void)doImmediateOpts(pOpts);
         pOpts->curOptIdx = 1;
         pOpts->pzCurOpt  = NULL;
         /* FALLTHROUGH */
 
     case ENV_NON_IMM:
-        (void)doRegularOpts( pOpts );
+        (void)doRegularOpts(pOpts);
     }
 
     /*
      *  Free up the temporary arg vector and restore the original program args.
      */
-    free( pTL );
+    free(pTL);
     pOpts->origArgVect = sv_argv;
     pOpts->origArgCt   = sv_argc;
     pOpts->fOptSet     = sv_flag;
@@ -113,7 +113,7 @@ static void
 checkEnvOpt(tOptState * os, char * env_name,
             tOptions* pOpts, teEnvPresetType type)
 {
-    os->pzOptArg = getenv( env_name );
+    os->pzOptArg = getenv(env_name);
     if (os->pzOptArg == NULL)
         return;
 
@@ -121,7 +121,7 @@ checkEnvOpt(tOptState * os, char * env_name,
     os->optType  = TOPT_UNDEFINED;
 
     if (  (os->pOD->pz_DisablePfx != NULL)
-       && (streqvcmp( os->pzOptArg, os->pOD->pz_DisablePfx ) == 0)) {
+       && (streqvcmp(os->pzOptArg, os->pOD->pz_DisablePfx) == 0)) {
         os->flags |= OPTST_DISABLED;
         os->pzOptArg = NULL;
     }
@@ -162,12 +162,12 @@ checkEnvOpt(tOptState * os, char * env_name,
         } else if (*os->pzOptArg == NUL) {
             os->pzOptArg = zNil;
         } else {
-            AGDUPSTR( os->pzOptArg, os->pzOptArg, "option argument" );
+            AGDUPSTR(os->pzOptArg, os->pzOptArg, "option argument");
             os->flags |= OPTST_ALLOC_ARG;
         }
     }
 
-    handleOption( pOpts, os );
+    handleOption(pOpts, os);
 }
 
 /*
@@ -175,7 +175,7 @@ checkEnvOpt(tOptState * os, char * env_name,
  *  This routine should process in all, immediate or normal modes....
  */
 LOCAL void
-doEnvPresets( tOptions* pOpts, teEnvPresetType type )
+doEnvPresets(tOptions* pOpts, teEnvPresetType type)
 {
     int        ct;
     tOptState  st;
@@ -190,13 +190,13 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
     if ((pOpts->fOptSet & OPTPROC_ENVIRON) == 0)
         return;
 
-    doPrognameEnv( pOpts, type );
+    doPrognameEnv(pOpts, type);
 
     ct  = pOpts->presetOptCt;
     st.pOD = pOpts->pOptDesc;
 
     pzFlagName = zEnvName
-        + snprintf( zEnvName, sizeof( zEnvName ), "%s_", pOpts->pzPROGNAME );
+        + snprintf(zEnvName, sizeof(zEnvName), "%s_", pOpts->pzPROGNAME);
     spaceLeft = AO_NAME_SIZE - (pzFlagName - zEnvName) - 1;
 
     for (;ct-- > 0; st.pOD++) {
@@ -211,13 +211,13 @@ doEnvPresets( tOptions* pOpts, teEnvPresetType type )
          *  IF there is no such environment variable,
          *  THEN skip this entry, too.
          */
-        if (strlen( st.pOD->pz_NAME ) >= spaceLeft)
+        if (strlen(st.pOD->pz_NAME) >= spaceLeft)
             continue;
 
         /*
          *  Set up the option state
          */
-        strcpy( pzFlagName, st.pOD->pz_NAME );
+        strcpy(pzFlagName, st.pOD->pz_NAME);
         checkEnvOpt(&st, zEnvName, pOpts, type);
     }
 

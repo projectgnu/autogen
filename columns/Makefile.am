@@ -1,8 +1,8 @@
 ##  -*- Mode: Makefile -*-
-## ---------------------------------------------------------------------
+##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-06-26 10:11:05 bkorb"
+## Time-stamp:      "2010-07-17 09:50:50 bkorb"
 ## Copyright (c):   1992-2010 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -21,10 +21,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: a5e1f445e668e0f9f052a46099ea76eba5c7704c $
-## ---------------------------------------------------------------------
 
 bin_PROGRAMS    = columns
 csrc            = opts.h columns.c opts.c

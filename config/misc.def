@@ -1,9 +1,10 @@
+// -*- Mode: C -*-
 
 autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2010-07-03 08:14:17 bkorb"
+/*  Time-stamp:        "2010-07-17 09:49:02 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -21,10 +22,8 @@ autogen definitions conftest.tpl;
  *
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  -------------------------------------------------------------------
- *  $Id: 1fd170ed1a44083413013a67703f34389fef3a4c $
- *  -------------------------------------------------------------------
  */
+
 group = ag;
 version = "$Revision: 4.29 $";
 output-file = ag_macros.m4;

@@ -80,3 +80,11 @@
 extern time_t parse_duration(char const * in_pz);
 
 #endif /* GNULIB_PARSE_DURATION_H */
+
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "gnu"
+ * indent-tabs-mode: nil
+ * End:
+ * end of autoopts/parse-duration.h */

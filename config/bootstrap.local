@@ -1,8 +1,9 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
+#
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-10 10:42:10 bkorb"
+# Time-stamp:        "2010-07-17 09:49:34 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -19,9 +20,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-# ----------------------------------------------------------------------
-# @(#) $Id: 2d136e2884f031057f51a7cd5cba0c2c5c44a3aa $
-# ----------------------------------------------------------------------
 
 locate_exe()
 {

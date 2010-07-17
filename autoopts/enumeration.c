@@ -2,7 +2,7 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2010-07-10 11:01:23 bkorb"
+ * Time-stamp:      "2010-07-17 10:32:41 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -89,7 +89,7 @@ enumError(
         tCC * const * paz = paz_names;
 
         do  {
-            size_t len = strlen( *(paz++) ) + 1;
+            size_t len = strlen(*(paz++)) + 1;
             if (len > max_len)
                 max_len = len;
             ttl_len += len;
@@ -103,7 +103,7 @@ enumError(
      */
     if (max_len > 35) {
         do  {
-            fprintf( option_usage_fp, "  %s\n", *(paz_names++) );
+            fprintf(option_usage_fp, "  %s\n", *(paz_names++));
         } while (--ct_down > 0);
     }
 
@@ -111,12 +111,12 @@ enumError(
      *  ELSE IF they all fit on one line, then do so.
      */
     else if (ttl_len < 76) {
-        fputc( ' ', option_usage_fp );
+        fputc(' ', option_usage_fp);
         do  {
-            fputc( ' ', option_usage_fp );
-            fputs( *(paz_names++), option_usage_fp );
+            fputc(' ', option_usage_fp);
+            fputs(*(paz_names++), option_usage_fp);
         } while (--ct_down > 0);
-        fputc( '\n', option_usage_fp );
+        fputc('\n', option_usage_fp);
     }
 
     /*
@@ -126,9 +126,9 @@ enumError(
         int   ent_no = 0;
         char  zFmt[16];  /* format for all-but-last entries on a line */
 
-        sprintf( zFmt, "%%-%ds", (int)max_len );
+        sprintf(zFmt, "%%-%ds", (int)max_len);
         max_len = 78 / max_len; /* max_len is now max entries on a line */
-        fputs( "  ", option_usage_fp );
+        fputs("  ", option_usage_fp);
 
         /*
          *  Loop through all but the last entry
@@ -139,7 +139,7 @@ enumError(
                 /*
                  *  Last entry on a line.  Start next line, too.
                  */
-                fprintf( option_usage_fp, "%s\n  ", *(paz_names++) );
+                fprintf(option_usage_fp, "%s\n  ", *(paz_names++));
                 ent_no = 0;
             }
 
@@ -152,7 +152,7 @@ enumError(
     if (pOpts > OPTPROC_EMIT_LIMIT) {
         fprintf(option_usage_fp, zIntRange, hidden, name_ct - 1 + hidden);
 
-        (*(pOpts->pUsageProc))( pOpts, EXIT_FAILURE );
+        (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
         /* NOTREACHED */
     }
 
@@ -178,7 +178,7 @@ findName(
      *  The result gets stashed in a char* pointer.
      */
     uintptr_t     res = name_ct;
-    size_t        len = strlen( (char*)pzName );
+    size_t        len = strlen((char*)pzName);
     uintptr_t     idx;
 
     if (IS_DEC_DIGIT_CHAR(*pzName)) {
@@ -195,7 +195,7 @@ findName(
      *  Multiple partial matches means we have an ambiguous match.
      */
     for (idx = 0; idx < name_ct; idx++) {
-        if (strncmp( (char*)paz_names[idx], (char*)pzName, len) == 0) {
+        if (strncmp((char*)paz_names[idx], (char*)pzName, len) == 0) {
             if (paz_names[idx][len] == NUL)
                 return idx;  /* full match */
 
@@ -284,9 +284,9 @@ optionEnumerationVal(
          *  print the name string.
          */
         if (ix >= name_ct)
-            printf( "INVALID-%d", ix );
+            printf("INVALID-%d", ix);
         else
-            fputs( paz_names[ ix ], stdout );
+            fputs(paz_names[ ix ], stdout);
 
         break;
     }
@@ -367,7 +367,7 @@ optionSetMembers(
 
         while (bits != 0) {
             if (bits & 1) {
-                if (len++ > 0) fputs( " | ", stdout );
+                if (len++ > 0) fputs(" | ", stdout);
                 fputs(paz_names[ix], stdout);
             }
             if (++ix >= name_ct) break;
@@ -391,7 +391,7 @@ optionSetMembers(
          */
         while (bits != 0) {
             if (bits & 1)
-                len += strlen( paz_names[ix]) + 8;
+                len += strlen(paz_names[ix]) + 8;
             if (++ix >= name_ct) break;
             bits >>= 1;
         }
@@ -403,7 +403,7 @@ optionSetMembers(
          *  because we will be restoring to current state, not adding to
          *  the default set of bits.
          */
-        strcpy( pz, "none" );
+        strcpy(pz, "none");
         pz += 4;
         bits = (uintptr_t)pOD->optCookie;
         bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
@@ -411,9 +411,9 @@ optionSetMembers(
 
         while (bits != 0) {
             if (bits & 1) {
-                strcpy( pz, " + " );
-                strcpy( pz+3, paz_names[ix]);
-                pz += strlen( paz_names[ix]) + 3;
+                strcpy(pz, " + ");
+                strcpy(pz+3, paz_names[ix]);
+                pz += strlen(paz_names[ix]) + 3;
             }
             if (++ix >= name_ct) break;
             bits >>= 1;
@@ -441,12 +441,12 @@ optionSetMembers(
             tSCC zSpn[] = " ,|+\t\r\f\n";
             int  iv, len;
 
-            pzArg += strspn( pzArg, zSpn );
+            pzArg += strspn(pzArg, zSpn);
             iv = (*pzArg == '!');
             if (iv)
-                pzArg += strspn( pzArg+1, zSpn ) + 1;
+                pzArg += strspn(pzArg+1, zSpn) + 1;
 
-            len = strcspn( pzArg, zSpn );
+            len = strcspn(pzArg, zSpn);
             if (len == 0)
                 break;
 
@@ -461,7 +461,7 @@ optionSetMembers(
             }
             else do {
                 char* pz;
-                uintptr_t bit = strtoul( pzArg, &pz, 0 );
+                uintptr_t bit = strtoul(pzArg, &pz, 0);
 
                 if (pz != pzArg + len) {
                     char z[ AO_NAME_SIZE ];
@@ -471,7 +471,7 @@ optionSetMembers(
                     if (*pz != NUL) {
                         if (len >= AO_NAME_LIMIT)
                             break;
-                        strncpy( z, pzArg, (size_t)len );
+                        strncpy(z, pzArg, (size_t)len);
                         z[len] = NUL;
                         p = z;
                     } else {
@@ -494,7 +494,7 @@ optionSetMembers(
                 break;
             pzArg += len + 1;
         }
-        if (name_ct < (8 * sizeof( uintptr_t ))) {
+        if (name_ct < (8 * sizeof(uintptr_t))) {
             res &= (1UL << name_ct) - 1UL;
         }
 

@@ -1,8 +1,8 @@
-#! /bin/ksh
+#! /bin/bash
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2010-02-24 08:38:22 bkorb"
+  Time-stamp:        "2010-07-17 09:45:29 bkorb"
   echo ${2} | sed 's/:[0-9][0-9] .*//;s/[^0-9]//g')
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
@@ -22,9 +22,7 @@ timestamp=$(set -- \
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-# ----------------------------------------------------------------------
-# @(#) $Id: 43ebff8aac5b89cef691e1f5b02596d038714472 $
-# ----------------------------------------------------------------------
+
 case "$1" in
 -CVS ) update_cvs=true  ;;
 -*   ) echo "USAGE: $0 [-CVS]"

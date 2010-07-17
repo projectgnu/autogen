@@ -2,7 +2,7 @@
 /**
  * \file time.c
  *
- *  Time-stamp:      "2010-07-10 10:55:42 bkorb"
+ *  Time-stamp:      "2010-07-17 10:36:19 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -74,7 +74,7 @@ optionTimeVal(tOptions* pOpts, tOptDesc* pOD )
     return;
 
 bad_time:
-    fprintf( stderr, zNotNumber, pOpts->pzProgName, pOD->optArg.argString );
+    fprintf(stderr, zNotNumber, pOpts->pzProgName, pOD->optArg.argString);
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
         (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
 
@@ -86,4 +86,4 @@ bad_time:
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of autoopts/numeric.c */
+ * end of autoopts/time.c */

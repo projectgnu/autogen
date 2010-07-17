@@ -1,7 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2010-02-24 08:41:04 bkorb"
-
+# Time-stamp:      "2010-07-17 10:04:31 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -73,10 +72,10 @@ inner_main(int argc, char** argv)
 
 (def-file-line "copyright.text" extract-fmt) =]
 [= guile-main =]
-    exit( EXIT_SUCCESS );[=
+    exit(EXIT_SUCCESS);[=
   ELSE  =]
 
-    export_options_to_guile( &[=(. pname)=]Options );
+    export_options_to_guile(&[=(. pname)=]Options);
     scm_shell(argc, argv);[=
   ENDIF =]
 }
@@ -88,7 +87,7 @@ main(int argc, char** argv)
     (string-append (def-file-line "before-guile-boot" extract-fmt)
        (get "before-guile-boot") ) )
 =]
-    gh_enter( argc, argv, inner_main );
+    gh_enter(argc, argv, inner_main);
     /* NOT REACHED */
     return 0;
 }
@@ -114,7 +113,7 @@ DEFINE build-test-main
 =]
 
 extern tOptions  genshelloptOptions;
-extern void      optionParseShell( tOptions* );
+extern void      optionParseShell(tOptions*);
 extern tOptions* pShellParseOptions;[=
 
   ELIF (not (exist? "main-text"))  =][=
@@ -124,7 +123,7 @@ extern tOptions* pShellParseOptions;[=
         (set! option-emitter-proc "optionPutShell"))
 =]
 
-extern void [= (. option-emitter-proc) =]( tOptions* );[=
+extern void [= (. option-emitter-proc) =](tOptions*);[=
 
   ENDIF
 
@@ -141,13 +140,13 @@ main(int argc, char** argv)
      *  `genshellUsage()' will use it.
      */
     pShellParseOptions = &[=(. pname)=]Options;
-    (void)optionProcess( &genshelloptOptions, argc, argv );
-    optionParseShell( &[=(. pname)=]Options );[=
+    (void)optionProcess(&genshelloptOptions, argc, argv);
+    optionParseShell(&[=(. pname)=]Options);[=
 
   ELIF (exist? "main-text") =][=
     IF (not (exist? "option-code")) =]
     {
-        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
+        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
         argc -= ct;
         argv += ct;
     }[=
@@ -162,8 +161,8 @@ main(int argc, char** argv)
   ELSE test-main is not optionParseShell and main-text not exist
 
 =]
-    (void)optionProcess( &[=(. pname)=]Options, argc, argv );
-    [= (. option-emitter-proc) =]( &[=(. pname)=]Options );[=
+    (void)optionProcess(&[=(. pname)=]Options, argc, argv);
+    [= (. option-emitter-proc) =](&[=(. pname)=]Options);[=
   ENDIF=]
     return res;
 }
@@ -202,10 +201,10 @@ DEFINE for-each-main            =][=
 static char*
 trim_input_line(char* pz_s)
 {
-    char* pz_e = pz_s + strlen( pz_s );
-    while ((pz_e > pz_s) && isspace( pz_e[-1] ))  pz_e--;
+    char* pz_e = pz_s + strlen(pz_s);
+    while ((pz_e > pz_s) && isspace(pz_e[-1]))  pz_e--;
     *pz_e = '\0';
-    while (isspace( *pz_s ))  pz_s++;
+    while (isspace(*pz_s))  pz_s++;
 
     switch (*pz_s) {
     case '\0':
@@ -248,7 +247,7 @@ ELSE
 
 =]
 
-extern int [= handler-proc =]( [=(. handler-arg-type)=] );[=
+extern int [= handler-proc =]([=(. handler-arg-type)=]);[=
 
 ENDIF
 
@@ -272,25 +271,25 @@ validate_fname(char const* pz_fname)
 
     {
         struct stat sb;
-        if (stat( pz_fname, &sb ) < 0) {
-            fprintf( stderr, pz_fs_err, errno, strerror(errno), "stat",
-                     pz_fname );
+        if (stat(pz_fname, &sb) < 0) {
+            fprintf(stderr, pz_fs_err, errno, strerror(errno), "stat",
+                    pz_fname);
             return 1;
         }[=
 
   IF (*=* (get "handler-type") "text") =]
 
         if (! S_ISREG(sb.st_mode)) {
-            fprintf( stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                     "not regular file:", pz_fname );
+            fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
+                    "not regular file:", pz_fname);
             return 1;
         }[=
 
     IF (=* (get "handler-type") "some-text") =]
 
         if (sb.st_size == 0) {
-            fprintf( stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                     "empty file:", pz_fname );
+            fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
+                    "empty file:", pz_fname);
             return 1;
         }[=
 
@@ -319,8 +318,8 @@ CASE handler-type =][=
         (shellf "echo '%s' | sed 's/.*-//'"
                 (get "handler-type")) =]");
         if (fp == NULL) {
-            fprintf( stderr, pz_fs_err, errno, strerror(errno), "fopen",
-                     pz_fname );
+            fprintf(stderr, pz_fs_err, errno, strerror(errno), "fopen",
+                    pz_fname);
             return 1;
         }
         res = [= handler-proc =](pz_fname, fp);
@@ -331,11 +330,11 @@ CASE handler-type =][=
 *=*  text        =][=
     (tpl-file-line extract-fmt)
     =]
-    file_text = malloc( text_size + 1 );
+    file_text = malloc(text_size + 1);
     if (file_text == NULL) {
         fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
                 text_size+1, pz_fname);
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
 
     {
@@ -345,14 +344,14 @@ CASE handler-type =][=
         int     try_ct = 0;
 
         if (fd < 0) {
-            fprintf( stderr, pz_fs_err, errno, strerror(errno), "open",
-                     pz_fname );
+            fprintf(stderr, pz_fs_err, errno, strerror(errno), "open",
+                    pz_fname);
             free(file_text);
             return 1;
         }
 
         while (sz > 0) {
-            ssize_t rd_ct = read( fd, pz, sz );
+            ssize_t rd_ct = read(fd, pz, sz);
             /*
              *  a read count of zero is theoretically okay, but we've already
              *  checked the file size, so we shoud be reading more.
@@ -366,9 +365,9 @@ CASE handler-type =][=
                    && (++try_ct < 10)  )
                     continue;
 
-                fprintf( stderr, pz_fs_err, errno, strerror(errno), "read",
-                         pz_fname );
-                exit( EXIT_FAILURE );
+                fprintf(stderr, pz_fs_err, errno, strerror(errno), "read",
+                        pz_fname);
+                exit(EXIT_FAILURE);
             }
             pz += rd_ct;
             sz -= rd_ct;
@@ -398,7 +397,7 @@ main(int argc, char** argv)
 {
     int res = 0;
     {
-        int ct = optionProcess( &[=(. pname)=]Options, argc, argv );
+        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
         argc -= ct;
         argv += ct;
     }[=
@@ -413,16 +412,16 @@ main(int argc, char** argv)
      */
     if (argc > 0) {
         do  {
-            res |= [= (. handler-proc) =]( *(argv++) );
+            res |= [= (. handler-proc) =](*(argv++));
         } while (--argc > 0);
     }
 
     /*
      *  Input list from tty input
      */
-    else if (isatty( STDIN_FILENO )) {
-        fputs( _("[=(. prog-name)=] ERROR: input list is a tty\n"), stderr );
-        [= (. UP-prefix) =]USAGE( EXIT_FAILURE );
+    else if (isatty(STDIN_FILENO)) {
+        fputs(_("[=(. prog-name)=] ERROR: input list is a tty\n"), stderr);
+        [= (. UP-prefix) =]USAGE(EXIT_FAILURE);
         /* NOTREACHED */
     }
 
@@ -432,28 +431,28 @@ main(int argc, char** argv)
     else {
         int in_ct   = 0;
         size_t pg_size = getpagesize();
-        char* buf   = malloc( pg_size );
+        char* buf   = malloc(pg_size);
         if (buf == NULL) {
-            fputs( _("[=(. prog-name)
-                   =] ERROR: no memory for input list\n"), stderr );
+            fputs(_("[=(. prog-name)
+                   =] ERROR: no memory for input list\n"), stderr);
             return EXIT_FAILURE;
         }
 
         for (;;) {
-            char* pz = fgets( buf, (ssize_t)pg_size, stdin );
+            char* pz = fgets(buf, (ssize_t)pg_size, stdin);
             if (pz == NULL)
                 break;
 
-            pz = trim_input_line( pz );
+            pz = trim_input_line(pz);
             if (pz != NULL) {
-                 res |= [= (. handler-proc) =]( pz );
+                 res |= [= (. handler-proc) =](pz);
                  in_ct++;
             }
         }
 
         if (in_ct == 0)
-            fputs( _("[=(. prog-name)
-                   =] Warning:  no input lines were read\n"), stderr );
+            fputs(_("[=(. prog-name)
+                   =] Warning:  no input lines were read\n"), stderr);
         free(buf);
     }[=
 
@@ -942,7 +941,7 @@ DEFINE   keyword-code           =][=
 =]
 
     pOptDesc->optArg.argEnum =
-        optionEnumerationVal( pOptions, pOptDesc, azNames, [=(. tmp-ct)=] );
+        optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
 [=
 
   ENDIF                         =][=

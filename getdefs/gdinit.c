@@ -1,10 +1,10 @@
-/*
- *  $Id: 7000b2dac5d2413b6c4a5fc4660407359941ead7 $
+/**
+ * \file gdinit.c
  *
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2010-02-24 08:38:31 bkorb"
+ *  Time-stamp:        "2010-07-17 09:48:00 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
@@ -23,7 +23,7 @@
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tSCC zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
+static char const zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static char*

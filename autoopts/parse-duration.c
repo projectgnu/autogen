@@ -579,4 +579,4 @@ parse_duration (char const * pz)
  * c-file-style: "gnu"
  * indent-tabs-mode: nil
  * End:
- * end of parse-duration.c */
+ * end of autoopts/parse-duration.c */

@@ -1,9 +1,9 @@
 ##  -*- Mode: Makefile -*-
-## ---------------------------------------------------------------------
+##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Time-stamp:      "2010-02-24 08:38:27 bkorb"
+## Time-stamp:      "2010-07-17 09:46:22 bkorb"
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
@@ -19,10 +19,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: 41cf4454bd4da22a40389f8b70db35637f07167c $
-## ---------------------------------------------------------------------
 
 TESTS      = cfg.test index.test option.test subblock.test
 EXTRA_DIST = defs $(TESTS)

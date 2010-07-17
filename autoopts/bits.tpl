@@ -5,7 +5,7 @@ c
 
 #!/bin/sh
 
-## Time-stamp:      "2010-07-10 10:51:55 bkorb"                                 
+## Time-stamp:      "2010-07-17 10:09:01 bkorb"                                 
 ## Author:          Bruce Korb <bkorb@gnu.org>                                  
 ##                                                                              
 ##  This file is part of AutoOpts, a companion to AutoGen.                      
@@ -204,7 +204,7 @@ FOR bit (for-from 0) (for-by 1) =][=
 ENDFOR bit  =][=
 
  (emit-string-table "nm")
- (sprintf "\nchar *\n%1$s_names( %1$s_bits_t bits )\n{" base-name)
+ (sprintf "\nchar *\n%1$s_names(%1$s_bits_t bits)\n{" base-name)
 =]
     static int const nm_ixa[ [= (+ 1 (high-lim "bit")) =] ] = {
 [=
@@ -293,7 +293,7 @@ ENDIF
 }
 
 static int
-str_to_id( char const * str, char const ** p_str )
+str_to_id(char const * str, char const ** p_str)
 {
     static char nm_buf[ [= (+ 1 name-width) =] ];
     int    res  = -1;
@@ -507,7 +507,7 @@ static char const bit_names[] =
  =];
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
     static char const fmt_z[] = "'%s' yields: %s\n";
     [= (. type-name) =] bts;
@@ -530,7 +530,7 @@ main( int argc, char** argv )
         }
     }
     {
-        char * pz = [= (. base-name) =]_names( bts );
+        char * pz = [= (. base-name) =]_names(bts);
         printf(fmt_z, argv[1], pz);
     }
     return 0;
@@ -645,9 +645,9 @@ DEFINE  emit-word-macro     =][=
   FOR un-mask
 
     =]
-[= (sprintf def-fmt (mask-name "_MASK")) =]( [=
+[= (sprintf def-fmt (mask-name "_MASK")) =]([=
    (string-append BASE-NAME "_MASK")     =] & ~( \
-[= INVOKE emit-bit-list =] ))[=
+[= INVOKE emit-bit-list =]))[=
 
   ENDFOR un-mask=][=
 
@@ -708,7 +708,7 @@ defined
               do { (_m)[(_b)/32] |= 1U << ((_b) % 32); } while (0)
 #define CLEAR_[= (. BASE-NAME) =](_m, _b) \
               do { (_m)[(_b)/32] &= ~(1U << ((_b) % 32)); } while (0)
-#define  TEST_[= (. BASE-NAME)   =]( _m, _b) \
+#define  TEST_[= (. BASE-NAME) =](_m, _b) \
               (((_m)[(_b)/32] & (1U << ((_b) % 32))) != 0)
 [= INVOKE emit-loop-macro op-code = "&"  mac-name = AND  =]
 [= INVOKE emit-loop-macro op-code = "|"  mac-name =  OR  =]

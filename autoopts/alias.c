@@ -2,7 +2,7 @@
 /**
  * \file alias.c
  *
- * Time-stamp:      "2010-07-10 11:02:31 bkorb"
+ * Time-stamp:      "2010-07-17 10:37:22 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -68,7 +68,7 @@ optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
             char const * pzEqv =
                 (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
 
-            fputs( zErrOnly, stderr );
+            fputs(zErrOnly, stderr);
 
             if (pOD->optMaxCt > 1)
                 fprintf(stderr, zAtMost, pOD->optMaxCt, pOD->pz_Name, pzEqv);
@@ -91,10 +91,11 @@ optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
     if (pOD->pOptProc != NULL)
         (*pOD->pOptProc)(pOpts, pOD);
 }
+
 /*
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of autoopts/boolean.c */
+ * end of autoopts/alias.c */

@@ -1,9 +1,9 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # forfrom.test --- test forfrom functionality
 #
-# Time-stamp:        "2010-02-24 08:41:53 bkorb"
+# Time-stamp:        "2010-07-17 09:52:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##
@@ -22,9 +22,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-# $Id: a5444377a2dfd04003b3437e89fd339cf04050f1 $
-# ----------------------------------------------------------------------
 
 . ./defs
 

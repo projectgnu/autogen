@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2010-07-10 10:11:43 bkorb"
+# Time-stamp:      "2010-07-17 10:05:27 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -230,8 +230,8 @@ DEFINE set-defines
   ESAC arg-type  =][=
 
   IF (hash-ref have-cb-procs flg-name) =]; \
-        (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
+        (*([=(. descriptor)=].pOptProc))(&[=(. pname)=]Options, \
+                [=(. pname)=]Options.pOptDesc + [=set-index=]);[=
   ENDIF "callout procedure exists" =] )[=
 
   IF (exist? "disable") =][=
@@ -248,8 +248,8 @@ DEFINE set-defines
         [=set-desc=].fOptState |= OPTST_SET | OPTST_DISABLED; \
         [=set-desc=].optArg.argString = NULL[=
       IF (hash-ref have-cb-procs flg-name) =]; \
-        (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=set-index=] );[=
+        (*([=(. descriptor)=].pOptProc))(&[=(. pname)=]Options, \
+                [=(. pname)=]Options.pOptDesc + [=set-index=]);[=
       ENDIF "callout procedure exists" =] )[=
     ENDIF  =][=
   ENDIF disable exists =][=
@@ -426,7 +426,7 @@ test $? -eq 0 || die ${CLexe} failed"
 
   =*  key        =]
 #define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
-                 =] optionKeywordName( &[=(. value-desc)=], (_v))
+                 =] optionKeywordName(&[=(. value-desc)=], (_v))
 #define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
                  =] ([=(. value-desc)=].optArg.argEnum)[=
 

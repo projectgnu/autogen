@@ -1,10 +1,10 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # option.test --- test option extraction
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:38:24 bkorb"
+# Time-stamp:        "2010-07-17 09:47:15 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,9 +21,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: f120a7b4b5e8af797e52c3c0f36760d134f4f6e5 $
-# ----------------------------------------------------------------------
 
 # Common definitions
 if test -z "$srcdir"; then

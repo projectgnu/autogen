@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2010-07-16 17:09:55 bkorb"
+ *  Time-stamp:        "2010-07-16 17:25:03 bkorb"
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 
@@ -140,7 +140,7 @@ compile_re(regex_t* pRe, char const * pzPat, int flags)
     int  rerr = regcomp(pRe, pat, flags);
     if (rerr != 0) {
         char zEr[ SCRIBBLE_SIZE ];
-        regerror(rerr, pRe, zEr, sizeof( zEr ));
+        regerror(rerr, pRe, zEr, sizeof(zEr));
         fprintf(stderr, zBadRe, rerr, zEr, pzPat);
         AG_ABEND("Bad regular expression");
     }
@@ -968,7 +968,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
         &Select_Match_NonExistence
     };
 
-    static char const * const apzMatchName[] = {
+    static char const * const match_names[] = {
         "COMPARE_FULL",
         "COMPARE_END",
         "COMPARE_START",
@@ -1027,7 +1027,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf(pfTrace, "CASE string `%s' %s matched `%s'\n",
                         pzSampleText,
-                        apzMatchName[pMac->funcCode & 0x0F],
+                        match_names[pMac->funcCode & 0x0F],
                         pT->pzTemplText + pMac->ozText);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
@@ -1041,7 +1041,7 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
         else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
             fprintf(pfTrace, "CASE no match: `%s' %s vs. `%s'\n",
                     pzSampleText,
-                    apzMatchName[pMac->funcCode & 0x0F],
+                    match_names[pMac->funcCode & 0x0F],
                     pT->pzTemplText + pMac->ozText);
         }
     }

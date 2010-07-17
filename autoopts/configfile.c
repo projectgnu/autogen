@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2010-07-10 11:01:44 bkorb"
+ *  Time-stamp:      "2010-07-17 10:25:53 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -34,7 +34,7 @@ filePreset(
     int           direction );
 
 static char*
-handleComment( char* pzText );
+handleComment(char* pzText);
 
 static char*
 handleConfig(
@@ -78,7 +78,7 @@ parseValueType(
     tOptionValue* pType );
 
 static char*
-skipUnknown( char* pzText );
+skipUnknown(char* pzText);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -113,14 +113,14 @@ skipUnknown( char* pzText );
  *  @end itemize
 =*/
 const tOptionValue*
-configFileLoad( char const* pzFile )
+configFileLoad(char const* pzFile)
 {
     tmap_info_t   cfgfile;
     tOptionValue* pRes = NULL;
     tOptionLoadMode save_mode = option_load_mode;
 
     char* pzText =
-        text_mmap( pzFile, PROT_READ, MAP_PRIVATE, &cfgfile );
+        text_mmap(pzFile, PROT_READ, MAP_PRIVATE, &cfgfile);
 
     if (TEXT_MMAP_FAILED_ADDR(pzText))
         return NULL; /* errno is set */
@@ -130,10 +130,10 @@ configFileLoad( char const* pzFile )
 
     if (pRes == NULL) {
         int err = errno;
-        text_munmap( &cfgfile );
+        text_munmap(&cfgfile);
         errno = err;
     } else
-        text_munmap( &cfgfile );
+        text_munmap(&cfgfile);
 
     option_load_mode = save_mode;
     return pRes;
@@ -165,8 +165,8 @@ configFileLoad( char const* pzFile )
  *  @end itemize
 =*/
 const tOptionValue*
-optionFindValue( const tOptDesc* pOptDesc,
-                 char const* pzName, char const* pzVal )
+optionFindValue(const tOptDesc* pOptDesc, char const* pzName,
+                char const* pzVal)
 {
     const tOptionValue* pRes = NULL;
 
@@ -196,7 +196,7 @@ optionFindValue( const tOptDesc* pOptDesc,
 
         while (--ct >= 0) {
             const tOptionValue* pOV = *(ppOV++);
-            const tOptionValue* pRV = optionGetValue( pOV, pzName );
+            const tOptionValue* pRV = optionGetValue(pOV, pzName);
 
             if (pRV == NULL)
                 continue;
@@ -240,9 +240,9 @@ optionFindValue( const tOptDesc* pOptDesc,
  *  @code{ENOENT} - no entry matched the given name.
  *  @end itemize
 =*/
-const tOptionValue*
-optionFindNextValue( const tOptDesc* pOptDesc, const tOptionValue* pPrevVal,
-                 char const* pzName, char const* pzVal )
+tOptionValue const *
+optionFindNextValue(const tOptDesc * pOptDesc, const tOptionValue * pPrevVal,
+                    char const * pzName, char const * pzVal)
 {
     int foundOldVal = 0;
     tOptionValue* pRes = NULL;
@@ -309,7 +309,7 @@ optionFindNextValue( const tOptDesc* pOptDesc, const tOptionValue* pPrevVal,
  *  @end itemize
 =*/
 const tOptionValue*
-optionGetValue( const tOptionValue* pOld, char const* pzValName )
+optionGetValue(const tOptionValue* pOld, char const* pzValName)
 {
     tArgList*     pAL;
     tOptionValue* pRes = NULL;
@@ -330,7 +330,7 @@ optionGetValue( const tOptionValue* pOld, char const* pzValName )
 
         else do {
             tOptionValue* pOV = *(papOV++);
-            if (strcmp( pOV->pzName, pzValName ) == 0) {
+            if (strcmp(pOV->pzName, pzValName) == 0) {
                 pRes = pOV;
                 break;
             }
@@ -419,7 +419,7 @@ filePreset(
     tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
     tAoUL         st_flags = optst.flags;
     char*         pzFileText =
-        text_mmap( pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile );
+        text_mmap(pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile);
 
     if (TEXT_MMAP_FAILED_ADDR(pzFileText))
         return;
@@ -453,15 +453,15 @@ filePreset(
 
             else switch (pzFileText[1]) {
             case '?':
-                pzFileText = handleDirective( pOpts, pzFileText );
+                pzFileText = handleDirective(pOpts, pzFileText);
                 break;
 
             case '!':
-                pzFileText = handleComment( pzFileText );
+                pzFileText = handleComment(pzFileText);
                 break;
 
             case '/':
-                pzFileText = strchr( pzFileText+2, '>' );
+                pzFileText = strchr(pzFileText+2, '>');
                 if (pzFileText++ != NULL)
                     break;
 
@@ -471,11 +471,11 @@ filePreset(
             break;
 
         case '[':
-            pzFileText = handleProgramSection( pOpts, pzFileText );
+            pzFileText = handleProgramSection(pOpts, pzFileText);
             break;
 
         case '#':
-            pzFileText = strchr( pzFileText+1, '\n' );
+            pzFileText = strchr(pzFileText+1, '\n');
             break;
 
         default:
@@ -484,7 +484,7 @@ filePreset(
     } while (pzFileText != NULL);
 
  all_done:
-    text_munmap( &cfgfile );
+    text_munmap(&cfgfile);
 }
 
 
@@ -495,9 +495,9 @@ filePreset(
  *  but actually I don't care that much.  It ends with "-->".
  */
 static char*
-handleComment( char* pzText )
+handleComment(char* pzText)
 {
-    char* pz = strstr( pzText, "-->" );
+    char* pz = strstr(pzText, "-->");
     if (pz != NULL)
         pz += 3;
     return pz;
@@ -519,7 +519,7 @@ handleConfig(
     int           direction )
 {
     char* pzName = pzText++;
-    char* pzEnd  = strchr( pzText, '\n' );
+    char* pzEnd  = strchr(pzText, '\n');
 
     if (pzEnd == NULL)
         return pzText + strlen(pzText);
@@ -529,7 +529,7 @@ handleConfig(
     if (pzText > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
-        loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED );
+        loadOptionLine(pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED);
         return pzEnd;
     }
 
@@ -585,7 +585,7 @@ handleConfig(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine( pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED );
+    loadOptionLine(pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED);
 
     return pzEnd;
 }
@@ -602,19 +602,19 @@ handleDirective(
     char*         pzText )
 {
     char   ztitle[32] = "<?";
-    size_t title_len = strlen( zProg );
+    size_t title_len = strlen(zProg);
     size_t name_len;
 
-    if (  (strncmp( pzText+2, zProg, title_len ) != 0)
+    if (  (strncmp(pzText+2, zProg, title_len) != 0)
        || (! IS_WHITESPACE_CHAR(pzText[title_len+2])) )  {
-        pzText = strchr( pzText+2, '>' );
+        pzText = strchr(pzText+2, '>');
         if (pzText != NULL)
             pzText++;
         return pzText;
     }
 
-    name_len = strlen( pOpts->pzProgName );
-    strcpy( ztitle+2, zProg );
+    name_len = strlen(pOpts->pzProgName);
+    strcpy(ztitle+2, zProg);
     title_len += 2;
 
     do  {
@@ -622,14 +622,14 @@ handleDirective(
 
         if (IS_WHITESPACE_CHAR(*pzText)) {
             while (IS_WHITESPACE_CHAR(*++pzText))  ;
-            if (  (strneqvcmp( pzText, pOpts->pzProgName, (int)name_len) == 0)
+            if (  (strneqvcmp(pzText, pOpts->pzProgName, (int)name_len) == 0)
                && (pzText[name_len] == '>'))  {
                 pzText += name_len + 1;
                 break;
             }
         }
 
-        pzText = strstr( pzText, ztitle );
+        pzText = strstr(pzText, ztitle);
     } while (pzText != NULL);
 
     return pzText;
@@ -647,22 +647,22 @@ handleProgramSection(
     tOptions*     pOpts,
     char*         pzText )
 {
-    size_t len = strlen( pOpts->pzPROGNAME );
-    if (   (strncmp( pzText+1, pOpts->pzPROGNAME, len ) == 0)
+    size_t len = strlen(pOpts->pzPROGNAME);
+    if (   (strncmp(pzText+1, pOpts->pzPROGNAME, len) == 0)
         && (pzText[len+1] == ']'))
-        return strchr( pzText + len + 2, '\n' );
+        return strchr(pzText + len + 2, '\n');
 
     if (len > 16)
         return NULL;
 
     {
         char z[24];
-        sprintf( z, "[%s]", pOpts->pzPROGNAME );
-        pzText = strstr( pzText, z );
+        sprintf(z, "[%s]", pOpts->pzPROGNAME);
+        pzText = strstr(pzText, z);
     }
 
     if (pzText != NULL)
-        pzText = strchr( pzText, '\n' );
+        pzText = strchr(pzText, '\n');
     return pzText;
 }
 
@@ -694,7 +694,7 @@ handleStructure(
     switch (*pzText) {
     case ' ':
     case '\t':
-        pzText = parseAttributes( pOpts, pzText, &mode, &valu );
+        pzText = parseAttributes(pOpts, pzText, &mode, &valu);
         if (*pzText == '>')
             break;
         if (*pzText != '/')
@@ -706,14 +706,14 @@ handleStructure(
             return NULL;
         *pzText = NUL;
         pzText += 2;
-        loadOptionLine( pOpts, pOS, pzName, direction, mode );
+        loadOptionLine(pOpts, pOS, pzName, direction, mode);
         return pzText;
 
     case '>':
         break;
 
     default:
-        pzText = strchr( pzText, '>');
+        pzText = strchr(pzText, '>');
         if (pzText != NULL)
             pzText++;
         return pzText;
@@ -735,9 +735,9 @@ handleStructure(
         if (len > sizeof(z))
             pz = AGALOC(len, "scan name");
 
-        sprintf( pz, "</%s>", pzName );
+        sprintf(pz, "</%s>", pzName);
         *pzText = ' ';
-        pzText = strstr( pzText, pz );
+        pzText = strstr(pzText, pz);
         if (pz != z) AGFREE(pz);
 
         if (pzText == NULL)
@@ -788,7 +788,7 @@ handleStructure(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine( pOpts, pOS, pzName, direction, mode );
+    loadOptionLine(pOpts, pOS, pzName, direction, mode);
 
     return pzText;
 }
@@ -801,7 +801,7 @@ handleStructure(
  *  (see "optionFileLoad()", the implementation for --load-opts)
  */
 LOCAL void
-internalFileLoad( tOptions* pOpts )
+internalFileLoad(tOptions* pOpts)
 {
     uint32_t  svfl;
     int       idx;
@@ -852,8 +852,8 @@ internalFileLoad( tOptions* pOpts )
 
         idx += inc;
 
-        if (! optionMakePath( zFileName, (int)sizeof(zFileName),
-                              pzPath, pOpts->pzProgPath ))
+        if (! optionMakePath(zFileName, (int)sizeof(zFileName),
+                             pzPath, pOpts->pzProgPath))
             continue;
 
         /*
@@ -861,23 +861,23 @@ internalFileLoad( tOptions* pOpts )
          *  THEN append the Resource Configuration file name
          *  ELSE we must have the complete file name
          */
-        if (stat( zFileName, &StatBuf ) != 0)
+        if (stat(zFileName, &StatBuf) != 0)
             continue; /* bogus name - skip the home list entry */
 
-        if (S_ISDIR( StatBuf.st_mode )) {
-            size_t len = strlen( zFileName );
+        if (S_ISDIR(StatBuf.st_mode)) {
+            size_t len = strlen(zFileName);
             char* pz;
 
-            if (len + 1 + strlen( pOpts->pzRcName ) >= sizeof( zFileName ))
+            if (len + 1 + strlen(pOpts->pzRcName) >= sizeof(zFileName))
                 continue;
 
             pz = zFileName + len;
             if (pz[-1] != DIRCH)
                 *(pz++) = DIRCH;
-            strcpy( pz, pOpts->pzRcName );
+            strcpy(pz, pOpts->pzRcName);
         }
 
-        filePreset( pOpts, zFileName, inc );
+        filePreset(pOpts, zFileName, inc);
 
         /*
          *  IF we are now to skip config files AND we are presetting,
@@ -930,13 +930,13 @@ internalFileLoad( tOptions* pOpts )
  *       always be returned.
 =*/
 int
-optionFileLoad( tOptions* pOpts, char const* pzProgram )
+optionFileLoad(tOptions* pOpts, char const* pzProgram)
 {
-    if (! SUCCESSFUL( validateOptionsStruct( pOpts, pzProgram )))
+    if (! SUCCESSFUL(validateOptionsStruct(pOpts, pzProgram)))
         return -1;
 
     pOpts->pzProgName = pzProgram;
-    internalFileLoad( pOpts );
+    internalFileLoad(pOpts);
     return 0;
 }
 
@@ -953,7 +953,7 @@ optionFileLoad( tOptions* pOpts, char const* pzProgram )
  *  pOptDesc->optArg.argString.
 =*/
 void
-optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
+optionLoadOpt(tOptions* pOpts, tOptDesc* pOptDesc)
 {
     struct stat sb;
 
@@ -967,21 +967,21 @@ optionLoadOpt( tOptions* pOpts, tOptDesc* pOptDesc )
        || ((pOptDesc->fOptState & OPTST_RESET) != 0))
         return;
 
-    if (stat( pOptDesc->optArg.argString, &sb ) != 0) {
+    if (stat(pOptDesc->optArg.argString, &sb) != 0) {
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
             return;
 
-        fprintf( stderr, zFSErrOptLoad, errno, strerror( errno ),
-                 pOptDesc->optArg.argString );
+        fprintf(stderr, zFSErrOptLoad, errno, strerror(errno),
+                pOptDesc->optArg.argString);
         exit(EX_NOINPUT);
         /* NOT REACHED */
     }
 
-    if (! S_ISREG( sb.st_mode )) {
+    if (! S_ISREG(sb.st_mode)) {
         if ((pOpts->fOptSet & OPTPROC_ERRSTOP) == 0)
             return;
 
-        fprintf( stderr, zNotFile, pOptDesc->optArg.argString );
+        fprintf(stderr, zNotFile, pOptDesc->optArg.argString);
         exit(EX_NOINPUT);
         /* NOT REACHED */
     }
@@ -1019,15 +1019,15 @@ parseAttributes(
 
         switch (find_xat_attribute_id(pzText, len)) {
         case XAT_KWD_TYPE:
-            pzText = parseValueType( pzText+len, pType );
+            pzText = parseValueType(pzText+len, pType);
             break;
 
         case XAT_KWD_WORDS:
-            pzText = parseKeyWordType( pOpts, pzText+len, pType );
+            pzText = parseKeyWordType(pOpts, pzText+len, pType);
             break;
 
         case XAT_KWD_MEMBERS:
-            pzText = parseSetMemType( pOpts, pzText+len, pType );
+            pzText = parseSetMemType(pOpts, pzText+len, pType);
             break;
 
         case XAT_KWD_COOKED:
@@ -1058,7 +1058,7 @@ parseAttributes(
         case XAT_KWD_INVALID:
         invalid_kwd:
             pType->valType = OPARG_TYPE_NONE;
-            return skipUnknown( pzText );
+            return skipUnknown(pzText);
         }
     } while (pzText != NULL);
 
@@ -1077,7 +1077,7 @@ parseKeyWordType(
     char*         pzText,
     tOptionValue* pType )
 {
-    return skipUnknown( pzText );
+    return skipUnknown(pzText);
 }
 
 
@@ -1093,7 +1093,7 @@ parseSetMemType(
     char*         pzText,
     tOptionValue* pType )
 {
-    return skipUnknown( pzText );
+    return skipUnknown(pzText);
 }
 
 
@@ -1117,7 +1117,7 @@ parseValueType(
     if ((len == 0) || (! IS_END_XML_TOKEN_CHAR(*pzText))) {
     woops:
         pType->valType = OPARG_TYPE_NONE;
-        return skipUnknown( pzText );
+        return skipUnknown(pzText);
     }
 
     switch (find_value_type_id(pzText - len, len)) {
@@ -1160,7 +1160,7 @@ parseValueType(
  *  Skip over some unknown attribute
  */
 static char*
-skipUnknown( char* pzText )
+skipUnknown(char* pzText)
 {
     for (;; pzText++) {
         if (IS_END_XML_TOKEN_CHAR(*pzText))  return pzText;
@@ -1178,11 +1178,11 @@ skipUnknown( char* pzText )
  *  already been called.)
  */
 LOCAL tSuccess
-validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
+validateOptionsStruct(tOptions* pOpts, char const* pzProgram)
 {
     if (pOpts == NULL) {
-        fputs( zAO_Bad, stderr );
-        exit( EX_CONFIG );
+        fputs(zAO_Bad, stderr);
+        exit(EX_CONFIG);
     }
 
     /*
@@ -1214,9 +1214,9 @@ validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
 
         fprintf(stderr, zAO_Err, pzProgram, NUM_TO_VER(pOpts->structVersion));
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
-            fputs( zAO_Big, stderr );
+            fputs(zAO_Big, stderr);
         else
-            fputs( zAO_Sml, stderr );
+            fputs(zAO_Sml, stderr);
 
         return FAILURE;
     }
@@ -1226,7 +1226,7 @@ validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
      *  and the set of equivalent characters.
      */
     if (pOpts->pzProgName == NULL) {
-        char const* pz = strrchr( pzProgram, DIRCH );
+        char const* pz = strrchr(pzProgram, DIRCH);
 
         if (pz == NULL)
              pOpts->pzProgName = pzProgram;
@@ -1237,7 +1237,7 @@ validateOptionsStruct( tOptions* pOpts, char const* pzProgram )
         /*
          *  when comparing long names, these are equivalent
          */
-        strequate( zSepChars );
+        strequate(zSepChars);
     }
 
     return SUCCESS;

@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2010-07-16 17:10:20 bkorb"
+ *  Time-stamp:        "2010-07-16 17:22:47 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -117,7 +117,13 @@ tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg)
 /**
  *  Evaluate an expression and return a string pointer.  Always.
  *  It may need to be deallocated, so a boolean pointer is used
- *  to tell the caller.
+ *  to tell the caller.  Also, the match existence and non-existence
+ *  pay attention to the address of the empty string that gets
+ *  returned.  If it is, specifically, "zNil", then this code is
+ *  saying, "we could not compute a value, so we're returning this
+ *  empty string".  This is used by the Select_Match_Existence and
+ *  Select_Match_NonExistence code to distinguish non-existence from
+ *  an empty string value.
  */
 LOCAL tCC*
 evalExpression(ag_bool* pMustFree)

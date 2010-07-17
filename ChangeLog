@@ -3,7 +3,8 @@
 	* agen5/autogen.h (zEmpty): new empty string
 	* agen5/defParse.x (dp_do_empty_val): Use "zEmpty" for an empty
 	string instead of zNil.  zNil is used to indicate "not found".
-	* all-over ($Id): remove more of these lines.
+	* all-over ($Id): remove more of these lines & remove surpurfluous
+	space within parentheses.
 
 2010-07-10  Bruce Korb  <bkorb@gnu.org>
 

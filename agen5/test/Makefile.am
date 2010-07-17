@@ -1,8 +1,8 @@
 ##  -*- Mode: Makefile -*-
-## ---------------------------------------------------------------------
+##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-06-26 16:35:23 bkorb"
+## Time-stamp:      "2010-07-17 09:51:44 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -20,10 +20,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: a7ae1761866edfb81186f5315bc7d7790c39eaf8 $
-## ---------------------------------------------------------------------
 
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test

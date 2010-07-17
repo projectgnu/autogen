@@ -2,7 +2,7 @@
 /*
  * \file restore.c
  *
- * Time-stamp:      "2010-02-24 08:40:18 bkorb"
+ * Time-stamp:      "2010-07-17 10:41:04 bkorb"
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -97,8 +97,8 @@ optionSaveState(tOptions* pOpts)
     tOptions* p = (tOptions*)pOpts->pSavedState;
 
     if (p == NULL) {
-        size_t sz = sizeof( *pOpts ) + (pOpts->optCt * sizeof( tOptDesc ));
-        p = AGALOC( sz, "saved option state" );
+        size_t sz = sizeof(*pOpts) + (pOpts->optCt * sizeof(tOptDesc));
+        p = AGALOC(sz, "saved option state");
         if (p == NULL) {
             tCC* pzName = pOpts->pzProgName;
             if (pzName == NULL) {
@@ -106,15 +106,15 @@ optionSaveState(tOptions* pOpts)
                 if (pzName == NULL)
                     pzName = zNil;
             }
-            fprintf( stderr, zCantSave, pzName, sz );
-            exit( EXIT_FAILURE );
+            fprintf(stderr, zCantSave, pzName, sz);
+            exit(EXIT_FAILURE);
         }
 
         pOpts->pSavedState = p;
     }
 
-    memcpy( p, pOpts, sizeof( *p ));
-    memcpy( p + 1, pOpts->pOptDesc, p->optCt * sizeof( tOptDesc ));
+    memcpy(p, pOpts, sizeof(*p));
+    memcpy(p + 1, pOpts->pOptDesc, p->optCt * sizeof(tOptDesc));
 
     fixupSavedOptionArgs(pOpts);
 }
@@ -136,7 +136,7 @@ optionSaveState(tOptions* pOpts)
  *       printed to @code{stderr} and exit is called.
 =*/
 void
-optionRestore( tOptions* pOpts )
+optionRestore(tOptions* pOpts)
 {
     tOptions* p = (tOptions*)pOpts->pSavedState;
 
@@ -147,15 +147,15 @@ optionRestore( tOptions* pOpts )
             if (pzName == NULL)
                 pzName = zNil;
         }
-        fprintf( stderr, zNoState, pzName );
-        exit( EXIT_FAILURE );
+        fprintf(stderr, zNoState, pzName);
+        exit(EXIT_FAILURE);
     }
 
     pOpts->pSavedState = NULL;
     optionFree(pOpts);
 
-    memcpy( pOpts, p, sizeof( *p ));
-    memcpy( pOpts->pOptDesc, p+1, p->optCt * sizeof( tOptDesc ));
+    memcpy(pOpts, p, sizeof(*p));
+    memcpy(pOpts->pOptDesc, p+1, p->optCt * sizeof(tOptDesc));
     pOpts->pSavedState = p;
 
     fixupSavedOptionArgs(pOpts);
@@ -175,7 +175,7 @@ optionRestore( tOptions* pOpts )
  *        this routine is always successful.
 =*/
 void
-optionFree( tOptions* pOpts )
+optionFree(tOptions* pOpts)
 {
  free_saved_state:
     {
@@ -212,9 +212,9 @@ optionFree( tOptions* pOpts )
     }
     if (pOpts->pSavedState != NULL) {
         tOptions * p = (tOptions*)pOpts->pSavedState;
-        memcpy( pOpts, p, sizeof( *p ));
-        memcpy( pOpts->pOptDesc, p+1, p->optCt * sizeof( tOptDesc ));
-        AGFREE( pOpts->pSavedState );
+        memcpy(pOpts, p, sizeof(*p));
+        memcpy(pOpts->pOptDesc, p+1, p->optCt * sizeof(tOptDesc));
+        AGFREE(pOpts->pSavedState);
         pOpts->pSavedState = NULL;
         goto free_saved_state;
     }

@@ -1,10 +1,10 @@
-/*
- *  $Id: ddba125726f5257e4c3200633e1b7e3952d70bcb $
+/**
+ * \file gdemit.c
  *
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2010-02-24 08:38:32 bkorb"
+ *  Time-stamp:        "2010-07-17 09:46:01 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved

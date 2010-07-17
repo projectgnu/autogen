@@ -1,8 +1,8 @@
 ##  -*- Mode: Makefile -*-
-## ---------------------------------------------------------------------
+##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-02-24 14:49:29 bkorb"
+## Time-stamp:      "2010-07-17 09:50:20 bkorb"
 ## Copyright (c):   1997-2010 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -20,11 +20,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
-## $Id: a87171f6ae2d418238eb90180c4bf08bb0f12a72 $
-## ---------------------------------------------------------------------
-## Code:
+
 COMPAT_CSRC = pathfind.c snprintf.c strchr.c strdup.c strftime.c strsignal.c
 COMPAT_HDRS = compat.h strsignal.h windows-config.h unlocked-io.h
 COMPAT_GEN  = bootstrap.dir strsignal.def strsignal.tpl

@@ -1,9 +1,10 @@
+// -*- Mode: C -*-
 
 autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2010-03-01 13:07:55 bkorb"
+ *  Time-stamp:        "2010-07-17 09:50:00 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -21,9 +22,6 @@ author =           "Bruce Korb <bkorb@gnu.org>";
  *
  *  You should have received a copy of the GNU General Public License along
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  -------------------------------------------------------------------
- *  $Id: 11e135d62dde98256ea18fae6a8d92d124f256b7 $
- *  -------------------------------------------------------------------
  */
 
 group       = libopts;

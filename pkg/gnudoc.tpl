@@ -2,9 +2,12 @@
 
 html
 
-# Time-stamp: "2010-07-16 15:21:34 bkorb"
-# Version:    "$Revision: 4.13 $
-##
+=][=
+`timestamp=\`sed 's@[^"]*"@@;s@".*@@' <<- \\_EOF_
+ Time-stamp: "2010-07-17 09:59:09 bkorb"
+_EOF_
+` =][=
+
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
@@ -20,6 +23,7 @@ html
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 =]
 <!--#include virtual="/server/header.html" -->
 [=(dne "  ==  " "<!-- ")=]
@@ -33,12 +37,6 @@ html
 <meta name="generator" content="AutoGen [=(. autogen-version)=]"/>
 <!--#include virtual="/server/banner.html" -->
 <h3>[= project =] version [= version =] - Table of Contents</h3>
-
-<!-- This document is in XML, and xhtml 1.0 -->
-<!-- Please make sure to properly nest your tags -->
-<!-- and ensure that your final document validates -->
-<!-- consistent with W3C xhtml 1.0 and CSS standards -->
-<!-- See validator.w3.org -->
 
 <address>Free Software Foundation</address>
 <address>last updated [=`date '+%B %e, %Y'`=]</address>
@@ -144,9 +142,7 @@ permitted in any medium, provided this notice is preserved.
 
 <p>
 Updated:
-<!-- timestamp start -->
-$Date: 2009/01/01 16:49:26 $ $Author: bkorb $
-<!-- timestamp end -->
+[=`echo ${timestamp}`=]
 </p>
 </div>
 

@@ -4,9 +4,7 @@
 
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
- * Time-stamp:       "2006-09-23 19:46:16 bkorb"
- *
- * $Id: 9e813178aaa710579193c8a92e10a378fafe08a5 $
+ * Time-stamp:       "2010-07-17 09:50:32 bkorb"
  */
 
 /* Code: */

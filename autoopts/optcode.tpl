@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2010-02-24 08:41:09 bkorb"
+# Time-stamp:      "2010-07-17 10:07:36 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -597,7 +597,7 @@ doUsageOpt(
 
   ELSE   =]
     (void)pOptions;
-    [= (. UP-prefix) =]USAGE( EXIT_SUCCESS );[=
+    [= (. UP-prefix) =]USAGE(EXIT_SUCCESS);[=
   ENDIF  =]
 }[=
 
@@ -631,11 +631,11 @@ ENDIF "test/guile main"
 #include <unistd.h>
 #include <autoopts/usage-txt.h>
 
-static char* AO_gettext( char const* pz );
+static char* AO_gettext(char const* pz);
 static void  coerce_it(void** s);
 
 static char*
-AO_gettext( char const* pz )
+AO_gettext(char const* pz)
 {
     char* pzRes;
     if (pz == NULL)
@@ -643,10 +643,10 @@ AO_gettext( char const* pz )
     pzRes = _(pz);
     if (pzRes == pz)
         return pzRes;
-    pzRes = strdup( pzRes );
+    pzRes = strdup(pzRes);
     if (pzRes == NULL) {
-        fputs( _("No memory for duping translated strings\n"), stderr );
-        exit( EXIT_FAILURE );
+        fputs(_("No memory for duping translated strings\n"), stderr);
+        exit(EXIT_FAILURE);
     }
     return pzRes;
 }
@@ -659,7 +659,7 @@ static void coerce_it(void** s) { *s = AO_gettext(*s); }
  *  This invokes the translation code (e.g. gettext(3)).
  */
 static void
-translate_option_strings( void )
+translate_option_strings(void)
 {
     /*
      *  Guard against re-translation.  It won't work.  The strings will have

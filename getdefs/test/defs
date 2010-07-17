@@ -1,10 +1,10 @@
 #! /bin/echo this_file_should_be_sourced,_not_executed
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # defs --- define the environment for autogen tests.
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-02-24 08:38:26 bkorb"
+# Time-stamp:        "2010-07-17 09:46:46 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -21,9 +21,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# $Id: 3368d723f2e0ecc6d595d839040f4e77d23ec6ad $
-# ----------------------------------------------------------------------
 
 # Make sure srcdir is an absolute path.  Supply the variable
 # if it does not exist.  We want to be able to run the tests

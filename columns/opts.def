@@ -1,8 +1,9 @@
+// -*- Mode: C -*-
+
 autogen definitions options;
 
 /*
- *  $Id: cd763ad29d4d60e0e71d2b6ebcbbae4f83302e71 $
- *  Time-stamp:        "2010-06-26 10:01:30 bkorb"
+ *  Time-stamp:        "2010-07-17 09:51:23 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *

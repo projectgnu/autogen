@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2010-02-24 08:41:09 bkorb"
+# Time-stamp:      "2010-07-17 10:07:03 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -100,7 +100,7 @@ ENDIF (exist? version) =]
 /*
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
  *  option name (as in the te[=(. Cap-prefix)=]OptIndex enumeration above).
- *  e.g. HAVE_[=(. UP-prefix)=]OPT( [= (up-c-name "flag[].name") =] )
+ *  e.g. HAVE_[=(. UP-prefix)=]OPT([= (up-c-name "flag[].name") =])
  */[=
 
 IF (exist? "library")
@@ -150,7 +150,7 @@ IF (> 1 (string-length UP-prefix))
 #define STACKLST_OPT(n) (((tArgList*)(DESC(n).optCookie))->apzArgs)
 #define    CLEAR_OPT(n) STMTS( \
                 DESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \
-                if ( (DESC(n).fOptState & OPTST_INITENABLED) == 0) \
+                if ((DESC(n).fOptState & OPTST_INITENABLED) == 0) \
                     DESC(n).fOptState |= OPTST_DISABLED; \
                 DESC(n).optCookie = NULL )[=
 
@@ -168,7 +168,7 @@ ELSE we have a prefix:
 #define STACKLST_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->apzArgs)
 #define    CLEAR_%1$sOPT(n) STMTS( \\
                 %1$sDESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \\
-                if ( (%1$sDESC(n).fOptState & OPTST_INITENABLED) == 0) \\
+                if ((%1$sDESC(n).fOptState & OPTST_INITENABLED) == 0) \\
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
 
@@ -248,8 +248,8 @@ FOR flag =][=
    IF (hash-ref have-cb-procs flg-name)
 =]
 #define SET_[= (string-append OPT-pfx UP-name) =]   STMTS( \
-        (*([=(. descriptor)=].pOptProc))( &[=(. pname)=]Options, \
-                [=(. pname)=]Options.pOptDesc + [=(for-index)=] )[=
+        (*([=(. descriptor)=].pOptProc))(&[=(. pname)=]Options, \
+                [=(. pname)=]Options.pOptDesc + [=(for-index)=])[=
 
    ENDIF              =][=
  ELSE                 =][=
@@ -377,24 +377,24 @@ IF (not (exist? "library"))
 
   IF (> 1 (string-length UP-prefix))
 
-=][= (sprintf  "OPTERR  STMTS( %1$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
-#define ERRSTOP_OPTERR  STMTS( %1$sOptions.fOptSet |= OPTPROC_ERRSTOP )
+=][= (sprintf  "OPTERR  STMTS(%1$sOptions.fOptSet &= ~OPTPROC_ERRSTOP)
+#define ERRSTOP_OPTERR  STMTS(%1$sOptions.fOptSet |= OPTPROC_ERRSTOP)
 #define RESTART_OPT(n)  STMTS( \\
                 %1$sOptions.curOptIdx = (n); \\
-                %1$sOptions.pzCurOpt  = NULL )
+                %1$sOptions.pzCurOpt  = NULL)
 #define START_OPT       RESTART_OPT(1)
-#define USAGE(c)        (*%1$sOptions.pUsageProc)( &%1$sOptions, c )"
+#define USAGE(c)        (*%1$sOptions.pUsageProc)(&%1$sOptions, c)"
    pname ) =][=
 
   ELSE  we have a prefix
 
-=][= (sprintf  "%1$sOPTERR  STMTS( %2$sOptions.fOptSet &= ~OPTPROC_ERRSTOP )
-#define ERRSTOP_%1$sOPTERR  STMTS( %2$sOptions.fOptSet |= OPTPROC_ERRSTOP )
+=][= (sprintf  "%1$sOPTERR  STMTS(%2$sOptions.fOptSet &= ~OPTPROC_ERRSTOP)
+#define ERRSTOP_%1$sOPTERR  STMTS(%2$sOptions.fOptSet |= OPTPROC_ERRSTOP)
 #define RESTART_%1$sOPT(n)  STMTS( \\
                 %2$sOptions.curOptIdx = (n); \\
                 %2$sOptions.pzCurOpt  = NULL )
 #define START_%1$sOPT       RESTART_%1$sOPT(1)
-#define %1$sUSAGE(c)        (*%2$sOptions.pUsageProc)( &%2$sOptions, c )"
+#define %1$sUSAGE(c)        (*%2$sOptions.pUsageProc)(&%2$sOptions, c)"
 
   UP-prefix  pname ) =][=
 
@@ -431,9 +431,9 @@ extern tOptions   [=(. pname)=]Options;[=
 #if defined(ENABLE_NLS)
 # ifndef _
 #   include <stdio.h>
-    static inline char* aoGetsText( char const* pz ) {
+    static inline char* aoGetsText(char const* pz) {
         if (pz == NULL) return NULL;
-        return (char*)gettext( pz );
+        return (char*)gettext(pz);
     }
 #   define _(s)  aoGetsText(s)
 # endif /* _() */

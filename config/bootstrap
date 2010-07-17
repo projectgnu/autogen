@@ -1,9 +1,9 @@
 #! /bin/bash
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-06-25 21:40:51 bkorb"
+# Time-stamp:      "2010-07-17 09:49:22 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -20,9 +20,6 @@
 ##
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
-# ----------------------------------------------------------------------
-# @(#) $Id: cfe1a952443c69ca32ad787ed4bb8e90700d8cef $
-# ----------------------------------------------------------------------
 
 # This script is designed to find any directories which contain a
 # configure.ac in script, and to run the autotools programs from each
@@ -48,8 +45,6 @@
 # in the same state as a freshly unrolled tarball.  In this way, one
 # no longer has to maintain generated files under source control, they
 # can be generated after checkout using this bootstrap procedure.
-
-# Code:
 
 PS4='>shl> '
 . config/bootstrap.shlib

@@ -1,6 +1,6 @@
 /*
  *  This file defines the string_tokenize interface
- * Time-stamp:      "2010-02-24 08:39:49 bkorb"
+ * Time-stamp:      "2010-07-17 10:40:26 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -31,17 +31,17 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-copy_cooked( ch_t** ppDest, char const ** ppSrc );
+copy_cooked(ch_t** ppDest, char const ** ppSrc);
 
 static void
-copy_raw( ch_t** ppDest, char const ** ppSrc );
+copy_raw(ch_t** ppDest, char const ** ppSrc);
 
 static token_list_t *
 alloc_token_list(char const * str);
 /* = = = END-STATIC-FORWARD = = = */
 
 static void
-copy_cooked( ch_t** ppDest, char const ** ppSrc )
+copy_cooked(ch_t** ppDest, char const ** ppSrc)
 {
     ch_t* pDest = (ch_t*)*ppDest;
     const ch_t* pSrc  = (const ch_t*)(*ppSrc + 1);
@@ -52,7 +52,7 @@ copy_cooked( ch_t** ppDest, char const ** ppSrc )
         case NUL:   *ppSrc = NULL; return;
         case '"':   goto done;
         case '\\':
-            pSrc += ao_string_cook_escape_char( (char*)pSrc, (char*)&ch, 0x7F );
+            pSrc += ao_string_cook_escape_char((char*)pSrc, (char*)&ch, 0x7F);
             if (ch == 0x7F)
                 break;
             /* FALLTHROUGH */
@@ -69,7 +69,7 @@ copy_cooked( ch_t** ppDest, char const ** ppSrc )
 
 
 static void
-copy_raw( ch_t** ppDest, char const ** ppSrc )
+copy_raw(ch_t** ppDest, char const ** ppSrc)
 {
     ch_t* pDest = *ppDest;
     cc_t* pSrc  = (cc_t*) (*ppSrc + 1);
@@ -210,10 +210,10 @@ alloc_token_list(char const * str)
  * @example
  *    #include <stdlib.h>
  *    int ix;
- *    token_list_t* ptl = ao_string_tokenize( some_string )
+ *    token_list_t* ptl = ao_string_tokenize(some_string)
  *    for (ix = 0; ix < ptl->tkn_ct; ix++)
- *       do_something_with_tkn( ptl->tkn_list[ix] );
- *    free( ptl );
+ *       do_something_with_tkn(ptl->tkn_list[ix]);
+ *    free(ptl);
  * @end example
  * Note that everything is freed with the one call to @code{free(3C)}.
  *
@@ -229,7 +229,7 @@ alloc_token_list(char const * str)
  *  @end itemize
 =*/
 token_list_t*
-ao_string_tokenize( char const* str )
+ao_string_tokenize(char const* str)
 {
     token_list_t* res = alloc_token_list(str);
     ch_t* pzDest;
@@ -255,7 +255,7 @@ ao_string_tokenize( char const* str )
 
             switch (ch) {
             case '"':
-                copy_cooked( &pzDest, &str );
+                copy_cooked(&pzDest, &str);
                 if (str == NULL) {
                     free(res);
                     errno = EINVAL;
@@ -266,7 +266,7 @@ ao_string_tokenize( char const* str )
                 break;
 
             case '\'':
-                copy_raw( &pzDest, &str );
+                copy_raw(&pzDest, &str);
                 if (str == NULL) {
                     free(res);
                     errno = EINVAL;
@@ -301,7 +301,7 @@ ao_string_tokenize( char const* str )
 #include <string.h>
 
 int
-main( int argc, char** argv )
+main(int argc, char** argv)
 {
     if (argc == 1) {
         printf("USAGE:  %s arg [ ... ]\n", *argv);
@@ -309,15 +309,15 @@ main( int argc, char** argv )
     }
     while (--argc > 0) {
         char* arg = *(++argv);
-        token_list_t* p = ao_string_tokenize( arg );
+        token_list_t* p = ao_string_tokenize(arg);
         if (p == NULL) {
-            printf( "Parsing string ``%s'' failed:\n\terrno %d (%s)\n",
-                    arg, errno, strerror( errno ));
+            printf("Parsing string ``%s'' failed:\n\terrno %d (%s)\n",
+                   arg, errno, strerror(errno));
         } else {
             int ix = 0;
-            printf( "Parsed string ``%s''\ninto %d tokens:\n", arg, p->tkn_ct );
+            printf("Parsed string ``%s''\ninto %d tokens:\n", arg, p->tkn_ct);
             do {
-                printf( " %3d:  ``%s''\n", ix+1, p->tkn_list[ix] );
+                printf(" %3d:  ``%s''\n", ix+1, p->tkn_list[ix]);
             } while (++ix < p->tkn_ct);
             free(p);
         }
