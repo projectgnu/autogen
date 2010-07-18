@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2010-02-24 08:40:12 bkorb"
+## Time-stamp:      "2010-07-18 09:06:08 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -24,9 +24,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-#
-## ---------------------------------------------------------------------
-## ---------------------------------------------------------------------
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
 TESTS      = nested.test cfg-edit.test alias.test \
@@ -39,7 +36,7 @@ testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = set -a ; \
 	CFLAGS='$(DEFS) $(CFLAGS)' CPPFLAGS='$(CPPFLAGS)' \
-	DEBUG_USAGE='$(DEBUG_USAGE)' testsubdir=$(testsubdir)
+	DEBUG_USAGE='$(DEBUG_USAGE)' testsubdir=$(testsubdir) INCS='$(INCS)'
 #`
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES
