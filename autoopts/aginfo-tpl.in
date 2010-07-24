@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2010-07-24 10:11:03 bkorb"
+## Time-stamp:        "2010-07-24 15:56:38 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -101,14 +101,14 @@ FOR flag        =][=
          (. down-prog-name)
          (string-append
             (string-tr! (get "name") "A-Z^_" "a-z--" )
-            "::" ) )
+            " ::" ) )
      =] [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] option[=
           % value " (-%s)" =]
 [=ENDIF         =][=
 
 ENDFOR flag     =][=
 
-(shell (string-append "sort <<\\_EOF_\n" (out-pop #t) "_EOF_"))
+(shell (string-append "sort <<\\_EOF_ | sed 's/ ::/::/'\n" (out-pop #t) "_EOF_"))
 
 =]
 @end menu
@@ -175,7 +175,7 @@ FOR flag                        =][=
   IF (not (exist? "documentation")) =][=
 
     (set! opt-name (string-tr! (get "name") optname-from optname-to))
-    (out-push-new (shellf "exec 2>/dev/tty;set -x;echo ${tmp_dir}/opt-text-%s;set +x" opt-name)) =][=
+    (out-push-new (shellf "echo ${tmp_dir}/opt-text-%s" opt-name)) =][=
     INVOKE emit-opt-text        =][=
     (out-pop)                   =][=
 
@@ -183,7 +183,7 @@ FOR flag                        =][=
 
 ENDFOR flag                     =][=
 
-`set -x;cat ${tmp_dir}/opt-text-*;set +x`      =][=
+`cat ${tmp_dir}/opt-text-*`      =][=
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
