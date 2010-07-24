@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-24 09:05:27 bkorb"
+ *  Time-stamp:        "2010-07-24 10:19:30 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -281,19 +281,16 @@ catch_sig_and_bail(int sig)
 static void
 ignore_signal(int sig)
 {
-#ifdef DEBUG_ENABLED
-    /*
-     *  This is not signal safe, but it is no big deal if we get
-     *  scrambled output.
-     */
-    fprintf(pfTrace, "Ignored signal %d (%s)\n", sig, strsignal(sig));
-#endif
     return;
 }
 
 
 /**
- *  This is called during normal exit processing.
+ *  This is _always_ called for exit processing.
+ *  This only returns if "exit(3C)" is called during option processing.
+ *  We have no way of determining the correct exit code.
+ *  (Requested version or help exits EXIT_SUCCESS.  Option failures
+ *  are EXIT_FAILURE.  We cannot determine here.)
  */
 static void
 done_check(void)
@@ -403,7 +400,15 @@ done_check(void)
     ag_scribble_deinit();
 
     exit_cleanup(EXIT_PCLOSE_WAIT);
-    _exit(exit_code);
+
+    /*
+     *  When processing options, return so that the option processing exit code
+     *  is used.  Otherwise, terminate execution now with the decided upon
+     *  exit code.  (Always EXIT_FAILURE, unless this was called at the end
+     *  of inner_main().)
+     */
+    if (procState != PROC_STATE_OPTIONS)
+        _exit(exit_code);
 }
 
 

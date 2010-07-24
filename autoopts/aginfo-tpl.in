@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2010-07-10 14:28:02 bkorb"
+## Time-stamp:        "2010-07-24 10:11:03 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -90,10 +90,12 @@ ENDIF =]
 * [=(sprintf "%s %-24s %s" down-prog-name "usage::" (get "prog-name"))
   =] usage help[=
      (if (exist? "flag.value") " (-?)") =]
-[=(out-push-new (string-append (out-name) ".tmp"))
-  (shell (string-append "f=" (out-name))) =][=
-FOR flag =][=
+[=(out-push-new)=][=
+
+FOR flag        =][=
+
   IF (not (exist? "documentation"))
+
 =]* [=(sprintf
          "%s %-24s"
          (. down-prog-name)
@@ -102,10 +104,13 @@ FOR flag =][=
             "::" ) )
      =] [=% name (string-tr! "%s" "A-Z^_" "a-z--")=] option[=
           % value " (-%s)" =]
-[=ENDIF =][=
-ENDFOR flag=][=
-(out-pop) =][=
-`sort $f ; rm -f $f` =]
+[=ENDIF         =][=
+
+ENDFOR flag     =][=
+
+(shell (string-append "sort <<\\_EOF_\n" (out-pop #t) "_EOF_"))
+
+=]
 @end menu
 
 @node [=(. down-prog-name)=] usage
@@ -152,9 +157,11 @@ This is the automatically generated usage text for [=prog-name=]:
 
 #  FOR all options, except the `documentation' options, ...  =][=
 
-IF (define opt-name "")
-   (define extra-ct 0)
-   (define extra-text "")
+IF (define opt-name       "")
+   (define extra-ct       0)
+   (define extra-text     "")
+   (make-tmp-dir)
+
    (exist? "preserve-case")     =][=
    (define optname-from "_^")
    (define optname-to   "--")   =][=
@@ -163,13 +170,26 @@ ELSE                            =][=
   (define optname-to   "a-z--") =][=
 ENDIF                           =][=
 
-FOR flag=][=
+FOR flag                        =][=
 
-  IF (not (exist? "documentation")) =]
+  IF (not (exist? "documentation")) =][=
 
-@node [=
     (set! opt-name (string-tr! (get "name") optname-from optname-to))
-    (string-append down-prog-name " " opt-name)=]
+    (out-push-new (shellf "exec 2>/dev/tty;set -x;echo ${tmp_dir}/opt-text-%s;set +x" opt-name)) =][=
+    INVOKE emit-opt-text        =][=
+    (out-pop)                   =][=
+
+  ENDIF documentation exists    =][=
+
+ENDFOR flag                     =][=
+
+`set -x;cat ${tmp_dir}/opt-text-*;set +x`      =][=
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-opt-text            =]
+
+@node [= (string-append down-prog-name " " opt-name) =]
 @[=CASE (. doc-level) =][=
    = chapter    =][=
    = section    =]sub[=
@@ -278,14 +298,12 @@ This option has some usage constraints.  It:
     ENDIF =][=
 
 ?% doc "\n%s" "\nThis option has no @samp{doc} documentation." =][=
-
-
-  ENDIF  `documentation' exists =][=
   IF (exist? "deprecated") =]
 
 @strong{NOTE: THIS OPTION IS DEPRECATED}[=
 
   ENDIF     =][=
-ENDFOR flag =][= #
+
+ENDDEF emit-opt-text
 
 aginfo.tpl ends here =]
