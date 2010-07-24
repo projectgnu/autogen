@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  Time-stamp:        "2010-06-30 20:52:49 bkorb"
+#  Time-stamp:        "2010-07-23 22:02:31 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -18,6 +18,10 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
+
+=][=
+
+(define exit-proc (get "exit-proc" "exit"))
 
 =][=
 
@@ -156,7 +160,8 @@ static te_[=(. pfx)=]_state
 "/*  %s == " (string-tr! (get "cb_name") "a-z_-" "A-Z  ") " == %s  */" )
 ""
 (if (= (get "cb-name") "invalid")
-    (sprintf "    exit( %s_invalid_transition( initial, trans_evt ));" pfx)
+    (string-append "    " exit-proc "(" pfx
+         "_invalid_transition(initial, trans_evt));")
     "    return maybe_next;" )) =]
 }
 [=
@@ -202,8 +207,9 @@ DEFINE build-switch    =]
   IF (== (get "cb_name") "NOOP") =]  break;[=
   ELSE =]
 [=
-(set! example-code (if (= (get "cb_name") "invalid") (sprintf
-      "        exit( %1$s_invalid_transition( %1$s_state, trans_evt ));" pfx)
+(set! example-code (if (= (get "cb_name") "invalid") (string-append
+      "        " exit-proc "(" pfx "_invalid_transition(" pfx
+               "_state, trans_evt));")
       (string-append "        nxtSt = HANDLE_" (get "cb_name") "();")  ))
 
 (extract fsm-source
@@ -233,8 +239,8 @@ DEFINE run-switch         =][=
   ENDWHILE  echo $#  =]
     default:
 [=(extract fsm-source "        /* %s == BROKEN MACHINE == %s */" ""
-           (string-append "        exit( " pfx "_invalid_transition( "
-           pfx "_state, trans_evt ));" ))=]
+           (string-append "        " exit-proc "(" pfx "_invalid_transition("
+           pfx "_state, trans_evt));" ))=]
     }[=
 
 ENDDEF run-switch

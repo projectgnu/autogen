@@ -281,7 +281,7 @@ LOCAL void
 closeOutput(ag_bool purge)
 {
     if ((pCurFp->flags & FPF_NOCHMOD) == 0)
-        removeWriteAccess(fileno(pCurFp->pFile));
+        make_readonly(fileno(pCurFp->pFile));
 
     fclose(pCurFp->pFile);
 

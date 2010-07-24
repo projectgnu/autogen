@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-07-17 09:49:22 bkorb"
+# Time-stamp:      "2010-07-21 18:39:12 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -73,7 +73,7 @@ config_tools()
     AGexe=$(which autogen)
     case ${AGexe} in
     ( /* )
-        v=$($AGexe --version)
+        v=$($AGexe --version || :)
         case "$v" in
         *"Ver. 5."* ) : ;;
         * ) die "OUT OF DATE AutoGen: $v" ;;

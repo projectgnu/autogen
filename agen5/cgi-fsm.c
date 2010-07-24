@@ -247,7 +247,7 @@ cgi_run_fsm(
             /* START == NAME_EQUAL == DO NOT CHANGE THIS COMMENT */
             strcpy( pzOut, "='" );
             outlen -= 2;
-            pzOut += 2;
+            pzOut  += 2;
             /* END   == NAME_EQUAL == DO NOT CHANGE THIS COMMENT */
             break;
 
@@ -256,7 +256,7 @@ cgi_run_fsm(
             /* START == SEPARATE == DO NOT CHANGE THIS COMMENT */
             strcpy( pzOut, "';\n" );
             outlen -= 2;
-            pzOut += 3;
+            pzOut  += 3;
             /* END   == SEPARATE == DO NOT CHANGE THIS COMMENT */
             break;
 

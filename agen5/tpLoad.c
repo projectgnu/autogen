@@ -513,7 +513,8 @@ wrap_up_depends(void)
     static char const fmt[] =
         "\n\n%1$s_SList =%2$s\n"
         "\n%3$s : $(%1$s_SList)\n"
-        "\n$(%1$s_TList) : %3$s\n";
+        "\n$(%1$s_TList) : %3$s\n"
+        "\t@:\n";
 
     fprintf(pfDepends, fmt, pz_targ_base, pzSourceList, pzDepTarget);
     fclose(pfDepends);

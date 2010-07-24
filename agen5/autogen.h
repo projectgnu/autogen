@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-07-16 16:08:17 bkorb"
+ *  Time-stamp:        "2010-07-24 07:26:34 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -530,10 +530,10 @@ MODE v2c_t p2p VALUE( { NULL } );
 #   define AG_SCM_STR02SCM(_s)          scm_makfrom0str(_s)
 #endif
 
-  static inline char* ag_scm2zchars( SCM s, tCC* type )
+  static inline char* ag_scm2zchars(SCM s, tCC* type)
   {
-    if (! AG_SCM_STRING_P( s ))
-        AG_ABEND( aprf( zNotStr, type ));
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf(zNotStr, type));
 
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
@@ -577,7 +577,7 @@ MODE v2c_t p2p VALUE( { NULL } );
 #define AG_SCM_LONG2SCM(_i)             gh_long2scm(_i)
 #define AG_SCM_SCM2LONG(_i)             gh_scm2long(_i)
 
-static inline SCM ag_eval( tCC* pzStr )
+static inline SCM ag_eval(tCC* pzStr)
 {
     SCM res;
     tCC* pzSaveScheme = pzLastScheme; /* Watch for nested calls */

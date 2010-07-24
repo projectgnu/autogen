@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-11 11:30:42 bkorb"
+ *  Time-stamp:        "2010-07-24 07:41:30 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -32,6 +32,7 @@ typedef enum {
 } wait_for_pclose_enum_t;
 
 static char const zClientInput[] = "client-input";
+static int  exit_code = EXIT_FAILURE;
 
 #define _State_(n)  #n,
 static char const * const state_names[] = { STATE_TABLE };
@@ -99,6 +100,7 @@ inner_main(int argc, char ** argv)
 
     procState = PROC_STATE_DONE;
     setup_signals(SIG_DFL, SIG_IGN, SIG_DFL);
+    exit_code = EXIT_SUCCESS;
     done_check();
     /* NOTREACHED */
 }
@@ -306,11 +308,6 @@ done_check(void)
         "Scheme evaluation error.  AutoGen ABEND-ing in template\n"
         "\t%s on line %d\n";
 
-#if GUILE_VERSION >= 107000
-    int exit_code = (procState != PROC_STATE_DONE)
-        ? EXIT_FAILURE : EXIT_SUCCESS;
-#endif
-
     /*
      *  There are contexts wherein this function can get registered twice.
      */
@@ -352,10 +349,6 @@ done_check(void)
             closeOutput(AG_TRUE);
 #endif
         } while (pCurFp->pPrev != NULL);
-
-#if GUILE_VERSION >= 107000
-        exit_code = EXIT_FAILURE;
-#endif
         break; /* continue failure exit */
 
     default:

@@ -1,6 +1,11 @@
 New in __CURRENT_VERSION__ November 2008
 
-* Nothing yet defined.
+* "columns" program takes an option for an end-of-output string
+* "autogen" takes a "-MF<dep-file-name>" option producing a dependency
+  file that is carefully engineered to be a little bit older than
+  any other output file.
+* A guile "(string->camelcase)" function has been added.  It removes
+  non-alphanumerics and capitalizes the letter after any removals.
 
 New in 5.10 - November 2009
 

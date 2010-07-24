@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-17 09:49:34 bkorb"
+# Time-stamp:        "2010-07-21 18:41:58 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -168,7 +168,7 @@ config_versions()
 
 check_tools()
 {
-    test -z "${AGexe}" -o -z "$GDexe" -o -z "$CLexe" && exit 1
+    test -x "${AGexe}" -a -x "$GDexe" -a -x "$CLexe" || exit 1
 
     ( $CLexe --version  && \
       $GDexe --version  && \

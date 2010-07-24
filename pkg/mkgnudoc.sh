@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ## mkgnudoc.sh --   create a native package
-## Time-stamp:      "2010-07-16 15:20:50 bkorb"
+## Time-stamp:      "2010-07-21 18:03:04 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -118,6 +118,7 @@ autogen --base-name=${pkg} -T ${pkgsrcdir}/gnudoc.tpl - <<- _EODefs_
 	version = '${ver}';
 	package = '${pkg}';
 	_EODefs_
+test $? -ne 0 && exit 1
 
 rm -f TAG
 cd ..

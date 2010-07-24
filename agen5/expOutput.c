@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-11 12:52:19 bkorb"
+ *  Time-stamp:        "2010-07-21 17:35:01 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -40,13 +40,8 @@ static int            suspAllocCt = 0;
 static tSuspendName*  pSuspended  = NULL;
 static int            outputDepth = 1;
 
-/* = = = START-STATIC-FORWARD = = = */
-static void
-addWriteAccess(char* pzFileName);
-/* = = = END-STATIC-FORWARD = = = */
-
 LOCAL void
-removeWriteAccess(int fd)
+make_readonly(int fd)
 {
     struct stat    sbuf;
 
@@ -76,7 +71,7 @@ removeWriteAccess(int fd)
 }
 
 static void
-addWriteAccess(char* pzFileName)
+make_writable(char* pzFileName)
 {
     struct stat sbuf;
 
@@ -128,10 +123,14 @@ ag_scm_out_delete(void)
  * what:   change name of output file
  * exparg: new-name, new name for the current output file
  *
- * doc:    Rename current output file.  @xref{output controls}.
- *         Please note: changing the name will not save a temporary
- *         file from being deleted.  It @i{may}, however, be used on the
- *         root output file.
+ * doc:
+ *
+ *  Rename current output file.  @xref{output controls}.
+ *  Please note: changing the name will not save a temporary file from
+ *  being deleted.  It @i{may}, however, be used on the root output file.
+ *
+ *  NOTE: if you are creating a dependency file, @i{both} the original
+ *  file name @i{and} the new file name will be listed as derived files.
 =*/
 SCM
 ag_scm_out_move(SCM new_file)
@@ -144,8 +143,13 @@ ag_scm_out_move(SCM new_file)
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, "renaming %s to %s\n",  pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
+
+    if (pfDepends != NULL)
+        fprintf(pfDepends, " \\\n\t%s", pz);
+
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
         AGFREE((void*)pCurFp->pzOutName);
+
     AGDUPSTR(pCurFp->pzOutName, pz, "file name");
     pCurFp->flags &= ~FPF_STATIC_NM;
     return SCM_UNDEFINED;
@@ -406,7 +410,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     p->flags = FPF_FREE | flags;
     outputDepth++;
 
-    addWriteAccess(pz);
+    make_writable(pz);
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
@@ -566,7 +570,7 @@ ag_scm_out_switch(SCM new_file)
         return SCM_UNDEFINED;
     }
 
-    removeWriteAccess(fileno(pCurFp->pFile));
+    make_readonly(fileno(pCurFp->pFile));
 
     /*
      *  Make sure we get a new file pointer!!

@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-07-16 17:44:36 bkorb"
+ *  Time-stamp:        "2010-07-23 21:47:06 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -827,9 +827,16 @@ flag = {
 	@example
 	-MFwhatever-you-like.dep
 	@end example
+	and then in your @code{Makefile}, make the @file{autogen} rule:
+	@example
+	whatever-you-like.dep:
+	    autogen -MF$@@ .....
+	@end example
 
 	The modification time on the dependency file is adjusted to be one
 	second before the earliest time stamp of any other output file.
+	Consequently, it is suitable for use as the sentinel file testifying
+	to the fact the program was successfully run.
 	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";

@@ -580,21 +580,6 @@ fumble = '
 As with the double quote string, a series of these, even intermixed
 with double quote strings, will be concatenated together.
 
-@node shell-generated
-@subsection Shell Output String
-@cindex shell-generated string
-
-@cindex string, shell output
-This is assembled according to the same rules as the double quote string,
-except that there is no concatenation of strings and the resulting string is
-written to a shell server process.  The definition takes on the value of
-the output string.
-
-NB@: The text is interpreted by a server shell.  There may be left over
-state from previous server shell processing.  This scriptlet may also leave
-state for subsequent processing.  However, a @code{cd} to the original
-directory is always issued before the new command is issued.
-
 @node simple-string
 @subsection An Unquoted String
 
@@ -609,6 +594,21 @@ backslash (@code{\\}).  Basically, if the string looks like it is a
 normal DOS or UNIX file or variable name, and it is not one of two
 keywords (@samp{autogen} or @samp{definitions}) then it is OK to not
 quote it, otherwise you should.
+
+@node shell-generated
+@subsection Shell Output String
+@cindex shell-generated string
+
+@cindex string, shell output
+This is assembled according to the same rules as the double quote string,
+except that there is no concatenation of strings and the resulting string is
+written to a shell server process.  The definition takes on the value of
+the output string.
+
+NB@: The text is interpreted by a server shell.  There may be left over
+state from previous server shell processing.  This scriptlet may also leave
+state for subsequent processing.  However, a @code{cd} to the original
+directory is always issued before the new command is issued.
 
 @node scheme-generated
 @subsection Scheme Result String
