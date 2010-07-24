@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-24 07:41:30 bkorb"
+ *  Time-stamp:        "2010-07-24 09:05:27 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -151,14 +151,8 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
     }
 
 #ifdef SHELL_ENABLED
-    {
-        static char const form[] =
-            "(if (> (string-length shell-cleanup) 0)"
-            " (shellf \"( (set -x;%s) & )\" "
-                     "shell-cleanup) )";
-        ag_scm_c_eval_string_from_file_line(form, __FILE__, __LINE__ - 3);
-        closeServer();
-    }
+    SCM_EVAL_CONST("(if (> (string-length shell-cleanup) 0)"
+                   " (shellf \"( (set -x;%s) & )\" shell-cleanup) )");
 #endif
 
     fflush(stdout);

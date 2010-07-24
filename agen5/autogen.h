@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-07-24 07:26:34 bkorb"
+ *  Time-stamp:        "2010-07-24 09:03:33 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -302,6 +302,18 @@ typedef struct {
 
 #define _MkStr(_s) #_s
 #define MK_STR(_s) _MkStr(_s)
+
+typedef struct {
+    int          line;
+    char const * file;
+    char const * text;
+} file_line_t;
+
+#define SCM_EVAL_CONST(_s) \
+    do { static file_line_t const fl = { __LINE__, __FILE__, _s }; \
+        pzLastScheme = fl.text; \
+        ag_scm_c_eval_string_from_file_line(fl.text, fl.file, fl.line); \
+    } while (0)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

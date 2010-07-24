@@ -2,7 +2,7 @@
 /**
  *  \file agInit.c
  *
- *  Time-stamp:      "2010-07-10 16:28:10 bkorb"
+ *  Time-stamp:      "2010-07-24 09:04:36 bkorb"
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
@@ -59,16 +59,11 @@ initialize(int arg_ct, char** arg_vec)
      */
     ag_init();
     pzLastScheme = zSchemeInit;
-    ag_scm_c_eval_string_from_file_line(zSchemeInit, SCHEME_INIT_FILE,
-                                        schemeLine);
+    ag_scm_c_eval_string_from_file_line(
+        zSchemeInit, SCHEME_INIT_FILE, schemeLine);
 #ifndef scm_t_port
-    {
-        static char const zInitRest[] =
-            "(add-hook! before-error-hook error-source-line)\n"
-            "(use-modules (ice-9 stack-catch))";
-        pzLastScheme = zInitRest;
-        ag_scm_c_eval_string_from_file_line(zInitRest, __FILE__, __LINE__-3);
-    }
+    SCM_EVAL_CONST("(add-hook! before-error-hook error-source-line)\n"
+                   "(use-modules (ice-9 stack-catch))");
 #endif
 
     pzLastScheme = NULL;
@@ -77,11 +72,8 @@ initialize(int arg_ct, char** arg_vec)
 
     doOptions(arg_ct, arg_vec);
 
-    if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        static char const zBT[] = "(debug-enable 'backtrace)";
-        pzLastScheme = zBT;
-        ag_scm_c_eval_string_from_file_line(zBT, __FILE__, __LINE__ - 2);
-    }
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        SCM_EVAL_CONST("(debug-enable 'backtrace)");
 
 #ifdef DAEMON_ENABLED
 

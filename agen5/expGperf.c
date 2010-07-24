@@ -1,6 +1,6 @@
 /*
  *
- *  Time-stamp:        "2010-07-11 12:34:32 bkorb"
+ *  Time-stamp:        "2010-07-24 09:06:11 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
@@ -66,9 +66,11 @@ ag_scm_gperf(SCM name, SCM str)
 SCM
 ag_scm_make_gperf(SCM name, SCM hlist)
 {
-    char const * pzName = ag_scm2zchars(name, "gperf name");
+    static ag_bool do_cleanup = AG_TRUE;
+
+    char const * pzName  = ag_scm2zchars(name, "gperf name");
     char const * pzList;
-    SCM     newline  = AG_SCM_STR2SCM("\n", (size_t)1);
+    SCM          newline = AG_SCM_STR2SCM("\n", (size_t)1);
 
     if (! AG_SCM_STRING_P(name))
         return SCM_UNDEFINED;
@@ -83,9 +85,6 @@ ag_scm_make_gperf(SCM name, SCM hlist)
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        static int  const  makeGperfLine = __LINE__ + 2;
-        static char const* pzCleanup =
-            "(add-cleanup \"rm -rf ${gpdir}\")";
         char* pzCmd = aprf(zMakeGperf, pzList, pzName);
 
         /*
@@ -94,15 +93,16 @@ ag_scm_make_gperf(SCM name, SCM hlist)
          */
         pzList = runShell(pzCmd);
         AGFREE(pzCmd);
+
         if (pzList != NULL)
             free((void *)pzList);
-
-        if (pzCleanup != NULL) {
-            (void)ag_scm_c_eval_string_from_file_line(
-                pzCleanup, __FILE__, makeGperfLine );
-            pzCleanup = NULL;
-        }
     }
+
+    if (do_cleanup) {
+        SCM_EVAL_CONST("(add-cleanup \"rm -rf ${gpdir}\")");
+        do_cleanup = AG_FALSE;
+    }
+
     return SCM_BOOL_T;
 }
 

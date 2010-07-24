@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-07-23 21:47:06 bkorb"
+ *  Time-stamp:        "2010-07-24 09:12:14 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -89,7 +89,7 @@ include = <<-  _END_INCLUDE
 	# define isspace(_c)  0
 	#endif
 
-	typedef void (init_proc_t)( void );
+	typedef void (init_proc_t)(void);
 	tCC*    pzTemplFileName  = NULL;
 	ag_bool trace_is_to_pipe = AG_FALSE;
 	_END_INCLUDE;
@@ -177,7 +177,7 @@ flag = {
 	    tTemplate* pT;
 	    procState = PROC_STATE_LIB_LOAD;
 	    pT = loadTemplate(pOptDesc->optArg.argString, NULL);
-	    unloadTemplate( pT );
+	    unloadTemplate(pT);
 	    procState = PROC_STATE_OPTIONS;
 	_EOCode_;
 #else
@@ -256,7 +256,7 @@ flag = {
     flag-code = <<-  _EOF_
 	    teProcState saveState = procState;
 	    char* pz;
-	    char  zPath[ MAXPATHLEN ];
+	    char  zPath[MAXPATHLEN];
 	    tSCC* apzSfx[] = { "scm", NULL };
 
 	    if (! SUCCESSFUL(
@@ -267,11 +267,11 @@ flag = {
 	        USAGE(EXIT_FAILURE);
 	    }
 
-	    pz = aprf( "(load \"%s\")", zPath );
+	    pz = aprf("(load \"%s\")", zPath);
 	    procState = PROC_STATE_GUILE_PRELOAD;
 	    (void)ag_scm_c_eval_string_from_file_line(
 	                   pz, __FILE__, __LINE__);
-	    free( pz );
+	    free(pz);
 	    procState = saveState;
 	_EOF_;
 #else
@@ -333,7 +333,7 @@ flag = {
 	                pOptDesc->optArg.argString, errno, pzErr);
 	        exit(EXIT_FAILURE);
 	    }
-	    proc = (init_proc_t*)dlsym( hdl, "scm_init" );
+	    proc = (init_proc_t*)dlsym(hdl, "scm_init");
 	    if (proc == NULL) {
 	        fprintf(stderr, "dlsym(scm_init) not found in %s\n"
 	                "\tyou must initialize the library yourself\n",
@@ -385,7 +385,7 @@ flag = {
     flag-code = <<- _EOF_
 	    if (  (pOptDesc->optArg.argString != NULL)
 	       && (*(pOptDesc->optArg.argString) != NUL))
-	        (void)doSuffixSpec( pOptDesc->optArg.argString, NULL, -1 );
+	        (void)doSuffixSpec(pOptDesc->optArg.argString, NULL, -1);
 	_EOF_;
 #else
     stack-arg;
