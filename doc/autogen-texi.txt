@@ -2765,6 +2765,127 @@ routine for handling command line options, set the next-option-to-process
 with the @code{RESTART_OPT()} macro, and recall @code{optionProcess()}.
 Repeat until done.
 
+@node information attributes
+@subsection Program Information Attributes
+@cindex information attributes
+
+These attributes are used to define how and what information is displayed
+to the user of the program.
+
+@table @samp
+@item copyright
+@vindex copyright
+The @code{copyright} is a structured value containing three to five
+values.  If @code{copyright} is used, then the first three are required.
+
+@enumerate
+@item
+@vindex date
+@file{date} - the list of applicable dates for the copyright.
+@item
+@vindex owner
+@file{owner} - the name of the copyright holder.
+@item
+@vindex type
+@file{type} - specifies the type of distribution license.
+AutoOpts/AutoGen will automatically support the text of the GNU Public
+License (@file{GPL}), the GNU General Public License with Library extensions
+(@file{LGPL}), the Free BSD license (@file{BSD}), and a
+write-it-yourself copyright notice (@file{NOTE}).  Only these values are
+recognized.
+@item
+@vindex text
+@file{text} - the text of the copyright notice.  It is only needed
+if @file{type} is set to @file{NOTE}.
+@item
+@vindex author
+@file{author} - in case the author name is to appear in the documentation
+and is different from the copyright owner.
+@item
+@vindex eaddr
+@file{eaddr} - email address for receiving praises and complaints.
+Typically that of the author or copyright holder.
+@end enumerate
+@*
+An example of this might be:
+@example
+copyright = @{
+    date  = "1992-2008";
+    owner = "Bruce Korb";
+    eaddr = 'bkorb@@gnu.org';
+    type  = GPL;
+@};
+@end example
+
+@item detail
+@vindex detail
+This string is added to the usage output when the HELP option is
+selected.
+
+@item explain
+@vindex explain
+Gives additional information whenever the usage routine is invoked..
+
+@item package
+@vindex package
+The name of the package the program belongs to.  This will appear
+parenthetically after the program name in the version and usage output,
+e.g.:  @code{autogen @i{(GNU autogen)} - The Automated Program Generator}.
+
+@item preserve-case
+@vindex preserve-case
+This attribute will not change anything except appearance.
+Normally, the option names are all documented in lower case.
+However, if you specify this attribute, then they will display
+in the case used in their specification.  Command line options
+will still be matched without case sensitivity.
+
+@item prog-desc @strong{and}
+@itemx opts-ptr
+@vindex prog-desc
+@vindex opts-ptr
+These define global pointer variables that point to the program
+descriptor and the first option descriptor for a library option.  This
+is intended for use by certain libraries that need command line and/or
+initialization file option processing.  These definitions have no effect
+on the option template output, but are used for creating a library
+interface file.  Normally, the first "option" for a library will be a
+documentation option that cannot be specified on the command line, but
+is marked as @code{settable}.  The library client program will invoke the
+@code{SET_OPTION} macro which will invoke a handler function that will
+finally set these global variables.
+
+@item usage
+@vindex usage
+Optionally names the usage procedure, if the library routine
+@code{optionUsage()} does not work for you.  If you specify
+@code{my_usage} as the value of this attribute, for example, you will
+use a procedure by that name for displaying usage.  Of course, you will
+need to provide that procedure and it must conform to this profile:
+@example
+void @i{my_usage}( tOptions* pOptions, int exitCode )
+@end example
+
+@item gnu-usage
+@vindex gnu-usage
+Normally, the default format produced by the @code{optionUsage} procedure
+is @i{AutoOpts Standard}.  By specifying this attribute, the default format
+will be @i{GNU-ish style}.  Either default may be overridden by the user with
+the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
+or @code{autoopts}, it will alter the style appropriately.  This attribute
+will conflict with the @code{usage} attribute.
+
+@item reorder-args
+@vindex reorder-args
+Some applications traditionally require that the command operands be
+intermixed with the command options.  In order to handle that, the arguments
+must be reordered.  If you are writing such an application, specify this
+global option.  All of the options (and any associated option arguments)
+will be brought to the beginning of the argument list.  New applications
+should not use this feature, if at all possible.  This feature is
+@i{disabled} if @code{POSIXLY_CORRECT} is defined in the environment.
+@end table
+
 @node Generated main
 @subsection Generating main procedures
 @cindex main procedure
@@ -3078,127 +3199,6 @@ If that character is the @code{NUL} byte, then only blank lines will be
 considered comments.
 @end table
 
-@node information attributes
-@subsection Program Information Attributes
-@cindex information attributes
-
-These attributes are used to define how and what information is displayed
-to the user of the program.
-
-@table @samp
-@item copyright
-@vindex copyright
-The @code{copyright} is a structured value containing three to five
-values.  If @code{copyright} is used, then the first three are required.
-
-@enumerate
-@item
-@vindex date
-@file{date} - the list of applicable dates for the copyright.
-@item
-@vindex owner
-@file{owner} - the name of the copyright holder.
-@item
-@vindex type
-@file{type} - specifies the type of distribution license.
-AutoOpts/AutoGen will automatically support the text of the GNU Public
-License (@file{GPL}), the GNU General Public License with Library extensions
-(@file{LGPL}), the Free BSD license (@file{BSD}), and a
-write-it-yourself copyright notice (@file{NOTE}).  Only these values are
-recognized.
-@item
-@vindex text
-@file{text} - the text of the copyright notice.  It is only needed
-if @file{type} is set to @file{NOTE}.
-@item
-@vindex author
-@file{author} - in case the author name is to appear in the documentation
-and is different from the copyright owner.
-@item
-@vindex eaddr
-@file{eaddr} - email address for receiving praises and complaints.
-Typically that of the author or copyright holder.
-@end enumerate
-@*
-An example of this might be:
-@example
-copyright = @{
-    date  = "1992-2008";
-    owner = "Bruce Korb";
-    eaddr = 'bkorb@@gnu.org';
-    type  = GPL;
-@};
-@end example
-
-@item detail
-@vindex detail
-This string is added to the usage output when the HELP option is
-selected.
-
-@item explain
-@vindex explain
-Gives additional information whenever the usage routine is invoked..
-
-@item package
-@vindex package
-The name of the package the program belongs to.  This will appear
-parenthetically after the program name in the version and usage output,
-e.g.:  @code{autogen @i{(GNU autogen)} - The Automated Program Generator}.
-
-@item preserve-case
-@vindex preserve-case
-This attribute will not change anything except appearance.
-Normally, the option names are all documented in lower case.
-However, if you specify this attribute, then they will display
-in the case used in their specification.  Command line options
-will still be matched without case sensitivity.
-
-@item prog-desc @strong{and}
-@itemx opts-ptr
-@vindex prog-desc
-@vindex opts-ptr
-These define global pointer variables that point to the program
-descriptor and the first option descriptor for a library option.  This
-is intended for use by certain libraries that need command line and/or
-initialization file option processing.  These definitions have no effect
-on the option template output, but are used for creating a library
-interface file.  Normally, the first "option" for a library will be a
-documentation option that cannot be specified on the command line, but
-is marked as @code{settable}.  The library client program will invoke the
-@code{SET_OPTION} macro which will invoke a handler function that will
-finally set these global variables.
-
-@item usage
-@vindex usage
-Optionally names the usage procedure, if the library routine
-@code{optionUsage()} does not work for you.  If you specify
-@code{my_usage} as the value of this attribute, for example, you will
-use a procedure by that name for displaying usage.  Of course, you will
-need to provide that procedure and it must conform to this profile:
-@example
-void @i{my_usage}( tOptions* pOptions, int exitCode )
-@end example
-
-@item gnu-usage
-@vindex gnu-usage
-Normally, the default format produced by the @code{optionUsage} procedure
-is @i{AutoOpts Standard}.  By specifying this attribute, the default format
-will be @i{GNU-ish style}.  Either default may be overridden by the user with
-the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
-or @code{autoopts}, it will alter the style appropriately.  This attribute
-will conflict with the @code{usage} attribute.
-
-@item reorder-args
-@vindex reorder-args
-Some applications traditionally require that the command operands be
-intermixed with the command options.  In order to handle that, the arguments
-must be reordered.  If you are writing such an application, specify this
-global option.  All of the options (and any associated option arguments)
-will be brought to the beginning of the argument list.  New applications
-should not use this feature, if at all possible.  This feature is
-@i{disabled} if @code{POSIXLY_CORRECT} is defined in the environment.
-@end table
-
 @node option attributes
 @subsection Option Attributes
 @cindex option attributes
@@ -3383,6 +3383,79 @@ Such an option may not take a @code{value} (flag character) attribute.
 The program must have the @code{homerc} (@pxref{program attributes}) option set.
 @end table
 
+@node Immediate Action
+@subsubsection Immediate Action Attributes
+@cindex immediate action
+
+Certain options may need to be processed early.  For example, in order to
+suppress the processing of configuration files, it is necessary to process the
+command line option @code{--no-load-opts} @strong{before} the config files are
+processed.  To accommodate this, certain options may have their enabled or
+disabled forms marked for immediate processing.  The consequence of this is
+that they are processed ahead of all other options in the reverse of normal
+order.
+
+Normally, the first options processed are the options specified in the first
+@code{homerc} file, followed by then next @code{homerc} file through to the
+end of config file processing.  Next, environment variables are processed and
+finally, the command line options.  The later options override settings
+processed earlier.  That actually gives them higher priority.  Command line
+immediate action options actually have the lowest priority of all.  They would
+be used only if they are to have an effect on the processing of subsequent
+options.
+
+@table @samp
+@item immediate
+@vindex immediate
+Use this option attribute to specify that the enabled form of the option
+is to be processed immediately.  The @code{help} and @code{more-help}
+options are so specified.  They will also call @code{exit()} upon
+completion, so they @strong{do} have an effect on the processing
+of the remaining options :-).
+
+@item immed-disable
+@vindex immed-disable
+Use this option attribute to specify that the disabled form of the
+option is to be processed immediately.  The @code{load-opts} option is
+so specified.  The @code{--no-load-opts} command line option will
+suppress the processing of config files and environment variables.
+Contrariwise, the @code{--load-opts} command line option is
+processed normally.  That means that the options specified in that file
+will be processed after all the @code{homerc} files and, in fact, after
+options that precede it on the command line.
+
+@item also
+If either the @code{immediate} or the @code{immed-disable} attributes
+are set to the string, ``@code{also}'', then the option will actually be
+processed twice:  first at the immediate processing phase and again
+at the ``normal'' time.
+@end table
+
+@node Option Conflict Attributes
+@subsubsection Option Conflict Attributes
+@cindex Option Conflict Attributes
+
+These attributes may be used as many times as you need.
+They are used at the end of the option processing to verify
+that the context within which each option is found does not
+conflict with the presence or absence of other options.
+
+This is not a complete cover of all possible conflicts and
+requirements, but it simple to implement and covers the
+more common situations.
+
+@table @samp
+@cindex flags-must
+@item flags-must
+one entry for every option that @strong{must} be present
+when this option is present
+
+@cindex flags-cant
+@item flags-cant
+one entry for every option that @strong{cannot} be present
+when this option is present
+@end table
+
 @node opt-attr settable
 @subsubsection Program may set option
 @vindex settable
@@ -3516,79 +3589,6 @@ to an @code{include} attribute (@pxref{program attributes}).  Do @strong{not}
 use this attribute globally, or it will get emitted into every option
 definition block.
 
-@node Immediate Action
-@subsubsection Immediate Action Attributes
-@cindex immediate action
-
-Certain options may need to be processed early.  For example, in order to
-suppress the processing of configuration files, it is necessary to process the
-command line option @code{--no-load-opts} @strong{before} the config files are
-processed.  To accommodate this, certain options may have their enabled or
-disabled forms marked for immediate processing.  The consequence of this is
-that they are processed ahead of all other options in the reverse of normal
-order.
-
-Normally, the first options processed are the options specified in the first
-@code{homerc} file, followed by then next @code{homerc} file through to the
-end of config file processing.  Next, environment variables are processed and
-finally, the command line options.  The later options override settings
-processed earlier.  That actually gives them higher priority.  Command line
-immediate action options actually have the lowest priority of all.  They would
-be used only if they are to have an effect on the processing of subsequent
-options.
-
-@table @samp
-@item immediate
-@vindex immediate
-Use this option attribute to specify that the enabled form of the option
-is to be processed immediately.  The @code{help} and @code{more-help}
-options are so specified.  They will also call @code{exit()} upon
-completion, so they @strong{do} have an effect on the processing
-of the remaining options :-).
-
-@item immed-disable
-@vindex immed-disable
-Use this option attribute to specify that the disabled form of the
-option is to be processed immediately.  The @code{load-opts} option is
-so specified.  The @code{--no-load-opts} command line option will
-suppress the processing of config files and environment variables.
-Contrariwise, the @code{--load-opts} command line option is
-processed normally.  That means that the options specified in that file
-will be processed after all the @code{homerc} files and, in fact, after
-options that precede it on the command line.
-
-@item also
-If either the @code{immediate} or the @code{immed-disable} attributes
-are set to the string, ``@code{also}'', then the option will actually be
-processed twice:  first at the immediate processing phase and again
-at the ``normal'' time.
-@end table
-
-@node Option Conflict Attributes
-@subsubsection Option Conflict Attributes
-@cindex Option Conflict Attributes
-
-These attributes may be used as many times as you need.
-They are used at the end of the option processing to verify
-that the context within which each option is found does not
-conflict with the presence or absence of other options.
-
-This is not a complete cover of all possible conflicts and
-requirements, but it simple to implement and covers the
-more common situations.
-
-@table @samp
-@cindex flags-must
-@item flags-must
-one entry for every option that @strong{must} be present
-when this option is present
-
-@cindex flags-cant
-@item flags-cant
-one entry for every option that @strong{cannot} be present
-when this option is present
-@end table
-
 @node Option Arguments
 @subsection Option Argument Specification
 @cindex Option Arguments
@@ -3633,45 +3633,6 @@ Supporting attributes for particular argument types:
 * arg-optional::            Option Argument Optional
 * arg-default::             Default Option Argument Value
 @end menu
-
-@node arg-keyword
-@subsubsection Keyword list
-@vindex keyword
-If the @code{arg-type} is @code{keyword} (@pxref{arg-type keyword}) or
-@code{set-membership} (@pxref{arg-type set membership}), then you must specify
-the list of keywords by a series of @code{keyword} entries.  The interface
-file will contain values for @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each
-keyword entry.  @code{keyword} option types will have an enumeration and
-@code{set-membership} option types will have a set of unsigned bits
-@code{#define}-d.
-
-If the @code{arg-type} is specifically @code{keyword}, you may also add
-special handling code with a
-@vindex extra-code
-@code{extra-code} attribute.  After @code{optionEnumerationVal} has
-converted the input string into an enumeration, you may insert code to
-process this enumeration value (@code{pOptDesc->optArg.argEnum}).
-
-@node arg-optional
-@subsubsection Option Argument Optional
-@vindex arg-optional
-This attribute indicates that the user does not have to supply an argument for
-the option.  This is only valid if the @var{arg-type} is @code{string}
-(@pxref{arg-type string}) or @code{keyword} (@pxref{arg-type keyword}).  If it
-is @code{keyword}, then this attribute may also specify the default keyword to
-assume when the argument is not supplied.  If left empty, @var{arg-default}
-(@pxref{arg-default}) or the zero-valued keyword will be used.
-
-This is overridden and the options are required if the libopts library
-gets configured with @code{--disable-optional-args}.
-
-
-@node arg-default
-@subsubsection Default Option Argument Value
-@vindex arg-default
-This specifies the default option argument value to be used when the option is
-not specified or preset.  You may specify multiple @code{arg-default} values if
-the argument type is @code{set membership}.
 
 @node arg-type string
 @subsubsection Arg Type String
@@ -3921,6 +3882,43 @@ The full documentation can be found with ISO-8601 documentation and the
 more extedded documentation when ``parse_duration()'' becomes more widely
 available.
 
+@node arg-keyword
+@subsubsection Keyword list
+@vindex keyword
+If the @code{arg-type} is @code{keyword} (@pxref{arg-type keyword}) or
+@code{set-membership} (@pxref{arg-type set membership}), then you must specify
+the list of keywords by a series of @code{keyword} entries.  The interface
+file will contain values for @code{@i{<OPTN_NAME>}_@i{<KEYWORD>}} for each
+keyword entry.  @code{keyword} option types will have an enumeration and
+@code{set-membership} option types will have a set of unsigned bits
+@code{#define}-d.
+
+If the @code{arg-type} is specifically @code{keyword}, you may also add
+special handling code with a
+@vindex extra-code
+@code{extra-code} attribute.  After @code{optionEnumerationVal} has
+converted the input string into an enumeration, you may insert code to
+process this enumeration value (@code{pOptDesc->optArg.argEnum}).
+
+@node arg-optional
+@subsubsection Option Argument Optional
+@vindex arg-optional
+This attribute indicates that the user does not have to supply an argument for
+the option.  This is only valid if the @var{arg-type} is @code{string}
+(@pxref{arg-type string}) or @code{keyword} (@pxref{arg-type keyword}).  If it
+is @code{keyword}, then this attribute may also specify the default keyword to
+assume when the argument is not supplied.  If left empty, @var{arg-default}
+(@pxref{arg-default}) or the zero-valued keyword will be used.
+
+This is overridden and the options are required if the libopts library
+gets configured with @code{--disable-optional-args}.
+
+@node arg-default
+@subsubsection Default Option Argument Value
+@vindex arg-default
+This specifies the default option argument value to be used when the option is
+not specified or preset.  You may specify multiple @code{arg-default} values if
+the argument type is @code{set membership}.
 
 @node Option Argument Handling
 @subsection Option Argument Handling
@@ -5093,6 +5091,7 @@ in the option descriptor file (@pxref{program attributes}) with the
 * saving rcfile::       Saving the presets into a configuration file
 * sample rcfile::       Creating a sample configuration file
 * environrc::           environment variable presets
+* config example::      Config file only example
 @end menu
 
 It is also possible to configure your program @i{without} using
@@ -5126,10 +5125,6 @@ memory.  @code{AutoOpts} generated code uses this function for its own
 needs.  Client code should only call this function with pointers
 gotten from @code{configFileLoad}.
 @end table
-
-@menu
-* config example::      Config file only example
-@end menu
 
 @node loading rcfile
 @subsection configuration file presets

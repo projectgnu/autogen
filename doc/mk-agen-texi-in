@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-07-10 16:47:09 bkorb"
+# Time-stamp:        "2010-07-25 08:58:37 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -212,7 +212,8 @@ run_getdefs
 
 env >&2
 opts="-t${timer} -L${srcdir} -L${top_srcdir} -L${top_srcdir}/autoopts"
-cmd=`echo "${cmd}" --base=${GEN_BASE} ${opts} ${tmp_dir}/${GEN_BASE}.def`
+opts="--base=${GEN_BASE} ${opts}"
+cmd=`echo "${cmd}" ${opts} ${tmp_dir}/${GEN_BASE}.def`
 echo "${PS4:-+} " ${cmd} >&8
 
 ${cmd} || die could not regenerate doc
