@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-08 21:42:17 bkorb"
+## Time-stamp:      "2010-07-25 08:01:38 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -32,7 +32,19 @@ nodist_getdefs_SOURCES = $(BUILT_SOURCES)
 SUBDIRS         = test
 EXTRA_DIST      = opts.def $(gdsrcs)
 RUNAG           = $(AGexe)
-AGEXE_LIB       = $(RUNAG) -MF$@ -L$(top_srcdir)/autoopts
+
+if AMDEP
+DEP_FILE        = $(DEPDIR)/opts-dep
+DEP_ARG         = -MF$(DEPDIR)/opts-dep
+TOUCH_SENTINEL  = touch -r $(DEP_FILE) $@
+include $(DEPDIR)/opts-dep
+else
+DEP_FILE        =
+DEP_ARG         =
+TOUCH_SENTINEL  = touch $@
+endif
+AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts
+
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
@@ -52,7 +64,8 @@ gd.c : $(gdsrcs)
 
 $(getdefs_OBJECTS) opts.h opts.c : stamp-opts
 stamp-opts : opts.def $(CLexe) $(AGexe)
-	$(AG_ENV) ; $(AGEXE_LIB) $(srcdir)/opts.def
+	$(AG_ENV) ; $(AGEXE_LIB) $(DEP_ARG) $(srcdir)/opts.def
+	$(TOUCH_SENTINEL)
 
 $(AGexe) :
 	@cd ../agen5 ; $(MAKE) $(AGnam)
