@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2010-07-11 12:57:08 bkorb"
+ *  Time-stamp:        "2010-07-26 18:21:07 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -55,6 +55,9 @@ find_entry_value(SCM op, SCM obj, SCM test);
 
 static ver_type_t
 str2int_ver(char* pz);
+
+static SCM
+do_ag_file_line(int line_delta, char const * fmt);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -715,6 +718,28 @@ ag_scm_tpl_file(SCM full)
     return AG_SCM_STR02SCM((char*)(void*)pzTemplFileName);
 }
 
+/**
+ * guts of the template file/line functions
+ */
+static SCM
+do_ag_file_line(int line_delta, char const * fmt)
+{
+    char * buf;
+
+    {
+        size_t sz = strlen(fmt) + strlen(pCurTemplate->pzTplFile) + 24;
+        buf = ag_scribble(sz);
+    }
+
+    {
+        void * args[2];
+        args[0] = (void*)pCurTemplate->pzTplFile;
+        args[1] = (void*)((long)pCurMacro->lineNo + line_delta);
+        sprintfv(buf, fmt, (snv_constpointer*)args);
+    }
+
+    return AG_SCM_STR02SCM(buf);
+}
 
 /*=gfunc tpl_file_line
  *
@@ -740,38 +765,36 @@ ag_scm_tpl_file(SCM full)
 SCM
 ag_scm_tpl_file_line(SCM fmt)
 {
-    char    zScribble[ 1024 ];
-    tSCC    zFmt[] = "from %s line %d";
-    char const * pzFmt = zFmt;
-    char*   pz;
+    char const * pzFmt = "from %s line %d";
 
     if (AG_SCM_STRING_P(fmt))
         pzFmt = ag_scm2zchars(fmt, "file/line format");
 
-    {
-        size_t  maxlen = strlen(pCurTemplate->pzTplFile)
-                       + strlen(pzFmt) + 4 * sizeof(int);
-        if (maxlen >= sizeof(zScribble))
-             pz = (char*)AGALOC(maxlen, "file-line buffer");
-        else pz = zScribble;
-    }
-
-    {
-        void* args[2];
-        args[0] = (void*)pCurTemplate->pzTplFile;
-        args[1] = (void*)(long)pCurMacro->lineNo;
-        sprintfv(pz, pzFmt, (snv_constpointer*)args);
-    }
-
-    {
-        SCM res = AG_SCM_STR02SCM(pz);
-        if (pz != zScribble)
-            AGFREE((void*)pz);
-
-        return res;
-    }
+    return do_ag_file_line(0, pzFmt);
 }
 
+/*=gfunc tpl_file_next_line
+ *
+ * what:   get the template file plus next line number
+ *
+ * exparg: msg-fmt, formatting for line message, optional
+ *
+ * doc:
+ *
+ *  This is almost the same as @xref{SCM tpl-file-line}, except that
+ *  the line referenced is the next line, per C compiler conventions and
+ *  defaults to the format:  # <line-no+1> "<file-name>"
+=*/
+SCM
+ag_scm_tpl_file_next_line(SCM fmt)
+{
+    char const * pzFmt = "# %2$d \"%1$s\"";
+
+    if (AG_SCM_STRING_P(fmt))
+        pzFmt = ag_scm2zchars(fmt, "file/line format");
+
+    return do_ag_file_line(1, pzFmt);
+}
 
 /*=gfunc def_file_line
  *

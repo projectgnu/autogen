@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-07-16 17:35:09 bkorb"
+ * Time-stamp:        "2010-07-26 17:52:21 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -343,7 +343,7 @@ open_output(tOutSpec* pOutSpec)
     char const * out_file = NULL;
 
     if (strcmp(pOutSpec->zSuffix, "null") == 0) {
-        static int const flags = FPF_NOUNLINK | FPF_NOCHMOD;
+        static int const flags = FPF_NOUNLINK | FPF_NOCHMOD | FPF_TEMPFILE;
     null_open:
         open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
         return;

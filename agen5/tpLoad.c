@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-07-11 13:43:52 bkorb"
+ * Time-stamp:        "2010-07-27 17:05:21 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -531,6 +531,19 @@ wrap_up_depends(void)
         };
 
         utime(pzDepFile, &tbuf);
+
+        /*
+         * If the target is not the dependency file, then ensure that the
+         * file exists and set its time to the same time.  Ignore all errors.
+         */
+        if (strcmp(pzDepFile, pzDepTarget) != 0) {
+            if (! access(pzDepTarget, R_OK)) {
+                static mode_t const mode =
+                    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+                close( open(pzDepTarget, O_CREAT, mode));
+            }
+            utime(pzDepTarget, &tbuf);
+        }
     }
 
     /*

@@ -1,3 +1,16 @@
+2010-07-27  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c (ag_scm_tpl_file_next_line): new function
+	(do_ag_file_line): broken out of ag_scm_tpl_file_line().
+	* agen5/tpLoad.c (wrap_up_depends): if the target file is different
+	from the dependency file, then modify its time, too.
+	* agen5/tpProcess.c (open_output): mark "/dev/null" as a temp file
+	so we won't list it as an output (derived) file
+
+2010-07-25  Bruce Korb  <bkorb@gnu.org>
+
+	5.11 release
+
 2010-07-17  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h (zEmpty): new empty string
