@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2010-07-26 18:21:07 bkorb"
+ *  Time-stamp:        "2010-07-28 18:16:25 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -57,7 +57,7 @@ static ver_type_t
 str2int_ver(char* pz);
 
 static SCM
-do_ag_file_line(int line_delta, char const * fmt);
+do_tpl_file_line(int line_delta, char const * fmt);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -722,7 +722,7 @@ ag_scm_tpl_file(SCM full)
  * guts of the template file/line functions
  */
 static SCM
-do_ag_file_line(int line_delta, char const * fmt)
+do_tpl_file_line(int line_delta, char const * fmt)
 {
     char * buf;
 
@@ -770,7 +770,7 @@ ag_scm_tpl_file_line(SCM fmt)
     if (AG_SCM_STRING_P(fmt))
         pzFmt = ag_scm2zchars(fmt, "file/line format");
 
-    return do_ag_file_line(0, pzFmt);
+    return do_tpl_file_line(0, pzFmt);
 }
 
 /*=gfunc tpl_file_next_line
@@ -780,7 +780,6 @@ ag_scm_tpl_file_line(SCM fmt)
  * exparg: msg-fmt, formatting for line message, optional
  *
  * doc:
- *
  *  This is almost the same as @xref{SCM tpl-file-line}, except that
  *  the line referenced is the next line, per C compiler conventions and
  *  defaults to the format:  # <line-no+1> "<file-name>"
@@ -793,7 +792,7 @@ ag_scm_tpl_file_next_line(SCM fmt)
     if (AG_SCM_STRING_P(fmt))
         pzFmt = ag_scm2zchars(fmt, "file/line format");
 
-    return do_ag_file_line(1, pzFmt);
+    return do_tpl_file_line(1, pzFmt);
 }
 
 /*=gfunc def_file_line
@@ -804,7 +803,6 @@ ag_scm_tpl_file_next_line(SCM fmt)
  * exparg: msg-fmt, formatting for line message, optional
  *
  * doc:
- *
  *  Returns the file and line number of a AutoGen defined value, using
  *  either the default format, "from %s line %d", or else the format you
  *  supply.  For example, if you want to insert a "C" language file-line

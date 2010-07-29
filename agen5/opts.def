@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-07-24 09:12:14 bkorb"
+ *  Time-stamp:        "2010-07-28 19:35:50 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -494,6 +494,27 @@ flag = {
 };
 
 flag = {
+    name        = shell;
+    arg-type    = string;
+    arg-name    = shell;
+
+    descrip     = "name or path name of shell to use";
+#ifndef XML2AG
+    ifdef       = SHELL_ENABLED;
+    doc = <<-  _EOF_
+	By default, when AutoGen is built, the configuration is probed for a
+	reasonable Bourne-like shell to use for shell script processing.  If
+	a particular template needs an alternate shell, it must be specified
+	with this option on the command line, with an environment variable
+	(@code{$@{AUTOGEN_SHELL@}}) or in the configuration/initialization file.
+	_EOF_;
+    flag-code   = "    pzShellProgram = pOptDesc->optArg.argString;";
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+flag = {
     name        = timeout;
     value       = t;
     arg-type    = number;
@@ -806,11 +827,15 @@ flag = {
 	predecessor dependencies, this emits both the predecessor and the
 	successor dependencies (output files).  By default, the output
 	dependency information will be placed in @code{<base-name>.d}, but may
-	also be specified with @code{-MF<file>}.  The target will be the
-	dependency file name, but may also be overridden with
-	@code{-MT<targ-name>}.  That is not, however, recommended.  AutoGen
-	will set the time stamp correctly on the dependency file, but it will
-	not mess with this specified target.
+	also be specified with @code{-MF<file>}.  The time stamp on this file
+	will be manipulated so that it will be one second older than the oldest
+	primary output file.
+
+	The target in this dependency file will normally be the dependency
+	file name, but may also be overridden with @code{-MT<targ-name>}.
+	AutoGen will not alter the contents of that file, but it may create
+	it and it will adjust the modification time to match the dependency
+	file.
 
 	@strong{NOTE:} these second letters are part of the option argument, so
 	@code{-MF <file>} must have the space character quoted or omitted, and
@@ -825,12 +850,12 @@ flag = {
 
 	This is the recommended usage:
 	@example
-	-MFwhatever-you-like.dep
+	-MFwhatever-you-like.dep -MTyour-sentinel-file
 	@end example
 	and then in your @code{Makefile}, make the @file{autogen} rule:
 	@example
 	whatever-you-like.dep:
-	    autogen -MF$@@ .....
+	    autogen -MT$@@ -MF$*.d .....
 	@end example
 
 	The modification time on the dependency file is adjusted to be one

@@ -2,7 +2,7 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2010-07-27 16:57:07 bkorb"
+# Time-stamp:        "2010-07-28 19:09:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
@@ -25,7 +25,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=11
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".1pre1"
+AG_PATCHLEVEL=".1pre2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -64,7 +64,7 @@ w=`expr \( ${COLUMNS:-80} - 1 \) / 2`
 h=`expr $w \* 2`
 h=`printf "*%${h}s" ''`
 h=`echo "$h"|sed 's/  /-*/g'`
-ag='A      U      T      O      G      E      N'
+ag=`echo AUTOGEN | sed 's/\(.\)/\1    /g;s/ *$//'`
 ag_off=`printf "$ag"|wc -c`
 ag_off=`expr $w - \( $ag_off / 2 \)`
 ag=`printf "%${ag_off}s${ag}" ""`

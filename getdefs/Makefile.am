@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-25 08:47:16 bkorb"
+## Time-stamp:      "2010-07-28 19:56:17 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -34,8 +34,8 @@ EXTRA_DIST      = opts.def $(gdsrcs)
 RUNAG           = $(AGexe)
 
 if AMDEP
-DEP_ARG         = -MF$(DEPDIR)/opts-dep
-TOUCH_SENTINEL  = touch -r $(DEPDIR)/opts-dep $@
+DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@
+TOUCH_SENTINEL  = @:
 include $(DEPDIR)/opts-dep
 else
 DEP_ARG         =

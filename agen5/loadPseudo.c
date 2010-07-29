@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2010-07-10 16:35:39 bkorb"
+ *  Time-stamp:        "2010-07-28 19:33:43 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -236,8 +236,9 @@ handle_hash_line(char const * pz)
          *  the SHELL environment variable to this executable.
          */
         if (access(nmbuf, X_OK) == 0) {
-            char * sp = malloc(sizeof(zShellEnv) + 1 + len);
-            sprintf(sp, "%s=%s", zShellEnv, nmbuf);
+            static char const sh_nm[] = "SHELL";
+            char * sp = malloc(sizeof(sh_nm) + 1 + len);
+            sprintf(sp, "%s=%s", sh_nm, nmbuf);
             putenv(sp);
             AGDUPSTR(pzShellProgram, nmbuf, "shell name");
             AGDUPSTR(serverArgs[0],  nmbuf, "shell name");
@@ -489,23 +490,6 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         }
 
         fsm_state = nxt_state;
-    }
-
-    /*
-     *  It is possible that the template writer specified a shell to use.
-     *  If the server shell has not already started, we'll catch it later.
-     *  If it has started, then check for a shell change & shut it down
-     *  if it has been changed.
-     */
-    if (serverArgs[0] != NULL) {
-        char* pz = getenv(zShellEnv);
-        if ((pz != NULL) && (strcmp(pz, serverArgs[0]) != 0)) {
-            fprintf(pfTrace, "Changing server shell from %s to %s\n",
-                    serverArgs[0], pz);
-            closeServer();
-            serverArgs[0]  = pz;
-            pzShellProgram = pz;
-        }
     }
 
     return pzData;

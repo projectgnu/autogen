@@ -1,7 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
 
-#  Time-stamp:        "2010-06-30 21:10:28 bkorb"
+#  Time-stamp:        "2010-07-28 18:45:44 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -280,8 +280,7 @@ FOR macfunc "\n"    =]echo [=
 
 ENDFOR macfunc      =][=
 
-(shellf "( %s ) | columns -I4 -S, --spread=1"
-        (out-pop #t))
+(shell (string-append "( " (out-pop #t) " ) | columns -I4 -S, --spread=1"))
 
 =] };
 

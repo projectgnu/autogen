@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2010-06-26 16:04:24 bkorb"
+# Time-stamp:        "2010-07-28 19:03:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -37,7 +37,7 @@ cat > ${testname}.c <<_EOF_
  *
 =*/
 SCM
-test_scm_test_to_example_x( SCM in )
+test_scm_test_to_example_x(SCM in)
 {
     return in;
 }
@@ -92,7 +92,7 @@ cat > ${testname}.ini.OK1 <<'_EOF_'
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -113,7 +113,7 @@ cat > ${testname}.ini.OK1 <<'_EOF_'
 extern SCM snarf_grp_scm_sym_bumble_it          = SCM_BOOL_F;
 static SCM snarf_grp_scm_sym_mumble_check       = SCM_BOOL_F;
 
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
 typedef SCM (*gh_callback_t)(void);
@@ -123,7 +123,7 @@ void Chosen_init(void);
  * snarf_grp Initialization procedure.
  */
 void
-Chosen_init( void )
+Chosen_init(void)
 {
 static char const g_nm[55] =
     "test->example!\0"   "guile-syntax-ele\0" "bumble-it\0"
@@ -146,7 +146,7 @@ cat > ${testname}.h.OK <<_EOF_
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -182,7 +182,7 @@ typedef enum {
     GH_TYPE_EXACT
 } teGuileType;
 
-extern SCM snarf_grp_scm_test_to_example_x( SCM );
+extern SCM snarf_grp_scm_test_to_example_x(SCM);
 extern SCM snarf_grp_scm_sym_bumble_it;
 
 #endif /* GUILE_PROCS_SNARF_H_GUARD */
@@ -216,7 +216,7 @@ cat > ${testname}.ini.OK2 <<'_EOF_'
 /*   -*- buffer-read-only: t -*- vi: set ro:
  *  
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -250,12 +250,12 @@ agrelay_scm_test_to_example_x(SCM scm0)
 }
 
 
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
                    _Ar, _Ao, _Ax)
 
 #else /* DEBUG_ENABLED *not* */
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
 #endif
@@ -266,7 +266,7 @@ void Chosen_init(void);
  * snarf_grp Initialization procedure.
  */
 void
-Chosen_init( void )
+Chosen_init(void)
 {
 static char const g_nm[55] =
     "test->example!\0"   "guile-syntax-ele\0" "bumble-it\0"

@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-21 17:35:01 bkorb"
+ *  Time-stamp:        "2010-07-28 18:55:56 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -201,6 +201,89 @@ ag_scm_out_pop(SCM ret_contents)
     return res;
 }
 
+/**
+ * return the current line number
+ */
+static int
+current_line(FILE * fp)
+{
+    int lnno = 1;
+
+    while (! feof(fp)) {
+        int ch = getc(fp);
+        if (ch == '\n')
+            lnno++;
+    }
+
+    return lnno;
+}
+
+/**
+ * guts of the output file/line function
+ */
+static SCM
+do_output_file_line(int line_delta, char const * fmt)
+{
+    char * buf;
+    char const * fname = pCurFp->pzOutName;
+
+    if (pCurFp->flags & FPF_TEMPFILE) {
+        fname = "* temp file *";
+        line_delta = 0;
+
+    } else if (fseek(pCurFp->pFile, 0, SEEK_SET) == 0) {
+        line_delta += current_line(pCurFp->pFile);
+
+    } else {
+        line_delta = 0;
+    }
+
+    {
+        size_t sz = strlen(fmt) + strlen(fname) + 24;
+        buf = ag_scribble(sz);
+    }
+
+    {
+        void * args[2];
+        args[0] = (void *)fname;
+        args[1] = (void *)(uintptr_t)line_delta;
+        sprintfv(buf, fmt, (snv_constpointer *)args);
+    }
+
+    return AG_SCM_STR02SCM(buf);
+}
+
+/*=gfunc output_file_next_line
+ *
+ * what:   print the file name and next line number
+ *
+ * exparg: line_off, offset to line number,   optional
+ * exparg: alt_fmt,  alternate format string, optional
+ *
+ * doc:
+ *    Returns a string with the current output file name and line number.
+ *    The default format is:  # <line+1> "<output-file-name>"
+ *    The argument may be either a number indicating an offset from
+ *    the current output line number or an alternate formatting string.
+ *    If both are provided, then the first must be a numeric offset.
+=*/
+SCM
+ag_scm_output_file_next_line(SCM num_or_str, SCM str)
+{
+    char const * pzFmt = "# %2$d \"%1$s\"";
+    int  line_off = 1;
+
+    if (AG_SCM_NUM_P(num_or_str))
+        line_off = gh_scm2long(num_or_str);
+    else
+        str = num_or_str;
+
+    if (AG_SCM_STRING_P(str))
+        pzFmt = ag_scm2zchars(str, "file/line format");
+
+    return do_output_file_line(line_off, pzFmt);
+}
+
 
 /*=gfunc out_suspend
  *
@@ -215,7 +298,7 @@ ag_scm_out_pop(SCM ret_contents)
  *  tag names are forgotten as soon as the file has been "resumed".
 =*/
 SCM
-ag_scm_out_suspend(SCM suspName)
+ag_scm_out_suspend(SCM susp_nm)
 {
     if (pCurFp->pPrev == NULL)
         AG_ABEND("ERROR:  Cannot pop output with no output pushed");
@@ -233,7 +316,7 @@ ag_scm_out_suspend(SCM suspName)
                          "augmenting suspended file list");
     }
 
-    pSuspended[ suspendCt-1 ].pzSuspendName = gh_scm2newstr(suspName, NULL);
+    pSuspended[ suspendCt-1 ].pzSuspendName = gh_scm2newstr(susp_nm, NULL);
     pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf(pfTrace, "suspended output to '%s'\n",
@@ -249,17 +332,17 @@ ag_scm_out_suspend(SCM suspName)
 /*=gfunc out_resume
  *
  * what:   resume suspended output file
- * exparg: suspName, A name tag for reactivating
+ * exparg: susp_nm, A name tag for reactivating
  * doc:
  *  If there has been a suspended output, then make that output descriptor
  *  current again.  That output must have been suspended with the same tag
  *  name given to this routine as its argument.
 =*/
 SCM
-ag_scm_out_resume(SCM suspName)
+ag_scm_out_resume(SCM susp_nm)
 {
     int  ix  = 0;
-    char const * pzName = ag_scm2zchars(suspName, "resume name");
+    char const * pzName = ag_scm2zchars(susp_nm, "resume name");
 
     for (; ix < suspendCt; ix++) {
         if (strcmp(pSuspended[ ix ].pzSuspendName, pzName) == 0) {
@@ -285,15 +368,15 @@ ag_scm_out_resume(SCM suspName)
 /*=gfunc out_emit_suspended
  *
  * what:   emit the text of suspended output
- * exparg: suspName, A name tag of suspended output
+ * exparg: susp_nm, A name tag of suspended output
  * doc:
  *  This function is equivalent to
  *  @code{(begin (out-resume <name>) (out-pop #t))}
 =*/
 SCM
-ag_scm_out_emit_suspended(SCM suspName)
+ag_scm_out_emit_suspended(SCM susp_nm)
 {
-    (void)ag_scm_out_resume(suspName);
+    (void)ag_scm_out_resume(susp_nm);
     return ag_scm_out_pop(SCM_BOOL_T);
 }
 

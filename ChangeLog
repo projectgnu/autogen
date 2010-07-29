@@ -6,6 +6,7 @@
 	from the dependency file, then modify its time, too.
 	* agen5/tpProcess.c (open_output): mark "/dev/null" as a temp file
 	so we won't list it as an output (derived) file
+	* agen5/expOutput.c (ag_scm_output_file_next_line): new function.
 
 2010-07-25  Bruce Korb  <bkorb@gnu.org>
 

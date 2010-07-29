@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-07-24 09:03:33 bkorb"
+ *  Time-stamp:        "2010-07-28 19:52:36 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -103,7 +103,7 @@ typedef enum { STATE_TABLE COUNT_PROC_STATE } teProcState;
 
 #define EXPORT
 
-typedef struct fpStack       tFpStack;
+typedef struct fp_stack      tFpStack;
 typedef struct outSpec       tOutSpec;
 typedef struct scanContext   tScanCtx;
 typedef struct defEntry      tDefEntry;
@@ -254,18 +254,18 @@ struct outSpec {
     char        zSuffix[ 1 ];
 };
 
-#define FPF_FREE       0x0001   /* free the fp structure   */
-#define FPF_UNLINK     0x0002   /* unlink file (temp file) */
-#define FPF_NOUNLINK   0x0004   /* do not unlink file      */
-#define FPF_STATIC_NM  0x0008   /* name statically alloced */
-#define FPF_NOCHMOD    0x0010   /* do not chmod(2) file    */
-#define FPF_TEMPFILE   0x0020   /* the file is a temp      */
+#define FPF_FREE        0x0001   /* free the fp structure   */
+#define FPF_UNLINK      0x0002   /* unlink file (temp file) */
+#define FPF_NOUNLINK    0x0004   /* do not unlink file      */
+#define FPF_STATIC_NM   0x0008   /* name statically alloced */
+#define FPF_NOCHMOD     0x0010   /* do not chmod(2) file    */
+#define FPF_TEMPFILE    0x0020   /* the file is a temp      */
 
-struct fpStack {
-    int         flags;
-    tFpStack*   pPrev;
-    FILE*       pFile;
-    tCC*        pzOutName;
+struct fp_stack {
+    int                 flags;
+    tFpStack *          pPrev;
+    FILE *              pFile;
+    char const *        pzOutName;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -371,8 +371,8 @@ MODE size_t      source_used      VALUE( 0 );
 MODE ag_bool     dep_phonies      VALUE( AG_FALSE );
 MODE char*       pzTmpStderr      VALUE( NULL );
 
-MODE tCC*        serverArgs[2]    VALUE( { NULL } );
-MODE tCC*        pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
+MODE char const* serverArgs[2]    VALUE( { NULL } );
+MODE char const* pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
 
 /*
  *  AutoGen definiton and template context
@@ -446,20 +446,19 @@ MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
 #define MKSTRING(_n, _v) \
         MODE char const z ## _n[sizeof(_v)] VALUE(_v)
 
-MKSTRING( AllocErr,   "Allocation Failure");
-MKSTRING( AllocWhat,  "Could not allocate a %d byte %s\n");
-MKSTRING( Cannot,     "fserr %d: cannot %s %s:  %s\n");
-MKSTRING( DevNull,    "/dev/null");
-MKSTRING( Empty,      "");
-MKSTRING( FileFormat, "%s%s\0%s.%s");
-MKSTRING( FileLine,   "\tfrom %s line %d\n");
-MKSTRING( Format,     "format");
-MKSTRING( MemFile,    "in-mem file");
-MKSTRING( Nil,        "");
-MKSTRING( NotStr,     "ERROR: %s is not a string\n");
-MKSTRING( ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
-MKSTRING( ShellEnv,   "SHELL");
-MKSTRING( TplWarn,    "Warning in template %s, line %d\n\t%s\n");
+MKSTRING(AllocErr,   "Allocation Failure");
+MKSTRING(AllocWhat,  "Could not allocate a %d byte %s\n");
+MKSTRING(Cannot,     "fserr %d: cannot %s %s:  %s\n");
+MKSTRING(DevNull,    "/dev/null");
+MKSTRING(Empty,      "");
+MKSTRING(FileFormat, "%s%s\0%s.%s");
+MKSTRING(FileLine,   "\tfrom %s line %d\n");
+MKSTRING(Format,     "format");
+MKSTRING(MemFile,    "in-mem file");
+MKSTRING(Nil,        "");
+MKSTRING(NotStr,     "ERROR: %s is not a string\n");
+MKSTRING(ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
+MKSTRING(TplWarn,    "Warning in template %s, line %d\n\t%s\n");
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

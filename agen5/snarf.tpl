@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2010-02-24 08:42:03 bkorb"
+# Time-stamp:        "2010-07-28 19:02:48 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -95,7 +95,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/*  ")=]
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -120,17 +120,17 @@ typedef enum {
 } teGuileType;
 [=
 FOR gfunc       =]
-extern SCM [=(. scm-prefix)=][=name=]( [=
+extern SCM [= (string-append scm-prefix (get "name") "(") =][=
   IF (exist? "exparg") =][=
     FOR exparg ", " =]SCM[=
     ENDFOR      =][=
   ELSE          =]void[=
-  ENDIF         =] );[=
+  ENDIF         =]);[=
 ENDFOR gfunc    =][=
 
 FOR symbol      =][=
   IF (exist? "global") =]
-extern SCM [=(. scm-prefix)=]sym_[=name=];[=
+extern SCM [= (string-append scm-prefix "sym_" (get "name") ";") =][=
   ENDIF         =][=
 ENDFOR symbol   =]
 
@@ -141,7 +141,7 @@ ENDFOR symbol   =]
 
 (dne " *  " "/*  ")=]
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
 [=
 (string-table-new "g_nm")
@@ -205,7 +205,7 @@ agrelay_scm_[= (get "name")     =]([=
 }
 
 [= ENDFOR  gfunc                =]
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
                    _Ar, _Ao, _Ax)
 
@@ -214,7 +214,7 @@ agrelay_scm_[= (get "name")     =]([=
 ENDIF debug-enabled exists
 
 =]
-#define NEW_PROC( _As, _Ar, _Ao, _Ax, _An )                                 \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
 [= (if (exist? "debug-enabled") "#endif\n") \=]
@@ -225,7 +225,7 @@ void [=(. init-proc)=](void);
  * [=group=] Initialization procedure.
  */
 void
-[=(. init-proc)=]( void )
+[=(. init-proc)=](void)
 {[=
 
   (out-push-new)
