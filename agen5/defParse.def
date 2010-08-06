@@ -1,5 +1,5 @@
 /*
- *  Time-stamp:        "2010-06-30 20:53:06 bkorb"
+ *  Time-stamp:        "2010-08-06 08:57:49 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -80,13 +80,13 @@ transition =
  *  or an '=' to start a value list or a '[' for an indexed value.
  */
 transition =
-{ tst = have_name;    tev   = lit_semi;        next = need_name;
+{ tst = have_name;    tev   = lit_semi;      next = need_name;
                       ttype = empty_val; },
-{ tst = have_name;    tev   = lit_eq;          next = need_value; },
-{ tst = have_name;    tev   = lit_open_bkt;    next = need_idx; ttype = noop; },
+{ tst = have_name;    tev   = lit_eq;        next = need_value; },
+{ tst = have_name;    tev   = lit_open_bkt;  next = need_idx; ttype = noop; },
 { tst = need_idx;     tev   = number, var_name;
-                      ttype = indexed_name;    next = need_cbkt; },
-{ tst = need_cbkt;    tev   = lit_close_bkt;   next = indx_name;
+                      ttype = indexed_name;  next = need_cbkt; },
+{ tst = need_cbkt;    tev   = lit_close_bkt; next = indx_name;
                       ttype = noop; },
 /*
  *  once you have one index, you cannot have another.
@@ -98,7 +98,7 @@ transition =
                       ttype = noop; };
 
 transition =
-{ tst  = need_value;  tev   = string, here_string, other_name, var_name, number;
+{ tst  = need_value;  tev = string, here_string, other_name, var_name, number;
                       next  = have_value;      ttype = str_value; },
 { tst  = need_value;  tev   = lit_o_brace;     next  = need_name;
                       ttype = start_block; },

@@ -72,7 +72,7 @@ utxt = { ut-name = AO_Sml;
 
 utxt = { ut-name = AO_Ver;
          ut-text = "Automated Options version %s\n"
-    "\tcopyright (c) 1999-2009 by Bruce Korb - all rights reserved\n";
+    "\tcopyright (c) 1999-2010 by Bruce Korb - all rights reserved\n";
 };
 
 utxt = { ut-name = AO_Woops;

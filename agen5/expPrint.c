@@ -63,10 +63,10 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
         struct sigaction  sa;
         sa.sa_handler = printFault;
         sa.sa_flags   = 0;
-        sigemptyset( &sa.sa_mask );
+        sigemptyset(&sa.sa_mask);
 
-        sigaction( SIGBUS,  &sa, &saSave1 );
-        sigaction( SIGSEGV, &sa, &saSave2 );
+        sigaction(SIGBUS,  &sa, &saSave1);
+        sigaction(SIGSEGV, &sa, &saSave2);
     }
 
     {
@@ -77,7 +77,7 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
          *  IF the sprintfv call below is going to address fault,
          *  THEN ...
          */
-        if (sigsetjmp( printJumpEnv, 0 ) != 0) {
+        if (sigsetjmp(printJumpEnv, 0) != 0) {
 #ifndef HAVE_STRSIGNAL
             extern char* strsignal(int signo);
 #endif
@@ -85,14 +85,14 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
              *  IF the fprintf command in the then clause has not failed yet,
              *  THEN perform that fprintf
              */
-            if (sigsetjmp( printJumpEnv, 0 ) == 0)
+            if (sigsetjmp(printJumpEnv, 0) == 0)
                 fprintf(pfTrace, zBadFmt, pzProg,
                         strsignal(printJumpSignal), pzFmt);
 
             /*
              *  The "sprintfv" command below faulted, so we exit
              */
-            AG_ABEND( zBadArgs );
+            AG_ABEND(zBadArgs);
         }
     }
 #endif /* ! defined(DEBUG_ENABLED) */
@@ -103,8 +103,8 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
             AG_ABEND(aprf("asprintfv returned 0x%08X\n", printSize));
 
 #if ! defined(DEBUG_ENABLED)
-        sigaction( SIGBUS,  &saSave1, NULL );
-        sigaction( SIGSEGV, &saSave2, NULL );
+        sigaction(SIGBUS,  &saSave1, NULL);
+        sigaction(SIGSEGV, &saSave2, NULL);
 #endif
         return printSize;
     }
@@ -126,9 +126,9 @@ run_printf(char const * pzFmt, int len, SCM alist)
         argp    = (void**)malloc((len+1) * sizeof(void*));
 
     while (len-- > 0) {
-        SCM  car = SCM_CAR( alist );
-        alist = SCM_CDR( alist );
-        switch (gh_type_e( car )) {
+        SCM  car = SCM_CAR(alist);
+        alist = SCM_CDR(alist);
+        switch (gh_type_e(car)) {
         default:
         case GH_TYPE_UNDEFINED:
             *(argp++) = (char*)"???";
@@ -139,7 +139,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_CHAR:
-            *(char*)(argp++) = gh_scm2char( car );
+            *(char*)(argp++) = gh_scm2char(car);
             break;
 
         case GH_TYPE_PAIR:
@@ -147,12 +147,12 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_NUMBER:
-            *(unsigned long*)(argp++) = gh_scm2ulong( car );
+            *(unsigned long*)(argp++) = gh_scm2ulong(car);
             break;
 
         case GH_TYPE_SYMBOL:
         case GH_TYPE_STRING:
-            *(argp++) = ag_scm2zchars( car, "printf str" );
+            *(argp++) = ag_scm2zchars(car, "printf str");
             break;
 
         case GH_TYPE_PROCEDURE:
@@ -195,15 +195,15 @@ run_printf(char const * pzFmt, int len, SCM alist)
  * doc:  Format a string using arguments from the alist.
 =*/
 SCM
-ag_scm_sprintf( SCM fmt, SCM alist )
+ag_scm_sprintf(SCM fmt, SCM alist)
 {
-    int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
+    int   list_len = scm_ilength(alist);
+    char* pzFmt    = ag_scm2zchars(fmt, zFormat);
 
     if (list_len <= 0)
         return fmt;
 
-    return run_printf( pzFmt, list_len, alist );
+    return run_printf(pzFmt, list_len, alist);
 }
 
 
@@ -221,12 +221,12 @@ ag_scm_sprintf( SCM fmt, SCM alist )
  *       Use ``(sprintf ...)'' to add text to your document.
 =*/
 SCM
-ag_scm_printf( SCM fmt, SCM alist )
+ag_scm_printf(SCM fmt, SCM alist)
 {
-    int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
+    int   list_len = scm_ilength(alist);
+    char* pzFmt    = ag_scm2zchars(fmt, zFormat);
 
-    gh_display( run_printf( pzFmt, list_len, alist ));
+    gh_display(run_printf(pzFmt, list_len, alist));
     return SCM_UNDEFINED;
 }
 
@@ -245,13 +245,13 @@ ag_scm_printf( SCM fmt, SCM alist )
  *       output.  Use this to print information messages to a template user.
 =*/
 SCM
-ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
+ag_scm_fprintf(SCM port, SCM fmt, SCM alist)
 {
-    int   list_len = scm_ilength( alist );
-    char* pzFmt    = ag_scm2zchars( fmt, zFormat );
-    SCM   res      = run_printf( pzFmt, list_len, alist );
+    int   list_len = scm_ilength(alist);
+    char* pzFmt    = ag_scm2zchars(fmt, zFormat);
+    SCM   res      = run_printf(pzFmt, list_len, alist);
 
-    return  scm_display( res, port );
+    return  scm_display(res, port);
 }
 
 
@@ -268,7 +268,7 @@ ag_scm_fprintf( SCM port, SCM fmt, SCM alist )
  *         rather than plain text.  They are also broken up.
 =*/
 SCM
-ag_scm_hide_email( SCM display, SCM eaddr )
+ag_scm_hide_email(SCM display, SCM eaddr)
 {
     tSCC zStrt[]  =
         "<script language=\"JavaScript\" type=\"text/javascript\">\n"
@@ -283,26 +283,26 @@ ag_scm_hide_email( SCM display, SCM eaddr )
         "//-->\n</script>";
 
     tSCC zFmt[]   = "&#%d;";
-    char*  pzDisp = ag_scm2zchars( display, zFormat );
-    char*  pzEadr = ag_scm2zchars( eaddr,   zFormat );
-    size_t str_size = (strlen( pzEadr ) * sizeof( zFmt ))
-            + sizeof( zStrt ) + sizeof( zEnd ) + strlen( pzDisp );
+    char*  pzDisp = ag_scm2zchars(display, zFormat);
+    char*  pzEadr = ag_scm2zchars(eaddr,   zFormat);
+    size_t str_size = (strlen(pzEadr) * sizeof(zFmt))
+            + sizeof(zStrt) + sizeof(zEnd) + strlen(pzDisp);
 
-    char*  pzRes  = ag_scribble( str_size );
+    char*  pzRes  = ag_scribble(str_size);
     char*  pzScan = pzRes;
 
-    strcpy( pzScan, zStrt );
-    pzScan += sizeof( zStrt ) - 1;
+    strcpy(pzScan, zStrt);
+    pzScan += sizeof(zStrt) - 1;
 
     for (;;) {
         if (*pzEadr == NUL)
             break;
-        pzScan += sprintf( pzScan, zFmt, *(pzEadr++) );
+        pzScan += sprintf(pzScan, zFmt, *(pzEadr++));
     }
 
-    pzScan += sprintf( pzScan, zEnd, pzDisp );
+    pzScan += sprintf(pzScan, zEnd, pzDisp);
 
-    return AG_SCM_STR2SCM( pzRes, (size_t)(pzScan - pzRes));
+    return AG_SCM_STR2SCM(pzRes, (size_t)(pzScan - pzRes));
 }
 
 
@@ -334,9 +334,9 @@ ag_scm_hide_email( SCM display, SCM eaddr )
  *         "You can do this by knowing that the format needs two arguments.\n"
 =*/
 SCM
-ag_scm_format_arg_count( SCM fmt )
+ag_scm_format_arg_count(SCM fmt)
 {
-    char* pzFmt = ag_scm2zchars( fmt, zFormat );
+    char* pzFmt = ag_scm2zchars(fmt, zFormat);
     int   ct    = 0;
     for (;;) {
         switch (*(pzFmt++)) {
@@ -348,7 +348,7 @@ ag_scm_format_arg_count( SCM fmt )
         }
     } scanDone:;
 
-    return AG_SCM_INT2SCM( ct );
+    return AG_SCM_INT2SCM(ct);
 }
 /*
  * Local Variables:

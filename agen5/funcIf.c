@@ -38,13 +38,13 @@ static tLoadProc mLoad_Elif, mLoad_Else;
 
 /* = = = START-STATIC-FORWARD = = = */
 static ag_bool
-eval_true( void );
+eval_true(void);
 
 static tMacro*
-mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
+mLoad_Elif(tTemplate* pT, tMacro* pMac, tCC** ppzScan);
 
 static tMacro*
-mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
+mLoad_Else(tTemplate* pT, tMacro* pMac, tCC** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -59,11 +59,11 @@ mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan );
  *      it matches the string "false"
  */
 static ag_bool
-eval_true( void )
+eval_true(void)
 {
     ag_bool needFree;
     ag_bool res = AG_TRUE;
-    tCC* pz = evalExpression( &needFree );
+    tCC* pz = evalExpression(&needFree);
 
     if (IS_DEC_DIGIT_CHAR(*pz))
         res = (atoi(pz) == 0) ? AG_FALSE : AG_TRUE;
@@ -81,10 +81,10 @@ eval_true( void )
     case 'f':
     case 'F':
     {
-        int len = strlen( pz );
+        int len = strlen(pz);
         if (len > 5)
             len = 5;
-        if (strneqvcmp( "false", pz, len ) == 0)
+        if (strneqvcmp("false", pz, len) == 0)
             res = AG_FALSE;
         break;
     }
@@ -143,7 +143,7 @@ eval_true( void )
  *    For a complete description @xref{IF}.
 =*/
 tMacro*
-mFunc_If( tTemplate* pT, tMacro* pMac )
+mFunc_If(tTemplate* pT, tMacro* pMac)
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     tMacro* pIf  = pMac;
@@ -162,28 +162,27 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
            || eval_true()) {
 
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf( pfTrace, zIfFmt, (pMac->funcCode == FTYP_ELSE)
-                         ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
-                         pMac->lineNo );
+                fprintf(pfTrace, zIfFmt, (pMac->funcCode == FTYP_ELSE)
+                        ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
+                        pMac->lineNo);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                             pIf->lineNo );
+                    fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile,
+                            pIf->lineNo);
             }
 
-            generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex );
+            generateBlock(pT, pMac+1, pT->aMacros + pMac->sibIndex);
             break;
         }
         pMac = pT->aMacros + pMac->sibIndex;
     } while (pMac < pRet);
 
     if ((OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) && (pMac >= pRet)) {
-        fprintf( pfTrace, "IF `%s' macro selected no clause\n",
-                 pCurTemplate->pzTemplText + pCurMacro->ozText );
+        fprintf(pfTrace, "IF `%s' macro selected no clause\n",
+                pCurTemplate->pzTemplText + pCurMacro->ozText);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                     pIf->lineNo );
+            fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile, pIf->lineNo);
     }
 
     return pRet;
@@ -227,15 +226,15 @@ mFunc_If( tTemplate* pT, tMacro* pMac )
  *    For a complete description @xref{WHILE}.
 =*/
 tMacro*
-mFunc_While( tTemplate* pT, tMacro* pMac )
+mFunc_While(tTemplate* pT, tMacro* pMac)
 {
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     int     ct   = 0;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf( pfTrace, "WHILE `%s' loop in %s on line %d begins:\n",
-                 pCurTemplate->pzTemplText + pCurMacro->ozText,
-                 pT->pzTplFile, pMac->lineNo );
+        fprintf(pfTrace, "WHILE `%s' loop in %s on line %d begins:\n",
+                pCurTemplate->pzTemplText + pCurMacro->ozText,
+                pT->pzTplFile, pMac->lineNo);
 
     for (;;) {
         pCurTemplate = pT;
@@ -244,14 +243,14 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
         if (! eval_true())
             break;
         ct++;
-        generateBlock( pT, pMac+1, pT->aMacros + pMac->sibIndex );
+        generateBlock(pT, pMac+1, pT->aMacros + pMac->sibIndex);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf( pfTrace, "WHILE macro repeated %d times\n", ct );
+        fprintf(pfTrace, "WHILE macro repeated %d times\n", ct);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf( pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo );
+            fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
     }
 
     return pRet;
@@ -271,14 +270,14 @@ mFunc_While( tTemplate* pT, tMacro* pMac )
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
 static tMacro*
-mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_Elif(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
     if ((int)pMac->res == 0)
-        AG_ABEND_IN( pT, pMac, zNoIfExpr );
+        AG_ABEND_IN(pT, pMac, zNoIfExpr);
     /*
      *  Load the expression
      */
-    (void)mLoad_Expr( pT, pMac, ppzScan );
+    (void)mLoad_Expr(pT, pMac, ppzScan);
 
     current_if.pElse->sibIndex = pMac - pT->aMacros;
     current_if.pElse = pMac;
@@ -298,7 +297,7 @@ mLoad_Elif( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
 static tMacro*
-mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_Else(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
     /*
      *  After processing an "ELSE" macro,
@@ -307,7 +306,7 @@ mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     static tpLoadProc apElseLoad[ FUNC_CT ] = { NULL };
 
     if (apElseLoad[0] == NULL) {
-        memcpy( (void*)apElseLoad, apLoadProc, sizeof( apLoadProc ));
+        memcpy((void*)apElseLoad, apLoadProc, sizeof(apLoadProc));
         apElseLoad[ FTYP_ENDIF ] = &mLoad_Ending;
     }
 
@@ -326,15 +325,15 @@ mLoad_Else( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *  By returning NULL, it tells the macro parsing loop to return.
  */
 tMacro*
-mLoad_Ending( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_Ending(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
-    memset( (void*)pMac, 0, sizeof( *pMac ));
+    memset((void*)pMac, 0, sizeof(*pMac));
     return NULL;
 }
 
 
 tMacro*
-mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_If(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -354,10 +353,10 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        AG_ABEND_IN( pT, pMac, zNoIfExpr );
+        AG_ABEND_IN(pT, pMac, zNoIfExpr);
 
     if (apIfLoad[0] == NULL) {
-        memcpy( (void*)apIfLoad, apLoadProc, sizeof( apLoadProc ));
+        memcpy((void*)apIfLoad, apLoadProc, sizeof(apLoadProc));
         apIfLoad[ FTYP_ELIF ]  = &mLoad_Elif;
         apIfLoad[ FTYP_ELSE ]  = &mLoad_Else;
         apIfLoad[ FTYP_ENDIF ] = &mLoad_Ending;
@@ -374,7 +373,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     /*
      *  Load the expression
      */
-    (void)mLoad_Expr( pT, pMac, ppzScan );
+    (void)mLoad_Expr(pT, pMac, ppzScan);
 
     /*
      *  Now, do a nested parse of the template.
@@ -383,9 +382,9 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  to return with the text scanning pointer pointing
      *  to the remaining text.
      */
-    pEndifMac = parseTemplate( pMac+1, ppzScan );
+    pEndifMac = parseTemplate(pMac+1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN( pT, pMac, "ENDIF not found" );
+        AG_ABEND_IN(pT, pMac, "ENDIF not found");
 
     current_if.pIf->endIndex   = \
     current_if.pElse->sibIndex = pEndifMac - pT->aMacros;
@@ -400,7 +399,7 @@ mLoad_If( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
 
 
 tMacro*
-mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
+mLoad_While(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -419,10 +418,10 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        AG_ABEND_IN( pT, pMac, "expressionless WHILE" );
+        AG_ABEND_IN(pT, pMac, "expressionless WHILE");
 
     if (apWhileLoad[0] == NULL) {
-        memcpy( (void*)apWhileLoad, apLoadProc, sizeof( apLoadProc ));
+        memcpy((void*)apWhileLoad, apLoadProc, sizeof(apLoadProc));
         apWhileLoad[ FTYP_ENDWHILE ] = &mLoad_Ending;
     }
 
@@ -431,7 +430,7 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
     /*
      *  Load the expression
      */
-    (void)mLoad_Expr( pT, pMac, ppzScan );
+    (void)mLoad_Expr(pT, pMac, ppzScan);
 
     /*
      *  Now, do a nested parse of the template.  When the matching 'ENDWHILE'
@@ -439,9 +438,9 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
      *  to return with the text scanning pointer pointing to the remaining
      *  text.
      */
-    pEndMac = parseTemplate( pMac+1, ppzScan );
+    pEndMac = parseTemplate(pMac+1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN( pT, pMac, "ENDWHILE not found" );
+        AG_ABEND_IN(pT, pMac, "ENDWHILE not found");
 
     pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;
 
@@ -465,21 +464,21 @@ mLoad_While( tTemplate* pT, tMacro* pMac, tCC** ppzScan )
  *         is reset when the current suffix's output is complete.
 =*/
 SCM
-ag_scm_set_writable( SCM set )
+ag_scm_set_writable(SCM set)
 {
     tSCC zWarn[] =
         "Warning: (set-writable) function in %s on line %d:\n"
         "\toverridden by invocation option\n";
 
-    switch (STATE_OPT( WRITABLE )) {
+    switch (STATE_OPT(WRITABLE)) {
     case OPTST_DEFINED:
     case OPTST_PRESET:
-        fprintf( pfTrace, zWarn, pCurTemplate->pzTplFile, pCurMacro->lineNo );
+        fprintf(pfTrace, zWarn, pCurTemplate->pzTplFile, pCurMacro->lineNo);
         break;
 
     default:
-        if (AG_SCM_BOOL_P( set ) && (set == SCM_BOOL_F))
-            CLEAR_OPT( WRITABLE );
+        if (AG_SCM_BOOL_P(set) && (set == SCM_BOOL_F))
+            CLEAR_OPT(WRITABLE);
         else
             SET_OPT_WRITABLE;
     }

@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-07-10 15:04:08 bkorb"
+# Time-stamp:        "2010-08-04 20:52:23 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -32,7 +32,7 @@ h =]
   (string-append
      (dne " *  " "/*  ")
      "\n *"
-     "\n *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved"
+     "\n *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved"
      "\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"

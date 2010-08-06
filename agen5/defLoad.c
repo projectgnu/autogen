@@ -2,7 +2,7 @@
 /**
  * \file defLoad.c
  *
- *  Time-stamp:        "2010-07-11 13:13:07 bkorb"
+ *  Time-stamp:        "2010-08-06 08:56:49 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -227,7 +227,7 @@ insertDef(tDefEntry* pDef)
                sizeof(def) - ag_offsetof(tDefEntry, pzDefName));
 
         /*
-         *  Contents are swapped.  Link "pDef" after "pList" and return "pList".
+         * Contents are swapped.  Link "pDef" after "pList" and return "pList".
          */
         pDef->pTwin = pList->pTwin;
         if (pDef->pTwin != NULL)

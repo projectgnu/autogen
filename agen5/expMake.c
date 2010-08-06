@@ -93,23 +93,23 @@
  *  @end example
 =*/
 SCM
-ag_scm_makefile_script( SCM text )
+ag_scm_makefile_script(SCM text)
 {
     tSCC   zNl[]  = " ; \\\n";
 
     SCM    res;
-    char*  pzText = ag_scm2zchars( text, "GPL line prefix" );
+    char*  pzText = ag_scm2zchars(text, "GPL line prefix");
     char   tabch;
-    size_t sz     = strlen( pzText ) + 2;
+    size_t sz     = strlen(pzText) + 2;
 
     /*
      *  skip all blank lines and other initial white space
      *  in the source string.
      */
-    if (! isspace( *pzText ))
+    if (! isspace(*pzText))
         tabch = '\t';
     else {
-        while (isspace( *++pzText ))  ;
+        while (isspace(*++pzText))  ;
         tabch  = (pzText[-1] == '\t') ? NUL : '\t';
     }
 
@@ -117,23 +117,23 @@ ag_scm_makefile_script( SCM text )
         return AG_SCM_STR02SCM(zNil);
 
     {
-        char*  pz  = strchr( pzText, '\n' );
-        size_t inc = ((*pzText == '\t') ? 0 : 1) + sizeof( zNl ) - 1;
+        char*  pz  = strchr(pzText, '\n');
+        size_t inc = ((*pzText == '\t') ? 0 : 1) + sizeof(zNl) - 1;
 
         while (pz != NULL) {
             sz += inc;
-            pz = strchr( pz+1, '\n' );
+            pz = strchr(pz+1, '\n');
         }
 
-        pz = strchr( pzText, '$' );
+        pz = strchr(pzText, '$');
         while (pz != NULL) {
             sz++;
-            pz = strchr( pz + 1, '$' );
+            pz = strchr(pz + 1, '$');
         }
     }
 
     {
-        char* pzRes = AGALOC( sz, "makefile text" );
+        char* pzRes = AGALOC(sz, "makefile text");
         char* pzOut = pzRes;
         char* pzScn = pzText;
 
@@ -149,7 +149,7 @@ ag_scm_makefile_script( SCM text )
                 /*
                  *  Backup past trailing white space (other than newline).
                  */
-                while (isspace( pzOut[ -1 ]) && (pzOut[ -1 ] != '\n'))
+                while (isspace(pzOut[ -1 ]) && (pzOut[ -1 ] != '\n'))
                     pzOut--;
 
                 /*
@@ -158,7 +158,7 @@ ag_scm_makefile_script( SCM text )
                  */
                 {
                     char* pz = pzScn;
-                    while (isspace( *pz )) {
+                    while (isspace(*pz)) {
                         if (*(pz++) == '\n')
                             pzScn = pz;
                     }
@@ -195,8 +195,8 @@ ag_scm_makefile_script( SCM text )
                      *  Whatever the reason for a final '|' or ';' we will not
                      *  add a semi-colon after it.
                      */
-                    strcpy( pzOut, zNl + 2 );
-                    pzOut += sizeof( zNl ) - 3;
+                    strcpy(pzOut, zNl + 2);
+                    pzOut += sizeof(zNl) - 3;
                     break;
 
                 default:
@@ -204,8 +204,8 @@ ag_scm_makefile_script( SCM text )
                     /*
                      *  Terminate the current command and escape the newline.
                      */
-                    strcpy( pzOut, zNl );
-                    pzOut += sizeof( zNl ) - 1;
+                    strcpy(pzOut, zNl);
+                    pzOut += sizeof(zNl) - 1;
                 }
 
                 /*
@@ -252,8 +252,8 @@ ag_scm_makefile_script( SCM text )
         } copy_done:;
 
         sz    = (pzOut - pzRes);
-        res   = AG_SCM_STR2SCM( pzRes, sz );
-        AGFREE( pzRes );
+        res   = AG_SCM_STR2SCM(pzRes, sz);
+        AGFREE(pzRes);
     }
 
     return res;

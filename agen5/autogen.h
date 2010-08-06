@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-07-28 19:52:36 bkorb"
+ *  Time-stamp:        "2010-08-06 09:17:41 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -310,7 +310,7 @@ typedef struct {
 } file_line_t;
 
 #define SCM_EVAL_CONST(_s) \
-    do { static file_line_t const fl = { __LINE__, __FILE__, _s }; \
+    do { static file_line_t const fl = { __LINE__ - 1, __FILE__, _s }; \
         pzLastScheme = fl.text; \
         ag_scm_c_eval_string_from_file_line(fl.text, fl.file, fl.line); \
     } while (0)
@@ -321,58 +321,58 @@ typedef struct {
  *
  *  General Processing Globals
  */
-#define pzProg   autogenOptions.pzProgName
-MODE teProcState procState        VALUE( PROC_STATE_INIT );
-MODE tTemplate*  pNamedTplList    VALUE( NULL );
-MODE tCC*        pzOopsPrefix     VALUE( "" );
+#define pzProg      autogenOptions.pzProgName
+MODE teProcState    procState        VALUE( PROC_STATE_INIT );
+MODE tTemplate*     pNamedTplList    VALUE( NULL );
+MODE char const *   pzOopsPrefix     VALUE( "" );
 
 /*
  *  Template Processing Globals
  */
-MODE tCC*        pzCurSfx         VALUE( NULL );
+MODE tCC*           pzCurSfx         VALUE( NULL );
 /**
  * The time to set for the modification times of the output files.
  */
-MODE time_t      outTime          VALUE( 0 );
+MODE time_t         outTime          VALUE( 0 );
 /**
  * The original time autogen started
  */
-MODE time_t      startTime        VALUE( 0 );
-MODE tFpStack*   pCurFp           VALUE( NULL );
-MODE tOutSpec*   pOutSpecList     VALUE( NULL );
-MODE jmp_buf     fileAbort;
-MODE char*       pzCurStart       VALUE( NULL );
-MODE uintptr_t   curStartOff      VALUE( 0 );
-MODE tForInfo    forInfo          VALUE( { 0 } );
-MODE FILE*       pfTrace          VALUE( NULL );
+MODE time_t         startTime        VALUE( 0 );
+MODE tFpStack *     pCurFp           VALUE( NULL );
+MODE tOutSpec *     pOutSpecList     VALUE( NULL );
+MODE jmp_buf        fileAbort;
+MODE char *         pzCurStart       VALUE( NULL );
+MODE uintptr_t      curStartOff      VALUE( 0 );
+MODE tForInfo       forInfo          VALUE( { 0 } );
+MODE FILE *         pfTrace          VALUE( NULL );
 /**
  * dependency file file pointer.
  */
-MODE FILE*       pfDepends        VALUE( NULL );
+MODE FILE*          pfDepends        VALUE( NULL );
 /**
  * name of target of rule
  */
-MODE char const* pzDepTarget      VALUE( NULL );
+MODE char const *   pzDepTarget      VALUE( NULL );
 /**
  * name of dependency file
  */
-MODE char const* pzDepFile        VALUE( NULL );
+MODE char const *   pzDepFile        VALUE( NULL );
 /**
  * base name of both source and derived files.
  * Either "_TList" or "_SList" gets put on the end.
  */
-MODE char const* pz_targ_base     VALUE( NULL );
+MODE char const *   pz_targ_base     VALUE( NULL );
 /**
  * The actual list of input (source) files.
  */
-MODE char const* pzSourceList     VALUE( NULL );
-MODE size_t      source_size      VALUE( 0 );
-MODE size_t      source_used      VALUE( 0 );
-MODE ag_bool     dep_phonies      VALUE( AG_FALSE );
-MODE char*       pzTmpStderr      VALUE( NULL );
+MODE char const *   pzSourceList     VALUE( NULL );
+MODE size_t         source_size      VALUE( 0 );
+MODE size_t         source_used      VALUE( 0 );
+MODE ag_bool        dep_phonies      VALUE( AG_FALSE );
+MODE char *         cgi_stderr       VALUE( NULL );
 
-MODE char const* serverArgs[2]    VALUE( { NULL } );
-MODE char const* pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
+MODE char const *   serverArgs[2]    VALUE( { NULL } );
+MODE char const *   pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
 
 /*
  *  AutoGen definiton and template context
@@ -384,21 +384,20 @@ MODE char const* pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
  *  the current set of macros is being extracted.
  *
  *  These are set in exactly ONE place:
- *  On entry to the dispatch routine (generateBlock)
- *  Two routines, however, must restore the values:  mFunc_Define
- *  and mFunc_For.  They are the only routines that dynamically
- *  push name/value pairs on the definition stack.
+ *  On entry to the dispatch routine (generateBlock).  Two routines, however,
+ *  must restore the values: mFunc_Define and mFunc_For.  They are the only
+ *  routines that dynamically push name/value pairs on the definition stack.
  */
-MODE tDefCtx     currDefCtx       VALUE( { NULL } );
-MODE tDefCtx     rootDefCtx       VALUE( { NULL } );
-MODE tTemplate*  pCurTemplate     VALUE( NULL );
-MODE tCC*        pzLastScheme     VALUE( NULL );
+MODE tDefCtx        currDefCtx       VALUE( { NULL } );
+MODE tDefCtx        rootDefCtx       VALUE( { NULL } );
+MODE tTemplate *    pCurTemplate     VALUE( NULL );
+MODE char const *   pzLastScheme     VALUE( NULL );
 #ifdef DAEMON_ENABLED
 /*
  *  When operating as a daemon, autogen can be told to reload
  *  its options the next time it wakes up (send it a SIGHUP).
  */
-MODE ag_bool     redoOptions      VALUE( AG_TRUE );
+MODE ag_bool        redoOptions      VALUE( AG_TRUE );
 #endif
 
 /*
@@ -411,33 +410,34 @@ MODE ag_bool     redoOptions      VALUE( AG_TRUE );
  *      alternation macros
  *  3.  mFunc_Case may transfer to one of its selection clauses.
  */
-MODE tMacro*     pCurMacro        VALUE( NULL );
+MODE tMacro *       pCurMacro        VALUE( NULL );
 
 /*
  *  Template Parsing Globals
  */
-MODE int         templLineNo      VALUE( 1 );
-MODE tScanCtx*   pBaseCtx         VALUE( NULL );
-MODE tScanCtx*   pCurCtx          VALUE( NULL );
-MODE tScanCtx*   pDoneCtx         VALUE( NULL );
-MODE size_t      endMacLen        VALUE( 0  );
-MODE char        zEndMac[   8 ]   VALUE( "" );
-MODE size_t      startMacLen      VALUE( 0  );
-MODE char        zStartMac[  8 ]  VALUE( "" );
-MODE int         guileFailure     VALUE( 0 );
+MODE int            templLineNo      VALUE( 1 );
+MODE tScanCtx *     pBaseCtx         VALUE( NULL );
+MODE tScanCtx *     pCurCtx          VALUE( NULL );
+MODE tScanCtx *     pDoneCtx         VALUE( NULL );
+MODE size_t         endMacLen        VALUE( 0  );
+MODE char           zEndMac[   8 ]   VALUE( "" );
+MODE size_t         startMacLen      VALUE( 0  );
+MODE char           zStartMac[  8 ]  VALUE( "" );
+MODE int            guileFailure     VALUE( 0 );
+MODE char           name_sep_ch      VALUE( '.' );
 
 /*
  *  Definition Parsing Globals
  */
-MODE char*       pzDefineData     VALUE( NULL );
-MODE char*       pz_token         VALUE( NULL );
-MODE te_dp_event lastToken        VALUE( DP_EV_INVALID );
+MODE char *         pzDefineData     VALUE( NULL );
+MODE char *         pz_token         VALUE( NULL );
+MODE te_dp_event    lastToken        VALUE( DP_EV_INVALID );
 
-MODE int         stackDepth       VALUE( 0 );
-MODE int         stackSize        VALUE( 16 );
-MODE tDefEntry*  parseStack[16]   VALUE( { 0 } );
-MODE tDefEntry** ppParseStack     VALUE( parseStack );
-MODE tDefEntry*  pCurrentEntry    VALUE( NULL );
+MODE int            stackDepth       VALUE( 0 );
+MODE int            stackSize        VALUE( 16 );
+MODE tDefEntry *    parseStack[16]   VALUE( { 0 } );
+MODE tDefEntry **   ppParseStack     VALUE( parseStack );
+MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

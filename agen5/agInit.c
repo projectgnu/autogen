@@ -2,10 +2,10 @@
 /**
  *  \file agInit.c
  *
- *  Time-stamp:      "2010-07-24 09:04:36 bkorb"
- *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
+ *
+ *  Time-stamp:      "2010-08-06 08:56:26 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -42,8 +42,8 @@ add_env_vars(void);
  static ag_bool evalProto(char const ** ppzS, uint16_t* pProto);
  static void spawnPipe(char const* pzFile);
  static void spawnListens(char const * pzPort, sa_family_t af);
- static void becomeDaemon(char const *, char const *, char const *,
-                          char const *);
+ static void daemonize(char const *, char const *, char const *,
+                       char const *);
 #endif
 
 #include "expr.ini"
@@ -54,6 +54,8 @@ add_env_vars(void);
 LOCAL void
 initialize(int arg_ct, char** arg_vec)
 {
+    ag_scribble_init();
+
     /*
      *  Initialize all the Scheme functions.
      */
@@ -80,12 +82,14 @@ initialize(int arg_ct, char** arg_vec)
     if (! HAVE_OPT(DAEMON))
         return;
 
-    if (0) {
 #ifdef DEBUG_ENABLED
-        static char const zDevNull[] = "/tmp/AutoGenDebug.txt";
-#endif /* DEBUG_ENABLED */
-        becomeDaemon("/", zDevNull, zDevNull, zDevNull);
+    {
+        static char const logf[] = "/tmp/ag-debug.txt";
+        daemonize("/", logf, logf, logf);
     }
+#else
+    daemonize("/", zDevNull, zDevNull, zDevNull);
+#endif /* DEBUG_ENABLED */
 
     {
         sa_family_t  af  = AF_INET;
@@ -575,8 +579,8 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
 
 
   static void
-becomeDaemon(char const * pzStdin, char const * pzStdout, char const * pzStderr,
-             char const * pzDaemonDir)
+daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
+          char const * pzDaemonDir)
 {
     static char const zNoFork[] = "Error %d while forking:  %s\n";
     /*

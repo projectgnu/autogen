@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-07-10 11:02:43 bkorb"
+## Time-stamp:      "2010-08-04 20:46:24 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -100,7 +100,7 @@ libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
-EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) \
+EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) autogen.map \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)

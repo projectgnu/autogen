@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2010-07-28 18:16:25 bkorb"
+ *  Time-stamp:        "2010-08-06 12:51:19 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -45,10 +45,10 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
-entry_length(char* pzName);
+entry_length(char* name);
 
 static int
-count_entries(char* pzName);
+count_entries(char* name);
 
 static SCM
 find_entry_value(SCM op, SCM obj, SCM test);
@@ -65,9 +65,9 @@ do_tpl_file_line(int line_delta, char const * fmt);
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static int
-entry_length(char* pzName)
+entry_length(char* name)
 {
-    tDefEntry**  papDefs = findEntryList(pzName);
+    tDefEntry**  papDefs = findEntryList(name);
     int          res     = 0;
 
     if (papDefs == NULL)
@@ -87,9 +87,9 @@ entry_length(char* pzName)
 
 
 static int
-count_entries(char* pzName)
+count_entries(char* name)
 {
-    tDefEntry**  papDefs = findEntryList(pzName);
+    tDefEntry**  papDefs = findEntryList(name);
     int          res     = 0;
 
     if (papDefs == NULL)
@@ -110,22 +110,25 @@ count_entries(char* pzName)
 static SCM
 find_entry_value(SCM op, SCM obj, SCM test)
 {
+    static char const zFailed[] = "failed\n";
+    static char const zSucc[]   = "SUCCESS\n";
+
     ag_bool     isIndexed;
     tDefEntry*  pE;
-    tSCC        zFailed[] = "failed\n";
-    tSCC        zSucc[]   = "SUCCESS\n";
     char*       pzField;
 
-    char * pzName = ag_scm2zchars(obj, "find name");
+    {
+        char * name = ag_scm2zchars(obj, "find name");
 
-    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, " in \"%s\" -- ", pzName);
+        if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+            fprintf(pfTrace, " in \"%s\" -- ", name);
 
-    pzField = strchr(pzName, '.');
-    if (pzField != NULL)
-        *(pzField++) = NUL;
+        pzField = strchr(name, name_sep_ch);
+        if (pzField != NULL)
+            *(pzField++) = NUL;
 
-    pE = findDefEntry(pzName, &isIndexed);
+        pE = findDefEntry(name, &isIndexed);
+    }
 
     /*
      *  No such entry?  return FALSE
@@ -178,7 +181,7 @@ find_entry_value(SCM op, SCM obj, SCM test)
     /*
      *  Search the members for what we want.
      */
-    pzField[-1] = '.';
+    pzField[-1] = name_sep_ch;
     {
         SCM field   = AG_SCM_STR02SCM(pzField);
         SCM result;
@@ -748,7 +751,6 @@ do_tpl_file_line(int line_delta, char const * fmt)
  * exparg: msg-fmt, formatting for line message, optional
  *
  * doc:
- *
  *  Returns the file and line number of the current template macro using
  *  either the default format, "from %s line %d", or else the format you
  *  supply.  For example, if you want to insert a "C" language file-line
@@ -760,7 +762,9 @@ do_tpl_file_line(int line_delta, char const * fmt)
  *  @end example
  *
  *  It is also safe to use the formatting string, "%2$d".  AutoGen uses
- *  an argument vector version of printf: @xref{snprintfv}.
+ *  an argument vector version of printf: @xref{snprintfv}
+ *  and it does not need to know the types of each argument in order to
+ *  skip forward to the second argument.
 =*/
 SCM
 ag_scm_tpl_file_line(SCM fmt)
@@ -781,8 +785,8 @@ ag_scm_tpl_file_line(SCM fmt)
  *
  * doc:
  *  This is almost the same as @xref{SCM tpl-file-line}, except that
- *  the line referenced is the next line, per C compiler conventions and
- *  defaults to the format:  # <line-no+1> "<file-name>"
+ *  the line referenced is the next line, per C compiler conventions, and
+ *  consequently defaults to the format:  # <line-no+1> "<file-name>"
 =*/
 SCM
 ag_scm_tpl_file_next_line(SCM fmt)

@@ -1,9 +1,9 @@
-/*
+/**
  *  \file agUtils.c
  *
- *  Time-stamp:        "2010-07-10 19:23:24 bkorb"
+ * Various utilities for AutoGen.
  *
- *  This is the main routine for autogen.
+ *  Time-stamp:        "2010-07-10 19:23:24 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -261,7 +261,7 @@ doOptions(int arg_ct, char ** arg_vec)
      */
     if (  (! ENABLED_OPT(DEFINITIONS))
        && (! HAVE_OPT(OVERRIDE_TPL)) )
-        AG_ABEND( "no template was specified" );
+        AG_ABEND("no template was specified");
 
     /*
      *  IF we do not have a base-name option, then we compute some value
@@ -277,7 +277,7 @@ doOptions(int arg_ct, char ** arg_vec)
     /*
      *  IF we have some defines to put in our environment, ...
      */
-    if (HAVE_OPT( DEFINE ))
+    if (HAVE_OPT(DEFINE))
         put_defines_into_env();
 }
 
@@ -291,9 +291,9 @@ getDefine(char const * pzDefName, ag_bool check_env)
         ppz = STACKLST_OPT(DEFINE);
 
         while (ct-- > 0) {
-            char const *  pz   = *(ppz++);
-            char* pzEq = strchr(pz, '=');
-            int   res;
+            char const * pz   = *(ppz++);
+            char * pzEq = strchr(pz, '=');
+            int    res;
 
             if (pzEq != NULL)
                 *pzEq = NUL;

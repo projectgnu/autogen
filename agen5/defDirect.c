@@ -1,5 +1,5 @@
-/*
- *  defDirect.c
+/**
+ * \file defDirect.c
  *
  *  Time-stamp:        "2010-07-10 19:23:12 bkorb"
  *
@@ -29,15 +29,21 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tSCC zNoEndif[]   = "Definition error:  in %s line %d, #endif not found\n";
-tSCC zNoMatch[]   = "Definition error:  in %s line %d, "
-                    "#%s no matching start/if directive\n";
-tSCC zCheckList[] = "\n#";
+static char const zNoEndif[]   =
+    "Definition error:  in %s line %d, #endif not found\n";
+static char const zNoMatch[]   =
+    "Definition error:  in %s line %d, "
+    "#%s no matching start/if directive\n";
+
+#define NO_MATCH_ERR(_typ) \
+        AG_ABEND(aprf(zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo, _typ))
+
+static char const zCheckList[] = "\n#";
 
 static int  ifdefLevel = 0;
 
 static teDirectives
-findDirective( char* pzDirName );
+findDirective(char* pzDirName);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -50,7 +56,7 @@ findDirective( char* pzDirName );
  *  where scanning is to resume.
  */
 LOCAL char*
-processDirective( char* pzScan )
+processDirective(char* pzScan)
 {
     const tDirTable* pTbl  = dirTable;
     char*      pzDir;
@@ -61,13 +67,13 @@ processDirective( char* pzScan )
      *  Replace "\\\n" sequences with "  ".
      */
     for (;;) {
-        pzEnd = strchr( pzScan, '\n' );
+        pzEnd = strchr(pzScan, '\n');
 
         if (pzEnd == NULL) {
             /*
              *  The end of the directive is the end of the string
              */
-            pzEnd = pzScan + strlen( pzScan );
+            pzEnd = pzScan + strlen(pzScan);
             break;
         }
         pCurCtx->lineNo++;
@@ -131,13 +137,13 @@ processDirective( char* pzScan )
      *  Trim off trailing white space
      */
     {
-        char* pz = pzScan + strlen( pzScan );
+        char* pz = pzScan + strlen(pzScan);
         while ((pz > pzScan) && IS_WHITESPACE_CHAR(pz[-1])) pz--;
         *pz = NUL;
     }
 
-    pTbl = dirTable + (int)findDirective( pzDir );
-    return (*(pTbl->pDirProc))( pzScan, pzEnd );
+    pTbl = dirTable + (int)findDirective(pzDir);
+    return (*(pTbl->pDirProc))(pzScan, pzEnd);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -147,31 +153,34 @@ processDirective( char* pzScan )
  */
 
 static teDirectives
-findDirective( char* pzDirName )
+findDirective(char* pzDirName)
 {
     teDirectives res = (teDirectives)0;
-    const tDirTable*  pTbl = dirTable;
+    const tDirTable *  pTbl = dirTable;
 
     do  {
-        if (  (strneqvcmp( pzDirName, pTbl[res].pzDirName,
-                           (int)pTbl[res].nameSize ) == 0)
-           && (  IS_WHITESPACE_CHAR(pzDirName[ pTbl[res].nameSize ])
-              || (pzDirName[ pTbl[res].nameSize ] == NUL) )  )
+        if (strneqvcmp(pzDirName, pTbl->pzDirName, pTbl->nameSize) != 0)
+            continue;
+
+        /*
+         *  A directive name ends with either white space or a NUL
+         */
+        if (IS_END_TOKEN_CHAR(pzDirName[ pTbl->nameSize ]))
             return res;
 
-    } while (++res < DIRECTIVE_CT);
+    } while (pTbl++, ++res < DIRECTIVE_CT);
 
     {
         char ch;
-        if (strlen( pzDirName ) > 32) {
+        if (strlen(pzDirName) > 32) {
             ch = pzDirName[32];
             pzDirName[32] = NUL;
         } else {
             ch = NUL;
         }
 
-        fprintf( pfTrace, "WARNING:  in %s on line %d unknown directive:\n"
-                 "\t#%s\n", pCurCtx->pzCtxFname, pCurCtx->lineNo, pzDirName );
+        fprintf(pfTrace, "WARNING:  in %s on line %d unknown directive:\n"
+                "\t#%s\n", pCurCtx->pzCtxFname, pCurCtx->lineNo, pzDirName);
 
         if (ch != NUL)
             pzDirName[32] = ch;
@@ -191,7 +200,7 @@ findDirective( char* pzDirName )
  *  while skipping a block of text due to a failed test.
  */
 static char*
-skipToEndif( char* pzStart )
+skipToEndif(char* pzStart)
 {
     char* pzScan = pzStart;
     char* pzRet;
@@ -205,26 +214,25 @@ skipToEndif( char* pzStart )
         if (*pzScan == '#')
             pzScan++;
         else {
-            char* pz = strstr( pzScan, zCheckList );
+            char* pz = strstr(pzScan, zCheckList);
             if (pz == NULL)
-                AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
-                                pCurCtx->lineNo ));
+                AG_ABEND(aprf(zNoEndif, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
-            pzScan = pz + STRSIZE( zCheckList );
+            pzScan = pz + STRSIZE(zCheckList);
         }
 
         while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
 
-        switch (findDirective( pzScan )) {
+        switch (findDirective(pzScan)) {
         case DIR_ENDIF:
         {
             /*
              *  We found the endif we are interested in
              */
-            char* pz = strchr( pzScan, '\n' );
+            char* pz = strchr(pzScan, '\n');
             if (pz != NULL)
                  pzRet = pz+1;
-            else pzRet = pzScan + strlen( pzScan );
+            else pzRet = pzScan + strlen(pzScan);
             goto leave_func;
         }
 
@@ -233,7 +241,7 @@ skipToEndif( char* pzStart )
             /*
              *  We found a nested ifdef/ifndef
              */
-            pzScan = skipToEndif( pzScan );
+            pzScan = skipToEndif(pzScan);
             break;
 
         default:
@@ -241,7 +249,7 @@ skipToEndif( char* pzStart )
              *  We do not care what we found
              */
             break; /* ignore it */
-        }  /* switch (findDirective( pzScan )) */
+        }  /* switch (findDirective(pzScan)) */
     }
 
  leave_func:
@@ -254,7 +262,7 @@ skipToEndif( char* pzStart )
 
 
 static char*
-skipToEndmac( char* pzStart )
+skipToEndmac(char* pzStart)
 {
     char* pzScan = pzStart;
     char* pzRet;
@@ -268,24 +276,23 @@ skipToEndmac( char* pzStart )
         if (*pzScan == '#')
             pzScan++;
         else {
-            char* pz = strstr( pzScan, zCheckList );
+            char* pz = strstr(pzScan, zCheckList);
             if (pz == NULL)
-                AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
-                                pCurCtx->lineNo ));
+                AG_ABEND(aprf(zNoEndif, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
-            pzScan = pz + STRSIZE( zCheckList );
+            pzScan = pz + STRSIZE(zCheckList);
         }
 
         while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
 
-        if (findDirective( pzScan ) == DIR_ENDMAC) {
+        if (findDirective(pzScan) == DIR_ENDMAC) {
             /*
              *  We found the endmac we are interested in
              */
-            char* pz = strchr( pzScan, '\n' );
+            char* pz = strchr(pzScan, '\n');
             if (pz != NULL)
                  pzRet = pz+1;
-            else pzRet = pzScan + strlen( pzScan );
+            else pzRet = pzScan + strlen(pzScan);
             break;
         }
     }
@@ -306,7 +313,7 @@ skipToEndmac( char* pzStart )
  *  "#if*def" test.
  */
 static char*
-skipToElseEnd( char* pzStart )
+skipToElseEnd(char* pzStart)
 {
     char* pzScan = pzStart;
     char* pzRet;
@@ -320,17 +327,16 @@ skipToElseEnd( char* pzStart )
         if (*pzScan == '#')
             pzScan++;
         else {
-            char* pz = strstr( pzScan, zCheckList );
+            char* pz = strstr(pzScan, zCheckList);
             if (pz == NULL)
-                AG_ABEND( aprf( zNoEndif, pCurCtx->pzCtxFname,
-                                pCurCtx->lineNo ));
+                AG_ABEND(aprf(zNoEndif, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
-            pzScan = pz + STRSIZE( zCheckList );
+            pzScan = pz + STRSIZE(zCheckList);
         }
 
         while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
 
-        switch (findDirective( pzScan )) {
+        switch (findDirective(pzScan)) {
         case DIR_ELSE:
             /*
              *  We found an "else" directive for an "ifdef"/"ifndef"
@@ -346,10 +352,10 @@ skipToElseEnd( char* pzStart )
              *  skipping (or we dropped in from above).
              *  Start processing the text.
              */
-            char* pz = strchr( pzScan, '\n' );
+            char* pz = strchr(pzScan, '\n');
             if (pz != NULL)
                  pzRet = pz+1;
-            else pzRet = pzScan + strlen( pzScan );
+            else pzRet = pzScan + strlen(pzScan);
             goto leave_func;
         }
 
@@ -360,7 +366,7 @@ skipToElseEnd( char* pzStart )
              *  Call "skipToEndif()" to find *its* end, then
              *  resume looking for our own "endif" or "else".
              */
-            pzScan = skipToEndif( pzScan );
+            pzScan = skipToEndif(pzScan);
             break;
 
         default:
@@ -368,7 +374,7 @@ skipToElseEnd( char* pzStart )
              *  We either don't know what it is or we do not care.
              */
             break;
-        }  /* switch (findDirective( pzScan )) */
+        }  /* switch (findDirective(pzScan)) */
     }
 
  leave_func:
@@ -394,7 +400,7 @@ skipToElseEnd( char* pzStart )
  *  also be an 'arg:' section describing the argument(s).
  */
 static char*
-doDir_IGNORE( char* pzArg, char* pzScan )
+doDir_IGNORE(char* pzArg, char* pzScan)
 {
     return pzScan;
 }
@@ -418,18 +424,18 @@ doDir_IGNORE( char* pzArg, char* pzScan )
  *  or "false").
 =*/
 static void
-check_assert_str( char const* pz, char const* pzArg )
+check_assert_str(char const* pz, char const* pzArg)
 {
     static char const fmt[] = "#assert yielded \"%s\":\n\t`%s`";
 
     while (IS_WHITESPACE_CHAR(*pz)) pz++;
 
     if (IS_FALSE_TYPE_CHAR(*pz))
-        AG_ABEND( aprf( fmt, pz, pzArg ));
+        AG_ABEND(aprf(fmt, pz, pzArg));
 }
 
 static char*
-doDir_assert( char* pzArg, char* pzScan )
+doDir_assert(char* pzArg, char* pzScan)
 {
     switch (*pzArg) {
     case '`':
@@ -442,8 +448,8 @@ doDir_assert( char* pzArg, char* pzScan )
             break; /* not a valid script */
 
         *pzR = NUL;
-        pzS = runShell( (char const*)pzS );
-        check_assert_str( pzS, pzArg );
+        pzS = runShell((char const*)pzS);
+        check_assert_str(pzS, pzArg);
         free(pzS);
         break;
     }
@@ -452,8 +458,8 @@ doDir_assert( char* pzArg, char* pzScan )
     {
         SCM res = ag_scm_c_eval_string_from_file_line(
             pzArg, pCurCtx->pzCtxFname, pCurCtx->lineNo );
-        tCC* pzR = resolveSCM( res );
-        check_assert_str( pzR, pzArg );
+        tCC* pzR = resolveSCM(res);
+        check_assert_str(pzR, pzArg);
         break;
     }
 
@@ -478,16 +484,16 @@ doDir_assert( char* pzArg, char* pzScan )
  *  in the define list will be added to the environment.
 =*/
 static char*
-doDir_define( char* pzArg, char* pzScan )
+doDir_define(char* pzArg, char* pzScan)
 {
     char*  pzName = pzArg;
 
     /*
      *  Skip any #defines that do not look reasonable
      */
-    if (! IS_VAR_FIRST_CHAR( *pzArg ))
+    if (! IS_VAR_FIRST_CHAR(*pzArg))
         return pzScan;
-    while (IS_VARIABLE_NAME_CHAR( *pzArg )) pzArg++;
+    while (IS_VARIABLE_NAME_CHAR(*pzArg)) pzArg++;
 
     /*
      *  IF this is a macro definition (rather than a value def),
@@ -532,7 +538,7 @@ doDir_define( char* pzArg, char* pzScan )
         }
     }
 
-    SET_OPT_DEFINE( pzName );
+    SET_OPT_DEFINE(pzName);
     return pzScan;
 }
 
@@ -545,12 +551,12 @@ doDir_define( char* pzArg, char* pzScan )
  *  It will be ignored.
 =*/
 static char*
-doDir_elif( char* pzArg, char* pzScan )
+doDir_elif(char* pzArg, char* pzScan)
 {
-    tSCC z[] =
+    static char const z[] =
         "`#elif' directive encountered out of context\n\tin %s on line %d\n";
 
-    AG_ABEND( aprf( z, pCurCtx->pzCtxFname, pCurCtx->lineNo ));
+    AG_ABEND(aprf(z, pCurCtx->pzCtxFname, pCurCtx->lineNo));
     /* NOTREACHED */
     return NULL;
 }
@@ -564,13 +570,12 @@ doDir_elif( char* pzArg, char* pzScan )
  *  it will change the processing state to the reverse of what it was.
 =*/
 static char*
-doDir_else( char* pzArg, char* pzScan )
+doDir_else(char* pzArg, char* pzScan)
 {
     if (--ifdefLevel < 0)
-        AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
-                        "else" ));
+        NO_MATCH_ERR("else");
 
-    return skipToEndif( pzScan );
+    return skipToEndif(pzScan);
 }
 
 
@@ -581,11 +586,10 @@ doDir_else( char* pzArg, char* pzScan )
  *  In all cases, this will resume normal processing of text.
 =*/
 static char*
-doDir_endif( char* pzArg, char* pzScan )
+doDir_endif(char* pzArg, char* pzScan)
 {
     if (--ifdefLevel < 0)
-        AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
-                        "endif" ));
+        NO_MATCH_ERR("endif");
 
     return pzScan;
 }
@@ -597,10 +601,9 @@ doDir_endif( char* pzArg, char* pzScan )
  *  This terminates a "macdef", but must not ever be encountered directly.
 =*/
 static char*
-doDir_endmac( char* pzArg, char* pzScan )
+doDir_endmac(char* pzArg, char* pzScan)
 {
-    AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
-                    "endmac" ));
+    NO_MATCH_ERR("endmac");
     /* NOTREACHED */
     return NULL;
 }
@@ -612,14 +615,14 @@ doDir_endmac( char* pzArg, char* pzScan )
  *  Ends the text processed by a command shell into autogen definitions.
 =*/
 static char*
-doDir_endshell( char* pzArg, char* pzScan )
+doDir_endshell(char* pzArg, char* pzScan)
 {
     /*
      *  In actual practice, the '#endshell's must be consumed inside
      *  the 'doDir_shell()' procedure.
      */
-    AG_ABEND( aprf( zNoMatch, pCurCtx->pzCtxFname, pCurCtx->lineNo,
-                    "endshell" ));
+    NO_MATCH_ERR("endshell");
+
     /* NOTREACHED */
     return NULL;
 }
@@ -634,10 +637,10 @@ doDir_endshell( char* pzArg, char* pzScan )
  *  and exit with a status of EXIT_FAILURE.
 =*/
 static char*
-doDir_error( char* pzArg, char* pzScan )
+doDir_error(char* pzArg, char* pzScan)
 {
-    AG_ABEND( aprf( "#error directive -- in %s on line %d\n\t%s\n",
-                    pCurCtx->pzCtxFname, pCurCtx->lineNo, pzArg ));
+    AG_ABEND(aprf("#error directive -- in %s on line %d\n\t%s\n",
+                    pCurCtx->pzCtxFname, pCurCtx->lineNo, pzArg));
     /* NOTREACHED */
     return NULL;
 }
@@ -658,9 +661,9 @@ doDir_error( char* pzArg, char* pzScan )
  *  to the matching @code{#endif} is skipped.
 =*/
 static char*
-doDir_if( char* pzArg, char* pzScan )
+doDir_if(char* pzArg, char* pzScan)
 {
-    return skipToEndif( pzScan );
+    return skipToEndif(pzScan);
 }
 
 
@@ -674,10 +677,10 @@ doDir_if( char* pzArg, char* pzScan )
  *  option or if a @code{#define} of that name has been previously encountered.
 =*/
 static char*
-doDir_ifdef( char* pzArg, char* pzScan )
+doDir_ifdef(char* pzArg, char* pzScan)
 {
-    if (getDefine( pzArg, AG_FALSE ) == NULL)
-        return skipToElseEnd( pzScan );
+    if (getDefine(pzArg, AG_FALSE) == NULL)
+        return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;
 }
@@ -693,10 +696,10 @@ doDir_ifdef( char* pzArg, char* pzScan )
  *  command line option or there was a canceling @code{-Uname} option.
 =*/
 static char*
-doDir_ifndef( char* pzArg, char* pzScan )
+doDir_ifndef(char* pzArg, char* pzScan)
 {
-    if (getDefine( pzArg, AG_FALSE ) != NULL)
-        return skipToElseEnd( pzScan );
+    if (getDefine(pzArg, AG_FALSE) != NULL)
+        return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;
 }
@@ -713,9 +716,9 @@ doDir_ifndef( char* pzArg, char* pzScan )
  *  include is ignored.
 =*/
 static char*
-doDir_include( char* pzArg, char* pzScan )
+doDir_include(char* pzArg, char* pzScan)
 {
-    tSCC*      apzSfx[] = { "def", NULL };
+    static char const * apzSfx[] = { "def", NULL };
     tScanCtx*  pCtx;
     size_t     inclSize;
     char       zFullName[ AG_PATH_MAX + 1 ];
@@ -729,9 +732,9 @@ doDir_include( char* pzArg, char* pzScan )
     pCurCtx->pzScan  = pzScan;
 
     if (! SUCCESSFUL(
-            findFile( pzArg, zFullName, apzSfx, pCurCtx->pzCtxFname ))) {
-        tSCC zFmt[] = "WARNING:  cannot find `%s' definitions file\n";
-        fprintf( pfTrace, zFmt, pzArg );
+            findFile(pzArg, zFullName, apzSfx, pCurCtx->pzCtxFname))) {
+        fprintf(pfTrace, "WARNING:  cannot find `%s' definitions file\n",
+                pzArg);
         return pzScan;
     }
 
@@ -741,14 +744,14 @@ doDir_include( char* pzArg, char* pzScan )
      */
     {
         struct stat stbf;
-        if (stat( zFullName, &stbf ) != 0) {
-            fprintf( pfTrace, "WARNING %d (%s):  cannot stat `%s' "
-                     "for include\n", errno, strerror( errno ), zFullName );
+        if (stat(zFullName, &stbf) != 0) {
+            fprintf(pfTrace, "WARNING %d (%s):  cannot stat `%s' "
+                    "for include\n", errno, strerror(errno), zFullName);
             return pzScan;
         }
-        if (! S_ISREG( stbf.st_mode )) {
-            fprintf( pfTrace, "WARNING:  `%s' must be regular file to "
-                     "include\n", zFullName );
+        if (! S_ISREG(stbf.st_mode)) {
+            fprintf(pfTrace, "WARNING:  `%s' must be regular file to "
+                    "include\n", zFullName);
             return pzScan;
         }
         inclSize = stbf.st_size;
@@ -765,10 +768,10 @@ doDir_include( char* pzArg, char* pzScan )
      *  'loadData()' for this special context.
      */
     {
-        size_t sz = sizeof( tScanCtx ) + 4 + inclSize;
-        pCtx = (tScanCtx*)AGALOC( sz, "include def header" );
+        size_t sz = sizeof(tScanCtx) + 4 + inclSize;
+        pCtx = (tScanCtx*)AGALOC(sz, "include def header");
 
-        memset( (void*)pCtx, 0, sz );
+        memset((void*)pCtx, 0, sz);
         pCtx->lineNo = 1;
     }
 
@@ -777,7 +780,7 @@ doDir_include( char* pzArg, char* pzScan )
      */
     pCtx->pCtx       = pCurCtx;
     pCurCtx          = pCtx;
-    AGDUPSTR( pCtx->pzCtxFname, zFullName, "def file name" );
+    AGDUPSTR(pCtx->pzCtxFname, zFullName, "def file name");
 
     pCtx->pzScan     =
     pCtx->pzData     =
@@ -788,7 +791,7 @@ doDir_include( char* pzArg, char* pzScan )
      *  in case multiple passes are required.
      */
     {
-        FILE*  fp = fopen( zFullName, "r" FOPEN_TEXT_FLAG );
+        FILE*  fp = fopen(zFullName, "r" FOPEN_TEXT_FLAG);
         char*  pz = pzScan;
 
         if (fp == NULL)
@@ -807,7 +810,7 @@ doDir_include( char* pzArg, char* pzScan )
             inclSize -= rdct;
         } while (inclSize > 0);
 
-        fclose( fp );
+        fclose(fp);
         *pz = NUL;
     }
 
@@ -832,7 +835,7 @@ doDir_include( char* pzArg, char* pzScan )
  *  definitions.
 =*/
 static char*
-doDir_line( char* pzArg, char* pzScan )
+doDir_line(char* pzArg, char* pzScan)
 {
     /*
      *  The sequence must be:  #line <number> "file-name-string"
@@ -843,7 +846,7 @@ doDir_line( char* pzArg, char* pzScan )
     if (! IS_DEC_DIGIT_CHAR(*pzArg))
         return pzScan;
 
-    pCurCtx->lineNo = strtol( pzArg, &pzArg, 0 );
+    pCurCtx->lineNo = strtol(pzArg, &pzArg, 0);
 
     /*
      *  Now extract the quoted file name string.
@@ -853,13 +856,13 @@ doDir_line( char* pzArg, char* pzScan )
     if (*(pzArg++) != '"')
         return pzScan;
     {
-        char* pz = strchr( pzArg, '"' );
+        char* pz = strchr(pzArg, '"');
         if (pz == NULL)
             return pzScan;
         *pz = NUL;
     }
 
-    AGDUPSTR( pCurCtx->pzCtxFname, pzArg, "#line file name" );
+    AGDUPSTR(pCurCtx->pzCtxFname, pzArg, "#line file name");
 
     return pzScan;
 }
@@ -872,9 +875,9 @@ doDir_line( char* pzArg, char* pzScan )
  *  a multi-line #define that may include other preprocessing directives.
 =*/
 static char*
-doDir_macdef( char* pzArg, char* pzScan )
+doDir_macdef(char* pzArg, char* pzScan)
 {
-    return skipToEndmac( pzScan );
+    return skipToEndmac(pzScan);
 }
 
 
@@ -902,9 +905,9 @@ doDir_macdef( char* pzArg, char* pzScan )
  *  the command line.
 =*/
 static char*
-doDir_option( char* pzArg, char* pzScan )
+doDir_option(char* pzArg, char* pzScan)
 {
-    optionLoadLine( &autogenOptions, pzArg );
+    optionLoadLine(&autogenOptions, pzArg);
     return pzScan;
 }
 
@@ -924,10 +927,10 @@ doDir_option( char* pzArg, char* pzScan )
  *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
 =*/
 static char*
-doDir_shell( char* pzArg, char* pzScan )
+doDir_shell(char* pzArg, char* pzScan)
 {
-    tSCC       zShellText[] = "Computed Definitions";
-    tSCC       zEndShell[]  = "\n#endshell";
+    static char const zShellText[] = "Computed Definitions";
+    static char const zEndShell[]  = "\n#endshell";
 
     tScanCtx*  pCtx;
     char*      pzText = pzScan;
@@ -943,13 +946,13 @@ doDir_shell( char* pzArg, char* pzScan )
      *  THEN we won't write any data
      *  ELSE we have to find the end of the data.
      */
-    if (strncmp( pzText, zEndShell+1, STRSIZE( zEndShell )-1) == 0)
+    if (strncmp(pzText, zEndShell+1, STRSIZE(zEndShell)-1) == 0)
         return pzScan;
 
     {
         static char const noend[] =
             "Missing #endshell after '#shell' in %s on line %d\n";
-        char* pz = strstr( pzScan, zEndShell );
+        char* pz = strstr(pzScan, zEndShell);
         if (pz == NULL)
             AG_ABEND(aprf(noend, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
@@ -965,7 +968,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  IF there is no such line,
      *  THEN the scan will resume on a zero-length string.
      */
-    pzScan = strchr( pzScan + STRSIZE( zEndShell ), '\n' );
+    pzScan = strchr(pzScan + STRSIZE(zEndShell), '\n');
     if (pzScan == NULL)
         pzScan = (void*)zNil;
 
@@ -978,7 +981,7 @@ doDir_shell( char* pzArg, char* pzScan )
      *  Run the shell command.  The output text becomes the
      *  "file text" that is used for more definitions.
      */
-    pzText = runShell( pzText );
+    pzText = runShell(pzText);
     if (pzText == NULL)
         return pzScan;
 
@@ -992,8 +995,8 @@ doDir_shell( char* pzArg, char* pzScan )
      *  This is an extra allocation and copy, but easier than rewriting
      *  'loadData()' for this special context.
      */
-    pCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ) + strlen( pzText ) + 4,
-                              "shell output" );
+    pCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx) + strlen(pzText) + 4,
+                             "shell output");
 
     /*
      *  Link the new scan data into the context stack
@@ -1004,12 +1007,12 @@ doDir_shell( char* pzArg, char* pzScan )
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR( pCtx->pzCtxFname, zShellText, "shell text" );
+    AGDUPSTR(pCtx->pzCtxFname, zShellText, "shell text");
     pCtx->pzScan     =
     pCtx->pzData     = (char*)(pCtx+1);
     pCtx->lineNo     = 0;
-    strcpy( pCtx->pzScan, pzText );
-    AGFREE( pzText );
+    strcpy(pCtx->pzScan, pzText);
+    AGFREE(pzText);
 
     return pCtx->pzScan;
 }
@@ -1024,9 +1027,9 @@ doDir_shell( char* pzArg, char* pzScan )
  *  that match the undef name pattern.
 =*/
 static char*
-doDir_undef( char* pzArg, char* pzScan )
+doDir_undef(char* pzArg, char* pzScan)
 {
-    SET_OPT_UNDEFINE( pzArg );
+    SET_OPT_UNDEFINE(pzArg);
     return pzScan;
 }
 

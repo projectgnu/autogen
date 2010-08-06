@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-07-28 18:55:56 bkorb"
+ *  Time-stamp:        "2010-08-06 08:45:24 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -261,11 +261,15 @@ do_output_file_line(int line_delta, char const * fmt)
  * exparg: alt_fmt,  alternate format string, optional
  *
  * doc:
- *    Returns a string with the current output file name and line number.
- *    The default format is:  # <line+1> "<output-file-name>"
- *    The argument may be either a number indicating an offset from
- *    the current output line number or an alternate formatting string.
- *    If both are provided, then the first must be a numeric offset.
+ *  Returns a string with the current output file name and line number.
+ *  The default format is:  # <line+1> "<output-file-name>"
+ *  The argument may be either a number indicating an offset from
+ *  the current output line number or an alternate formatting string.
+ *  If both are provided, then the first must be a numeric offset.
+ *
+ *  Be careful you are directing output to the final output file.
+ *  Otherwise, you will get the file name and line number of the
+ *  temporary file.  That won't be what you want.
 =*/
 SCM
 ag_scm_output_file_next_line(SCM num_or_str, SCM str)

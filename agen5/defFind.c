@@ -1,7 +1,7 @@
 /**
  * \file defFind.c
  *
- *  Time-stamp:        "2010-07-11 12:45:27 bkorb"
+ *  Time-stamp:        "2010-08-06 12:50:41 bkorb"
  *
  *  This module locates definitions.
  *
@@ -49,7 +49,6 @@ static tDefEntry* findEntryByIndex(tDefEntry* pE, char* pzScan);
     AG_ABEND(aprf(zNameRef, zDefinitionName, \
               pCurTemplate->pzTplFile, pCurMacro->lineNo));
 
-
 /* = = = START-STATIC-FORWARD = = = */
 static tDefEntry*
 findEntryByIndex(tDefEntry* pE, char* pzScan);
@@ -69,8 +68,8 @@ hash_string(unsigned char const * pz);
 static void
 stringAdd(char const * pz);
 
-static tDefEntry**
-entryListSearch(char* pzName, tDefCtx* pDefCtx);
+static tDefEntry **
+get_def_list(char* pzName, tDefCtx* pDefCtx);
 /* = = = END-STATIC-FORWARD = = = */
 
 static tDefEntry*
@@ -210,7 +209,7 @@ badName(char* pzD, char const* pzS, size_t srcLen)
  *  forms a valid AutoGen compound definition name.
  *  We leave legally when:
  *  1.  the state is "CN_NAME_ENDED", AND
- *  2.  We stumble into a character that is not either '[' or '.'
+ *  2.  We stumble into a character that is not either '[' or name_sep_ch
  *      (always skipping white space).
  *  We start in CN_START.
  */
@@ -219,10 +218,10 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
 {
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
-        CN_NAME_ENDED,       /* must find '[' or '.' or we end */
+        CN_NAME_ENDED,       /* must find '[' or name_sep_ch or we end */
         CN_INDEX,            /* must find name, number, '$' or ']' */
         CN_INDEX_CLOSE,      /* must find ']' */
-        CN_INDEX_ENDED       /* must find '.' or we end */
+        CN_INDEX_ENDED       /* must find name_sep_ch or we end */
     } teConState;
 
     teConState state = CN_START_NAME;
@@ -232,8 +231,8 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
     size_t      stLen = srcLen;
 
     /*
-     *  Before anything, skip a leading '.' as a special hack to force
-     *  a current context lookup.
+     *  Before anything, skip a leading name_sep_ch as a special hack
+     *  to force a current context lookup.
      */
     while (IS_WHITESPACE_CHAR(*pzS )) {
         if (--srcLen <= 0) {
@@ -243,8 +242,8 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
         pzS++;
     }
 
-    if (*pzS == '.') {
-        *(pzD++) = '.';
+    if (*pzS == name_sep_ch) {
+        *(pzD++) = name_sep_ch;
         pzS++;
     }
 
@@ -276,10 +275,12 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
             state = CN_INDEX;
             break;
 
-        case '.':
-            *(pzD++) = '.';
-            state = CN_START_NAME;
-            break;
+        case '.': case '/':
+            if (pzS[-1] == name_sep_ch) {
+                *(pzD++) = name_sep_ch;
+                state = CN_START_NAME;
+                break;
+            }
 
         default:
             /* legal exit -- we have a name already */
@@ -341,7 +342,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
         goto nextSegment;
 
     case CN_INDEX_ENDED:
-        if ((*pzS != '.') || (--srcLen < 0)) {
+        if ((*pzS != name_sep_ch) || (--srcLen < 0)) {
             *pzD = NUL;
             return srcLen;
         }
@@ -399,9 +400,9 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
 static tDefEntry*
 find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
 {
-    char*        pcBrace;
-    char         breakCh;
-    tDefEntry*   pE;
+    char *       brace;
+    char         br_ch;
+    tDefEntry *  ent;
     ag_bool      dummy;
     ag_bool      noNesting    = AG_FALSE;
 
@@ -421,25 +422,25 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
              *pIsIndexed = AG_FALSE;
         else pIsIndexed  = &dummy;
 
-        if (*pzName == '.') {
+        if (*pzName == name_sep_ch) {
             noNesting = AG_TRUE;
             pzName++;
         }
     }
 
-    pcBrace  = pzName + strcspn(pzName, "[.");
-    breakCh  = *pcBrace;
-    *pcBrace = NUL;
+    brace  = pzName + strcspn(pzName, "[.");
+    br_ch  = *brace;
+    *brace = NUL;
 
-    if (breakCh == '[') *pIsIndexed = AG_TRUE;
+    if (br_ch == '[') *pIsIndexed = AG_TRUE;
 
     for (;;) {
         /*
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        pE = pDefCtx->pDefs;
-        if (pE == NULL)
+        ent = pDefCtx->pDefs;
+        if (ent == NULL)
             return NULL;
 
         do  {
@@ -447,11 +448,11 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp(pE->pzDefName, pzName) == 0)
+            if (strcmp(ent->pzDefName, pzName) == 0)
                 goto found_def_entry;
 
-            pE = pE->pNext;
-        } while (pE != NULL);
+            ent = ent->pNext;
+        } while (ent != NULL);
 
         /*
          *  IF we are nested, then we cannot change the definition level.
@@ -469,57 +470,72 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
     } found_def_entry:;
 
     /*
-     *  At this point, we have found the entry that matches the supplied
-     *  name, up to the '[' or '.' or NUL character.  It *must* be one of
+     *  At this point, we have found the entry that matches the supplied name,
+     *  up to the '[' or name_sep_ch or NUL character.  It *must* be one of
      *  those three characters.
      */
-    *pcBrace = breakCh;
+    *brace = br_ch;
 
-    switch (breakCh) {
+    switch (br_ch) {
     case NUL:
-        return pE;
+        return ent;
 
     case '[':
         /*
          *  We have to find a specific entry in a list.
          */
-        while (IS_WHITESPACE_CHAR(*++pcBrace )) ;
+        while (IS_WHITESPACE_CHAR(*++brace )) ;
 
-        pE = findEntryByIndex(pE, pcBrace);
-        if (pE == NULL)
-            return pE;
+        ent = findEntryByIndex(ent, brace);
+        if (ent == NULL)
+            return ent;
 
         /*
          *  We must find the closing brace, or there is an error
          */
-        pcBrace = strchr(pcBrace, ']');
-        if (pcBrace == NULL)
+        brace = strchr(brace, ']');
+        if (brace == NULL)
             ILLFORMEDNAME();
 
         /*
-         *  IF we are at the end of the definition,
-         *  THEN return what we found
+         *  What follows the closing brace?  IF we are at the end of the
+         *  definition, THEN return what we found.  However, if there's
+         *  another name, then we have to go look that one up, too.
          */
-        switch (*++pcBrace) {
+        switch (*++brace) {
         case NUL:
-            return pE;
+            return ent;
 
-        case '.':
-            break;
+        case '.': case '/':
+            /*
+             *  Which one?  One is valid, the other not and it is not known
+             *  at compile time.
+             */
+            if (*brace == name_sep_ch) {
+                pzName = brace + 1;
+                break;
+            }
+            /* FALLTHROUGH */
 
         default:
             ILLFORMEDNAME();
         }
-        /* FALLTHROUGH */
-
-    case '.':
-        /*
-         *  It is a segmented value name.  Set the name pointer
-         *  to the next segment and search starting from the newly
-         *  available set of definitions.
-         */
-        pzName = pcBrace + 1;
         break;
+
+    case '.': case '/':
+        if (br_ch == name_sep_ch) {
+            /*
+             *  Which one?  One is valid, the other not and it is not known
+             *  at compile time.
+             *
+             *  It is a segmented value name.  Set the name pointer
+             *  to the next segment and search starting from the newly
+             *  available set of definitions.
+             */
+            pzName = brace + 1;
+            break;
+        }
+        /* FALLTHROUGH */
 
     default:
         ILLFORMEDNAME();
@@ -528,7 +544,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
     /*
      *  We cannot find a member of a non-block type macro definition.
      */
-    if (pE->valType != VALTYP_BLOCK)
+    if (ent->valType != VALTYP_BLOCK)
         return NULL;
 
     /*
@@ -540,20 +556,20 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
     {
         tDefCtx ctx = { NULL, &currDefCtx };
 
-        ctx.pDefs = pE->val.pDefEntry;
+        ctx.pDefs = ent->val.pDefEntry;
 
         for (;;) {
             tDefEntry* res;
 
             res = find_def(pzName, &ctx, pIsIndexed);
-            if ((res != NULL) || (breakCh == '[')) {
+            if ((res != NULL) || (br_ch == '[')) {
                 nestingDepth--;
                 return res;
             }
-            pE = pE->pTwin;
-            if (pE == NULL)
+            ent = ent->pTwin;
+            if (ent == NULL)
                 break;
-            ctx.pDefs = pE->val.pDefEntry;
+            ctx.pDefs = ent->val.pDefEntry;
         }
     }
 
@@ -607,7 +623,7 @@ stringAdd(char const * pz)
      *  Save only the last component of the name, sans any index, too.
      */
     {
-        char const * p = strrchr(pz, '.');
+        char const * p = strrchr(pz, name_sep_ch);
         if (p != NULL)
             pz = p + 1;
         p = strchr(pz, '[');
@@ -695,17 +711,15 @@ print_used_defines(void)
 }
 
 
-/*
- *  entryListSearch
- *
- *  Find the definition entry for the name passed in.  It is okay to find
+/**
+ *  Find the definition entries for the name passed in.  It is okay to find
  *  block entries IFF they are found on the current level.  Once you start
  *  traversing up the tree, the macro must be a text macro.  Return an
  *  indicator saying if the element has been indexed (so the caller will
  *  not try to traverse the list of twins).
  */
-static tDefEntry**
-entryListSearch(char* pzName, tDefCtx* pDefCtx)
+static tDefEntry **
+get_def_list(char* pzName, tDefCtx* pDefCtx)
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
 
@@ -721,7 +735,7 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
      *  an index yet).
      */
     if (defList.nestLevel == 0) {
-        if (*pzName == '.') {
+        if (*pzName == name_sep_ch) {
             noNesting = AG_TRUE;
             while (IS_WHITESPACE_CHAR(*++pzName)) ;
         }
@@ -730,7 +744,6 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
             strncpy(zDefinitionName, pzName, sizeof(zDefinitionName) - 1);
             zDefinitionName[ sizeof(zDefinitionName) - 1] = NUL;
             ILLFORMEDNAME();
-            return NULL;
         }
 
         canonicalizeName(zDefinitionName, pzName, (int)strlen(pzName));
@@ -738,7 +751,10 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
         defList.usedCt = 0;
     }
 
-    pcBrace  = pzName + strcspn(pzName, "[.");
+    {
+        char sep_buf[3] = { '[', name_sep_ch, NUL };
+        pcBrace = pzName + strcspn(pzName, sep_buf);
+    }
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
@@ -790,8 +806,8 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
     } found_def_entry:;
 
     /*
-     *  At this point, we have found the entry that matches the supplied
-     *  name, up to the '[' or '.' or NUL character.  It *must* be one of
+     *  At this point, we have found the entry that matches the supplied name,
+     *  up to the '[' or name_sep_ch or NUL character.  It *must* be one of
      *  those three characters.
      */
     *pcBrace = breakCh;
@@ -829,22 +845,34 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
         case NUL:
             goto returnResult;
 
-        case '.':
-            break;
+        case '.': case '/':
+            /*
+             *  Which one?  One is valid, the other not and it is not known
+             *  at compile time.
+             */
+            if (*pcBrace == name_sep_ch)
+                break;
+            /* FALLTHROUGH */
 
         default:
             ILLFORMEDNAME();
         }
-        /* FALLTHROUGH */
-
-    case '.':
-        /*
-         *  It is a segmented value name.  Set the name pointer
-         *  to the next segment and search starting from the newly
-         *  available set of definitions.
-         */
         pzName = pcBrace + 1;
         break;
+
+    case '.': case '/':
+        if (breakCh == name_sep_ch) {
+            /*
+             *  Which one?  One is valid, the other not and it is not known
+             *  at compile time.
+             *
+             *  It is a segmented value name.  Set the name pointer to the
+             *  next segment and search starting from the newly available set
+             *  of definitions.
+             */
+            pzName = pcBrace + 1;
+            break;
+        }
 
     default:
         ILLFORMEDNAME();
@@ -860,7 +888,7 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
         tDefCtx ctx = { pE->val.pDefEntry, &currDefCtx };
 
         if (pE->valType == VALTYP_BLOCK)
-            (void)entryListSearch(pzName, &ctx);
+            (void)get_def_list(pzName, &ctx);
 
         if (breakCh == '[')
             break;
@@ -881,7 +909,7 @@ entryListSearch(char* pzName, tDefCtx* pDefCtx)
 LOCAL tDefEntry**
 findEntryList(char* pzName)
 {
-    return entryListSearch(pzName, &currDefCtx);
+    return get_def_list(pzName, &currDefCtx);
 }
 /*
  * Local Variables:

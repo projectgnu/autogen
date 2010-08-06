@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-07-24 10:19:30 bkorb"
+ *  Time-stamp:        "2010-08-06 08:54:38 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -145,33 +145,46 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
      */
     {
         static int exit_cleanup_done = 0;
-        if (exit_cleanup_done)
+        if (exit_cleanup_done) {
+            if (OPT_VALUE_TRACE > TRACE_NOTHING)
+                fprintf(pfTrace, "exit_cleanup re-done\n");
             return;
+        }
+
         exit_cleanup_done = 1;
     }
 
 #ifdef SHELL_ENABLED
     SCM_EVAL_CONST("(if (> (string-length shell-cleanup) 0)"
-                   " (shellf \"( (set -x;%s) & )\" shell-cleanup) )");
+                   " (shellf \"( (%s) & >/dev/null 2>&1 )\" shell-cleanup) )");
 #endif
+
+    close_server_shell();
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf(pfTrace, "exit_cleanup %s done\n",
+                (cl_wait == EXIT_PCLOSE_WAIT) ? "waited" : "no waiting");
+
+    do  {
+        if (pfTrace == stderr)
+            break;
+
+        if (! trace_is_to_pipe) {
+            fclose(pfTrace);
+            break;
+        }
+
+
+        fflush(pfTrace);
+        pclose(pfTrace);
+        if (cl_wait == EXIT_PCLOSE_WAIT) {
+            int status;
+            while (wait(&status) > 0)  ;
+        }
+    } while (0);
 
     fflush(stdout);
     fflush(stderr);
-
-    if (pfTrace == stderr)
-        return;
-
-    if (! trace_is_to_pipe) {
-        fclose(pfTrace);
-        return;
-    }
-
-    fflush(pfTrace);
-    pclose(pfTrace);
-    if (cl_wait == EXIT_PCLOSE_WAIT) {
-        int status;
-        while (wait(&status) > 0)  ;
-    }
 }
 
 /**
@@ -193,12 +206,13 @@ cleanup_and_abort(int sig)
             ((unsigned)procState <= PROC_STATE_DONE)
             ? state_names[ procState ] : "** BOGUS **");
 
-    exit_cleanup(EXIT_PCLOSE_NOWAIT);
-
-    if (procState == PROC_STATE_ABORTING)
+    if (procState == PROC_STATE_ABORTING) {
+        exit_cleanup(EXIT_PCLOSE_NOWAIT);
         _exit(sig + 128);
+    }
 
     procState = PROC_STATE_ABORTING;
+    setup_signals(SIG_DFL, SIG_DFL, SIG_DFL);
 
     /*
      *  IF there is a current template, then we should report where we are
@@ -234,8 +248,6 @@ cleanup_and_abort(int sig)
         fprintf(stderr, zAt, pzFl, line, pzFn, fnCd);
     }
 
-    setup_signals(SIG_DFL, SIG_DFL, SIG_DFL);
-
 #ifdef HAVE_SYS_RESOURCE_H
     /*
      *  If `--core' has been specified and if we have get/set rlimit,
@@ -249,13 +261,15 @@ cleanup_and_abort(int sig)
     }
 #endif
 
+    exit_cleanup(EXIT_PCLOSE_NOWAIT);
     abort();
 }
 
 
 /**
- *  catch_sig_and_bail catches signals we abend on.  The "siglongjmp" goes back
- *  to the real "main()" procedure and it will call "cleanup_and_abort()", above.
+ *  catch_sig_and_bail catches signals we abend on.  The "siglongjmp"
+ *  goes back to the real "main()" procedure and it will call
+ *  "cleanup_and_abort()", above.
  */
 static void
 catch_sig_and_bail(int sig)
@@ -300,12 +314,15 @@ done_check(void)
         "\t%s on line %d\n";
 
     /*
-     *  There are contexts wherein this function can get registered twice.
+     *  There are contexts wherein this function can get called twice.
      */
     {
         static int done_check_done = 0;
-        if (done_check_done)
+        if (done_check_done) {
+            if (OPT_VALUE_TRACE > TRACE_NOTHING)
+                fprintf(pfTrace, "done_check re-done\n");
             return;
+        }
         done_check_done = 1;
     }
 
@@ -375,7 +392,7 @@ done_check(void)
      *  This is done for CGI mode wherein we produce an error page in case of
      *  an error, but otherwise discard stderr.
      */
-    if (pzTmpStderr != NULL) {
+    if (cgi_stderr != NULL) {
         do {
             long pos = ftell(stderr);
             char* pz;
@@ -392,12 +409,15 @@ done_check(void)
             AGFREE(pz);
         } while (0);
 
-        unlink(pzTmpStderr);
-        AGFREE(pzTmpStderr);
-        pzTmpStderr = NULL;
+        unlink(cgi_stderr);
+        AGFREE(cgi_stderr);
+        cgi_stderr = NULL;
     }
 
     ag_scribble_deinit();
+
+    if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf(pfTrace, "done_check done\n");
 
     exit_cleanup(EXIT_PCLOSE_WAIT);
 

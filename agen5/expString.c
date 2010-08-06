@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2010-07-09 18:03:29 bkorb"
+ *  Time-stamp:        "2010-08-06 08:59:04 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -32,7 +32,7 @@ static SCM
 makeString(char const * pzText, char const * pzNewLine, size_t newLineSize);
 
 static size_t
-stringify_for_shell(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize);
+stringify_for_sh(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize);
 
 static SCM
 shell_stringify(SCM obj, u_int qt);
@@ -223,7 +223,7 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
 }
 
 static size_t
-stringify_for_shell(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize)
+stringify_for_sh(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize)
 {
     char * pz = pzNew;
     *(pz++) = qt;
@@ -309,7 +309,7 @@ shell_stringify(SCM obj, u_int qt)
     } loopDone1:;
 
     pzNew = AGALOC(dtaSize, "shell string");
-    dtaSize = stringify_for_shell(pzNew, qt, pzDta, dtaSize);
+    dtaSize = stringify_for_sh(pzNew, qt, pzDta, dtaSize);
 
     {
         SCM res = AG_SCM_STR2SCM(pzNew, dtaSize);

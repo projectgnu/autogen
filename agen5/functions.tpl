@@ -1,7 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
 
-#  Time-stamp:        "2010-07-28 18:45:44 bkorb"
+#  Time-stamp:        "2010-08-06 09:00:48 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -32,7 +32,7 @@
  *
  *  Tables of Text Functions for AutoGen
  *
- *  copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -321,7 +321,9 @@ ENDFOR macfunc =]
     (set! decl-list "") (set! temp-txt "") =][=
 
 FOR macfunc =][=
-    (set! func-name (string-append "mUnload_" (string-capitalize (get "name"))))
+    (set! func-name (string-append
+          "mUnload_" (string-capitalize (get "name"))))
+
     (if (exist? "unload-proc")
         (begin
 	  (set! decl-list (string-append decl-list func-name ", "))

@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-07-26 17:52:21 bkorb"
+ * Time-stamp:        "2010-08-06 12:51:50 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -33,7 +33,7 @@ static void
 do_stdout_tpl(tTemplate * pTF);
 
 static void
-open_output(tOutSpec* pOutSpec);
+open_output(tOutSpec * spec);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
@@ -330,19 +330,19 @@ closeOutput(ag_bool purge)
 }
 
 
-/*
+/**
  *  Figure out what to use as the base name of the output file.
  *  If an argument is not provided, we use the base name of
  *  the definitions file.
  */
 static void
-open_output(tOutSpec* pOutSpec)
+open_output(tOutSpec * spec)
 {
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
     char const * out_file = NULL;
 
-    if (strcmp(pOutSpec->zSuffix, "null") == 0) {
+    if (strcmp(spec->zSuffix, "null") == 0) {
         static int const flags = FPF_NOUNLINK | FPF_NOCHMOD | FPF_TEMPFILE;
     null_open:
         open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
@@ -356,10 +356,10 @@ open_output(tOutSpec* pOutSpec)
      */
     if (HAVE_OPT(SKIP_SUFFIX)) {
         int     ct  = STACKCT_OPT(SKIP_SUFFIX);
-        tCC**   ppz = STACKLST_OPT(SKIP_SUFFIX);
+        const char ** ppz = STACKLST_OPT(SKIP_SUFFIX);
 
         while (--ct >= 0) {
-            if (strcmp(pOutSpec->zSuffix, *ppz++) == 0)
+            if (strcmp(spec->zSuffix, *ppz++) == 0)
                 goto null_open;
         }
     }
@@ -373,33 +373,33 @@ open_output(tOutSpec* pOutSpec)
 
         char const * def_file = OPT_ARG(BASE_NAME);
         char   z[AG_PATH_MAX];
-        tCC*   pS = strrchr(def_file, '/');
-        char*  pE;
+        const char * pst = strrchr(def_file, '/');
+        char * end;
 
-        pS = (pS == NULL) ? def_file : (pS + 1);
+        pst = (pst == NULL) ? def_file : (pst + 1);
 
         /*
          *  We allow users to specify a suffix with '-' and '_', but when
          *  stripping a suffix from the "base name", we do not recognize 'em.
          */
-        pE = strchr(pS, '.');
-        if (pE != NULL) {
-            size_t len = (unsigned)(pE - pS);
+        end = strchr(pst, '.');
+        if (end != NULL) {
+            size_t len = (unsigned)(end - pst);
             if (len >= sizeof(z))
                 AG_ABEND("--base-name name is too long");
 
-            memcpy(z, pS, len);
-            z[ pE - pS ] = NUL;
-            pS = z;
+            memcpy(z, pst, len);
+            z[ end - pst ] = NUL;
+            pst = z;
         }
 
         /*
          *  Now formulate the output file name in the buffer
          *  provided as the input argument.
          */
-        out_file = aprf(pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix);
+        out_file = aprf(spec->pzFileFmt, pst, spec->zSuffix);
         if (out_file == NULL)
-            AG_ABEND(aprf(bad_fmt, pOutSpec->pzFileFmt, pS, pOutSpec->zSuffix));
+            AG_ABEND(aprf(bad_fmt, spec->pzFileFmt, pst, spec->zSuffix));
     }
 
     open_output_file(out_file, strlen(out_file), write_mode, 0);

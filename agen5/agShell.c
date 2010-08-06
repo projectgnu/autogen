@@ -64,9 +64,8 @@ static char*
 load_data(void);
 /* = = = END-STATIC-FORWARD = = = */
 
-
 LOCAL void
-closeServer(void)
+close_server_shell(void)
 {
     if (serverId == NULLPROCESS)
         return;
@@ -125,7 +124,7 @@ handle_signal(int signo)
         fprintf(pfTrace, zCmdFmt, pCurDir, pz, zShDone, logCount);
     }
     pzLastCmd = NULL;
-    closeServer();
+    close_server_shell();
 }
 
 
@@ -543,7 +542,7 @@ runShell(char const*  pzCmd)
         char* pz = load_data();
         if (pz == NULL) {
             fprintf(pfTrace, zCmdFail, pzCmd);
-            closeServer();
+            close_server_shell();
             pz = (char*)AGALOC(1, "Text Block");
 
             *pz = NUL;

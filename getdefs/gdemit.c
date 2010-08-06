@@ -4,10 +4,10 @@
  *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2010-07-17 09:46:01 bkorb"
+ *  Time-stamp:        "2010-08-04 20:50:11 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

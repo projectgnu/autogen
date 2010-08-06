@@ -1,3 +1,9 @@
+2010-08-01  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h (SCM_EVAL_CONST): adjust line number
+	* agen5/autogen.c (exit_cleanup): clean up cleanup.  Ensure that
+	server shell is properly shut down.
+
 2010-07-27  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c (ag_scm_tpl_file_next_line): new function

@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2010-07-28 19:02:48 bkorb"
+# Time-stamp:        "2010-08-06 09:01:33 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -151,7 +151,7 @@ ENDFOR symbol   =]
     (if (exist? "string")
         (get "string")
         (shellf
-          "echo '%s' | sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
+          "echo '%s'|sed -e's/_p$/?/' -e's/_x$/!/' -e's/_/-/g' -e's/-to-/->/'"
           (get "name")  )  ) ) ))
 
 (gpl "AutoGen" " *  ")=]

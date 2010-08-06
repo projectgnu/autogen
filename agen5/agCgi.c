@@ -2,7 +2,7 @@
 /**
  * \file agCgi.c
  *
- *  Time-stamp:        "2010-07-10 16:23:45 bkorb"
+ *  Time-stamp:        "2010-08-06 08:54:16 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -31,26 +31,26 @@ typedef struct {
 } tNameMap;
 
 #define ENV_TABLE \
-    _ET_( SERVER_SOFTWARE ) \
-    _ET_( SERVER_NAME ) \
-    _ET_( GATEWAY_INTERFACE ) \
-    _ET_( SERVER_PROTOCOL ) \
-    _ET_( SERVER_PORT ) \
-    _ET_( REQUEST_METHOD ) \
-    _ET_( PATH_INFO ) \
-    _ET_( PATH_TRANSLATED ) \
-    _ET_( SCRIPT_NAME ) \
-    _ET_( QUERY_STRING ) \
-    _ET_( REMOTE_HOST ) \
-    _ET_( REMOTE_ADDR ) \
-    _ET_( AUTH_TYPE ) \
-    _ET_( REMOTE_USER ) \
-    _ET_( REMOTE_IDENT ) \
-    _ET_( CONTENT_TYPE ) \
-    _ET_( CONTENT_LENGTH ) \
-    _ET_( HTTP_ACCEPT ) \
-    _ET_( HTTP_USER_AGENT ) \
-    _ET_( HTTP_REFERER )
+    _ET_(SERVER_SOFTWARE) \
+    _ET_(SERVER_NAME) \
+    _ET_(GATEWAY_INTERFACE) \
+    _ET_(SERVER_PROTOCOL) \
+    _ET_(SERVER_PORT) \
+    _ET_(REQUEST_METHOD) \
+    _ET_(PATH_INFO) \
+    _ET_(PATH_TRANSLATED) \
+    _ET_(SCRIPT_NAME) \
+    _ET_(QUERY_STRING) \
+    _ET_(REMOTE_HOST) \
+    _ET_(REMOTE_ADDR) \
+    _ET_(AUTH_TYPE) \
+    _ET_(REMOTE_USER) \
+    _ET_(REMOTE_IDENT) \
+    _ET_(CONTENT_TYPE) \
+    _ET_(CONTENT_LENGTH) \
+    _ET_(HTTP_ACCEPT) \
+    _ET_(HTTP_USER_AGENT) \
+    _ET_(HTTP_REFERER)
 
 static tNameMap nameValueMap[] = {
 #define _ET_(n) { #n, NULL },
@@ -76,11 +76,11 @@ static char const zOops[] =
 
 /* = = = START-STATIC-FORWARD = = = */
 static char*
-parseInput( char* pzSrc, int len );
+parseInput(char* pzSrc, int len);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void
-loadCgi( void )
+loadCgi(void)
 {
     /*
      *  Redirect stderr to a file.  If it gets used, we must trap it
@@ -88,17 +88,17 @@ loadCgi( void )
      *  First, tho, do a simple stderr->stdout redirection just in case
      *  we stumble before we're done with this.
      */
-    dup2( STDOUT_FILENO, STDERR_FILENO );
-    (void)fdopen( STDERR_FILENO, "w" FOPEN_BINARY_FLAG );
+    dup2(STDOUT_FILENO, STDERR_FILENO);
+    (void)fdopen(STDERR_FILENO, "w" FOPEN_BINARY_FLAG);
     pzOopsPrefix = zOops;
     {
         int tmpfd;
-        AGDUPSTR(pzTmpStderr, "/tmp/ag-stderr-XXXXXX", "temp stderr file");
-        tmpfd = mkstemp( pzTmpStderr );
+        AGDUPSTR(cgi_stderr, "/tmp/cgi-stderr-XXXXXX", "stderr file");
+        tmpfd = mkstemp(cgi_stderr);
         if (tmpfd < 0)
-            AG_ABEND(aprf("failed to create temp file from `%s'", pzTmpStderr));
-        dup2( tmpfd, STDERR_FILENO );
-        close( tmpfd );
+            AG_ABEND(aprf("mkstemp failed on `%s'", cgi_stderr));
+        dup2(tmpfd, STDERR_FILENO);
+        close(tmpfd);
     }
 
     /*
@@ -110,39 +110,39 @@ loadCgi( void )
         tNameIdx  ix  = (tNameIdx)0;
 
         do  {
-            pNM->pzValue = getenv( pNM->pzName );
+            pNM->pzValue = getenv(pNM->pzName);
             if (pNM->pzValue == NULL)
                 pNM->pzValue = (char*)zNil;
         } while (pNM++, ++ix < NAME_CT);
     }
 
-    pBaseCtx = (tScanCtx*)AGALOC( sizeof( tScanCtx ), "CGI context" );
-    memset( (void*)pBaseCtx, 0, sizeof( tScanCtx ));
+    pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "CGI context");
+    memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
 
     {
-        size_t textLen = strtoul( pzCgiLength, NULL, 0 );
+        size_t textLen = strtoul(pzCgiLength, NULL, 0);
         char*  pzText;
 
-        if (strcasecmp( pzCgiMethod, "POST" ) == 0) {
+        if (strcasecmp(pzCgiMethod, "POST") == 0) {
             if (textLen == 0)
-                AG_ABEND( "No CGI data were received" );
+                AG_ABEND("No CGI data were received");
 
-            pzText  = AGALOC( textLen + 1, "CGI POST text" );
+            pzText  = AGALOC(textLen + 1, "CGI POST text");
             if (fread(pzText, (size_t)1, textLen, stdin) != textLen)
                 AG_CANT("read", "CGI text");
 
             pzText[ textLen ] = NUL;
 
-            pBaseCtx->pzData = parseInput( pzText, (int)textLen );
-            AGFREE( pzText );
+            pBaseCtx->pzData = parseInput(pzText, (int)textLen);
+            AGFREE(pzText);
 
-        } else if (strcasecmp( pzCgiMethod, "GET" ) == 0) {
+        } else if (strcasecmp(pzCgiMethod, "GET") == 0) {
             if (textLen == 0)
-                textLen = strlen( pzCgiQuery );
-            pBaseCtx->pzData = parseInput( pzCgiQuery, (int)textLen );
+                textLen = strlen(pzCgiQuery);
+            pBaseCtx->pzData = parseInput(pzCgiQuery, (int)textLen);
 
         } else {
-            AG_ABEND( aprf("invalid CGI request method: ``%s''", pzCgiMethod));
+            AG_ABEND(aprf("invalid CGI request method: ``%s''", pzCgiMethod));
             /* NOTREACHED */
 #ifdef  WARNING_WATCH
             pzText = NULL;
@@ -157,15 +157,15 @@ loadCgi( void )
 
 
 static char*
-parseInput( char* pzSrc, int len )
+parseInput(char* pzSrc, int len)
 {
     tSCC   zDef[] = "Autogen Definitions cgi;\n";
-#   define defLen   (sizeof( zDef ) - 1)
-    char*  pzRes  = AGALOC( (len * 2) + defLen + 1, "CGI Definitions" );
+#   define defLen   (sizeof(zDef) - 1)
+    char*  pzRes  = AGALOC((len * 2) + defLen + 1, "CGI Definitions");
 
-    memcpy( pzRes, zDef, defLen );
-    (void)cgi_run_fsm( pzSrc, len, pzRes + defLen, len*2 );
-    return AGREALOC( pzRes, strlen( pzRes )+1, "CGI input" );
+    memcpy(pzRes, zDef, defLen);
+    (void)cgi_run_fsm(pzSrc, len, pzRes + defLen, len*2);
+    return AGREALOC(pzRes, strlen(pzRes)+1, "CGI input");
 }
 
 /*

@@ -1,7 +1,7 @@
 /**
  * \file expExtract.c
  *
- *  Time-stamp:        "2010-07-11 12:53:06 bkorb"
+ *  Time-stamp:        "2010-08-06 08:49:16 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -24,24 +24,22 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static char const*
-loadExtractData(char const* pzNewFile);
+load_extract_file(char const* pzNewFile);
 
 static SCM
-buildEmptyText(char const* pzStart, char const* pzEnd, SCM def);
+mk_empty_text(char const* pzStart, char const* pzEnd, SCM def);
 
 static SCM
-extractText(char const* pzText, char const* pzStart, char const* pzEnd, SCM def);
+get_text(char const* pzText, char const* pzStart, char const* pzEnd, SCM def);
 /* = = = END-STATIC-FORWARD = = = */
 
-/*
- *  loadExtractData
- *
+/**
  *  Load a file into memory.  Keep it in memory and try to reuse it
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
  */
 static char const*
-loadExtractData(char const* pzNewFile)
+load_extract_file(char const* pzNewFile)
 {
     static char const * pzFile = NULL;
     static char const * pzText = NULL;
@@ -134,12 +132,12 @@ loadExtractData(char const* pzNewFile)
 }
 
 
-/*
+/**
  *  Could not find the file or could not find the markers.
  *  Either way, emit an empty enclosure.
  */
 static SCM
-buildEmptyText(char const* pzStart, char const* pzEnd, SCM def)
+mk_empty_text(char const* pzStart, char const* pzEnd, SCM def)
 {
     size_t mlen = strlen(pzStart) + strlen(pzEnd) + 3;
     char* pzOut;
@@ -163,17 +161,17 @@ buildEmptyText(char const* pzStart, char const* pzEnd, SCM def)
  *  If we got it, emit it.
  */
 static SCM
-extractText(char const* pzText, char const* pzStart, char const* pzEnd, SCM def)
+get_text(char const* pzText, char const* pzStart, char const* pzEnd, SCM def)
 {
     char const* pzS = strstr(pzText, pzStart);
     char const* pzE;
 
     if (pzS == NULL)
-        return buildEmptyText(pzStart, pzEnd, def);
+        return mk_empty_text(pzStart, pzEnd, def);
 
     pzE = strstr(pzS, pzEnd);
     if (pzE == NULL)
-        return buildEmptyText(pzStart, pzEnd, def);
+        return mk_empty_text(pzStart, pzEnd, def);
 
     pzE += strlen(pzEnd);
 
@@ -281,7 +279,7 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
     if (! AG_SCM_STRING_P(file) || ! AG_SCM_STRING_P(marker))
         return SCM_UNDEFINED;
 
-    pzText = loadExtractData(ag_scm2zchars(file, "extract file"));
+    pzText = load_extract_file(ag_scm2zchars(file, "extract file"));
 
     {
         char const * pzMarker = ag_scm2zchars(marker, "marker");
@@ -298,8 +296,8 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
         SCM res;
 
         if (pzText == NULL)
-             res = buildEmptyText(pzStart, pzEnd, def);
-        else res = extractText(pzText, pzStart, pzEnd, def);
+             res = mk_empty_text(pzStart, pzEnd, def);
+        else res = get_text(pzText, pzStart, pzEnd, def);
 
         AGFREE((void*)pzStart);
         AGFREE((void*)pzEnd);

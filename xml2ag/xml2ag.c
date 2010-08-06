@@ -2,13 +2,13 @@
 /**
  * \file xml2ag.c
  *
- *  Time-stamp:         "2010-07-16 15:28:40 bkorb"
+ *  Time-stamp:         "2010-08-04 20:49:34 bkorb"
  *
  *  This is the main routine for xml2ag.
  *  xml2ag Copyright (c) 2002-2010 by Bruce Korb - all rights reserved
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2009 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
