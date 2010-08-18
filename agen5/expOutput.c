@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-08-06 08:45:24 bkorb"
+ *  Time-stamp:        "2010-08-06 16:25:44 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -40,6 +40,85 @@ static int            suspAllocCt = 0;
 static tSuspendName*  pSuspended  = NULL;
 static int            outputDepth = 1;
 
+/**
+ * chmod u+w on a file.
+ */
+static void
+make_writable(char* pzFileName)
+{
+    struct stat sbuf;
+
+#ifdef DEBUG_ENABLED
+    /*
+     *  "stat(2)" does not initialize the entire structure.
+     */
+    memset(&sbuf, NUL, sizeof(sbuf));
+#endif
+
+    stat(pzFileName, &sbuf);
+
+    /*
+     *  Or in the user write bit
+     */
+    sbuf.st_mode |= S_IWUSR;
+    chmod(pzFileName, sbuf.st_mode & S_IAMB);
+}
+
+/**
+ * return the current line number
+ */
+static int
+current_line(FILE * fp)
+{
+    int lnno = 1;
+
+    while (! feof(fp)) {
+        int ch = getc(fp);
+        if (ch == '\n')
+            lnno++;
+    }
+
+    return lnno;
+}
+
+/**
+ * guts of the output file/line function
+ */
+static SCM
+do_output_file_line(int line_delta, char const * fmt)
+{
+    char * buf;
+    char const * fname = pCurFp->pzOutName;
+
+    if (pCurFp->flags & FPF_TEMPFILE) {
+        fname = "* temp file *";
+        line_delta = 0;
+
+    } else if (fseek(pCurFp->pFile, 0, SEEK_SET) == 0) {
+        line_delta += current_line(pCurFp->pFile);
+
+    } else {
+        line_delta = 0;
+    }
+
+    {
+        size_t sz = strlen(fmt) + strlen(fname) + 24;
+        buf = ag_scribble(sz);
+    }
+
+    {
+        void * args[2];
+        args[0] = (void *)fname;
+        args[1] = (void *)(uintptr_t)line_delta;
+        sprintfv(buf, fmt, (snv_constpointer *)args);
+    }
+
+    return AG_SCM_STR02SCM(buf);
+}
+
+/**
+ * chmod a-w on a file descriptor.
+ */
 LOCAL void
 make_readonly(int fd)
 {
@@ -70,27 +149,47 @@ make_readonly(int fd)
     fchmod(fd, sbuf.st_mode & S_IAMB);
 }
 
-static void
-make_writable(char* pzFileName)
+/**
+ * Some common code for creating a new file
+ */
+LOCAL void
+open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 {
-    struct stat sbuf;
+    char *    pz;
+    tFpStack* p  = AGALOC(sizeof(*p), "out file stack");
 
-#ifdef DEBUG_ENABLED
-    /*
-     *  "stat(2)" does not initialize the entire structure.
-     */
-    memset(&sbuf, NUL, sizeof(sbuf));
-#endif
-
-    stat(pzFileName, &sbuf);
+    pz = (char*)AGALOC(nmsz + 1, "file name string");
+    memcpy(pz, fname, nmsz);
+    pz[ nmsz ] = NUL;
+    memset(p, NUL, sizeof(*p));
+    p->pzOutName = pz;
 
     /*
-     *  Or in the user write bit
+     *  IF we are creating the file and we are allowed to unlink the output,
+     *  then start by unlinking the thing.
      */
-    sbuf.st_mode |= S_IWUSR;
-    chmod(pzFileName, sbuf.st_mode & S_IAMB);
+    if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
+        if ((unlink(pz) != 0) && (errno != ENOENT))
+            AG_CANT("unlink", pz);
+    }
+
+    p->pFile = fopen(pz, mode);
+    if (p->pFile == NULL)
+        AG_CANT("open for output", pz);
+
+    p->pPrev = pCurFp;
+    pCurFp   = p;
+    p->flags = FPF_FREE | flags;
+    outputDepth++;
+
+    make_writable(pz);
+
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+        fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
+
+    if ((pfDepends != NULL) && ((flags & FPF_TEMPFILE) == 0))
+        fprintf(pfDepends, " \\\n\t%s", fname);
 }
-
 
 /*=gfunc out_delete
  *
@@ -201,58 +300,6 @@ ag_scm_out_pop(SCM ret_contents)
     return res;
 }
 
-/**
- * return the current line number
- */
-static int
-current_line(FILE * fp)
-{
-    int lnno = 1;
-
-    while (! feof(fp)) {
-        int ch = getc(fp);
-        if (ch == '\n')
-            lnno++;
-    }
-
-    return lnno;
-}
-
-/**
- * guts of the output file/line function
- */
-static SCM
-do_output_file_line(int line_delta, char const * fmt)
-{
-    char * buf;
-    char const * fname = pCurFp->pzOutName;
-
-    if (pCurFp->flags & FPF_TEMPFILE) {
-        fname = "* temp file *";
-        line_delta = 0;
-
-    } else if (fseek(pCurFp->pFile, 0, SEEK_SET) == 0) {
-        line_delta += current_line(pCurFp->pFile);
-
-    } else {
-        line_delta = 0;
-    }
-
-    {
-        size_t sz = strlen(fmt) + strlen(fname) + 24;
-        buf = ag_scribble(sz);
-    }
-
-    {
-        void * args[2];
-        args[0] = (void *)fname;
-        args[1] = (void *)(uintptr_t)line_delta;
-        sprintfv(buf, fmt, (snv_constpointer *)args);
-    }
-
-    return AG_SCM_STR02SCM(buf);
-}
-
 /*=gfunc output_file_next_line
  *
  * what:   print the file name and next line number
@@ -262,14 +309,14 @@ do_output_file_line(int line_delta, char const * fmt)
  *
  * doc:
  *  Returns a string with the current output file name and line number.
- *  The default format is:  # <line+1> "<output-file-name>"
- *  The argument may be either a number indicating an offset from
- *  the current output line number or an alternate formatting string.
- *  If both are provided, then the first must be a numeric offset.
+ *  The default format is: # <line+1> "<output-file-name>" The argument may be
+ *  either a number indicating an offset from the current output line number
+ *  or an alternate formatting string.  If both are provided, then the first
+ *  must be a numeric offset.
  *
- *  Be careful you are directing output to the final output file.
- *  Otherwise, you will get the file name and line number of the
- *  temporary file.  That won't be what you want.
+ *  Be careful that you are directing output to the final output file.
+ *  Otherwise, you will get the file name and line number of the temporary
+ *  file.  That won't be what you want.
 =*/
 SCM
 ag_scm_output_file_next_line(SCM num_or_str, SCM str)
@@ -293,13 +340,14 @@ ag_scm_output_file_next_line(SCM num_or_str, SCM str)
  *
  * what:   suspend current output file
  * exparg: suspName, A name tag for reactivating
+ *
  * doc:
- *  If there has been a @code{push} on the output, then set aside the
- *  output descriptor for later reactiviation with @code{(out-resume "xxx")}.
- *  The tag name need not reflect the name of the output file.  In fact,
- *  the output file may be an anonymous temporary file.  You may also
- *  change the tag every time you suspend output to a file, because the
- *  tag names are forgotten as soon as the file has been "resumed".
+ *  If there has been a @code{push} on the output, then set aside the output
+ *  descriptor for later reactiviation with @code{(out-resume "xxx")}.  The
+ *  tag name need not reflect the name of the output file.  In fact, the
+ *  output file may be an anonymous temporary file.  You may also change the
+ *  tag every time you suspend output to a file, because the tag names are
+ *  forgotten as soon as the file has been "resumed".
 =*/
 SCM
 ag_scm_out_suspend(SCM susp_nm)
@@ -461,49 +509,6 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
     AG_ABEND(invalid_z);
     /* NOTREACHED */
     return SCM_UNDEFINED;
-}
-
-
-/*
- * Some common code for creating a new file
- */
-LOCAL void
-open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
-{
-    char *    pz;
-    tFpStack* p  = AGALOC(sizeof(*p), "out file stack");
-
-    pz = (char*)AGALOC(nmsz + 1, "file name string");
-    memcpy(pz, fname, nmsz);
-    pz[ nmsz ] = NUL;
-    memset(p, NUL, sizeof(*p));
-    p->pzOutName = pz;
-
-    /*
-     *  IF we are creating the file and we are allowed to unlink the output,
-     *  then start by unlinking the thing.
-     */
-    if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
-        if ((unlink(pz) != 0) && (errno != ENOENT))
-            AG_CANT("unlink", pz);
-    }
-
-    p->pFile = fopen(pz, mode);
-    if (p->pFile == NULL)
-        AG_CANT("open for output", pz);
-
-    p->pPrev = pCurFp;
-    pCurFp   = p;
-    p->flags = FPF_FREE | flags;
-    outputDepth++;
-
-    make_writable(pz);
-
-    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
-
-    if ((pfDepends != NULL) && ((flags & FPF_TEMPFILE) == 0))
-        fprintf(pfDepends, " \\\n\t%s", fname);
 }
 
 /*=gfunc out_push_add
@@ -748,6 +753,8 @@ ag_scm_out_line(void)
 }
 
 #if 0 /* for compilers that do not like C++ comments... */
+// This is done so that comment delimiters can be included in the doc.
+//
 // /*=gfunc   make_header_guard
 //  *
 //  * what:   make self-inclusion guard

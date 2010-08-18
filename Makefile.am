@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-17 09:45:44 bkorb"
+## Time-stamp:      "2010-08-13 16:36:20 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@ if DO_SHELL_CMDS
 if  HAVE_XML_LIB
 SUBDIRS       += columns getdefs xml2ag doc pkg
 else
-SUBDIRS       += columns getdefs doc pkg
+SUBDIRS       += columns getdefs pkg
 endif
 else
 

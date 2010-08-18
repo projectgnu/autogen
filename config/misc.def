@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2010-07-17 09:49:02 bkorb"
+/*  Time-stamp:        "2010-08-12 18:38:49 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -268,7 +268,7 @@ test   = {
 	xml2ag won't work without libxml2, so either the methods
 	for finding the header and libraries must be provided,
 	or xml2-config must be found in the executable path.
-	_END_OF_DOC_;
+	_END_OF_DOC_; // '
 };
 
 test   = {
