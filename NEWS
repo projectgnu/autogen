@@ -1,5 +1,10 @@
 New in __CURRENT_VERSION__ November 2008
 
+* fix for root user build
+* without libxml2, the docs cannot be rebuilt.
+
+New in 5.10 November 2008
+
 * "columns" program takes an option for an end-of-output string
 * "autogen" takes a "-MF<dep-file-name>" option producing a dependency
   file that is carefully engineered to be a little bit older than
@@ -32,18 +37,3 @@ New in 5.10 - November 2009
   option will be listed in the usage text but will be handled exactly as
   if the aliased-to option were specified. You probably shouldn't use it
   unless you have to.
-
-* AutoGen tracing output: You may now prefix a file name with shell style
-  append redirection to indicate that the output appends to the file
-  (i.e. >>file).
-
-New in 5.9.9 - August 2009
-
-* options may now be "deprecated".  They get processed, but do not show
-  in the usage output.
-
-* options may be marked "no-command", meaning they are not to appear on
-  the command line.  Thus, they are recognized in config files only.
-
-* "disable-save" and "disable-load" may be used to prevent the command
-  line options from loading or saving options from/to a file.

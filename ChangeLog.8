@@ -1,3 +1,103 @@
+2009-11-18  Bruce Korb  <bkorb@gnu.org>
+
+	5.10 release
+
+2009-11-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agUtils.c: coverity flag
+	* agen5/cgi-fsm.c: ditto
+	* agen5/expString.c: ditto
+	* agen5/fsm-trans.tpl: ditto
+	* autoopts/options_h.tpl: ditto
+	* agen5/tpProcess.c (openOutFile): ditto
+	(nextOutSpec): remove dead code
+	* agen5/defDirect.c (doDir_shell): free empty string results, too.
+	* agen5/funcEval.c (evalExpression): add assert for Coverity
+	* autoopts/autoopts.c (longOptionFind): ditto
+	* autoopts/reset.c (optionResetOpt): ditto
+	* snprintfv/printf.c: ditto
+	* columns/columns.c (writeColumns): free allocated memory
+	* getdefs/getdefs.c (startAutogen): ditto
+
+2009-11-08  Eric McDonald  <Eric_McDonald@users.sourceforge.net>
+
+	* agen5/defFind.c (entryListSearch): strip "no nesting" marker
+	from name before testing for "does string start with name character?"
+
+2009-10-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c (loadData): only compile if SHELL_ENABLED is defined
+	* agen5/directive.tpl (zShellInit): ditto
+	* autoopts/install-options-h (intptr_t): add this in if necessary
+	* autoopts/optcode.tpl (more-help): skip if no working fork()
+	* autoopts/optlib.tpl (more-help): no usage if no working fork()
+	* autoopts/alias.c: new module to handle "aliases" attribute
+	* autoopts/opt*.tpl: implement "aliases" attribute
+
+2009-10-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/optcode.tpl (tmp-val): define it instead of setting it.
+	Sun's Guile sometimes loses track of the name (?!?!)
+	* autoopts/optlib.tpl: ditto
+	* autoopts/opthead.tpl: ditto
+
+2009-10-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/time.test: new test
+	* agen5/test/Makefile.am: add the test
+	* agen5/tpLoad.c (loadTemplate): output time must be later than any
+	input template.
+	* autoopts/opthead.tpl (MORE_HELP): only works if HAVE_WORKING_FORK
+	* autoopts/optlib.tpl (MORE_HELP): ditto
+	* autoopts/optmain.tpl (MORE_HELP): ditto
+
+2009-10-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def (trace-out): allow trace file appending
+	* autoopts/autoopts.c (longOptionFind): print a disabled option
+	message for selecting unconfigured options.
+	(shortOptionFind): ditto
+	* autoopts/options-tpl.in (omitted-usage): make sure that if supplied,
+	then either "ifdef" or "ifndef" has been supplied.
+	* autoopts/optlib.tpl (_Name): set non-null when "omitted-usage"
+	* autoopts/usage-txt.def (DisabledErr): error message for selecting
+	a configured-out option
+	(DisabledOpt): extended usage text for de-configured option.
+	* autoopts/usage.c (printOptPreamble): new function that prints just
+	the option flags
+	(printOneUsage): call this new function
+	(printOptionUsage): when an option has been omitted, see if it
+	should be printed for extended usage.
+	* doc/autogen-texi.txt: doc the new stuff
+
+2009-09-27  Bruce Korb  <bkorb@gnu.org>
+
+	* config/misc.def (shell): split the test in two.  If "shell" is
+	enabled, then run the does-fork()-work test.
+	(do-shell): test both that "shell" is enabled and that fork()
+	works before defining SHELL_ENABLED.
+
+2009-09-27  Eric McDonald  <Eric_McDonald@users.sourceforge.net>
+
+	* agen5/tpProcess.c (openOutFile): Reset the post-output control flags
+	* expGuile.c (ag_scm_max), (ag_scm_min), (ag_scm_sum):
+	use signed arithmetic instead of unsigned.  Fixes "(min ...)" etc
+
+2009-09-20  Mike Frysinger <vapier@users.sourceforge.net>
+
+	* config/libopts.def (AC_FUNC_FORK): add this test
+	* autoopts/makeshell.c (genshelloptUsage): use HAVE_WORKING_FORK
+	instead of defined(__windows__) && !defined(__CYGWIN__)
+	* autoopts/pgusage.c (optionPagedUsage): ditto
+
+2009-09-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/tpProcess.c: simplify the printf
+	* autoopts/makeshell.c: use "static char const"
+
+2009-08-09  Bruce Korb  <bkorb@gnu.org>
+
+	5.9.9 release
 
 2009-07-31  Bruce Korb  <bkorb@gnu.org>
 
