@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-06-30 20:53:48 bkorb"
+# Time-stamp:        "2010-08-22 11:22:29 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -43,23 +43,26 @@ test "X${mainpid}" = X && {
 
 set_exe_var()
 {
-    d=$(cd $dir ; pwd)
-    if [ -x $d/$prog ]
-    then
-      echo ${var}exe=$d/$prog export ${var}exe
+    if test -d "$dir" && test -x "$dir/$prog"
+    then 
+        exe=$(\cd $dir >/dev/null ; pwd)/$prog
+
     else
-      eval f=\$${var}exe
-      if test -x "$f"
-      then
-        echo ${var}exe=$f export ${var}exe
-      else
-        f=$(which $prog 2> /dev/null)
-        case ${f} in
-        ( */${prog} )  echo ${var}exe=${f} export ${var}exe ;;
-        ( * )          echo unset ${var}exe ;;
-        esac
-      fi
+        eval f=\$${var}exe
+        if test -x "$f"
+        then
+            exe=$f
+
+        else
+            f=$(which $prog 2> /dev/null)
+            case ${f} in
+            ( */${prog} )  exe=${f} ;;
+            ( * )          echo unset ${var}exe ; return ;;
+            esac
+        fi
     fi
+
+    echo ${var}exe=${exe} export ${var}exe
 }
 
 set_defaults()
@@ -126,7 +129,7 @@ set_defaults()
     #  Name our executable in one place and disable any $HOME defaults
     #  Use the local tools, if available.  Otherwise, look for them.
     #
-    eval $(
+    txt=$(
         while read var prog dir
         do
             test -n ${#dir} && set_exe_var
@@ -137,6 +140,7 @@ set_defaults()
 	CL  ${CLnam-columns}  ${builddir}/../columns
 	EOF
     )
+    eval "$txt"
 
     ${VERBOSE:-false} && set -x || :
     #  Ensure complete success or a noticable failure

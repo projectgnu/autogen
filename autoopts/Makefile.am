@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-08-04 20:46:24 bkorb"
+## Time-stamp:      "2010-08-22 11:40:21 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -135,7 +135,7 @@ libopts.c : $(HDRS) $(CSRC)
 	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
 
 makeshell.lo : genshell.c
-genshell.c : genshell.def
+genshell.c : $(srcdir)/genshell.def
 	@cd $(srcdir) ; AGexe=$(AGexe) $(SHELL) ./bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c

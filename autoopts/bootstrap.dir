@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-07-10 10:46:26 bkorb"
+# Time-stamp:      "2010-08-22 11:47:32 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -36,6 +36,8 @@ noag=`${AGexe} -v > /dev/null 2>&1 && echo false || echo true`
 make_funcs_def()
 {
     local PS4=">${FUNCNAME}> "
+
+    $noag && exit 1
 
     sedcmd=$(cat <<- _EOF_
 	s=@CONFIG_SHELL@=$(which bash)=
@@ -95,13 +97,16 @@ make_funcs_def()
 	_END_VERS_INFO_
     ${AGexe} funcs.def
     test -f options.h || exit 1
+    mv options.h autoopts/.
 
     #  Regenerate the "genshell.h" 'cuz we just altered the template to
     #  contain the header version number.
     #
-    ${AGexe} -L. genshell.def || exit 1
-    mv options.h autoopts/.
-    ${AGexe} -Tagman3.tpl funcs.def || exit 1
+    ${AGexe} -L . genshell.def || \
+        die "FAILED: ${AGexe} -L . genshell.def"
+    ${AGexe} -L . -Tagman3.tpl funcs.def || \
+        die "FAILED: ${AGexe} -L . -Tagman3.tpl funcs.def"
+
     exec 4> Makefile.new
     sed '/^GENMAN /q' Makefile.am >&4
     ls -1 *.3 | \
@@ -145,7 +150,8 @@ case "$1" in
     #  We were probably invoked by make
     #
     $noag && test -f genshell.c && exit 0
-    ${AGexe} -L. genshell.def || die "FAILED: ${AGexe} -L. genshell.def"
+    ${AGexe} -L . genshell.def || \
+        die "FAILED: ${AGexe} -L. genshell.def"
     ;;
 
 *libopts.texi )
@@ -158,9 +164,6 @@ case "$1" in
 aoconf )
     make_funcs_def
     ;;
-
-* ) :
-  ;;
 esac
 
 ${free_trap} && trap '' 0

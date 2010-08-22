@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2010-07-28 19:25:53 bkorb"
+ *  Time-stamp:        "2010-08-20 11:30:16 bkorb"
  *
  *  Manage a server shell process
  *
@@ -318,8 +318,7 @@ chainOpen(int stdinFd, char const ** ppArgs, pid_t * pChild)
     }
 
     execvp((char*)pzShell, (char**)ppArgs);
-    AG_ABEND(aprf("Could not execvp('%s', ...):  %d - %s\n",
-                  pzShell, errno, strerror(errno)));
+    AG_CANT("execvp", pzShell);
     /* NOTREACHED */
     return -1;
 }

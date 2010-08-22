@@ -1,3 +1,15 @@
+2010-08-21  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/bootstrap.dir (set_defaults): some shells require quotes around
+	subshell output for "eval".  Dump the subshell output into a variable.
+	eval the quoted variable.
+	* agen5/directive.tpl (gperf): --null-strings is a relatively new
+	option.  Not 10 years old --> too new.  Drop it.
+	* agen5/fmemopen.c (fmem_seek): fix BSD argument usage
+	* autoopts/nested.c (optionLoadNested): constrain scope of pAL.
+	* autoopts/test/nested.test: the ' - reading file ' line contained
+	temp directory information.  Strip it out.
+
 2010-08-14  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am (SUBDIRS): the "doc" dir cannot be built without libxml2.

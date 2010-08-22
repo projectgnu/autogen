@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-08-04 20:52:23 bkorb"
+# Time-stamp:        "2010-08-20 15:39:33 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -234,7 +234,7 @@ gperf_%2$s=${gpdir}/%2$s
 ) > %2$s.gperf
 
 exec 2> %2$s.log
-gperf --language=ANSI-C -H %2$s_hash -N %2$s_find --null-strings \
+gperf --language=ANSI-C -H %2$s_hash -N %2$s_find \
       -C -E -I -t %2$s.gperf > %2$s-temp.c || \
    die "gperf failed on ${gpdir}/%2$s.gperf
       `cat %2$s.log`"

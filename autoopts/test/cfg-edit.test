@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-02-24 08:40:09 bkorb"
+# Time-stamp:        "2010-08-20 15:32:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -194,7 +194,7 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
 
 
 The following option preset mechanisms are supported:
- - reading file ${cfg_file}
+ - reading file ${testname}.cfg
 
 The valid "members" option keywords are:
   one two three four five six seven eight nine ten
@@ -207,6 +207,9 @@ The valid "enumerate" option keywords are:
   or an integer from 0 through 7
 _EOF_
 
+sed "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
+    ${testname}.help > X$$
+mv -f X$$ ${testname}.help
 cmp -s ${basehelp} ${testname}.help || \
   failure "`diff ${basehelp} ${testname}.help`"
 

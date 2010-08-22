@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-07-10 16:33:59 bkorb"
+ * Time-stamp:      "2010-08-20 12:59:32 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -72,12 +72,16 @@
 #  if defined(HAVE_LIBIO_H)
 #    include <libio.h>
 #  endif
-   typedef _IO_off64_t  fmem_off_t;
-   typedef int          seek_pos_t;
+   typedef off64_t * seek_off_t;
+   typedef int       seek_ret_t;
+#  define FOPENCOOKIE_INTERFACE  1
+#  undef  FUNOPEN_INTERFACE
 
 #elif defined(HAVE_FUNOPEN)
-   typedef size_t  fmem_off_t;
-   typedef fpos_t  seek_pos_t;
+   typedef fpos_t  seek_off_t;
+   typedef fpos_t  seek_ret_t;
+#  undef  FOPENCOOKIE_INTERFACE
+#  define FUNOPEN_INTERFACE  1
 
 #  ifdef NEED_COOKIE_FUNCTION_TYPEDEFS
      typedef int     (cookie_read_function_t )(void *, char *, int);
@@ -139,8 +143,8 @@ fmem_read(void *cookie, void *pBuf, size_t sz);
 static ssize_t
 fmem_write(void *cookie, const void *pBuf, size_t sz);
 
-static seek_pos_t
-fmem_seek(void * cookie, fmem_off_t * p_offset, int dir);
+static seek_ret_t
+fmem_seek(void * cookie, seek_off_t offset, int dir);
 
 static int
 fmem_close(void * cookie);
@@ -335,20 +339,37 @@ fmem_write(void *cookie, const void *pBuf, size_t sz)
 /**
  * Handle file system callback to set a new current position
  */
-static seek_pos_t
-fmem_seek(void * cookie, fmem_off_t * p_offset, int dir)
+static seek_ret_t
+fmem_seek(void * cookie, seek_off_t offset, int dir)
 {
     size_t new_pos;
     fmem_cookie_t *pFMC = cookie;
 
+#ifdef FOPENCOOKIE_INTERFACE
+    /*
+     *  GNU interface:  offset passed and returned by address.
+     */
     switch (dir) {
-    case SEEK_SET: new_pos = *p_offset;  break;
-    case SEEK_CUR: new_pos = pFMC->next_ix  + *p_offset;  break;
-    case SEEK_END: new_pos = pFMC->eof - *p_offset;  break;
+    case SEEK_SET: new_pos = *offset;  break;
+    case SEEK_CUR: new_pos = pFMC->next_ix  + *offset;  break;
+    case SEEK_END: new_pos = pFMC->eof - *offset;  break;
 
     default:
         goto seek_oops;
     }
+#else
+    /*
+     *  BSD interface:  offset passed by value, returned as retval.
+     */
+    switch (dir) {
+    case SEEK_SET: new_pos = offset;  break;
+    case SEEK_CUR: new_pos = pFMC->next_ix  + offset;  break;
+    case SEEK_END: new_pos = pFMC->eof - offset;  break;
+
+    default:
+        goto seek_oops;
+    }
+#endif
 
     if ((signed)new_pos < 0)
         goto seek_oops;
@@ -359,8 +380,13 @@ fmem_seek(void * cookie, fmem_off_t * p_offset, int dir)
     }
 
     pFMC->next_ix = new_pos;
-    *p_offset     = (fmem_off_t)new_pos;
+
+#ifdef FOPENCOOKIE_INTERFACE
+    *offset = (off64_t)new_pos;
+    return 0;
+#else
     return new_pos;
+#endif
 
  seek_oops:
     errno = EINVAL;
@@ -491,11 +517,10 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *  This function requires underlying @var{libc} functionality:
  *  either @code{fopencookie(3GNU)} or @code{funopen(3BSD)}.
  *
- *  If @var{buf} is @code{NULL}, then a buffer is allocated.
- *  The initial allocation is @var{len} bytes.  If @var{len} is
- *  less than zero, then the buffer will not be reallocated if more
- *  space is needed.  Any allocated memory is @code{free()}-ed
- *  when @code{fclose(3C)} is called.
+ *  If @var{buf} is @code{NULL}, then a buffer is allocated.  The initial
+ *  allocation is @var{len} bytes.  If @var{len} is less than zero, then the
+ *  buffer will not be reallocated if more space is needed.  Any allocated
+ *  memory is @code{free()}-ed when @code{fclose(3C)} is called.
  *
  *  If @code{buf} is not @code{NULL}, then @code{len} must not be zero.
  *  It may still be less than zero to indicate that the buffer is not to
@@ -529,8 +554,8 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *  The buffer is marked as updatable and both reading and writing is enabled.
  *
  *  @item b
- *  The I/O is marked as "binary" and a trailing NUL will not be inserted into
- *  the buffer.  Without this mode flag, one will be inserted after the
+ *  The I/O is marked as "binary" and a trailing NUL will not be inserted
+ *  into the buffer.  Without this mode flag, one will be inserted after the
  *  @code{EOF}, if it fits.  It will fit if the buffer is extensible (the
  *  provided @var{len} was not negative).  This mode flag has no effect if
  *  the buffer is opened in read-only mode.
@@ -606,23 +631,17 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
             ? (cookie_write_function_t*)fmem_write : NULL;
 
-        FILE * res;
-
-#if defined(HAVE_FOPENCOOKIE)
+#ifdef FOPENCOOKIE_INTERFACE
         cookie_io_functions_t iof;
         iof.read  = pRd;
         iof.write = pWr;
-        iof.seek  = (cookie_seek_function_t* )fmem_seek;
-        iof.close = (cookie_close_function_t*)fmem_close;
+        iof.seek  = fmem_seek;
+        iof.close = fmem_close;
 
-        res = fopencookie(pFMC, pMode, iof);
+        return fopencookie(pFMC, pMode, iof);
 #else
-        res = funopen(pFMC, pRd, pWr,
-                      (cookie_seek_function_t* )fmem_seek,
-                      (cookie_close_function_t*)fmem_close);
+        return funopen(pFMC, pRd, pWr, fmem_seek, fmem_close);
 #endif
-
-        return res;
     }
 }
 

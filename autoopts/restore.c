@@ -2,7 +2,7 @@
 /*
  * \file restore.c
  *
- * Time-stamp:      "2010-07-17 10:41:04 bkorb"
+ * Time-stamp:      "2010-08-22 11:04:00 bkorb"
  *
  *  This module's routines will save the current option state to memory
  *  and restore it.  If saved prior to the initial optionProcess call,
@@ -203,7 +203,7 @@ optionFree(tOptions* pOpts)
 
             case OPARG_TYPE_HIERARCHY:
                 if (p->optCookie != NULL)
-                    unloadNestedArglist(p->optCookie);
+                    unload_arg_list(p->optCookie);
                 break;
             }
 
