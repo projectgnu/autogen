@@ -1,14 +1,18 @@
-2010-08-21  Bruce Korb  <bkorb@gnu.org>
+2010-08-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/bootstrap.dir (set_defaults): some shells require quotes around
 	subshell output for "eval".  Dump the subshell output into a variable.
 	eval the quoted variable.
 	* agen5/directive.tpl (gperf): --null-strings is a relatively new
 	option.  Not 10 years old --> too new.  Drop it.
-	* agen5/fmemopen.c (fmem_seek): fix BSD argument usage
+	* agen5/fmemopen.c (fmem_seek): fix BSD funopen argument usage
 	* autoopts/nested.c (optionLoadNested): constrain scope of pAL.
 	* autoopts/test/nested.test: the ' - reading file ' line contained
 	temp directory information.  Strip it out.
+	* snprintfv/bootstrap.dir: do not use awk.  Much simpler as shell
+	* snprintfv/format.c (print_float): break it up.  Waaaaaay too big.
+	* snprintfv/gendoc.awk: obsolete removed
+	* snprintfv/genproto: obsolete removed
 
 2010-08-14  Bruce Korb  <bkorb@gnu.org>
 

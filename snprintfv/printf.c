@@ -68,7 +68,8 @@ SNV_INLINE unsigned spec_hash (unsigned spec);
 SNV_INLINE void spec_init (void);
 SNV_INLINE spec_entry *spec_lookup (unsigned spec);
 static void spec_insert (spec_entry * pentry);
-static int do_printfv (STREAM *stream, const char *format, union printf_arg const args[]);
+static int do_printfv (STREAM *stream, const char *format,
+                       union printf_arg const args[]);
 
 /* FIXME:  We are assuming an ASCII character set where all the
            printable characters are between SPACE and DEL. */
@@ -145,7 +146,8 @@ spec_lookup (unsigned spec)
  * %spec_entry with the information on the function if it was.
  **/
 spec_entry *
-register_printf_function (unsigned spec, printf_function *fmt, printf_arginfo_function *arg)
+register_printf_function (unsigned spec, printf_function *fmt,
+                          printf_arginfo_function *arg)
 {
   spec_entry *new, *old;
   old = spec_lookup (spec);
@@ -313,7 +315,9 @@ parser_reset (struct printf_info *pinfo)
  * returned.
  **/
 char *
-printf_error (struct printf_info *pinfo, const char *file, int line, const char *func1, const char *func2, const char *func3, const char *error_message)
+printf_error (struct printf_info *pinfo, const char *file, int line,
+              const char *func1, const char *func2, const char *func3,
+              const char *error_message)
 {
   int i;
   char *result;
@@ -1267,9 +1271,7 @@ snv_fprintfv (FILE *file, const char *format, snv_constpointer const args[])
  * The value of @ch that has been put in @stream.
  **/
 int
-snv_bufputc (ch, stream)
-     int ch;
-     STREAM *stream;
+snv_bufputc (int ch, STREAM * stream)
 {
   char **ppbuffer = (char **) stream_details (stream);
   **ppbuffer = (char) ch;
@@ -1428,7 +1430,8 @@ snv_vsnprintf (char buffer[], unsigned long limit, const char *format, va_list a
  * an error, when %SNV_ERROR is returned.
  **/
 int
-snv_snprintfv (char buffer[], unsigned long limit, const char *format, snv_constpointer const args[])
+snv_snprintfv (char buffer[], unsigned long limit, const char *format,
+               snv_constpointer const args[])
 {
   int count_or_errorcode;
   STREAM *out = stream_new (&buffer, limit - 1, NULL, snv_bufputc);
@@ -1452,9 +1455,7 @@ snv_snprintfv (char buffer[], unsigned long limit, const char *format, snv_const
  * The value of @ch that has been put in @stream.
  **/
 int
-snv_filputc (ch, stream)
-     int ch;
-     STREAM *stream;
+snv_filputc (int ch, STREAM * stream)
 {
   return filccat ((Filament *) stream_details (stream), ch), ch;
 }

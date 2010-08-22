@@ -2,7 +2,7 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2010-07-17 10:32:41 bkorb"
+ * Time-stamp:      "2010-08-22 15:36:14 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -34,27 +34,29 @@ tSCC*  pz_enum_err_fmt;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-enumError(
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC* const *  paz_names,
-    int           name_ct );
+enum_err(tOptions * pOpts, tOptDesc * pOD,
+         char const * const * paz_names, int name_ct);
 
 static uintptr_t
-findName(
-    tCC*          pzName,
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC* const *  paz_names,
-    unsigned int  name_ct );
+find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
+          char const * const *  paz_names, unsigned int name_ct);
+
+static void
+set_memb_usage(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct);
+
+static void
+set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct);
+
+static void
+set_memb_names(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct);
 /* = = = END-STATIC-FORWARD = = = */
 
 static void
-enumError(
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC* const *  paz_names,
-    int           name_ct )
+enum_err(tOptions * pOpts, tOptDesc * pOD,
+         char const * const * paz_names, int name_ct)
 {
     size_t max_len = 0;
     size_t ttl_len = 0;
@@ -86,7 +88,7 @@ enumError(
      *  of all the names.
      */
     {
-        tCC * const * paz = paz_names;
+        char const * const * paz = paz_names;
 
         do  {
             size_t len = strlen(*(paz++)) + 1;
@@ -166,27 +168,23 @@ enumError(
 
 
 static uintptr_t
-findName(
-    tCC*          pzName,
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC* const *  paz_names,
-    unsigned int  name_ct )
+find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
+          char const * const *  paz_names, unsigned int name_ct)
 {
     /*
      *  Return the matching index as a pointer sized integer.
      *  The result gets stashed in a char* pointer.
      */
-    uintptr_t     res = name_ct;
-    size_t        len = strlen((char*)pzName);
-    uintptr_t     idx;
+    uintptr_t   res = name_ct;
+    size_t      len = strlen((char*)pzName);
+    uintptr_t   idx;
 
     if (IS_DEC_DIGIT_CHAR(*pzName)) {
         char * pz = (char *)(void *)pzName;
         unsigned long val = strtoul(pz, &pz, 0);
         if ((*pz == NUL) && (val < name_ct))
             return (uintptr_t)val;
-        enumError(pOpts, pOD, paz_names, (int)name_ct);
+        enum_err(pOpts, pOD, paz_names, (int)name_ct);
         return name_ct;
     }
 
@@ -208,7 +206,7 @@ findName(
 
     pz_enum_err_fmt = (res == name_ct) ? zNoKey : zAmbigKey;
     option_usage_fp = stderr;
-    enumError(pOpts, pOD, paz_names, (int)name_ct);
+    enum_err(pOpts, pOD, paz_names, (int)name_ct);
     return name_ct;
 }
 
@@ -220,15 +218,13 @@ findName(
  * arg:   tOptDesc*,     pOD,       enumeration option description
  * arg:   unsigned int,  enum_val,  the enumeration value to map
  *
- * ret_type:  char const*
+ * ret_type:  char const *
  * ret_desc:  the enumeration name from const memory
  *
  * doc:   This converts an enumeration value into the matching string.
 =*/
-char const*
-optionKeywordName(
-    tOptDesc*     pOD,
-    unsigned int  enum_val )
+char const *
+optionKeywordName(tOptDesc * pOD, unsigned int enum_val)
 {
     tOptDesc od;
 
@@ -257,11 +253,8 @@ optionKeywordName(
  *        if there is only one partial match.
 =*/
 uintptr_t
-optionEnumerationVal(
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC * const * paz_names,
-    unsigned int  name_ct )
+optionEnumerationVal(tOptions * pOpts, tOptDesc * pOD,
+                     char const * const * paz_names, unsigned int name_ct)
 {
     uintptr_t res = 0UL;
 
@@ -274,7 +267,7 @@ optionEnumerationVal(
         /*
          *  print the list of enumeration names.
          */
-        enumError(pOpts, pOD, paz_names, (int)name_ct);
+        enum_err(pOpts, pOD, paz_names, (int)name_ct);
         break;
 
     case (uintptr_t)OPTPROC_EMIT_SHELL:
@@ -306,7 +299,7 @@ optionEnumerationVal(
     }
 
     default:
-        res = findName(pOD->optArg.argString, pOpts, pOD, paz_names, name_ct);
+        res = find_name(pOD->optArg.argString, pOpts, pOD, paz_names, name_ct);
 
         if (pOD->fOptState & OPTST_ALLOC_ARG) {
             AGFREE(pOD->optArg.argString);
@@ -318,6 +311,84 @@ optionEnumerationVal(
     return res;
 }
 
+static void
+set_memb_usage(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct)
+{
+    /*
+     *  print the list of enumeration names.
+     */
+    enum_err(OPTPROC_EMIT_USAGE, pOD, paz_names, (int)name_ct );
+}
+
+static void
+set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct)
+{
+    /*
+     *  print the name string.
+     */
+    int       ix   =  0;
+    uintptr_t bits = (uintptr_t)pOD->optCookie;
+    size_t    len  = 0;
+
+    bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
+
+    while (bits != 0) {
+        if (bits & 1) {
+            if (len++ > 0) fputs(" | ", stdout);
+            fputs(paz_names[ix], stdout);
+        }
+        if (++ix >= name_ct) break;
+        bits >>= 1;
+    }
+}
+
+static void
+set_memb_names(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
+               unsigned int name_ct)
+{
+    char*     pz;
+    uintptr_t bits = (uintptr_t)pOD->optCookie;
+    int       ix   = 0;
+    size_t    len  = 5;
+
+    bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
+
+    /*
+     *  Replace the enumeration value with the name string.
+     *  First, determine the needed length, then allocate and fill in.
+     */
+    while (bits != 0) {
+        if (bits & 1)
+            len += strlen(paz_names[ix]) + 8;
+        if (++ix >= name_ct) break;
+        bits >>= 1;
+    }
+
+    pOD->optArg.argString = pz = AGALOC(len, "enum name");
+
+    /*
+     *  Start by clearing all the bits.  We want to turn off any defaults
+     *  because we will be restoring to current state, not adding to
+     *  the default set of bits.
+     */
+    strcpy(pz, "none");
+    pz += 4;
+    bits = (uintptr_t)pOD->optCookie;
+    bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
+    ix = 0;
+
+    while (bits != 0) {
+        if (bits & 1) {
+            strcpy(pz, " + ");
+            strcpy(pz+3, paz_names[ix]);
+            pz += strlen(paz_names[ix]) + 3;
+        }
+        if (++ix >= name_ct) break;
+        bits >>= 1;
+    }
+}
 
 /*=export_func  optionSetMembers
  * what:  Convert between bit flag values and strings
@@ -336,11 +407,8 @@ optionEnumerationVal(
  *        if there is only one partial match.
 =*/
 void
-optionSetMembers(
-    tOptions*     pOpts,
-    tOptDesc*     pOD,
-    tCC* const *  paz_names,
-    unsigned int  name_ct )
+optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
+                 char const* const * paz_names, unsigned int name_ct)
 {
     /*
      *  IF the program option descriptor pointer is invalid,
@@ -348,78 +416,16 @@ optionSetMembers(
      */
     switch ((uintptr_t)pOpts) {
     case (uintptr_t)OPTPROC_EMIT_USAGE:
-        /*
-         *  print the list of enumeration names.
-         */
-        enumError(OPTPROC_EMIT_USAGE, pOD, paz_names, (int)name_ct );
+        set_memb_usage(pOpts, pOD, paz_names, name_ct);
         return;
 
     case (uintptr_t)OPTPROC_EMIT_SHELL:
-    {
-        /*
-         *  print the name string.
-         */
-        int       ix   =  0;
-        uintptr_t bits = (uintptr_t)pOD->optCookie;
-        size_t    len  = 0;
-
-        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
-
-        while (bits != 0) {
-            if (bits & 1) {
-                if (len++ > 0) fputs(" | ", stdout);
-                fputs(paz_names[ix], stdout);
-            }
-            if (++ix >= name_ct) break;
-            bits >>= 1;
-        }
+        set_memb_shell(pOpts, pOD, paz_names, name_ct);
         return;
-    }
 
     case (uintptr_t)OPTPROC_RETURN_VALNAME:
-    {
-        char*     pz;
-        uintptr_t bits = (uintptr_t)pOD->optCookie;
-        int       ix   = 0;
-        size_t    len  = 5;
-
-        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
-
-        /*
-         *  Replace the enumeration value with the name string.
-         *  First, determine the needed length, then allocate and fill in.
-         */
-        while (bits != 0) {
-            if (bits & 1)
-                len += strlen(paz_names[ix]) + 8;
-            if (++ix >= name_ct) break;
-            bits >>= 1;
-        }
-
-        pOD->optArg.argString = pz = AGALOC(len, "enum name");
-
-        /*
-         *  Start by clearing all the bits.  We want to turn off any defaults
-         *  because we will be restoring to current state, not adding to
-         *  the default set of bits.
-         */
-        strcpy(pz, "none");
-        pz += 4;
-        bits = (uintptr_t)pOD->optCookie;
-        bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
-        ix = 0;
-
-        while (bits != 0) {
-            if (bits & 1) {
-                strcpy(pz, " + ");
-                strcpy(pz+3, paz_names[ix]);
-                pz += strlen(paz_names[ix]) + 3;
-            }
-            if (++ix >= name_ct) break;
-            bits >>= 1;
-        }
+        set_memb_names(pOpts, pOD, paz_names, name_ct);
         return;
-    }
 
     default:
         break;
@@ -429,7 +435,7 @@ optionSetMembers(
         return;
 
     {
-        tCC*      pzArg = pOD->optArg.argString;
+        char const*      pzArg = pOD->optArg.argString;
         uintptr_t res;
         if ((pzArg == NULL) || (*pzArg == NUL)) {
             pOD->optCookie = (void*)0;
@@ -450,12 +456,12 @@ optionSetMembers(
             if (len == 0)
                 break;
 
-            if ((len == 3) && (strncmp(pzArg, zAll, (size_t)3) == 0)) {
+            if ((len == 3) && (strncmp(pzArg, zAll, 3) == 0)) {
                 if (iv)
                      res = 0;
                 else res = ~0UL;
             }
-            else if ((len == 4) && (strncmp(pzArg, zNone, (size_t)4) == 0)) {
+            else if ((len == 4) && (strncmp(pzArg, zNone, 4) == 0)) {
                 if (! iv)
                     res = 0;
             }
@@ -465,7 +471,7 @@ optionSetMembers(
 
                 if (pz != pzArg + len) {
                     char z[ AO_NAME_SIZE ];
-                    tCC* p;
+                    char const* p;
                     int  shift_ct;
 
                     if (*pz != NUL) {
@@ -478,7 +484,7 @@ optionSetMembers(
                         p = pzArg;
                     }
 
-                    shift_ct = findName(p, pOpts, pOD, paz_names, name_ct);
+                    shift_ct = find_name(p, pOpts, pOD, paz_names, name_ct);
                     if (shift_ct >= name_ct) {
                         pOD->optCookie = (void*)0;
                         return;

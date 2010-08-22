@@ -32,27 +32,104 @@
 
 # Code:
 
-top_srcdir=..
-srcdir=.
-cwd=`pwd`
+init() {
+    top_srcdir=..
+    srcdir=.
+    cwd=`pwd`
+    BASH=`which bash`
+    test -z "$BASH" && BASH=/bin/sh
+}
 
-AWK=${AWK-awk}
-GENPROTO_ENVIRONMENT='FORMAT=SNV_GNUC_PRINTF /bin/sh ./genproto'
+do_all_headers() {
+    # Generate the header files
+    #
+    local PS4='>dah> '
+    for file in [abd-z]*.in
+    do
+        gen_hdr `echo $file | sed 's/\.in$//'`
+    done
+}
 
-# Generate the header files
-for file in [abd-z]*.in
-do
-  header=`echo $file | sed 's,\.in$,.h,'`
-  test -z "${header}" && continue
-  stamp=`echo $file|sed 's,\.in$,.stamp,'`
-  temp=${header}T
-  eval $GENPROTO_ENVIRONMENT ./gendoc.awk $srcdir/$file > $temp
-  if cmp -s $header $temp; then
-    echo $header is unchanged; rm -f $temp;
-  else
-    echo creating $header; mv -f $temp $header;
-  fi
-  date > $stamp
-done
+protoize() {
+    local PS4='>pt> '
+    state=do_comment
+
+    while IFS='' read -r line
+    do
+        case $state in
+        do_comment )
+            printf '%s\n' "${line}"
+            case "$line" in
+            *'*/' ) state=need_extern ;;
+            esac
+            ;;
+
+        need_extern )
+            case "$line" in
+            extern' '* ) : ;;
+            * ) line="extern $line"
+            esac
+            printf '%s\n' "${line}"
+            state=do_proto
+            ;;
+
+        do_proto )
+            case "$line" in
+            *')' )
+                line="${line};"
+                state=skip_brace
+                ;;
+            esac
+            printf '%s\n' "${line}"
+            ;;
+
+        skip_brace )
+            echo
+            test "X${line}" = "X{" && \
+                state=do_comment
+            ;;
+        esac
+    done
+}
+
+gen_hdr() {
+    local PS4='>gh> '
+    line_no=1
+    hdr=${1}.h
+    inf=${1}.in
+    stp=${1}.stamp
+    tmp=${1}.tmp
+
+    exec < ${inf} > ${tmp}
+    while IFS='' read -r line
+    do
+        line_no=`expr $line_no + 1`
+
+        case "${line}" in
+        '@protos '* ) : ;;
+        * ) printf '%s\n' "${line}"
+            continue ;;
+        esac
+
+        cfile=`echo "$line" | sed 's/.* //'`
+        sed -n '/^\/\*\*$/,/^{$/p' ${cfile} | protoize
+        printf '#line %d "%s"\n' $line_no $inf
+    done
+
+    if cmp -s $hdr $tmp
+    then rm -f $tmp
+    else mv -f $tmp $hdr
+    fi
+    touch $stp
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#    M A I N
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+init
+do_all_headers
 
 # bootstrap.dir ends here

@@ -137,12 +137,27 @@ fetch_double (struct printf_info *pinfo, union printf_arg const *arg)
 
 
 #ifndef NO_FLOAT_PRINTING
+
 /* These two routines are cleaned up version of the code in libio 2.95.3
    (actually I got it from the Attic, not from the released tarball).
    The changes were mainly to share code between %f and %g (libio did
    share some code between %e and %g), and to share code between the
    %e and %f when invoked by %g.  Support from infinities and NaNs comes
    from the old snprintfv code.  */
+
+typedef struct {
+  int    pfs_prec;
+  int    fmtch;
+  int    expcnt;
+  int    gformat;
+  char * scan_back_pz;
+  char * out_pz;
+  char * start_pz;
+  char * pfs_end;
+  snv_long_double fract;
+  snv_long_double integer;
+  snv_long_double tmp;
+} print_float_status_t;
 
 static char *
 print_float_round (snv_long_double fract, int *exp, char *start, char *end,
@@ -186,235 +201,270 @@ print_float_round (snv_long_double fract, int *exp, char *start, char *end,
   return (start);
 }
 
-static int
-print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp, snv_long_double n)
+static void
+fiddle_precision (print_float_status_t * pfs)
 {
-  int prec, fmtch;
-  char *p, *t;
-  snv_long_double fract;
-  int expcnt, gformat = 0;
-  snv_long_double integer, tmp;
-  char expbuf[10];
+  /* %e/%f/%#g add 0's for precision, others trim 0's */
+  if (pfs->gformat && !pinfo->alt)
+    {
+      while (pfs->out_pz > pfs->start_pz && *--pfs->out_pz == '0');
+      if (*pfs->out_pz != '.')
+        ++pfs->out_pz;
+    }
+  else
+    for (; pfs->pfs_prec--; *pfs->out_pz++ = '0');
+}
 
-  prec = pinfo->prec;
-  fmtch = pinfo->spec;
-  t = startp;
+static void
+do_fformat (print_float_status_t * pfs)
+{
+  /* reverse integer into beginning of buffer */
+  if (pfs->expcnt)
+    for (; ++pfs->scn_bk_pz < pfs->pfs_end; *pfs->out_pz++ = *pfs->scn_bk_pz);
+  else
+    *pfs->out_pz++ = '0';
+
+  /* If precision required or alternate flag set, add in a
+     decimal point.  */
+  if (pinfo->prec || pinfo->alt)
+    *pfs->out_pz++ = '.';
+
+  /* if requires more precision and some fraction left */
+  if (pfs->fract)
+    {
+      if (pfs->pfs_prec)
+        {
+          /* For %g, if no integer part, don't count initial
+             zeros as significant digits. */
+          do
+            {
+              pfs->fract = modfl (pfs->fract * 10, &pfs->tmp);
+              *pfs->out_pz++ = '0' + ((int) pfs->tmp);
+            }
+          while (!pfs->tmp && !pfs->expcnt && pfs->gformat);
+
+          while (--pfs->pfs_prec && pfs->fract)
+            {
+              pfs->fract = modfl (pfs->fract * 10, &pfs->tmp);
+              *pfs->out_pz++ = '0' + ((int) pfs->tmp);
+            }
+        }
+
+      if (pfs->fract)
+        pfs->start_pz =
+          print_float_round (pfs->fract, (int *) NULL, pfs->start_pz,
+                             pfs->out_pz - 1, (char) 0, signp);
+    }
+
+  fiddle_precision (pfp);
+}
+
+static void
+do_eformat (print_float_status_t * pfs)
+{
+  if (pfs->expcnt)
+    {
+      *pfs->out_pz++ = *++pfs->scn_bk_pz;
+      if (pinfo->prec || pinfo->alt)
+        *pfs->out_pz++ = '.';
+
+      /* if requires more precision and some integer left */
+      for (; pfs->pfs_prec && ++pfs->scn_bk_pz < pfs->pfs_end; --pfs->pfs_prec)
+        *pfs->out_pz++ = *pfs->scn_bk_pz;
+
+      /* if done precision and more of the integer component,
+         round using it; adjust fract so we don'pfs->out_pz re-round
+         later.  */
+      if (!pfs->pfs_prec && ++pfs->scn_bk_pz < pfs->pfs_end)
+        {
+          pfs->fract = 0;
+          pfs->start_pz = print_float_round (
+              (snv_long_double) 0, &pfs->expcnt, pfs->start_pz, pfs->out_pz - 1,
+              *pfs->scn_bk_pz, signp);
+        }
+
+      /* adjust expcnt for digit in front of decimal */
+      --pfs->expcnt;
+    }
+
+  /* until first fractional digit, decrement exponent */
+  else if (pfs->fract)
+    {
+      /* adjust expcnt for digit in front of decimal */
+      for (pfs->expcnt = -1;; --pfs->expcnt)
+        {
+          pfs->fract = modfl (pfs->fract * 10, &pfs->tmp);
+          if (pfs->tmp)
+            break;
+        }
+      *pfs->out_pz++ = '0' + ((int) pfs->tmp);
+      if (pinfo->prec || pinfo->alt)
+        *pfs->out_pz++ = '.';
+    }
+
+  else
+    {
+      *pfs->out_pz++ = '0';
+      if (pinfo->prec || pinfo->alt)
+        *pfs->out_pz++ = '.';
+    }
+
+  /* if requires more precision and some fraction left */
+  if (pfs->fract)
+    {
+      if (pfs->pfs_prec)
+        do
+          {
+            pfs->fract = modfl (pfs->fract * 10, &pfs->tmp);
+            *pfs->out_pz++ = '0' + ((int) pfs->tmp);
+          }
+        while (--pfs->pfs_prec && pfs->fract);
+
+      if (pfs->fract)
+        pfs->start_pz = print_float_round (
+            pfs->fract, &pfs->expcnt, pfs->start_pz, pfs->out_pz - 1,
+            (char) 0, signp);
+    }
+
+  fiddle_precision (pfp);
+
+  if (pfs.fmtch != 'e' && pfs.fmtch != 'E')
+    return;
+
+  {
+    char expbuf[10];
+    *pfs.out_pz++ = pfs.fmtch;
+    if (pfs.expcnt < 0)
+      {
+        pfs.expcnt = -pfs.expcnt;
+        *pfs.out_pz++ = '-';
+      }
+    else
+      *pfs.out_pz++ = '+';
+
+    pfs.scn_bk_pz = expbuf;
+    do
+      *pfs.scn_bk_pz++ = '0' + (pfs.expcnt % 10);
+    while ((pfs.expcnt /= 10) > 9);
+    *pfs.scn_bk_pz++ = '0' + pfs.expcnt;
+    while (pfs.scn_bk_pz > expbuf)
+      *pfs.out_pz++ = *--pfs.scn_bk_pz;
+  }
+}
+
+static void
+do_gformat (print_float_status_t * pfs)
+{
+  pfs->gformat = 1;
+
+  /* a precision of 0 is treated as a precision of 1. */
+  if (!pfs->pfs_prec)
+    pinfo->prec = ++pfs->pfs_prec;
+
+  /* ``The style used depends on the value converted; style e
+     will be used only if the exponent resulting from the
+     conversion is less than -4 or greater than the precision.''
+     -- ANSI X3J11 */
+  if (  (pfs->expcnt > pfs->pfs_prec)
+        || (!pfs->expcnt && pfs->fract && pfs->fract < .0001L))
+    {
+      /* g/G format counts "significant digits, not digits of
+         precision; for the e/E format, this just causes an
+         off-by-one problem, i.e. g/G considers the digit
+         before the decimal point significant and e/E doesn't
+         count it as precision.  */
+      --pfs->pfs_prec;
+      pfs->fmtch -= 2;		/* G->E, g->e */
+      do_eformat (pfs);
+    }
+  else
+    {
+      /* Decrement precision */
+      if (fnum != 0.0L)
+        pfs->pfs_prec -= (pfs->pfs_end - pfs->scn_bk_pz) - 1;
+      else
+        pfs->pfs_prec--;
+
+      do_fformat (pfs);
+    }
+}
+
+static int
+print_float (struct printf_info *pinfo, char *startp, char *endp, int *signp,
+             snv_long_double fnum)
+{
+  print_float_status_t pfs = {
+    .pfs_prec = pinfo->prec,
+    .pfs_end  = endp,
+    .fmtch    = pinfo->spec,
+    .out_pz   = startp,
+    .start_pz = startp,
+    .gformat  = 0
+  };
+
   *signp = 0;
 
   /* Do the special cases: nans, infinities, zero, and negative numbers. */
-  if (isnanl (n))
+  if (isnanl (fnum))
     {
       /* Not-a-numbers are printed as a simple string. */
-      *t++ = fmtch < 'a' ? 'N' : 'n';
-      *t++ = fmtch < 'a' ? 'A' : 'a';
-      *t++ = fmtch < 'a' ? 'N' : 'n';
-      return t - startp;
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'N' : 'n';
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'A' : 'a';
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'N' : 'n';
+      return pfs.out_pz - pfs.start_pz;
     }
 
   /* Zero and infinity also can have a sign in front of them. */
-  if (copysignl (1.0, n) < 0.0)
+  if (copysignl (1.0, fnum) < 0.0)
     {
-      n = -1.0 * n;
+      fnum = -1.0 * fnum;
       *signp = '-';
     }
 
-  if (isinfl (n))
+  if (isinfl (fnum))
     {
       /* Infinities are printed as a simple string. */
-      *t++ = fmtch < 'a' ? 'I' : 'i';
-      *t++ = fmtch < 'a' ? 'N' : 'n';
-      *t++ = fmtch < 'a' ? 'F' : 'f';
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'I' : 'i';
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'N' : 'n';
+      *pfs.out_pz++ = pfs.fmtch < 'a' ? 'F' : 'f';
       goto set_signp;
     }
 
-  expcnt = 0;
-  fract = modfl (n, &integer);
+  pfs.expcnt = 0;
+  pfs.fract = modfl (fnum, &pfs.integer);
 
   /* get an extra slot for rounding. */
-  *t++ = '0';
+  *pfs.out_pz++ = '0';
 
   /* get integer portion of number; put into the end of the buffer; the
      .01 is added for modfl (356.0 / 10, &integer) returning .59999999...  */
-  for (p = endp - 1; p >= startp && integer; ++expcnt)
+  for (pfs.scn_bk_pz = pfs.pfs_end - 1;
+       pfs.scn_bk_pz >= pfs.start_pz && pfs.integer;
+       ++pfs.expcnt)
     {
-      tmp = modfl (integer / 10, &integer);
-      *p-- = '0' + ((int) ((tmp + .01L) * 10));
+      pfs.tmp = modfl (pfs.integer / 10, &pfs.integer);
+      *pfs.scn_bk_pz-- = '0' + ((int) ((pfs.tmp + .01L) * 10));
     }
 
-  switch (fmtch)
+  switch (pfs.fmtch)
     {
     case 'g':
     case 'G':
-      gformat = 1;
-
-      /* a precision of 0 is treated as a precision of 1. */
-      if (!prec)
-	pinfo->prec = ++prec;
-
-      /* ``The style used depends on the value converted; style e
-         will be used only if the exponent resulting from the
-         conversion is less than -4 or greater than the precision.''
-                -- ANSI X3J11 */
-      if (expcnt > prec || (!expcnt && fract && fract < .0001L))
-	{
-	  /* g/G format counts "significant digits, not digits of
-	     precision; for the e/E format, this just causes an
-	     off-by-one problem, i.e. g/G considers the digit
-	     before the decimal point significant and e/E doesn't
-	     count it as precision.  */
-	  --prec;
-	  fmtch -= 2;		/* G->E, g->e */
-	  goto eformat;
-	}
-      else
-	{
-          /* Decrement precision */
-          if (n != 0.0L)
-	    prec -= (endp - p) - 1;
-	  else
-	    prec--;
-
-	  goto fformat;
-	}
+      do_gformat (&pfs);
+      break;
 
     case 'f':
     case 'F':
-    fformat:
-      /* reverse integer into beginning of buffer */
-      if (expcnt)
-	for (; ++p < endp; *t++ = *p);
-      else
-	*t++ = '0';
-
-      /* If precision required or alternate flag set, add in a
-         decimal point.  */
-      if (pinfo->prec || pinfo->alt)
-	*t++ = '.';
-
-      /* if requires more precision and some fraction left */
-      if (fract)
-	{
-	  if (prec)
-	    {
-	      /* For %g, if no integer part, don't count initial
-	         zeros as significant digits. */
-	      do
-		{
-		  fract = modfl (fract * 10, &tmp);
-		  *t++ = '0' + ((int) tmp);
-		}
-	      while (!tmp && !expcnt && gformat);
-
-	      while (--prec && fract)
-		{
-		  fract = modfl (fract * 10, &tmp);
-		  *t++ = '0' + ((int) tmp);
-		}
-	    }
-
-	  if (fract)
-	    startp =
-	      print_float_round (fract, (int *) NULL, startp, t - 1, (char) 0, signp);
-	}
-
+      do_fformat (&pfs);
       break;
 
     case 'e':
     case 'E':
-    eformat:
-      if (expcnt)
-	{
-	  *t++ = *++p;
-	  if (pinfo->prec || pinfo->alt)
-	    *t++ = '.';
-
-	  /* if requires more precision and some integer left */
-	  for (; prec && ++p < endp; --prec)
-	    *t++ = *p;
-
-	  /* if done precision and more of the integer component,
-	     round using it; adjust fract so we don't re-round
-	     later.  */
-	  if (!prec && ++p < endp)
-	    {
-	      fract = 0;
-	      startp = print_float_round ((snv_long_double) 0, &expcnt, startp, t - 1, *p, signp);
-	    }
-
-	  /* adjust expcnt for digit in front of decimal */
-	  --expcnt;
-	}
-
-      /* until first fractional digit, decrement exponent */
-      else if (fract)
-	{
-	  /* adjust expcnt for digit in front of decimal */
-	  for (expcnt = -1;; --expcnt)
-	    {
-	      fract = modfl (fract * 10, &tmp);
-	      if (tmp)
-		break;
-	    }
-	  *t++ = '0' + ((int) tmp);
-	  if (pinfo->prec || pinfo->alt)
-	    *t++ = '.';
-	}
-
-      else
-	{
-	  *t++ = '0';
-	  if (pinfo->prec || pinfo->alt)
-	    *t++ = '.';
-	}
-
-      /* if requires more precision and some fraction left */
-      if (fract)
-	{
-	  if (prec)
-	    do
-	      {
-		fract = modfl (fract * 10, &tmp);
-		*t++ = '0' + ((int) tmp);
-	      }
-	    while (--prec && fract);
-
-	  if (fract)
-	    startp = print_float_round (fract, &expcnt, startp, t - 1, (char) 0, signp);
-	}
+      do_eformat (&pfs);
       break;
 
     default:
       abort ();
-    }
-
-  /* %e/%f/%#g add 0's for precision, others trim 0's */
-  if (gformat && !pinfo->alt)
-    {
-      while (t > startp && *--t == '0');
-      if (*t != '.')
-        ++t;
-    }
-  else
-    for (; prec--; *t++ = '0');
-
-  if (fmtch == 'e' || fmtch == 'E')
-    {
-      *t++ = fmtch;
-      if (expcnt < 0)
-        {
-          expcnt = -expcnt;
-          *t++ = '-';
-        }
-      else
-        *t++ = '+';
-
-      p = expbuf;
-      do
-        *p++ = '0' + (expcnt % 10);
-      while ((expcnt /= 10) > 9);
-      *p++ = '0' + expcnt;
-      while (p > expbuf)
-	*t++ = *--p;
     }
 
 set_signp:
@@ -426,7 +476,7 @@ set_signp:
         *signp = ' ';
     }
 
-  return (t - startp);
+  return (pfs.out_pz - pfs.start_pz);
 }
 #endif
 
