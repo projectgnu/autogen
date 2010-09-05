@@ -1,6 +1,6 @@
 
 /*
- * Time-stamp:      "2010-07-17 10:10:39 bkorb"
+ * Time-stamp:      "2010-09-05 05:53:20 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -112,6 +112,11 @@ printVersion(tOptions* pOpts, tOptDesc* pOD, FILE* fp)
         exit(EXIT_FAILURE);
     }
 
+    fflush(fp);
+    if (ferror(fp) != 0) {
+        fputs(zOutputFail, stderr);
+        exit(EXIT_FAILURE);
+    }
     exit(EXIT_SUCCESS);
 }
 

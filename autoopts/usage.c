@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2010-07-17 10:43:46 bkorb"
+ * Time-stamp:      "2010-09-05 06:14:15 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -122,9 +122,7 @@ checkGNUUsage(tOptions* pOpts)
  *  information not available to AutoOpts.
 =*/
 void
-optionOnlyUsage(
-    tOptions* pOpts,
-    int       ex_code )
+optionOnlyUsage(tOptions * pOpts, int ex_code)
 {
     tCC* pOptTitle = NULL;
 
@@ -139,6 +137,12 @@ optionOnlyUsage(
     }
 
     printOptionUsage(pOpts, ex_code, pOptTitle);
+
+    fflush(option_usage_fp);
+    if (ferror(option_usage_fp) != 0) {
+        fputs(zOutputFail, stderr);
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -159,9 +163,7 @@ optionOnlyUsage(
  *  and the actual exit code will be "EXIT_SUCCESS".
 =*/
 void
-optionUsage(
-    tOptions* pOptions,
-    int       usage_exit_code )
+optionUsage(tOptions * pOptions, int usage_exit_code)
 {
     int actual_exit_code =
         (usage_exit_code == EX_USAGE) ? EXIT_SUCCESS : usage_exit_code;
@@ -260,7 +262,13 @@ optionUsage(
 
     if (pOptions->pzBugAddr != NULL)
         fprintf(option_usage_fp, zPlsSendBugs, pOptions->pzBugAddr);
+
     fflush(option_usage_fp);
+
+    if (ferror(option_usage_fp) != 0) {
+        actual_exit_code = EXIT_FAILURE;
+        fputs(zOutputFail, stderr);
+    }
 
     exit(actual_exit_code);
 }
@@ -271,10 +279,7 @@ optionUsage(
  *   PER OPTION TYPE USAGE INFORMATION
  */
 static void
-printExtendedUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT )
+printExtendedUsage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT)
 {
     /*
      *  IF there are option conflicts or dependencies,
@@ -469,10 +474,7 @@ printInitList(
 
 
 static void
-printOptPreamble(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT )
+printOptPreamble(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT)
 {
     /*
      *  Flag prefix: IF no flags at all, then omit it.  If not printable
@@ -501,10 +503,7 @@ printOptPreamble(
  *  Print the usage information for a single option.
  */
 static void
-printOneUsage(
-    tOptions*     pOptions,
-    tOptDesc*     pOD,
-    arg_types_t*  pAT )
+printOneUsage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT)
 {
     printOptPreamble(pOptions, pOD, pAT);
 

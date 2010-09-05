@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2010-07-17 10:22:53 bkorb"
+ * Time-stamp:      "2010-09-05 05:58:57 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -470,6 +470,10 @@ optionParseShell(tOptions* pOpts)
     fflush(stdout);
     fchmod(STDOUT_FILENO, 0755);
     fclose(stdout);
+    if (ferror(stdout)) {
+        fputs(zOutputFail, stderr);
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -985,14 +989,17 @@ openOutput(char const* pzFile)
         }
 
         /*
-         *  Check to see if the data contains
-         *  our marker.  If it does, then we will skip over it
+         *  Check to see if the data contains our marker.
+         *  If it does, then we will skip over it
          */
         pzTrailer = pzScan + sizeof(zTrailerMarker) - 1;
         pzLeader  = pzData;
     } while (AG_FALSE);
 
-    freopen(pzFile, "w" FOPEN_BINARY_FLAG, stdout);
+    if (freopen(pzFile, "w" FOPEN_BINARY_FLAG, stdout) != stdout) {
+        fprintf(stderr, zFreopenFail, errno, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -1024,6 +1031,8 @@ genshelloptUsage(tOptions*  pOpts, int exitCode)
         optionUsage(pOpts, exitCode);
     fflush(stderr);
     fflush(stdout);
+    if (ferror(stdout) || ferror(stderr))
+        exit(EXIT_FAILURE);
 
     option_usage_fp = stdout;
 
@@ -1084,6 +1093,12 @@ genshelloptUsage(tOptions*  pOpts, int exitCode)
         int  sts;
         wait(&sts);
     }
+    }
+
+    fflush(stdout);
+    if (ferror(stdout)) {
+        fputs(zOutputFail, stderr);
+        exit(EXIT_FAILURE);
     }
 
     exit(EXIT_SUCCESS);

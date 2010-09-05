@@ -1,3 +1,13 @@
+2010-09-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c: update to current version
+	* autoopts/makeshell.c (optionParseShell): ensure output is written
+	(openOutput): also
+	(genshelloptUsage): also
+	* autoopts/optmain.tpl (option-emitter-proc): ensure the emission worked
+	* autoopts/usage.c: also
+	* autoopts/version.c (printVersion): also
+
 2010-08-22  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/bootstrap.dir (set_defaults): some shells require quotes around

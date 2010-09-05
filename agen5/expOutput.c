@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-08-20 11:28:47 bkorb"
+ *  Time-stamp:        "2010-09-05 05:10:51 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -606,7 +606,7 @@ ag_scm_out_push_new(SCM new_file)
         p = (tFpStack*)AGALOC(sizeof(tFpStack), "out file stack");
         p->pPrev  = pCurFp;
         p->flags  = FPF_FREE;
-        p->pFile  = ag_fmemopen(NULL, (size_t)0, "wb+");
+        p->pFile  = ag_fmemopen(NULL, (ssize_t)0, "wb+");
         pzNewFile = (char*)zMemFile;
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
 

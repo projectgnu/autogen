@@ -2,7 +2,7 @@
 /**
  * \file putshell.c
  *
- * Time-stamp:      "2010-07-17 10:31:37 bkorb"
+ * Time-stamp:      "2010-09-05 06:10:56 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -359,6 +359,8 @@ optionPutShell(tOptions* pOpts)
     if (  ((pOpts->fOptSet & OPTPROC_REORDER) != 0)
        && (pOpts->curOptIdx < pOpts->origArgCt))
         print_reordering(pOpts);
+
+    fflush(stdout);
 }
 
 /*

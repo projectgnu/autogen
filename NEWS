@@ -1,39 +1,19 @@
-New in __CURRENT_VERSION__ November 2008
+New in __CURRENT_VERSION__ September 2010
 
-* fix for root user build
-* without libxml2, the docs cannot be rebuilt.
+* Fix (kill) orphaned shell program
+* add file-next-line functions to facilitate #line "C" directives
+* simplify some snprintfv code
 
-New in 5.10 November 2008
+New in 5.11 July 2010
 
-* "columns" program takes an option for an end-of-output string
-* "autogen" takes a "-MF<dep-file-name>" option producing a dependency
-  file that is carefully engineered to be a little bit older than
-  any other output file.
-* A guile "(string->camelcase)" function has been added.  It removes
-  non-alphanumerics and capitalizes the letter after any removals.
+* implement dependency generation in autogen output.
+* fix up fmemopen()
 
-New in 5.10 - November 2009
+New in 5.10.2 June 2010
 
-* When an option is configured out (via ifdef or ifndef attributes), it is
-  not normally displayed in the usage text. Sometimes, users want to know
-  why the option they supplied is against the law ("illegal"). If the option
-  has the omitted-usage attribute, the extended usage (via "--help") will
-  now show the option name and the text:
+* Fixes for unusual shell programs
 
-    This option has been disabled
+New in 5.10.1 March 2010
 
-  Or, alternately, the text specified with the omitted-usage attribute.
-
-  If the option is specified, the error message will be:
-
-    PROGRAM: The MUMBLE option has been disabled
-
-  followed by the abbreviated usage.
-
-* Option aliasing: Several times it has been necessary to have two different
-  options mean exactly the same thing. Usually, this is a consequence of
-  some sort of historical use. However it came about, the need is
-  there. So, AutoOpts now supports a new option attribute: aliases. This
-  option will be listed in the usage text but will be handled exactly as
-  if the aliased-to option were specified. You probably shouldn't use it
-  unless you have to.
+* Bug fix release
+* Remove guile option code

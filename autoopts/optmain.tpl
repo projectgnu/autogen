@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2010-07-17 10:04:31 bkorb"
+# Time-stamp:      "2010-09-05 06:43:03 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -162,7 +162,10 @@ main(int argc, char** argv)
 
 =]
     (void)optionProcess(&[=(. pname)=]Options, argc, argv);
-    [= (. option-emitter-proc) =](&[=(. pname)=]Options);[=
+    [= (. option-emitter-proc) =](&[=(. pname)=]Options);
+    res = ferror(stdout);
+    if (res != 0)
+        fputs("output error writing to stdout\n", stderr);[=
   ENDIF=]
     return res;
 }
@@ -184,9 +187,9 @@ DEFINE for-each-main            =][=
   (if (not (exist? "handler-proc"))
       (error "'for-each' mains require a handler proc") )
 
-=][=
-(define handler-arg-type "")
-(tpl-file-line extract-fmt)
+  (define handler-arg-type "")
+  (tpl-file-line extract-fmt)
+
 =]
 #include <sys/types.h>
 #include <sys/stat.h>

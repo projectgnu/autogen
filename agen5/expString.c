@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2010-08-06 08:59:04 bkorb"
+ *  Time-stamp:        "2010-09-05 06:24:42 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -47,11 +47,7 @@ do_substitution(
     scm_sizet *  pResLen );
 
 static void
-do_multi_subs(
-    char**      ppzStr,
-    scm_sizet*  pStrLen,
-    SCM         match,
-    SCM         repl );
+do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl);
 /* = = = END-STATIC-FORWARD = = = */
 
 static size_t
@@ -389,11 +385,7 @@ do_substitution(
  *  The "match" and "repl" trees *must* be identical in structure.
  */
 static void
-do_multi_subs(
-    char**      ppzStr,
-    scm_sizet*  pStrLen,
-    SCM         match,
-    SCM         repl )
+do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl)
 {
     char* pzStr = *ppzStr;
     char* pzOri = pzStr;
@@ -1061,16 +1053,16 @@ ag_scm_c_string(SCM str)
 SCM
 ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
 {
-    unsigned char map[ 1 << 8 /* bits-per-byte */ ];
-    int   i      = sizeof(map) - 1;
+    unsigned char ch_map[ 1 << 8 /* bits-per-byte */ ];
+    int   i      = sizeof(ch_map) - 1;
     char* pzFrom = ag_scm2zchars(from_xform, "string");
     char* pzTo   = ag_scm2zchars(to_xform, "string");
 
     do  {
-        map[i] = i;
+        ch_map[i] = i;
     } while (--i > 0);
 
-    for (;i <= sizeof(map) - 1;i++) {
+    for (;i <= sizeof(ch_map) - 1;i++) {
         unsigned char fch = (unsigned char)*(pzFrom++);
         unsigned char tch = (unsigned char)*(pzTo++);
 
@@ -1091,7 +1083,7 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
                 unsigned char te = (unsigned char)pzTo[0];
                 if (te != NUL) {
                     while (fs < fe) {
-                        map[ fs++ ] = ts;
+                        ch_map[ fs++ ] = ts;
                         if (ts < te) ts++;
                     }
                     break;
@@ -1099,14 +1091,14 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
             }
 
         default:
-            map[ fch ] = tch;
+            ch_map[ fch ] = tch;
         }
     } mapDone:;
 
     pzTo = (char*)(void*)AG_SCM_CHARS(str);
     i    = AG_SCM_STRLEN(str);
     while (i-- > 0) {
-        *pzTo = map[ (int)*pzTo ];
+        *pzTo = ch_map[ (int)*pzTo ];
         pzTo++;
     }
     return str;

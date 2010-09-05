@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-08-06 09:17:41 bkorb"
+ *  Time-stamp:        "2010-09-05 06:19:10 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -474,6 +474,7 @@ extern size_t strlcpy( char* dest, char const* src, size_t n);
  */
 #ifdef ENABLE_FMEMOPEN
 extern FILE * ag_fmemopen(void *buf, ssize_t len, char const *mode);
+extern int    ag_fmemioctl(FILE * fp, int req, ...);
 #endif
 
 #include "proto.h"

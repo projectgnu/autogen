@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-08-20 12:59:32 bkorb"
+ * Time-stamp:      "2010-09-05 06:16:27 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -18,14 +18,11 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the author nor the name of any other contributor
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -57,21 +54,36 @@
  * - See the man page.
  */
 
-#if defined(__linux) && ! defined(_GNU_SOURCE)
-#  define _GNU_SOURCE
+#if defined(__linux)
+#  if ! defined(_GNU_SOURCE)
+#    define _GNU_SOURCE
+#  endif
+
+#  define HAVE_FOPENCOOKIE 1
+#  undef  HAVE_FUNOPEN
 #endif
 
+#ifdef  _NETBSD_SOURCE
+#  undef  HAVE_FOPENCOOKIE
+#  define HAVE_FUNOPEN 1
+#endif
+
+#include <sys/ioctl.h>
 #include <sys/types.h>
+
 #include <fcntl.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #if defined(HAVE_FOPENCOOKIE)
 #  if defined(HAVE_LIBIO_H)
 #    include <libio.h>
 #  endif
+
    typedef off64_t * seek_off_t;
    typedef int       seek_ret_t;
 #  define FOPENCOOKIE_INTERFACE  1
@@ -95,6 +107,29 @@
    Choke Me.
 #endif
 
+#ifndef NUL
+# define NUL '\0'
+#endif
+
+typedef enum {
+    FMEMC_INVALID       = 0,
+    FMEMC_GET_BUF_ADDR
+} fmemctl_t;
+
+#define FMEMC_IOCTL_BASE  'm'
+
+typedef struct {
+    enum { FMEMC_GBUF_LEAVE_OWNERSHIP,
+           FMEMC_GBUF_TAKE_OWNERSHIP
+    }          own;
+    char *     buffer;
+    size_t     buf_size;
+    size_t     eof;
+} fmemc_get_buf_addr_t;
+
+#define IOCTL_FMEMC_GET_BUF_ADDR \
+    _IOWR(FMEMC_IOCTL_BASE, FMEMC_GET_BUF_ADDR, fmemc_get_buf_addr_t)
+
 #define PROP_TABLE \
 _Prop_( read,       "Read from buffer"        ) \
 _Prop_( write,      "Write to buffer"         ) \
@@ -104,10 +139,6 @@ _Prop_( create,     "allocate the string"     ) \
 _Prop_( truncate,   "start writing at start"  ) \
 _Prop_( allocated,  "we allocated the buffer" ) \
 _Prop_( fixed_size, "writes do not append"    )
-
-#ifndef NUL
-# define NUL '\0'
-#endif
 
 #define _Prop_(n,s)   BIT_ID_ ## n,
 typedef enum { PROP_TABLE BIT_CT } fmem_flags_e;
@@ -129,6 +160,15 @@ struct fmem_cookie_s {
                                    Future architectures allow it to vary
                                    by memory region. */
 };
+
+typedef struct {
+    FILE *          fp;
+    fmem_cookie_t * cookie;
+} cookie_fp_map_t;
+
+static cookie_fp_map_t const * map    = NULL;
+static unsigned int            map_ct = 0;
+static unsigned int            map_alloc_ct = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
@@ -164,12 +204,12 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len);
  * Convert a mode string into mode bits.
  */
 static int
-fmem_getmode(char const *pMode, mode_bits_t *pRes)
+fmem_getmode(char const * mode, mode_bits_t * pRes)
 {
-    if (pMode == NULL)
+    if (mode == NULL)
         return 1;
 
-    switch (*pMode) {
+    switch (*mode) {
     case 'a': *pRes = FLAG_BIT(write) | FLAG_BIT(append);
               break;
     case 'w': *pRes = FLAG_BIT(write) | FLAG_BIT(truncate);
@@ -180,12 +220,12 @@ fmem_getmode(char const *pMode, mode_bits_t *pRes)
     }
 
     /*
-     *  If someone wants to supply a "wxxbxbbxbb+" pMode string, I don't care.
+     *  If someone wants to supply a "wxxbxbbxbb+" mode string, I don't care.
      */
     for (;;) {
-        switch (*++pMode) {
+        switch (*++mode) {
         case '+': *pRes |= FLAG_BIT(read) | FLAG_BIT(write);
-                  if (pMode[1] != NUL)
+                  if (mode[1] != NUL)
                       return EINVAL;
                   break;
         case NUL: break;
@@ -400,7 +440,20 @@ fmem_seek(void * cookie, seek_off_t offset, int dir)
 static int
 fmem_close(void * cookie)
 {
-    fmem_cookie_t * pFMC = cookie;
+    fmem_cookie_t   * pFMC = cookie;
+    cookie_fp_map_t * pmap = (void *)map;
+    unsigned int      mct  = map_ct;
+
+    while (mct-- != 0) {
+        if (pmap->cookie == cookie) {
+            *pmap = map[--map_ct];
+            break;
+        }
+        pmap++;
+    }
+
+    if (mct > map_ct)
+        errno = EINVAL;
 
     if (pFMC->mode & FLAG_BIT(allocated))
         free(pFMC->buffer);
@@ -519,11 +572,11 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *
  *  If @var{buf} is @code{NULL}, then a buffer is allocated.  The initial
  *  allocation is @var{len} bytes.  If @var{len} is less than zero, then the
- *  buffer will not be reallocated if more space is needed.  Any allocated
+ *  buffer will be reallocated as more space is needed.  Any allocated
  *  memory is @code{free()}-ed when @code{fclose(3C)} is called.
  *
  *  If @code{buf} is not @code{NULL}, then @code{len} must not be zero.
- *  It may still be less than zero to indicate that the buffer is not to
+ *  It may still be less than zero to indicate that the buffer may
  *  be reallocated.
  *
  *  The mode string is interpreted as follows.  If the first character of
@@ -557,7 +610,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *  The I/O is marked as "binary" and a trailing NUL will not be inserted
  *  into the buffer.  Without this mode flag, one will be inserted after the
  *  @code{EOF}, if it fits.  It will fit if the buffer is extensible (the
- *  provided @var{len} was not negative).  This mode flag has no effect if
+ *  provided @var{len} was negative).  This mode flag has no effect if
  *  the buffer is opened in read-only mode.
  *
  *  @item x
@@ -568,14 +621,14 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *  Any other letters following the inital 'a', 'w' or 'r' will cause an error.
 =*/
 FILE *
-ag_fmemopen(void *buf, ssize_t len, char const *pMode)
+ag_fmemopen(void * buf, ssize_t len, char const * mode)
 {
     fmem_cookie_t *pFMC;
 
     {
-        mode_bits_t mode;
+        mode_bits_t bits;
 
-        if (fmem_getmode(pMode, &mode) != 0) {
+        if (fmem_getmode(mode, &bits) != 0) {
             return NULL;
         }
 
@@ -585,7 +638,7 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
             return NULL;
         }
 
-        pFMC->mode = mode;
+        pFMC->mode = bits;
     }
 
     /*
@@ -593,16 +646,17 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
      *  a negative size implies fixed size buffer and a NULL
      *  buffer pointer means we must allocate (and free) it.
      */
-    if (len < 0) {
-        len = -len;
-        pFMC->mode |= FLAG_BIT(fixed_size);
-    }
-
-    else
+    if (len <= 0) {
         /*
          *  We only need page size if we might extend an allocation.
          */
+        len = -len;
         pFMC->pg_size = getpagesize();
+    }
+
+    else {
+        pFMC->mode |= FLAG_BIT(fixed_size);
+    }
 
     if (buf != NULL) {
         if (! fmem_config_user_buf(pFMC, buf, len))
@@ -626,6 +680,8 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
 #endif
 
     {
+        FILE * res;
+
         cookie_read_function_t* pRd = (pFMC->mode & FLAG_BIT(read))
             ?  (cookie_read_function_t*)fmem_read  : NULL;
         cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
@@ -638,11 +694,105 @@ ag_fmemopen(void *buf, ssize_t len, char const *pMode)
         iof.seek  = fmem_seek;
         iof.close = fmem_close;
 
-        return fopencookie(pFMC, pMode, iof);
+        res = fopencookie(pFMC, mode, iof);
 #else
-        return funopen(pFMC, pRd, pWr, fmem_seek, fmem_close);
+        res = funopen(pFMC, pRd, pWr, fmem_seek, fmem_close);
 #endif
+        if (res == NULL)
+            return res;
+
+        if (++map_ct >= map_alloc_ct) {
+            void * p = (map_alloc_ct > 0)
+                ? realloc((void *)map, (map_alloc_ct += 4) * sizeof(*map))
+                : malloc((map_alloc_ct = 4) * sizeof(*map));
+
+            if (p == NULL) {
+                fclose(res);
+                errno = ENOMEM; /* "fclose" set it to "EINVAL". */
+                return NULL;
+            }
+
+            map = p;
+        }
+
+        {
+            cookie_fp_map_t * p = (void *)(map + map_ct - 1);
+            p->fp = res;
+            p->cookie = pFMC;
+        }
+
+        return res;
     }
+}
+
+/*=export_func ag_fmemioctl
+ *
+ *  what:  perform an ioctl on a FILE* descriptor
+ *
+ *  arg: + FILE* + fp      + file pointer  +
+ *  arg: + int   + req     + ioctl command +
+ *  arg: + ...   + varargs + arguments for command +
+ *
+ *  ret-type:  int
+ *  ret-desc:  zero on success, otherwise error in errno
+ *
+ *  err:  errno is set to @code{EINVAL} or @code{ENOSPC}.
+ *
+ *  doc:
+ *
+ *  The file pointer passed in must have been returned by ag_fmemopen.
+=*/
+int
+ag_fmemioctl(FILE * fp, int req, ...)
+{
+    fmem_cookie_t * cookie;
+    fmemc_get_buf_addr_t * gba;
+
+    switch (req) {
+    case IOCTL_FMEMC_GET_BUF_ADDR:
+        break;
+
+    default:
+        /*
+         *  It is not any of the IOCTL commands we know about.
+         */
+        errno = EINVAL;
+        return -1;
+    }
+
+    {
+        cookie_fp_map_t const * pmap = map;
+        unsigned int mct  = map_ct;
+
+        for (;;) {
+            if (mct-- == 0) {
+                /*
+                 *  fmemopen didn't create this FILE*, so it is invalid.
+                 */
+                errno = EINVAL;
+                return -1;
+            }
+            if (pmap->fp == fp)
+                break;
+            pmap++;
+        }
+
+        cookie = pmap->cookie;
+    }
+
+    {
+        va_list ap;
+        va_start(ap, req);
+        gba = va_arg(ap, fmemc_get_buf_addr_t *);
+        va_end(ap);
+    }
+
+    gba->buffer   = (char *)(cookie->buffer);
+    gba->buf_size = cookie->buf_size;
+    gba->eof      = cookie->eof;
+    if (gba->own != FMEMC_GBUF_LEAVE_OWNERSHIP)
+        cookie->mode &= ~FLAG_BIT(allocated);
+    return 0;
 }
 
 #endif /* ENABLE_FMEMOPEN */

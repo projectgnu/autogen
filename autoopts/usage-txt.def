@@ -185,6 +185,10 @@ utxt = { ut-name = ForkFail;
          ut-text = "fs error %d (%s) on fork - cannot obtain %s usage\n";
 };
 
+utxt = { ut-name = FreopenFail;
+         ut-text = "fs error %d (%s) on freopen\n";
+};
+
 utxt = { ut-name = FSErrOptLoad;
          ut-text = "File error %d (%s) opening %s for loading options\n";
 };
@@ -419,6 +423,10 @@ utxt = { ut-name = OnlyOne;
 
 utxt = { ut-name = OptsOnly;
          ut-text = "All arguments are named options.\n";
+};
+
+utxt = { ut-name = OutputFail;
+         ut-text = "Write failure to output file";
 };
 
 utxt = { ut-name = PathFmt;
