@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-10 16:47:54 bkorb"
+## Time-stamp:      "2010-09-26 15:19:18 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -40,7 +40,7 @@ AG_ENV          = top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
   PATH=`cd ../columns;pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH
 
-run_AG = $(AGexe) -MF$@ -L$(top_srcdir)/autoopts \
+run_AG = $(AGexe) -MF$@ -L$(top_srcdir)/autoopts/tpl \
 	--definition=$(srcdir)/xmlopts.def
 
 all 	    : gen

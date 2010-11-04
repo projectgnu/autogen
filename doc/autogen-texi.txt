@@ -2038,7 +2038,7 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 @menu
 * Features::            AutoOpts Features
 * Licensing::           AutoOpts Licensing
-* Caveats::             Cautionary Notes
+* Caveats::             Developer and User Notes
 * Quick Start::         Quick Start
 * Option Definitions::  Option Definitions
 * AutoOpts API::        Programmatic Interface
@@ -2265,6 +2265,49 @@ View the @file{libopts/README} file for further integration information.
 @node Caveats
 @section Cautionary Notes
 
+AutoOpts has its conventional way of displaying option information
+that includes somewhat more information that the standard GNU method.
+AutoOpts will also print out a line of usage text for each option type
+when options are misspecified.  GNU programs typically do not do this.
+These defaults can be changed on a per-program basis by adding either
+or both of the following in the option definition file:
+
+@example
+gnu-usage;
+no-misuse-usage;
+@end example
+
+Users may also override these settings with the @code{AUTOOPTS_USAGE}
+environment variable.  It may be set to a comma or white space separated
+list of the following strings:
+
+@table @samp
+@item gnu
+@cindex gnu
+The format of the extended usage text will be displayed in GNU-normal form.
+
+@item autoopts
+@cindex autoopts
+The format of the extended usage will be in AutoOpts' native layout.
+
+@item no-misuse-usage
+@cindex no-misuse-usage
+When an option error is made on the command line, the abbreviated
+usage text will be suppressed.
+
+@item misuse-usage
+@cindex misuse-usage
+When an option error is made on the command line, the abbreviated
+usage text will be shown.
+@end table
+
+@noindent
+The setting used is the last one seen.  The @code{autoopts} and
+@code{misuse-usage} serve no purpose, unless the definition file
+entries were specified as above.
+
+@b{Note for developers}:
+
 The templates used to implement AutoOpts depend heavily upon
 token pasting.  That mens that if you name an option, ``debug'', for
 example, the generated header will expect to be able to emit
@@ -2280,6 +2323,7 @@ that something else will be in the above expansion.
 If you discover you are having strange problems like this,
 you may wish to use some variation of the @code{guard-option-names}
 @xref{program attributes}.
+
 
 @c === SECTION MARKER
 
@@ -5281,7 +5325,7 @@ both allow for hierarchical values.
 * config name/string-value::    assigning a string value to a configurable
 * config integer-values::       integer values
 * config nested-values::        hierarchical values
-* config sections::             configuration file sections
+* config directives::           configuration file directives
 * config comments::             comments in the configuration file
 @end menu
 
@@ -5375,11 +5419,14 @@ formatting, specifying a type that is shorter and easier to spell:
 The ellipsis may be filled with any legal configuration file name/value
 assignments.
 
-@node config sections
-@subsection configuration file sections
+@node config directives
+@subsection configuration file directives
+@cindex autoopts directives
 
-Configuration files may be sectioned.
-@cindex sectioned config file
+The @code{<?} marker indicates an XML directive.
+There is only one directive supported:  program sectioning,
+though two syntaxes are supported.
+
 If, for example, you have a collection of programs that work closely
 together and, likely, have a common set of options, these programs may use a
 single, sectioned, configuration file.  The file may be sectioned in either
@@ -5388,20 +5435,15 @@ file.  All text before the first segmentation line is processed, then only
 the segment that applies:
 
 @table @samp
-@item [PROG_NAME]
-The file is partitioned by lines that contains an square open bracket
-(@code{[}), the @strong{upper-cased} c-variable-syntax program name
-and a square close bracket (@code{]}).
-For example, if the @command{prog-name} program had a sectioned
-configuration file, then a line containing exactly @samp{[PROG_NAME]}
-would be processed.
-
 @item <?program prog-name>
 The @code{<?} marker indicates an XML directive.
-The @code{program} directive is interpreted by the configuration file
-processor to segment the file in the same way as the @samp{[PROG_NAME]}
-sectioning is done.  Any other XML directives are treated as comments.
+The file is partitioned by these lines and the options are processed
+for the @code{prog-name} program only before the first @code{<?program}
+directive and the program section with a matching program name.
 
+@item [PROG_NAME]
+This is basically an alias for @code{<?program prog-name>}, except that
+the program name must be upper cased and segmented only with underscores.
 @end table
 
 @noindent

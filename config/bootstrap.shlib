@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-16 16:39:34 bkorb"
+# Time-stamp:        "2010-10-02 15:52:55 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -89,6 +89,9 @@ test -n "${BASH_VERSION}" || {
 
 test -z "${BASH_VERSION}" && local() { : ; }
 # Setup run_ag
+tpl_dir=$(\cd ${top_srcdir}/autoopts/tpl && pwd -P)
+typeset -r tpl_dir
+
 if ${VERBOSE}
 then
     # vgopts='--suppressions=/old-home/bkorb/ag/valgrind.conf --leak-check=yes'
@@ -98,13 +101,11 @@ then
     {
         local tag=${1} ; shift
         # local vgfile=/tmp/vglog/${tag}-%p.txt
-        local PS4='>run-ag> '
         local tfile='>>'ag-${tag}-$$.log
         tag="-MFstamp-${tag} --trace=every --trace-out=${tfile}"
 
         MALLOC_CHECK_=2 \
-            ${AGexe} ${tag} "$@" || \
-            die "FAILED: ${AGexe} $*"
+            ${AGexe} -L${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
     }
 else
     run_ag()
@@ -112,8 +113,8 @@ else
         # local vgfile=/tmp/vglog/${1}-%p.txt
         local tag="-MFstamp-${1}" ; shift
 
-        echo ${AGexe} ${tag} "$@"
-        ${AGexe} ${tag} "$@" || die "FAILED: ${AGexe} $*"
+        echo ${AGexe} -L${tpl_dir} ${tag} "$@"
+        ${AGexe} -L${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
     }
 fi
 
@@ -133,7 +134,6 @@ export setx dashx VERBOSE nl
 #
 make_opts()
 {
-    local PS4=">${FUNCNAME}> "
     # Make the option processing files:
     #
     if [ -z "${AGexe}" ]
@@ -143,7 +143,7 @@ make_opts()
       if [ -f opts.h ] && [ -f opts.c ]
       then exit 0 ; else exit 1 ; fi
     fi
-    run_ag opts -L ${top_srcdir}/autoopts ${DEBUG_OPTS} *opts.def
+    run_ag opts ${DEBUG_OPTS} *opts.def
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -153,7 +153,6 @@ make_opts()
 #
 make_proto()
 {
-    local PS4=">${FUNCNAME}> "
     rm -f proto.h
     exec 5> proto.h
 

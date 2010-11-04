@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-07-25 08:58:37 bkorb"
+# Time-stamp:        "2010-09-07 17:35:48 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -32,6 +32,7 @@ die()
   echo
   cat ${LOG_FILE}
   trap : EXIT
+  echo leaving ${tmp_dir} in place
   kill -TERM ${parent_pid}
   exit 1
 }
@@ -211,8 +212,21 @@ sanity_check
 run_getdefs
 
 env >&2
-opts="-t${timer} -L${srcdir} -L${top_srcdir} -L${top_srcdir}/autoopts"
-opts="--base=${GEN_BASE} ${opts}"
+exec 3> ${tmp_dir}/ag.ini
+cat >&3 <<- _EOF_
+	timeout     ${timer}
+	templ-dirs  ${srcdir}
+	templ-dirs  ${top_srcdir}
+	templ-dirs  ${top_srcdir}/autoopts
+	base-name   ${GEN_BASE}
+	_EOF_
+${VERBOSE} && {
+  echo 'trace       every'
+  echo "trace-out   >>${tmp_dir}/ag.log"
+} >&3
+exec 3>&-
+
+opts=--load-opts=${tmp_dir}/ag.ini
 cmd=`echo "${cmd}" ${opts} ${tmp_dir}/${GEN_BASE}.def`
 echo "${PS4:-+} " ${cmd} >&8
 

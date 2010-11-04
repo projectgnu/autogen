@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-17 09:50:50 bkorb"
+## Time-stamp:      "2010-09-26 18:43:44 bkorb"
 ## Copyright (c):   1992-2010 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -32,7 +32,7 @@ columns_LDADD   = $(LO_LIB) $(LIBGUILE_LIBS)
 BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
 
-RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts -bcolumns -MF$@
+RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl -bcolumns -MF$@
 man_MANS        = columns.1
 
 INCLUDES        = @INCLIST@

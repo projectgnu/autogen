@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-09-05 06:16:27 bkorb"
+ * Time-stamp:      "2010-09-07 17:49:08 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -172,7 +172,7 @@ static unsigned int            map_alloc_ct = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
-fmem_getmode(char const *pMode, mode_bits_t *pRes);
+fmem_getmode(char const * mode, mode_bits_t * pRes);
 
 static int
 fmem_extend(fmem_cookie_t *pFMC, size_t new_size);

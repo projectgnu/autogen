@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2010-07-17 10:25:53 bkorb"
+ *  Time-stamp:      "2010-11-02 11:33:08 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -43,10 +43,17 @@ handleConfig(
     char*         pzText,
     int           direction );
 
-static char*
-handleDirective(
-    tOptions*     pOpts,
-    char*         pzText );
+static char *
+handle_directive(tOptions * pOpts, char * pzText);
+
+static void
+set_usage_flags(tOptions * opts, char const * flg_txt);
+
+static char *
+aoflags_directive(tOptions * pOpts, char * pzText);
+
+static char *
+program_directive(tOptions * pOpts, char * pzText);
 
 static char*
 handleProgramSection(
@@ -453,7 +460,7 @@ filePreset(
 
             else switch (pzFileText[1]) {
             case '?':
-                pzFileText = handleDirective(pOpts, pzFileText);
+                pzFileText = handle_directive(pOpts, pzFileText);
                 break;
 
             case '!':
@@ -591,42 +598,72 @@ handleConfig(
 }
 
 
-/*  handleDirective
+/*  handle_directive
  *
  *  "pzText" points to a "<?" sequence.
- *  For the moment, we only handle "<?program" directives.
+ *  We handle "<?program" and "<?auto-options" directives.
  */
-static char*
-handleDirective(
-    tOptions*     pOpts,
-    char*         pzText )
+static char *
+handle_directive(tOptions * pOpts, char * pzText)
 {
-    char   ztitle[32] = "<?";
     size_t title_len = strlen(zProg);
-    size_t name_len;
 
-    if (  (strncmp(pzText+2, zProg, title_len) != 0)
-       || (! IS_WHITESPACE_CHAR(pzText[title_len+2])) )  {
-        pzText = strchr(pzText+2, '>');
-        if (pzText != NULL)
-            pzText++;
-        return pzText;
+    if (  (strncmp(pzText+2, zProg, title_len) == 0)
+       && (! IS_VALUE_NAME_CHAR(pzText[title_len+2])) )
+        return program_directive(pOpts, pzText);
+
+    title_len = strlen(zAO_Flags);
+
+    if (  (strncmp(pzText+2, zAO_Flags, title_len) == 0)
+       && (! IS_VALUE_NAME_CHAR(pzText[title_len+2])) )
+        return aoflags_directive(pOpts, pzText);
+
+    pzText = strchr(pzText+2, '>');
+    if (pzText != NULL)
+        pzText++;
+    return pzText;
+}
+
+static void
+set_usage_flags(tOptions * opts, char const * flg_txt);
+
+static char *
+aoflags_directive(tOptions * pOpts, char * pzText)
+{
+    char * pz = (pzText += strlen(zAO_Flags) + 2);
+
+    while (IS_WHITESPACE_CHAR(*++pz))  ;
+    pzText = strchr(pz, '>');
+    if (pzText != NULL) {
+
+        size_t len  = pzText - pz;
+        char * ftxt = AGALOC(len + 1, "aoflags");
+        memcpy(ftxt, pz, len);
+        ftxt[len] = NUL;
+        set_usage_flags(pOpts, ftxt);
+        AGFREE(ftxt);
+        pzText++;
     }
 
-    name_len = strlen(pOpts->pzProgName);
-    strcpy(ztitle+2, zProg);
-    title_len += 2;
+    return pzText;
+}
+
+static char *
+program_directive(tOptions * pOpts, char * pzText)
+{
+    char * ttl;
+    size_t ttl_len = asprintf(&ttl, "<?%s ", pOpts->pzProgName);
+    char   ztitle[32] = "<?";
+    size_t name_len = strlen(pOpts->pzProgName);
 
     do  {
-        pzText += title_len;
+        pzText += ttl_len;
+        while (IS_WHITESPACE_CHAR(*++pzText))  ;
 
-        if (IS_WHITESPACE_CHAR(*pzText)) {
-            while (IS_WHITESPACE_CHAR(*++pzText))  ;
-            if (  (strneqvcmp(pzText, pOpts->pzProgName, (int)name_len) == 0)
-               && (pzText[name_len] == '>'))  {
-                pzText += name_len + 1;
-                break;
-            }
+        if (  (strneqvcmp(pzText, pOpts->pzProgName, (int)name_len) == 0)
+           && (pzText[name_len] == '>'))  {
+            pzText += name_len + 1;
+            break;
         }
 
         pzText = strstr(pzText, ztitle);

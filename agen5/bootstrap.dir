@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-08-22 11:22:29 bkorb"
+# Time-stamp:        "2010-10-02 15:26:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -33,9 +33,7 @@
 #  deal with the dual update problem.
 
 test "X${mainpid}" = X && {
-    PS4='>bsl> '
     . ${top_srcdir}/config/bootstrap.shlib
-    PS4='>bsd> '
     free_trap=true
 } || {
     free_trap=false
@@ -67,7 +65,6 @@ set_exe_var()
 
 set_defaults()
 {
-    local PS4=">${FUNCNAME}> "
     local f
 
     #  If the argument is "recursive", then we are bootstrapping.
@@ -154,7 +151,6 @@ set_defaults()
 #
 make_parse()
 {
-    local PS4=">${FUNCNAME}> "
     local opts=''
 
     test ${#DEBUG_ENABLED} -gt 0 && \
@@ -169,8 +165,6 @@ make_parse()
 #
 make_fsm()
 {
-    local PS4=">${FUNCNAME}> "
-
     run_ag pseudo pseudo.def
     run_ag cgi    cgi.def
     rm -f .fsm.*
@@ -180,9 +174,10 @@ make_fsm()
 #
 # Make the expression processing code
 #
+# NOTE: the expr.test test extracts this function!!
+#
 make_exprini()
 {
-    local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" -o -z "${GDexe}" && \
         die "Cannot locate columns or getdefs"
 
@@ -223,7 +218,6 @@ make_exprini()
 #
 make_directive()
 {
-    local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" && die "Cannot locate columns"
 
     cat > directive.cfg <<- _EOConfig_
@@ -244,10 +238,9 @@ make_directive()
 #
 make_texi()
 {
-    local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" && die "Cannot locate columns"
 
-    eopt="-L${top_srcdir}/autoopts -Taginfo -DLEVEL=chapter -bautogen"
+    eopt="-Taginfo -DLEVEL=chapter -bautogen"
     run_ag texi ${eopt} ${srcdir}/opts.def
 }
 
@@ -257,20 +250,17 @@ make_texi()
 #
 make_man()
 {
-    local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" && die "Cannot locate columns"
 
-    eopt="-L ${top_srcdir}/autoopts"
-    run_ag man ${eopt} -Tagman1 -bautogen ${srcdir}/opts.def
+    run_ag man -Tagman1 -bautogen ${srcdir}/opts.def
 
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
-    run_ag fmem ${eopt} fmemopen.def
+    run_ag fmem fmemopen.def
     rmlist=${rmlist}\ fmemopen.def
 }
 
 make_func()
 {
-    local PS4=">${FUNCNAME}> "
     test -z "${CLexe}" -o -z "${GDexe}" && \
         die "Cannot locate columns or getdefs"
 

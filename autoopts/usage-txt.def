@@ -66,6 +66,10 @@ utxt = { ut-name = AO_Err;
             "\t%s called AutoOpts function with structure version %d:%d:%d.\n";
 };
 
+utxt = { ut-name = AO_Flags;
+         ut-text = "auto-options";
+};
+
 utxt = { ut-name = AO_Sml;
          ut-text = "\tThis is less than the minimum library version:  ";
 };

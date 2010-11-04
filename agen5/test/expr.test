@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2010-07-10 11:39:16 bkorb"
+# Time-stamp:      "2010-09-28 05:10:26 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -25,32 +25,36 @@
 # ----------------------------------------------------------------------
 
 . ./defs
-PS4='>expr> '
 
 # # # # # # # TEMPLATE & DEFINITIONS FILES # # # # # # # # #
 #
 #  We construct this by pulling down the sources from the
 #  AutoGen source directory.  We will also copy out the same
 #  commands as are used there.  ${top_srcdir} is a full path.
-mkdir ${testname}.d
+mkdir ${TMPDIR}
 cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
-   ${top_srcdir}/agen5/func*.c ${testname}.d/.
+   ${top_srcdir}/agen5/func*.c ${TMPDIR}/.
 f=`fgrep '#ifdef DEBUG_ENABLED' ${top_srcdir}/agen5/expr.ini`
 test -n "$f" && {
     DEBUG_ENABLED=true
     export DEBUG_ENABLED
 }
 
-exec 3> ${testname}.d/${testname}.sh
+exec 3> ${TMPDIR}/${testname}.sh
 cat  >&3 <<- _EOF_
 	GDexe=${GDexe}
 	CLexe=${CLexe}
-	export GDexe CLexe
+	srcdir=`pwd`
+	export GDexe CLexe srcdir
+	cd ${TMPDIR}
+	set -e
 	_EOF_
 
 if ${VERBOSE}
 then
     cat  >&3 <<- _EOF_
+	PS4='>${testname}-\${FUNCNAME-mkexp}> '
+	set -x
 	run_ag()
 	{
 	    tfile=ag-\${1}-$$.log
@@ -71,19 +75,18 @@ else
 	_EOF_
 fi
 
-sed -n '/^make_exprini()/,/^[}]/p' \
-    ${top_srcdir}/agen5/bootstrap.dir | \
-      sed '1,/local PS4=/d;/^[}]$/d' >&3
+sed -n '/^make_exprini()/,/^[}]$/p' ${top_srcdir}/agen5/bootstrap.dir >&3
+cat >&3 <<- _EOF_
+	make_exprini
+	sed '/DO NOT EDIT/,/and the template/d' expr.ini > \${srcdir}/expr.res
+	sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
+	    > \${srcdir}/expr.base
+	_EOF_
 exec 3>&-
 
 #  Remove the lines that *will* be different, always...
 #
-( 
- cd ${testname}.d ; srcdir=. PS4=">${testname}-x> " \
-    ${SHELL} -x ./${testname}.sh )
-sed '/DO NOT EDIT/,/and the template/d' ${testname}.d/expr.ini > expr.res
-sed '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
-    > expr.base
+${SHELLX} ${TMPDIR}/${testname}.sh || failure "${testname}.sh failed"
 
 test -s expr.res || \
   failure "${testname} test produced no output"

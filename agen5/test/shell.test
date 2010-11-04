@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2010-06-26 16:04:28 bkorb"
+# Time-stamp:        "2010-09-07 17:33:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -147,6 +147,7 @@ then
 	the environment.  This is a known breakage on some platforms
 	(viz., BSD derivatives).  Sorry.
 	_EOF_
+    ${FGREP} 'SHELL=' ${testname}.test >&9
     cleanup
     exit 0
   fi

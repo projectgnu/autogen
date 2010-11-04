@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-07-18 11:01:17 bkorb"
+# Time-stamp:     "2010-11-04 13:27:02 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,7 +29,7 @@
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`
 test_name=`echo ${testname} | sed 's/-/_/g'`
-PS4=">${testname}> "
+PS4=">${testname}-\${FUNCNAME}> "
 export progname testname
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -79,7 +79,6 @@ unset $vars
 #
 purge()
 {
-  local PS4='>purge>'
   rm -rf ${*} 2>/dev/null
   bad=''
   for f
@@ -99,17 +98,15 @@ purge()
 }
 
 set_exe() {
-  local PS4='>set_exe>'
   eval f=\${${1}}
   d=`dirname $f`
   d=`cd $d >/dev/null && pwd`
   PATH=${d}:${PATH}
   f=`basename $f`
-  eval ${1}=${d}/${f}
+  eval export ${1}=${d}/${f}
 }
 
 init_tests() {
-    local PS4='>ini>'
     logfile=`pwd`/testdir/${testname}.log
     exec 8>&2 1>${logfile} 2>&1
     set -x
@@ -183,7 +180,7 @@ be_silent()
         local tfile=${testname}-aglog-${1}-$$.log
         shift
 
-        ${AGexe} -m "$@"
+        ${AGexe} -L ${top_srcdir}/autoopts/tpl -m "$@"
     }
 
     init_tests
@@ -203,9 +200,10 @@ be_verbose()
         # valgrind ${vgopts} --log-file=${vgfile} \
         local tfile=${testname}-aglog-${1}-$$.log
         shift
+        local tr="--trace=every --trace-out='>>${tfile}'"
 
         MALLOC_CHECK_=2 \
-            ${AGexe} -m --trace=every --trace-out=">>${tfile}" "$@"
+            ${AGexe} -L ${top_srcdir}/autoopts/tpl -m ${tr} "$@"
     }
 
     init_tests
@@ -215,7 +213,6 @@ be_verbose()
 #
 failure()
 {
-  local PS4='>fail>'
   ${setx}
   cd ${testsubdir}
   if test -d ../FAILURES
@@ -246,7 +243,6 @@ cleanup()
 
 compile()
 {
-  local PS4='>cc>'
   ${setx}
   test "X${Csrc}"  = "X" && Csrc="${testname}"
   test "X${Cexe}"  = "X" && Cexe="${Csrc}"
@@ -259,8 +255,11 @@ compile()
 
   if test $# -gt 0
   then
-    ./${Cexe} ${*} > ${Csrc}.help || \
+    if test "X${sedcmd}" = "X"
+    then ./${Cexe} ${*} ${dosed} || \
       failure cannot obtain help output for ${Csrc}
+    else ./${Cexe} ${*} ${dosed} | sed "${sedcmd}"
+    fi > ${Csrc}.help    
   fi
   Csrc='' Cexe='' Dnam=''
 }

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ## mkgnudoc.sh --   create a native package
-## Time-stamp:      "2010-07-21 18:03:04 bkorb"
+## Time-stamp:      "2010-09-05 07:29:53 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -111,7 +111,8 @@ body-end -i TAG */*.html
  tar cf - ${pkg}*.html | gzip --best > ${pkg}_node_html.tar.gz )
 
 
-autogen --base-name=${pkg} -T ${pkgsrcdir}/gnudoc.tpl - <<- _EODefs_
+autogen --trace-out=/tmp/ag-log.txt \
+--base-name=${pkg} -T ${pkgsrcdir}/gnudoc.tpl - <<- _EODefs_
 	autogen definitions gnudoc;
 	title   = '${PACKAGE} - ${*}';
 	project = '${PACKAGE}';

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2010-02-24 08:39:52 bkorb"
+## Time-stamp:      "2010-11-04 13:43:38 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -42,9 +42,16 @@ X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
+X   ->, --save-opts[=arg]      Save the option state to a config file
+X   -<, --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage should be in GNU style.
@@ -61,9 +68,16 @@ X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
+X   ->, --save-opts[=arg]      Save the option state to a config file
+X   -<, --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage should be in GNU style.
@@ -81,9 +95,16 @@ X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
+X   ->, --save-opts[=arg]      Save the option state to a config file
+X   -<, --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage should be in GNU style.
@@ -100,9 +121,16 @@ X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
+X   ->, --save-opts[=arg]      Save the option state to a config file
+X   -<, --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage should be in GNU style.
@@ -119,8 +147,15 @@ X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
+X   --save-opts[=arg]      Save the option state to a config file
+X   --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage should be in GNU style.
@@ -137,8 +172,15 @@ X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
+X   --save-opts[=arg]      Save the option state to a config file
+X   --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage should be in GNU style.
@@ -155,8 +197,15 @@ X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
+X   --save-opts[=arg]      Save the option state to a config file
+X   --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage should be in GNU style.
@@ -173,8 +222,15 @@ X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
+X   --save-opts[=arg]      Save the option state to a config file
+X   --load-opts=str        Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage should be in GNU style.
@@ -192,9 +248,16 @@ X   -L Str check-dirs     YES  Checkout directory list
 X      opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -> opt save-opts      opt  Save the option state to a config file
+X   -< Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -211,9 +274,16 @@ X   -L no  check-dirs     YES  Checkout directory list
 X      no  show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -> opt save-opts      opt  Save the option state to a config file
+X   -< Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -231,9 +301,16 @@ X   -L Str check-dirs     Checkout directory list
 X      opt show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
+X   -> opt save-opts      Save the option state to a config file
+X   -< Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -250,9 +327,16 @@ X   -L no  check-dirs     Checkout directory list
 X      no  show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
+X   -> opt save-opts      Save the option state to a config file
+X   -< Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by doubled hyphens and their name
 or by a single hyphen and the flag character.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Long and short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -269,8 +353,15 @@ X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
+X   opt save-opts      opt  Save the option state to a config file
+X   Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage is in AutoOpts traditional style.
@@ -287,8 +378,15 @@ X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
+X   opt save-opts      opt  Save the option state to a config file
+X   Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage is in AutoOpts traditional style.
@@ -305,8 +403,15 @@ X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
+X   opt save-opts      Save the option state to a config file
+X   Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage is in AutoOpts traditional style.
@@ -323,8 +428,15 @@ X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
+X   opt save-opts      Save the option state to a config file
+X   Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 Options are specified by single or double hyphens and their name.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only long options are accepted.
 Usage is in AutoOpts traditional style.
@@ -341,7 +453,14 @@ X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
+X   -> [arg]   Save the option state to a config file
+X   -< str     Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage should be in GNU style.
@@ -358,7 +477,14 @@ X   -L         Checkout directory list
 X   -s         Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
+X   -> [arg]   Save the option state to a config file
+X   -< str     Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage should be in GNU style.
@@ -375,7 +501,14 @@ X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
+X   -> [arg]   Save the option state to a config file
+X   -< str     Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage should be in GNU style.
@@ -392,7 +525,14 @@ X   -L         Checkout directory list
 X   -s         Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
+X   -> [arg]   Save the option state to a config file
+X   -< str     Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage should be in GNU style.
@@ -409,8 +549,15 @@ X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
+X   save-opts[=arg]        Save the option state to a config file
+X   load-opts=str          Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage should be in GNU style.
@@ -427,8 +574,15 @@ X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
+X   save-opts[=arg]        Save the option state to a config file
+X   load-opts=str          Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage should be in GNU style.
@@ -445,8 +599,15 @@ X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
+X   save-opts[=arg]        Save the option state to a config file
+X   load-opts=str          Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage should be in GNU style.
@@ -463,8 +624,15 @@ X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
+X   save-opts[=arg]        Save the option state to a config file
+X   load-opts=str          Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage should be in GNU style.
@@ -481,7 +649,14 @@ X   -L Str check-dirs     YES  Checkout directory list
 X   -s opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -> opt save-opts      opt  Save the option state to a config file
+X   -< Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -498,7 +673,14 @@ X   -L no  check-dirs     YES  Checkout directory list
 X   -s no  show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -> opt save-opts      opt  Save the option state to a config file
+X   -< Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -515,7 +697,14 @@ X   -L Str check-dirs     Checkout directory list
 X   -s opt show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
+X   -> opt save-opts      Save the option state to a config file
+X   -< Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -532,7 +721,14 @@ X   -L no  check-dirs     Checkout directory list
 X   -s no  show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
+X   -> opt save-opts      Save the option state to a config file
+X   -< Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 Only short (flag) options are accepted.
 Usage is in AutoOpts traditional style.
@@ -549,8 +745,15 @@ X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
+X   opt save-opts      opt  Save the option state to a config file
+X   Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage is in AutoOpts traditional style.
@@ -567,8 +770,15 @@ X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
+X   opt save-opts      opt  Save the option state to a config file
+X   Str load-opts      opt  Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage is in AutoOpts traditional style.
@@ -585,8 +795,15 @@ X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
+X   opt save-opts      Save the option state to a config file
+X   Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage is in AutoOpts traditional style.
@@ -603,8 +820,15 @@ X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
+X   opt save-opts      Save the option state to a config file
+X   Str load-opts      Load options from a config file
+X				- disabled as --no-load-opts
+X				- may appear multiple times
 X
 All arguments are named options.
+X
+The following option preset mechanisms are supported:
+ - reading file ./usage.ini
 X
 All command line arguments must be named options.
 Usage is in AutoOpts traditional style.
@@ -617,7 +841,6 @@ nl='
 '
 emit_defs()
 {
-  local PS4='>ed>'
   exec 4> $1.def
   cat >&4 <<-  _EOF_
 	AutoGen Definitions options;
@@ -625,6 +848,7 @@ emit_defs()
 	prog-title = "Checkout $1 Options";
 	config-header = 'config.h';
 	test-main;
+	homerc     = ./usage.ini;
 	_EOF_
 
   cmd_arg="argument = 'cmd-arg ...';"
@@ -705,11 +929,83 @@ emit_defs()
   exec 4>&-
 }
 
+readonly sedcmd='s@ reading file .*@ reading file ./usage.ini@'
+
+run_usage_test() {
+  ${arg_opts} && name="${rname}A" || name="${rname}p"
+  testname=${tname}_${name}
+  emit_defs ${testname}
+  test_list="${test_list} ${testname}"
+  echo firstline >> ${defnames_raw}
+  ${AG_L} ${testname}.def >> ${defnames_raw} || {
+    cat ${defnames_raw}
+    failure "AutoGen could not process $testname"
+  }
+
+  sed -e '1,/definition names looked up/d' \
+    -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
+  compile ${helpstr}
+  cmp -s ${testname}.help ${testname}.hlp || \
+    failure "FAILED ${testname} hlp -> help
+`diff ${testname}.hlp ${testname}.help`"
+
+  if ${gnu_usage}
+  then
+    f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1a\\2/"`
+    sed "s/${f}/${testname}/g;\
+         s/is in AutoOpts traditional/should be in GNU/" ${f}.hlp > \
+      ${testname}.alt.hlp
+    AUTOOPTS_USAGE=autoopts ./${testname} ${helpstr} | sed "${sedcmd}" \
+      > ${testname}.alt.help
+  else
+    f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1G\\2/"`
+    sed "s/${f}/${testname}/g;\
+         s/should be in GNU/is in AutoOpts traditional/" ${f}.hlp \
+      > ${testname}.alt.hlp
+    AUTOOPTS_USAGE=gnu ./${testname} ${helpstr} | sed "${sedcmd}" \
+      > ${testname}.alt.help
+  fi
+  cmp -s ${testname}.alt.help ${testname}.alt.hlp || \
+    failure "FAILED ${testname} alt [$f] hlp -> help
+`diff ${testname}.alt.help ${testname}.alt.hlp`"
+
+  echo "$directive" > usage.ini
+  local bad_opt=''
+
+  case "${long_opts}-${flag_opts}" in
+  true-true )   return 0         ;;
+  true-false )  bad_opt="--bad" ;;
+  false-true )  bad_opt="-Z"    ;;
+  false-false ) bad_opt=bad     ;;
+  esac
+
+  set +x
+  echo ${PS4}AUTOOPTS_USAGE=no-misuse-usage ./${testname} ${bad_opt} >&2
+  AUTOOPTS_USAGE=no-misuse-usage \
+    ./${testname} ${bad_opt} 2> ${testname}.bad.help >/dev/null
+  $setx
+
+  bad_opt=`echo ${bad_opt}|sed 's/-*//'`
+  exec 4> ${testname}.bad.hlp
+  echo "./${testname}: illegal option -- ${bad_opt}" >&4
+  sed -n 1,2p ${testname}.alt.hlp >&4
+  exec 4>&-
+
+  cmp -s ${testname}.bad.help ${testname}.bad.hlp || \
+    failure "INI FILE FAILED ${testname} alt [$f] hlp -> help
+`diff ${testname}.bad.help ${testname}.bad.hlp`"
+}
+
 test_list=""
 tname=${testname}
 defnames_raw=${TMPDIR}/defnames.raw
 defnames_file=${TMPDIR}/defnames.uniq
 AG_L=${AG_L}\ --used-defines
+
+case "$-" in
+*x* ) setx='set -x' ;;
+* )   setx='' ;;
+esac
 
 for long_opts in true false
 do
@@ -738,42 +1034,7 @@ do
 
         for arg_opts in true false
         do
-          ${arg_opts} && name="${rname}A" || name="${rname}p"
-          testname=${tname}_${name}
-          emit_defs ${testname}
-          test_list="${test_list} ${testname}"
-          echo firstline >> ${defnames_raw}
-          ${AG_L} ${testname}.def >> ${defnames_raw} || {
-             cat ${defnames_raw}
-             failure "AutoGen could not process $testname"
-          }
-          sed -e '1,/definition names looked up/d' \
-              -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
-          compile ${helpstr}
-          cmp -s ${testname}.help ${testname}.hlp || \
-             failure "FAILED ${testname} hlp -> help
-`diff ${testname}.hlp ${testname}.help`"
-
-          if ${gnu_usage}
-          then
-            f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1a\\2/"`
-            sed "s/${f}/${testname}/g;\
-                 s/is in AutoOpts traditional/should be in GNU/" ${f}.hlp > \
-              ${testname}.alt.hlp
-            AUTOOPTS_USAGE=autoopts ./${testname} ${helpstr} > \
-              ${testname}.alt.help
-          else
-            f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1G\\2/"`
-            sed "s/${f}/${testname}/g;\
-                 s/should be in GNU/is in AutoOpts traditional/" ${f}.hlp > \
-              ${testname}.alt.hlp
-            AUTOOPTS_USAGE=gnu ./${testname} ${helpstr} > \
-              ${testname}.alt.help
-          fi
-          cmp -s ${testname}.alt.help ${testname}.alt.hlp || \
-             failure "FAILED ${testname} alt [$f] hlp -> help
-`diff ${testname}.alt.help ${testname}.alt.hlp`"
-
+          run_usage_test
         done
       done
     done

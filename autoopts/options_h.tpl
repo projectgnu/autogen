@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2010-03-04 16:13:57 bkorb"
+# Time-stamp:      "2010-09-26 15:58:26 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -77,18 +77,6 @@ h=options.h
  *  See the relevant generated header file to determine which and what
  *  values for "opt_name" are available.
  */
-[=
-
- ;;;
- ;;; These "vers" values are manipulated by the contents of ../VERSION
- ;;;
-
-(shellf "
-sed 's/@AO_TEMPLATE_VERSION@/%s/' opthead.tpl > XXXX
-mv -f XXXX opthead.tpl"
- (get "vers-curr"))
-
-=]
 #define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
 #define  OPTIONS_VERSION_STRING  "[= vers-sovers  =]"
 #define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
@@ -143,7 +131,7 @@ typedef union {
  *  Bits in the fOptState option descriptor field.
  */
 [= `
-autogen opt-state.def || die "Cannot regen opt-state.h"
+ ${AGexe} opt-state.def || die "Cannot regen opt-state.h"
 sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
     -e 's/_BIT / /g' \
     -e 's/_MASK     /_MASK /' opt-state.h
@@ -176,7 +164,7 @@ rm  -f opt-state.h
  *  Define the processing state flags
  */
 [= `
-autogen proc-state.def || die 'Cannot regen proc-state.h'
+ ${AGexe} proc-state.def || die 'Cannot regen proc-state.h'
 sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
     -e 's/_BIT / /g' \
     -e 's/_MASK    /_MASK/' proc-state.h

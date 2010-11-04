@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-24 10:14:16 bkorb"
+# Time-stamp:        "2010-09-26 15:21:12 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -23,7 +23,6 @@
 
 locate_exe()
 {
-    local PS4=">${FUNCNAME}> "
     if [ -x "$1" ]
     then
         echo "$1"
@@ -60,7 +59,6 @@ locate_exe()
 
 config_configurables()
 {
-    local PS4=">${FUNCNAME}> "
     exec 4> configure.files
     local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
     find ${tops} -type f -name '*-tpl.in' | \
@@ -99,7 +97,6 @@ config_configurables()
 
 config_versions()
 {
-    local PS4=">${FUNCNAME}> "
     set -a
     eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION)"
     set +a
@@ -193,7 +190,6 @@ case "${BOOTSTRAP}" in
 
     check_tools
     config_versions
-    chmod a+x ${srcdir}/*/test/*.test
 
     sed "/^bootstrap /s@=.*@= $(
         echo config/bootstrap*)@;/^aclocal_DATA /s@=.*@= $(

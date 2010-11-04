@@ -33,7 +33,8 @@ up to date.  This package allows you to specify several program attributes, up
 to a hundred option types and many option attributes.  From this, it then
 produces all the code necessary to parse and handle the command line and
 configuration file options, and the documentation that should go with your
-program as well.[=
+program as well.
+[=
 
 INVOKE  get-text tag = autoopts
 
@@ -105,7 +106,7 @@ cat >> checkopt.def <<- _EOF_
 	include = '#include \"compat/compat.h\"';
 	_EOF_
 (
-  ${AGexe} -L${top_srcdir}/autoopts checkopt.def
+  ${AGexe} -L${top_srcdir}/autoopts/tpl checkopt.def
   opts=\"-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}\"
   ${CC} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
 ) > checkopt.err 2>&1
@@ -189,7 +190,7 @@ exec 3>&1
 (
   cd ${tmp_dir}
   echo 'config-header = \"config.h\";' >> default-test.def
-  HOME='' ${AGexe} -L${OPTDIR} -L${top_srcdir}/autoopts default-test.def
+  HOME='' ${AGexe} -L${OPTDIR} -L${top_srcdir}/autoopts/tpl default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}\"
@@ -232,7 +233,7 @@ I tend to be wordy in my @code{doc} attributes:
 @example
 [= (texi-escape-encode (shell "
   cd ${tmp_dir}
-  ${AGexe} -T${top_srcdir}/autoopts/rc-sample.tpl \
+  ${AGexe} -T${top_srcdir}/autoopts/tpl/rc-sample.tpl \
            ${top_srcdir}/getdefs/opts.def >/dev/null
   test -f sample-getdefsrc || die did not create sample-getdefsrc
   cat sample-getdefsrc
@@ -387,7 +388,7 @@ log=${tmp_dir}/genshellopt.log
   cd ${tmp_dir}
   # cmd="valgrind --leak-check=full ${AGexe}"
   cmd="${AGexe}"
-  HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts genshellopt.def
+  HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts/tpl genshellopt.def
   test $? -eq 0 || die "autogen failed to create genshellopt.c - See ${log}"
 
   ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}

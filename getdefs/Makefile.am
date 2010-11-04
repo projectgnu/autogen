@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-28 19:56:17 bkorb"
+## Time-stamp:      "2010-09-26 18:43:28 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -41,7 +41,7 @@ else
 DEP_ARG         =
 TOUCH_SENTINEL  = touch $@
 endif
-AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts
+AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts/tpl
 
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1

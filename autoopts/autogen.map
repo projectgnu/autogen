@@ -47,3 +47,4 @@ suffix-fmt      "%/"          +suffix
 false-type      "nNfF0\x00"
 file-name       "/"           +suffix
 end-token       "\x00"        +whitespace
+end-list-entry  ","           +end-token

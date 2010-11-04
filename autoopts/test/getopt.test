@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2010-08-04 20:58:02 bkorb"
+# Time-stamp:        "2010-09-26 18:16:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -33,9 +33,9 @@
 CC="${CC} ${CFLAGS} ${INC}"
 CFLAGS=''
 INC=''
+export AUTOGEN_TEMPL_DIRS=${TMPDIR}
 
 compile_getopt() {
-  local PS4='>cgo> '
   run_ag opts -L${TMPDIR} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
@@ -58,6 +58,7 @@ compile_getopt() {
     failure "`diff -c ${testname}${1}-base.c ${testname}${1}-getopt.c`" ; }
 }
 
+go_init() {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #  Fix up a test-specific include directory:
@@ -78,10 +79,10 @@ case " ${LDFLAGS} " in
 esac
 
 cd ${top_srcdir}/autoopts
-cp opt*.tpl getopt.tpl ${TMPDIR}/.
+cp tpl/*.tpl ${TMPDIR}/.
 sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
     -e "/^ldflags=/s@=.*@='${aolib}'@" \
-    usage.tpl > ${TMPDIR}/usage.tpl
+    tpl/usage.tpl > ${TMPDIR}/usage.tpl
 cd ${builddir}/testdir
 
 # In order to compile correctly, we have to temporarily install the options.h
@@ -92,8 +93,10 @@ top_builddir=${top_builddir} \
 ${SHELL} ${top_srcdir}/autoopts/install-options-h
 AUTOGEN_TEMPL_DIRS=${TMPDIR}
 export AUTOGEN_TEMPL_DIRS
+}
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+go_samples() {
 
 echo "creating ${testname}.def in `pwd`"
 
@@ -637,9 +640,14 @@ process_test_getopt_opts (int argc, char** argv)
   return 0;
 }
 _EndOfSample_
+}
 
 # # # # # # # # # # RESULTS TESTING # # # # # # # # #
+set -x
+PS4='>${FUNCNAME:-getopt}> '
 
+go_init
+go_samples
 compile_getopt 1
 
 grep 'getopt_long' /usr/include/getopt.h >/dev/null && {

@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-07-21 18:39:12 bkorb"
+# Time-stamp:      "2010-10-03 08:36:05 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -46,13 +46,12 @@
 # no longer has to maintain generated files under source control, they
 # can be generated after checkout using this bootstrap procedure.
 
-PS4='>shl> '
+PS4='>${FUNCNAME:-bsl}> '
 . config/bootstrap.shlib
-PS4='>bs> '
+PS4='>${FUNCNAME:-bs}> '
 
 config_tools()
 {
-    local PS4=">${FUNCNAME}> "
     top_srcdir=$(pwd)
     top_builddir=${top_srcdir}
     srcdir=${top_srcdir}
@@ -116,6 +115,7 @@ config_tools()
     export char_mapper
 
     echo bootstrapping in ${PWD}
+    set +e
 }
 
 run_gnulib()
@@ -148,15 +148,15 @@ run_gnulib()
 #
 pre_local()
 {
-    local PS4=">${FUNCNAME}> "
     BOOTSTRAP=pre
     export BOOTSTRAP
-    PS4='>bsl> '
+
+    local PS4='>pre-bsl-${FUNCNAME}> '
     . ${conf_dir}/bootstrap.local ${1+"$@"} || \
         die FAILED: ${conf_dir}/bootstrap.local
 
     cd autoopts
-    PS4='>aobs> '
+    PS4='>aobs-${FUNCNAME}> '
     . bootstrap.dir aoconf
     cd ..
     # run_gnulib
@@ -164,27 +164,24 @@ pre_local()
 
 post_local()
 {
-    local PS4=">${FUNCNAME}> "
-
     for f in $(
         find . -name bootstrap.dir | fgrep -v '/CVS/')
     do
         (   ${setx} ; cd $(dirname $f)
             srcdir=.
             echo running POST-bootstrap.dir in ${PWD}
-            PS4=">$(basename ${PWD}-B)> "
+            PS4='>post-bsl> '
             . ./bootstrap.dir recursive || :
         )
     done
 
     local BOOTSTRAP=post
-    PS4='>bsl2> '
+    local PS4='>post-bsl-${FUNCNAME}> '
     . ${conf_dir}/bootstrap.local ${1+"$@"}
 }
 
 run_autotools()
 {
-    local PS4=">${FUNCNAME}> "
     # remove any stale config.cache
     doit rm -f config.cache
 

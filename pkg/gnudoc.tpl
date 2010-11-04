@@ -1,12 +1,10 @@
 [= AutoGen5 Template -*- Mode: html -*-
 
-html
-
-=][=
-`timestamp=\`sed 's@[^"]*"@@;s@".*@@' <<- \\_EOF_
- Time-stamp: "2010-07-17 09:59:09 bkorb"
+html =][= `
+timestamp=\`sed 's@[^"]*"@@;s@".*@@' <<- \\_EOF_
+ Time-stamp: "2010-09-07 18:00:29 bkorb"
 _EOF_
-` =][=
+\` ` =][=
 
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
