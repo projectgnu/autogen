@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2010-11-04 14:37:47 bkorb"
+ * Time-stamp:      "2010-11-05 11:41:54 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -54,14 +54,17 @@ static inline ag_bool
 skip_misuse_usage(tOptions * pOpts);
 
 static void
+print_usage_details(tOptions * opts, int exit_code);
+
+static void
 prt_extd_usage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT);
 
 static void
 prt_ini_list(
-    char const * const* papz,
-    ag_bool*            pInitIntro,
-    char const *        pzRc,
-    char const *        pzPN );
+    char const * const * papz,
+    ag_bool *    pInitIntro,
+    char const * pzRc,
+    char const * pzPN );
 
 static void
 prt_preamble(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT);

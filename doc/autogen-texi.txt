@@ -2263,7 +2263,7 @@ View the @file{libopts/README} file for further integration information.
 
 @page
 @node Caveats
-@section Cautionary Notes
+@section Developer and User Notes
 
 AutoOpts has its conventional way of displaying option information
 that includes somewhat more information that the standard GNU method.

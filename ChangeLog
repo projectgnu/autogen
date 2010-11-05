@@ -12,6 +12,10 @@
 	gnu vs. autoopts and no-misuse-usage vs. misuse-usage
 	* autoopts/test/defs.in (compile): allow help text to be sedded.
 	* autoopts/test/usage.test: adjust to changes and test new feature
+	* autoopts/Makefile.am: clarify distinction between pkgdatadir and
+	the *DESTINATION* pkgdatadir.
+	* autoopts/install-options-h: use these more distinct names and also
+	replace the "bindir" value for the columns executable.
 
 2010-09-04  Bruce Korb  <bkorb@gnu.org>
 

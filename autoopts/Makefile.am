@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-10-06 20:14:56 bkorb"
+## Time-stamp:      "2010-11-05 10:48:16 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -158,8 +158,8 @@ pkgconfig/autoopts.pc : mk-autoopts-pc
 	$(SHELL) mk-autoopts-pc $@
 
 install-data-hook:
-	@destdir='$(DESTDIR)$(includedir)/autoopts' \
-	pkgdatadir='$(DESTDIR)$(pkgdatadir)' \
+	@DESTdestdir='$(DESTDIR)$(includedir)/autoopts' \
+	DESTpkgdatadir='$(DESTDIR)$(pkgdatadir)' \
 	top_builddir='$(top_builddir)' \
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
 	CONFIG_SHELL='$(CONFIG_SHELL)'  \

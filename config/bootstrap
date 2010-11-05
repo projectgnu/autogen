@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-10-03 08:36:05 bkorb"
+# Time-stamp:      "2010-11-05 10:59:00 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -157,15 +157,12 @@ pre_local()
 
     cd autoopts
     PS4='>aobs-${FUNCNAME}> '
-    . bootstrap.dir aoconf
-    cd ..
-    # run_gnulib
+    . ./bootstrap.dir aoconf
 }
 
 post_local()
 {
-    for f in $(
-        find . -name bootstrap.dir | fgrep -v '/CVS/')
+    for f in $(find . -name bootstrap.dir)
     do
         (   ${setx} ; cd $(dirname $f)
             srcdir=.

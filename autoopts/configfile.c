@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2010-11-02 11:33:08 bkorb"
+ *  Time-stamp:      "2010-11-05 11:56:39 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -26,6 +26,9 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
+static void
+set_usage_flags(tOptions * opts, char const * flg_txt);
+
 /* = = = START-STATIC-FORWARD = = = */
 static void
 filePreset(
@@ -45,9 +48,6 @@ handleConfig(
 
 static char *
 handle_directive(tOptions * pOpts, char * pzText);
-
-static void
-set_usage_flags(tOptions * opts, char const * flg_txt);
 
 static char *
 aoflags_directive(tOptions * pOpts, char * pzText);
@@ -602,35 +602,56 @@ handleConfig(
  *
  *  "pzText" points to a "<?" sequence.
  *  We handle "<?program" and "<?auto-options" directives.
+ *  All others are treated as comments.
  */
 static char *
 handle_directive(tOptions * pOpts, char * pzText)
 {
-    size_t title_len = strlen(zProg);
+#   define DIRECTIVE_TABLE                      \
+    _dt_(zCfgProg,     program_directive)       \
+    _dt_(zCfgAO_Flags, aoflags_directive)
 
-    if (  (strncmp(pzText+2, zProg, title_len) == 0)
-       && (! IS_VALUE_NAME_CHAR(pzText[title_len+2])) )
-        return program_directive(pOpts, pzText);
+    typedef char * (directive_func_t)(tOptions *, char *);
+#   define _dt_(_s, _fn) _fn,
+    static directive_func_t * dir_disp[] = {
+        DIRECTIVE_TABLE
+    };
+#   undef  _dt_
 
-    title_len = strlen(zAO_Flags);
+#   define _dt_(_s, _fn) 1 +
+    static int  const   dir_ct  = DIRECTIVE_TABLE 0;
+    static char const * dir_names[DIRECTIVE_TABLE 0];
+#   undef _dt_
 
-    if (  (strncmp(pzText+2, zAO_Flags, title_len) == 0)
-       && (! IS_VALUE_NAME_CHAR(pzText[title_len+2])) )
-        return aoflags_directive(pOpts, pzText);
+    int    ix;
 
+    if (dir_names[0] == NULL) {
+        ix = 0;
+#   define _dt_(_s, _fn) dir_names[ix++] = _s;
+        DIRECTIVE_TABLE;
+#   undef _dt_
+    }
+
+    for (ix = 0; ix < dir_ct; ix++) {
+        size_t len = strlen(dir_names[ix]);
+        if (  (strncmp(pzText + 2, dir_names[ix], len) == 0)
+           && (! IS_VALUE_NAME_CHAR(pzText[len+2])) )
+            return dir_disp[ix](pOpts, pzText + len + 2);
+    }
+
+    /*
+     *  We don't know what this is.  Skip it.
+     */
     pzText = strchr(pzText+2, '>');
     if (pzText != NULL)
         pzText++;
     return pzText;
 }
 
-static void
-set_usage_flags(tOptions * opts, char const * flg_txt);
-
 static char *
 aoflags_directive(tOptions * pOpts, char * pzText)
 {
-    char * pz = (pzText += strlen(zAO_Flags) + 2);
+    char * pz = pzText;
 
     while (IS_WHITESPACE_CHAR(*++pz))  ;
     pzText = strchr(pz, '>');
@@ -638,10 +659,12 @@ aoflags_directive(tOptions * pOpts, char * pzText)
 
         size_t len  = pzText - pz;
         char * ftxt = AGALOC(len + 1, "aoflags");
+
         memcpy(ftxt, pz, len);
         ftxt[len] = NUL;
         set_usage_flags(pOpts, ftxt);
         AGFREE(ftxt);
+
         pzText++;
     }
 
@@ -652,22 +675,33 @@ static char *
 program_directive(tOptions * pOpts, char * pzText)
 {
     char * ttl;
-    size_t ttl_len = asprintf(&ttl, "<?%s ", pOpts->pzProgName);
-    char   ztitle[32] = "<?";
+    size_t ttl_len  = asprintf(&ttl, "<?%s", zCfgProg);
     size_t name_len = strlen(pOpts->pzProgName);
 
+    (void) ttl_len;
+
     do  {
-        pzText += ttl_len;
         while (IS_WHITESPACE_CHAR(*++pzText))  ;
 
         if (  (strneqvcmp(pzText, pOpts->pzProgName, (int)name_len) == 0)
-           && (pzText[name_len] == '>'))  {
-            pzText += name_len + 1;
+           && (IS_END_XML_TOKEN_CHAR(pzText[name_len])) ) {
+            pzText += name_len;
             break;
         }
 
-        pzText = strstr(pzText, ztitle);
+        pzText = strstr(pzText, ttl);
     } while (pzText != NULL);
+
+    free(ttl);
+    if (pzText != NULL)
+        for (;;) {
+            if (*pzText == NUL) {
+                pzText = NULL;
+                break;
+            }
+            if (*(pzText++) == '>')
+                break;
+        }
 
     return pzText;
 }
