@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2010-09-05 06:24:42 bkorb"
+ *  Time-stamp:        "2010-11-08 14:54:31 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -863,7 +863,7 @@ ag_scm_raw_shell_str(SCM obj)
  *  escape character @code{\\} before two special characters to
  *  accomplish this: the backslash @code{\\} and double quote @code{"}.
  *
- *  @strong{NOTE}: some shells will not correctly handle unusual
+ *  @strong{Notice}: some shells will not correctly handle unusual
  *  non-printing characters.  This routine works for most reasonably
  *  conventional ASCII strings.
  *

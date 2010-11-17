@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-07-28 19:35:50 bkorb"
+ *  Time-stamp:        "2010-11-08 15:05:33 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -837,7 +837,7 @@ flag = {
 	it and it will adjust the modification time to match the dependency
 	file.
 
-	@strong{NOTE:} these second letters are part of the option argument, so
+	@strong{NB:} these second letters are part of the option argument, so
 	@code{-MF <file>} must have the space character quoted or omitted, and
 	@code{-M "F <file>"} is acceptable because the @code{F} is part of the
 	option argument.

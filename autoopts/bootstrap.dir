@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-10-06 20:36:36 bkorb"
+# Time-stamp:      "2010-11-07 14:41:20 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -54,12 +54,11 @@ burn_aover() {
     } || :
 
     cd tpl
-    for f in *.*
+    for f in *.in
     do
-        sed "${sedcmd}" $f > XX
-        mv -f XX $f
-        case "$f" in ( *.pl ) chmod +x $f ;; esac
+        sed "${sedcmd}" $f > ${f%.in}
     done
+    chmod a+x *.pl
     cd -
     ${VERBOSE} && set -x || :
 }
@@ -71,19 +70,30 @@ add_files_to_mf() {
     ${AGexe} -Tagman3.tpl funcs.def || \
         die "FAILED: ${AGexe} -Tagman3.tpl funcs.def"
 
+    local dtpl_files=$(
+        for f in tpl/*.tpl
+        do
+            test -f ${f}.in || echo $f
+        done
+        echo tpl/std*.def tpl/*.pl
+    )
+    local ndtpl_files=$(
+        for f in tpl/*.tpl
+        do
+            test -f ${f}.in && echo $f
+        done)
     sedcmd=$'/^TPL_FILES /a\\\n'$(
-        ls -1 tpl/ag*.tpl tpl/bits.tpl tpl/getopt.tpl tpl/*.pl tpl/opt*.tpl \
-                tpl/std*.def tpl/rc-sample.tpl tpl/usage.tpl | \
-            columns -I4 --spread=1 --line=' \\\'
+        ls -1 ${dtpl_files} | columns -I4 --spread=1 --line=' \\\'
     )$'\n\n/^GENMAN /a\\\n'$(
         ls -1 *.3 | \
             sed '/^pathfind.3$/d' | \
             columns -I4 --spread=1 --line=' \\\'
+    )$'\\\n\\\nINST_ND_PKGDATA = $(libsrc) \\\\\\\n'$(
+        ls -1 ${ndtpl_files} | columns -I4 --spread=1 --line=' \\\'
     )
 
     rm -f *.3
-    sed "${sedcmd}" Makefile.am > XX
-    mv -f XX Makefile.am
+    sed -i "${sedcmd}" Makefile.am
 }
 
 make_funcs_def()

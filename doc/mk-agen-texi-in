@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-09-07 17:35:48 bkorb"
+# Time-stamp:        "2010-11-08 13:13:07 bkorb"
 #
 ##
 ##  This file is part of AutoGen.
@@ -60,9 +60,13 @@ set_config_values()
   test -z "${LIBS}"   && LIBS="@LIBS@"
   test -z "${MAKE}"   && MAKE=`which make`
 
+  top_srcdir=`cd @top_srcdir@/. > /dev/null && pwd`
+  top_builddir=`cd @top_builddir@/. > /dev/null && pwd`
+  export top_srcdir top_builddir
+
   INCLUDES="@DEFS@ "`
 
-    for d in @top_builddir@ @top_srcdir@ \
+    for d in ${top_srcdir} ${top_builddir} \
              @top_builddir@/autoopts @top_srcdir@/autoopts
     do
       (\cd ${d} && pwd) 2>/dev/null

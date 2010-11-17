@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2010-08-06 12:51:19 bkorb"
+ *  Time-stamp:        "2010-11-08 14:45:32 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -762,7 +762,7 @@ do_tpl_file_line(int line_delta, char const * fmt)
  *  @end example
  *
  *  It is also safe to use the formatting string, "%2$d".  AutoGen uses
- *  an argument vector version of printf: @xref{snprintfv}
+ *  an argument vector version of printf: @xref{snprintfv},
  *  and it does not need to know the types of each argument in order to
  *  skip forward to the second argument.
 =*/

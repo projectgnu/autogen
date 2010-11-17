@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2010-07-17 10:07:36 bkorb"
+# Time-stamp:      "2010-11-02 10:14:30 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -532,7 +532,8 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
-    + OPTPROC_GNUUSAGE[=   ENDIF=] ),
+    + OPTPROC_GNUUSAGE[=   ENDIF=][=IF      (exist? "no-misuse-usage")   =]
+    + OPTPROC_MISUSE[=     ENDIF=] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         zPROGNAME,
     zRcName,      zCopyright,   zCopyrightNotice,

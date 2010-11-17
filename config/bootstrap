@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-11-05 10:59:00 bkorb"
+# Time-stamp:      "2010-11-08 13:58:31 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -47,6 +47,11 @@
 # can be generated after checkout using this bootstrap procedure.
 
 PS4='>${FUNCNAME:-bsl}> '
+top_srcdir=$(
+    cd $(dirname $0)/.. >/dev/null
+    pwd )
+top_builddir=${top_srcdir}
+
 . config/bootstrap.shlib
 PS4='>${FUNCNAME:-bs}> '
 
@@ -70,7 +75,7 @@ config_tools()
     #  Check for AutoGen version 5.
     #
     AGexe=$(which autogen)
-    case ${AGexe} in
+    case "${AGexe}" in
     ( /* )
         v=$($AGexe --version || :)
         case "$v" in

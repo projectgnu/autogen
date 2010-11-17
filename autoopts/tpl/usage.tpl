@@ -112,7 +112,7 @@ ldflags=`autoopts-config ldflags`
 flags="${defs} ${cflags} ${CFLAGS}"
 
 ( cd ${tmp_dir}
-  autogen [= prog-name=].def
+  ${AGexe-autogen} [= prog-name=].def
 ) || die "Cannot gen [= prog-name =]"
 exe=tmp-[= prog-name =]-$$
 cfile=${tmp_dir}/[= prog-name =].c

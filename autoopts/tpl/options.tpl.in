@@ -92,8 +92,6 @@ CASE    (suffix)            =][=
      test $? -ne 0 && return 1
      CLexe=${1}
    }
-   prefix="@prefix@"
-   exec_prefix="@exec_prefix@"
    test_exe "${CLexe}" || \
      test_exe ${top_builddir}/columns/columns || \
      test_exe "@bindir@/columns" || \

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-09-26 18:43:28 bkorb"
+## Time-stamp:      "2010-11-08 09:30:51 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -31,7 +31,8 @@ nodist_getdefs_SOURCES = $(BUILT_SOURCES)
 
 SUBDIRS         = test
 EXTRA_DIST      = opts.def $(gdsrcs)
-RUNAG           = $(AGexe)
+RUNAG           := $(AGexe) -L$(top_srcdir)/autoopts/tpl \
+	 -L$(top_builddir)/autoopts/tpl
 
 if AMDEP
 DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@
@@ -41,7 +42,6 @@ else
 DEP_ARG         =
 TOUCH_SENTINEL  = touch $@
 endif
-AGEXE_LIB       = $(RUNAG) -L$(top_srcdir)/autoopts/tpl
 
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
@@ -62,7 +62,7 @@ gd.c : $(gdsrcs)
 
 $(getdefs_OBJECTS) opts.h opts.c : stamp-opts
 stamp-opts : opts.def $(CLexe) $(AGexe)
-	$(AG_ENV) ; $(AGEXE_LIB) $(DEP_ARG) $(srcdir)/opts.def
+	$(AG_ENV) ; $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
 	$(TOUCH_SENTINEL)
 
 $(AGexe) :
@@ -73,8 +73,8 @@ $(CLexe) :
 
 $(DOCFILES) : stamp-doc
 stamp-doc : $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
-	$(AG_ENV) ; $(AGEXE_LIB) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
-	$(AGEXE_LIB) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+	$(AG_ENV) ; $(RUNAG) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
+	$(RUNAG) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 
 .NOTPARALLEL:
 

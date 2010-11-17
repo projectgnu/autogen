@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-11-04 13:27:02 bkorb"
+# Time-stamp:     "2010-11-08 13:44:55 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -156,10 +156,12 @@ init_tests() {
       esac
     }
 
-    export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe GDexe CLexe
-}
+    AG_L=run_ag\ ao
+    agl_opts="-L${top_srcdir}/autoopts/tpl -L${top_builddir}/autoopts/tpl"
 
-vgopts='--suppressions=/old-home/bkorb/ag/valgrind.conf --leak-check=yes'
+    export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe AG_L GDexe CLexe \
+        agl_opts AG_L
+}
 
 be_silent()
 {
@@ -180,7 +182,7 @@ be_silent()
         local tfile=${testname}-aglog-${1}-$$.log
         shift
 
-        ${AGexe} -L ${top_srcdir}/autoopts/tpl -m "$@"
+        ${AGexe} ${agl_opts} -m "$@"
     }
 
     init_tests
@@ -196,14 +198,12 @@ be_verbose()
 
     run_ag()
     {
-        # local vgfile=/tmp/vglog/${1}-%p.txt
-        # valgrind ${vgopts} --log-file=${vgfile} \
         local tfile=${testname}-aglog-${1}-$$.log
         shift
         local tr="--trace=every --trace-out='>>${tfile}'"
 
         MALLOC_CHECK_=2 \
-            ${AGexe} -L ${top_srcdir}/autoopts/tpl -m ${tr} "$@"
+            ${AGexe} ${agl_opts} -m ${tr} "$@"
     }
 
     init_tests
@@ -296,12 +296,6 @@ INC=`echo ${dirs} ${CPPFLAGS} ${INC}`
 
 stdopts=${top_srcdir}/autoopts/test/stdopts.def
 
-#  All the tests will require the templates in the autoopts dir.
-#
-AUTOGEN_TEMPL_DIRS=`cd ${top_srcdir} > /dev/null ; pwd`/autoopts
-AG_L=run_ag\ ao\ -L${AUTOGEN_TEMPL_DIRS}
-export AUTOGEN_TEMPL_DIRS AG_L
-
 #  In general, they will have a test main procedure, too.
 #
 test_main=yes
@@ -309,11 +303,7 @@ use_flags=true
 
 : "=== Running $progname for ${testname} using ${SHELL} ==="
 chmod +w * > /dev/null 2>&1 || :
-export SHELL
-case "$-" in
-*x*) SHELLX="${SHELL} -x" ;;
- * ) SHELLX="${SHELL}" ;;
-esac
+${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
 
 ## Local Variables:
 ## mode: shell-script

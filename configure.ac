@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-07-10 16:45:16 bkorb"
+dnl Time-stamp:      "2010-11-07 14:07:49 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -43,6 +43,9 @@ AC_SUBST(AG_MINOR_VERSION)
 AC_SUBST(AO_CURRENT)
 AC_SUBST(AO_REVISION)
 AC_SUBST(AO_AGE)
+[AO_TEMPLATE_VERSION=`expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION`
+]dnl
+AC_SUBST(AO_TEMPLATE_VERSION)
 AC_SUBST(GO_CURRENT)
 AC_SUBST(GO_REVISION)
 AC_SUBST(GO_AGE)

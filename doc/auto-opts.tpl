@@ -25,8 +25,16 @@
 @cindex autoopts
 
 AutoOpts [=`
+run_ag() {
+    echo ${AGexe} -L${top_srcdir}/autoopts/tpl \
+        -L${top_builddir}/autoopts/tpl "$@" >&2
+
+    ${AGexe} -L${top_srcdir}/autoopts/tpl -L${top_builddir}/autoopts/tpl "$@"
+}
+
 eval "\`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION\`" 2> /dev/null
 echo ${AO_CURRENT}.${AO_REVISION}
+
 `=] is bundled with AutoGen.  It is a tool that virtually eliminates the
 hassle of processing options and keeping man pages, info docs and usage text
 up to date.  This package allows you to specify several program attributes, up
@@ -98,16 +106,17 @@ the code below ensures we are running out tools out of the build directory =]
 Running those commands yields:
 
 @example
-[= (texi-escape-encode (shell
-"cd ${tmp_dir}
+[= (out-push-new) \=]
+cd ${tmp_dir}
+
 test -f checkopt.def || die cannot locate checkopt.def
 test -f check && rm -f check
 cat >> checkopt.def <<- _EOF_
-	include = '#include \"compat/compat.h\"';
+	include = '#include "compat/compat.h"';
 	_EOF_
 (
-  ${AGexe} -L${top_srcdir}/autoopts/tpl checkopt.def
-  opts=\"-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}\"
+  run_ag checkopt.def
+  opts="-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}"
   ${CC} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
 ) > checkopt.err 2>&1
 
@@ -116,8 +125,12 @@ test -x ./check || {
   die cannot create checkopt program
 }
 
-./check --help | sed 's/\t/        /g'"
-) ) =]
+./check --help | sed 's/\t/        /g'
+[=
+
+(texi-escape-encode (shell (out-pop #t)))
+
+=]
 @end example
 [=
 
@@ -175,25 +188,27 @@ cc -o default-test $@{copts@} default-test.c $@{lopts@}
 Yields a program which, when run with @file{--help}, prints out:
 
 @example
-[= (shell (string-append "
-OPTDIR=`cd ${top_builddir}/autoopts >/dev/null && pwd`
+[= (out-push-new) \=]
+
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
-libs=`cd ${OPTDIR} >/dev/null ; [ -d .libs ] && cd .libs >/dev/null ; pwd`
+OPTDIR=${TOPDIR}/autoopts
+libs=${OPTDIR}
+test -d ${libs}/.libs && libs=${libs}/.libs
 
 if [ -f ${libs}/libopts.a ]
-then libs=\"${libs}/libopts.a\"
-else libs=\"-L ${libs} -lopts\"
+then libs="${libs}/libopts.a"
+else libs="-L ${libs} -lopts"
 fi
-libs=\"${libs} ${LIBS}\"
+libs="${libs} ${LIBS}"
 
 exec 3>&1
 (
   cd ${tmp_dir}
-  echo 'config-header = \"config.h\";' >> default-test.def
-  HOME='' ${AGexe} -L${OPTDIR} -L${top_srcdir}/autoopts/tpl default-test.def
+  echo 'config-header = "config.h";' >> default-test.def
+  HOME='' run_ag default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
-  opts=\"-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}\"
+  opts="-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}"
   ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
@@ -203,9 +218,11 @@ test $? -eq 0 || {
   die Check ${tmp_dir}/default-test.log file
 }
 HOME='$HOME/.default_testrc' ${tmp_dir}/default-test --help | \
-   sed 's,\t,        ,g;s,\\([@{}]\\),@\\1,g'
+   sed 's,	,        ,g;s,\([@{}]\),@\1,g'
 
-exec 3>&-" ))
+exec 3>&-
+[=
+ (shell (out-pop #t))
 =]
 @end example
 [=
@@ -233,8 +250,7 @@ I tend to be wordy in my @code{doc} attributes:
 @example
 [= (texi-escape-encode (shell "
   cd ${tmp_dir}
-  ${AGexe} -T${top_srcdir}/autoopts/tpl/rc-sample.tpl \
-           ${top_srcdir}/getdefs/opts.def >/dev/null
+  run_ag -Trc-sample.tpl ${top_srcdir}/getdefs/opts.def >/dev/null
   test -f sample-getdefsrc || die did not create sample-getdefsrc
   cat sample-getdefsrc
 " )) =]
@@ -386,9 +402,7 @@ log=${tmp_dir}/genshellopt.log
   exec 3>&-
 
   cd ${tmp_dir}
-  # cmd="valgrind --leak-check=full ${AGexe}"
-  cmd="${AGexe}"
-  HOME='' ${cmd} -t40 -L${OPTDIR} -L${top_srcdir}/autoopts/tpl genshellopt.def
+  HOME='' run_ag -t40 genshellopt.def
   test $? -eq 0 || die "autogen failed to create genshellopt.c - See ${log}"
 
   ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}

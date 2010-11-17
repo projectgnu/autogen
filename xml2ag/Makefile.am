@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-09-26 15:19:18 bkorb"
+## Time-stamp:      "2010-11-08 14:36:34 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -36,12 +36,12 @@ man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) stamp-*
 INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
-AG_ENV          = top_builddir=$(top_builddir) top_srcdir=$(top_srcdir) \
-  PATH=`cd ../columns;pwd`:$$PATH ; \
-  export top_builddir top_srcdir PATH
 
-run_AG = $(AGexe) -MF$@ -L$(top_srcdir)/autoopts/tpl \
-	--definition=$(srcdir)/xmlopts.def
+BOOTENV     = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
+	PATH=`cd ../columns;pwd`:"$$PATH" CLexe="$(CLexe)"
+
+RUNAG       = $(BOOTENV) $(AGexe) -MF$@ -L$(top_srcdir)/autoopts/tpl \
+	-L$(top_builddir)/autoopts/tpl --definition=$(srcdir)/xmlopts.def
 
 all 	    : gen
 gen 	    : $(gsrcs) $(DOCFILES)
@@ -52,22 +52,19 @@ x.c 	    : $(gsrcs) $(csrcs)
 
 $(getdefs_OBJECTS) xmlopts.c xmlopts.h : stamp-opts
 stamp-opts  : xmlopts.def $(CLexe)
-	$(AG_ENV) ; $(run_AG)
+	$(RUNAG)
 
 fork.c      : stamp-fork
 stamp-fork  : fork.tpl xmlopts.def $(CLexe)
-	$(AG_ENV) ; CLexe=$(CLexe) ; export CLexe ; \
-	$(run_AG) -L$(srcdir) -Tfork.tpl
+	$(RUNAG) -L$(srcdir) -Tfork.tpl
 
 $(TARG).texi $(TARG).menu : stamp-texi
 stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
-	$(AG_ENV) ; \
-	$(run_AG) -Taginfo -b$(TARG) -DLEVEL=section
+	$(RUNAG) -Taginfo -b$(TARG) -DLEVEL=section
 
 $(TARG).1   : stamp-man
 stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
-	$(AG_ENV) ; \
-	$(run_AG) -Tagman1 -b$(TARG)
+	$(RUNAG) -Tagman1 -b$(TARG)
 
 $(CLexe)    :
 	cd ../columns ; $(MAKE) $(CLnam)

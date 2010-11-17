@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-09-26 15:21:12 bkorb"
+# Time-stamp:        "2010-11-07 13:56:58 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -72,7 +72,7 @@ config_configurables()
     echo "AC_CONFIG_FILES([\\" >&4
     for f in $(
         find ${tops} -name 'Makefile.am' -o -name '*.in' | \
-            sed '/-tpl.in$/d;s,\.\(am\|in\)$,,;/^configure$/d' | \
+            sed 's,\.\(am\|in\)$,,;/^configure$/d' | \
             sort -u)
     do
         echo "    ${f}"

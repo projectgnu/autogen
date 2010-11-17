@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-10-02 15:52:55 bkorb"
+# Time-stamp:        "2010-11-08 09:18:53 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -89,7 +89,8 @@ test -n "${BASH_VERSION}" || {
 
 test -z "${BASH_VERSION}" && local() { : ; }
 # Setup run_ag
-tpl_dir=$(\cd ${top_srcdir}/autoopts/tpl && pwd -P)
+tpl_dir='-L'$(\cd ${top_srcdir}/autoopts/tpl && pwd)' -L'$(
+    \cd ${top_builddir}/autoopts/tpl && pwd)
 typeset -r tpl_dir
 
 if ${VERBOSE}
@@ -105,7 +106,7 @@ then
         tag="-MFstamp-${tag} --trace=every --trace-out=${tfile}"
 
         MALLOC_CHECK_=2 \
-            ${AGexe} -L${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
+            ${AGexe} ${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
     }
 else
     run_ag()
@@ -113,8 +114,8 @@ else
         # local vgfile=/tmp/vglog/${1}-%p.txt
         local tag="-MFstamp-${1}" ; shift
 
-        echo ${AGexe} -L${tpl_dir} ${tag} "$@"
-        ${AGexe} -L${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
+        echo ${AGexe} ${tpl_dir} ${tag} "$@"
+        ${AGexe} ${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
     }
 fi
 

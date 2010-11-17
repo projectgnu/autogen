@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2010-11-05 11:56:39 bkorb"
+ *  Time-stamp:      "2010-11-07 14:43:09 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -31,20 +31,13 @@ set_usage_flags(tOptions * opts, char const * flg_txt);
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-filePreset(
-    tOptions*     pOpts,
-    char const*   pzFileName,
-    int           direction );
+file_preset(tOptions * opts, char const * fname, int dir);
 
 static char*
-handleComment(char* pzText);
+handle_comment(char* pzText);
 
-static char*
-handleConfig(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction );
+static char *
+handle_cfg(tOptions * pOpts, tOptState * pOS, char * pzText, int dir);
 
 static char *
 handle_directive(tOptions * pOpts, char * pzText);
@@ -55,37 +48,23 @@ aoflags_directive(tOptions * pOpts, char * pzText);
 static char *
 program_directive(tOptions * pOpts, char * pzText);
 
-static char*
-handleProgramSection(
-    tOptions*     pOpts,
-    char*         pzText );
+static char *
+handle_section(tOptions * pOpts, char * pzText);
+
+static char *
+handle_struct(tOptions * pOpts, tOptState * pOS, char * pzText, int dir);
 
 static char*
-handleStructure(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction );
+parse_keyword(tOptions * pOpts, char * pzText, tOptionValue * pType);
 
 static char*
-parseKeyWordType(
-    tOptions*     pOpts,
-    char*         pzText,
-    tOptionValue* pType );
+parse_set_mem(tOptions * pOpts, char * pzText, tOptionValue * pType);
 
-static char*
-parseSetMemType(
-    tOptions*     pOpts,
-    char*         pzText,
-    tOptionValue* pType );
+static char *
+parse_value(char * pzText, tOptionValue * pType);
 
-static char*
-parseValueType(
-    char*         pzText,
-    tOptionValue* pType );
-
-static char*
-skipUnknown(char* pzText);
+static char *
+skip_unkn(char* pzText);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -412,28 +391,24 @@ optionNextValue(tOptionValue const * pOVList,tOptionValue const * pOldOV )
 }
 
 
-/*  filePreset
- *
+/**
  *  Load a file containing presetting information (a configuration file).
  */
 static void
-filePreset(
-    tOptions*     pOpts,
-    char const*   pzFileName,
-    int           direction )
+file_preset(tOptions * opts, char const * fname, int dir)
 {
     tmap_info_t   cfgfile;
     tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
     tAoUL         st_flags = optst.flags;
-    char*         pzFileText =
-        text_mmap(pzFileName, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile);
+    char *        ftext =
+        text_mmap(fname, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile);
 
-    if (TEXT_MMAP_FAILED_ADDR(pzFileText))
+    if (TEXT_MMAP_FAILED_ADDR(ftext))
         return;
 
-    if (direction == DIRECTION_CALLED) {
+    if (dir == DIRECTION_CALLED) {
         st_flags = OPTST_DEFINED;
-        direction   = DIRECTION_PROCESS;
+        dir   = DIRECTION_PROCESS;
     }
 
     /*
@@ -442,34 +417,33 @@ filePreset(
      *  If this is called via "optionFileLoad", then the bit is not set
      *  and we consider stuff set herein to be "set" by the client program.
      */
-    if ((pOpts->fOptSet & OPTPROC_PRESETTING) == 0)
+    if ((opts->fOptSet & OPTPROC_PRESETTING) == 0)
         st_flags = OPTST_SET;
 
     do  {
         optst.flags = st_flags;
-        while (IS_WHITESPACE_CHAR(*pzFileText))  pzFileText++;
+        while (IS_WHITESPACE_CHAR(*ftext))  ftext++;
 
-        if (IS_VAR_FIRST_CHAR(*pzFileText)) {
-            pzFileText = handleConfig(pOpts, &optst, pzFileText, direction);
+        if (IS_VAR_FIRST_CHAR(*ftext)) {
+            ftext = handle_cfg(opts, &optst, ftext, dir);
 
-        } else switch (*pzFileText) {
+        } else switch (*ftext) {
         case '<':
-            if (IS_VAR_FIRST_CHAR(pzFileText[1]))
-                pzFileText =
-                    handleStructure(pOpts, &optst, pzFileText, direction);
+            if (IS_VAR_FIRST_CHAR(ftext[1]))
+                ftext = handle_struct(opts, &optst, ftext, dir);
 
-            else switch (pzFileText[1]) {
+            else switch (ftext[1]) {
             case '?':
-                pzFileText = handle_directive(pOpts, pzFileText);
+                ftext = handle_directive(opts, ftext);
                 break;
 
             case '!':
-                pzFileText = handleComment(pzFileText);
+                ftext = handle_comment(ftext);
                 break;
 
             case '/':
-                pzFileText = strchr(pzFileText+2, '>');
-                if (pzFileText++ != NULL)
+                ftext = strchr(ftext + 2, '>');
+                if (ftext++ != NULL)
                     break;
 
             default:
@@ -478,31 +452,30 @@ filePreset(
             break;
 
         case '[':
-            pzFileText = handleProgramSection(pOpts, pzFileText);
+            ftext = handle_section(opts, ftext);
             break;
 
         case '#':
-            pzFileText = strchr(pzFileText+1, '\n');
+            ftext = strchr(ftext + 1, '\n');
             break;
 
         default:
             goto all_done; /* invalid format */
         }
-    } while (pzFileText != NULL);
+    } while (ftext != NULL);
 
- all_done:
+all_done:
     text_munmap(&cfgfile);
 }
 
 
-/*  handleComment
- *
+/**
  *  "pzText" points to a "<!" sequence.
  *  Theoretically, we should ensure that it begins with "<!--",
  *  but actually I don't care that much.  It ends with "-->".
  */
 static char*
-handleComment(char* pzText)
+handle_comment(char* pzText)
 {
     char* pz = strstr(pzText, "-->");
     if (pz != NULL)
@@ -511,19 +484,14 @@ handleComment(char* pzText)
 }
 
 
-/*  handleConfig
- *
+/**
  *  "pzText" points to the start of some value name.
  *  The end of the entry is the end of the line that is not preceded by
  *  a backslash escape character.  The string value is always processed
  *  in "cooked" mode.
  */
-static char*
-handleConfig(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction )
+static char *
+handle_cfg(tOptions * pOpts, tOptState * pOS, char * pzText, int dir)
 {
     char* pzName = pzText++;
     char* pzEnd  = strchr(pzText, '\n');
@@ -536,7 +504,7 @@ handleConfig(
     if (pzText > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
-        loadOptionLine(pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED);
+        loadOptionLine(pOpts, pOS, pzName, dir, OPTION_LOAD_UNCOOKED);
         return pzEnd;
     }
 
@@ -592,14 +560,13 @@ handleConfig(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine(pOpts, pOS, pzName, direction, OPTION_LOAD_UNCOOKED);
+    loadOptionLine(pOpts, pOS, pzName, dir, OPTION_LOAD_UNCOOKED);
 
     return pzEnd;
 }
 
 
-/*  handle_directive
- *
+/**
  *  "pzText" points to a "<?" sequence.
  *  We handle "<?program" and "<?auto-options" directives.
  *  All others are treated as comments.
@@ -648,6 +615,9 @@ handle_directive(tOptions * pOpts, char * pzText)
     return pzText;
 }
 
+/**
+ *  handle AutoOpts mode flags
+ */
 static char *
 aoflags_directive(tOptions * pOpts, char * pzText)
 {
@@ -671,6 +641,9 @@ aoflags_directive(tOptions * pOpts, char * pzText)
     return pzText;
 }
 
+/**
+ * handle program segmentation of config file.
+ */
 static char *
 program_directive(tOptions * pOpts, char * pzText)
 {
@@ -707,16 +680,13 @@ program_directive(tOptions * pOpts, char * pzText)
 }
 
 
-/*  handleProgramSection
- *
+/**
  *  "pzText" points to a '[' character.
  *  The "traditional" [PROG_NAME] segmentation of the config file.
  *  Do not ever mix with the "<?program prog-name>" variation.
  */
-static char*
-handleProgramSection(
-    tOptions*     pOpts,
-    char*         pzText )
+static char *
+handle_section(tOptions * pOpts, char * pzText)
 {
     size_t len = strlen(pOpts->pzPROGNAME);
     if (   (strncmp(pzText+1, pOpts->pzPROGNAME, len) == 0)
@@ -738,18 +708,13 @@ handleProgramSection(
 }
 
 
-/*  handleStructure
- *
+/**
  *  "pzText" points to a '<' character, followed by an alpha.
  *  The end of the entry is either the "/>" following the name, or else a
  *  "</name>" string.
  */
-static char*
-handleStructure(
-    tOptions*     pOpts,
-    tOptState*    pOS,
-    char*         pzText,
-    int           direction )
+static char *
+handle_struct(tOptions * pOpts, tOptState * pOS, char * pzText, int dir)
 {
     tOptionLoadMode mode = option_load_mode;
     tOptionValue    valu;
@@ -777,7 +742,7 @@ handleStructure(
             return NULL;
         *pzText = NUL;
         pzText += 2;
-        loadOptionLine(pOpts, pOS, pzName, direction, mode);
+        loadOptionLine(pOpts, pOS, pzName, dir, mode);
         return pzText;
 
     case '>':
@@ -859,14 +824,13 @@ handleStructure(
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine(pOpts, pOS, pzName, direction, mode);
+    loadOptionLine(pOpts, pOS, pzName, dir, mode);
 
     return pzText;
 }
 
 
-/*  internalFileLoad
- *
+/**
  *  Load a configuration file.  This may be invoked either from
  *  scanning the "homerc" list, or from a specific file request.
  *  (see "optionFileLoad()", the implementation for --load-opts)
@@ -948,7 +912,7 @@ internalFileLoad(tOptions* pOpts)
             strcpy(pz, pOpts->pzRcName);
         }
 
-        filePreset(pOpts, zFileName, inc);
+        file_preset(pOpts, zFileName, inc);
 
         /*
          *  IF we are now to skip config files AND we are presetting,
@@ -1057,12 +1021,11 @@ optionLoadOpt(tOptions* pOpts, tOptDesc* pOptDesc)
         /* NOT REACHED */
     }
 
-    filePreset(pOpts, pOptDesc->optArg.argString, DIRECTION_CALLED);
+    file_preset(pOpts, pOptDesc->optArg.argString, DIRECTION_CALLED);
 }
 
 
-/*  parseAttributes
- *
+/**
  *  Parse the various attributes of an XML-styled config file entry
  */
 LOCAL char*
@@ -1090,15 +1053,15 @@ parseAttributes(
 
         switch (find_xat_attribute_id(pzText, len)) {
         case XAT_KWD_TYPE:
-            pzText = parseValueType(pzText+len, pType);
+            pzText = parse_value(pzText+len, pType);
             break;
 
         case XAT_KWD_WORDS:
-            pzText = parseKeyWordType(pOpts, pzText+len, pType);
+            pzText = parse_keyword(pOpts, pzText+len, pType);
             break;
 
         case XAT_KWD_MEMBERS:
-            pzText = parseSetMemType(pOpts, pzText+len, pType);
+            pzText = parse_set_mem(pOpts, pzText+len, pType);
             break;
 
         case XAT_KWD_COOKED:
@@ -1129,7 +1092,7 @@ parseAttributes(
         case XAT_KWD_INVALID:
         invalid_kwd:
             pType->valType = OPARG_TYPE_NONE;
-            return skipUnknown(pzText);
+            return skip_unkn(pzText);
         }
     } while (pzText != NULL);
 
@@ -1137,45 +1100,34 @@ parseAttributes(
 }
 
 
-/*  parseKeyWordType
- *
+/**
  *  "pzText" points to the character after "words=".
  *  What should follow is a name of a keyword (enumeration) list.
  */
 static char*
-parseKeyWordType(
-    tOptions*     pOpts,
-    char*         pzText,
-    tOptionValue* pType )
+parse_keyword(tOptions * pOpts, char * pzText, tOptionValue * pType)
 {
-    return skipUnknown(pzText);
+    return skip_unkn(pzText);
 }
 
 
-/*  parseSetMemType
- *
+/**
  *  "pzText" points to the character after "members="
  *  What should follow is a name of a "set membership".
  *  A collection of bit flags.
  */
 static char*
-parseSetMemType(
-    tOptions*     pOpts,
-    char*         pzText,
-    tOptionValue* pType )
+parse_set_mem(tOptions * pOpts, char * pzText, tOptionValue * pType)
 {
-    return skipUnknown(pzText);
+    return skip_unkn(pzText);
 }
 
 
-/*  parseValueType
- *
+/**
  *  "pzText" points to the character after "type="
  */
-static char*
-parseValueType(
-    char*         pzText,
-    tOptionValue* pType )
+static char *
+parse_value(char * pzText, tOptionValue * pType)
 {
     size_t len = 0;
 
@@ -1188,7 +1140,7 @@ parseValueType(
     if ((len == 0) || (! IS_END_XML_TOKEN_CHAR(*pzText))) {
     woops:
         pType->valType = OPARG_TYPE_NONE;
-        return skipUnknown(pzText);
+        return skip_unkn(pzText);
     }
 
     switch (find_value_type_id(pzText - len, len)) {
@@ -1226,12 +1178,11 @@ parseValueType(
 }
 
 
-/*  skipUnknown
- *
+/**
  *  Skip over some unknown attribute
  */
-static char*
-skipUnknown(char* pzText)
+static char *
+skip_unkn(char* pzText)
 {
     for (;; pzText++) {
         if (IS_END_XML_TOKEN_CHAR(*pzText))  return pzText;
@@ -1240,8 +1191,7 @@ skipUnknown(char* pzText)
 }
 
 
-/*  validateOptionsStruct
- *
+/**
  *  Make sure the option descriptor is there and that we understand it.
  *  This should be called from any user entry point where one needs to
  *  worry about validity.  (Some entry points are free to assume that

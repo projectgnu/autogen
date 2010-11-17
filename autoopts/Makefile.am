@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-11-05 10:48:16 bkorb"
+## Time-stamp:      "2010-11-16 16:42:21 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,6 +27,8 @@
 
 SUBDIRS     = @OPTS_TESTDIR@
 INCLUDES    = @INCLIST@
+libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
+LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
 if  NEED_PATHFIND
 PATHFIND_MAN= pathfind.3
@@ -39,7 +41,6 @@ GENMAN      = $(PATHFIND_MAN) \
 MAN_STAMP   = man3-stamp
 GENTEXI     = libopts.texi libopts.menu
 TEXI_STAMP  = texi-stamp
-libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 
 GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h \
 	xat-attribute.h value-type.h ag-char-map.h
@@ -55,13 +56,11 @@ CSRC        = $(GEN_SRC) \
     boolean.c configfile.c cook.c      enumeration.c environment.c \
     file.c    genshell.c   load.c      makeshell.c   nested.c  numeric.c \
     pgusage.c putshell.c   reset.c     restore.c     save.c    sort.c    \
-    stack.c   streqvcmp.c  text_mmap.c tokenize.c    time.c \
-    usage.c   version.c
+    stack.c   streqvcmp.c  text_mmap.c tokenize.c    time.c    usage.c   \
+    version.c
 
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
-LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
-LGUILE_VER  = @GO_CURRENT@:@GO_REVISION@:@GO_AGE@
 
 TPL_FILES   = \
 DEF_FILES   = genshell.def $(srcdir)/funcs.def
@@ -92,7 +91,6 @@ EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) autogen.map \
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
 INST_M4DATA               = autoopts.m4
-INST_ND_PKGDATA           = $(libsrc)
 INST_PKGCFG               = pkgconfig/autoopts.pc
 INST_PKGDATA              = autoopts.m4 $(TPL_FILES)
 INST_LIBS                 = libopts.la
@@ -108,6 +106,8 @@ lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
+BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -123,7 +123,7 @@ libopts.c : $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
-	@AGexe="$(AGexe)" top_srcdir="$(top_srcdir)" \
+	@$(BOOTENV) \
 	$(SHELL) $(srcdir)/bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
@@ -134,23 +134,23 @@ install-data-local : install-man3
 $(GENMAN) : $(MAN_STAMP)
 $(MAN_STAMP) : $(srcdir)/funcs.def
 	@if [ -x ../agen5/autogen ] ; then \
-	touch tmp-$@ ; \
-	echo ! $(AGexe) -L$(srcdir)/tpl -Tagman3.tpl $(srcdir)/funcs.def ; \
-	$(AGexe) -L$(srcdir)/tpl -Tagman3.tpl $(srcdir)/funcs.def ; \
-	mv -f tmp-$@ $@ ; else true ; fi
+	  touch tmp-$@ ; \
+	  opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Tagman3.tpl' ; \
+	  echo ! $(AGexe) $${opts} $(srcdir)/funcs.def ; \
+	  $(AGexe) $${opts} $(srcdir)/funcs.def ; \
+	  mv -f tmp-$@ $@ ; else true ; fi
 
 $(GENTEXI) : $(TEXI_STAMP)
 $(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
 	@touch tmp-$@ ; \
-	cmd="$(AGexe) -L$(srcdir)/tpl -DLEVEL=subsection -Taginfo3.tpl -blibopts " ; \
+	opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Taginfo3.tpl' ; \
+	cmd="$(AGexe) $${opts} -DLEVEL=subsection -blibopts" ; \
 	cmd="$${cmd} -L$(srcdir) $(srcdir)/funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
 libsrc : $(libsrc)
 $(libsrc) :
-	@top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) ; \
-	export top_srcdir top_builddir ; \
-	AGexe="$(AGexe)" CLexe="$(CLexe)" \
+	@$(BOOTENV) \
 	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
 	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
 
