@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am
 ##
-## Time-stamp:      "2010-11-16 16:42:21 bkorb"
+## Time-stamp:      "2010-11-18 08:18:50 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -116,10 +116,11 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 libopts.c : $(HDRS) $(CSRC)
-	( echo '#define AUTOOPTS_INTERNAL' ; \
+	{ echo '#define AUTOOPTS_INTERNAL' ; \
 	echo '#include "compat/compat.h"' ; \
 	echo '#define LOCAL static' ; \
-	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; done ) > $@
+	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; \
+	done ; } > $@
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def

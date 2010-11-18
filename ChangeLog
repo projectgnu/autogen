@@ -1,5 +1,16 @@
 2010-11-04  Bruce Korb  <bkorb@gnu.org>
 
+	* autoopts/configfile.c (aoflags_directive) do not use asprintf().
+	It causes problems on some platforms.
+	* getdefs/Makefile.am (RUNAG): do not use ":=" assignment 'cuz
+	Solaris' make cannot cope.
+
+2010-11-04  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.2 release
+
+2010-11-04  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/Makefile.am (GENMAN): derive more of the list
 	* autoopts/autogen.map (end-list-entry): new char classification
 	* autoopts/configfile.c (handle_directive): handle new directive

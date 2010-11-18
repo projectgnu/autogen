@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-11-08 09:30:51 bkorb"
+## Time-stamp:      "2010-11-18 10:28:50 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -31,7 +31,7 @@ nodist_getdefs_SOURCES = $(BUILT_SOURCES)
 
 SUBDIRS         = test
 EXTRA_DIST      = opts.def $(gdsrcs)
-RUNAG           := $(AGexe) -L$(top_srcdir)/autoopts/tpl \
+RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
 	 -L$(top_builddir)/autoopts/tpl
 
 if AMDEP

@@ -77,9 +77,8 @@ flag = {
     descrip   = "Show the definition tree";
     disable   = dont;     /* mark as enable/disable type */
                           /* option.  Disable as `dont-' */
-};[=
-
-(texi-escape-encode (out-pop #t)) =]
+};
+[= (texi-escape-encode (out-pop #t)) \=]
 @end example
 
 @noindent
@@ -114,11 +113,11 @@ test -f check && rm -f check
 cat >> checkopt.def <<- _EOF_
 	include = '#include "compat/compat.h"';
 	_EOF_
-(
+{
   run_ag checkopt.def
   opts="-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}"
   ${CC} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
-) > checkopt.err 2>&1
+} > checkopt.err 2>&1
 
 test -x ./check || {
   cat checkopt.err >&2
