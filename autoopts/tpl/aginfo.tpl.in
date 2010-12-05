@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2010-07-24 15:56:38 bkorb"
+## Time-stamp:        "2010-12-03 16:05:23 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -126,7 +126,14 @@ This is the automatically generated usage text for [=prog-name=]:
 
 @exampleindent 0
 @example
-[= (shellf "PROG=./%1$s
+[=
+(define help-opt
+   (if (exist? "long-opts")      "--help"
+   (if (exist? "help-value")     (string-append "-" (get "help-value"))
+   (if (exist? "flag.value")     "'-?'"
+                                 "help" ))) )
+
+(shellf "PROG=./%1$s
 
     if [ ! -f ${PROG} ]
     then PROG=./`echo $PROG | tr '[A-Z]' '[a-z]'` ; fi
@@ -145,13 +152,8 @@ This is the automatically generated usage text for [=prog-name=]:
             -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' \
             -e 's/\t/        /g' "
 
-    (get "prog-name")
-
-    (if (exist? "long_opts")       "--help"
-        (if (exist? "flag.value")  "-?"
-                                   "help" ))
-
-    )  =]
+    (get "prog-name") help-opt
+)  =]
 @end example
 @exampleindent 4[=
 

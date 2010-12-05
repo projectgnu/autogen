@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-07-10 13:48:21 bkorb"
+# Time-stamp:        "2010-12-04 14:42:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -38,7 +38,7 @@ testname="${testname}" \
 test_main="${test_main}" \
 argument="arg ..." \
 long_opts="yes" \
-${SHELLX} -x ${stdopts} option second:fumble ignored || \
+${SHELLX} ${stdopts} option second:fumble ignored || \
     failure "Could not run stdopts.def"
 
 echo 'reorder-args;' >> ${testname}.def
@@ -206,12 +206,19 @@ flag = {
     value = 'Y';
 };
 _EOF_
-${AG_L} ${testname}.def 2>/dev/null && \
-  failure AutoGen processed double ifdefs
 
-sed '/ value /s/Y/X/;s/ ifndef =.*//' ${testname}.def > ${testname}-2.def
-${AG_L} ${testname}-2.def && \
-  failure AutoGen processed conflicting flag values
+case "${BASH_VERSION}" in
+not-good-enough )
+  echo "You are running Solaris without bash available."
+  echo "duplicate option flags cannot be tested."
+  ;;
+
+* )
+  sed '/ value /s/Y/X/;s/ ifndef =.*//' ${testname}.def > ${testname}-2.def
+  ${AG_L} ${testname}-2.def && \
+    failure AutoGen processed conflicting flag values
+  ;;
+esac
 
 cleanup
 

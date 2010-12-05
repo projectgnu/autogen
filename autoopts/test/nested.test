@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2010-08-20 15:34:30 bkorb"
+# Time-stamp:        "2010-11-30 14:45:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -188,7 +188,7 @@ cmp -s ${testname}-res1.* || \
 
 # # # # # # # # # # DOUBLE ARG TEST # # # # # # # # #
 
-arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
+arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 (./${testname} -s "${arg1}" -s "${arg2}" \
     | sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
@@ -217,7 +217,8 @@ cmp -s ${testname}-res2.* || \
   failure "`diff ${testname}-res2.*`"
 
 ./${testname} -s "${arg1}" -s "${arg2}" '->'
-sed -i -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg
+sed -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg > ${testname}.XX
+mv -f ${testname}.XX ${testname}.d/${testname}.cfg
 cat > ${testname}-res3.base <<- _EOF_
 	#  test_nested - Test AutoOpts for nested
 	#  preset/initialization file
@@ -246,7 +247,8 @@ cmp -s ${files} || \
 # Copy the config file and verify that the contents are the same.
 #
 ./${testname} "->${testname}.d/${testname}.cfg2"
-sed -i -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2
+sed -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2 > ${testname}.XX
+mv -f ${testname}.XX ${testname}.d/${testname}.cfg2
 files=${testname}.d/${testname}.cfg\ ${testname}.d/${testname}.cfg2
 cmp -s ${files} || \
     failure "re-saved config${nl}`diff ${files}`"

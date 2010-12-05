@@ -2,7 +2,7 @@
 
 null
 
-##  Time-stamp:        "2010-02-24 08:39:01 bkorb"
+##  Time-stamp:        "2010-11-29 15:27:39 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -63,10 +63,8 @@ dnl
 dnl do always before generated macros:
 dnl
 AC_DEFUN([[= (. do-all-name) =]_FIRST],[
-[if test X${[= (. do-all-name) =]_FIRST_done} != Xyes ; then]
 [= (prefix "  " (join "\n" (stack "do-first"))) =]
-[  [= (. do-all-name) =]_FIRST_done=yes
-fi]])
+])
 [= (if (exist? "do-always") "\n\n") =][=
 
 ENDIF do-first                  =][=
@@ -93,7 +91,7 @@ dnl[=
 AC_DEFUN([[=(. do-all-name)=]],[[=
 
 (if (exist? "do-first")
-    (string-append "\n  " do-all-name "_FIRST")) =][=
+    (string-append "\n  AC_REQUIRE([" do-all-name "_FIRST])")) =][=
 
 FOR test        =][=
   preamble      =][=

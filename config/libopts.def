@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2010-07-17 09:50:00 bkorb"
+ *  Time-stamp:        "2010-11-29 15:22:45 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -246,7 +246,7 @@ test = {
 };
 
 do-first = <<-_EOF_
-	AC_HEADER_STDC
+	AC_REQUIRE([AC_HEADER_STDC])
 	AC_HEADER_DIRENT
 
 	# =================

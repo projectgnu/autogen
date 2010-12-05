@@ -1,4 +1,15 @@
-New in __CURRENT_VERSION__ September 2010
+New in __CURRENT_VERSION__ November 2010
+
+* 
+
+New in 5.11.3 - November 2010
+
+* new man page templates were added
+* usage information on usage errors may be suppressed
+* asprintf was introduced into libopts, but is not on all
+  platforms.  It has been removed.
+
+New in 5.11.3 - July 2010
 
 * Fix (kill) orphaned shell program
 * add file-next-line functions to facilitate #line "C" directives

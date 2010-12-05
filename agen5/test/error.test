@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-10 11:33:04 bkorb"
+# Time-stamp:        "2010-12-04 11:22:43 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -123,7 +123,7 @@ cmp -s ${testname}.base2 ${testname}.trc2 || \
 echo creating ${testname}.base3
 # this is the output we should expect to see
 cat > ${testname}.base3 <<_EOF_
-Killing AutoGen:  testing death
+Killing AutoGen <pid>:  testing death
 AutoGen aborting on signal <text-varies> in state EMITTING
 processing template error2.tpl
             on line 2
@@ -142,17 +142,17 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
 # Lots of variations happen based on timing.
 # Remove the variations and verify the basic.
 #
-sedcmd=`
-    cat <<- _EOF_
+sedcmd='
 	s,on signal .* in state,on signal <text-varies> in state,
 	/trapped on [0-9]/d
+	/^Killing AutoGen/s/ [0-9]*:/ <pid>:/
 	/ signal.*Child exited/d
 	/Abort/d
 	/Broken pipe/d
 	/Last command issued:/,/ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd/d
 	/^[ 	]*$/d
-	_EOF_
-`
+	/defs: line .*: .* Hangup/d
+'
 sed -e "${sedcmd}" ${testname}.tmp3 > ${testname}.trc3
 cmp -s ${testname}.trc3 ${testname}.base3 || \
   failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"

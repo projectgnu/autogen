@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2010-02-24 08:39:53 bkorb"
+# Time-stamp:        "2010-11-30 15:32:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -141,7 +141,11 @@ cmp -s ${testname}.h[br]* || {
     failure "MISCOMPARE: `diff ${testname}-2.h[br]*`"
 }
 
-use=`./${testname} --usage 2>&1 > /dev/null`
+use=`
+  set +x
+  exec 2>&1
+  exec 1>/dev/null
+  ./${testname} --usage`
 test $? -eq 0       || failure usage failure
 test "X${use}" = X  || failure misdirected usage
 

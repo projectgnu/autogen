@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-11-08 15:05:33 bkorb"
+ *  Time-stamp:        "2010-11-30 17:01:03 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -414,7 +414,6 @@ flag = {
     name       = no-fmemopen;
     descrip    = "Do not use in-mem streams";
     value      = m;
-    ifdef      = ENABLE_FMEMOPEN;
 #ifndef XML2AG
     doc = <<-  _EOF_
 	If the local C library supports "@code{fopencookie(3GNU)}", or
@@ -423,6 +422,9 @@ flag = {
 	if there is a shortage of virtual memory.  If, for a particular
 	application, you run out of memory, then specify this option.
 	This is unlikely in a modern virtual memory environment.
+
+	On platforms without these functions,
+	the option is accepted but ignored.
 	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";

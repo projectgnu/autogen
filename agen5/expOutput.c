@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-09-05 05:10:51 bkorb"
+ *  Time-stamp:        "2010-11-29 15:06:20 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -555,21 +555,50 @@ ag_scm_out_push_new(SCM new_file)
     if (AG_SCM_STRING_P(new_file)) {
         open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
                          write_mode, 0);
+        return SCM_UNDEFINED;
     }
 
+    /*
+     *  "ENABLE_FMEMOPEN" is defined if we have either fopencookie(3GNU) or
+     *  funopen(3BSD) is available and autogen was not configured with fmemopen
+     *  disabled.  We cannot use the POSIX fmemopen.
+     */
 #if defined(ENABLE_FMEMOPEN)
-    else if (HAVE_OPT(NO_FMEMOPEN))
+    if (! HAVE_OPT(NO_FMEMOPEN)) {
+        char *     pzNewFile;
+        tFpStack * p;
+
+        /*
+         *  This block is used IFF ENABLE_FMEMOPEN is defined and if
+         *  --no-fmemopen is *not* selected on the command line.
+         */
+        p = (tFpStack*)AGALOC(sizeof(tFpStack), "out file stack");
+        p->pPrev  = pCurFp;
+        p->flags  = FPF_FREE;
+        p->pFile  = ag_fmemopen(NULL, (ssize_t)0, "wb+");
+        pzNewFile = (char*)zMemFile;
+        p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
+
+        if (p->pFile == NULL)
+            AG_CANT("open 'wb+'", pzNewFile);
+
+        p->pzOutName = pzNewFile;
+        outputDepth++;
+        pCurFp    = p;
+
+        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+            fprintf(pfTrace, "out-push-new on temp file\n");
+        return SCM_UNDEFINED;
+    }
 #endif
+
+    /*
+     *  Either --no-fmemopen was specified or we cannot use ag_fmemopen().
+     */
     {
         static char const mk_tmp_dir[] = "(make-tmp-dir)";
         static int  const line_no      = __LINE__ - 1;
 
-        /*
-         *  IF we do not have fopencookie(3GNU) or funopen(3BSD), then this
-         *  block is a pure "else" clause.  If we do have one of those, then
-         *  the block is executed when a file name is not specified *and*
-         *  --no-fmemopen was *not* selected.
-         */
         static char * temp_pat = NULL;
         static size_t tmplen = 0;
         char *  tmp_fnm;
@@ -591,40 +620,9 @@ ag_scm_out_push_new(SCM new_file)
         open_output_file(tmp_fnm, tmplen, write_mode, FPF_TEMPFILE);
         close(tmpfd);
     }
-#if defined(ENABLE_FMEMOPEN)
-
-    else
-
-    {
-        char *     pzNewFile;
-        tFpStack * p;
-
-        /*
-         *  This block is used IFF ENABLE_FMEMOPEN is defined and if
-         *  --no-fmemopen is selected on the command line.
-         */
-        p = (tFpStack*)AGALOC(sizeof(tFpStack), "out file stack");
-        p->pPrev  = pCurFp;
-        p->flags  = FPF_FREE;
-        p->pFile  = ag_fmemopen(NULL, (ssize_t)0, "wb+");
-        pzNewFile = (char*)zMemFile;
-        p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
-
-        if (p->pFile == NULL)
-            AG_CANT("open 'wb+'", pzNewFile);
-
-        p->pzOutName = pzNewFile;
-        outputDepth++;
-        pCurFp    = p;
-
-        if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "out-push-new on temp file\n");
-    }
-#endif /* ENABLE_FMEMOPEN */
 
     return SCM_UNDEFINED;
 }
-
 
 /*=gfunc out_switch
  *

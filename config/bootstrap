@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-11-08 13:58:31 bkorb"
+# Time-stamp:      "2010-12-02 13:17:39 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -69,8 +69,6 @@ config_tools()
     MISSING="${conf_dir}/missing"
     export config_file srcdir top_srcdir top_builddir MISSING
     chmod +x ${MISSING} || exit 1
-
-    set -e
 
     #  Check for AutoGen version 5.
     #

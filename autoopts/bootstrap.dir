@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-11-07 14:41:20 bkorb"
+# Time-stamp:      "2010-12-02 22:58:59 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -99,16 +99,19 @@ add_files_to_mf() {
 make_funcs_def()
 {
     $noag && exit 1
+    s2enum=`which mk-str2enum` 2>/dev/null || :
+    test -x "${s2enum}" || \
+        s2enum="bash ${top_srcdir}/add-on/char-mapper/mk-str2enum.sh"
 
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
 
-    mk-str2enum --base-name=xat-attribute -n \
+    ${s2enum} --base-name=xat-attribute -n \
         type words members cooked uncooked keep || \
-        die "FAILED: mk-str2enum --base-name=xat-attribute"
+        die "FAILED: ${s2enum} --base-name=xat-attribute"
 
-    mk-str2enum --base-name=value-type --prefix=vtp -n string integer \
+    ${s2enum} --base-name=value-type --prefix=vtp -n string integer \
         boolean bool keyword set set-membership nested hierarchy || \
-        die "FAILED: mk-str2enum --base-name=value-type"
+        die "FAILED: ${s2enum} --base-name=value-type"
     burn_aover
 
     test -d autoopts || mkdir autoopts

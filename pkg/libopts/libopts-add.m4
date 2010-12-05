@@ -1,7 +1,7 @@
 
 dnl @synopsis  LIBOPTS_CHECK
 dnl
-dnl Time-stamp:        "2010-02-24 08:37:21 bkorb"
+dnl Time-stamp:        "2010-11-29 15:45:54 bkorb"
 dnl
 dnl If autoopts-config works, add the linking information to LIBS.
 dnl Otherwise, add ``libopts-${ao_rev}'' to SUBDIRS and run all
@@ -27,6 +27,7 @@ dnl
 dnl Default to system libopts
 dnl
 AC_DEFUN([LIBOPTS_CHECK],[
+  AC_REQUIRE([INVOKE_LIBOPTS_MACROS_FIRST])
   [NEED_LIBOPTS_DIR='']
   m4_pushdef([AO_Libopts_Dir],
 	    [ifelse($1, , [libopts], [$1])])

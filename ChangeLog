@@ -1,3 +1,34 @@
+2010-12-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/directive.tpl (zShellInit): compute the pid offset
+	* agen5/agShell.c (server_setup): print pid at compiled offset
+	(die): use signal numbers instead of names
+	* 
+	* agen5/test/error.test: handle pid number in Killing AutoGen msg
+	* autoopts/test/defs.in (tabch): define for global use
+	(SunOS): avoid /bin/sh at all costs.
+	* autoopts/test/cfg-edit.test: use ${tabch}, not $'\t'
+	* utoopts/test/nested.test: ditto
+	* autoopts/test/errors.test (conflicting flag): skip test on
+	Solaris when not using BASH.  shell quits on program coring.
+
+2010-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (local): eval the args, do not discard
+	(compile): The Solaris /usr/xpg4/bin/tr is junk.  Do not use.
+	* autoopts/test/nested.test (sed): '-i' is a GNU-ism
+	* doc/mk-agen-texi-in (setup_exports): libopts.a must be found
+	in order to build docs.
+
+	Dave Hart  <hart@ntp.org>
+	* agen5/expOutput.c (ag_scm_out_push_new): fix #ifdef-ed "else"
+
+	Elias Pipping  <pipping@users.sourceforge.net>
+	* agen5/expFormat.c (mk_license): pass owner string to aprf().
+	* autoopts/bootstrap.dir (make_funcs_def): locate mk-str2enum
+	if it is not in the current PATH.
+	* config/bootstrap (config_tools): "set -e" is unnecessary
+
 2010-11-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/configfile.c (aoflags_directive) do not use asprintf().

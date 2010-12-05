@@ -32,6 +32,14 @@ run_ag() {
     ${AGexe} -L${top_srcdir}/autoopts/tpl -L${top_builddir}/autoopts/tpl "$@"
 }
 
+test -z "$tmp_dir" && tmp_dir=${TMPDIR-/tmp}/agdoc-$$
+test -d "$tmp_dir" || {
+  rm -rf "$tmp_dir"
+  mkdir "$tmp_dir" || die cannot midir "$tmp_dir"
+  cleanup() { rm -rf ${tmp_dir} ; }
+  trap cleanup 0
+}
+
 eval "\`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION\`" 2> /dev/null
 echo ${AO_CURRENT}.${AO_REVISION}
 
@@ -191,14 +199,6 @@ Yields a program which, when run with @file{--help}, prints out:
 
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 OPTDIR=${TOPDIR}/autoopts
-libs=${OPTDIR}
-test -d ${libs}/.libs && libs=${libs}/.libs
-
-if [ -f ${libs}/libopts.a ]
-then libs="${libs}/libopts.a"
-else libs="-L ${libs} -lopts"
-fi
-libs="${libs} ${LIBS}"
 
 exec 3>&1
 (
@@ -208,7 +208,7 @@ exec 3>&1
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts="-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}"
-  ${CC} ${CFLAGS} ${opts} default-test.c ${libs}
+  ${CC} ${CFLAGS} ${opts} default-test.c ${LIBS}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
 ) > ${tmp_dir}/default-test.log 2>&1
@@ -404,7 +404,7 @@ log=${tmp_dir}/genshellopt.log
   HOME='' run_ag -t40 genshellopt.def
   test $? -eq 0 || die "autogen failed to create genshellopt.c - See ${log}"
 
-  ${CC} ${CFLAGS} ${opts} genshellopt.c ${libs}
+  ${CC} ${CFLAGS} ${opts} genshellopt.c ${LIBS}
   test $? -eq 0 || die "could not compile genshellopt.c - See ${log}"
 ) > ${log} 2>&1
 

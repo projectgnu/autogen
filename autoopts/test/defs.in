@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-11-08 13:44:55 bkorb"
+# Time-stamp:     "2010-12-04 11:37:36 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,10 +26,25 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
+case `uname -s` in
+SunOS )
+  if test "X$BASH_VERSION" = X
+  then
+    # On Solaris, make certain we do not use /bin/sh
+    sh=`which bash`
+    test "X$sh" = X && sh=/usr/xpg4/bin/sh
+    BASH_VERSION=not-good-enough
+    export BASH_VERSION
+    exec $sh "$0" "$@"
+  fi
+  ;;
+esac
+
 progname=`echo "$0" | sed 's,^.*/,,'`
 testname=`echo "$progname" | sed 's,\..*$,,'`
 test_name=`echo ${testname} | sed 's/-/_/g'`
 PS4=">${testname}-\${FUNCNAME}> "
+tabch='	'
 export progname testname
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -70,10 +85,10 @@ set +a
 
 nl='
 '
-test -z "${BASH_VERSION}" && local() { : ; }
+test -z "${BASH_VERSION}" && local() { eval "$@" ; }
 
 vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
-unset $vars
+test "X$vars" = X || unset $vars
 
 #  If only the "rm(1)" command could be relied upon....
 #
@@ -248,7 +263,7 @@ compile()
   test "X${Cexe}"  = "X" && Cexe="${Csrc}"
   test "X${Dnam}"  = "X" && Dnam="${testname}"
 
-  d=`echo TEST_TEST_${Dnam}_OPTS | tr '[a-z]-' '[A-Z]_'`
+  d=`echo TEST_TEST_${Dnam}_OPTS | /usr/bin/tr '[a-z]-' '[A-Z]_'`
   cc_cmd="${CC} ${CFLAGS} -D$d ${INC} -o ${Cexe} ${Csrc}.c ${LIB}"
   eval ${cc_cmd} || \
     failure cannot compile ${Csrc}.c

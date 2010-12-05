@@ -227,7 +227,7 @@ case "${members}" in
 * ) failure "members entry not removed"
 esac
 
-arg1=$'stumble, <foo>foo\tlish</foo>, <bar type=integer>1234</bar>, able'
+arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 dir=`echo ${TMPDIR} | sed "s@^\`pwd\`//*@@"`
 out_file=${dir}/${testname}-out-file

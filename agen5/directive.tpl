@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-08-20 15:39:33 bkorb"
+# Time-stamp:        "2010-12-04 11:03:19 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -123,7 +123,7 @@ static char const zSchemeInit[= (set! tmp-txt (shell
  *  The shell initialization string.  It is not in "const" memory because
  *  we have to write our PID into it.
  */
-static char zShellInit[] =
+static char shell_init_str[] =
 [= #  Things this scriptlett has to do:
 
 1.  Open fd 8 as a duplicate of 2.  It will remain open.
@@ -167,8 +167,10 @@ test -n "${CDPATH}" && {
 }
 ( unalias cd ) 1>&2 && unalias cd
 die() {
-  echo "Killing AutoGen:  $*" >&8
-  kill -TERM ${AG_pid}
+  echo "Killing AutoGen ${AG_pid}:  $*" >&8
+  kill -15 ${AG_pid}
+  kill -1  ${AG_pid}
+  kill -2  ${AG_pid}
   exit 1
 }
 test -z "${TMPDIR}" && TMPDIR=/tmp
@@ -188,7 +190,9 @@ mk_tmp_dir() {
 }
 exec 2>&8
 AG_pid=[=
-(kr-string (out-pop #t))=] "\000........."; /* ' // " // */
+ (define init-str (out-pop #t))
+ (kr-string init-str)=] "\000........."; /* ' // " // */
+static int const shell_init_len = [= (string-length init-str) =];
 
 /*
  *  "gperf" functionality only works if the subshell is enabled.

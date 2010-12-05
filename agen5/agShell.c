@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2010-08-20 11:30:16 bkorb"
+ *  Time-stamp:        "2010-12-03 11:26:51 bkorb"
  *
  *  Manage a server shell process
  *
@@ -161,12 +161,10 @@ server_setup(void)
     errClose = AG_FALSE;
 
     {
-        static char* pzPid = NULL;
         char* pz;
-        pzLastCmd = zShellInit;
-        if (pzPid == NULL)
-            pzPid = zShellInit + strlen(zShellInit);
-        sprintf(pzPid, "%u\n", (unsigned int)getpid());
+        pzLastCmd = shell_init_str;
+        sprintf(shell_init_str + shell_init_len, "%u\n",
+                (unsigned int)getpid());
         fprintf(serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
                 zShDone, ++logCount);
 

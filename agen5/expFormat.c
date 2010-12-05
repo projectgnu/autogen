@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-07-11 12:54:17 bkorb"
+ *  Time-stamp:        "2010-12-02 14:22:08 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -348,7 +348,7 @@ mk_license(SCM prog, SCM pfx, char const * lic, char const * owner)
     {
         char const * pzPfx = ag_scm2zchars(pfx,  "lic prefix");
         char const * pzPrg = ag_scm2zchars(prog, "prog name");
-        char const * pzRes = aprf(lic, pzPrg, pzPfx);
+        char const * pzRes = aprf(lic, pzPrg, pzPfx, owner);
         SCM res = AG_SCM_STR02SCM(pzRes);
 
         AGFREE((void*)pzRes);
