@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-12-04 11:03:19 bkorb"
+# Time-stamp:        "2010-12-06 13:28:34 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -221,14 +221,14 @@ gperf_%2$s=${gpdir}/%2$s
   do echo "${f}, ${idx}"
      idx=`expr ${idx} + 1`
   done <<- _EOLIST_
-%1$s
+%3$s
 	_EOLIST_
 
   cat <<- '_EOF_'
 	%%%%
 	int main( int argc, char** argv ) {
 	    char*    pz = argv[1];
-	    struct %2$s_index* pI = %2$s_find( pz, strlen( pz ));
+	    struct %2$s_index const * pI = %2$s_find( pz, strlen( pz ));
 	    if (pI == NULL)
 	        return 1;
 	    printf( "0x%%02X\n", pI->idx );
@@ -244,9 +244,9 @@ gperf --language=ANSI-C -H %2$s_hash -N %2$s_find \
       `cat %2$s.log`"
 egrep -v '^_*inline$' %2$s-temp.c > %2$s.c
 export CFLAGS=-g
-${MAKE-make} %2$s 1>&2
+%1$s %2$s 1>&2
 test $? -eq 0 -a -x ${gperf_%2$s} || \
-  die "could not build gperf program
+  die "could not '%1$s %2$s' gperf program
       `cat %2$s.log`"
 exec 2>&8
 [=

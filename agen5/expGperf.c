@@ -1,6 +1,6 @@
 /*
  *
- *  Time-stamp:        "2010-07-24 09:06:11 bkorb"
+ *  Time-stamp:        "2010-12-06 13:18:05 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
@@ -85,7 +85,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        char* pzCmd = aprf(zMakeGperf, pzList, pzName);
+        char * pzCmd = aprf(zMakeGperf, zMakeProg, pzName, pzList);
 
         /*
          *  Run the command and ignore the results.

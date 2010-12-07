@@ -1,9 +1,17 @@
+2010-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am (ag.c): gperf code needs the "make" program,
+	so define the make program name in the generated "ag.c" file.
+	* agen5/autogen.h (pCurDir): used in multiple modules --> global
+	* agen5/directive.tpl (zMakeGperf): add parameter for make program
+	* agen5/expGperf.c (ag_scm_make_gperf): supply that parameter
+	* autoopts/environment.c (do_env_opt): ignore empty value strings
+
 2010-12-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/directive.tpl (zShellInit): compute the pid offset
 	* agen5/agShell.c (server_setup): print pid at compiled offset
 	(die): use signal numbers instead of names
-	* 
 	* agen5/test/error.test: handle pid number in Killing AutoGen msg
 	* autoopts/test/defs.in (tabch): define for global use
 	(SunOS): avoid /bin/sh at all costs.

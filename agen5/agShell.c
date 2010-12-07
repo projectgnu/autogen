@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2010-12-03 11:26:51 bkorb"
+ *  Time-stamp:        "2010-12-06 14:49:08 bkorb"
  *
  *  Manage a server shell process
  *
@@ -21,13 +21,10 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-static tpChar  pCurDir    = NULL;
-
 #ifndef SHELL_ENABLED
- void closeServer(void) { }
+ void  closeServer(void) { }
 
- int chainOpen(int stdinFd, tCC** ppArgs, pid_t* pChild) { return -1; }
+ int   chainOpen(int stdinFd, tCC** ppArgs, pid_t* pChild) { return -1; }
 
  pid_t openServer(tFdPair* pPair, tCC** ppArgs) { return NOPROCESS; }
 
@@ -43,15 +40,13 @@ static tpChar  pCurDir    = NULL;
 /*
  *  Dual pipe opening of a child process
  */
-static tpfPair serverPair = { NULL, NULL };
-static pid_t   serverId   = NULLPROCESS;
-static ag_bool errClose   = AG_FALSE;
-static int     logCount   = 0;
-static tCC     logIntroFmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
-
-tSCC   zCmdFmt[]   = "cd %s\n%s\n\necho\necho %s - %d\n";
-
-char const* pzLastCmd = NULL;
+static tpfPair      serv_pair     = { NULL, NULL };
+static pid_t        serv_id       = NULLPROCESS;
+static ag_bool      was_close_err = AG_FALSE;
+static int          log_ct        = 0;
+static char const   log_sep_fmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
+static char const   cmd_fmt[]     = "cd %s\n%s\n\necho\necho %s - %d\n";
+static char const * last_cmd      = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
@@ -67,17 +62,17 @@ load_data(void);
 LOCAL void
 close_server_shell(void)
 {
-    if (serverId == NULLPROCESS)
+    if (serv_id == NULLPROCESS)
         return;
 
-    (void)kill(serverId, SIGTERM);
+    (void)kill(serv_id, SIGTERM);
 #ifdef HAVE_USLEEP
     usleep(100000); /* 1/10 of a second */
 #else
     sleep(1);
 #endif
-    (void)kill(serverId, SIGKILL);
-    serverId = NULLPROCESS;
+    (void)kill(serv_id, SIGKILL);
+    serv_id = NULLPROCESS;
 
     /*
      *  This guard should not be necessary.  However, sometimes someone
@@ -86,7 +81,7 @@ close_server_shell(void)
      *  are aborting, we just let the OS close these file descriptors.
      */
     if (procState != PROC_STATE_ABORTING) {
-        (void)fclose(serverPair.pfRead);
+        (void)fclose(serv_pair.pfRead);
         /*
          *  This is _completely_ wrong, but sometimes there are data left
          *  hanging about that gets sucked up by the _next_ server shell
@@ -95,11 +90,11 @@ close_server_shell(void)
          *  the initialization string twice.  It must be a broken timing
          *  issue in the Linux stdio code.  I have no other explanation.
          */
-        fflush(serverPair.pfWrite);
-        (void)fclose(serverPair.pfWrite);
+        fflush(serv_pair.pfWrite);
+        (void)fclose(serv_pair.pfWrite);
     }
 
-    serverPair.pfRead = serverPair.pfWrite = NULL;
+    serv_pair.pfRead = serv_pair.pfWrite = NULL;
 }
 
 /**
@@ -115,15 +110,15 @@ handle_signal(int signo)
 
     fprintf(pfTrace, "Closing server:  %s signal (%d) received\n",
             strsignal(signo), signo);
-    errClose = AG_TRUE;
+    was_close_err = AG_TRUE;
 
     (void)fputs("\nLast command issued:\n", pfTrace);
     {
-        char const* pz = (pzLastCmd == NULL)
-            ? "?? unknown ??\n" : pzLastCmd;
-        fprintf(pfTrace, zCmdFmt, pCurDir, pz, zShDone, logCount);
+        char const* pz = (last_cmd == NULL)
+            ? "?? unknown ??\n" : last_cmd;
+        fprintf(pfTrace, cmd_fmt, pCurDir, pz, zShDone, log_ct);
     }
-    pzLastCmd = NULL;
+    last_cmd = NULL;
     close_server_shell();
 }
 
@@ -158,22 +153,22 @@ server_setup(void)
         (void)sigaction(SIGALRM, &new_sa, NULL);
     }
 
-    errClose = AG_FALSE;
+    was_close_err = AG_FALSE;
 
     {
         char* pz;
-        pzLastCmd = shell_init_str;
+        last_cmd = shell_init_str;
         sprintf(shell_init_str + shell_init_len, "%u\n",
                 (unsigned int)getpid());
-        fprintf(serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
-                zShDone, ++logCount);
+        fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, last_cmd,
+                zShDone, ++log_ct);
 
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-            fprintf(pfTrace, logIntroFmt, logCount);
-            fprintf(pfTrace, zCmdFmt, pCurDir, pzLastCmd, zShDone, logCount);
+            fprintf(pfTrace, log_sep_fmt, log_ct);
+            fprintf(pfTrace, cmd_fmt, pCurDir, last_cmd, zShDone, log_ct);
         }
 
-        (void)fflush(serverPair.pfWrite);
+        (void)fflush(serv_pair.pfWrite);
         pz = load_data();
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
             fputs("(result discarded)\n", pfTrace);
@@ -187,22 +182,22 @@ server_setup(void)
         char* pz;
 
         fputs("Server traps set\n", pfTrace);
-        pzLastCmd = zSetup;
-        fprintf(serverPair.pfWrite, zCmdFmt, pCurDir, pzLastCmd,
-                zShDone, ++logCount);
+        last_cmd = zSetup;
+        fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, last_cmd,
+                zShDone, ++log_ct);
         if (pfTrace != stderr) {
-            fprintf(pfTrace, logIntroFmt, logCount);
-            fprintf(pfTrace, zCmdFmt, pCurDir, pzLastCmd, zShDone, logCount);
+            fprintf(pfTrace, log_sep_fmt, log_ct);
+            fprintf(pfTrace, cmd_fmt, pCurDir, last_cmd, zShDone, log_ct);
         }
 
-        (void)fflush(serverPair.pfWrite);
+        (void)fflush(serv_pair.pfWrite);
         pz = load_data();
         if (pfTrace != stderr)
             fputs("(result discarded)\n", pfTrace);
         fprintf(pfTrace, "Trap state:\n%s\n", pz);
         AGFREE((void*)pz);
     }
-    pzLastCmd = NULL;
+    last_cmd = NULL;
 }
 
 
@@ -400,21 +395,21 @@ load_data(void)
          *  at all and we should.  Retry in those cases (but not on EOF).
          */
         alarm((unsigned int)OPT_VALUE_TIMEOUT);
-        line_p = fgets(zLine, (int)sizeof(zLine), serverPair.pfRead);
+        line_p = fgets(zLine, (int)sizeof(zLine), serv_pair.pfRead);
         alarm(0);
 
         if (line_p == NULL) {
             /*
              *  Guard against a server timeout
              */
-            if (serverId == NULLPROCESS)
+            if (serv_id == NULLPROCESS)
                 break;
 
             if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retryCt++ > 0))
                 fprintf(pfTrace, "fs err %d (%s) reading from server shell\n",
                          errno, strerror(errno));
 
-            if (feof(serverPair.pfRead) || (retryCt > 32))
+            if (feof(serv_pair.pfRead) || (retryCt > 32))
                 break;
 
             continue;  /* no data - retry */
@@ -433,7 +428,7 @@ load_data(void)
         /*
          *  Stop now if server timed out or if we are at EOF
          */
-        if ((serverId == NULLPROCESS) || feof(serverPair.pfRead)) {
+        if ((serv_id == NULLPROCESS) || feof(serv_pair.pfRead)) {
             fputs("feof on data load\n", pfTrace);
             break;
         }
@@ -491,11 +486,11 @@ runShell(char const*  pzCmd)
      *  IF the shell server process is not running yet,
      *  THEN try to start it.
      */
-    if (serverId == NULLPROCESS) {
+    if (serv_id == NULLPROCESS) {
         static char pz4_z[] = "PS4=>ag> ";
         putenv(pz4_z);
-        serverId = openServerFP(&serverPair, serverArgs);
-        if (serverId > 0)
+        serv_id = openServerFP(&serv_pair, serverArgs);
+        if (serv_id > 0)
             server_setup();
     }
 
@@ -503,7 +498,7 @@ runShell(char const*  pzCmd)
      *  IF it is still not running,
      *  THEN return the nil string.
      */
-    if (serverId <= 0) {
+    if (serv_id <= 0) {
         char* pz = (char*)AGALOC(1, "Text Block");
 
         *pz = NUL;
@@ -515,18 +510,18 @@ runShell(char const*  pzCmd)
      *  send the supplied command, and then
      *  have it output a special marker that we can find.
      */
-    pzLastCmd = pzCmd;
-    fprintf(serverPair.pfWrite, zCmdFmt, pCurDir, pzCmd, zShDone, ++logCount);
+    last_cmd = pzCmd;
+    fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, pzCmd, zShDone, ++log_ct);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, logIntroFmt, logCount);
-        fprintf(pfTrace, zCmdFmt, pCurDir, pzCmd, zShDone, logCount);
+        fprintf(pfTrace, log_sep_fmt, log_ct);
+        fprintf(pfTrace, cmd_fmt, pCurDir, pzCmd, zShDone, log_ct);
     }
 
-    if (serverPair.pfWrite != NULL)
-        fflush(serverPair.pfWrite);
+    if (serv_pair.pfWrite != NULL)
+        fflush(serv_pair.pfWrite);
 
-    if (errClose) {
+    if (was_close_err) {
         fprintf(pfTrace, zCmdFail, pzCmd);
         return NULL;
     }
@@ -544,10 +539,10 @@ runShell(char const*  pzCmd)
 
             *pz = NUL;
 
-        } else if (errClose)
+        } else if (was_close_err)
             fprintf(pfTrace, zCmdFail, pzCmd);
 
-        pzLastCmd = NULL;
+        last_cmd = NULL;
         return pz;
     }
 }

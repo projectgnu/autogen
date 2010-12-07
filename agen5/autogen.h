@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-09-05 06:19:10 bkorb"
+ *  Time-stamp:        "2010-12-06 14:21:49 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -72,7 +72,7 @@ typedef struct {
 #define NOPROCESS   ((pid_t)-1)
 #define NULLPROCESS ((pid_t)0)
 
-typedef unsigned char* tpChar;
+typedef unsigned char * tpChar;
 
 #define STRSIZE( s )  (sizeof(s)-1)
 
@@ -438,6 +438,8 @@ MODE int            stackSize        VALUE( 16 );
 MODE tDefEntry *    parseStack[16]   VALUE( { 0 } );
 MODE tDefEntry **   ppParseStack     VALUE( parseStack );
 MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
+
+MODE tpChar         pCurDir          VALUE( NULL );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

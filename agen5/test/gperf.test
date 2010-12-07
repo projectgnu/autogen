@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # gperf.test --- test functionality of `gperf'
 #
-# Time-stamp:        "2010-06-26 16:05:30 bkorb"
+# Time-stamp:        "2010-12-06 13:08:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -75,8 +75,8 @@ fourth	yields: 0x04
 _EOF_
 
 if ${VERBOSE:-false}
-then opts="x ${testname}.def"
-else opts="x --trace=server-shell ${testname}.def"
+then opts="x --trace=server-shell ${testname}.def"
+else opts="x ${testname}.def"
 fi
 
 run_ag ${opts} || failure AutoGen failed

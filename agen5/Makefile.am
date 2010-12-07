@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-03 09:38:04 bkorb"
+## Time-stamp:      "2010-12-06 14:15:20 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -38,14 +38,20 @@ MAINTAINERCLEANFILES = $(GEN_CSRC)
 
 bin_PROGRAMS    = autogen
 
+FUNCLIST        = \
+	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
+
+EXPRLIST        = \
+	expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
+	expOutput.c  expPrint.c  expState.c expString.c $(FUNCLIST)
+
+FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
-    autogen.c   agCgi.c     agInit.c       agShell.c  cgi-fsm.c    \
-    defDirect.c agUtils.c   defParse-fsm.c defLex.c   defLoad.c    \
-    defFind.c   expFormat.c expGperf.c     expGuile.c expExtract.c \
-    expOutput.c expPrint.c  expState.c     expMake.c  fmemopen.c   \
-    funcCase.c  funcDef.c   expString.c    funcFor.c  funcIf.c     \
-    functions.c funcEval.c  loadPseudo.c   opts.c     scmStrings.c \
-    tpLoad.c    tpProcess.c tpParse.c
+    autogen.c $(FSMLIST) $(EXPRLIST) \
+    agCgi.c      agInit.c     agShell.c  agUtils.c    \
+    defDirect.c  defFind.c    defLex.c   defLoad.c    \
+    fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
+    tpLoad.c     tpParse.c    tpProcess.c
 
 hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
 
@@ -60,17 +66,15 @@ autogen_SOURCES = $(GEN_CSRC)
 autogen_LDADD   = $(LO_LIB) $(SNV_LIB) $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)
-FUNCLIST        = \
-	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
-EXPRLIST        = \
-	expFormat.c expGuile.c expOutput.c  expPrint.c expState.c \
-	expString.c expGperf.c expExtract.c $(FUNCLIST)
 
 AM_YFLAGS = -d
 
 ag.c : Makefile
 	( echo '#define DEFINING' ; echo '#include "autogen.h"' ; \
-	for f in $(csrc) ; do echo "#include \"$$f\"" ; done ) > $@
+	  mk=`set -- $(MAKE) ; which $$1` ; \
+	  echo 'static char const zMakeProg[] = "'$$mk'";' ; \
+	  for f in $(csrc) ; do echo "#include \"$$f\"" ; done \
+	) > $@
 
 SUFFIXES = .i
 .c.i :

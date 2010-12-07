@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-04 11:22:43 bkorb"
+# Time-stamp:        "2010-12-06 13:57:51 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -134,10 +134,10 @@ sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
     < ${testname}.tpl > ${testname}2.tpl
 
 # this is *supposed* to exit with a failure status
-( set +x ; VERBOSE=false
-  unset AUTOGEN_TRACE AUTOGEN_TRACE_OUT
-  run_ag x3 -T${testname}2.tpl ${agopts}3 2> ${testname}.tmp3
-) && failure Unexpected success for AutoGen
+#
+VERBOSE=false AUTOGEN_TRACE='' AUTOGEN_TRACE_OUT='' \
+  ${AGexe} ${agl_opts} -m -T${testname}2.tpl ${agopts}3 2> ${testname}.tmp3 \
+    && failure Unexpected success for AutoGen
 
 # Lots of variations happen based on timing.
 # Remove the variations and verify the basic.
