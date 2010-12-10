@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-12-04 11:37:36 bkorb"
+# Time-stamp:     "2010-12-09 18:24:09 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,27 +26,6 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
-case `uname -s` in
-SunOS )
-  if test "X$BASH_VERSION" = X
-  then
-    # On Solaris, make certain we do not use /bin/sh
-    sh=`which bash`
-    test "X$sh" = X && sh=/usr/xpg4/bin/sh
-    BASH_VERSION=not-good-enough
-    export BASH_VERSION
-    exec $sh "$0" "$@"
-  fi
-  ;;
-esac
-
-progname=`echo "$0" | sed 's,^.*/,,'`
-testname=`echo "$progname" | sed 's,\..*$,,'`
-test_name=`echo ${testname} | sed 's/-/_/g'`
-PS4=">${testname}-\${FUNCNAME}> "
-tabch='	'
-export progname testname
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #  C O N F I G U R E D   V A L U E S
@@ -55,40 +34,67 @@ export progname testname
 # if it does not exist.  We want to be able to run the tests
 # stand-alone!!
 #
-set -a
-srcdir=`cd "@srcdir@" && pwd `
-top_srcdir=`cd "@top_srcdir@" && pwd`
-top_builddir=`cd @top_builddir@ && pwd`
-GUILE_VERSION="@GUILE_VERSION@"
-LIBGUILE_PATH="@LIBGUILE_PATH@"
-AG_VERSION="@AG_VERSION@"
-GREP="@GREP@"
-EGREP="@EGREP@"
-FGREP="@FGREP@"
-SHELL="@CONFIG_SHELL@"
-AGexe="@AGexe@"
-CLexe="@CLexe@"
-GDexe="@GDexe@"
-INC="@LIBGUILE_CFLAGS@"
-LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
-DEBUG_ENABLED='@DEBUG_ENABLED@'
-ulimit -c unlimited
+cfg_vals()
+{
+  case `uname -s` in
+  SunOS )
+    if test "X$BASH_VERSION" = X
+    then
+      # On Solaris, make certain we do not use /bin/sh
+      sh=`which bash`
+      test "X$sh" = X && sh=/usr/xpg4/bin/sh
+      BASH_VERSION=not-good-enough
+      export BASH_VERSION
+      exec $sh "$0" "$@"
+    fi
+    ;;
+  esac
 
-test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
-test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
-test -z "${testsubdir}" && testsubdir='@testsubdir@'
-test -z "${CC}"         && CC='@CC@'
-test -z "${CC}"         && echo "No CC configured" && exit 1
-test -z "${PAGER}"      && PAGER=more
+  set -a
+  progname=`echo "$1" | sed 's,^.*/,,'`
+  testname=`echo "$progname" | sed 's,\..*$,,'`
+  test_name=`echo ${testname} | sed 's/-/_/g'`
+  PS4=">${testname}-\${FUNCNAME}> "
+  tabch='	'
 
-set +a
+  srcdir=`cd "@srcdir@" && pwd `
+  top_srcdir=`cd "@top_srcdir@" && pwd`
+  top_builddir=`cd @top_builddir@ && pwd`
+  GUILE_VERSION="@GUILE_VERSION@"
+  LIBGUILE_PATH="@LIBGUILE_PATH@"
+  AG_VERSION="@AG_VERSION@"
+  GREP="@GREP@"
+  EGREP="@EGREP@"
+  FGREP="@FGREP@"
+  SHELL="@CONFIG_SHELL@"
+  AGexe="@AGexe@"
+  CLexe="@CLexe@"
+  GDexe="@GDexe@"
+  INC="@LIBGUILE_CFLAGS@"
+  LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
+  DEBUG_ENABLED='@DEBUG_ENABLED@'
+  ulimit -c unlimited
 
-nl='
+  test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
+  test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
+  test -z "${testsubdir}" && testsubdir='@testsubdir@'
+  test -z "${CC}"         && CC='@CC@'
+  test -z "${CC}"         && echo "No CC configured" && exit 1
+  test -z "${PAGER}"      && PAGER=more
+  nl='
 '
-test -z "${BASH_VERSION}" && local() { eval "$@" ; }
 
-vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
-test "X$vars" = X || unset $vars
+  set +a
+
+  stdopts=${top_srcdir}/autoopts/test/stdopts.def
+  test_main=yes
+  use_flags=true
+
+  test -z "${BASH_VERSION}" && local() { eval "$@" ; }
+
+  vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
+  test "X$vars" = X || unset $vars
+}
 
 #  If only the "rm(1)" command could be relied upon....
 #
@@ -180,80 +186,72 @@ init_tests() {
 
 be_silent()
 {
-    setx=:
-    VERBOSE=false
-    purge testdir
+  setx=:
+  VERBOSE=false
+  purge testdir
 
-    # Sometimes, MSDos FS cannot even rename the directory!!
-    #
-    if test -d testdir
-    then purge testdir/* testdir/.??*
-    else msg=echo
-         mkdir testdir || exit 1
-    fi
+  # Sometimes, MSDos FS cannot even rename the directory!!
+  #
+  if test -d testdir
+  then purge testdir/* testdir/.??*
+  else msg=echo
+       mkdir testdir || exit 1
+  fi
 
-    run_ag()
-    {
-        local tfile=${testname}-aglog-${1}-$$.log
-        shift
+  run_ag()
+  {
+    local tfile=${testname}-aglog-${1}-$$.log
+    shift
 
-        ${AGexe} ${agl_opts} -m "$@"
-    }
+    ${AGexe} ${agl_opts} -m "$@"
+  }
 
-    init_tests
+  init_tests
 }
 
 be_verbose()
 {
-    set -x
-    setx='set -x'
-    msg=:
-    VERBOSE=true
-    test -d testdir || mkdir testdir || exit 1
+  set -x
+  setx='set -x'
+  msg=:
+  VERBOSE=true
+  test -d testdir || mkdir testdir || exit 1
 
-    run_ag()
-    {
-        local tfile=${testname}-aglog-${1}-$$.log
-        shift
-        local tr="--trace=every --trace-out='>>${tfile}'"
+  run_ag()
+  {
+    local tfile=${testname}-aglog-${1}-$$.log
+    shift
+    local tr="--trace=every --trace-out='>>${tfile}'"
 
-        MALLOC_CHECK_=2 \
-            ${AGexe} ${agl_opts} -m ${tr} "$@"
-    }
+    MALLOC_CHECK_=2 \
+      ${AGexe} ${agl_opts} -m ${tr} "$@"
+  }
 
-    init_tests
+  init_tests
 }
 
-# A standard failure function
-#
-failure()
+cfg_inc()
 {
-  ${setx}
-  cd ${testsubdir}
-  if test -d ../FAILURES
-  then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
-  else mkdir ../FAILURES ; fi
+  cd testdir || {
+    echo "Cannot make or change into testdir" >&8
+    exit 1
+  }
+  testsubdir=`pwd`
 
-  exec > /dev/tty 2>&8
-  cat ${logfile} >&2
+  dirs=`
+  for f in ${top_builddir} ${top_srcdir}
+  do
+    for d in . autoopts agen5
+    do
+      (cd $f/$d && pwd)
+    done
+  done | sort -u | sed 's/^/-I/'`
 
-  ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
-  for f in core*
-  do test -f ${f} && mv -f ${f} ../FAILURES/${testname}-${f} ; done
+  INC=`echo ${dirs} ${CPPFLAGS} ${INC}`
 
-  echo FAILURE: "$*" >&8
-  exit 1
-}
-
-cleanup()
-{
-  ${setx}
-  if ${VERBOSE} ; then : ; else
-    cd ${builddir}
-    purge testdir
-    test -d testdir && mv testdir ZZJUNK-$$
-  fi
-  ${msg} ${testname} done
+  : "=== Running $progname for ${testname} using ${SHELL} ==="
+  chmod +w * > /dev/null 2>&1 || :
+  ${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
 }
 
 compile()
@@ -279,7 +277,43 @@ compile()
   Csrc='' Cexe='' Dnam=''
 }
 
+cleanup()
+{
+  trap '' 15
+  ${setx}
+  if ${VERBOSE} ; then : ; else
+    cd ${builddir}
+    purge testdir
+    test -d testdir && mv testdir ZZJUNK-$$
+  fi
+  ${msg} ${testname} done
+}
+
+# A standard failure function
+#
+failure()
+{
+  trap '' 15
+  ${setx}
+  cd ${testsubdir}
+  if test -d ../FAILURES
+  then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
+  else mkdir ../FAILURES ; fi
+
+  exec > /dev/tty 2>&8
+  cat ${logfile} >&2
+
+  ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
+  for f in core*
+  do test -f ${f} && mv -f ${f} ../FAILURES/${testname}-${f} ; done
+
+  echo FAILURE: "$*" >&8
+  exit 1
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+cfg_vals $0
 
 case "${VERBOSE}" in
 ( '' | [Nn]* | 0 | [Ff]* )
@@ -292,33 +326,18 @@ case "${VERBOSE}" in
     esac
 esac
 
-cd testdir || {
-  echo "Cannot make or change into testdir" >&8
-  exit 1
-}
-testsubdir=`pwd`
+cfg_inc
 
-dirs=`
-for f in ${top_builddir} ${top_srcdir}
-do
-  for d in . autoopts agen5
-  do
-    (cd $f/$d && pwd)
-  done
-done | sort -u | sed 's/^/-I/'`
-
-INC=`echo ${dirs} ${CPPFLAGS} ${INC}`
-
-stdopts=${top_srcdir}/autoopts/test/stdopts.def
-
-#  In general, they will have a test main procedure, too.
-#
-test_main=yes
-use_flags=true
-
-: "=== Running $progname for ${testname} using ${SHELL} ==="
-chmod +w * > /dev/null 2>&1 || :
-${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
+trap "failure 'test ${testname} killed on timeout'" 15
+( ( exec > /dev/null 2>&1 </dev/null
+    sleep ${kill_delay:-30}
+    ps -p $$ || exit
+    kill -15 $$
+    sleep 1
+    ps -p $$ || exit
+    kill -9 $$
+) &
+)
 
 ## Local Variables:
 ## mode: shell-script

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2010-11-02 10:14:30 bkorb"
+# Time-stamp:      "2010-12-09 17:36:22 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -611,14 +611,14 @@ IF (or (exist? "flag.flag-code")
 
 ENDIF                           =][=
 
-IF (. make-test-main)           =][=
+IF (exist? "main")              =][=
+  INVOKE build-main             =][=
+
+ELIF (. make-test-main)         =][=
   INVOKE build-test-main        =][=
 
 ELIF (exist? "guile-main")      =][=
   INVOKE build-guile-main       =][=
-
-ELIF (exist? "main")            =][=
-  INVOKE build-main             =][=
 
 ENDIF "test/guile main"
 

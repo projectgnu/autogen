@@ -1,11 +1,11 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-09 15:46:57 bkorb"
-##
+# Time-stamp:        "2010-12-09 18:43:04 bkorb"
+#
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
@@ -21,10 +21,8 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-#
-# ----------------------------------------------------------------------
 
+kill_delay=30
 . ./defs
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #

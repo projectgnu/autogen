@@ -1,3 +1,14 @@
+2010-12-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (trap): organize the code into functions and
+	set up a timer trap that limits most tests to 30 seconds.
+	Remove the trap in cleanup() and failure().
+	* columns/columns.c (construct_first_pfx): extract from main() and
+	insert line separation, new line and indentation if it is longer
+	than the indentation.
+	* agen5/tpLoad.c (wrap_up_depends): make dependency files readable
+	by everyone.
+
 2010-12-07  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am (aclocal_DATA): not needed.  Removed.
@@ -9,6 +20,8 @@
 	* agen5/agShell.c (load_data): fix allocation fence post issue.
 
 2010-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.4 release
 
 	* agen5/Makefile.am (ag.c): gperf code needs the "make" program,
 	so define the make program name in the generated "ag.c" file.

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2010-09-05 06:43:03 bkorb"
+# Time-stamp:      "2010-12-09 17:14:44 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -392,7 +392,9 @@ ESAC             =]
 ENDIF handler-type exists
 
 =][=
+
 (tpl-file-line extract-fmt)
+
 =]
 
 int

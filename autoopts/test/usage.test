@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2010-11-05 13:03:16 bkorb"
+## Time-stamp:      "2010-12-09 16:47:25 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -28,6 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
+kill_delay=90
 . ./defs
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #

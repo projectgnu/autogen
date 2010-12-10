@@ -28,23 +28,22 @@ null
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-##
+
 ## This "library" converts texi-isms into man-isms.  It gets included
 ## by the man page template at the point where texi-isms might start appearing
 ## and then "emit-man-text" is invoked when all the text has been assembled.
+##
+## Display the command line prototype,
+## based only on the argument processing type.
+##
+## And run the entire output through "sed" to convert texi-isms
 
-    ;; * * * * * * * * * * * * * * * * * * * * * * * * *
-    ;;
-    ;;  Display the command line prototype,
-    ;;  based only on the argument processing type.
-    ;;
-    ;;  And run the entire output through "sed" to convert texi-isms
-    ;;
 :+][+:
 
-    (out-push-new)
+(out-push-new)
 
-:+]sed \
+\:+]
+sed \
  -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
  -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
  -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
@@ -73,7 +72,7 @@ null
 [+:
 
 DEFINE emit-man-text    :+]
-_End_Of_Man_[+: DEBUG   :+][+:
+_End_Of_Man_[+:
 
 (shell (out-pop #t) )   :+][+:
 

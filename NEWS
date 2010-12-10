@@ -1,5 +1,15 @@
 New in __CURRENT_VERSION__ December 2010
 
+* When "columns" puts a special prefix on the first line, it now
+  tests to see if it is longer than the indentation.  If so, that
+  first prefix has the line separator, new line and indentation
+  string appended to it.
+* A fence post bug was fixed triggered by creating temporary
+  strings that are 8160 through 8163 bytes long.
+* dependency output files should be readable by everyone.
+
+New in 5.11.4 December 2010
+
 * various test fixes:
   accommodate some severe brokenness in Solaris shells
 * Fix a seg fault on Solaris
@@ -21,13 +31,3 @@ New in 5.11.1 - July 2010
 New in 5.11 July 2010
 
 * implement dependency generation in autogen output.
-* fix up fmemopen()
-
-New in 5.10.2 June 2010
-
-* Fixes for unusual shell programs
-
-New in 5.10.1 March 2010
-
-* Bug fix release
-* Remove guile option code

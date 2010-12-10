@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-02-24 08:39:59 bkorb"
+# Time-stamp:        "2010-12-09 18:00:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -42,6 +42,7 @@ ${SHELLX} ${stdopts} option:'opt init' second=020 || \
 
 exec 4> ${testname}.def2
 sed '/test_main=/d' ${testname}.def >&4
+unset test_main
 cat >&4 <<-  _EOF_
 	explain  = 'This is some explanatory text.';
 	argument = '[ <argument> ... ]';

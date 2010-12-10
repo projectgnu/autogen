@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-07-27 17:05:21 bkorb"
+ * Time-stamp:        "2010-12-09 19:10:18 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -510,6 +510,9 @@ unloadTemplate(tTemplate* pT)
 static void
 wrap_up_depends(void)
 {
+    static mode_t const fil_mode =
+        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+
     static char const fmt[] =
         "\n\n%1$s_SList =%2$s\n"
         "\n%3$s : $(%1$s_SList)\n"
@@ -537,14 +540,14 @@ wrap_up_depends(void)
          * file exists and set its time to the same time.  Ignore all errors.
          */
         if (strcmp(pzDepFile, pzDepTarget) != 0) {
-            if (! access(pzDepTarget, R_OK)) {
-                static mode_t const mode =
-                    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-                close( open(pzDepTarget, O_CREAT, mode));
-            }
+            if (! access(pzDepTarget, R_OK))
+                close( open(pzDepTarget, O_CREAT, fil_mode));
+
             utime(pzDepTarget, &tbuf);
         }
     }
+
+    chmod(pzDepFile, fil_mode);
 
     /*
      * Trim off the temporary suffix and rename the dependency file into

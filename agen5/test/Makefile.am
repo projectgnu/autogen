@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-17 09:51:44 bkorb"
+## Time-stamp:      "2010-12-09 18:40:52 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -50,8 +50,8 @@ $(TESTS)    : defs
 
 defs        : ${top_builddir}/autoopts/test/defs
 	@set -x ; \
-	sed -e '/^srcdir=/s@".*"@"$(srcdir)"@' \
-	    -e '/^top_srcdir=/s@".*"@"$(top_srcdir)"@' \
+	sed -e '/^ *srcdir=/s@".*"@"$(srcdir)"@' \
+	    -e '/^ *top_srcdir=/s@".*"@"$(top_srcdir)"@' \
 	   ${top_builddir}/autoopts/test/defs > $@ ; \
 	cd $(srcdir) ; chmod +x *.test || :
 

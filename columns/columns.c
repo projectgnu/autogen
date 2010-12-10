@@ -2,7 +2,7 @@
 /*
  *  \file columns.c
  *
- *  Time-stamp:        "2010-06-30 17:23:57 bkorb"
+ *  Time-stamp:        "2010-12-09 10:44:57 bkorb"
  *
  *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -41,14 +41,14 @@ int fillColumnCt  = 0;
 char zLine[ LINE_LIMIT ];
 char zFmtLine[ LINE_LIMIT ];
 
-char**  papzLines  = (char**)NULL;
-tCC*    pzLinePfx  = NULL;
-tCC*    pzFirstPfx = NULL;
-size_t  allocCt    = 0;
-size_t  usedCt     = 0;
-size_t  columnCt   = 0;
-size_t  columnSz   = 0;
-size_t  indentSize = 0;
+char**       papzLines  = (char**)NULL;
+char const * pzLinePfx  = "";
+char const * pzFirstPfx = NULL;
+size_t       allocCt    = 0;
+size_t       usedCt     = 0;
+size_t       columnCt   = 0;
+size_t       columnSz   = 0;
+size_t       indentSize = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
@@ -57,8 +57,11 @@ fserr_die(char const * fmt, ...);
 static inline void *
 malloc_or_die(size_t sz);
 
+static char const *
+construct_first_pfx(char const * f_indent);
+
 static uint32_t
-handleIndent(tCC* pzIndentArg);
+pad_indentation(char const * pzIndentArg);
 
 static void
 readLines(void);
@@ -79,7 +82,7 @@ static void
 writeFill(void);
 
 static int
-compProc( const void* p1, const void* p2 );
+compProc(const void * p1, const void * p2);
 /* = = = END-STATIC-FORWARD = = = */
 
 int
@@ -88,43 +91,12 @@ main(int argc, char ** argv)
     (void)optionProcess( &columnsOptions, argc, argv );
 
     if (HAVE_OPT( INDENT )) {
-        indentSize = handleIndent( OPT_ARG( INDENT ));
+        indentSize = pad_indentation( OPT_ARG(INDENT), &pzLinePfx);
         OPT_VALUE_WIDTH -= indentSize;
 
-        if (! HAVE_OPT( FIRST_INDENT ))
-            pzFirstPfx = pzLinePfx;
-        else {
-
-            /*
-             *  The first line has a special indentation/prefix.
-             *  Compute it, but do not let it be larger than
-             *  the indentation value.
-             */
-            tCC* pzSave = pzLinePfx;
-            size_t firstSize = handleIndent( OPT_ARG( FIRST_INDENT ));
-            pzFirstPfx = pzLinePfx;
-            pzLinePfx  = pzSave;
-
-            /*
-             *  Now force the first line prefix to have the same size
-             *  as the indentSize
-             */
-            if (firstSize > indentSize) {
-                static char const zSepLine[] =
-                    "Note: prefix `%s' has been put on a separate line\n";
-                fputs(pzFirstPfx, stdout);
-                putc('\n', stdout);
-                fprintf( stderr, zSepLine, pzFirstPfx );
-                pzFirstPfx = pzLinePfx;
-
-            } else if (firstSize < indentSize) {
-                char* tmp = malloc_or_die( indentSize + 1 );
-                char  z[10];
-                snprintf( z, sizeof(z), "%%-%ds", (int)indentSize );
-                snprintf( tmp, indentSize + 1, z, pzFirstPfx );
-                pzFirstPfx = tmp;
-            }
-        }
+        pzFirstPfx = HAVE_OPT(FIRST_INDENT)
+            ? construct_first_pfx( OPT_ARG(FIRST_INDENT))
+            : pzLinePfx;
     }
 
     if (HAVE_OPT( LINE_SEPARATION ))
@@ -177,23 +149,68 @@ malloc_or_die(size_t sz)
     return res;
 }
 
+static char const *
+construct_first_pfx(char const * f_indent)
+{
+    char const pad_fmt[] = "%%-%ds";
+    // 24 > log10(0xFFFFFFFFFFFFFFFFULL)
+    char pfx_buf[24 + sizeof(pad_fmt)];
+    size_t firstSize;
+    size_t len = indentSize + 3;
+    char * res;
+
+    /*
+     *  The first line has a special indentation/prefix.
+     *  Compute it, but do not let it be larger than
+     *  the indentation value.
+     */
+    firstSize = pad_indentation(f_indent, &pzFirstPfx);
+
+    sprintf(pfx_buf, pad_fmt, (int)indentSize);
+
+    /*
+     *  If this first line exceeds the indentation size, then we
+     *  need to append a newline and any indentation.
+     */
+    if (firstSize > indentSize)
+        len += HAVE_OPT(LINE_SEPARATION) ? strlen( OPT_ARG(LINE_SEPARATION)) : 0
+            + indentSize;
+
+    res = malloc_or_die(indentSize + 1);
+    snprintf(res, indentSize + 1, pfx_buf, pzFirstPfx);
+    pzFirstPfx = res;
+
+    if (firstSize > indentSize) {
+        char * p = res + strlen(res);
+
+        if (HAVE_OPT( LINE_SEPARATION )) {
+            len = strlen(OPT_ARG(LINE_SEPARATION));
+            memcpy(p, OPT_ARG(LINE_SEPARATION), len);
+            p  += len;
+        }
+
+        sprintf(p, "\n%s", pzLinePfx);
+    }
+
+    return res;
+}
 
 static uint32_t
-handleIndent(tCC* pzIndentArg)
+pad_indentation(char const * pzIndentArg, char const ** pfx)
 {
-    char* pz;
+    char * pz;
     unsigned int colCt = (unsigned int)strtoul(pzIndentArg, &pz, 0);
 
     /*
      *  IF the indent argument is a number
      */
     if ((*pz == NUL) && (colCt > 0) && (colCt < OPT_VALUE_WIDTH)) {
-        char* p;
+        char * p;
 
         /*
          *  Allocate a string to hold the line prefix
          */
-        pzLinePfx = p = malloc_or_die( (size_t)colCt + 1 );
+        *pfx = p = malloc_or_die( (size_t)colCt + 1 );
 
         /*
          *  Set it to a NUL terminated string of spaces
@@ -202,20 +219,18 @@ handleIndent(tCC* pzIndentArg)
         p[colCt] = NUL;
 
     } else {
-        tCC* p;
         /*
          *  Otherwise, set the line prefix to whatever the string is.
          *  It will not be the empty string because that is handled
          *  as an indent count of zero and is ignored.
          */
-        pzLinePfx = pzIndentArg;
-        p = pzIndentArg;
-        colCt =  0;
+        char const * p = pzIndentArg;
+        *pfx = pzIndentArg;
+        colCt     =  0;
+
         for (;;) {
             /*
-             *  Figure out how much of the line is taken up by
-             *  the prefix.  We might consider restricted format
-             *  strings some time in the future, but not now.
+             *  Compute the length of the last line of the prefix.
              */
             switch (*p++) {
             case NUL:
@@ -733,10 +748,10 @@ writeFill(void)
  *  Line comparison procedure
  */
 static int
-compProc( const void* p1, const void* p2 )
+compProc(const void * p1, const void * p2)
 {
-    char const* pz1 = *(char* const*)p1;
-    char const* pz2 = *(char* const*)p2;
+    char const * pz1 = *(char* const*)p1;
+    char const * pz2 = *(char* const*)p2;
     return strcmp(pz1, pz2);
 }
 /*
