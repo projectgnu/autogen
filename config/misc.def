@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2010-08-12 18:38:49 bkorb"
+/*  Time-stamp:        "2010-12-07 10:33:16 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -279,23 +279,6 @@ test   = {
         int fds[2];
         pipe(fds);
         return fattach(fds[0],__FILE__);
-_END_OF_CODE_;
-  run-mode      =  "null";
-  code-mode     =  "body";
-
-  action   = { yes; act-type=define; act-text = "1"; };
-
-  doc = "fattach(3) is available but non-functional on some systems.";
-};
-
-test   = {
-  name          = "connld";
-  type          = "run";
-  check    = "connld works";
-  code     = <<- _END_OF_CODE_
-        int fds[2];
-        pipe(fds);
-        return ioctl( fds[0], I_PUSH, "connld" );
 _END_OF_CODE_;
   run-mode      =  "null";
   code-mode     =  "body";

@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2010-12-02 12:09:44 bkorb"
+# Time-stamp:        "2010-12-07 13:31:21 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -130,7 +130,7 @@ setup_exports()
 
   DOC_INCLUDES=`
     echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h
-    echo ${top_builddir}/agen5/autogen.menu ${top_builddir}/agen5/autogen.texi
+    echo ${top_builddir}/agen5/autogen.menu ${AGEN_TEXI}
     echo ${top_builddir}/autoopts/libopts.texi `
 
   DOC_TEMPLATE=${srcdir}/auto_gen.tpl
@@ -234,9 +234,15 @@ cmd=`echo "${cmd}" ${opts} ${tmp_dir}/${GEN_BASE}.def`
 echo "${PS4:-+} " ${cmd} >&8
 
 ${cmd} || die could not regenerate doc
-
+page_style=\
+'\internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%'
 cat > autogen.texi <<- _EOF_
 	\input texinfo
+	@ignore
+	${page_style}
+	@end ignore
+	@c %**start of header
+	@setfilename autogen.info
 	@include ${GEN_BASE}.texi
 	_EOF_
 test -f ${GEN_BASE}.texi || die "MISSING: ${GEN_BASE}.texi"

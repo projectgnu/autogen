@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-10 16:45:57 bkorb"
+## Time-stamp:      "2010-12-07 09:06:58 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -56,4 +56,4 @@ clobber : maintainer-clean
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# doc/Makefile.am ends here

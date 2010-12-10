@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-06 13:57:51 bkorb"
+# Time-stamp:        "2010-12-09 15:46:57 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -104,7 +104,8 @@ _EOF_
 agopts="--no-def --base=${testname}"
 
 # this is *supposed* to exit with a failure status
-( set +x ; VERBOSE=false
+( VERBOSE=false
+  set +x
   run_ag x2 -T${testname}.tpl ${agopts}2 2> ${testname}.err2
 ) && failure Unexpected success for AutoGen
 

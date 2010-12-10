@@ -1,6 +1,9 @@
-New in __CURRENT_VERSION__ November 2010
+New in __CURRENT_VERSION__ December 2010
 
-* 
+* various test fixes:
+  accommodate some severe brokenness in Solaris shells
+* Fix a seg fault on Solaris
+* Do not install .m4 files used to create configure script
 
 New in 5.11.3 - November 2010
 
@@ -9,7 +12,7 @@ New in 5.11.3 - November 2010
 * asprintf was introduced into libopts, but is not on all
   platforms.  It has been removed.
 
-New in 5.11.3 - July 2010
+New in 5.11.1 - July 2010
 
 * Fix (kill) orphaned shell program
 * add file-next-line functions to facilitate #line "C" directives

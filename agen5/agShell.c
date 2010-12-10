@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2010-12-06 14:49:08 bkorb"
+ *  Time-stamp:        "2010-12-09 11:55:08 bkorb"
  *
  *  Manage a server shell process
  *
@@ -54,6 +54,9 @@ handle_signal(int signo);
 
 static void
 server_setup(void);
+
+static void
+realloc_text(char ** p_txt, size_t * p_sz, size_t need_len);
 
 static char*
 load_data(void);
@@ -364,6 +367,17 @@ openServerFP(tpfPair* pfPair, tCC** ppArgs)
     return chId;
 }
 
+static void
+realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
+{
+    size_t sz = (*p_sz + need_len + 0xFFF) & ~0xFFF;
+    void * p = AGREALOC((void*)*p_txt, sz, "expanding text");
+    if (p == NULL)
+        AG_ABEND(aprf(zAllocWhat, sz, "Realloc Text Block"));
+
+    *p_txt = p;
+    *p_sz  = sz;
+}
 
 /**
  *  Read data from a file pointer (a pipe to a process in this context)
@@ -375,20 +389,19 @@ static char*
 load_data(void)
 {
     char*   pzText;
-    size_t  textSize;
+    size_t  textSize = 4096;
+    size_t  usedCt   = 0;
     char*   pzScan;
     char    zLine[ 1024 ];
     int     retryCt = 0;
 
-    textSize = 4096;
     pzScan   = \
-    pzText   = AGALOC(textSize, "Text Block");
+        pzText = AGALOC(textSize, "Text Block");
 
     *pzText  = NUL;
 
     for (;;) {
-        size_t  usedCt;
-        char*   line_p;
+        char * line_p;
 
         /*
          *  Set a timeout so we do not wait forever.  Sometimes we don't wait
@@ -421,9 +434,17 @@ load_data(void)
         if (strncmp(zLine, zShDone, STRSIZE(zShDone)) == 0)
             break;
 
-        strcpy(pzScan, zLine);
-        pzScan += strlen(zLine);
-        usedCt = (size_t)(pzScan - pzText);
+        {
+            size_t llen = strlen(zLine);
+            if (textSize <= usedCt + llen) {
+                realloc_text(&pzText, &textSize, llen);
+                pzScan = pzText + usedCt;
+            }
+
+            memcpy(pzScan, zLine, llen);
+            usedCt += llen;
+            pzScan += llen;
+        }
 
         /*
          *  Stop now if server timed out or if we are at EOF
@@ -431,25 +452,6 @@ load_data(void)
         if ((serv_id == NULLPROCESS) || feof(serv_pair.pfRead)) {
             fputs("feof on data load\n", pfTrace);
             break;
-        }
-
-        /*
-         *  IF we are running low on space in our line buffer,
-         *  THEN expand the line
-         */
-        if (textSize - usedCt < sizeof(zLine)) {
-
-            size_t off = (size_t)(pzScan - pzText);
-            void*  p;
-            textSize += 4096;
-            p = AGREALOC((void*)pzText, textSize, "expanding text");
-            if (p == NULL) {
-                tSCC zRTB[] = "Realloc Text Block";
-                AG_ABEND(aprf(zAllocWhat, textSize, zRTB));
-            }
-
-            pzText   = (char*)p;
-            pzScan = pzText + off;
         }
     }
 

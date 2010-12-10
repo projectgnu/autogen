@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-11-07 13:56:58 bkorb"
+# Time-stamp:        "2010-12-09 14:57:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -172,28 +172,19 @@ check_tools()
       $AGexe --version ) > /dev/null || exit 1
 }
 
-#  IF the source dir is not known,
-#  THEN it is the directory above the directory that
-#       contains this file.
-#
-[ -z "${srcdir}" ] && {
-    srcdir=$(echo $0 | sed 's;/[^/]*$;;')
-}
+tweak_Makefile_am()
+{
+    #  IF the source dir is not known,
+    #  THEN it is the directory above the directory of this file.
+    #
+    test -z "${srcdir}" && \
+        srcdir=$(\cd $(dirname $0) ; \cd .. ; pwd)
 
-MISSING=${MISSING-${srcdir}/config/missing}
+    MISSING=${MISSING-${srcdir}/config/missing}
 
-case "${BOOTSTRAP}" in
-( pre )
-    echo '@setfilename autogen.info' > ${srcdir}/doc/autogen.texi
-    if test -f ${srcdir}/configure
-    then rm -f ${srcdir}/configure ; fi
-
-    check_tools
-    config_versions
-
-    sed "/^bootstrap /s@=.*@= $(
-        echo config/bootstrap*)@;/^aclocal_DATA /s@=.*@= $(
-        echo config/*.m4)@" ${srcdir}/Makefile.am > XXX$$
+    sed "/^misc_extra /s@=.*@= $(
+        echo VERSION NOTES config/bootstrap* config/*.m4
+        )@" ${srcdir}/Makefile.am > XXX$$
     mv -f XXX$$ ${srcdir}/Makefile.am
 
     exec 3> XXX$$
@@ -211,10 +202,20 @@ case "${BOOTSTRAP}" in
     exec 3>&-
 
     mv -f XXX$$ ${srcdir}/pkg/Makefile.am
+}
+
+case "${BOOTSTRAP}" in
+( pre )
+    dummy_texi=${srcdir}/doc/autogen.texi
+    echo '@setfilename autogen.info' > ${dummy_texi}
+    test -f ${srcdir}/configure && rm -f ${srcdir}/configure
+    check_tools
+    config_versions
+    tweak_Makefile_am
     ;;
 
 ( post )
-    rm -f  ${srcdir}/doc/autogen.texi
+    rm -f  ${dummy_texi}
     ;;
 esac
 

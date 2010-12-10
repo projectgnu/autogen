@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-11-18 10:28:50 bkorb"
+## Time-stamp:      "2010-12-07 09:06:40 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -78,4 +78,4 @@ stamp-doc : $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# getdefs/Makefile.am ends here

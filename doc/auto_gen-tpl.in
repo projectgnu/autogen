@@ -5,7 +5,7 @@ texi
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2010-07-10 16:46:24 bkorb"
+## Time-stamp:        "2010-12-07 13:30:15 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -48,12 +48,7 @@ texi
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 \=]
-@ignore
-\internalpagesizes{46\baselineskip}{6in}{-.25in}{-.25in}{\bindingoffset}{36pt}%
-@end ignore
-@c %**start of header
-@setfilename [=(base-name)=].info
-@settitle AutoGen - [= prog-title =]
+@settitle [= package =] - [= prog-title =]
 @setchapternewpage off
 @syncodeindex pg cp
 @c %**end of header

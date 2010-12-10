@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2010-07-16 14:33:23 bkorb"
+ * Time-stamp:        "2010-12-09 15:01:34 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -28,14 +28,16 @@
 typedef struct string_buf_s string_buf_t;
 
 struct string_buf_s {
-    string_buf_t*   next_p;
-    size_t  const   sb_size;
-    size_t          sb_off;
+    string_buf_t *  next_p;
+    ssize_t  const  sb_size;
+    ssize_t         sb_off;
     unsigned char   sb_buf[1];
 };
 
 static string_buf_t *  ag_strbufs  = NULL;
 static string_buf_t ** next_strbuf = &ag_strbufs;
+static size_t const    str_buf_hdr_sz =
+    (&(((string_buf_t *)NULL)->sb_buf[0])) - ((unsigned char *)NULL);
 
 /**
  * Initialize the scribble string library
@@ -85,19 +87,25 @@ new_scribble_block(size_t min_size)
 {
     string_buf_t * res = NULL;
 
-    /* allow space for allocation header */
-    min_size += ((char *)&(res->sb_buf)) - (char *)res;
+    /*
+     * allow space for allocation header and round up
+     */
+    min_size    += str_buf_hdr_sz;
+    min_size     = ROUND_SCRIBBLE(min_size, 0x2000);
 
-    /* some multiple of 8K.  Probably exactly 8K */
-    min_size  = ROUND_SCRIBBLE(min_size, 0x2000);
-
+    /*
+     * Allocate and link into list.  Advance pointer to next entry.
+     */
     *next_strbuf = res = AGALOC(min_size, "SCM String Buffer");
     next_strbuf  = &(res->next_p);
-    *next_strbuf = NULL;
+    res->next_p  = NULL;
     res->sb_off  = 0;
+    /*
+     *  The "sb_size" field is read-only.  Override this.
+     */
     {
         size_t * psz = (void *)&(res->sb_size);
-        *psz = min_size - sizeof(*res);
+        *psz = min_size - str_buf_hdr_sz;
     }
 
     return res;
@@ -111,7 +119,7 @@ new_scribble_block(size_t min_size)
  *  be kept on the stack.  Expression processing.
  */
 LOCAL char*
-ag_scribble(size_t size)
+ag_scribble(ssize_t size)
 {
     string_buf_t* sb = ag_strbufs;
     char* buf;

@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-08-13 16:36:20 bkorb"
+## Time-stamp:      "2010-12-07 12:24:46 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -39,13 +39,9 @@ SUBDIRS       += xml2ag
 endif
 endif
 
-misc_extra     = VERSION NOTES
-pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl
-aclocaldir     = $(datadir)/aclocal
-aclocal_DATA   = config/*.m4
-bootstrap      = config/bootstrap*
-dist_data      = $(pkgdata_DATA) $(aclocal_DATA)
-EXTRA_DIST     = $(misc_extra) $(bootstrap) $(pkg_dist) $(dist_data)
+misc_extra     = VERSION NOTES config/bootstrap* config/*.m4
+pkgdata_DATA   = config/conftest.tpl config/confmacs.tpl config/liboptschk.m4
+EXTRA_DIST     = $(misc_extra) $(pkgdata_DATA)
 DISTCLEANFILES = stamp-h
 
 distcleancheck_listfiles = \

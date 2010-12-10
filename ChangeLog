@@ -1,3 +1,13 @@
+2010-12-07  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am (aclocal_DATA): not needed.  Removed.
+	* config/liboptschk.m4 (CFLAGS): builder domain, (LIBS): also
+	(ao_CFLAGS): proper naming, (ao_LIBS): ditto
+	* config/misc.def (connld): not used any more.
+	* doc/auto_gen-tpl.in (setfilename): move to mk-agen-texi-in
+	* doc/mk-agen-texi-in (setfilename): insert into autogen.texi
+	* agen5/agShell.c (load_data): fix allocation fence post issue.
+
 2010-12-06  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am (ag.c): gperf code needs the "make" program,
@@ -37,14 +47,16 @@
 	if it is not in the current PATH.
 	* config/bootstrap (config_tools): "set -e" is unnecessary
 
-2010-11-04  Bruce Korb  <bkorb@gnu.org>
+2010-11-18  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.3 release
 
 	* autoopts/configfile.c (aoflags_directive) do not use asprintf().
 	It causes problems on some platforms.
 	* getdefs/Makefile.am (RUNAG): do not use ":=" assignment 'cuz
 	Solaris' make cannot cope.
 
-2010-11-04  Bruce Korb  <bkorb@gnu.org>
+2010-11-17  Bruce Korb  <bkorb@gnu.org>
 
 	5.11.2 release
 

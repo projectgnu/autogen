@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-07-17 09:50:20 bkorb"
+## Time-stamp:      "2010-12-07 09:07:10 bkorb"
 ## Copyright (c):   1997-2010 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -48,4 +48,4 @@ strsignal.h : strsignal.def strsignal.tpl
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# compat/Makefile.am ends here

@@ -3,7 +3,7 @@
 
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-07-10 16:42:34 bkorb"
+# Time-stamp:        "2010-12-06 17:20:20 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -31,7 +31,6 @@
 AUTOOPTS_TRACE=every
 AUTOOPTS_TRACE_OUT=">>`pwd`/${testname}-ag-trace.txt"
 export AUTOOPTS_TRACE AUTOOPTS_TRACE_OUT
-exec 2> ${testname}-stderr.txt
 set -x
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #

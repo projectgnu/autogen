@@ -73,7 +73,7 @@ null
 [+:
 
 DEFINE emit-man-text    :+]
-_End_Of_Man_[+:
+_End_Of_Man_[+: DEBUG   :+][+:
 
 (shell (out-pop #t) )   :+][+:
 

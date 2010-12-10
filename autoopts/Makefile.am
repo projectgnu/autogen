@@ -1,8 +1,8 @@
 ##  -*- Mode: Makefile -*-
 ## ---------------------------------------------------------------------
-## Makefile.am
+## autoopts/Makefile.am
 ##
-## Time-stamp:      "2010-11-18 08:18:50 bkorb"
+## Time-stamp:      "2010-12-07 09:07:29 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

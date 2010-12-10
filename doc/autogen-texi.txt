@@ -5564,8 +5564,10 @@ passing a @samp{-DLEVEL=<level-name>} argument to AutoGen when you build
 the document.  (See the example invocation below.)
 
 Two files will be produced, a @file{.texi} file and a @file{.menu} file.
-You should include the @file{.menu} file in your document where you wish
-to reference the @samp{invoking} chapter, section or subsection.
+You should include the text in the @file{.menu} file in a @file{@@menu}
+list, either with @file{@@include}-ing it or just copying text.
+The @file{.texi} file should be @file{@@include}-ed where the invoking
+section belongs in your document.
 
 The @file{.texi} file will contain an introductory paragraph, a menu
 and a subordinate section for the invocation usage and for each
