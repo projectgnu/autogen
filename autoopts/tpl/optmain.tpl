@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2010-12-09 17:14:44 bkorb"
+# Time-stamp:      "2010-12-10 12:22:42 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -1012,7 +1012,15 @@ DEFINE   file-name-code
    ESAC =];
     static tuFileMode           mode;
 [= IF (or (=* tmp-val "desc") (== tmp-val "")) \=]
-    mode.file_flags = [= (if (exist? "file-mode") (get "file-mode") "0") =];
+[= IF (not (exist? "file-mode"))   \=]
+#ifndef O_CLOEXEC
+#  define O_CLOEXEC 0
+#endif
+[= (define file-mode "O_CLOEXEC")   =][=
+   ELSE                             =][=
+   (define file-mode (get "file-mode")) \=]
+[= ENDIF \=]
+    mode.file_flags = [= (. file-mode) =];
 [= ELSE \=]
 #ifndef FOPEN_BINARY_FLAG
 #  define FOPEN_BINARY_FLAG

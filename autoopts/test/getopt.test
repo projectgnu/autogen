@@ -1,11 +1,11 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
-# ----------------------------------------------------------------------
+#
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2010-11-08 14:00:12 bkorb"
+# Time-stamp:        "2010-12-12 12:00:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-##
+#
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -25,10 +25,11 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-#
-# ----------------------------------------------------------------------
 
 . ./defs
+
+set -x
+PS4='>${FUNCNAME:-go}> '
 
 CC="${CC} ${CFLAGS} ${INC}"
 CFLAGS=''
@@ -36,6 +37,10 @@ INC=''
 export AUTOGEN_TEMPL_DIRS=${TMPDIR}
 
 compile_getopt() {
+  ${VERBOSE} && {
+    AUTOGEN_TRACE=every
+    AUTOGEN_TRACE_OUT='>>'${TMPDIR}/runag-log
+  }
   run_ag opts -L${TMPDIR} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
@@ -66,36 +71,40 @@ compile_getopt() {
 # However, we have to work with the local stuff.  So, remove the
 # "autoopts-config" probing and replace with local stuff:
 #
-go_init() {
-    mkdir -p ${TMPDIR}/autoopts
+go_init()
+{
+  mkdir -p ${TMPDIR}/autoopts
 
-    CFLAGS="-I${TMPDIR}"
-    LDFLAGS="${LDFLAGS} ${LIB}"
-    export CFLAGS LDFLAGS TMPDIR
+  CFLAGS="-I${TMPDIR}"
+  LDFLAGS="${LDFLAGS} ${LIB}"
+  export CFLAGS LDFLAGS TMPDIR
 
-    aolib=`find ${top_builddir}/autoopts -type f -name libopts.a`
-    case " ${LDFLAGS} " in
-    *' -lgen '* ) aolib=${aolib}\ -lgen ;;
-    esac
+  aolib=`find ${top_builddir}/autoopts -type f -name libopts.a`
+  case " ${LDFLAGS} " in
+  *' -lgen '* ) aolib=${aolib}\ -lgen ;;
+  esac
 
-    cd ${top_srcdir}/autoopts
-    cp tpl/*.tpl tpl/*.pl ${TMPDIR}/.
-    chmod u+w ${TMPDIR}/*
-    sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
-        -e "/^ldflags=/s@=.*@='${aolib}'@" \
-        tpl/usage.tpl > ${TMPDIR}/usage.tpl
-    cd ${top_builddir}/autoopts
-    cp tpl/*.tpl tpl/*.pl ${TMPDIR}/.
-    cd ${builddir}/testdir
+  cd ${top_srcdir}/autoopts/tpl
+  cp *.tpl *.pl ${TMPDIR}/.
+  cd ${top_builddir}/autoopts/tpl
+  cp *.tpl ${TMPDIR}/.
+  chmod u+w ${TMPDIR}/*
 
-    # In order to compile correctly, we have to temporarily install the options.h
-    # header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:
-    #
-    destdir=${TMPDIR}/autoopts \
-    top_builddir=${top_builddir} \
-    ${SHELLX} ${top_srcdir}/autoopts/install-options-h
-    AUTOGEN_TEMPL_DIRS=${TMPDIR}
-    export AUTOGEN_TEMPL_DIRS
+  cd ${builddir}/testdir
+  sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
+    -e "/^ldflags=/s@=.*@='${aolib}'@" \
+    ${TMPDIR}/usage.tpl > ${TMPDIR}/usage.tpl-$$
+  mv -f ${TMPDIR}/usage.tpl-$$ ${TMPDIR}/usage.tpl
+
+  # In order to compile correctly, we have to temporarily install the options.h
+  # header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:
+  #
+  DESTdestdir=${TMPDIR}/autoopts \
+  top_builddir=${top_builddir} \
+    CONFIG_SHELL="${SHELL}" \
+    ${SHELLX} -x ${top_srcdir}/autoopts/install-options-h
+  AUTOGEN_TEMPL_DIRS=${TMPDIR}
+  export AUTOGEN_TEMPL_DIRS
 }
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
@@ -669,6 +678,8 @@ cleanup
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of getopt.test

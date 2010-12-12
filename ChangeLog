@@ -1,3 +1,13 @@
+2010-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/loadPseudo.c (handle_hash_line): add file name argument for
+	error display.
+	* agen5/test/error.test (test 2): ensure VERBOSE is off
+	* agen5/test/opts.test (-L ${top_srcdir}/autoopts): this is supplied
+	by the "defs" test setup script.
+	* autoopts/tpl/optmain.tpl (O_CLOEXEC): set on opened files, unless
+	client overrides the default mode.
+
 2010-12-09  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/defs.in (trap): organize the code into functions and

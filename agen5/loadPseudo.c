@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2010-07-28 19:33:43 bkorb"
+ *  Time-stamp:        "2010-12-12 11:56:23 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -40,7 +40,7 @@ static char const *
 handle_hash_line(char const * pz);
 
 static te_pm_event
-next_pm_token(char const **  ppzData, te_pm_state fsm_state);
+next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm);
 
 static char const *
 copy_mark(char const * pzData, char* pzMark, size_t * pCt);
@@ -256,7 +256,7 @@ handle_hash_line(char const * pz)
  *  the scan pointer (pzData).
  */
 static te_pm_event
-next_pm_token(char const **  ppzData, te_pm_state fsm_state)
+next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
 {
     char const * pzData = *ppzData;
 
@@ -354,7 +354,7 @@ next_pm_token(char const **  ppzData, te_pm_state fsm_state)
     /*
      *  Otherwise, it is just junk.
      */
-    AG_ABEND("Invalid template file");
+    AG_ABEND(aprf("Invalid template file: %s", fnm));
     /* NOTREACHED */
     return PM_EV_INVALID;
 }
@@ -409,7 +409,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
     templLineNo  = 1;
 
     while (fsm_state != PM_ST_DONE) {
-        te_pm_event fsm_tkn = next_pm_token(&pzData, fsm_state);
+        te_pm_event fsm_tkn = next_pm_token(&pzData, fsm_state, pzFileName);
         te_pm_state nxt_state;
         te_pm_trans trans;
 

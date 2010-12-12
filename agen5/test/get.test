@@ -89,6 +89,7 @@ cleanup
 ## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of get.test

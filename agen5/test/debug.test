@@ -2,15 +2,15 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2010-06-26 16:06:33 bkorb"
+# Time-stamp:        "2010-12-10 09:55:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-##
+#
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
-## under the terms of the GNU General Public License as published by the
-## Free Software Foundation, either version 3 of the License, or
+## under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
 ## AutoGen is distributed in the hope that it will be useful, but
@@ -20,9 +20,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-#
-# ----------------------------------------------------------------------
 
 . ./defs
 
@@ -163,5 +160,13 @@ ${VERBOSE} || {
 }
 
 cleanup
+
+## 
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
+## End:
 
 # end of debug.test

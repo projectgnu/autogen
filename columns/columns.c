@@ -61,7 +61,7 @@ static char const *
 construct_first_pfx(char const * f_indent);
 
 static uint32_t
-pad_indentation(char const * pzIndentArg);
+pad_indentation(char const * pzIndentArg, char const ** pfx);
 
 static void
 readLines(void);

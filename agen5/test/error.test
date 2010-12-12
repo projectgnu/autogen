@@ -4,14 +4,14 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-09 18:43:04 bkorb"
+# Time-stamp:        "2010-12-10 10:30:49 bkorb"
 #
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
-## under the terms of the GNU General Public License as published by the
-## Free Software Foundation, either version 3 of the License, or
+## under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
 ## AutoGen is distributed in the hope that it will be useful, but
@@ -25,7 +25,33 @@
 kill_delay=30
 . ./defs
 
-# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+verb_ok=true
+
+ag_err()
+{
+  (
+    set +x
+    if ${VERBOSE} && ${verb_ok}
+    then
+      AUTOGEN_TRACE=everything
+      AUTOGEN_TRACE_OUT=${testname}-task${seq}-aglog.txt
+      VERBOSE=false
+      export AUTOGEN_TRACE AUTOGEN_TRACE_OUT
+    else
+      unset AUTOGEN_TRACE AUTOGEN_TRACE_OUT
+    fi
+
+    seq=${1} ; shift
+    exec 2> ${testname}.err${seq}
+    touch ${testname}-task${seq}-running
+    run_ag x${seq} "$@"
+    res=$?
+    rm -f ${testname}-task${seq}-running
+    exit $res
+  ) && touch ${testname}-task${seq}-OK
+}
+
+# # # # # # # # # # # # # TEST 1 # # # # # # # # # # # #
 
 echo creating ${testname}.tpl
 sed 's/[ 0-9]*=//' > ${testname}.tpl <<'_EOF_'
@@ -52,15 +78,11 @@ sed 's/[ 0-9]*=//' > ${testname}.tpl <<'_EOF_'
  21 =this is never seen
 _EOF_
 
-# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
-
 echo creating ${testname}.def
 cat > ${testname}.def <<'_EOF_'
 autogen definitions alist;
 #error The definitions file has a `#error' directive
 _EOF_
-
-# # # # # # # # # # EXPECTED OUTPUT FILE 1 # # # # # # #
 
 echo creating ${testname}.base1
 # this is the output we should expect to see
@@ -69,16 +91,16 @@ cat > ${testname}.base1 <<'_EOF_'
 	The definitions file has a `#error' directive
 _EOF_
 
-( set +x ; VERBOSE=false
-  run_ag x1 ${testname}.def 2> ${testname}.err1
-) && failure unexpected success
+ag_err 1 ${testname}.def
+test -f  ${testname}-task1-OK \
+  && failure unexpected success for test-1
 
 sed '/Giving up in/d;/Failing Guile command:/,$d' ${testname}.err1 \
-    > ${testname}.err
+  > ${testname}.err
 cmp -s ${testname}.err ${testname}.base1 || \
-  failure "expected->actual `diff -c ${testname}.base1 ${testname}.err`"
+  failure "expected->actual${nl}`diff -c ${testname}.base1 ${testname}.err`"
 
-# # # # # # # # # # EXPECTED OUTPUT FILE 2 # # # # # # #
+# # # # # # # # # # # # # TEST 2 # # # # # # # # # # # #
 
 echo creating ${testname}.base2
 # this is the output we should expect to see
@@ -101,23 +123,23 @@ _EOF_
 
 agopts="--no-def --base=${testname}"
 
-# this is *supposed* to exit with a failure status
-( VERBOSE=false
-  set +x
-  run_ag x2 -T${testname}.tpl ${agopts}2 2> ${testname}.err2
-) && failure Unexpected success for AutoGen
+verb_ok=false
+ag_err 2 -T${testname}.tpl ${agopts}2
+test -f ${testname}-task2-OK \
+  && failure unexpected success for test-2
+verb_ok=true
 
 if test ${GUILE_VERSION} -gt 107000
 then
   ${EGREP} -v 'Giving up in | is deprecated\.' ${testname}.err2
 else
   ${EGREP} -v 'Giving up in ' ${testname}.err2
-fi >> ${testname}.trc2
+fi > ${testname}.res2
 
-cmp -s ${testname}.base2 ${testname}.trc2 || \
-  failure "expected->actual `diff -c ${testname}.base2 ${testname}.trc2`"
+cmp -s ${testname}.base2 ${testname}.res2 || \
+  failure "expected->actual${nl}`diff -c ${testname}.base2 ${testname}.res2`"
 
-# # # # # # # # # # EXPECTED OUTPUT FILE 3 # # # # # # #
+# # # # # # # # # # # # # TEST 3 # # # # # # # # # # # #
 
 echo creating ${testname}.base3
 # this is the output we should expect to see
@@ -130,13 +152,11 @@ processing template error2.tpl
 _EOF_
 
 sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
-    < ${testname}.tpl > ${testname}2.tpl
+  < ${testname}.tpl > ${testname}2.tpl
 
-# this is *supposed* to exit with a failure status
-#
-VERBOSE=false AUTOGEN_TRACE='' AUTOGEN_TRACE_OUT='' \
-  ${AGexe} ${agl_opts} -m -T${testname}2.tpl ${agopts}3 2> ${testname}.tmp3 \
-    && failure Unexpected success for AutoGen
+ag_err 3 ${agl_opts} -T${testname}2.tpl ${agopts}3
+test -f ${testname}-task3-OK \
+  && failure unexpected success for test-3
 
 # Lots of variations happen based on timing.
 # Remove the variations and verify the basic.
@@ -152,11 +172,11 @@ sedcmd='
 	/^[ 	]*$/d
 	/defs: line .*: .* Hangup/d
 '
-sed -e "${sedcmd}" ${testname}.tmp3 > ${testname}.trc3
-cmp -s ${testname}.trc3 ${testname}.base3 || \
-  failure "expected->actual `diff -c ${testname}.base3 ${testname}.trc3`"
+sed -e "${sedcmd}" ${testname}.err3 > ${testname}.res3
+cmp -s ${testname}.res3 ${testname}.base3 || \
+  failure "expected->actual${nl}`diff -c ${testname}.base3 ${testname}.res3`"
 
-# # # # # # # # # # EXPECTED OUTPUT FILE 4 # # # # # # #
+# # # # # # # # # # # # # TEST 4 # # # # # # # # # # # #
 
 sed 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
 
@@ -175,14 +195,15 @@ Likely causes:  a mismatched quote, a value that needs quoting,
 		or a missing semi-colon
 _EOF_
 
-( set +x ; VERBOSE=false
-  run_ag x4 ${testname}2.def 2> ${testname}.trc4
-) && failure unexpected success
-${GREP} -v 'Giving up in' ${testname}.trc4 > ${testname}.err4
-cmp -s  ${testname}.err4 ${testname}.base4 || \
-  failure "expected->actual `diff -c ${testname}.base4 ${testname}.err4`"
+ag_err 4 ${testname}2.def
+test -f ${testname}-task4-OK \
+  && failure unexpected success for test-4
 
-# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+${GREP} -v 'Giving up in' ${testname}.err4 > ${testname}.res4
+cmp -s  ${testname}.res4 ${testname}.base4 \
+  || failure "expected->actual${nl}`diff -c ${testname}.base4 ${testname}.res4`"
+
+# # # # # # # # # # # # # TEST 5 # # # # # # # # # # # #
 
 echo creating ${testname}.tpl5
 cat > ${testname}.tpl5 <<'_EOF_'
@@ -191,24 +212,21 @@ THIS TEXT SHOULD BE DELETED!!
 <= ENDIF =>
 _EOF_
 
-( set +x ; VERBOSE=false
-  run_ag x5 -T ${testname}.tpl5 ${agopts}5 > /dev/null 2> ${testname}.out5
-  res=$?
-  echo ag results: $res
-  exit $?
-) || failure "autogen was okay with bogus input"
+ag_err 5 -T ${testname}.tpl5 ${agopts}5 > /dev/null
+test -f ${testname}-task5-OK \
+  && failure unexpected success for test-5
 
-${EGREP} -v 'Giving up in .*functions\.c' ${testname}.out5 > ${testname}.samp5
+${EGREP} -v 'Giving up in .*functions\.c' ${testname}.err5 > ${testname}.res5
 cat > ${testname}.base5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:
 	ENDIF
 EOF
 
-cmp -s  ${testname}.base5  ${testname}.samp5 || \
-  failure "expected->actual `diff -c ${testname}.base5 ${testname}.samp5`"
+cmp -s  ${testname}.base5  ${testname}.res5 || \
+  failure "expected->actual${nl}`diff -c ${testname}.base5 ${testname}.res5`"
 
-# # # # # # # # # # TEMPLATE FILE # # # # # # # # #
+# # # # # # # # # # # # # TEST 6 # # # # # # # # # # # #
 
 echo creating ${testname}.tpl6
 cat > ${testname}.tpl6 <<'_EOF_'
@@ -223,9 +241,9 @@ if (exist? "nothing")
 End Of File
 _EOF_
 
-run_ag x6 -T ${testname}.tpl6 ${agopts}6 \
-  > /dev/null 2> ${testname}.out6 && \
-  failure "Your Guile lib exits 0 on failure"
+ag_err 6 -T ${testname}.tpl6 ${agopts}6 > /dev/null
+test -f ${testname}-task6-OK \
+  && failure unexpected success for test-6
 
 cat > ${testname}.base6 <<EOF
 Scheme evaluation error.  AutoGen ABEND-ing in template
@@ -247,12 +265,11 @@ EOF
 # print file and line, but it was made just too hard.  Strip out all
 # the Guile library error messages.  :(
 #
-sed -n '/^Scheme evaluation error./,$p' ${testname}.out6 | \
-    sed "/^${testname}\.tpl6:7:4:/d" > ${testname}.tmp6
-mv -f ${testname}.tmp6 ${testname}.out6
+sed -n '/^Scheme evaluation error./,$p' ${testname}.err6 | \
+  sed "/^${testname}\.tpl6:7:4:/d" > ${testname}.res6
 
-cmp -s  ${testname}.base6  ${testname}.out6 || \
-  failure "expected->actual `diff -c ${testname}.base6 ${testname}.out6`"
+cmp -s  ${testname}.base6  ${testname}.res6 || \
+  failure "expected->actual${nl}`diff -c ${testname}.base6 ${testname}.res6`"
 
 cleanup
 
@@ -260,6 +277,7 @@ cleanup
 ## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of error.test

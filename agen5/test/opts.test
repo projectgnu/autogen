@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # opts.test --- Verify the handling of options
 #
-# Time-stamp:       "2010-07-10 11:40:59 bkorb"
+# Time-stamp:       "2010-12-12 12:11:19 bkorb"
 # Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -50,9 +50,9 @@ ls -l * ../VERSION > $testname.log
 echo Checking for "'define DEBUG'" options
 if ${GREP} 'define DEBUG' ${srcdir}/../opts.h
 then
-  AGCMD="-L ${top_srcdir}/autoopts -DDEBUG=1"
+  AGCMD="-DDEBUG=1"
 else
-  AGCMD="-L ${top_srcdir}/autoopts"
+  AGCMD=""
 fi
 
 run_ag x ${AGCMD} opts.def || {
@@ -78,6 +78,7 @@ cleanup
 ## mode: shell-script
 ## indent-tabs-mode: nil
 ## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of opts.test

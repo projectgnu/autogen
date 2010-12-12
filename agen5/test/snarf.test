@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2010-07-28 19:03:34 bkorb"
+# Time-stamp:        "2010-12-10 09:53:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -286,9 +286,10 @@ cleanup
 
 ## 
 ## Local Variables:
-## mode:shell-script
-## indent-tabs-mode:nil
-## sh-indentation:2
+## mode: shell-script
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## sh-basic-offset: 2
 ## End:
 
 # end of snarf.test
