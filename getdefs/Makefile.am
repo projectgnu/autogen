@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-12 13:50:11 bkorb"
+## Time-stamp:      "2010-12-12 14:55:48 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -36,11 +36,9 @@ RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
 
 if AMDEP
 DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@
-TOUCH_SENTINEL  = @:
 include $(DEPDIR)/opts-dep
 else
 DEP_ARG         =
-TOUCH_SENTINEL  = touch $@
 endif
 
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
@@ -65,7 +63,6 @@ stamp-opts : opts.def
 	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
 	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
 	$(AG_ENV) ; $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
-	$(TOUCH_SENTINEL)
 
 $(DOCFILES) : stamp-doc
 stamp-doc : $(TARG)$(EXEEXT)
