@@ -7,6 +7,11 @@
 	by the "defs" test setup script.
 	* autoopts/tpl/optmain.tpl (O_CLOEXEC): set on opened files, unless
 	client overrides the default mode.
+	* agen5/Makefile.am (stamp-texi): remove "columns" and "getdefs" from
+	dependencies and ensure they have been made in the rule instead.
+	(stamp-man): ditto
+	* getdefs/Makefile.am (stamp-opts): ditto, but "columns" and "autogen".
+	(stamp-doc): ditto
 
 2010-12-09  Bruce Korb  <bkorb@gnu.org>
 

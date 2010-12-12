@@ -1,8 +1,8 @@
 ##  -*- Mode: Makefile -*-
-## ---------------------------------------------------------------------
+##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-06 14:15:20 bkorb"
+## Time-stamp:      "2010-12-12 14:09:22 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -19,8 +19,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-## ---------------------------------------------------------------------
 
 SUBDIRS         = test
 INCLUDES        = @INCLIST@
@@ -47,7 +45,7 @@ EXPRLIST        = \
 
 FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
-    autogen.c $(FSMLIST) $(EXPRLIST) \
+    autogen.c    $(FSMLIST)   $(EXPRLIST) \
     agCgi.c      agInit.c     agShell.c  agUtils.c    \
     defDirect.c  defFind.c    defLex.c   defLoad.c    \
     fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
@@ -76,18 +74,13 @@ ag.c : Makefile
 	  for f in $(csrc) ; do echo "#include \"$$f\"" ; done \
 	) > $@
 
-SUFFIXES = .i
-.c.i :
-	$(COMPILE) -E $< > $@
-
 ## Funny build rules for extracting definitions.  "Makefile.in"
 ## should never depend on these, so they must *not* be listed in the
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
 BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	srcdir=$(srcdir) \
-	AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
+	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION $(CLexe)
@@ -114,22 +107,20 @@ proto.h :
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-texi GEN-RULE
-stamp-texi : $(AGnam) $(CLexe) $(GDexe)
+stamp-texi : $(AGnam)
+	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
+	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-man GEN-RULE
-stamp-man : opts.def $(AGnam) $(CLexe) $(GDexe)
+stamp-man : opts.def $(AGnam)
+	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
+	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 autogen.1       : stamp-man
 autogen.texi    : stamp-texi
 gen      : stamp-texi
-
-$(GDexe) :
-	cd ../getdefs ; $(MAKE) $(GDnam)
-
-$(CLexe) :
-	cd ../columns ; $(MAKE) $(CLnam)
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \

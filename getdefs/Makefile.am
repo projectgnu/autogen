@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-07 09:06:40 bkorb"
+## Time-stamp:      "2010-12-12 13:50:11 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -61,18 +61,16 @@ gd.c : $(gdsrcs)
 	  do echo "#include \"$$f\"" ; done ) > $@
 
 $(getdefs_OBJECTS) opts.h opts.c : stamp-opts
-stamp-opts : opts.def $(CLexe) $(AGexe)
+stamp-opts : opts.def
+	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
+	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
 	$(AG_ENV) ; $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
 	$(TOUCH_SENTINEL)
 
-$(AGexe) :
-	@cd ../agen5 ; $(MAKE) $(AGnam)
-
-$(CLexe) :
-	@cd ../columns ; $(MAKE) $(CLnam)
-
 $(DOCFILES) : stamp-doc
-stamp-doc : $(CLexe) $(TARG)$(EXEEXT) $(AGexe)
+stamp-doc : $(TARG)$(EXEEXT)
+	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
+	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
 	$(AG_ENV) ; $(RUNAG) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
 	$(RUNAG) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 
