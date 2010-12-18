@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2010-07-17 10:07:03 bkorb"
+# Time-stamp:      "2010-12-15 11:58:46 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -174,15 +174,43 @@ ELSE we have a prefix:
 
   UP-prefix pname ) =][=
 
-ENDIF prefix/not    =][=
+ENDIF prefix/not    =]
 
-  IF (exist? "export")  =]
+/* * * * * *
+ *
+ *  Enumeration of [= prog-name =] exit codes
+ */
+typedef enum {[=
+
+  (set! tmp-val "")
+  (if (not (exist? "exit-name[0]"))
+      (set! tmp-val (string-append
+            "\n    " pname-up "_EXIT_SUCCESS = 0" )) )
+
+  (if (not (exist? "exit-name[1]"))
+      (set! tmp-val (string-append tmp-val
+            (if (> (string-length tmp-val) 1) "," "")
+            "\n    " pname-up "_EXIT_FAILURE = 1" )) )
+
+  (if (and (exist? "exit-name") (> (string-length tmp-val) 1))
+      (set! tmp-val (string-append tmp-val ",")) )
+
+  tmp-val                             =][=
+
+  FOR exit-name ,                     =]
+    [= (. pname-up) =]_EXIT_[=
+       (string-upcase! (string->c-name! (get "exit-name")))
+       =] = [= (for-index)            =][=
+  ENDFOR                              =]
+} [= (. pname-down) =]_exit_code_t;[=
+
+  IF (exist? "export")                =]
 
 /* * * * * *
  *
  *  Globals exported from the [=prog_title=] option definitions
  */
-[=  (join "\n\n" (stack "export")) =][=
+[=  (join "\n\n" (stack "export"))    =][=
   ENDIF  export? =]
 [=
 
@@ -198,7 +226,6 @@ CASE guard-option-names               =][=
     FOR  flag                         =]
 #undef [= (up-c-name "name")          =][=
     ENDFOR flag                       =][=
-
 
 *                                     =][=
 

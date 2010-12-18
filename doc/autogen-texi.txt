@@ -2514,6 +2514,32 @@ Indicates looking in the environment for values of variables named,
 upper cased @code{C-name} of the program and @code{OPTNAME} is the
 upper cased @code{C-name} of a specific option.
 
+@item exit-name
+@itemx exit-desc
+@vindex exit-name
+@vindex exit-desc
+@vindex exit-code
+These values should be defined as indexed value, thus:
+@example
+exit-name[0] = success;
+exit-desc[0] = 'Successful program execution.';
+exit-name[1] = failure;
+exit-desc[1] = 'The operation failed or command syntax was not valid.';
+@end example
+By default, all programs have these effectively defined for them.
+They may be overridden by explicitly defining any or all of these values.
+Additional names and descriptions may be defined.
+They will cause an enumeration to be emitted, like this one
+for @code{getdefs}:
+@example
+typedef enum @{
+    GETDEFS_EXIT_SUCCESS = 0,
+    GETDEFS_EXIT_FAILURE = 1
+@} getdefs_exit_code_t;
+@end example
+@noindent
+which will be augmented by any @code{exit-name} definitions beyond ``1''.
+
 @item export
 @vindex export
 This string is inserted into the .h interface file.  Generally used for
@@ -2584,12 +2610,26 @@ instead of @code{HAVE_OPT(DEBUG)}.
 
 @item homerc
 @vindex homerc
-Specifies either a directory or a file using a specific path (like @code{.}
-or @file{/usr/local/share/progname}) or an environment variable (like
-@file{$HOME/rc/} or @file{$PREFIX/share/progname}) or the directory
-where the executable was found (@file{$$[/...]}) to use to try to find
-the rcfile.  Use as many as you like.  The presence of this attribute
+Specifies either a directory or a file using a specific path, a path based
+on an environment variable or a path relative to installation directories.
+The method used depends on the first two characters of the name.  If the
+first character is not the dollar character (@code{$}), then it is
+presumed to be a path name based on the current directory.
+
+Otherwise, the method depends on the second character:
+@table @samp
+@item $
+The path is relative to the directory where the executable was found.
+@item @@
+The path is relative to the package data directory, e.g.
+@code{/usr/local/share/autogen}.
+@item [a-zA-Z]
+The path is derived from the named environment variable.
+@end table
+
+Use as many as you like.  The presence of this attribute
 activates the @code{--save-opts} and @code{--load-opts} options.
+See the @code{optionMakePath(3AGEN)} man page for excruciating details.
 @xref{loading rcfile}.
 
 @item include
@@ -5676,7 +5716,7 @@ stylized comments (@pxref{getdefs Invocation}).
 @subsection command line man pages
 
 Using the option definitions for an AutoOpts client program,
-the @samp{agman1.tpl} template will produce an nroff document
+the @samp{agman-cmd.tpl} template will produce an nroff document
 suitable for use as a @samp{man(1)} page document for a command
 line command.  The description section of the document is either
 the @samp{prog-man-descrip} text, if present, or the @samp{detail}
@@ -5704,7 +5744,7 @@ Replace the @samp{@@*} command with ".br"
 This document is produced by invoking the following command:
 
 @example
-autogen -L $@{prefix@}/share/autogen -T agman1.tpl options.def
+autogen -L $@{prefix@}/share/autogen -Tagman-cmd.tpl options.def
 @end example
 
 @noindent

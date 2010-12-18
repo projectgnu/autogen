@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-09 18:40:52 bkorb"
+## Time-stamp:      "2010-12-16 17:43:02 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -30,7 +30,7 @@ NOSHELL_TESTS = \
     get.test      gperf.test    heredef.test html.test   in.test \
     license.test  line.test     loop.test    make.test   match.test \
     pseudo.test   reorder.test  stack.test   stress.test string.test \
-    strtable.test strxform.test time.test
+    strtable.test strxform.test time.test    columns.test
 
 UNREADY_TESTS   = daemon.test
 TESTS       	= @AGEN5_TESTS@
@@ -39,7 +39,7 @@ FUNCLIST    	= funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
 EXPRLIST    	= expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 	    	  expString.c expGperf.c expExtract.c $(FUNCLIST)
 
-TESTS_ENVIRONMENT = \
+TESTS_ENVIRONMENT = TERM='' \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
 	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
 

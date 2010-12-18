@@ -9,8 +9,6 @@ my ($count,$tableitemcount);
 
 $optlist = 0;       ### 1 = bullet, 2 = enum, 3 = tag, 4 = item
 $oldoptlist = 0;
-my $data_file = 'texi2mdoc.txt';
-open DATA, "$data_file" or die "can't open kapila $data_file $!";
 
 while ($line = <STDIN>)
 {

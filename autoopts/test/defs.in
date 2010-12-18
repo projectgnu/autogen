@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-12-10 12:37:43 bkorb"
+# Time-stamp:     "2010-12-16 18:38:29 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -90,6 +90,7 @@ cfg_vals()
   test_main=yes
   use_flags=true
 
+  TERM=''
   test -z "${BASH_VERSION}" && local() { eval "$@" ; }
 
   vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
@@ -205,8 +206,8 @@ be_silent()
     shift
 
     case " $* " in
-    ( *' -L'* ) : ;;
-    ( * ) opts="${agl_opts}" ;;
+    *' -L'* ) : ;;
+    * ) opts="${agl_opts}" ;;
     esac
 
     ${AGexe} ${opts} "$@"
@@ -231,8 +232,8 @@ be_verbose()
     local tr="--trace=every --trace-out='>>${tfile}'"
 
     case " $* " in
-    ( *' -L'* ) : ;;
-    ( * ) opts="${agl_opts}" ;;
+    *' -L'* ) : ;;
+    * ) opts="${agl_opts}" ;;
     esac
 
     MALLOC_CHECK_=2 \
@@ -328,13 +329,13 @@ failure()
 cfg_vals $0
 
 case "${VERBOSE}" in
-( '' | [Nn]* | 0 | [Ff]* )
+'' | [Nn]* | 0 | [Ff]* )
     be_silent ;;
 
-( * )
+* )
     case "$-" in
-    ( *x* ) be_verbose ;;
-    (  *  ) be_silent ;;
+    *x* ) be_verbose ;;
+     *  ) be_silent ;;
     esac
 esac
 
@@ -342,7 +343,8 @@ cfg_inc
 
 trap "failure 'test ${testname} killed on timeout'" 15
 ( ( exec > /dev/null 2>&1 </dev/null
-    sleep ${kill_delay:-30}
+    test -z "${kill_delay}" && kill_delay=30
+    sleep ${kill_delay}
     ps -p $$ || exit
     kill -15 $$
     sleep 1

@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-10-02 15:26:21 bkorb"
+# Time-stamp:        "2010-12-15 15:07:27 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -252,7 +252,7 @@ make_man()
 {
     test -z "${CLexe}" && die "Cannot locate columns"
 
-    run_ag man -Tagman1 -bautogen ${srcdir}/opts.def
+    run_ag man -Tagman-cmd -DMAN_SECTION=1 -bautogen ${srcdir}/opts.def
 
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
     run_ag fmem fmemopen.def

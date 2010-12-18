@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-12-02 14:22:08 bkorb"
+ *  Time-stamp:        "2010-12-17 16:01:30 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -148,53 +148,59 @@ tSCC zFmtAlloc[] = "asprintf allocation";
 SCM
 ag_scm_dne(SCM prefix, SCM first, SCM opt)
 {
-    int      noDate   = 0;
-    char     zScribble[ SCRIBBLE_SIZE ];
-    char*    pzRes;
-    tCC*     pzFirst  = zNil;
-    SCM      res;
-    size_t   pfxLen   = AG_SCM_STRLEN(prefix);
-    tCC*     pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
+    char const *  date_str;
+    char const *  pzRes;
+    char const *  pzFirst;
+    size_t        pfxLen;
+    char const *  pzPrefix;
+    SCM           res;
+
+    if (! AG_SCM_STRING_P(prefix))
+        return SCM_UNDEFINED;
+
+    date_str = NULL;
+    pzFirst  = zNil;
+    pfxLen   = AG_SCM_STRLEN(prefix);
+    pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
 
     /*
      *  Check for the ``-d'' option
      */
     if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
-        noDate   = 1;
+        date_str = zNil;
         pfxLen   = AG_SCM_STRLEN(first);
         pzPrefix = ag_scm2zchars(first, "dne-prefix");
         first    = opt;
     }
 
-    if (pfxLen > SCRIBBLE_SIZE )
-        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
-
     /*
      *  IF we also have a 'first' prefix string,
      *  THEN we set it to something other than ``zNil'' and deallocate later.
      */
-    if (AG_SCM_STRING_P(first)) {
-        int len = AG_SCM_STRLEN(first);
-        if (len >= SCRIBBLE_SIZE)
-            AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
-
+    if (AG_SCM_STRING_P(first))
         pzFirst = aprf(ENABLED_OPT(WRITABLE) ? "%s\n" : zDne1,
                        ag_scm2zchars(first, "first-prefix"), pzPrefix);
-    }
 
-    if (noDate) {
-        zScribble[0] = NUL;
-    } else {
+    if (date_str == NULL) {
         static char const tim_fmt[] =
             "  %B %e, %Y at %r by AutoGen " AUTOGEN_VERSION;
-        time_t    curTime = time(NULL);
-        struct tm*  pTime = localtime(&curTime);
-        strftime(zScribble, (size_t)SCRIBBLE_SIZE, tim_fmt, pTime);
+
+        size_t const  tsiz = sizeof(tim_fmt) + sizeof("september") * 2;
+        time_t     curTime = time(NULL);
+        struct tm*   pTime = localtime(&curTime);
+
+        date_str = ag_scribble(tsiz);
+        strftime((char *)date_str, tsiz, tim_fmt, pTime);
     }
 
     {
-        char const* pz;
-        tFpStack*   pfp = pCurFp;
+        char const * pz;
+        tFpStack *   pfp = pCurFp;
+        char const * tpl_name = strrchr(pzTemplFileName, DIRCH);
+        if (tpl_name == NULL)
+            tpl_name = pzTemplFileName;
+        else
+            tpl_name++;
 
         while (pfp->flags & FPF_UNLINK)  pfp = pfp->pPrev;
         if (! ENABLED_OPT(DEFINITIONS))
@@ -210,8 +216,8 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         }
 
         pzRes = aprf(ENABLED_OPT(WRITABLE) ? zDne2 : zDne,
-                     pzPrefix, pfp->pzOutName, zScribble,
-                     pz, pzTemplFileName, pzFirst);
+                     pzPrefix, pfp->pzOutName, date_str,
+                     pz, tpl_name, pzFirst);
     }
 
     if (pzRes == NULL)

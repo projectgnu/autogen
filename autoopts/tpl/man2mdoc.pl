@@ -3,7 +3,7 @@
 use strict;
 
 my $data_file = 'man2mdoc.txt';
-#open DATA, "$data_file" or die "can't open kapila $data_file $!";
+#open DATA, "$data_file" or die "can't open $data_file $!";
 my ($taglist , $optlistold, $paraold, $parafirstval,$List,
     $indentation,$isindentated);
 

@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-08-06 08:54:38 bkorb"
+ *  Time-stamp:        "2010-12-18 11:59:05 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -32,7 +32,6 @@ typedef enum {
 } wait_for_pclose_enum_t;
 
 static char const zClientInput[] = "client-input";
-static int  exit_code = EXIT_FAILURE;
 
 #define _State_(n)  #n,
 static char const * const state_names[] = { STATE_TABLE };
@@ -100,7 +99,7 @@ inner_main(int argc, char ** argv)
 
     procState = PROC_STATE_DONE;
     setup_signals(SIG_DFL, SIG_IGN, SIG_DFL);
-    exit_code = EXIT_SUCCESS;
+    exit_code = AUTOGEN_EXIT_SUCCESS;
     done_check();
     /* NOTREACHED */
 }
@@ -275,12 +274,15 @@ static void
 catch_sig_and_bail(int sig)
 {
     switch (procState) {
-    case PROC_STATE_DONE:
     case PROC_STATE_ABORTING:
+        exit_code = AUTOGEN_EXIT_SIGNAL;
+
+    case PROC_STATE_DONE:
         break;
 
     default:
         abendJumpSignal = sig;
+        exit_code = AUTOGEN_EXIT_SIGNAL;
         siglongjmp(abendJumpEnv, sig);
     }
 }
@@ -357,13 +359,22 @@ done_check(void)
             closeOutput(AG_TRUE);
 #endif
         } while (pCurFp->pPrev != NULL);
+        exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
         break; /* continue failure exit */
+
+    case PROC_STATE_LOAD_DEFS:
+        exit_code = AUTOGEN_EXIT_BAD_DEFINITIONS;
+        fprintf(stderr, "ABEND-ing in %s state\n", state_names[procState]);
+        goto autogen_aborts;
 
     default:
         fprintf(stderr, "ABEND-ing in %s state\n", state_names[procState]);
-        /* FALLTHROUGH */
+        goto autogen_aborts;
 
     case PROC_STATE_ABORTING:
+        exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
+
+    autogen_aborts:
         if (*pzOopsPrefix != NUL) {
             /*
              *  Emit the CGI page header for an error message.  We will rewind
@@ -376,6 +387,8 @@ done_check(void)
 
     case PROC_STATE_OPTIONS:
         /* Exiting in option processing state is verbose enough */
+        break;
+
     case PROC_STATE_DONE:
         break; /* continue normal exit */
     }
@@ -624,6 +637,12 @@ ao_strdup (char const * str)
     return res;
 }
 
+#ifdef __GNUC__
+    void ignore_vars(void);
+    void ignore_vars(void) {
+        (void)option_load_mode, (void)program_pkgdatadir;
+    }
+#endif
 /*
  * Local Variables:
  * mode: C

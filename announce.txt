@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# Time-stamp:        "2010-07-16 15:04:06 bkorb"
+# Time-stamp:        "2010-12-13 12:59:58 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -114,8 +114,6 @@ cat >&3 <<_EOF_
 AutoGen home:    http://www.gnu.org/software/${project}/
 primary ftp:     ${ftpurl}/
 .tar.gz:         ${ftpurl}/${project}-${AG_VERSION}.tar.gz
-library project: $(echo ${ftpurl} | \
-  sed "s,${project}/.*,libopts/rel${AO_CURRENT}.${AO_REVISION}/,")
 bug reports:     autogen-users at the lists dot SourceForge net domain
 bug archive:     http://sourceforge.net/mailarchive/forum.php?forum_id=7034
 maintainer:      Bruce Korb - bkorb at the usual GNU domain

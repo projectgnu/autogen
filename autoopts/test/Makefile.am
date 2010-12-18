@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2010-07-18 09:06:08 bkorb"
+## Time-stamp:      "2010-12-16 17:42:40 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -34,7 +34,7 @@ TESTS      = nested.test cfg-edit.test alias.test \
 
 testsubdir = ./testdir
 
-TESTS_ENVIRONMENT = set -a ; \
+TESTS_ENVIRONMENT = set -a ; TERM='' \
 	CFLAGS='$(DEFS) $(CFLAGS)' CPPFLAGS='$(CPPFLAGS)' \
 	DEBUG_USAGE='$(DEBUG_USAGE)' testsubdir=$(testsubdir) INCS='$(INCS)'
 #`

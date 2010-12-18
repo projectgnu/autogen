@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-12-06 14:21:49 bkorb"
+ *  Time-stamp:        "2010-12-17 15:59:21 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -50,6 +50,14 @@
 #else
 #  define VALUE( s )
 #  define MODE extern
+#endif
+
+#ifndef DIRCH
+# if defined(_WIN32) && !defined(__CYGWIN__)
+#  define DIRCH                  '\\'
+# else
+#  define DIRCH                  '/'
+# endif
 #endif
 
 #define YYSTYPE t_word
@@ -440,6 +448,8 @@ MODE tDefEntry **   ppParseStack     VALUE( parseStack );
 MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
 
 MODE tpChar         pCurDir          VALUE( NULL );
+
+MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

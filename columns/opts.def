@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2010-12-09 10:21:38 bkorb"
+ *  Time-stamp:        "2010-12-13 13:36:42 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *
@@ -147,7 +147,19 @@ flag = {
 	the first line.  Otherwise, it is a line prefix that will be inserted
 	at the start of that line.  If its length exceeds "indent", then it
 	will be emitted on a line by itself, suffixed by any line separation
-	string.
+	string.  For example:
+
+	@example
+	$ columns --first='#define TABLE' -c 2 -I4 --line=' \' <<_EOF_
+	one
+	two
+	three
+	four
+	_EOF_
+	#define TABLE \
+	    one   two \
+	    three four
+	@end example
 	_EODoc_;
 };
 

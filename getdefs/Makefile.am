@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-12 14:55:48 bkorb"
+## Time-stamp:      "2010-12-18 11:03:50 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -54,9 +54,12 @@ all : gen
 gen : $(BUILT_SOURCES) $(DOCFILES)
 
 gd.c : $(gdsrcs)
-	( echo '#define DEFINE' ; \
-	  for f in config.h opts.c $(gdsrcs) ; \
-	  do echo "#include \"$$f\"" ; done ) > $@
+	exec > $@ ; \
+	echo '#include "config.h"' ; \
+	echo '#undef   PKGDATADIR' ; \
+	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	for f in opts.c $(gdsrcs) ; \
+	do echo "#include \"$$f\"" ; done
 
 $(getdefs_OBJECTS) opts.h opts.c : stamp-opts
 stamp-opts : opts.def
@@ -68,7 +71,7 @@ $(DOCFILES) : stamp-doc
 stamp-doc : $(TARG)$(EXEEXT)
 	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
 	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
-	$(AG_ENV) ; $(RUNAG) -b$(TARG) -Tagman1 $(srcdir)/opts.def ; \
+	$(AG_ENV) ; $(RUNAG) -b$(TARG) -Tagman-cmd $(srcdir)/opts.def ; \
 	$(RUNAG) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 
 .NOTPARALLEL:

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-11-08 12:09:04 bkorb"
+## Time-stamp:      "2010-12-18 11:03:55 bkorb"
 ## Copyright (c):   1992-2010 by Bruce Korb
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -52,7 +52,11 @@ columns.menu columns.texi : stamp-aginfo
 columns.1                 : stamp-agman
 
 cols.c : Makefile
-	for f in config.h $(csrc) ; do echo "#include \"$$f\"" ; done > $@
+	exec > $@ ; \
+	echo '#include "config.h"' ; \
+	echo '#undef   PKGDATADIR' ; \
+	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
 stamp-aginfo : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
@@ -60,7 +64,7 @@ stamp-aginfo : opts.def columns$(EXEEXT)
 
 stamp-agman  : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
-	$(RUNAG) -Tagman1 $(srcdir)/opts.def
+	$(RUNAG) -Tagman-cmd $(srcdir)/opts.def
 
 .NOTPARALLEL:
 

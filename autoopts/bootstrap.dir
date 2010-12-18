@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-12-02 22:58:59 bkorb"
+# Time-stamp:      "2010-12-16 11:44:04 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -50,7 +50,7 @@ burn_aover() {
 
     ${VERBOSE} && {
         : sedcmd $sedcmd
-        : on files: $(ls *.*)
+        : on files: $(ls *.in)
     } || :
 
     cd tpl
@@ -58,7 +58,18 @@ burn_aover() {
     do
         sed "${sedcmd}" $f > ${f%.in}
     done
-    chmod a+x *.pl
+    for f in *
+    do
+        case "$f" in
+        *~ )
+            rm -f $f ;;
+
+        *.tpl* | *.def )
+            chmod 644 $f ;;
+
+        * ) chmod 755 $f ;;
+        esac
+    done
     cd -
     ${VERBOSE} && set -x || :
 }
@@ -75,15 +86,15 @@ add_files_to_mf() {
         do
             test -f ${f}.in || echo $f
         done
-        echo tpl/std*.def tpl/*.pl
+        echo tpl/std*.def tpl/*.pl tpl/*.sh
     )
     local ndtpl_files=$(
         for f in tpl/*.tpl
         do
             test -f ${f}.in && echo $f
         done)
-    sedcmd=$'/^TPL_FILES /a\\\n'$(
-        ls -1 ${dtpl_files} | columns -I4 --spread=1 --line=' \\\'
+    sedcmd='/^TPL_FILES *=/a\\'$(ls -1 ${dtpl_files} | \
+        columns -I4 --spread=1 --line=' \\\'
     )$'\n\n/^GENMAN /a\\\n'$(
         ls -1 *.3 | \
             sed '/^pathfind.3$/d' | \

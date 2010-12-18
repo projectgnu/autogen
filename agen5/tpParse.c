@@ -3,7 +3,7 @@
  *  tpParse.c
  *
  *
- * Time-stamp:        "2010-06-30 21:25:54 bkorb"
+ * Time-stamp:        "2010-12-16 13:25:49 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -39,6 +39,9 @@ find_mac_end(char const ** ppzMark);
 
 static char const *
 find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl);
+
+static char const *
+find_macro(tTemplate * pTpl, tMacro * pM, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -235,6 +238,82 @@ find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl)
     return res;  /* may be NULL, if there are no more macros */
 }
 
+static char const *
+find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan)
+{
+    char const * pzScan = *ppzScan;
+    char const * pzMark;
+
+    pzMark = find_mac_start(pzScan, ppM, pTpl);
+
+    /*
+     *  IF no more macro marks are found, THEN we are done...
+     */
+    if (pzMark == NULL)
+        return pzMark;
+
+    /*
+     *  Find the macro code and the end of the macro invocation
+     */
+    pCurMacro = *ppM;
+    pzScan    = find_mac_end(&pzMark);
+
+    /*
+     *  Count the lines in the macro text and advance the
+     *  text pointer to after the marker.
+     */
+    {
+        char const *  pzMacEnd = pzScan;
+        char const *  pz       = pzMark;
+
+        for (;;pz++) {
+            pz = strchr(pz, '\n');
+            if ((pz == NULL) || (pz > pzMacEnd))
+                break;
+            templLineNo++;
+        }
+
+        /*
+         *  Strip white space from the macro
+         */
+        while ((pzMark < pzMacEnd) && IS_WHITESPACE_CHAR(*pzMark))
+            pzMark++;
+        while ((pzMacEnd > pzMark) && IS_WHITESPACE_CHAR(pzMacEnd[-1]))
+            pzMacEnd--;
+
+        if (pzMark != pzMacEnd) {
+            (*ppM)->ozText = (uintptr_t)pzMark;
+            (*ppM)->res    = (long)(pzMacEnd - pzMark);
+        }
+    }
+
+    /*
+     *  IF the end macro mark was preceded by a backslash, then we remove
+     *  trailing white space from there to the end of the line.
+     */
+    if ((*pzScan != '\\') || (strncmp(zEndMac, pzScan, endMacLen) == 0))
+        pzScan += endMacLen;
+
+    else {
+        char const * pz = (pzScan += endMacLen + 1);
+
+        /*
+         *  We are eating white space, do so only if there is white space
+         *  from the end macro marker to EOL.  Anything else on the line
+         *  will suppress the feature.
+         */
+        while (IS_WHITESPACE_CHAR(*pz)) {
+            if (*(pz++) == '\n') {
+                templLineNo++;
+                pzScan = pz;
+                break;
+            }
+        }
+    }
+
+    *ppzScan = pzScan;
+    return pzMark;
+}
 
 LOCAL tMacro*
 parseTemplate(tMacro* pM, char const ** ppzText)
@@ -263,73 +342,9 @@ parseTemplate(tMacro* pM, char const ** ppzText)
 #endif
 
     for (;;) {
-        char const * pzMark = find_mac_start(pzScan, &pM, pTpl);
-
-        /*
-         *  IF no more macro marks are found,
-         *  THEN we are done...
-         */
+        char const * pzMark = find_macro(pTpl, &pM, &pzScan);
         if (pzMark == NULL)
             break;
-
-        /*
-         *  Find the macro code and the end of the macro invocation
-         */
-        pCurMacro = pM;
-        pzScan = find_mac_end(&pzMark);
-
-        /*
-         *  Count the lines in the macro text and advance the
-         *  text pointer to after the marker.
-         */
-        {
-            char const *  pzMacEnd = pzScan;
-            char const *  pz       = pzMark;
-
-            for (;;pz++) {
-                pz = strchr(pz, '\n');
-                if ((pz == NULL) || (pz > pzMacEnd))
-                    break;
-                templLineNo++;
-            }
-
-            /*
-             *  Strip white space from the macro
-             */
-            while ((pzMark < pzMacEnd) && IS_WHITESPACE_CHAR(*pzMark))
-                pzMark++;
-            while ((pzMacEnd > pzMark) && IS_WHITESPACE_CHAR(pzMacEnd[-1]))
-                pzMacEnd--;
-
-            if (pzMark != pzMacEnd) {
-                pM->ozText = (uintptr_t)pzMark;
-                pM->res    = (long)(pzMacEnd - pzMark);
-            }
-        }
-
-        /*
-         *  IF the end macro mark was preceded by a backslash, then we remove
-         *  trailing white space from there to the end of the line.
-         */
-        if ((*pzScan != '\\') || (strncmp(zEndMac, pzScan, endMacLen) == 0))
-            pzScan += endMacLen;
-
-        else {
-            char const * pz = (pzScan += endMacLen + 1);
-
-            /*
-             *  We are eating white space, do so only if there is white space
-             *  from the end macro marker to EOL.  Anything else on the line
-             *  will suppress the feature.
-             */
-            while (IS_WHITESPACE_CHAR(*pz)) {
-                if (*(pz++) == '\n') {
-                    templLineNo++;
-                    pzScan = pz;
-                    break;
-                }
-            }
-        }
 
         /*
          *  IF the called function returns a NULL next macro pointer,
@@ -337,7 +352,7 @@ parseTemplate(tMacro* pM, char const ** ppzText)
          *       will be non-NULL.
          */
         {
-            tMacro* pNM = (*(papLoadProc[ pM->funcCode ]))(pTpl, pM, &pzScan);
+            tMacro * pNM = (*(papLoadProc[ pM->funcCode]))(pTpl, pM, &pzScan);
 
 #if defined(DEBUG_ENABLED)
             if (HAVE_OPT(SHOW_DEFS)) {

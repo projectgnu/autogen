@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2010-07-16 17:25:03 bkorb"
+ *  Time-stamp:        "2010-12-16 14:56:53 bkorb"
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 
@@ -1084,7 +1084,7 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 
     /*
      *  IF this is the first time here,
-     *  THEN set up the "CASE" mode callout table.
+     *  THEN set up the "CASE" mode callout tables.
      *  It is the standard table, except entries are inserted
      *  for SELECT and ESAC.
      */
@@ -1092,17 +1092,17 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
         int i;
 
         /*
-         *  Until there is a selection clause, _any_ other
-         *  macro will be illegal (except comments :)!
+         *  Until there is a selection clause, only comment and select
+         *  macros are allowed.
          */
         for (i=0; i < FUNC_CT; i++)
-            apSelectOnly[i] = &mLoad_Bogus;
+            apSelectOnly[i] = mLoad_Bogus;
 
         memcpy((void*)apCaseLoad, apLoadProc, sizeof( apLoadProc ));
         apSelectOnly[ FTYP_COMMENT] = mLoad_Comment;
         apSelectOnly[ FTYP_SELECT ] = \
-        apCaseLoad[   FTYP_SELECT ] = &mLoad_Select;
-        apCaseLoad[   FTYP_ESAC   ] = &mLoad_Ending;
+        apCaseLoad[   FTYP_SELECT ] = mLoad_Select;
+        apCaseLoad[   FTYP_ESAC   ] = mLoad_Ending;
     }
 
     /*

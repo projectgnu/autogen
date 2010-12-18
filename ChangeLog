@@ -1,4 +1,70 @@
+2010-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am (ag.c): define PKGDATADIR
+	* columns/Makefile.am (cols.c): ditto
+	* getdefs/Makefile.am (gd.c): ditto
+	* xml2ag/Makefile.am (x.c): ditto
+	* agen5/autogen.c (ignore_vars): new -- ignore static variables
+	declared in ../autoopts/autoopts.h. Move some more into here
+	* agen5/autogen.h (DIRCH): move to here
+	* agen5/expFormat.c (ag_scm_dne): only print the file name,
+	not all the directories leading up to a file name.
+	* autoopts/autogen.map (option-char-category) replacement for
+	opt-char-cat which is too short for a global used in a library.
+	* autoopts/autoopts.c: collect global definitions and make more
+	of them be "static" scope.
+	* autoopts/load.c (optionMakePath): use longer global name
+	for pkgdatadir. It is also set from the tOptions structure.
+	* autoopts/usage.c: remove static variables
+	(prt_ini_list): do not print environment variable expansions in the
+	usage information.  Print the variable used.
+	* autoopts/options_h.tpl (pzPkgDataDir): new options structure field
+	(HAS_pzPkgDataDir_STRUCT_VERSION): add a test to see if the field is
+	in an input structure.
+	* autoopts/tpl/optcode.tpl (PKGDATADIR): if defined, then initialize
+	pzPkgData to that string, otherwise use the empty string.
+	* autoopts/usage-txt.def (AO_Alloc): new translatable string
+	(AO_Realloc): also
+	(AO_Strdup): also
+	* doc/autogen-texi.txt: document the $@ expansion in rc/ini/config
+	file names
+
+2010-12-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/opthead.tpl.in (exit_code_t): new exit code enumeration
+	* doc/autogen-texi.txt: doc exit code handling
+	* agen5/opts.def (exit-name): new exit codes
+	(exit-desc): ditto
+	* agen5/autogen.h (autogen_exit_code_t): use newly generated enum
+	* agen5/agInit.c (initialize): use the enum
+	* agen5/autogen.c (inner_main): ditto
+	(catch_sig_and_bail): ditto
+	(done_check): ditto
+
+	* autoopts/options_h.tpl (pzProgPath): make pointer const
+	(pzProgName): ditto
+	* autoopts/makeshell.c (emitUsage): adjust code for const-ness
+	(genshelloptUsage): ditto
+	* autoopts/configfile.c (optionFileLoad): ditto
+	(validateOptionsStruct): ditto
+	* autoopts/tpl/getopt.tpl: adjust template to accommodate const-ness
+	* autoopts/test/getopt.test: adjust for new template
+
+	* autoopts/tpl/agman-cmd.tpl: tweak -- ensure all hyphens are escaped
+	and document the newly generated exit code enumeration
+	* columns/Makefile.am (agman): use new template for man page
+	* agen5/bootstrap.dir: ditto
+	* getdefs/Makefile.am: ditto
+	* xml2ag/Makefile.am: ditto
+	* autoopts/test/keyword.test: adjust for new man page template
+
+	* autoopts/test/defs.in (TERM): make sure it is empty
+	* autoopts/test/Makefile.am (TERM): make really sure
+	* agen5/test/Makefile.am: ditto
+
 2010-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.5 release
 
 	* agen5/loadPseudo.c (handle_hash_line): add file name argument for
 	error display.

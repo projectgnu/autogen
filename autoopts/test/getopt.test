@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2010-12-12 12:00:29 bkorb"
+# Time-stamp:        "2010-12-16 14:42:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -325,12 +325,18 @@ int
 process_test_getopt_opts (int argc, char** argv)
 {
   {
-    char const * pz_prog = strrchr (argv[0], DIRCH);
+    char * pz_prog = strrchr (argv[0], DIRCH);
+    /*
+     * This violates the const-ness of the pzProgName field.
+     * The const-ness is to prevent accidents.  This is not accidental.
+     */
+    char ** pp = (char **)(void *)&(test_getoptOptions.pzProgName);
+
     if (pz_prog != NULL)
       pz_prog++;
     else
       pz_prog = argv[0];
-    test_getoptOptions.pzProgName = pz_prog;
+    *pp = pz_prog;
   }
 
   for (;;) {
@@ -570,12 +576,18 @@ int
 process_test_getopt_opts (int argc, char** argv)
 {
   {
-    char const * pz_prog = strrchr (argv[0], DIRCH);
+    char * pz_prog = strrchr (argv[0], DIRCH);
+    /*
+     * This violates the const-ness of the pzProgName field.
+     * The const-ness is to prevent accidents.  This is not accidental.
+     */
+    char ** pp = (char **)(void *)&(test_getoptOptions.pzProgName);
+
     if (pz_prog != NULL)
       pz_prog++;
     else
       pz_prog = argv[0];
-    test_getoptOptions.pzProgName = pz_prog;
+    *pp = pz_prog;
   }
 
   for (;;) {
@@ -655,8 +667,6 @@ _EndOfSample_
 }
 
 # # # # # # # # # # RESULTS TESTING # # # # # # # # #
-set -x
-PS4='>${FUNCNAME:-getopt}> '
 
 go_init
 go_samples

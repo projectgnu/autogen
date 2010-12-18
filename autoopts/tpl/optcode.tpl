@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2010-12-09 17:36:22 bkorb"
+# Time-stamp:      "2010-12-18 10:57:28 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -405,20 +405,24 @@ ENDIF have homerc
  *
  *  Define the [= (. pname-cap) =] Option Environment
  */
-tSCC   zPROGNAME[]   = "[= (. pname-up) =]";
-tSCC   zUsageTitle[] =
+static char const zPROGNAME[[=(+ (string-length pname-up) 1)
+=]] = "[= (. pname-up) =]";
+static char const zUsageTitle[[=(+ (string-length usage-text) 1)=]] =
 [= (kr-string usage-text) =];[=
 
 IF (exist? "homerc") =]
-tSCC   zRcName[]     = "[=
-  (if (not (exist? "rcfile"))
+static char const zRcName[[=
+
+  (set! tmp-text (if (not (exist? "rcfile"))
       (string-append "." pname-down "rc")
-      (get "rcfile") ) =]";
-tSCC*  apzHomeList[] = {[=
+          (get "rcfile") ))
+  (+ 1 (string-length tmp-text))
+=]] = "[= (. tmp-text) =]";
+static char const * const apzHomeList[[=(+ (count "homerc") 1)=]] = {[=
   FOR homerc            =]
-       [= (kr-string (get "homerc")) =],[=
+    [= (kr-string (get "homerc")) =],[=
   ENDFOR homerc=]
-       NULL };[=
+    NULL };[=
 
 ELSE                    =]
 #define zRcName     NULL
@@ -445,20 +449,25 @@ s/^@item *$/\
     "\n_EODetail_" ))
   "\n" ))) ))
 
-(define bug-text "\n\ntSCC   zBugsAddr[]    = %s;")
+(define bug-text "\n\nstatic char const zBugsAddr[%d]    = %s;")
 
 (if (exist? "copyright.eaddr")
-    (sprintf bug-text (kr-string (get "copyright.eaddr")))
+    (begin
+      (set! tmp-text (get "copyright.eaddr"))
+      (sprintf bug-text (+ 1 (string-length tmp-text))
+                        (kr-string tmp-text)) )
 
     (if (exist? "eaddr")
-        (sprintf bug-text (kr-string (get "eaddr")))
+        (begin
+         (set! tmp-text (get "eaddr"))
+         (sprintf bug-text (+ 1 (string-length tmp-text)) (kr-string tmp-text)))
 
         "\n\n#define zBugsAddr NULL" )  )
 
                         =][=
 
 IF (or (exist? "explain") (== (get "main.main-type") "for-each"))  =]
-tSCC   zExplain[]     = [=
+static char const zExplain[] = [=
 
  (if (exist? "explain")
      (patch-text "explain")
@@ -478,14 +487,16 @@ ELSE                    =]
 ENDIF                   =][=
 
 IF (exist? "detail")    =]
-tSCC    zDetail[]     = [= (patch-text "detail") tmp-text =];[=
+static char const zDetail[[=
+   (patch-text "detail") (+ 1 (string-length tmp-text)) =]] = [=
+ (. tmp-text) =];[=
 
 ELSE                    =]
 #define zDetail         NULL[=
 ENDIF                   =][=
 
 IF (exist? "version")   =]
-tSCC    zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
+static char const zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
 
 ELSE                    =]
 #define zFullVersion    NULL[=
@@ -516,7 +527,10 @@ static void * const original[=(. pname-cap)=]Cookies[ [=
 };
 [= ENDIF =]
 [= INVOKE usage-text usage-type = full  \=]
-[= INVOKE usage-text usage-type = short \=]
+[= INVOKE usage-text usage-type = short  =]
+#ifndef  PKGDATADIR
+# define PKGDATADIR ""
+#endif
 
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
@@ -562,10 +576,11 @@ tOptions [=(. pname)=]Options = {
        (count "flag")=] /* user option count */,
     [= (. pname) =]_full_usage, [= (. pname) =]_short_usage,
 [= IF (exist? "resettable") \=]
-    original[=(. pname-cap)=]Defaults, original[=(. pname-cap)=]Cookies
+    original[=(. pname-cap)=]Defaults, original[=(. pname-cap)=]Cookies,
 [= ELSE \=]
-    NULL, NULL
+    NULL, NULL,
 [= ENDIF \=]
+    PKGDATADIR
 };
 [=
 

@@ -2,9 +2,9 @@
 #  -*- Mode: Shell-script -*-
 # case.test --- test CASE functionality
 #
-# Time-stamp:        "2010-06-26 16:06:49 bkorb"
+# Time-stamp:        "2010-12-13 14:16:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
-##
+#
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
 ##
@@ -20,16 +20,13 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-#
-# ----------------------------------------------------------------------
 
 . ./defs
 
 # # # # # # # TEMPLATE FILE # # # # # #
 
-echo creating $testname.tpl
-cat > $testname.tpl <<'EOF'
+echo creating ${testname}.tpl
+cat > ${testname}.tpl <<'EOF'
 <= AutoGen5 template test =>
 <=
 FOR grp "\n" =><=
@@ -87,9 +84,9 @@ EOF
 
 # # # # # # # SAMPLE OUTPUT FILE # # # # # #
 
-echo creating $testname.out in `pwd`
+echo creating ${testname}.out in `pwd`
 # this is the output we should expect to see
-cat > $testname.out <<'EOF'
+cat > ${testname}.out <<'EOF'
 first:  string matches: ~~ ^[a-z]*$  OK and ~ ^[a-z]*$  OK
 second: String matches: ~* .         OK and ~ ^[a-z]*$  OK
 third:  STRING matches: ~~ ^[A-Z]*$  OK and ~ ^[a-z]*$  OK
@@ -99,8 +96,8 @@ EOF
 
 # # # # # # # DEFINITIONS FILE # # # # # #
 
-cat > $testname.def <<EOF
-autogen definitions $testname;
+cat > ${testname}.def <<EOF
+autogen definitions ${testname};
 
 grp = {
    nam = first;
@@ -121,11 +118,11 @@ EOF
 
 # # # # # # # RUN AUTOGEN # # # # # #
 
-run_ag x $testname.def ||  failure autogen failed
+run_ag x ${testname}.def ||  failure autogen failed
 
 # # # # # # # TEST RESULTS # # # # # #
 
-cmp -s $testname.test $testname.out || failure unexpected output
+cmp -s ${testname}.test ${testname}.out || failure unexpected output
 
 cleanup
 

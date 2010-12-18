@@ -2,7 +2,7 @@
 /*
  *  \file columns.c
  *
- *  Time-stamp:        "2010-12-09 10:44:57 bkorb"
+ *  Time-stamp:        "2010-12-13 13:29:43 bkorb"
  *
  *  Columns Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -152,36 +152,33 @@ malloc_or_die(size_t sz)
 static char const *
 construct_first_pfx(char const * f_indent)
 {
-    char const pad_fmt[] = "%%-%ds";
+    static char const pad_fmt[] = "%%-%ds";
     // 24 > log10(0xFFFFFFFFFFFFFFFFULL)
     char pfx_buf[24 + sizeof(pad_fmt)];
-    size_t firstSize;
-    size_t len = indentSize + 3;
+    size_t firstSize = pad_indentation(f_indent, &pzFirstPfx);
+    size_t len;
     char * res;
-
-    /*
-     *  The first line has a special indentation/prefix.
-     *  Compute it, but do not let it be larger than
-     *  the indentation value.
-     */
-    firstSize = pad_indentation(f_indent, &pzFirstPfx);
-
-    sprintf(pfx_buf, pad_fmt, (int)indentSize);
 
     /*
      *  If this first line exceeds the indentation size, then we
      *  need to append a newline and any indentation.
      */
-    if (firstSize > indentSize)
-        len += HAVE_OPT(LINE_SEPARATION) ? strlen( OPT_ARG(LINE_SEPARATION)) : 0
-            + indentSize;
+    if (firstSize > indentSize) {
+        size_t sep_len = HAVE_OPT(LINE_SEPARATION)
+            ? strlen( OPT_ARG(LINE_SEPARATION)) : 0;
+        len = firstSize + sep_len + indentSize + 3;
+        sprintf(pfx_buf, pad_fmt, (int)firstSize);
+    } else {
+        len = indentSize + 3;
+        sprintf(pfx_buf, pad_fmt, (int)indentSize);
+    }
 
-    res = malloc_or_die(indentSize + 1);
-    snprintf(res, indentSize + 1, pfx_buf, pzFirstPfx);
+    res = malloc_or_die(len);
+    snprintf(res, len, pfx_buf, pzFirstPfx);
     pzFirstPfx = res;
 
     if (firstSize > indentSize) {
-        char * p = res + strlen(res);
+        char * p = res + firstSize;
 
         if (HAVE_OPT( LINE_SEPARATION )) {
             len = strlen(OPT_ARG(LINE_SEPARATION));

@@ -52,6 +52,10 @@ utxt = { ut-type = cch_t;
 };
 #endif
 
+utxt = { ut-name = AO_Alloc;
+         ut-text = "malloc of %d bytes failed\n";
+};
+
 utxt = { ut-name = AO_Bad;
          ut-text = "AutoOpts function called without option descriptor\n";
 };
@@ -66,8 +70,16 @@ utxt = { ut-name = AO_Err;
             "\t%s called AutoOpts function with structure version %d:%d:%d.\n";
 };
 
+utxt = { ut-name = AO_Realloc;
+         ut-text = "realloc of %d bytes at 0x%p failed\n";
+};
+
 utxt = { ut-name = AO_Sml;
          ut-text = "\tThis is less than the minimum library version:  ";
+};
+
+utxt = { ut-name = AO_Strdup;
+         ut-text = "strdup of %d byte string failed\n";
 };
 
 utxt = { ut-name = AO_Ver;

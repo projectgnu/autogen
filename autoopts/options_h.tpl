@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2010-09-26 15:58:26 bkorb"
+# Time-stamp:      "2010-12-18 10:31:19 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -306,6 +306,13 @@ struct optSpecIndex {
  */
 typedef void (tOptionXlateProc)(void);
 
+/*
+ * Everything marked "PUBLIC" is also marked "const".
+ * Public access is not a license to modify.  Other fields
+ * are used and modified by the library.  They are also
+ * subject to change without any notice.  Do not even
+ * look at these outside of libopts.
+ */
 struct options {
     int const           structVersion;
     int                 origArgCt;
@@ -314,8 +321,8 @@ struct options {
     unsigned int        curOptIdx;
     char*               pzCurOpt;
 
-    char const*         pzProgPath;         /* PUBLIC */
-    char const*         pzProgName;         /* PUBLIC */
+    char const* const   pzProgPath;         /* PUBLIC */
+    char const* const   pzProgName;         /* PUBLIC */
     char const* const   pzPROGNAME;         /* PUBLIC */
     char const* const   pzRcName;           /* PUBLIC */
     char const* const   pzCopyright;        /* PUBLIC */
@@ -343,6 +350,7 @@ struct options {
     /* PUBLIC: */
     optArgBucket_t const * const originalOptArgArray;
     void * const * const originalOptArgCookie;
+    char const * const  pzPkgDataDir;
 };
 
 /*
@@ -352,6 +360,10 @@ struct options {
 #define originalOptArgArray_STRUCT_VERSION  131072 /* AO_CURRENT = 32 */
 #define HAS_originalOptArgArray(_opt) \
     ((_opt)->structVersion >= originalOptArgArray_STRUCT_VERSION)
+
+#define pzPkgDataDir_STRUCT_VERSION  139264 /* AO_CURRENT = 34 */
+#define HAS_pzPkgDataDir(_opt) \
+    ((_opt)->structVersion >= pzPkgDataDir_STRUCT_VERSION)
 
 /*
  *  "token list" structure returned by "string_tokenize()"

@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2010-08-06 08:56:26 bkorb"
+ *  Time-stamp:      "2010-12-15 17:33:14 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -73,6 +73,7 @@ initialize(int arg_ct, char** arg_vec)
     add_env_vars();
 
     doOptions(arg_ct, arg_vec);
+    exit_code = AUTOGEN_EXIT_LOAD_ERROR;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
         SCM_EVAL_CONST("(debug-enable 'backtrace)");

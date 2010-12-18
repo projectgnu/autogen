@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-11-08 14:36:34 bkorb"
+## Time-stamp:      "2010-12-18 11:03:45 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -47,8 +47,12 @@ all 	    : gen
 gen 	    : $(gsrcs) $(DOCFILES)
 
 x.c 	    : $(gsrcs) $(csrcs)
-	for f in config.h $(gsrcs) $(csrcs) ; \
-	do echo "#include \"$$f\"" ; done > $@
+	exec > $@ ; \
+	echo '#include "config.h"' ; \
+	echo '#undef   PKGDATADIR' ; \
+	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	for f in $(gsrcs) $(csrcs) ; \
+	do echo "#include \"$$f\"" ; done
 
 $(getdefs_OBJECTS) xmlopts.c xmlopts.h : stamp-opts
 stamp-opts  : xmlopts.def $(CLexe)
@@ -64,7 +68,7 @@ stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 
 $(TARG).1   : stamp-man
 stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
-	$(RUNAG) -Tagman1 -b$(TARG)
+	$(RUNAG) -Tagman-cmd -b$(TARG)
 
 $(CLexe)    :
 	cd ../columns ; $(MAKE) $(CLnam)

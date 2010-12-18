@@ -5,7 +5,7 @@
 +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2010-07-10 14:38:38 bkorb"
+  Time-stamp:        "2010-12-16 14:30:40 bkorb"
 _EOF_
 \` `
 
@@ -281,12 +281,18 @@ int
 process_[+(. prog-name)+]_opts (int argc, char** argv)
 {
   {
-    char const * pz_prog = strrchr (argv[0], DIRCH);
+    char * pz_prog = strrchr (argv[0], DIRCH);
+    /*
+     * This violates the const-ness of the pzProgName field.
+     * The const-ness is to prevent accidents.  This is not accidental.
+     */
+    char ** pp = (char **)(void *)&([+ (. prog-name) +]Options.pzProgName);
+
     if (pz_prog != NULL)
       pz_prog++;
     else
       pz_prog = argv[0];
-    [+ (. prog-name) +]Options.pzProgName = pz_prog;
+    *pp = pz_prog;
   }
 
   for (;;) {
