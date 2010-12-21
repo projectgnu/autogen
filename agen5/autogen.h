@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-12-17 15:59:21 bkorb"
+ *  Time-stamp:        "2010-12-21 10:54:37 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -337,7 +337,7 @@ MODE char const *   pzOopsPrefix     VALUE( "" );
 /*
  *  Template Processing Globals
  */
-MODE tCC*           pzCurSfx         VALUE( NULL );
+MODE char const *   pzCurSfx         VALUE( NULL );
 /**
  * The time to set for the modification times of the output files.
  */
@@ -353,6 +353,14 @@ MODE char *         pzCurStart       VALUE( NULL );
 MODE uintptr_t      curStartOff      VALUE( 0 );
 MODE tForInfo       forInfo          VALUE( { 0 } );
 MODE FILE *         pfTrace          VALUE( NULL );
+/**
+ * temporary file name template
+ */
+MODE char const *   pz_temp_tpl      VALUE( NULL );
+/**
+ * Length of the template that is the temp directory
+ */
+MODE size_t         temp_tpl_dir_len VALUE( 0 );
 /**
  * dependency file file pointer.
  */

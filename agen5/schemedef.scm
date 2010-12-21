@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2010-06-30 21:09:46 bkorb"
+;;; Time-stamp:        "2010-12-21 11:48:39 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -91,15 +91,6 @@
 (define add-cleanup (lambda (t)
    (set! shell-cleanup (string-append shell-cleanup "\n" t "\n"))  ))
 (define tmp-dir "")
-(define make-tmp-dir
-  (lambda () 
-    (begin (if (= tmp-dir "") (set! tmp-dir (shell
-  "mk_tmp_dir ; echo ${tmp_dir}" ))))
-
-  (add-cleanup (string-append
-   "test \"${VERBOSE:-false}\" = true || rm -rf " tmp-dir))
-
-) )
 
 (define header-file     "")
 (define header-guard    "")

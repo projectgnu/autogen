@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-11-29 15:06:20 bkorb"
+ *  Time-stamp:        "2010-12-21 11:54:40 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -187,7 +187,13 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
 
-    if ((pfDepends != NULL) && ((flags & FPF_TEMPFILE) == 0))
+    /*
+     * Avoid printing temporary file names in the dependency file
+     */
+    if (  (pfDepends != NULL)
+       && ((flags & FPF_TEMPFILE) == 0)
+       && (  (pz_temp_tpl == NULL)
+          || (strncmp(fname, pz_temp_tpl, temp_tpl_dir_len) != 0)) )
         fprintf(pfDepends, " \\\n\t%s", fname);
 }
 
@@ -243,7 +249,12 @@ ag_scm_out_move(SCM new_file)
         fprintf(pfTrace, "renaming %s to %s\n",  pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
 
-    if (pfDepends != NULL)
+    /*
+     * Avoid printing temporary file names in the dependency file
+     */
+    if (  (pfDepends != NULL)
+       && (  (pz_temp_tpl == NULL)
+          || (strncmp(pz, pz_temp_tpl, temp_tpl_dir_len) != 0)) )
         fprintf(pfDepends, " \\\n\t%s", pz);
 
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
@@ -534,6 +545,42 @@ ag_scm_out_push_add(SCM new_file)
 }
 
 
+/*=gfunc make_tmp_dir
+ *
+ * what:   create a temporary directory
+ *
+ * doc:
+ *  Create a directory that will be cleaned up upon exit.
+=*/
+SCM
+ag_scm_make_tmp_dir(void)
+{
+    static char const tmp_dir_cmd[] =
+        "mk_tmp_dir ; echo ${tmp_dir}/ag-XXXXXX";
+    static char const set_tmp_dir[] =
+        "(set! tmp-dir \"%1$s\")"
+        "(add-cleanup \"test \\\"${VERBOSE:-false}\\\" = true "
+            "|| rm -rf %1$s\")";
+
+    if (pz_temp_tpl == NULL) {
+        char * tmpdir    = runShell(tmp_dir_cmd);
+        char * cmdbf     = ag_scribble(sizeof(set_tmp_dir) + strlen(tmpdir));
+
+        pz_temp_tpl      = tmpdir;
+        temp_tpl_dir_len = strlen(pz_temp_tpl) - 9;
+
+        tmpdir[temp_tpl_dir_len - 1] = NUL;
+        sprintf(cmdbf, set_tmp_dir, tmpdir);
+        tmpdir[temp_tpl_dir_len - 1] = DIRCH;
+
+        ag_scm_c_eval_string_from_file_line(
+            cmdbf, __FILE__, __LINE__);
+    }
+
+    return SCM_UNDEFINED;
+}
+
+
 /*=gfunc out_push_new
  *
  * what:   purge and create output file
@@ -596,26 +643,20 @@ ag_scm_out_push_new(SCM new_file)
      *  Either --no-fmemopen was specified or we cannot use ag_fmemopen().
      */
     {
-        static char const mk_tmp_dir[] = "(make-tmp-dir)";
-        static int  const line_no      = __LINE__ - 1;
-
-        static char * temp_pat = NULL;
-        static size_t tmplen = 0;
+        static size_t tmplen;
         char *  tmp_fnm;
         int     tmpfd;
 
-        if (temp_pat == NULL) {
-            ag_scm_c_eval_string_from_file_line(mk_tmp_dir, __FILE__, line_no);
-            temp_pat = runShell("echo ${tmp_dir}/ag-XXXXXX");
-            tmplen   = strlen(temp_pat);
-        }
+        if (pz_temp_tpl == NULL)
+            ag_scm_make_tmp_dir();
 
+        tmplen  = temp_tpl_dir_len + 10;
         tmp_fnm = ag_scribble(tmplen + 1);
-        memcpy(tmp_fnm, temp_pat, tmplen + 1);
-        tmpfd = mkstemp(tmp_fnm);
+        memcpy(tmp_fnm, pz_temp_tpl, tmplen + 1);
+        tmpfd   = mkstemp(tmp_fnm);
 
         if (tmpfd < 0)
-            AG_ABEND(aprf("failed to create temp file from `%s'", temp_pat));
+            AG_ABEND(aprf("failed to create temp file from %s", pz_temp_tpl));
 
         open_output_file(tmp_fnm, tmplen, write_mode, FPF_TEMPFILE);
         close(tmpfd);

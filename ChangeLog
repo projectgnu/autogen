@@ -5,6 +5,20 @@
 	* autoopts/tpl/usage.tpl (autoopts-config): try to find it in
 	$top_builddir/autoopts instead of via PATH first.
 	* pkg/libopts/libopts-add.m4: adopt Dave Hart's NTP patch
+	* agen5/autogen.h (pz_temp_tpl): temp file template added
+	(temp_tpl_dir_len): portion of template that is a temp dir.
+	* agen5/expOutput.c (open_output_file): do not print files from the
+	temp directory in the dependency output
+	(ag_scm_out_move): also
+	(ag_scm_make_tmp_dir): rewritten as C code
+	(ag_scm_out_push_new): use the new function
+	* agen5/schemedef.scm (make-tmp-dir): removed
+	* autoopts/tpl/aginfo.tpl.in: use (make-tmp-dir) function so that
+	temporary files do not show up in dependencies
+	* getdefs/Makefile.am: remove getdefs executable from dependencies
+	of the man page output.
+	* pkg/libopts/README: clean up and adapt to new LIBOPTS_CHECK
+	macros.  Thank you, Dave Hart.
 
 2010-12-18  Bruce Korb  <bkorb@gnu.org>
 

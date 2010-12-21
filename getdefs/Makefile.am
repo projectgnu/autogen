@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-18 11:03:50 bkorb"
+## Time-stamp:      "2010-12-21 12:11:47 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -36,9 +36,15 @@ RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
 
 if AMDEP
 DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@
+INF_DEP         = -b$(TARG) -MF$(DEPDIR)/info-dep -MT$@
+MAN_DEP         = -b$(TARG) -MF$(DEPDIR)/man-dep  -MT$@
 include $(DEPDIR)/opts-dep
+include $(DEPDIR)/info-dep
+include $(DEPDIR)/man-dep
 else
 DEP_ARG         =
+INF_DEP         =
+MAN_DEP         =
 endif
 
 getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
@@ -68,11 +74,13 @@ stamp-opts : opts.def
 	$(AG_ENV) ; $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
 
 $(DOCFILES) : stamp-doc
-stamp-doc : $(TARG)$(EXEEXT)
+stamp-doc :
+	@test -x $(TARG)$(EXEEXT) || $(MAKE) $(TARG)$(EXEEXT)
 	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
 	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
-	$(AG_ENV) ; $(RUNAG) -b$(TARG) -Tagman-cmd $(srcdir)/opts.def ; \
-	$(RUNAG) -b$(TARG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+	$(AG_ENV) ; \
+	$(RUNAG) $(MAN_DEP) -Tagman-cmd $(srcdir)/opts.def ; \
+	$(RUNAG) $(INF_DEP) -Taginfo -DLEVEL=section $(srcdir)/opts.def
 
 .NOTPARALLEL:
 

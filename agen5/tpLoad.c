@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-12-09 19:10:18 bkorb"
+ * Time-stamp:        "2010-12-21 10:36:42 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -540,7 +540,7 @@ wrap_up_depends(void)
          * file exists and set its time to the same time.  Ignore all errors.
          */
         if (strcmp(pzDepFile, pzDepTarget) != 0) {
-            if (! access(pzDepTarget, R_OK))
+            if (access(pzDepTarget, R_OK) != 0)
                 close( open(pzDepTarget, O_CREAT, fil_mode));
 
             utime(pzDepTarget, &tbuf);

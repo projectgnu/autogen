@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2010-12-03 16:05:23 bkorb"
+## Time-stamp:        "2010-12-21 11:53:58 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -32,6 +32,7 @@ texi
 =]
 @node [= prog-name =] Invocation
 @[=
+ (make-tmp-dir)
  (define down-prog-name (string-downcase! (get "prog-name")))
  (define doc-level (getenv "LEVEL"))
  (if (not (string? doc-level))
