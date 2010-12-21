@@ -26,12 +26,11 @@ dnl  with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl
 dnl Default to system libopts
 dnl
-AC_DEFUN([LIBOPTS_CHECK],[
+AC_DEFUN([LIBOPTS_CHECK_COMMON],[
   AC_REQUIRE([INVOKE_LIBOPTS_MACROS_FIRST])
   [NEED_LIBOPTS_DIR='']
   m4_pushdef([AO_Libopts_Dir],
 	    [ifelse($1, , [libopts], [$1])])
-  AC_SUBST(LIBOPTS_DIR, AO_Libopts_Dir)
   AC_ARG_ENABLE([local-libopts],
     AC_HELP_STRING([--enable-local-libopts],
        [Force using the supplied libopts tearoff code]),[
@@ -88,19 +87,51 @@ AC_DEFUN([LIBOPTS_CHECK],[
         LIBOPTS_CFLAGS='-I$(top_srcdir)/]AO_Libopts_Dir['
         NEED_LIBOPTS_DIR=true
      fi
-  fi # end of if test -z "${NEED_LIBOPTS_DIR}"]
-
+  fi # end of if test -z "${NEED_LIBOPTS_DIR}"
+  if test -n "${LIBOPTS_BUILD_BLOCKED}" ; then
+    NEED_LIBOPTS_DIR=''
+  fi]
   AM_CONDITIONAL([NEED_LIBOPTS], [test -n "${NEED_LIBOPTS_DIR}"])
   AC_SUBST(LIBOPTS_LDADD)
   AC_SUBST(LIBOPTS_CFLAGS)
   AC_SUBST(LIBOPTS_DIR, AO_Libopts_Dir)
-  AC_CONFIG_FILES(AO_Libopts_Dir/Makefile)
   m4_popdef([AO_Libopts_Dir])
-
-  [if test -n "${NEED_LIBOPTS_DIR}" ; then]
-    INVOKE_LIBOPTS_MACROS
-  else
-    INVOKE_LIBOPTS_MACROS_FIRST
-  [fi
-# end of AC_DEFUN of LIBOPTS_CHECK]
+[# end of AC_DEFUN of LIBOPTS_CHECK_COMMON]
 ])
+dnl AC_CONFIG_FILES conditionalization requires using AM_COND_IF, however
+dnl AM_COND_IF is new to Automake 1.11.  To use it on new Automake without
+dnl requiring same, a fallback implementation for older Autoconf is provided.
+dnl Note that disabling of AC_CONFIG_FILES requires Automake 1.11, this code
+dnl is correct only in terms of m4sh generated script.
+m4_ifndef([AM_COND_IF], [AC_DEFUN([AM_COND_IF], [
+if test -z "$$1_TRUE"; then :
+  m4_n([$2])[]dnl
+m4_ifval([$3],
+[else
+  $3
+])dnl
+fi[]dnl
+])])
+dnl
+AC_DEFUN([LIBOPTS_CHECK_NOBUILD], [
+  m4_pushdef([AO_Libopts_Dir],
+	      [ifelse($1, , [libopts], [$1])])
+  LIBOPTS_BUILD_BLOCKED=true
+  LIBOPTS_CHECK_COMMON(AO_Libopts_Dir)
+  m4_popdef([AO_Libopts_Dir])dnl
+# end of AC_DEFUN of LIBOPTS_CHECK_NOBUILD
+])
+dnl
+AC_DEFUN([LIBOPTS_CHECK], [
+  m4_pushdef([AO_Libopts_Dir],
+	      [ifelse($1, , [libopts], [$1])])
+  LIBOPTS_BUILD_BLOCKED=''
+  LIBOPTS_CHECK_COMMON(AO_Libopts_Dir)
+  AM_COND_IF([NEED_LIBOPTS], [
+    INVOKE_LIBOPTS_MACROS
+    AC_CONFIG_FILES(AO_Libopts_Dir/Makefile)
+  ])dnl
+  m4_popdef([AO_Libopts_Dir])dnl
+# end of AC_DEFUN of LIBOPTS_CHECK
+])
+

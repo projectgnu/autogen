@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-10 10:30:49 bkorb"
+# Time-stamp:        "2010-12-20 13:43:56 bkorb"
 #
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
@@ -54,7 +54,7 @@ ag_err()
 # # # # # # # # # # # # # TEST 1 # # # # # # # # # # # #
 
 echo creating ${testname}.tpl
-sed 's/[ 0-9]*=//' > ${testname}.tpl <<'_EOF_'
+${SED} 's/[ 0-9]*=//' > ${testname}.tpl <<'_EOF_'
   1 =<= AutoGen5 template fnord null =>
   2 =THIS TEXT SHOULD BE DELETED!!
   3 =<=
@@ -95,7 +95,7 @@ ag_err 1 ${testname}.def
 test -f  ${testname}-task1-OK \
   && failure unexpected success for test-1
 
-sed '/Giving up in/d;/Failing Guile command:/,$d' ${testname}.err1 \
+${SED} '/Giving up in/d;/Failing Guile command:/,$d' ${testname}.err1 \
   > ${testname}.err
 cmp -s ${testname}.err ${testname}.base1 || \
   failure "expected->actual${nl}`diff -c ${testname}.base1 ${testname}.err`"
@@ -151,7 +151,7 @@ processing template error2.tpl
        for function EXPR (12)
 _EOF_
 
-sed '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
+${SED} '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
   < ${testname}.tpl > ${testname}2.tpl
 
 ag_err 3 ${agl_opts} -T${testname}2.tpl ${agopts}3
@@ -172,13 +172,13 @@ sedcmd='
 	/^[ 	]*$/d
 	/defs: line .*: .* Hangup/d
 '
-sed -e "${sedcmd}" ${testname}.err3 > ${testname}.res3
+${SED} -e "${sedcmd}" ${testname}.err3 > ${testname}.res3
 cmp -s ${testname}.res3 ${testname}.base3 || \
   failure "expected->actual${nl}`diff -c ${testname}.base3 ${testname}.res3`"
 
 # # # # # # # # # # # # # TEST 4 # # # # # # # # # # # #
 
-sed 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
+${SED} 's,^#error.*,this is broken;,' ${testname}.def > ${testname}2.def
 
 echo creating ${testname}.base4
 # this is the output we should expect to see
@@ -265,8 +265,8 @@ EOF
 # print file and line, but it was made just too hard.  Strip out all
 # the Guile library error messages.  :(
 #
-sed -n '/^Scheme evaluation error./,$p' ${testname}.err6 | \
-  sed "/^${testname}\.tpl6:7:4:/d" > ${testname}.res6
+${SED} -n '/^Scheme evaluation error./,$p' ${testname}.err6 | \
+  ${SED} "/^${testname}\.tpl6:7:4:/d" > ${testname}.res6
 
 cmp -s  ${testname}.base6  ${testname}.res6 || \
   failure "expected->actual${nl}`diff -c ${testname}.base6 ${testname}.res6`"

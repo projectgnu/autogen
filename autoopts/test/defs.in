@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-12-16 18:38:29 bkorb"
+# Time-stamp:     "2010-12-20 13:56:53 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -51,9 +51,13 @@ cfg_vals()
   esac
 
   set -a
-  progname=`echo "$1" | sed 's,^.*/,,'`
-  testname=`echo "$progname" | sed 's,\..*$,,'`
-  test_name=`echo ${testname} | sed 's/-/_/g'`
+  SED=`which sed`
+  test -x "${SED}" || SED=/bin/sed
+  test -x "${SED}" || SED=/usr/bin/sed
+
+  progname=`echo "$1" | ${SED} 's,^.*/,,'`
+  testname=`echo "$progname" | ${SED} 's,\..*$,,'`
+  test_name=`echo ${testname} | ${SED} 's/-/_/g'`
   PS4=">${testname}-\${FUNCNAME}> "
   tabch='	'
 
@@ -93,7 +97,7 @@ cfg_vals()
   TERM=''
   test -z "${BASH_VERSION}" && local() { eval "$@" ; }
 
-  vars=`set | sed -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
+  vars=`set | ${SED} -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
   test "X$vars" = X || unset $vars
 }
 
@@ -149,7 +153,7 @@ init_tests()
   builddir=`pwd`
   testsubdir=testdir
   INCS="-I${top_builddir} -I${top_builddir}/autoopts"
-  CFLAGS="${INCS} "`echo ${CFLAGS} | sed 's/-Werror//'`
+  CFLAGS="${INCS} "`echo ${CFLAGS} | ${SED} 's/-Werror//'`
 
   export PATH
   echo PATH is ${PATH} >&2
@@ -258,7 +262,7 @@ cfg_inc()
     do
       (cd $f/$d && pwd)
     done
-  done | sort -u | sed 's/^/-I/'`
+  done | sort -u | ${SED} 's/^/-I/'`
 
   INC=`echo ${dirs} ${CPPFLAGS} ${INC}`
 
@@ -284,7 +288,7 @@ compile()
     if test "X${sedcmd}" = "X"
     then ./${Cexe} ${*} ${dosed} || \
       failure cannot obtain help output for ${Csrc}
-    else ./${Cexe} ${*} ${dosed} | sed "${sedcmd}"
+    else ./${Cexe} ${*} ${dosed} | ${SED} "${sedcmd}"
     fi > ${Csrc}.help    
   fi
   Csrc='' Cexe='' Dnam=''
@@ -349,6 +353,7 @@ trap "failure 'test ${testname} killed on timeout'" 15
     kill -15 $$
     sleep 1
     ps -p $$ || exit
+    mv -f `dirname $logfile` ${builddir}/FAILED-${testname}
     kill -9 $$
 ) &
 )

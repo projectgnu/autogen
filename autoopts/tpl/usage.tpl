@@ -104,22 +104,22 @@ ENDFOR flag
 =][=
 
 (out-pop)
-(out-push-new)  \=]
+(out-push-new)
 
-defs=-DTEST_[= (string-upcase! (string->c-name! (get "prog-name"))) =]_OPTS=1
-cflags=`autoopts-config cflags`
-ldflags=`autoopts-config ldflags`
-flags="${defs} ${cflags} ${CFLAGS}"
+\=]
+aocfg=${top_builddir}/autoopts/autoopts-config
+test -x "${aocfg}" || aocfg=`which autoopts-config`
+test -x "${aocfg}" || die "Cannot locate autoopts-config"
+ldflags=`${aocfg} ldflags`
+flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
+     =]_OPTS=1 `${aocfg} cflags` ${CFLAGS}"
 
-( cd ${tmp_dir}
-  ${AGexe-autogen} [= prog-name=].def
-) || die "Cannot gen [= prog-name =]"
-exe=tmp-[= prog-name =]-$$
-cfile=${tmp_dir}/[= prog-name =].c
-${CC:-cc} ${flags} -g -o ${exe} ${cfile} ${ldflags} || \
+cd ${tmp_dir}
+${AGexe-autogen} [= prog-name=].def || die "Cannot gen [= prog-name =]"
+${CC:-cc} ${flags} -g -o [= prog-name =] [= prog-name =].c ${ldflags} || \
   die cannot compile ${cfile}
-mv -f ${exe} ${tmp_dir}/[= prog-name =]
-${tmp_dir}/[= prog-name =] [=
+
+./[= prog-name =] [=
 
 CASE usage-type =][=
 == short        =][=

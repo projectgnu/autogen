@@ -1,3 +1,11 @@
+2010-12-21  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (SED): define to working sed program
+	* agen5/test/error.test: use it
+	* autoopts/tpl/usage.tpl (autoopts-config): try to find it in
+	$top_builddir/autoopts instead of via PATH first.
+	* pkg/libopts/libopts-add.m4: adopt Dave Hart's NTP patch
+
 2010-12-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am (ag.c): define PKGDATADIR
