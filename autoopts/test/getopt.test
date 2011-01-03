@@ -8,7 +8,7 @@
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -257,7 +257,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-copyright (c) 2003-2010 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2011 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -508,7 +508,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-copyright (c) 2003-2010 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2011 by Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 

@@ -9,7 +9,7 @@ dnl the config tests that the library needs.  Invoke the
 dnl "INVOKE_LIBOPTS_MACROS" macro iff we are building libopts.
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+dnl  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 dnl
 dnl  AutoGen is free software: you can redistribute it and/or modify it
 dnl  under the terms of the GNU General Public License as published by the
@@ -100,7 +100,7 @@ AC_DEFUN([LIBOPTS_CHECK_COMMON],[
 ])
 dnl AC_CONFIG_FILES conditionalization requires using AM_COND_IF, however
 dnl AM_COND_IF is new to Automake 1.11.  To use it on new Automake without
-dnl requiring same, a fallback implementation for older Autoconf is provided.
+dnl requiring same, a fallback implementation for older Automake is provided.
 dnl Note that disabling of AC_CONFIG_FILES requires Automake 1.11, this code
 dnl is correct only in terms of m4sh generated script.
 m4_ifndef([AM_COND_IF], [AC_DEFUN([AM_COND_IF], [

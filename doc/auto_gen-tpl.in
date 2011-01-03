@@ -5,10 +5,10 @@ texi
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2010-12-07 13:30:15 bkorb"
+## Time-stamp:        "2010-12-21 13:10:07 bkorb"
 ##
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -28,8 +28,6 @@ texi
 #
 (setenv "SHELL" "@CONFIG_SHELL@")
 
-(make-tmp-dir)
-
 (define texi-file-source (getenv "DOC_TEXT"))
 
 (define texi-escape-encode (lambda (in-str)
@@ -44,6 +42,7 @@ texi
 (define func-str  "")
 (define func-name "")
 (define func-str  "")
+(make-tmp-dir)
 
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

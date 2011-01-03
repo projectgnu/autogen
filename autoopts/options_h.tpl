@@ -2,11 +2,11 @@
 
 h=options.h
 
-# Time-stamp:      "2010-12-18 10:31:19 bkorb"
+# Time-stamp:      "2011-01-02 17:15:41 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -33,7 +33,7 @@ h=options.h
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
  *
- *  Automated Options copyright (c) 1992-[=`date +Y`=] by Bruce Korb
+ *  Automated Options Copyright [=`date +'(C) 1992-%Y'`=] by Bruce Korb
  *
 [=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
  */

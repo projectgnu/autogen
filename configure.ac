@@ -5,7 +5,7 @@ dnl Time-stamp:      "2010-11-07 14:07:49 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+dnl  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 dnl
 dnl AutoGen is free software: you can redistribute it and/or modify it
 dnl under the terms of the GNU General Public License as published by the

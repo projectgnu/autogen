@@ -3,7 +3,7 @@
 #  Time-stamp:        "2010-08-04 20:52:14 bkorb"
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -267,7 +267,7 @@ DEFINE preamble
  *
  *  Automated Finite State Machine
  *
- *  copyright (c) 2001-2010 by Bruce Korb - all rights reserved
+ *  copyright (c) 2001-2011 by Bruce Korb - all rights reserved
  *
 [=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
  */[=

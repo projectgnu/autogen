@@ -347,7 +347,12 @@ One of the following exit values will be returned:
 FOR exit-desc (for-from 2)            :+][+:
   (sprintf ".TP\n.B %d\n%s\n"
     (for-index) (get "exit-desc"))    :+][+:
-ENDFOR exit-desc                      :+][+:#
+ENDFOR exit-desc                      :+][+:
+
+(if (exist? "exit-status-desc")
+    (string-append ".PP\n" (get "exit-status-desc") "\n") )
+
+:+][+:#
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  VARIOUS SECTIONS

@@ -4,10 +4,10 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2010-07-16 17:22:47 bkorb"
+ *  Time-stamp:        "2010-12-21 13:36:22 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -467,10 +467,13 @@ tMacro*
 mFunc_Expr(tTemplate* pT, tMacro* pMac)
 {
     ag_bool needFree;
-    tCC* pz = evalExpression(&needFree);
+    char const * pz = evalExpression(&needFree);
 
-    fputs(pz, pCurFp->pFile);
-    fflush(pCurFp->pFile);
+    if (*pz != NUL) {
+        fputs(pz, pCurFp->pFile);
+        fflush(pCurFp->pFile);
+    }
+
     if (needFree)
         AGFREE((void*)pz);
 

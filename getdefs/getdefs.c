@@ -1,13 +1,13 @@
 /**
  * \file getdefs.c
  *
- *  getdefs Copyright (c) 1999-2010 by Bruce Korb - all rights reserved
+ *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Time-stamp:        "2010-08-04 20:49:50 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

@@ -7,7 +7,7 @@ dnl Time-stamp:        "2010-02-24 08:41:23 bkorb"
 dnl
 dnl  This file is part of AutoOpts, a companion to AutoGen.
 dnl  AutoOpts is free software.
-dnl  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+dnl  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 dnl
 dnl  AutoOpts is available under any one of two licenses.  The license
 dnl  in use must be one of these two and the choice is under the control

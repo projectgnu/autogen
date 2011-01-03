@@ -19,6 +19,9 @@
 	of the man page output.
 	* pkg/libopts/README: clean up and adapt to new LIBOPTS_CHECK
 	macros.  Thank you, Dave Hart.
+	* agen5/funcEval.c (mFunc_Expr): do not fputs() empty strings.
+	* doc/auto-opts.tpl (hello example): use ${CC} when available
+	for compiling the hello example.
 
 2010-12-18  Bruce Korb  <bkorb@gnu.org>
 

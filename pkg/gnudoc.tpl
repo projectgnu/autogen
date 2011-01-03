@@ -2,12 +2,12 @@
 
 html =][= `
 timestamp=\`sed 's@[^"]*"@@;s@".*@@' <<- \\_EOF_
- Time-stamp: "2010-09-07 18:00:29 bkorb"
+ Time-stamp: "2011-01-02 17:09:31 bkorb"
 _EOF_
 \` ` =][=
 
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the

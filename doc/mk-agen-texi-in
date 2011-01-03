@@ -1,10 +1,10 @@
 #! @SHELL@
 
-# Time-stamp:        "2010-12-07 13:31:21 bkorb"
+# Time-stamp:        "2010-12-21 12:54:48 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
-##  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -158,12 +158,14 @@ run_getdefs()
 	assign      ag-texi = invoke-`basename ${AGEN_TEXI}`
 	EOCat
 
-  ln -s ${AGEN_TEXI} invoke-`basename ${AGEN_TEXI}`
+  tf=invoke-`basename ${AGEN_TEXI}`
+  test -f ${tf} || ln -s ${AGEN_TEXI} ${tf}
 
   for f in ${ADDON_TEXI}
   do
-    ln -s ${f} ./invoke-`basename ${f}`
-    echo "assign      addon-texi = invoke-`basename ${f}`"
+    tf=invoke-`basename ${f}`
+    test -f ${tf} || ln -s ${f} ${tf}
+    echo "assign      addon-texi = ${tf}"
   done >&3
 
   for f in ${GETDEF_SRC}

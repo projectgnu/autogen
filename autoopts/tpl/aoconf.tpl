@@ -4,12 +4,12 @@ in=autoopts-config.in
 
 #!/bin/sh
 
-## Time-stamp:      "2010-10-06 20:12:41 bkorb"
+## Time-stamp:      "2011-01-02 17:04:27 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -241,7 +241,7 @@ DEFINE script-preamble
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
-##  Autoopts copyright (c) 1992-[=`date +%Y`=] by Bruce Korb
+##  Autoopts Copyright (c) 1992-2011[=`date +%Y`=] by Bruce Korb
 ##
 [= (dne "## ") =]
 ##[=

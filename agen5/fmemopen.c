@@ -2,7 +2,7 @@
 /**
  * \file fmemopen.c
  *
- * Copyright (c) 2004-2010 by Bruce Korb.  All rights reserved.
+ * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
  *
  * Time-stamp:      "2010-09-07 17:49:08 bkorb"
  *

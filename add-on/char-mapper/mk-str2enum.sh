@@ -1,11 +1,9 @@
 #! /bin/bash
 
-#  $Id: 4149e7b722c281c5495476c4b74d684cb3a87852 $
-#  Time-stamp:        "2010-06-25 12:58:34 bkorb"
-#  Last Committed:    $Date: 2009/08/01 14:05:00 $
+#  Time-stamp:        "2010-07-17 09:59:33 bkorb"
 #
 #  This file is part of char-mapper.
-#  char-mapper Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+#  char-mapper Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 #
 # char-mapper is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the

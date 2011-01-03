@@ -3,7 +3,7 @@
  AutoGen5 Template
 
 #  This file is part of AutoGen.
-#  AutoGen Copyright (c) 1992-2010 by Bruce Korb - all rights reserved
+#  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
 #
 #  AutoGen is free software: you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License as published by the
@@ -124,7 +124,7 @@ cat >> checkopt.def <<- _EOF_
 {
   run_ag checkopt.def
   opts="-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}"
-  ${CC} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
+  ${CC:-cc} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
 } > checkopt.err 2>&1
 
 test -x ./check || {
@@ -208,7 +208,7 @@ exec 3>&1
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts="-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}"
-  ${CC} ${CFLAGS} ${opts} default-test.c ${LIBS}
+  ${CC:-cc} ${CFLAGS} ${opts} default-test.c ${LIBS}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
 ) > ${tmp_dir}/default-test.log 2>&1
@@ -297,7 +297,7 @@ int main(int argc, char ** argv) {
   printf("%s, %s!\n", greeting, greeted);
   return 0;
 }
-[= (texi-escape-encode (out-pop #t)) =]
+[= (texi-escape-encode (out-pop #t)) \=]
 @end example
 
 @noindent
@@ -318,7 +318,7 @@ will produce the following output:
 @example
 [= (texi-escape-encode (shell "
 cd ${tmp_dir}
-cc -o hello hello.c ${CFLAGS} ${LIBS} ${LDFLAGS} || \
+${CC:-cc} -o hello hello.c ${CFLAGS} ${LIBS} ${LDFLAGS} || \
   die cannot compile hello
 ./hello
 echo 'greeting Buzz off' > hello.conf
