@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2010-12-16 14:42:32 bkorb"
+# Time-stamp:        "2011-01-05 15:12:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -128,7 +128,7 @@ gnu-usage;
 no-libopts;
 
 copyright = {
-    date  = "2003-2010";
+    date  = "2003-2011";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";

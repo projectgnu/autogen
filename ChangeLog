@@ -1,3 +1,8 @@
+2011-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c (load_extract_file): do not include extraction
+	files in dependencies.  They are not required to exist.
+
 2010-12-21  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/defs.in (SED): define to working sed program

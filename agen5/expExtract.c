@@ -1,7 +1,7 @@
 /**
  * \file expExtract.c
  *
- *  Time-stamp:        "2010-08-06 08:49:16 bkorb"
+ *  Time-stamp:        "2011-01-05 15:03:49 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -56,6 +56,10 @@ load_extract_file(char const* pzNewFile)
      *
      *  If we don't know about the current file, we leave the data
      *  from any previous file we may have loaded.
+     *
+     *  DO *NOT* include this file in dependency output.  The output may vary
+     *  based on its contents, but since it is always optional input, it cannot
+     *  be made to be required by make.
      */
     if (pzNewFile == NULL)
         return NULL;
@@ -96,9 +100,6 @@ load_extract_file(char const* pzNewFile)
             fclose(fp);
             goto bad_return;
         }
-
-        if (pfDepends != NULL)
-            append_source_name(pzNewFile);
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;

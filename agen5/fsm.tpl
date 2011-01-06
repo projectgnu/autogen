@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2010-06-30 20:52:29 bkorb"
+#  Time-stamp:      "2011-01-05 14:59:46 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -29,9 +29,7 @@ c=%s-fsm.c
 (shellf "test -f %1$s-fsm.h && mv -f %1$s-fsm.h .fsm.head
          test -f %1$s-fsm.c && mv -f %1$s-fsm.c .fsm.code" (base-name))
 
-(define add-cleanup (lambda (t)
-   (set! shell-cleanup (string-append shell-cleanup "\n" t "\n"))  ))
-(add-cleanup "rm -f .fsm.*")
+(add-cleanup "rm -f .fsm.head .fsm.code")
 
 =]
 [=
