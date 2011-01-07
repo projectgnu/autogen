@@ -3,7 +3,7 @@
  *  tpParse.c
  *
  *
- * Time-stamp:        "2010-12-16 13:25:49 bkorb"
+ * Time-stamp:        "2011-01-06 12:39:55 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -41,7 +41,7 @@ static char const *
 find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl);
 
 static char const *
-find_macro(tTemplate * pTpl, tMacro * pM, char const ** ppzScan);
+find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*

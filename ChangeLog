@@ -2,6 +2,9 @@
 
 	* agen5/expExtract.c (load_extract_file): do not include extraction
 	files in dependencies.  They are not required to exist.
+	* .cright-opts: config file for updating copyright dates in options
+	* autoopts/configfile.c (+parse_xml_encoding): new function for parsing
+	XML-ish encodings in config files.
 
 2010-12-21  Bruce Korb  <bkorb@gnu.org>
 

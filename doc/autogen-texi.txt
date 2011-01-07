@@ -2908,7 +2908,7 @@ selected.
 
 @item explain
 @vindex explain
-Gives additional information whenever the usage routine is invoked..
+Gives additional information whenever the usage routine is invoked.
 
 @item package
 @vindex package
@@ -5408,24 +5408,54 @@ white space.
 This mode strips leading and trailing white space, but not do any
 quote processing.  This is the default and need not be specified.
 @item cooked
-Strings are formed and concatenated if, after stripping leading and trailing
-white space, the text begins and ends with either single (') or double (")
-quote characters.  That processing is identical to the string formation used
-in AutoGen definition files (@pxref{basic expression}), except that backquotes
-are treated like ordinary characters.
+The text is trimmed of leading and trailing white space and XML encodings
+are processed.  These encodings are slightly expanded over the XML
+specification.  They are specified with an ampersand followed by a value
+name or numeric value and then a semicolon:
+
+@table @samp
+@item  amp
+@itemx lt
+@itemx gt
+@itemx quot
+@itemx apos
+@itemx #dd
+@itemx #xHH
+
+These are all per fairly standad HTML and/or XML encodings.
+Additionally:
+
+@item bs
+The ASCII back space character.
+@item ff
+The ASCII form feed character.
+@item ht
+The ASCII horizontal (normal) tab character.
+@item cr
+The ASCII carriage return character.
+@item vt
+The ASCII vertical tab character.
+@item bel
+The ASCII alarm bell character.
+@item nl
+The ASCII new line character.
+@item space
+The ASCII space character.  Normally not necessary, but if you want
+to preserve leading or trailing space characters, then use this.
+@end table
 @end table
 
 And here is an example of an XML-styled value:
 
 @example
 <name cooked>
-    "This is\n\tanother multi-line\n"
-    "\tstring example."
+    This is&nl;&ht;another multi-line
+&ht;string example.
 </name>
 @end example
 
 The string value associated with ``name'' will be exactly the text enclosed
-in quotes with the escaped characters ``cooked'' as you would expect
+in quotes with the encoded characters ``cooked'' as you would expect
 (three text lines with the last line not ending with a newline, but
 ending with a period).
 

@@ -20,7 +20,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date   = "1999-2009";
+    date   = "1999-2011";
     type   = gpl;
     owner  = "Bruce Korb";
     eaddr  = 'autogen-users@lists.sourceforge.net';
