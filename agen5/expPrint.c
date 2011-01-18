@@ -2,7 +2,7 @@
 /**
  * \file expPrint.c
  *
- *  Time-stamp:        "2010-07-16 15:17:19 bkorb"
+ *  Time-stamp:        "2011-01-17 13:14:10 bkorb"
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -128,7 +128,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
     while (len-- > 0) {
         SCM  car = SCM_CAR(alist);
         alist = SCM_CDR(alist);
-        switch (gh_type_e(car)) {
+        switch (ag_scm_type_e(car)) {
         default:
         case GH_TYPE_UNDEFINED:
             *(argp++) = (char*)"???";
@@ -139,7 +139,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_CHAR:
-            *(char*)(argp++) = gh_scm2char(car);
+            *(char*)(argp++) = AG_SCM_CHAR(car);
             break;
 
         case GH_TYPE_PAIR:
@@ -147,7 +147,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_NUMBER:
-            *(unsigned long*)(argp++) = gh_scm2ulong(car);
+            *(unsigned long*)(argp++) = AG_SCM_TO_ULONG(car);
             break;
 
         case GH_TYPE_SYMBOL:
@@ -226,7 +226,7 @@ ag_scm_printf(SCM fmt, SCM alist)
     int   list_len = scm_ilength(alist);
     char* pzFmt    = ag_scm2zchars(fmt, zFormat);
 
-    gh_display(run_printf(pzFmt, list_len, alist));
+    AG_SCM_DISPLAY(run_printf(pzFmt, list_len, alist));
     return SCM_UNDEFINED;
 }
 

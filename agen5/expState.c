@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2010-11-08 14:45:32 bkorb"
+ *  Time-stamp:        "2011-01-17 14:00:20 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -152,7 +152,7 @@ find_entry_value(SCM op, SCM obj, SCM test)
         }
 
         field  = AG_SCM_STR02SCM(pE->val.pzText);
-        result = gh_call2(op, field, test);
+        result = AG_SCM_APPLY2(op, field, test);
         if (! isIndexed)
             while (result == SCM_BOOL_F) {
 
@@ -161,7 +161,7 @@ find_entry_value(SCM op, SCM obj, SCM test)
                     break;
 
                 field = AG_SCM_STR02SCM(pE->val.pzText);
-                result = gh_call2(op, field, test);
+                result = AG_SCM_APPLY2(op, field, test);
             }
 
         if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
@@ -711,7 +711,7 @@ ag_scm_suffix(void)
 SCM
 ag_scm_tpl_file(SCM full)
 {
-    if (AG_SCM_BOOL_P(full) && SCM_NFALSEP(full)) {
+    if (AG_SCM_BOOL_P(full) && AG_SCM_NFALSEP(full)) {
         tSCC* sfx[] = { "tpl", NULL };
         char z[AG_PATH_MAX];
         if (SUCCESSFUL(findFile(pzTemplFileName, z, sfx, NULL)))

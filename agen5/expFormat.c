@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2010-12-17 16:01:30 bkorb"
+ *  Time-stamp:        "2011-01-17 12:45:15 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -273,16 +273,16 @@ ag_scm_error(SCM res)
     char      zNum[16];
     int       msgLen;
 
-    switch (gh_type_e(res)) {
+    switch (ag_scm_type_e(res)) {
     case GH_TYPE_BOOLEAN:
-        if (SCM_FALSEP(res))
+        if (AG_SCM_FALSEP(res))
             abrt = PROBLEM;
         pzMsg = zNil;
         break;
 
     case GH_TYPE_NUMBER:
     {
-        unsigned long val = gh_scm2ulong(res);
+        unsigned long val = AG_SCM_TO_ULONG(res);
         if (val == 0)
             abrt = PROBLEM;
         snprintf(zNum, sizeof(zNum), "%d", (int)val);
@@ -291,7 +291,7 @@ ag_scm_error(SCM res)
     }
 
     case GH_TYPE_CHAR:
-        zNum[0] = gh_scm2char(res);
+        zNum[0] = AG_SCM_CHAR(res);
         if ((zNum[0] == NUL) || (zNum[0] == '0'))
             abrt = PROBLEM;
         zNum[1] = NUL;

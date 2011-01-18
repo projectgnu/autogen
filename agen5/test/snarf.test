@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2010-12-10 09:53:31 bkorb"
+# Time-stamp:        "2011-01-18 11:17:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -113,9 +113,15 @@ cat > ${testname}.ini.OK1 <<'_EOF_'
 extern SCM snarf_grp_scm_sym_bumble_it          = SCM_BOOL_F;
 static SCM snarf_grp_scm_sym_mumble_check       = SCM_BOOL_F;
 
+#if GUILE_VERSION >= 108000
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
+  scm_c_define_gsubr((char*)(_As),          \
+                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)ag_scm_ ## _An)
+#else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
+#endif
 typedef SCM (*gh_callback_t)(void);
 void Chosen_init(void);
 
@@ -165,7 +171,11 @@ cat > ${testname}.h.OK <<_EOF_
  */
 #ifndef GUILE_PROCS_SNARF_H_GUARD
 #define GUILE_PROCS_SNARF_H_GUARD 1
-#include <guile/gh.h>
+#if GUILE_VERSION >= 108000
+# include <libguile.h>
+#else
+# include <guile/gh.h>
+#endif
 
 typedef enum {
     GH_TYPE_UNDEFINED = 0,
@@ -250,14 +260,26 @@ agrelay_scm_test_to_example_x(SCM scm0)
 }
 
 
+#if GUILE_VERSION >= 108000
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
+  scm_c_define_gsubr((char*)(_As),          \
+                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)agrelay_scm_ ## _An)
+#else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
                    _Ar, _Ao, _Ax)
+#endif
 
 #else /* DEBUG_ENABLED *not* */
+#if GUILE_VERSION >= 108000
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
+  scm_c_define_gsubr((char*)(_As),          \
+                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)ag_scm_ ## _An)
+#else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
+#endif
 #endif
 typedef SCM (*gh_callback_t)(void);
 void Chosen_init(void);

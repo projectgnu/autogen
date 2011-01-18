@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2010-12-21 10:54:37 bkorb"
+ *  Time-stamp:        "2011-01-17 17:39:22 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -31,7 +31,11 @@
 
 #include REGEX_HEADER
 #include <libguile/scmconfig.h>
-#include <guile/gh.h>
+#if GUILE_VERSION >= 109000
+# include <libguile.h>
+#else
+# include <guile/gh.h>
+#endif
 
 #include "opts.h"
 #include "expr.h"
@@ -531,96 +535,7 @@ MODE v2c_t p2p VALUE( { NULL } );
 /*
  *  Code variations based on the version of Guile:
  */
-#if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
-
-#if GUILE_VERSION < 106000 /* Guile 1.4 */
-
-#   define AG_SCM_STRING_P(_s)          gh_string_p(_s)
-#   define AG_SCM_BOOL_P(_b)            gh_boolean_p(_b)
-#   define AG_SCM_SYM_P(_s)             gh_symbol_p(_s)
-#   define AG_SCM_IS_PROC(_p)           gh_procedure_p(_p)
-#   define AG_SCM_CHAR_P(_c)            gh_char_p(_c)
-#   define AG_SCM_VEC_P(_v)             gh_vector_p(_v)
-#   define AG_SCM_PAIR_P(_p)            gh_pair_p(_p)
-#   define AG_SCM_NUM_P(_n)             gh_number_p(_n)
-#   define AG_SCM_LIST_P(_l)            gh_list_p(_l)
-#   define AG_SCM_STR2SCM(_st,_sz)      gh_str2scm(_st,_sz)
-#   define AG_SCM_STR02SCM(_s)          gh_str02scm(_s)
-
-#else /* Guile 1.6.x */
-
-#   define AG_SCM_STRING_P(_s)          SCM_STRINGP(_s)
-#   define AG_SCM_BOOL_P(_b)            SCM_BOOLP(_b)
-#   define AG_SCM_SYM_P(_s)             SCM_SYMBOLP(_s)
-#   define AG_SCM_IS_PROC(_p)           SCM_NFALSEP( scm_procedure_p(_p))
-#   define AG_SCM_CHAR_P(_c)            SCM_CHARP(_c)
-#   define AG_SCM_VEC_P(_v)             SCM_VECTORP(_v)
-#   define AG_SCM_PAIR_P(_p)            SCM_NFALSEP( scm_pair_p(_p))
-#   define AG_SCM_NUM_P(_n)             SCM_NUMBERP(_n)
-#   define AG_SCM_LIST_P(_l)            SCM_NFALSEP( scm_list_p(_l))
-#   define AG_SCM_STR2SCM(_st,_sz)      scm_mem2string(_st,_sz)
-#   define AG_SCM_STR02SCM(_s)          scm_makfrom0str(_s)
-#endif
-
-  static inline char* ag_scm2zchars(SCM s, tCC* type)
-  {
-    if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(zNotStr, type));
-
-    if (SCM_SUBSTRP(s))
-        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
-    return SCM_CHARS(s);
-  }
-
-# define AG_SCM_STRLEN(_s)              SCM_LENGTH(_s)
-# define AG_SCM_CHARS(_s)               SCM_CHARS(_s)
-
-#else /* Guile 1.7 and following */
-
-  extern char* ag_scm2zchars(SCM s, tCC* type);
-
-# if GUILE_VERSION < 108000
-#   define AG_SCM_STRLEN(_s)            SCM_STRING_LENGTH(_s)
-#   define AG_SCM_CHARS(_s)             SCM_STRING_CHARS(_s)
-#   define AG_SCM_VEC_P(_v)             SCM_VECTORP(_v)
-# else
-#   define AG_SCM_STRLEN(_s)            scm_c_string_length(_s)
-#   define AG_SCM_CHARS(_s)             scm_i_string_chars(_s)
-#   define AG_SCM_VEC_P(_v)             scm_is_vector(_v)
-# endif
-
-# define AG_SCM_STRING_P(_s)            scm_is_string(_s)
-# define AG_SCM_BOOL_P(_b)              SCM_BOOLP(_b)
-# define AG_SCM_SYM_P(_s)               SCM_SYMBOLP(_s)
-# define AG_SCM_IS_PROC(_p)             scm_is_true( scm_procedure_p(_p))
-# define AG_SCM_CHAR_P(_c)              SCM_CHARP(_c)
-# define AG_SCM_PAIR_P(_p)              scm_is_true( scm_pair_p(_p))
-# define AG_SCM_NUM_P(_n)               scm_is_number(_n)
-# define AG_SCM_LIST_P(_l)              SCM_NFALSEP( scm_list_p(_l))
-# define AG_SCM_STR2SCM(_st,_sz)        scm_from_locale_stringn(_st,_sz)
-# define AG_SCM_STR02SCM(_s)            scm_from_locale_string(_s)
-#endif /* pre-1.7 / 1.7 and following */
-
-/*
- *  Guile version invariant!!
- */
-#define AG_SCM_INT2SCM(_i)              gh_int2scm(_i)
-#define AG_SCM_SCM2INT(_i)              gh_scm2int(_i)
-#define AG_SCM_LONG2SCM(_i)             gh_long2scm(_i)
-#define AG_SCM_SCM2LONG(_i)             gh_scm2long(_i)
-
-static inline SCM ag_eval(tCC* pzStr)
-{
-    SCM res;
-    tCC* pzSaveScheme = pzLastScheme; /* Watch for nested calls */
-    pzLastScheme = pzStr;
-
-    res = ag_scm_c_eval_string_from_file_line(
-        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
-
-    pzLastScheme = pzSaveScheme;
-    return res;
-}
+#include "guile-iface.h"
 
 #endif /* AUTOGEN_BUILD */
 /*

@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2010-11-08 14:54:31 bkorb"
+ *  Time-stamp:        "2011-01-17 13:36:12 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -211,7 +211,7 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
     *pzDta = NUL;
 
     {
-        SCM res = scm_makfrom0str(pzFre);
+        SCM res = AG_SCM_STR02SCM(pzFre);
         if (pzFre != z)
             AGFREE(pzFre);
         return res;
@@ -394,7 +394,7 @@ do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl)
     /*
      *  Loop for as long as our list has more entries
      */
-    while (! SCM_NULLP(match)) {
+    while (! AG_SCM_NULLP(match)) {
         /*
          *  "CAR" is the current value, "CDR" is rest of list
          */
@@ -420,7 +420,7 @@ do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl)
             pzStr = pzNxt;
         }
 
-        else if (gh_list_p(matchCar))
+        else if (AG_SCM_LIST_P(matchCar))
             do_multi_subs(&pzStr, pStrLen, matchCar, replCar);
 
         else
@@ -842,7 +842,7 @@ ag_scm_raw_shell_str(SCM obj)
 
  returnString:
     {
-        SCM res = scm_makfrom0str(pzFree);
+        SCM res = AG_SCM_STR02SCM(pzFree);
         AGFREE(pzFree);
         return res;
     }

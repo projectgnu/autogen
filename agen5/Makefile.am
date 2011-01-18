@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-18 12:04:32 bkorb"
+## Time-stamp:      "2011-01-17 17:45:22 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -51,10 +51,11 @@ csrc = \
     fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
     tpLoad.c     tpParse.c    tpProcess.c
 
-hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h
+hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
-             defParse.x bootstrap.dir schemedef.scm
+             defParse.x bootstrap.dir schemedef.scm \
+             guile-iface.def guile-iface.tpl
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la

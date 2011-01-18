@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2010-08-06 09:01:33 bkorb"
+# Time-stamp:        "2011-01-18 11:12:20 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -102,7 +102,11 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
  *  Guile Implementation Routines[=% group " - for the %s group" =]
  */
 [=(make-header-guard  "GUILE_PROCS")=]
-#include <guile/gh.h>
+#if GUILE_VERSION >= 108000
+# include <libguile.h>
+#else
+# include <guile/gh.h>
+#endif
 
 typedef enum {
     GH_TYPE_UNDEFINED = 0,
@@ -205,18 +209,30 @@ agrelay_scm_[= (get "name")     =]([=
 }
 
 [= ENDFOR  gfunc                =]
+#if GUILE_VERSION >= 108000
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
+  scm_c_define_gsubr((char*)(_As),          \
+                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)agrelay_scm_ ## _An)
+#else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
                    _Ar, _Ao, _Ax)
+#endif
 
 #else /* DEBUG_ENABLED *not* */[=
 
 ENDIF debug-enabled exists
 
 =]
+#if GUILE_VERSION >= 108000
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
+  scm_c_define_gsubr((char*)(_As),          \
+                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)ag_scm_ ## _An)
+#else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
   gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
                    _Ar, _Ao, _Ax)
+#endif
 [= (if (exist? "debug-enabled") "#endif\n") \=]
 typedef SCM (*gh_callback_t)(void);
 void [=(. init-proc)=](void);

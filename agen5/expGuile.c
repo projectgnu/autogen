@@ -2,7 +2,7 @@
 /**
  *  \file expGuile.c
  *
- *  Time-stamp:        "2010-07-10 16:29:48 bkorb"
+ *  Time-stamp:        "2011-01-17 13:03:17 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -25,7 +25,7 @@
  */
 
 LOCAL teGuileType
-gh_type_e(SCM typ)
+ag_scm_type_e(SCM typ)
 {
     if (AG_SCM_BOOL_P(  typ)) return GH_TYPE_BOOLEAN;
     if (AG_SCM_SYM_P(   typ)) return GH_TYPE_SYMBOL;
@@ -147,7 +147,7 @@ ag_scm_max(SCM list)
         car  = SCM_CAR(list);
         list = SCM_CDR(list);
 
-        switch (gh_type_e(car)) {
+        switch (ag_scm_type_e(car)) {
         case GH_TYPE_BOOLEAN:
             if (car == SCM_BOOL_F) {
                 val = 0;
@@ -157,11 +157,11 @@ ag_scm_max(SCM list)
             break;
 
         case GH_TYPE_CHAR:
-            val = (int)gh_scm2char(car);
+            val = (int)AG_SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2long(car);
+            val = AG_SCM_TO_LONG(car);
             break;
 
         case GH_TYPE_STRING:
@@ -174,7 +174,7 @@ ag_scm_max(SCM list)
         max_val = MAX(max_val, val);
     }
 
-    return gh_long2scm(max_val);
+    return AG_SCM_FROM_LONG(max_val);
 }
 
 
@@ -206,7 +206,7 @@ ag_scm_min(SCM list)
         car  = SCM_CAR(list);
         list = SCM_CDR(list);
 
-        switch (gh_type_e(car)) {
+        switch (ag_scm_type_e(car)) {
         case GH_TYPE_BOOLEAN:
             if (car == SCM_BOOL_F) {
                 val = 0;
@@ -216,11 +216,11 @@ ag_scm_min(SCM list)
             break;
 
         case GH_TYPE_CHAR:
-            val = (int)gh_scm2char(car);
+            val = (int)AG_SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
-            val = gh_scm2long(car);
+            val = AG_SCM_TO_LONG(car);
             break;
 
         case GH_TYPE_STRING:
@@ -233,7 +233,7 @@ ag_scm_min(SCM list)
         min_val = MIN(min_val, val);
     }
 
-    return gh_long2scm(min_val);
+    return AG_SCM_FROM_LONG(min_val);
 }
 
 
@@ -258,16 +258,16 @@ ag_scm_sum(SCM list)
     do  {
         SCM  car = SCM_CAR(list);
         list = SCM_CDR(list);
-        switch (gh_type_e(car)) {
+        switch (ag_scm_type_e(car)) {
         default:
             return SCM_UNDEFINED;
 
         case GH_TYPE_CHAR:
-            sum += (long)(unsigned char)gh_scm2char(car);
+            sum += (long)(unsigned char)AG_SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
-            sum += gh_scm2long(car);
+            sum += AG_SCM_TO_LONG(car);
             break;
 
         case GH_TYPE_STRING:
@@ -275,7 +275,7 @@ ag_scm_sum(SCM list)
         }
     } while (--len > 0);
 
-    return gh_long2scm(sum);
+    return AG_SCM_FROM_LONG(sum);
 }
 
 

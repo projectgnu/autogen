@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2010-07-03 09:49:59 bkorb"
+ *  Time-stamp:        "2011-01-17 15:26:44 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -172,7 +172,7 @@ ag_scm_for_from(SCM from)
 {
     if ((! pFS->for_loading) || (! AG_SCM_NUM_P(from)))
         return SCM_UNDEFINED;
-    pFS->for_from = AG_SCM_SCM2INT(from);
+    pFS->for_from = AG_SCM_TO_INT(from);
     return SCM_BOOL_T;
 }
 
@@ -192,7 +192,7 @@ ag_scm_for_to(SCM to)
 {
     if ((! pFS->for_loading) || (! AG_SCM_NUM_P(to)))
         return SCM_UNDEFINED;
-    pFS->for_to = AG_SCM_SCM2INT(to);
+    pFS->for_to = AG_SCM_TO_INT(to);
     return SCM_BOOL_T;
 }
 
@@ -212,7 +212,7 @@ ag_scm_for_by(SCM by)
 {
     if ((! pFS->for_loading) || (! AG_SCM_NUM_P(by)))
         return SCM_UNDEFINED;
-    pFS->for_by = AG_SCM_SCM2INT(by);
+    pFS->for_by = AG_SCM_TO_INT(by);
     return SCM_BOOL_T;
 }
 

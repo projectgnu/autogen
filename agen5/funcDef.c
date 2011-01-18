@@ -500,7 +500,7 @@ build_defs(int defCt, tDefList* pList)
             else if (AG_SCM_NUM_P(res)) {
                 pList->de.val.pzText = AGALOC(16, "number buf");
                 snprintf(pList->de.val.pzText, (size_t)16, "%ld",
-                         gh_scm2ulong(res));
+                         AG_SCM_TO_ULONG(res));
             }
             else
                 AGDUPSTR(pList->de.val.pzText, zNil, "empty string");

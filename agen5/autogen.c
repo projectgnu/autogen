@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2010-12-18 11:59:05 bkorb"
+ *  Time-stamp:        "2011-01-18 11:35:37 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -26,6 +26,8 @@
 #include <sys/resource.h>
 #endif
 
+typedef void (void_main_proc_t)(int, char **);
+
 typedef enum {
     EXIT_PCLOSE_WAIT,
     EXIT_PCLOSE_NOWAIT
@@ -45,7 +47,11 @@ static sighandler_proc_t ignore_signal, catch_sig_and_bail;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-inner_main(int argc, char ** argv);
+inner_main(
+#if GUILE_VERSION >= 108000
+    void * closure,
+#endif
+    int argc, char ** argv);
 
 static void
 exit_cleanup(wait_for_pclose_enum_t cl_wait);
@@ -72,7 +78,11 @@ setup_signals(sighandler_proc_t * chldHandler,
  * main routine under Guile guidance
  */
 static void
-inner_main(int argc, char ** argv)
+inner_main(
+#if GUILE_VERSION >= 108000
+    void * closure,
+#endif
+    int argc, char ** argv)
 {
     ag_scribble_init();
     atexit(done_check);
@@ -123,12 +133,11 @@ main(int argc, char ** argv)
 
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
 
-#if GUILE_VERSION >= 107000
     if (getenv("GUILE_WARN_DEPRECATED") == NULL)
         putenv((char*)(void*)"GUILE_WARN_DEPRECATED=no");
-#endif
 
-    gh_enter(argc, argv, inner_main);
+    AG_SCM_BOOT_GUILE(argc, argv, inner_main);
+
     /* NOT REACHED */
     return EXIT_FAILURE;
 }

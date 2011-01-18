@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2010-12-07 10:33:16 bkorb"
+/*  Time-stamp:        "2011-01-17 13:44:40 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -133,10 +133,9 @@ test   = {
   type     = withlib;
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
-	#include <guile/gh.h>
-	#include <libguile/list.h>
-	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 108
-	This has not been tested with Guile 1.9.  Remove this line to proceed.
+	#include <libguile.h>
+	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 109
+	This has not been tested with Guile 1.10.  Remove this line to proceed.
 	#endif
 	int main () {
 	  SCM fumble = SCM_UNDEFINED;
@@ -146,8 +145,8 @@ test   = {
 	  stumble = scm_cons( fumble, bumble );
 	  stumble = scm_display( fumble, bumble );
 	  lstumble = scm_ilength( fumble );
-	  stumble = scm_makstr( 1, 2 );
-	  stumble = gh_eval_str( "stumble" );
+	  stumble = scm_c_make_string( 1, SCM_UNDEFINED);
+	  stumble = scm_c_eval_string( "stumble" );
 	  scm_misc_error( "oops", "bad", bumble );
 	  stumble = scm_num_eq_p( fumble, bumble );
 	  scm_wrong_type_arg( "oops", 1, bumble );

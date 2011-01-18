@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2010-12-21 11:54:40 bkorb"
+ *  Time-stamp:        "2011-01-17 13:57:53 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -287,7 +287,7 @@ ag_scm_out_pop(SCM ret_contents)
     if (pCurFp->pPrev == NULL)
         AG_ABEND("ERROR:  Cannot pop output with no output pushed\n");
 
-    if (AG_SCM_BOOL_P(ret_contents) && SCM_NFALSEP(ret_contents)) {
+    if (AG_SCM_BOOL_P(ret_contents) && AG_SCM_NFALSEP(ret_contents)) {
         unsigned long pos = ftell(pCurFp->pFile);
 
         if (pos == 0)
@@ -335,7 +335,7 @@ ag_scm_output_file_next_line(SCM num_or_str, SCM str)
     int  line_off = 1;
 
     if (AG_SCM_NUM_P(num_or_str))
-        line_off = gh_scm2long(num_or_str);
+        line_off = AG_SCM_TO_LONG(num_or_str);
     else
         str = num_or_str;
 
@@ -378,7 +378,7 @@ ag_scm_out_suspend(SCM susp_nm)
                          "augmenting suspended file list");
     }
 
-    pSuspended[ suspendCt-1 ].pzSuspendName = gh_scm2newstr(susp_nm, NULL);
+    pSuspended[ suspendCt-1 ].pzSuspendName = AG_SCM_TO_NEWSTR(susp_nm);
     pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         fprintf(pfTrace, "suspended output to '%s'\n",
@@ -496,7 +496,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      */
     else if (AG_SCM_NUM_P(port)) {
         tFpStack* pSaveFp = pCurFp;
-        unsigned long val = gh_scm2ulong(port);
+        unsigned long val = AG_SCM_TO_ULONG(port);
 
         for (; val > 0; val--) {
             pCurFp = pCurFp->pPrev;

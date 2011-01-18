@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2010-12-21 13:36:22 bkorb"
+ *  Time-stamp:        "2011-01-17 14:01:48 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -37,12 +37,12 @@ exprType(char* pz);
 LOCAL tCC*
 resolveSCM(SCM s)
 {
-    static char z[48];
-    tCC*  pzRes = z;
+    static char  z[48];
+    char const * pzRes = z;
 
-    switch (gh_type_e(s)) {
+    switch (ag_scm_type_e(s)) {
     case GH_TYPE_BOOLEAN:
-        z[0] = SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL;
+        z[0] = AG_SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL;
         break;
 
     case GH_TYPE_STRING:
@@ -51,7 +51,7 @@ resolveSCM(SCM s)
         break;
 
     case GH_TYPE_CHAR:
-        z[0] = gh_scm2char(s); z[1] = NUL; break;
+        z[0] = AG_SCM_CHAR(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
         pzRes = "** Vector **"; break;
@@ -60,7 +60,7 @@ resolveSCM(SCM s)
         pzRes = "** Pair **"; break;
 
     case GH_TYPE_NUMBER:
-        snprintf(z, sizeof(z), "%ld", gh_scm2ulong(s)); break;
+        snprintf(z, sizeof(z), "%ld", AG_SCM_TO_ULONG(s)); break;
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY
@@ -345,12 +345,12 @@ ag_scm_emit(SCM val)
             break;
 
         pSaveFp = pCurFp;
-        pnum    = gh_scm2ulong(val);
+        pnum    = AG_SCM_TO_ULONG(val);
 
         for (; pnum > 0; pnum--) {
             pSaveFp = pSaveFp->pPrev;
             if (pSaveFp == NULL)
-                AG_ABEND(aprf("invalid emission port: %d", gh_scm2ulong(val)));
+                AG_ABEND(aprf("invalid emission port: %d", AG_SCM_TO_ULONG(val)));
         }
 
         fp = pSaveFp->pFile;
@@ -367,7 +367,7 @@ ag_scm_emit(SCM val)
         if (val == SCM_UNDEFINED)
             break;
 
-        if (SCM_NULLP(val))
+        if (AG_SCM_NULLP(val))
             break;
 
         if (AG_SCM_STRING_P(val)) {
@@ -376,7 +376,7 @@ ag_scm_emit(SCM val)
             break;
         }
 
-        switch (gh_type_e(val)) {
+        switch (ag_scm_type_e(val)) {
         case GH_TYPE_LIST:
         case GH_TYPE_PAIR:
             ag_scm_emit(SCM_CAR(val));
