@@ -4,7 +4,7 @@ null
 
 ## agman3.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-07-10 14:29:54 bkorb"
+## Time-stamp:      "2011-01-19 10:58:28 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,8 +26,6 @@ null
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-
-(setenv "SHELL" "@CONFIG_SHELL@")
 
 +}{+
 
@@ -81,7 +79,7 @@ cc [...] -o outfile infile.c -l{+library+} [...]
 .sp 1
 .SH DESCRIPTION
 {+
-  INCLUDE "agman-lib.tpl"
+  INCLUDE "agman.tlib"
 +}{+
 (get "doc")    +}{+
   IF (exist? "arg") +}{+

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2010-12-18 10:57:28 bkorb"
+# Time-stamp:      "2011-01-19 10:08:43 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -86,7 +86,7 @@
 
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-INCLUDE "optmain.tpl"
+INCLUDE "optmain.tlib"
 
 =]
 #include <sys/types.h>

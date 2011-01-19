@@ -4,7 +4,7 @@ AutoGen5 template man=%s.1
 
 ## agman1.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2010-07-10 14:29:27 bkorb"
+## Time-stamp:      "2011-01-19 10:58:13 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,8 +26,6 @@ AutoGen5 template man=%s.1
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-
-(setenv "SHELL" "@CONFIG_SHELL@")
 
 :+]
 .TH [+: % prog-name (string-upcase! "%s") :+] 1 [+:
@@ -56,7 +54,7 @@ AutoGen5 template man=%s.1
 
 :+][+:
 
-  INCLUDE "agman-lib.tpl"
+  INCLUDE "agman.tlib"
 
 :+][+:
 

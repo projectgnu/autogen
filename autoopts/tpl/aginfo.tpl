@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2010-12-21 11:53:58 bkorb"
+## Time-stamp:        "2011-01-19 09:51:39 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,8 +26,6 @@ texi
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-
-(setenv "SHELL" "@CONFIG_SHELL@")
 
 =]
 @node [= prog-name =] Invocation

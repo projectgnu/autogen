@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2010-11-07 14:07:49 bkorb"
+dnl Time-stamp:      "2011-01-18 14:03:04 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -59,8 +59,7 @@ AC_DEFINE_UNQUOTED(AO_AGE,$AO_AGE,
 # Set up the environment to configure the snprintv subpackage using
 # this version of AutoGen (as opposed to any installed version).
 # ----------------------------------------------------------------------
-[ac_configure_args="$ac_configure_args --enable-snprintfv-convenience"
-ag_srcdir=`\cd $srcdir && pwd`
+[ag_srcdir=`\cd $srcdir && pwd`
 if test x$ag_srcdir != x && test -d $ag_srcdir; then
   :
 else

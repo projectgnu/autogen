@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2010-12-16 11:44:04 bkorb"
+# Time-stamp:      "2011-01-19 10:29:30 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -86,7 +86,7 @@ add_files_to_mf() {
         do
             test -f ${f}.in || echo $f
         done
-        echo tpl/std*.def tpl/*.pl tpl/*.sh
+        echo tpl/*.tlib tpl/std*.def tpl/*.pl tpl/*.sh
     )
     local ndtpl_files=$(
         for f in tpl/*.tpl

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: Text -*-
 
-# Time-stamp:      "2010-07-17 10:05:27 bkorb"
+# Time-stamp:      "2011-01-19 11:04:27 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -262,7 +262,7 @@ Emit the copyright comment  =][=
 
 DEFINE Option_Copyright =]
  *
- * Generated from AutoOpts @AO_CURRENT@:@AO_REVISION@:@AO_AGE@ templates.
+ * Generated from AutoOpts [=(. ao-version)=] templates.
  *
  *  AutoOpts is a copyrighted work.  This [=
  (if (= "h" (suffix)) "header" "source") =] file is not encumbered
@@ -327,7 +327,7 @@ static char const [= (. usage-text-name) =][] =
        [=
 
     (out-push-new)                     \=][=
-    INCLUDE "usage.tpl"                \=][=
+    INCLUDE "usage.tlib"               \=][=
     (kr-string (out-pop #t))
 
  =];

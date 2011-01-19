@@ -5,7 +5,7 @@ texi
 ## ---------------------------------------------------------------------
 ## aginfo3.tpl -- Template for function texi doc
 ##
-## Time-stamp:      "2010-07-10 14:27:53 bkorb"
+## Time-stamp:      "2011-01-19 09:51:30 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,8 +27,6 @@ texi
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-
-(setenv "SHELL" "@CONFIG_SHELL@")
 
 +}{+
 

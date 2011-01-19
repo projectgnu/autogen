@@ -5,7 +5,7 @@
 +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2010-12-16 14:30:40 bkorb"
+  Time-stamp:        "2011-01-19 11:04:14 bkorb"
 _EOF_
 \` `
 
@@ -35,7 +35,7 @@ _EOF_
 DEFINE emit-usage-string    +][+
 
   (out-push-new)            +][+
-  INCLUDE "usage.tpl"       +][+
+  INCLUDE "usage.tlib"      +][+
   (kr-string (string-append (shell (string-append
   "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
        -e '/: illegal option --/d' \

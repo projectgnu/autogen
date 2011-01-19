@@ -3,7 +3,7 @@
 h
 c
 
-# Time-stamp:      "2010-07-10 11:26:03 bkorb"
+# Time-stamp:      "2011-01-19 10:25:37 bkorb"
 
 # This file contains the templates used to generate the
 # option descriptions for client programs, and it declares
@@ -29,18 +29,19 @@ c
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
-(define have-cb-procs     (make-hash-table 31))
-(define is-ext-cb-proc    (make-hash-table 31))
-(define is-lib-cb-proc    (make-hash-table 31))
-(define cb-proc-name      (make-hash-table 31))
-(define test-proc-name    (make-hash-table 31))
-(define disable-name      (make-hash-table 31))
-(define disable-prefix    (make-hash-table 31))
-(define ifdef-ed          (make-hash-table 31))
-(define tmp-ct            0)
-
-(setenv "SHELL"           "@CONFIG_SHELL@")
-(define extract-fmt       "\n/* extracted from %s near line %d */\n")
+(define have-cb-procs   (make-hash-table 31))
+(define is-ext-cb-proc  (make-hash-table 31))
+(define is-lib-cb-proc  (make-hash-table 31))
+(define cb-proc-name    (make-hash-table 31))
+(define test-proc-name  (make-hash-table 31))
+(define disable-name    (make-hash-table 31))
+(define disable-prefix  (make-hash-table 31))
+(define ifdef-ed        (make-hash-table 31))
+(define tmp-ct          0)
+(define extract-fmt     "\n/* extracted from %s near line %d */\n")
+(define ao-version      "@AO_CURRENT@:@AO_REVISION@:@AO_AGE@")
+(define ao-template-ver "@AO_TEMPLATE_VERSION@")
+(setenv "SHELL"         "@CONFIG_SHELL@")
 
 =][=
 
@@ -74,14 +75,14 @@ CASE    (suffix)            =][=
 
    INVOKE Option_Copyright  =][=
 
-   INCLUDE "optcode"        =][= ;; create the option source code
+   INCLUDE "optcode.tlib"   =][= ;; create the option source code
 
    (if (exist? "flag.extract-code")
        (shellf "test -f %1$s.c && rm -f %1$s.c.save" (base-name)))  =][=
 
 == h                        =][=
 
-  INCLUDE "optlib.tpl"      =][=
+  INCLUDE "optlib.tlib"     =][=
 
   INVOKE Option_Copyright   =][=
 
@@ -304,11 +305,11 @@ test `echo \"${ulst}\" | wc -l` -ne %d && {
         (set! lib-opt-ptr (string->c-name! (string-append
                           (get "lib-name") "_" (get "name") "_optDesc_p"))) )
   =][=
-  ENDFOR flag           =][=
+  ENDFOR flag               =][=
 
-  include "opthead"     =][=
+  INCLUDE "opthead.tlib"    =][=
 
 ESAC =]
 /* [= (out-name) =] ends here */[=
 
-# options.tpl ends here =]
+# options.tpl ends here     =]

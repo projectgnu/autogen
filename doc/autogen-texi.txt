@@ -2463,10 +2463,11 @@ The following global definitions are used to define attributes of the entire
 program.  These generally alter the configuration or global behavior of the
 AutoOpts option parser.  The first two are required of every program.  The
 third is required if there are to be any left over arguments (operands)
-after option processing.  The rest have been alphabetized.  Except as noted,
+after option processing.  The rest have been grouped below.  Except as noted,
 there may be only one copy of each of these definitions:
 
 @table @samp
+
 @item prog-name
 @vindex prog-name
 This attribute is required.  Variable names derived from this name
@@ -2486,20 +2487,102 @@ open bracket (@code{[}), then there is no requirement on the presence or
 absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
+@end table
 
-@item allow-errors
-@vindex allow-errors
-The presence of this attribute indicates ignoring any command line
-option errors.  This may also be turned on and off by invoking the
-macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
-generated interface file.
+@menu
+* usage attributes::            Usage and Version Info Display
+* config attributes::           Program Configuration
+* programming attributes::      Programming Details
+* presentation attributes::     User Presentation Attributes
+@end menu
 
-@item config-header
-@vindex config-header
-The contents of this attribute should be just the name of the configuration
-file.  A "#include" naming this file will be inserted at the top of the
-generated header.
+@c
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@node usage attributes
+@subsubsection Usage and Version Info Display
 
+These will affect the way usage is seen and whether or not version
+information gets displayed.
+
+@table @samp
+@item full-usage
+@vindex full-usage
+If this attribute is provided, it may specify the full length
+usage text, or a variable name assignable to a ``char const *'' pointer,
+or it may be empty.  The meanings are determined by  the length.
+@itemize @bullet
+@item
+If not provided, the text will be computed as normal.
+@item
+If the length is zero, then the usage text will be derived from
+the current settings and inserted as text into the generated .c file.
+@item
+If the length is 1 to 32 bytes, then it is presumed to be a variable
+name that either points to or is an array of const chars.
+@item
+If it is longer than that, it is presumed to be the help text itself.
+This text will be inserted into the generated .c file.
+@end itemize
+
+This string should be readily translatable and provision will be made
+to translate it if this is provided and the source code is compiled with
+``ENABLE_NLS'' defined.
+
+@item short-usage
+@vindex short-usage
+If this attribute is provided, it is used to specify an abbreviated
+version of the usage text.  This text is constructed in the same way
+as the ``full-usage'', described above.
+
+@item gnu-usage
+@vindex gnu-usage
+AutoOpts normaly displays usage text in a format that provides more
+information than the standard GNU layout, but that also means it is
+not the standard GNU layout.  This attribute changes the default to
+GNU layout, with the @code{AUTOOPTS_USAGE} environment variable used
+to request @code{autoopts} layout.
+See @xref{Caveats, Developer and User Notes}.
+
+@item no-misuse-usage
+@vindex no-misuse-usage
+When there is a command line syntax error, by default AutoOpts will
+display the abbreviated usage text, rather than just a one line
+``you goofed it, ask for usage'' message.  You can change the default
+behavior for your program by supplying this attribute.  The user may
+override this choice, again, with the @code{AUTOOPTS_USAGE} environment
+variable.  See @xref{Caveats, Developer and User Notes}.
+
+@item prog-group
+@vindex prog-group
+The version text in the @file{getopt.tpl} template will include this
+text in parentheses after the program name, when this attribute is specified.
+For example:
+@example
+mumble (stumble) 1.0
+@end example
+@noindent
+says that the ``@code{mumble}'' program is version 1.0 and is part of the
+``@code{stumble}'' group of programs.
+
+@item version
+@vindex version
+Specifies the program version and activates the VERSION option,
+@xref{automatic options}.
+@end table
+
+@c
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@node config attributes
+@subsubsection Program Configuration
+
+Programs may be ``pre-configured'' before normal command line options
+are processed (See @pxref{Immediate Action, Immediate Action Attributes}).
+How configuration files and environment variables are handled get
+specified with these attributes.
+
+@table @samp
 @item disable-load
 @itemx disable-save
 @vindex disable-load
@@ -2512,14 +2595,64 @@ Indicates that the command line usage of @code{--load-opts} and/or
 Indicates looking in the environment for values of variables named,
 @code{PROGRAM_OPTNAME} or @code{PROGRAM}, where @code{PROGRAM} is the
 upper cased @code{C-name} of the program and @code{OPTNAME} is the
-upper cased @code{C-name} of a specific option.
+upper cased @code{C-name} of a specific option.  The contents of
+the @code{PROGRAM} variable, if found, are tokenized and processed.
+The contents of @code{PROGRAM_OPTNAME} environment variables are taken
+as the option argument to the option nameed @code{optname}.
+
+@item homerc
+@vindex homerc
+Specifies either a directory or a file using a specific path, a path based
+on an environment variable or a path relative to installation directories.
+The method used depends on the first two characters of the name.  If the
+first character is not the dollar character (@code{$}), then it is
+presumed to be a path name based on the current directory.
+
+Otherwise, the method depends on the second character:
+@table @samp
+@item $
+The path is relative to the directory where the executable was found.
+@item @@
+The path is relative to the package data directory, e.g.
+@code{/usr/local/share/autogen}.
+@item [a-zA-Z]
+The path is derived from the named environment variable.
+@end table
+
+Use as many as you like.  The presence of this attribute
+activates the @code{--save-opts} and @code{--load-opts} options.
+See the @code{optionMakePath(3AGEN)} man page for excruciating details.
+@xref{loading rcfile}.
+
+@item rcfile
+@vindex rcfile
+Specifies the configuration file name.  This is only useful if you
+have provided at least one @code{homerc} attribute.
+@noindent
+default: .<prog-name>rc
+@end table
+
+@c
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@node programming attributes
+@subsubsection Programming Details
+
+These attributes affect some of the ways that the option data are
+made available to the program.
+
+@table @samp
+@item config-header
+@vindex config-header
+The contents of this attribute should be just the name of the configuration
+file.  A "#include" naming this file will be inserted at the top of the
+generated header.
 
 @item exit-name
 @itemx exit-desc
 @vindex exit-name
 @vindex exit-desc
-@vindex exit-code
-These values should be defined as indexed value, thus:
+These values should be defined as indexed values, thus:
 @example
 exit-name[0] = success;
 exit-desc[0] = 'Successful program execution.';
@@ -2548,29 +2681,6 @@ global variables or @code{#include} directives required by
 Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
 @code{config-header}, above.n.
-
-@item full-usage
-@vindex full-usage
-If this attribute is provided, it may specify the full length
-usage text, or a variable name assignable to a ``char const *'' pointer,
-or it may be empty.  The meanings are determined by  the length.
-@itemize @bullet
-@item
-If not provided, the text will be computed as normal.
-@item
-If the length is zero, then the usage text will be derived from
-the current settings and inserted as text into the generated .c file.
-@item
-If the length is 1 to 32 bytes, then it is presumed to be a variable
-name that either points to or is an array of const chars.
-@item
-If it is longer than that, it is presumed to be the help text itself.
-This text will be inserted into the generated .c file.
-@end itemize
-
-This string should be readily translatable and provision will be made
-to translate it if this is provided and the source code is compiled with
-``ENABLE_NLS'' defined.
 
 @item guard-option-names
 @vindex guard-option-names
@@ -2608,34 +2718,40 @@ enumeration prefix.  e.g. you will need to use @code{HAVE_OPT(INDEX_OPT_DEBUG)}
 instead of @code{HAVE_OPT(DEBUG)}.
 @end itemize
 
-@item homerc
-@vindex homerc
-Specifies either a directory or a file using a specific path, a path based
-on an environment variable or a path relative to installation directories.
-The method used depends on the first two characters of the name.  If the
-first character is not the dollar character (@code{$}), then it is
-presumed to be a path name based on the current directory.
-
-Otherwise, the method depends on the second character:
-@table @samp
-@item $
-The path is relative to the directory where the executable was found.
-@item @@
-The path is relative to the package data directory, e.g.
-@code{/usr/local/share/autogen}.
-@item [a-zA-Z]
-The path is derived from the named environment variable.
-@end table
-
-Use as many as you like.  The presence of this attribute
-activates the @code{--save-opts} and @code{--load-opts} options.
-See the @code{optionMakePath(3AGEN)} man page for excruciating details.
-@xref{loading rcfile}.
-
 @item include
 @vindex include
 This string is inserted into the .c file.  Generally used for global
 variables required only by @code{flag-code} program text.
+
+@item no-libopts
+@vindex no-libopts
+If you are going to handle your option processing with the @code{getopt.tpl}
+template instead of using libopts, then specify this attribute.  It will
+suppress mention of @code{--more-help} in the generated documentation.
+(@code{getopt_long} does not support @code{--more-help}.)
+
+@item prefix
+@vindex prefix
+This value is inserted into @strong{all} global names.  This will
+disambiguate them if more than one set of options are to be compiled
+into a single program.
+@end table
+
+@c
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@c
+@node presentation attributes
+@subsubsection User Presentation Attributes
+
+Attributes that affect the user's experience.
+
+@table @samp
+@item allow-errors
+@vindex allow-errors
+The presence of this attribute indicates ignoring any command line
+option errors.  This may also be turned on and off by invoking the
+macros @code{ERRSKIP_OPTERR} and @code{ERRSTOP_OPTERR} from the
+generated interface file.
 
 @item long-opts
 @vindex long-opts
@@ -2659,12 +2775,6 @@ One of the options may be specified as the default
 (as long as it has a required option argument).
 @end itemize
 
-@item no-libopts
-@vindex no-libopts
-If you are going to handle your option processing with the @code{getopt.tpl}
-template instead of using libopts, then specify this attribute.  It will
-suppress mention of @code{--more-help} in the generated documentation.
-
 @item no-xlate
 @vindex no-xlate
 Modifies when or whether option names get translated.  If provided,
@@ -2681,45 +2791,31 @@ translations for that text.
 See also the various ``@code{XLAT}'' interface entries in the
 AutoOpts Programmatic Interface section (@pxref{AutoOpts API}).
 
-@item prefix
-@vindex prefix
-This value is inserted into @strong{all} global names.  This will
-disambiguate them if more than one set of options are to be compiled
-into a single program.
+@item reorder-args
+@vindex reorder-args
+Normally, POSIX compliant commands do not allow for options to be interleaved
+with operands.  If this is necessary for historical reasons, there are two
+approaches available:
+@itemize @bullet
+@item
+Allow @code{optionProcess} to return the index of the operand like it normally
+does and process the operand(s).  When an operand is encountered that starts
+with a hyphen, then set the AutoOpts current index with the @code{RESTART_OPT}
+macro (see @pxref{RESTART_OPT}), and re-invoke @code{optionProcess}.  This will
+also allow you to process the operands in context.
 
-@item prog-group
-@vindex prog-group
-The version text in the @file{getopt.tpl} template will include this
-text in parentheses after the program name, when this attribute is specified.
-For example:
-@example
-mumble (stumble) 1.0
-@end example
-@noindent
-says that the ``@code{mumble}'' program is version 1.0 and is part of the
-``@code{stumble}'' group of programs.
-
-@item rcfile
-@vindex rcfile
-Specifies the configuration file name.  This is only useful if you
-have provided at least one @code{homerc} attribute.
-@noindent
-default: .<prog-name>rc
+@item
+Specify this attribute.  AutoOpts will re-order the command arguments
+so that the operands appear (in the original order) at the end of
+the argument list.  Differing configuration state is not possible
+to detect after all options have been processed.
+@end itemize
 
 @item resettable
 @vindex resettable
 Specifies that the @code{--reset-option} command line option is to be supported.
-
-@item short-usage
-@vindex short-usage
-If this attribute is provided, it is used to specify an abbreviated
-version of the usage text.  This text is constructed in the same way
-as the ``full-usage'', described above.
-
-@item version
-@vindex version
-Specifies the program version and activates the VERSION option,
-@xref{automatic options}.
+This makes it possible to suppress any setting that might be found in
+a configuration file or environment variable.
 @end table
 
 @node library attributes
@@ -4278,11 +4374,10 @@ to reinvoke @code{optionProcess}.
 This option is activated by specifying one or more @code{homerc} attributes.
 
 @item reset-option -R
-This option is enabled by setting the global program attribute,
-@code{resettable}.  This option takes the name of an option for the current
-program and resets its state such that it is set back to its original,
-compile-time initialized value.  If the option state is subsequently stored
-(via @code{--save-opts}), the named option will not appear in that file.
+This option takes the name of an option for the current program and resets its
+state such that it is set back to its original, compile-time initialized
+value.  If the option state is subsequently stored (via @code{--save-opts}),
+the named option will not appear in that file.
 
 This option is activated by specifying the @code{resettable} attribute.
 

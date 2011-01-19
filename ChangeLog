@@ -1,10 +1,29 @@
+2011-01-19  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl: rename non-base templates from *.tpl to *.tlib
+	and adjust the INCLUDEs.
+
 2011-01-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/guile-iface.tpl: template for producing versioned Guile
 	interface glue
 	* agen5/guile-iface.def: define the interfaces that migrate.
+	* agen5/bootstrap.dir: generate the new guile-iface.h file
 	* agen5/autogen.h: remove Guile interface glue and include
 	generated guile-iface.h.
+	* agen5/Makefile.am:
+	* agen5/autogen.c: Adjust to new Guile interface macros
+	* agen5/expFormat.c: likewise
+	* agen5/expGuile.c: likewise
+	* agen5/expOutput.c: likewise
+	* agen5/expPrint.c: likewise
+	* agen5/expState.c: likewise
+	* agen5/expString.c: likewise
+	* agen5/funcDef.c: likewise
+	* agen5/funcEval.c: likewise
+	* agen5/funcFor.c: likewise
+	* agen5/snarf.tpl: likewise
+	* agen5/test/snarf.test: likewise
 
 2011-01-05  Bruce Korb  <bkorb@gnu.org>
 

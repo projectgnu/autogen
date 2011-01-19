@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-05 15:12:07 bkorb"
+# Time-stamp:        "2011-01-19 11:10:04 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -85,7 +85,7 @@ go_init()
   esac
 
   cd ${top_srcdir}/autoopts/tpl
-  cp *.tpl *.pl ${TMPDIR}/.
+  cp *.tpl *.tlib *.pl ${TMPDIR}/.
   cd ${top_builddir}/autoopts/tpl
   cp *.tpl ${TMPDIR}/.
   chmod u+w ${TMPDIR}/*
@@ -93,8 +93,8 @@ go_init()
   cd ${builddir}/testdir
   sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
     -e "/^ldflags=/s@=.*@='${aolib}'@" \
-    ${TMPDIR}/usage.tpl > ${TMPDIR}/usage.tpl-$$
-  mv -f ${TMPDIR}/usage.tpl-$$ ${TMPDIR}/usage.tpl
+    ${TMPDIR}/usage.tlib > ${TMPDIR}/usage.tlib-XX
+  mv -f ${TMPDIR}/usage.tlib-XX ${TMPDIR}/usage.tlib
 
   # In order to compile correctly, we have to temporarily install the options.h
   # header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:
