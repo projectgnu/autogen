@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-01-19 10:29:30 bkorb"
+# Time-stamp:      "2011-01-19 13:25:03 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -64,7 +64,7 @@ burn_aover() {
         *~ )
             rm -f $f ;;
 
-        *.tpl* | *.def )
+        *.tpl* | *.def | *.tlib )
             chmod 644 $f ;;
 
         * ) chmod 755 $f ;;

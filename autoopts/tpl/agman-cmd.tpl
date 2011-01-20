@@ -1,21 +1,51 @@
 [+: -*- Mode: nroff -*-
-  AutoGen5 template man
-:+][+:
 
-;;; * * * * * * * * * * * * * * * * * * * * * * * * *
-;;; Start  : definitions
-;;; * * * * * * * * * * * * * * * * * * * * * * * * *
+  AutoGen5 template man
+
+## agman-cmd.tpl -- Template for command line man pages
+##
+## Time-stamp:      "2011-01-19 12:35:19 bkorb"
+##
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+
+# Produce a man page for section 1, 5 or 8 commands.
+# Which is selected via:  -DMAN_SECTION=n
+# passed to the autogen invocation.  "n" may have a suffix, if desired.
+#
+:+][+:
 
 (define down_prog-name (string-downcase! (get "prog-name")))
 (define PROG_NAME      (string-upcase! (get "prog-name")))
 (define tmp-val        (getenv "MAN_SECTION"))
-(define man-sect       "1")
-:+][+:
+(define man-sect       (if (exist? "cmd-section") (get "cmd-section") "1"))
+
 (if (defined? 'tmp-val)
     (if (string? tmp-val)
         (set! man-sect tmp-val)))
+
+(if (not (~~* man-sect "[158]")) (error
+    "the agman-cmd template only produces section 1, 5 and 8 man pages"))
+
 (out-move (string-append (base-name) "." man-sect))
-:+][+:
+
 (define package-text "")
 (if (or (exist? "package") (exist? "version")) (begin
   (set! package-text (string-append
@@ -25,20 +55,17 @@
         (get "version")
         ")\"" ))
 ))
-:+][+:
-(sprintf ".TH %s %s %s%s"
+
+(ag-fprintf 0 ".TH %s %s %s%s \"Programmer Manual\"\n"
         (string-upcase! (get "prog-name"))
         man-sect (shell "date") package-text)
 
-:+] "Programmer's Manual"
-[+:
-
- (dne ".\\\"  ") 				  
+(dne ".\\\"  ")
 
 :+]
 .\"
 .SH NAME
-[+: prog-name :+] \- [+: prog-title :+]
+.B [+: prog-name :+] \- [+: prog-title :+]
 .SH SYNOPSIS
 .B [+: prog-name :+][+:
 
@@ -667,9 +694,9 @@ X?* )
 X* ) echo $range is indeterminate
 esac"
 
-(get "arg-range") )
-:+][+:
-      ENDFOR arg-range :+]
+(get "arg-range") )     :+][+:
+
+      ENDFOR arg-range  :+]
 .fi
 .in -4[+:
 
@@ -694,9 +721,8 @@ NOTE: THIS OPTION IS DEPRECATED
 .R[+:
   ENDIF                               :+][+:
 
-ENDDEF emit-flag-text :+][+:
+ENDDEF emit-flag-text   :+][+:
 
+#
 
- #
-
-agman-cmd.tpl ends here  :+]
+agman-cmd.tpl ends here :+]

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2010-12-18 11:07:40 bkorb"
+# Time-stamp:        "2011-01-19 12:11:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -166,7 +166,7 @@ cmp -s ${testname}.t1-* || \
 
 ${AG_L} -T agman-cmd.tpl ${testname}.def
 cat > ${testname}-base.1 <<\_EOMan_
-test_keyword \- Test AutoOpts for keyword
+.B test_keyword \- Test AutoOpts for keyword
 .SH SYNOPSIS
 .B test_keyword
 .\" Mixture of short (flag) options and long options

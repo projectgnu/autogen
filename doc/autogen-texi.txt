@@ -4267,10 +4267,37 @@ section and before the @code{AUTHOR} section.
 This text will be inserted as a lead-in paragraph in the @code{OPTIONS}
 section of the generated man page.
 
+@item doc-section
+@vindex doc-section
+This is a compound attribute that requires three @i{sub}attributes:
+@table @i
+@item ds-type
+This describes the section type.  This is for use in man pages.
+@item ds-format
+This describes the format of the associated @code{ds-text} section.
+@code{man}, @code{mdoc} and @code{texi} formats are supported.
+@item ds-text
+This is the descriptive text, written according to the rules for
+@code{ds-format} documents.
+@end table
+
+@example
+doc-section = @{
+  ds-type   = 'SEE ALSO'; // or anything else
+  ds-format = 'man';      // or texi or mdoc format
+  ds-text   = <<-_EOText_
+	text relevant to this section type,
+	in the chosen format
+	_EOText_;
+@};
+@end example
+
 @item prog-man-descrip
 @itemx prog-info-descrip
 @vindex prog-man-descrip
 @vindex prog-info-descrip
+These attributes are now deprecated.  Please use @code{doc-section} stanzas.
+
 Then, you need to supply a brief description of what your program does.
 If you already have a @code{detail} definition, this may be sufficient.
 If not, or if you need special formatting for one of the manual formats,

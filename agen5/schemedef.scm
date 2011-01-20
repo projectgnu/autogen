@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2010-12-21 11:48:39 bkorb"
+;;; Time-stamp:        "2011-01-19 11:41:34 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -361,5 +361,21 @@
 (use-modules (ice-9 debug))
 
 (read-enable 'positions)
+
+;;; /*=gfunc   stack_join
+;;;  *
+;;;  * what:   stack values then join them
+;;;  *
+;;;  * exparg: join , string between each element
+;;;  * exparg: ag-name , name of autogen values to stack
+;;;  *
+;;;  * doc:    This function will collect all the values named @code{ag-name}
+;;;  *         (see the @pxref{SCM stack, stack function}) and join them
+;;;  *         separated by the @code{join} string (see the
+;;;  *         @pxref{SCM join, join function}).
+;;; =*/
+;;;
+(define stack-join (lambda (j-str ag-name)
+  (join j-str (stack ag-name))))
 
 ;;; end of agen5/schemedef.scm

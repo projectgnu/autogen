@@ -4,7 +4,7 @@ usr/share/aclocal/autoopts.m4
 usr/share/autogen/aginfo.tpl
 usr/share/autogen/aginfo3.tpl
 usr/share/autogen/agman-lib.tpl
-usr/share/autogen/agman1.tpl
+usr/share/autogen/agman-cmd.tpl
 usr/share/autogen/agman3.tpl
 usr/share/autogen/conftest.tpl
 usr/share/autogen/confmacs.tpl

@@ -2,6 +2,12 @@
 
 AutoGen5 template man=%s.1
 
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##
+## NOTICE:  this template is DEPRECATED.  Please convert to agman-cmd.
+##
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 ## agman1.tpl -- Template for command line man pages
 ##
 ## Time-stamp:      "2011-01-19 10:58:13 bkorb"
