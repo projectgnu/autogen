@@ -3,7 +3,7 @@
  *  tpParse.c
  *
  *
- * Time-stamp:        "2011-01-06 12:39:55 bkorb"
+ * Time-stamp:        "2011-01-20 16:18:29 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -27,7 +27,7 @@
 #if defined(DEBUG_ENABLED)
 static int tplNestLevel = 0;
 
-tSCC zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
+static char const zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
@@ -322,7 +322,7 @@ parseTemplate(tMacro* pM, char const ** ppzText)
     tTemplate* pTpl = pCurTemplate;
 
 #if defined(DEBUG_ENABLED)
-    tSCC zTUndef[] = "%-10s (%d) line %d - MARKER\n";
+    static char const zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
     #define DEBUG_DEC(l)  l--
 

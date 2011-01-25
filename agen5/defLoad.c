@@ -2,7 +2,7 @@
 /**
  * \file defLoad.c
  *
- *  Time-stamp:        "2010-08-06 08:56:49 bkorb"
+ *  Time-stamp:        "2011-01-20 16:25:52 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -275,7 +275,7 @@ insertDef(tDefEntry* pDef)
  * Figure out where to insert an entry in a list of twins.
  */
 LOCAL tDefEntry*
-findPlace(char* name, tCC* pzIndex)
+findPlace(char* name, char const * pzIndex)
 {
     tDefEntry* pE = getEntry();
 
@@ -383,12 +383,12 @@ ready_input(char const ** ppzfile, size_t * psz)
 LOCAL void
 readDefines(void)
 {
-    tCC*     pzDefFile;
-    char*    pzData;
-    size_t   dataSize;
-    size_t   sizeLeft;
+    char const *  pzDefFile;
+    char *        pzData;
+    size_t        dataSize;
+    size_t        sizeLeft;
+    FILE *        fp;
     def_input_mode_t in_mode = ready_input(&pzDefFile, &dataSize);
-    FILE*    fp;
 
     if (in_mode == INPUT_DONE)
         return;

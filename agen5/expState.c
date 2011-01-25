@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2011-01-17 14:00:20 bkorb"
+ *  Time-stamp:        "2011-01-20 16:21:06 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -300,7 +300,8 @@ str2int_ver(char* pz)
 SCM
 ag_scm_version_compare(SCM op, SCM v1, SCM v2)
 {
-    tSCC  zVer[] = "version str";
+    static char const  zVer[] = "version str";
+
     ver_type_t val1 = str2int_ver(ag_scm2zchars(v1, zVer));
     ver_type_t val2 = str2int_ver(ag_scm2zchars(v2, zVer));
     v1 = SCM_FROM(val1);
@@ -323,7 +324,7 @@ ag_scm_version_compare(SCM op, SCM v1, SCM v2)
 SCM
 ag_scm_chdir(SCM dir)
 {
-    tSCC zChdirDir[] = "chdir directory";
+    static char const zChdirDir[] = "chdir directory";
 
     scm_chdir(dir);
 
@@ -712,7 +713,8 @@ SCM
 ag_scm_tpl_file(SCM full)
 {
     if (AG_SCM_BOOL_P(full) && AG_SCM_NFALSEP(full)) {
-        tSCC* sfx[] = { "tpl", NULL };
+        static char const * const sfx[] = { "tpl", NULL };
+
         char z[AG_PATH_MAX];
         if (SUCCESSFUL(findFile(pzTemplFileName, z, sfx, NULL)))
             return AG_SCM_STR02SCM(z);

@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-01-17 13:57:53 bkorb"
+ *  Time-stamp:        "2011-01-20 16:14:29 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -31,8 +31,8 @@
 #endif
 
 typedef struct {
-    tCC*        pzSuspendName;
-    tFpStack*   pOutDesc;
+    char const *  pzSuspendName;
+    tFpStack*     pOutDesc;
 } tSuspendName;
 
 static int            suspendCt   = 0;
@@ -209,7 +209,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 SCM
 ag_scm_out_delete(void)
 {
-    tSCC zSkipMsg[] = "NOTE:  skipping file '%s'\n";
+    static char const zSkipMsg[] = "NOTE:  skipping file '%s'\n";
 
     /*
      *  Delete the current output file

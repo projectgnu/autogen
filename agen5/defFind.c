@@ -1,7 +1,7 @@
 /**
  * \file defFind.c
  *
- *  Time-stamp:        "2010-08-06 12:50:41 bkorb"
+ *  Time-stamp:        "2011-01-20 16:23:20 bkorb"
  *
  *  This module locates definitions.
  *
@@ -30,7 +30,7 @@ struct defEntryList {
 };
 typedef struct defEntryList tDefEntryList;
 
-tSCC zNameRef[]   = "Ill formed name ``%s'' in %s line %d\n";
+static char const zNameRef[] = "Ill formed name ``%s'' in %s line %d\n";
 
 typedef struct hash_name_s hash_name_t;
 struct hash_name_s {

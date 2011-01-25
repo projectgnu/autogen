@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-01-06 11:44:39 bkorb"
+ *  Time-stamp:        "2011-01-20 15:58:10 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -90,11 +90,14 @@ include = <<-  _END_INCLUDE
 	#endif
 
 	typedef void (init_proc_t)(void);
-	tCC*    pzTemplFileName  = NULL;
-	ag_bool trace_is_to_pipe = AG_FALSE;
+	char const * pzTemplFileName  = NULL;
+	ag_bool      trace_is_to_pipe = AG_FALSE;
 	_END_INCLUDE;
 
-export = "extern tCC* pzTemplFileName;\nextern ag_bool trace_is_to_pipe;";
+export = <<- _EOExport_
+	extern char const * pzTemplFileName;
+	extern ag_bool      trace_is_to_pipe;
+	_EOExport_;
 
 explain =
 "AutoGen creates text files from templates using external definitions.";
@@ -268,7 +271,7 @@ flag = {
 	    teProcState saveState = procState;
 	    char* pz;
 	    char  zPath[MAXPATHLEN];
-	    tSCC* apzSfx[] = { "scm", NULL };
+	    static char const * const apzSfx[] = { "scm", NULL };
 
 	    if (! SUCCESSFUL(
 	        findFile(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {

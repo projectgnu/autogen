@@ -51,7 +51,6 @@ iface = {
 iface = {
   i-name    = char_p;
   i-args    = '_c';
-  i-impl    = { i-end = '106'; i-code = 'gh_char_p(_c)'; };
   i-impl    = { i-end = '201'; i-code = 'SCM_CHARP(_c)'; };
 };
 
@@ -87,7 +86,6 @@ iface = {
 iface = {
   i-name    = is_proc;
   i-args    = '_p';
-  i-impl    = { i-end = '106'; i-code = 'gh_procedure_p(_p)'; };
   i-impl    = { i-end = '107'; i-code = 'SCM_NFALSEP( scm_procedure_p(_p))'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_true( scm_procedure_p(_p))'; };
 };
@@ -95,7 +93,6 @@ iface = {
 iface = {
   i-name    = list_p;
   i-args    = '_l';
-  i-impl    = { i-end = '106'; i-code = 'gh_list_p(_l)'; };
   i-impl    = { i-end = '107'; i-code = 'SCM_NFALSEP( scm_list_p(_l))'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_true( scm_list_p(_l))'; };
 };
@@ -124,7 +121,6 @@ iface = {
 iface = {
   i-name    = num_p;
   i-args    = '_n';
-  i-impl    = { i-end = '106'; i-code = 'gh_number_p(_n)'; };
   i-impl    = { i-end = '107'; i-code = 'SCM_NUMBERP(_n)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_number(_n)'; };
 };
@@ -132,7 +128,6 @@ iface = {
 iface = {
   i-name    = pair_p;
   i-args    = '_p';
-  i-impl    = { i-end = '106'; i-code = 'gh_pair_p(_p)'; };
   i-impl    = { i-end = '107'; i-code = 'SCM_NFALSEP( scm_pair_p(_p))'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_true( scm_pair_p(_p))'; };
 };
@@ -140,7 +135,6 @@ iface = {
 iface = {
   i-name    = str02scm;
   i-args    = '_s';
-  i-impl    = { i-end = '106'; i-code = 'gh_str02scm(_s)'; };
   i-impl    = { i-end = '107'; i-code = 'scm_makfrom0str(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_from_locale_string(_s)'; };
 };
@@ -148,7 +142,6 @@ iface = {
 iface = {
   i-name    = str2scm;
   i-args    = '_st,_sz';
-  i-impl    = { i-end = '106'; i-code = 'gh_str2scm(_st,_sz)'; };
   i-impl    = { i-end = '107'; i-code = 'scm_mem2string(_st,_sz)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_from_locale_stringn(_st,_sz)'; };
 };
@@ -156,7 +149,6 @@ iface = {
 iface = {
   i-name    = string_p;
   i-args    = '_s';
-  i-impl    = { i-end = '106'; i-code = 'gh_string_p(_s)'; };
   i-impl    = { i-end = '107'; i-code = 'SCM_STRINGP(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_string(_s)'; };
 };
@@ -172,7 +164,6 @@ iface = {
 iface = {
   i-name    = sym_p;
   i-args    = '_s';
-  i-impl    = { i-end = '106'; i-code = 'gh_symbol_p(_s)'; };
   i-impl    = { i-end = '108'; i-code = 'SCM_SYMBOLP(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_symbol(_s)'; };
 };
@@ -208,7 +199,6 @@ iface = {
 iface = {
   i-name    = vec_p;
   i-args    = '_v';
-  i-impl    = { i-end = '106'; i-code = 'gh_vector_p(_v)'; };
   i-impl    = { i-end = '108'; i-code = 'SCM_VECTORP(_v)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_vector(_v)'; };
 };

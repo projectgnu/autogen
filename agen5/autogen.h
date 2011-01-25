@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-01-17 17:39:22 bkorb"
+ *  Time-stamp:        "2011-01-20 16:28:27 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -189,29 +189,29 @@ struct template_lib_marker {
 #define EMIT_NO_DEFINE      0x0800  /* don't get defined value */
 
 struct macro_desc {
-    teFuncType  funcCode;  /* Macro function         */
-    int         lineNo;    /* of macro def           */
-    int         endIndex;  /* End of block macro     */
-    int         sibIndex;  /* Sibling macro (ELIF or SELECT) */
+    teFuncType    funcCode;    /* Macro function           */
+    int           lineNo;      /* of macro def             */
+    int           endIndex;    /* End of block macro       */
+    int           sibIndex;    /* Sibling macro (ELIF or SELECT) */
 
-    uintptr_t   ozName;    /* macro name (sometimes) */
-    uintptr_t   ozText;    /* associated text        */
-    uintptr_t   res;       /* some sort of result    */
-    void*       funcPrivate;
+    uintptr_t     ozName;      /* macro name (sometimes)   */
+    uintptr_t     ozText;      /* associated text          */
+    uintptr_t     res;         /* some sort of result      */
+    void *        funcPrivate;
 };
 
 struct template_desc {
-    tTlibMark   magic;       /* TEMPLATE_MAGIC_MARKER    */
-    size_t      descSize;    /* Structure Size           */
-    char*       pNext;       /* Next Pointer             */
-    int         macroCt;     /* Count of Macros          */
-    tCC*        pzTplFile;   /* Name of template file    */
-    char*       pzTplName;   /* Defined Macro Name       */
-    char*       pzTemplText; /* offset of the text       */
-    char        zStartMac[MAX_SUFFIX_LEN];
-    char        zEndMac[MAX_SUFFIX_LEN];
-    tMacro      aMacros[1];  /* Array of Macros          */
-/*  char        text[...];    * strings at end of macros */
+    tTlibMark     magic;       /* TEMPLATE_MAGIC_MARKER    */
+    size_t        descSize;    /* Structure Size           */
+    char *        pNext;       /* Next Pointer             */
+    int           macroCt;     /* Count of Macros          */
+    char const *  pzTplFile;   /* Name of template file    */
+    char *        pzTplName;   /* Defined Macro Name       */
+    char *        pzTemplText; /* offset of the text       */
+    char          zStartMac[MAX_SUFFIX_LEN];
+    char          zEndMac[MAX_SUFFIX_LEN];
+    tMacro        aMacros[1];  /* Array of Macros          */
+/*  char          text[...];    * strings at end of macros */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -252,11 +252,11 @@ struct defEntry {
 };
 
 struct scanContext {
-    tScanCtx*   pCtx;
-    char*       pzScan;
-    tCC*        pzCtxFname;
-    char*       pzData;
-    int         lineNo;
+    tScanCtx *    pCtx;
+    char*         pzScan;
+    char const *  pzCtxFname;
+    char *        pzData;
+    int           lineNo;
 };
 
 struct outSpec {

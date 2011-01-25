@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2010-07-10 19:23:24 bkorb"
+ *  Time-stamp:        "2011-01-20 16:24:31 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -73,7 +73,8 @@ aprf(char const * pzFmt, ...)
     va_end(ap);
 
     if (pz == NULL) {
-        tSCC zMsg[] = "could not allocate for or formatting failed on:\n%s";
+        static char const zMsg[] =
+            "could not allocate for or formatting failed on:\n%s";
         char z[ sizeof (zMsg) + SCRIBBLE_SIZE ];
         snprintf(z, sizeof(z), zMsg, pzFmt);
         AG_ABEND(z);
@@ -224,7 +225,7 @@ doOptions(int arg_ct, char ** arg_vec)
      *  command line options
      */
     {
-        tSCC zOnlyOneSrc[] = "%s ERROR:  Too many definition files\n";
+        static char const one_src[] = "%s ERROR:  Too many definition files\n";
         int  optCt = optionProcess(&autogenOptions, arg_ct, arg_vec);
 
         /*
@@ -239,7 +240,7 @@ doOptions(int arg_ct, char ** arg_vec)
             /* FALLTHROUGH */
 
         default:
-            fprintf(stderr, zOnlyOneSrc, pzProg);
+            fprintf(stderr, one_src, pzProg);
             USAGE(EXIT_FAILURE);
             /* NOTREACHED */
 

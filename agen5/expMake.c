@@ -2,7 +2,7 @@
 /*
  *  expMake.c
  *
- *  Time-stamp:        "2010-02-24 08:42:59 bkorb"
+ *  Time-stamp:        "2011-01-20 16:22:01 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -95,7 +95,7 @@
 SCM
 ag_scm_makefile_script(SCM text)
 {
-    tSCC   zNl[]  = " ; \\\n";
+    static char const zNl[]  = " ; \\\n";
 
     SCM    res;
     char*  pzText = ag_scm2zchars(text, "GPL line prefix");

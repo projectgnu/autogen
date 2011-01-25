@@ -1,3 +1,13 @@
+2011-01-24  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/error.test (TEST 3): remove it.  Too many variations
+	on the output.
+	* autoopts/tpl/usage.tlib: try a little harder to get data from
+	the build tree before using the installed files.
+	* config/misc.def (scm_c_make_string): not available in Guile 1.6
+	and the previous version is not available in Guile 1.9.
+	* doc/mk-agen-texi-in: do a "find" for the libraries we're interested in
+
 2011-01-19  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl: rename non-base templates from *.tpl to *.tlib

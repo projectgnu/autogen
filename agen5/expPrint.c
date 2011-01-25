@@ -2,7 +2,7 @@
 /**
  * \file expPrint.c
  *
- *  Time-stamp:        "2011-01-17 13:14:10 bkorb"
+ *  Time-stamp:        "2011-01-20 16:21:45 bkorb"
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -70,8 +70,9 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
     }
 
     {
-        tSCC zBadArgs[] = "Bad args to sprintf";
-        tSCC zBadFmt[]  = "%s ERROR:  %s processing printf format:\n\t%s\n";
+        static char const zBadArgs[] = "Bad args to sprintf";
+        static char const zBadFmt[]  =
+            "%s ERROR:  %s processing printf format:\n\t%s\n";
 
         /*
          *  IF the sprintfv call below is going to address fault,
@@ -270,7 +271,8 @@ ag_scm_fprintf(SCM port, SCM fmt, SCM alist)
 SCM
 ag_scm_hide_email(SCM display, SCM eaddr)
 {
-    tSCC zStrt[]  =
+    static char const zFmt[]   = "&#%d;";
+    static char const zStrt[]  =
         "<script language=\"JavaScript\" type=\"text/javascript\">\n"
         "<!--\n"
         "var one = 'm&#97;';\n"
@@ -278,11 +280,10 @@ ag_scm_hide_email(SCM display, SCM eaddr)
         "document.write('<a href=\"' + one + two );\n"
         "document.write('&#111;:";
 
-    tSCC zEnd[]   = "');\n"
+    static char const zEnd[]   = "');\n"
         "document.write('\" >%s</a>');\n"
         "//-->\n</script>";
 
-    tSCC zFmt[]   = "&#%d;";
     char*  pzDisp = ag_scm2zchars(display, zFormat);
     char*  pzEadr = ag_scm2zchars(eaddr,   zFormat);
     size_t str_size = (strlen(pzEadr) * sizeof(zFmt))

@@ -2,7 +2,7 @@
 /**
  *  \file functions.c
  *
- *  Time-stamp:        "2010-07-11 13:27:33 bkorb"
+ *  Time-stamp:        "2011-01-20 16:03:37 bkorb"
  *
  *  This module implements text functions.
  *
@@ -23,8 +23,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tSCC zCantInc[] = "cannot include file";
-tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
+static char const zCantInc[] = "cannot include file";
+static char const zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
 
 /*=macfunc INCLUDE
  *
@@ -46,10 +46,10 @@ tSCC zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
 tMacro*
 mFunc_Include(tTemplate* pT, tMacro* pMac)
 {
-    tTemplate* pNewTpl;
-    ag_bool    needFree;
-    tCC*       pzFile = evalExpression(&needFree);
-    tMacro*    pM;
+    tTemplate *   pNewTpl;
+    ag_bool       needFree;
+    char const *  pzFile = evalExpression(&needFree);
+    tMacro*       pM;
 
     if (*pzFile != NUL) {
         pNewTpl = loadTemplate(pzFile, pT->pzTplFile);
@@ -72,8 +72,8 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
         }
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE) {
-            tSCC zTplFmt[] = "Template %s included\n";
-            tSCC zLinFmt[] = "\tfrom %s line %d\n";
+            static char const zTplFmt[] = "Template %s included\n";
+            static char const zLinFmt[] = "\tfrom %s line %d\n";
             fprintf(pfTrace, zTplFmt, pNewTpl->pzTplFile);
             if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                 fprintf(pfTrace, zLinFmt, pCurTemplate->pzTplFile,
@@ -100,7 +100,7 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
  *  Regular "expr" macros are their own argument, so there is always one.
  */
 tMacro*
-mLoad_Include(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Include(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     if ((int)pMac->res == 0)
         AG_ABEND_IN(pT, pMac, "The INCLUDE macro requires a file name");
@@ -188,9 +188,12 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
 tMacro*
 mFunc_Bogus(tTemplate* pT, tMacro* pMac)
 {
-    tSCC z[] = "%d (%s) is an unknown macro function, or has no handler";
+    static char const z[] =
+        "%d (%s) is an unknown macro function, or has no handler";
+
     char* pz = aprf(z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
                     ? apzFuncNames[ pMac->funcCode ] : "??");
+
     AG_ABEND_IN(pT, pMac, pz);
     /* NOTREACHED */
     return pMac;
@@ -231,7 +234,7 @@ mFunc_Text(tTemplate* pT, tMacro* pMac)
  *    @end example
 =*/
 tMacro*
-mLoad_Comment(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Comment(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     memset((void*)pMac, 0, sizeof(*pMac));
     return pMac;
@@ -245,11 +248,11 @@ mLoad_Comment(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
  *  This is used as the default load mechanism.
  */
 tMacro*
-mLoad_Unknown(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Unknown(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    char*          pzCopy = pT->pNext;
-    char const*    pzSrc;
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
+    char *        pzCopy = pT->pNext;
+    char const *  pzSrc;
+    size_t        srcLen = (size_t)pMac->res;         /* macro len  */
 
     if (srcLen <= 0)
         goto return_emtpy_expression;
@@ -340,13 +343,13 @@ mLoad_Unknown(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
  *  here, until an "IF" function is encountered.
  */
 tMacro*
-mLoad_Bogus(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Bogus(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    tSCC zUnk[] =
+    static char const zUnk[] =
         "Unknown macro or invalid context in %s line %d:\n\t%s%s";
 
-    tCC* pzSrc = (char const*)pMac->ozText; /* macro text */
-    tCC* pzMac;
+    char const * pzSrc = (char const*)pMac->ozText; /* macro text */
+    char const * pzMac;
 
     char z[ 64 ];
 

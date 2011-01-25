@@ -2,7 +2,7 @@
 /**
  * \file agCgi.c
  *
- *  Time-stamp:        "2010-08-06 08:54:16 bkorb"
+ *  Time-stamp:        "2011-01-20 16:24:54 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -159,7 +159,8 @@ loadCgi(void)
 static char*
 parseInput(char* pzSrc, int len)
 {
-    tSCC   zDef[] = "Autogen Definitions cgi;\n";
+    static char const zDef[] = "Autogen Definitions cgi;\n";
+
 #   define defLen   (sizeof(zDef) - 1)
     char*  pzRes  = AGALOC((len * 2) + defLen + 1, "CGI Definitions");
 

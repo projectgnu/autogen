@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2010-06-30 22:02:27 bkorb"
+ *  Time-stamp:        "2011-01-20 16:22:57 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-tSCC zErrMsg[] = "%s Error:  %s in %s on line %d\n";
+static char const zErrMsg[] = "%s Error:  %s in %s on line %d\n";
 
 /*
  *  This keyword table must match those found in agParse.y.
@@ -33,12 +33,12 @@ tSCC zErrMsg[] = "%s Error:  %s in %s on line %d\n";
   _KW_( AUTOGEN )                               \
   _KW_( DEFINITIONS )
 
-#define _KW_(w) tSCC z ## w [] = #w;
+#define _KW_(w) static char const z ## w [] = #w;
 KEYWORD_TABLE
 #undef _KW_
 
 #define _KW_(w) z ## w,
-tSCC*  apzKeywords[] = { KEYWORD_TABLE };
+static char const*  apzKeywords[] = { KEYWORD_TABLE };
 #undef _KW_
 
 #define _KW_(w) DP_EV_ ## w,
@@ -443,8 +443,8 @@ loadScheme(void)
 static void
 alist_to_autogen_def(void)
 {
-    tSCC   zSchemeText[] = "Scheme Computed Definitions";
-    tSCC   zWrap[] = "(alist->autogen-def %s)";
+    static char const zSchemeText[] = "Scheme Computed Definitions";
+    static char const zWrap[] = "(alist->autogen-def %s)";
 
     char*  pzText  = ++(pCurCtx->pzScan);
     char*  pzEnd   = (char*)skipScheme(pzText, pzText + strlen(pzText));
@@ -474,7 +474,8 @@ alist_to_autogen_def(void)
      *  The result *must* be a string, or we choke.
      */
     if (! AG_SCM_STRING_P(res)) {
-        tSCC zEr[] = "Scheme definition expression does not yield string:\n";
+        static char const zEr[] =
+            "Scheme definition expression does not yield string:\n";
         AG_ABEND(zEr);
     }
 

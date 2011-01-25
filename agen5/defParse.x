@@ -4,7 +4,7 @@
  *
  * Definition parser functions.
  *
- *  Time-stamp:        "2010-07-16 16:26:38 bkorb"
+ *  Time-stamp:        "2011-01-20 16:22:19 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -228,8 +228,8 @@ dp_do_tpl_name(
      *  This may happen if we include another definition file.
      */
     if (rootDefCtx.pDefs == NULL) {
-        tSCC   zBogus[] = "@BOGUS@";
-        static tDefEntry seed = {
+        static char const zBogus[] = "@BOGUS@";
+        static tDefEntry  seed = {
             NULL, NULL, NULL, NULL, (char*)zBogus, 0, { NULL },
             (char*)zBogus, 0, VALTYP_BLOCK };
 

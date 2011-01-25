@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2010-12-09 11:55:08 bkorb"
+ *  Time-stamp:        "2011-01-20 16:29:32 bkorb"
  *
  *  Manage a server shell process
  *
@@ -24,11 +24,14 @@
 #ifndef SHELL_ENABLED
  void  closeServer(void) { }
 
- int   chainOpen(int stdinFd, tCC** ppArgs, pid_t* pChild) { return -1; }
+ int   chainOpen(int stdinFd, char const ** ppArgs, pid_t* pChild) {
+     return -1; }
 
- pid_t openServer(tFdPair* pPair, tCC** ppArgs) { return NOPROCESS; }
+ pid_t openServer(tFdPair* pPair, char const ** ppArgs) {
+     return NOPROCESS; }
 
- pid_t openServerFP(tpfPair* pfPair, tCC** ppArgs) { return NOPROCESS; }
+ pid_t openServerFP(tpfPair* pfPair, char const ** ppArgs) {
+     return NOPROCESS; }
 
  char* runShell(char const* pzCmd) {
      char* pz;
@@ -179,9 +182,10 @@ server_setup(void)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        tSCC zSetup[] = "set -x\n"
-                        "trap\n"
-                        "echo server setup done\n";
+        static char const zSetup[] =
+            "set -x\n"
+            "trap\n"
+            "echo server setup done\n";
         char* pz;
 
         fputs("Server traps set\n", pfTrace);
@@ -216,7 +220,7 @@ chainOpen(int stdinFd, char const ** ppArgs, pid_t * pChild)
 {
     tFdPair   stdoutPair = { -1, -1 };
     pid_t     chId;
-    tCC*      pzShell;
+    char const *      pzShell;
 
     /*
      *  If we did not get an arg list, use the default
@@ -329,7 +333,7 @@ chainOpen(int stdinFd, char const ** ppArgs, pid_t * pChild)
  *  The return value is the process id of the created process.
  */
 LOCAL pid_t
-openServer(tFdPair* pPair, tCC** ppArgs)
+openServer(tFdPair* pPair, char const ** ppArgs)
 {
     pid_t chId = NOPROCESS;
 
@@ -354,7 +358,7 @@ openServer(tFdPair* pPair, tCC** ppArgs)
  *  into file pointers instead.
  */
 LOCAL pid_t
-openServerFP(tpfPair* pfPair, tCC** ppArgs)
+openServerFP(tpfPair* pfPair, char const ** ppArgs)
 {
     tFdPair   fdPair;
     pid_t     chId = openServer(&fdPair, ppArgs);
@@ -482,7 +486,8 @@ load_data(void)
 LOCAL char*
 runShell(char const*  pzCmd)
 {
-    tSCC zCmdFail[] = "CLOSING SHELL SERVER - command failure:\n\t%s\n";
+    static char const zCmdFail[] =
+        "CLOSING SHELL SERVER - command failure:\n\t%s\n";
 
     /*
      *  IF the shell server process is not running yet,

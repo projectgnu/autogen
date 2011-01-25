@@ -78,7 +78,7 @@ ENDFOR iface    =][=
 
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
 
-  static inline char* ag_scm2zchars(SCM s, tCC* type)
+  static inline char * ag_scm2zchars(SCM s, char const * type)
   {
     if (! AG_SCM_STRING_P(s))
         AG_ABEND(aprf(zNotStr, type));
@@ -90,11 +90,11 @@ ENDFOR iface    =][=
 
 #else /* Guile 1.7 and following */
 
-  extern char* ag_scm2zchars(SCM s, tCC* type);
+  extern char * ag_scm2zchars(SCM s, char const * type);
 
 #endif
 
-static inline SCM ag_eval(tCC* pzStr)
+static inline SCM ag_eval(char const * pzStr)
 {
     SCM res;
     char const * pzSaveScheme = pzLastScheme; /* Watch for nested calls */

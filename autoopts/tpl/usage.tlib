@@ -104,15 +104,23 @@ ENDFOR flag
 =][=
 
 (out-pop)
-(out-push-new)
+(out-push-new (string-append tmp-dir "/mk-opts.sh"))
 
 \=]
-aocfg=${top_builddir}/autoopts/autoopts-config
-test -x "${aocfg}" || aocfg=`which autoopts-config`
-test -x "${aocfg}" || die "Cannot locate autoopts-config"
-ldflags=`${aocfg} ldflags`
+while :
+do
+    ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
+    test -f "${ldflags}" && break
+    ldflags=`autoopts-config static-libs | sed 's/ //g'`
+    test -f "${ldflags}" && break
+    die "Cannot locate libopts.a"
+done
+
+cflags="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts "`
+    autoopts-config cflags`
+
 flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
-     =]_OPTS=1 `${aocfg} cflags` ${CFLAGS}"
+     =]_OPTS=1 ${cflags} ${CFLAGS}"
 
 cd ${tmp_dir}
 ${AGexe-autogen} [= prog-name=].def || die "Cannot gen [= prog-name =]"

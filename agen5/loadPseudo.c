@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2010-12-12 11:56:23 bkorb"
+ *  Time-stamp:        "2011-01-20 16:19:25 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -29,8 +29,8 @@
 #define DEFINE_FSM
 #include "pseudo-fsm.h"
 
-tSCC zAgName[] = "autogen5";
-tSCC zTpName[] = "template";
+static char const zAgName[] = "autogen5";
+static char const zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
 static char const *
@@ -95,7 +95,7 @@ doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    tSCC zEmptySpec[] = "Empty suffix format";
+    static char const zEmptySpec[] = "Empty suffix format";
 
     tOutSpec*  pOS;
     char const *       pzSfxFmt;
@@ -399,8 +399,11 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
 LOCAL char const *
 loadPseudoMacro(char const * pzData, char const * pzFileName)
 {
-    tSCC zMarkErr[] = "start/end macro mark too long";
-    tSCC zBadMark[] = "bad template marker in %s on line %d:\n\t%s";
+    static char const zMarkErr[] =
+        "start/end macro mark too long";
+    static char const zBadMark[] =
+        "bad template marker in %s on line %d:\n\t%s";
+
     char const * pzBadness;
 #   define BAD_MARKER(t) { pzBadness = t; goto abort_load; }
 

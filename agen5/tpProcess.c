@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2010-08-06 12:51:50 bkorb"
+ * Time-stamp:        "2011-01-20 15:56:01 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -104,10 +104,10 @@ trace_macro(tTemplate * pT, tMacro * pMac)
 static void
 do_stdout_tpl(tTemplate * pTF)
 {
-    tSCC zNoSfx[] = "* NONE *";
-    tSCC zBadR[]  = "%sBogus return from setjmp\n";
-    SCM  res;
-    tCC* pzRes;
+    static char const zNoSfx[] = "* NONE *";
+    static char const zBadR[]  = "%sBogus return from setjmp\n";
+    char   const *    pzRes;
+    SCM    res;
 
     pzLastScheme = NULL; /* We cannot be in Scheme processing */
 
@@ -148,7 +148,7 @@ do_stdout_tpl(tTemplate * pTF)
         generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
     else {
-        tSCC zCont[]  = "content-type:";
+        static char const zCont[]  = "content-type:";
         (void)ag_scm_out_push_new(SCM_UNDEFINED);
 
         generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);

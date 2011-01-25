@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2011-01-17 12:45:15 bkorb"
+ *  Time-stamp:        "2011-01-20 16:15:53 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -103,12 +103,12 @@ static char const zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-tSCC zOwnLen[]  = "owner length";
-tSCC zPfxLen[]  = "prefix length";
-tSCC zProgLen[] = "program name length";
-tSCC zPfxMsg[]  = "%s may not exceed %d chars\n";
+static char const zOwnLen[]  = "owner length";
+static char const zPfxLen[]  = "prefix length";
+static char const zProgLen[] = "program name length";
+static char const zPfxMsg[]  = "%s may not exceed %d chars\n";
 
-tSCC zFmtAlloc[] = "asprintf allocation";
+static char const zFmtAlloc[] = "asprintf allocation";
 
 /*=gfunc dne
  *
@@ -264,14 +264,16 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
 SCM
 ag_scm_error(SCM res)
 {
-    tSCC      zFmt[]    = "DEFINITIONS %s in %s line %d for %s:\n\t%s\n";
-    tSCC      zErr[]    = "ERROR";
-    tSCC      zWarn[]   = "Warning";
-    tSCC      zBadMsg[] = "??? indecipherable error message ???";
-    tCC*      pzMsg;
-    tSuccess  abrt = FAILURE;
-    char      zNum[16];
-    int       msgLen;
+    static char const zErr[]    = "ERROR";
+    static char const zWarn[]   = "Warning";
+    static char const zBadMsg[] = "??? indecipherable error message ???";
+    static char const zFmt[]    =
+        "DEFINITIONS %s in %s line %d for %s:\n\t%s\n";
+
+    char const *  pzMsg;
+    tSuccess      abrt = FAILURE;
+    char          zNum[16];
+    int           msgLen;
 
     switch (ag_scm_type_e(res)) {
     case GH_TYPE_BOOLEAN:
@@ -483,8 +485,8 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
     char const * pzPrg   = ag_scm2zchars(prog_name, "program name");
     char const * pzOwner = ag_scm2zchars(owner,     "owner");
     static struct {
-        tCC*    pzFN;
-        tmap_info_t mi;
+        char const * pzFN;
+        tmap_info_t  mi;
     } lic = { NULL, { NULL, 0, 0, 0, 0, 0, 0, 0 }};
 
     char*     pzRes;
@@ -493,7 +495,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         return SCM_UNDEFINED;
 
     {
-        tSCC*  apzSfx[] = { "lic", NULL };
+        static char const * apzSfx[] = { "lic", NULL };
         static char zRealFile[ AG_PATH_MAX ];
         char const * pzLicense = ag_scm2zchars(license, "license file");
 

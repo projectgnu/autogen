@@ -2,7 +2,7 @@
 /**
  * \file funcIf.c
  *
- *  Time-stamp:        "2010-02-24 08:42:09 bkorb"
+ *  Time-stamp:        "2011-01-20 16:08:14 bkorb"
  *
  *  This module implements the _IF text function.
  *
@@ -23,8 +23,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tSCC zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
-tSCC zNoIfExpr[] = "expressionless IF";
+static char const zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
+static char const zNoIfExpr[] = "expressionless IF";
 
 
 typedef struct if_stack tIfStack;
@@ -41,10 +41,10 @@ static ag_bool
 eval_true(void);
 
 static tMacro*
-mLoad_Elif(tTemplate* pT, tMacro* pMac, tCC** ppzScan);
+mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
 
 static tMacro*
-mLoad_Else(tTemplate* pT, tMacro* pMac, tCC** ppzScan);
+mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -63,7 +63,7 @@ eval_true(void)
 {
     ag_bool needFree;
     ag_bool res = AG_TRUE;
-    tCC* pz = evalExpression(&needFree);
+    char const * pz = evalExpression(&needFree);
 
     if (IS_DEC_DIGIT_CHAR(*pz))
         res = (atoi(pz) == 0) ? AG_FALSE : AG_TRUE;
@@ -145,9 +145,11 @@ eval_true(void)
 tMacro*
 mFunc_If(tTemplate* pT, tMacro* pMac)
 {
+    static char const zIfFmt[] =
+        "IF expression `%s' on line %d yielded true\n";
+
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     tMacro* pIf  = pMac;
-    tSCC    zIfFmt[] = "IF expression `%s' on line %d yielded true\n";
 
     do  {
         /*
@@ -270,7 +272,7 @@ mFunc_While(tTemplate* pT, tMacro* pMac)
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
 static tMacro*
-mLoad_Elif(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     if ((int)pMac->res == 0)
         AG_ABEND_IN(pT, pMac, zNoIfExpr);
@@ -297,7 +299,7 @@ mLoad_Elif(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
 static tMacro*
-mLoad_Else(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     /*
      *  After processing an "ELSE" macro,
@@ -325,7 +327,7 @@ mLoad_Else(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
  *  By returning NULL, it tells the macro parsing loop to return.
  */
 tMacro*
-mLoad_Ending(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Ending(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     memset((void*)pMac, 0, sizeof(*pMac));
     return NULL;
@@ -333,7 +335,7 @@ mLoad_Ending(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 
 
 tMacro*
-mLoad_If(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -399,7 +401,7 @@ mLoad_If(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 
 
 tMacro*
-mLoad_While(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     size_t         srcLen = (size_t)pMac->res;         /* macro len  */
 
@@ -466,7 +468,7 @@ mLoad_While(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 SCM
 ag_scm_set_writable(SCM set)
 {
-    tSCC zWarn[] =
+    static char const zWarn[] =
         "Warning: (set-writable) function in %s on line %d:\n"
         "\toverridden by invocation option\n";
 

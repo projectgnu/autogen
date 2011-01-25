@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-20 13:43:56 bkorb"
+# Time-stamp:        "2011-01-24 15:02:12 bkorb"
 #
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -141,40 +141,8 @@ cmp -s ${testname}.base2 ${testname}.res2 || \
 
 # # # # # # # # # # # # # TEST 3 # # # # # # # # # # # #
 
-echo creating ${testname}.base3
-# this is the output we should expect to see
-cat > ${testname}.base3 <<_EOF_
-Killing AutoGen <pid>:  testing death
-AutoGen aborting on signal <text-varies> in state EMITTING
-processing template error2.tpl
-            on line 2
-       for function EXPR (12)
-_EOF_
-
-${SED} '/THIS TEXT/,/ESAC/d;s,this is never seen,<= `die testing death` =>,' \
-  < ${testname}.tpl > ${testname}2.tpl
-
-ag_err 3 ${agl_opts} -T${testname}2.tpl ${agopts}3
-test -f ${testname}-task3-OK \
-  && failure unexpected success for test-3
-
-# Lots of variations happen based on timing.
-# Remove the variations and verify the basic.
-#
-sedcmd='
-	s,on signal .* in state,on signal <text-varies> in state,
-	/trapped on [0-9]/d
-	/^Killing AutoGen/s/ [0-9]*:/ <pid>:/
-	/ signal.*Child exited/d
-	/Abort/d
-	/Broken pipe/d
-	/Last command issued:/,/ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd/d
-	/^[ 	]*$/d
-	/defs: line .*: .* Hangup/d
-'
-${SED} -e "${sedcmd}" ${testname}.err3 > ${testname}.res3
-cmp -s ${testname}.res3 ${testname}.base3 || \
-  failure "expected->actual${nl}`diff -c ${testname}.base3 ${testname}.res3`"
+# REMOVED:  This test always worked, but the exact results
+#           vary all over the place.  Too hard to test.
 
 # # # # # # # # # # # # # TEST 4 # # # # # # # # # # # #
 

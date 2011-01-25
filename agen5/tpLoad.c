@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2010-12-21 10:36:42 bkorb"
+ * Time-stamp:        "2011-01-20 16:18:51 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -323,7 +323,8 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
      */
 #if defined(DEBUG_ENABLED)
     if (HAVE_OPT(SHOW_DEFS)) {
-        tSCC zSum[] = "loaded %d macros from %s\n"
+        static char const zSum[] =
+            "loaded %d macros from %s\n"
             "\tBinary template size:  0x%zX\n\n";
         fprintf(pfTrace, zSum, pT->macroCt, pzF, pT->descSize);
     }

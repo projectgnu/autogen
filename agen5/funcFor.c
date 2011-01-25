@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2011-01-17 15:26:44 bkorb"
+ *  Time-stamp:        "2011-01-20 16:04:27 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -26,7 +26,7 @@
 
 static tForState*  pFS;  /* Current "FOR" information (state) */
 
-tSCC zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
+static char const zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static ag_bool
@@ -39,7 +39,7 @@ static int
 doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef);
 
 static void
-load_ForIn(tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac);
+load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -483,7 +483,7 @@ doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn(tCC* pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
+load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
 {
     char* pzName = pT->pzTemplText + pMac->ozName;
     int   ix     = 0;
@@ -761,12 +761,12 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
 
 
 tMacro*
-mLoad_For(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    char*   pzCopy = pT->pNext; /* next text dest   */
-    tCC*    pzSrc  = (char const*)pMac->ozText; /* macro text */
-    size_t  srcLen = (size_t)pMac->res;         /* macro len  */
-    tMacro* pEndMac;
+    char *        pzCopy = pT->pNext; /* next text dest   */
+    char const *  pzSrc  = (char const*)pMac->ozText; /* macro text */
+    size_t        srcLen = (size_t)pMac->res;         /* macro len  */
+    tMacro *      pEndMac;
 
     /*
      *  Save the global macro loading mode

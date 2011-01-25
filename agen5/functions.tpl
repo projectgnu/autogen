@@ -1,7 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
 
-#  Time-stamp:        "2010-08-06 09:00:48 bkorb"
+#  Time-stamp:        "2011-01-24 15:48:42 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -181,9 +181,9 @@ tpLoadProc* papLoadProc = apLoadProc;
  */
 typedef struct name_type tNameType;
 struct name_type {
-    size_t      cmpLen;  /* compare length (sans NUL) */
-    tCC*        pName;   /* ptr to name */
-    teFuncType  fType;   /* function type enum */
+    size_t        cmpLen;  /* compare length (sans NUL) */
+    char const *  pName;   /* ptr to name */
+    teFuncType    fType;   /* function type enum */
 };
 
 /*
@@ -202,8 +202,8 @@ FOR macfunc =][=
 =][=
 
         (set! func-name (string-append func-name
-		 "\"" (if (== (get "alias") "\"") "\\\""
-		       (get "alias")) "\\0\"\n"))
+                 "\"" (if (== (get "alias") "\"") "\\\""
+                       (get "alias")) "\\0\"\n"))
 
         (set! decl-list (string-append decl-list
               (get "alias") " ::    "
@@ -233,7 +233,7 @@ ENDFOR macfunc
 =][=
 
  (shellf "file=%s.tmp ; cat > ${file} <<\\_EOF_\n%s_EOF_" (out-name) decl-list)
- (emit (sprintf "\ntSCC zFnStrg[%d] =\n" func-str-off))
+ (emit (sprintf "\nstatic char const zFnStrg[%d] =\n" func-str-off))
  (shellf "columns -I4 --spread=1<<\\_EOF_\n%s_EOF_" func-name)
 
 =];
@@ -288,7 +288,9 @@ ENDFOR macfunc      =][=
 
 (shellf
 "set -- `sum %s`
-sum=`printf '((unsigned short)0x%%04X)' $1`
+sum=`echo $1 | sed 's/^0*//'`
+test -z \"$sum\" && sum=0
+sum=`printf '((unsigned short)0x%%04X)' ${1}`
 echo \"#define FUNCTION_CKSUM ${sum}\"
 rm -f $file"
 (out-name)) =]

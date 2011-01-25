@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2010-12-21 12:54:48 bkorb"
+# Time-stamp:        "2011-01-24 12:59:57 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -74,7 +74,11 @@ set_config_values()
       sed s/^/-I/ `
 
   CFLAGS="${INCLUDES} ${CFLAGS}"
-
+  LIBS=-L`
+    test -d ${top_builddir}/autoopts/.libs \
+      && echo ${top_builddir}/autoopts/.libs \
+      || echo ${top_builddir}/autoopts
+    `" $LIBS"
   # Give preference to configured SHELL
   #
   for SHELL in @CONFIG_SHELL@ @SHELL@ `which bash` `which sh` /bin/sh
@@ -129,9 +133,9 @@ setup_exports()
     echo ${top_srcdir}/doc/snprintfv.texi`
 
   DOC_INCLUDES=`
-    echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h
-    echo ${top_builddir}/agen5/autogen.menu ${AGEN_TEXI}
-    echo ${top_builddir}/autoopts/libopts.texi `
+    echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h \
+     ${top_builddir}/agen5/autogen.menu ${AGEN_TEXI} \
+     ${top_builddir}/autoopts/libopts.texi `
 
   DOC_TEMPLATE=${srcdir}/auto_gen.tpl
 
@@ -211,8 +215,6 @@ sanity_check()
 #
 set_config_values
 setup_exports
-printf '\n\n\n\n' >&2
-
 sanity_check
 run_getdefs
 

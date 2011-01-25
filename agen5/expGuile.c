@@ -2,7 +2,7 @@
 /**
  *  \file expGuile.c
  *
- *  Time-stamp:        "2011-01-17 13:03:17 bkorb"
+ *  Time-stamp:        "2011-01-20 16:14:27 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -42,7 +42,8 @@ ag_scm_type_e(SCM typ)
 
 
 LOCAL SCM
-ag_scm_c_eval_string_from_file_line(tCC* pzExpr, tCC* pzFile, int line)
+ag_scm_c_eval_string_from_file_line(
+    char const * pzExpr, char const * pzFile, int line)
 {
     SCM port;
 
@@ -53,7 +54,7 @@ ag_scm_c_eval_string_from_file_line(tCC* pzExpr, tCC* pzFile, int line)
 
 #if GUILE_VERSION < 106000
     {
-        tSCC zEx[] = "eval-string-from-file-line";
+        static char const zEx[] = "eval-string-from-file-line";
         SCM  expr  = scm_makfrom0str(pzExpr);
         port = scm_mkstrport(SCM_INUM0, expr, SCM_OPN | SCM_RDNG, zEx);
     }
@@ -293,8 +294,8 @@ ag_scm_sum(SCM list)
 SCM
 ag_scm_string_to_c_name_x(SCM str)
 {
-    tSCC  zFun[] = "ag_scm_string_to_c_name_x";
-    tSCC  zMap[] = "cannot map unprintable chars to C name chars";
+    static char const zFun[] = "ag_scm_string_to_c_name_x";
+    static char const zMap[] = "cannot map unprintable chars to C name chars";
     int   len;
     char* pz;
 

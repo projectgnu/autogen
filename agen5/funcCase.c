@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2010-12-16 14:56:53 bkorb"
+ *  Time-stamp:        "2011-01-20 16:20:28 bkorb"
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 
@@ -39,7 +39,7 @@
 
 #define PTRUP(p) STMTS(if(IS_LOW(*(p))) *(p)=_toupper(*(p));(p)++)
 
-tSCC zBadRe[]  = "Invalid regular expression:  error %d (%s):\n%s";
+static char const zBadRe[] = "Invalid regular expression:  error %d (%s):\n%s";
 
 typedef tSuccess (tSelectProc)(char const * sample, char const * pattern);
 static tSelectProc
@@ -321,7 +321,7 @@ Select_Equivalent(char const * sample, char const * pattern)
 SCM
 ag_scm_string_contains_eqv_p(SCM text, SCM substr)
 {
-    tSCC zSrch[] = "search string";
+    static char const zSrch[] = "search string";
     char* pzSubstr;
     SCM   res;
 
@@ -1175,7 +1175,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
     char const *    pzSrc  = (char*)pMac->ozText; /* macro text */
     long           srcLen = pMac->res;           /* macro len  */
 
-    tSCC zInvSel[] = "Invalid selection clause";
+    static char const zInvSel[] = "Invalid selection clause";
     int  typ       = (int)FTYP_SELECT_COMPARE_FULL;
 
     /*

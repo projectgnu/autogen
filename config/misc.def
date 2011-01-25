@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-01-17 13:44:40 bkorb"
+/*  Time-stamp:        "2011-01-21 16:51:09 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -145,7 +145,7 @@ test   = {
 	  stumble = scm_cons( fumble, bumble );
 	  stumble = scm_display( fumble, bumble );
 	  lstumble = scm_ilength( fumble );
-	  stumble = scm_c_make_string( 1, SCM_UNDEFINED);
+	  /* stumble = scm_c_make_string( 1, SCM_UNDEFINED); */
 	  stumble = scm_c_eval_string( "stumble" );
 	  scm_misc_error( "oops", "bad", bumble );
 	  stumble = scm_num_eq_p( fumble, bumble );
@@ -172,7 +172,7 @@ test   = {
 	or /usr/local.  Since the Guile interface changes so wildly from
 	release to release, we have to explicitly accept every new minor
 	revision.  Sorry about that.
-	_END_OF_DOC_;
+	_END_OF_DOC_; // '
 };
 
 test   = {
@@ -424,7 +424,7 @@ test = {
 	This option will enable two debugging options for AutoGen.
 	viz., --show-defs (dump out the definition tree)
 	and --show-shell (trace all shell commands via `set -x')
-	_EOF_;
+	_EOF_; // '
 };
 
 do-always = <<- _END_ALWAYS_

@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2011-01-17 14:01:48 bkorb"
+ *  Time-stamp:        "2011-01-20 16:07:46 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -34,7 +34,7 @@ static int
 exprType(char* pz);
 /* = = = END-STATIC-FORWARD = = = */
 
-LOCAL tCC*
+LOCAL char const *
 resolveSCM(SCM s)
 {
     static char  z[48];
@@ -125,15 +125,15 @@ tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg)
  *  Select_Match_NonExistence code to distinguish non-existence from
  *  an empty string value.
  */
-LOCAL tCC*
+LOCAL char const *
 evalExpression(ag_bool* pMustFree)
 {
-    tTemplate*  pT      = pCurTemplate;
-    tMacro*     pMac    = pCurMacro;
-    ag_bool     isIndexed;
-    tDefEntry*  pDef;
-    int         code    = pMac->res;
-    tCC*        pzText  = NULL; /* warning patrol */
+    tTemplate *   pT      = pCurTemplate;
+    tMacro *      pMac    = pCurMacro;
+    ag_bool       isIndexed;
+    tDefEntry *   pDef;
+    int           code    = pMac->res;
+    char const *  pzText  = NULL; /* warning patrol */
 
     *pMustFree = AG_FALSE;
 
@@ -188,7 +188,8 @@ evalExpression(ag_bool* pMustFree)
          *  OTHERWISE, we found an entry.  Make sure we were supposed to.
          */
         else {
-            tSCC zBlock[] = "attempted to use block macro in eval expression";
+            static char const zBlock[] =
+                "attempted to use block macro in eval expression";
 
             if ((code & EMIT_IF_ABSENT) != 0)
                 return (char*)zNil;
@@ -307,7 +308,9 @@ evalExpression(ag_bool* pMustFree)
 SCM
 ag_scm_error_source_line(void)
 {
-    tSCC zErr[] = "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
+    static char const zErr[] =
+        "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
+
     fprintf(stderr, zErr, pCurTemplate->pzTplName, pCurMacro->lineNo,
             pCurTemplate->pzTemplText + pCurMacro->ozText);
     fflush(stderr);
@@ -350,7 +353,8 @@ ag_scm_emit(SCM val)
         for (; pnum > 0; pnum--) {
             pSaveFp = pSaveFp->pPrev;
             if (pSaveFp == NULL)
-                AG_ABEND(aprf("invalid emission port: %d", AG_SCM_TO_ULONG(val)));
+                AG_ABEND(aprf("invalid emission port: %d",
+                              AG_SCM_TO_ULONG(val)));
         }
 
         fp = pSaveFp->pFile;
@@ -508,13 +512,13 @@ exprType(char* pz)
  *  mLoad_Expression
  */
 tMacro*
-mLoad_Expr(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    char*    pzCopy; /* next text dest   */
-    tCC*     pzSrc  = (char const*)pMac->ozText; /* macro text */
-    size_t   srcLen = (long)pMac->res;           /* macro len  */
-    tCC*     pzSrcEnd = pzSrc + srcLen;
-    tMacro*  pNextMac;
+    char *        pzCopy; /* next text dest   */
+    char const *  pzSrc    = (char const*)pMac->ozText; /* macro text */
+    size_t        srcLen   = (long)pMac->res;           /* macro len  */
+    char const *  pzSrcEnd = pzSrc + srcLen;
+    tMacro *      pNextMac;
 
     switch (*pzSrc) {
     case '-':

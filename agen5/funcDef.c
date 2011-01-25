@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2010-07-28 18:42:39 bkorb"
+ *  Time-stamp:        "2011-01-20 16:08:34 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -742,7 +742,7 @@ mFunc_Invoke(tTemplate* pT, tMacro* pMac)
  *          at load time, too :-)
  */
 tMacro*
-mLoad_Debug(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Debug(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
         return mLoad_Unknown(pT, pMac, ppzScan);
@@ -751,7 +751,7 @@ mLoad_Debug(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
 
 
 tMacro*
-mLoad_Define(tTemplate* pT, tMacro* pMac, tCC** ppzScan)
+mLoad_Define(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     static char const zNameNeeded[] = "DEFINE requires a name";
 

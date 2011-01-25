@@ -1,7 +1,7 @@
 /**
  * \file defDirect.c
  *
- *  Time-stamp:        "2010-07-10 19:23:12 bkorb"
+ *  Time-stamp:        "2011-01-20 16:26:43 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -458,8 +458,8 @@ doDir_assert(char* pzArg, char* pzScan)
     {
         SCM res = ag_scm_c_eval_string_from_file_line(
             pzArg, pCurCtx->pzCtxFname, pCurCtx->lineNo );
-        tCC* pzR = resolveSCM(res);
-        check_assert_str(pzR, pzArg);
+
+        check_assert_str(resolveSCM(res), pzArg);
         break;
     }
 

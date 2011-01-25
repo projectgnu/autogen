@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2010-12-06 13:28:34 bkorb"
+# Time-stamp:        "2011-01-20 16:16:50 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -46,10 +46,10 @@ typedef char* (tDirProc)( char* pzArg, char* pzScan );
 
 typedef struct dir_table tDirTable;
 struct dir_table {
-    size_t      nameSize;
-    tCC*        pzDirName;
-    tDirProc*   pDirProc;
-    int         unused;
+    size_t        nameSize;
+    char const *  pzDirName;
+    tDirProc *    pDirProc;
+    int           unused;
 };
 
 /*
