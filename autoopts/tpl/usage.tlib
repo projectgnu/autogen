@@ -104,7 +104,7 @@ ENDFOR flag
 =][=
 
 (out-pop)
-(out-push-new (string-append tmp-dir "/mk-opts.sh"))
+(out-push-new)
 
 \=]
 while :
@@ -116,11 +116,11 @@ do
     die "Cannot locate libopts.a"
 done
 
-cflags="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts "`
-    autoopts-config cflags`
+cfg=`autoopts-config cflags`
+inc="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts "
 
 flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
-     =]_OPTS=1 ${cflags} ${CFLAGS}"
+     =]_OPTS=1 ${inc} ${cfg} ${CFLAGS}"
 
 cd ${tmp_dir}
 ${AGexe-autogen} [= prog-name=].def || die "Cannot gen [= prog-name =]"
