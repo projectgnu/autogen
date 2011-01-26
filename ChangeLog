@@ -1,3 +1,10 @@
+2011-01-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/getopt.tpl (3GNU): not always -- if "long-opts" is not
+	specified, then getopt(3posix) is used in preference to
+	getopt_long(3GNU)
+	* autoopts/test/getopt.test: adjust
+
 2011-01-24  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/error.test (TEST 3): remove it.  Too many variations

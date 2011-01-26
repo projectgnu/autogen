@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2010-12-16 17:42:40 bkorb"
+## Time-stamp:      "2011-01-26 09:01:35 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -47,7 +47,7 @@ perm-stamp :
 	@-cd $(srcdir) ; chmod +x *.test 2>/dev/null
 
 verbose :
-	rm -rf FAILURES testdir ; \
-	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
+	rm -rf FAILURES testdir ; VERBOSE=true ; export VERBOSE ; \
+	$(MAKE) check TESTS="$(TESTS)"
 
 # Makefile.am ends here

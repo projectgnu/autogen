@@ -1,51 +1,33 @@
 [+ AutoGen5 Template  -*- Mode: C -*-
 
    h=%s-temp.h
-   c=%s-temp.c
-+][+
+   c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-01-19 11:04:14 bkorb"
+  Time-stamp:        "2011-01-26 08:40:08 bkorb"
 _EOF_
-\` `
+\` `            +][+
 
-+][+
+;;  This file is part of AutoOpts, a companion to AutoGen.
+;;  AutoOpts is free software.
+;;  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+;;
+;;  AutoOpts is available under any one of two licenses.  The license
+;;  in use must be one of these two and the choice is under the control
+;;  of the user of the license.
+;;
+;;   The GNU Lesser General Public License, version 3 or later
+;;      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+;;
+;;   The Modified Berkeley Software Distribution License
+;;      See the file "COPYING.mbsd"
+;;
+;;  These files have the following md5sums:
+;;
+;;  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+;;  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+;;  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-+][+
-
-DEFINE emit-usage-string    +][+
-
-  (out-push-new)            +][+
-  INCLUDE "usage.tlib"      +][+
-  (kr-string (string-append (shell (string-append
-  "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
-       -e '/: illegal option --/d' \
-       -e 's/ --version\\[=arg\\]/ --version      /' <<_EOF_\n"
-  (out-pop #t) "\n_EOF_"
-  )) "\n" ))  +][+
-
-ENDDEF
-
-+][+
   (if (not (exist? "settable"))
       (error "'settable' must be specified globally for getopt_long\n"))
   (define prog-name (string->c-name! (get "prog-name")))
@@ -131,7 +113,8 @@ static char z_opts[] = "[+ # close quote for emacs " +][+
 
       ESAC              +][+
 
-    ENDFOR              +][+
+    ENDFOR flag         +][+
+
     IF  (not (exist? "help-value")) +]?[+
     ELSE                +][+
       CASE help-value   +][+
@@ -140,6 +123,7 @@ static char z_opts[] = "[+ # close quote for emacs " +][+
       *                 +][+ help-value  +][+
       ESAC              +][+
     ENDIF               +][+
+
     IF  (exist? "version")  +][+
       IF  (not (exist? "version-value")) +]v[+
       ELSE              +][+
@@ -190,7 +174,7 @@ optionPrintVersion(
          "" )
      (get "version") ) +]\n\
 Written by [+(join ", " (stack "copyright.author"))+].\n\n\
-copyright (c) [+ copyright.date +] by [+ copyright.owner +]\n[+
+copyright (c) [+ copyright.date +] [+ copyright.owner +]\n[+
 
 CASE copyright.type +][+
 *= gpl    +]\
@@ -271,7 +255,8 @@ usage_must (char const* pz_what, char const* pz_must)
 +]
 /*
  *  Process the options for the "[+(. prog-name)+]" program.
- *  This function was generated to use the getopt_long(3GNU) function.
+ *  This function was generated to use the getopt[+
+ (if (exist? "long-opts") "_long(3GNU)" "(3posix)") +] function.
  *  There are [+ (+ (count "flag") (if (exist? "version") 2 1))
               +] options for this program,
  * including "help (usage)"[+
@@ -345,18 +330,19 @@ FOR flag +][+
 +]
   if (HAVE_OPT( [+ (. OPT-NAME) +] )) {[+
 
-    FOR flags-cant +]
+    FOR flags-cant      +]
     if (HAVE_OPT( [+ (string-upcase! (string->c-name! (get "flags-cant"))) +] ))
       usage_cannot (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
         (string-upcase! (string->c-name! (get "flags-cant"))) +]).pz_Name);[+
-    ENDFOR cant    +][+
+    ENDFOR cant         +][+
 
-    FOR flags-must +]
+    FOR flags-must      +]
     if (! HAVE_OPT( [+(string-upcase! (string->c-name! (get "flags-must")))+] ))
       usage_must (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
         (string-upcase! (string->c-name! (get "flags-must"))) +]).pz_Name);[+
-    ENDFOR must    +][+
-    IF (exist? "min") +][+
+    ENDFOR must         +][+
+
+    IF (exist? "min")   +][+
       IF (> (string->number (get "min" "0")) 1) +]
     if (DESC([+(. OPT-NAME)+]).optOccCt < DESC([+(. OPT-NAME)+]).optMinCt)
       usage_too_few (&DESC([+(. OPT-NAME) +]));[+
@@ -370,7 +356,7 @@ FOR flag +][+
 
 +][+
 
-  IF (exist? "min")  +][+
+  IF (exist? "min")     +][+
     IF (. check-have-opt)
 +]  else[+
 
@@ -397,4 +383,19 @@ FOR flag +][+
 ENDFOR   +]
   return 0;
 }
-[+ ESAC \+]
+[+ ESAC  +][+
+
+DEFINE emit-usage-string    +][+
+
+  (out-push-new)            +][+
+  INCLUDE "usage.tlib"      +][+
+  (kr-string (string-append (shell (string-append
+  "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
+       -e '/: illegal option --/d' \
+       -e 's/ --version\\[=arg\\]/ --version      /' <<_EOF_\n"
+  (out-pop #t) "\n_EOF_"
+  )) "\n" ))  +][+
+
+ENDDEF
+
+# end of getopt.tpl \+]

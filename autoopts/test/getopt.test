@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-19 11:10:04 bkorb"
+# Time-stamp:        "2011-01-26 09:00:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -37,14 +37,14 @@ INC=''
 export AUTOGEN_TEMPL_DIRS=${TMPDIR}
 
 compile_getopt() {
-  ${VERBOSE} && {
-    AUTOGEN_TRACE=every
-    AUTOGEN_TRACE_OUT='>>'${TMPDIR}/runag-log
-  }
-  run_ag opts -L${TMPDIR} ${testname}.def || \
+  opts="-L${TMPDIR} -b${testname}-bn"
+  ${VERBOSE} && \
+    opts="${opts} --trace=every --trace-out='>>'${TMPDIR}/runag-log"
+
+  run_ag opts ${opts} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  run_ag getopt -L${TMPDIR} -T getopt.tpl ${testname}.def || \
+  run_ag getopt ${opts} -Tgetopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
 
   # Remove the variable comments so we can test against the expected result
@@ -207,7 +207,7 @@ cat > ${testname}1-base.c <<\_EndOfSample_
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "getopt.h"
+#include "getopt-bn.h"
 #include "getopt-test_getopt.h"
 
 #ifndef DIRCH
@@ -257,7 +257,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-copyright (c) 2003-2011 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2011 Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -317,7 +317,7 @@ usage_must (char const* pz_what, char const* pz_must)
 
 /*
  *  Process the options for the "test_getopt" program.
- *  This function was generated to use the getopt_long(3GNU) function.
+ *  This function was generated to use the getopt(3posix) function.
  *  There are 8 options for this program,
  * including "help (usage)" and "version".
  */
@@ -440,7 +440,7 @@ cat > ${testname}2-base.c <<\_EndOfSample_
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
-#include "getopt.h"
+#include "getopt-bn.h"
 #include "getopt-test_getopt.h"
 
 #ifndef DIRCH
@@ -508,7 +508,7 @@ optionPrintVersion(
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-copyright (c) 2003-2011 by Odyssey Computing Concepts, Inc.\n\
+copyright (c) 2003-2011 Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
