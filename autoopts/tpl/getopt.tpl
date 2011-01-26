@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-01-26 08:40:08 bkorb"
+  Time-stamp:        "2011-01-26 09:08:32 bkorb"
 _EOF_
 \` `            +][+
 
@@ -37,10 +37,8 @@ _EOF_
  *
 [+ CASE copyright.type +][+
    = gpl  +][+ (gpl  prog-name " *  ") +][+
-   = lgpl +][+ (lgpl prog-name (if (exist? "copyright.owner")
-                                   (get "copyright.owner")
-                                   (get "copyright.author")) " *  ") +][+
-   = note +][+ (prefix " *  " (get "copyright.text")) +][+
+   = lgpl +][+ (lgpl prog-name (get "copyright.owner") " *  ") +][+
+   = note +][+ (prefix " *  "  (get "copyright.text")) +][+
    ESAC   +]
  *
  *  Last template edit: [+ `echo $stamp` +]

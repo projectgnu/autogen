@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2011-01-20 16:04:27 bkorb"
+ *  Time-stamp:        "2011-01-26 12:22:17 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -23,6 +23,7 @@
  */
 
 #define ENTRY_END  INT_MAX
+#define UNASSIGNED 0x7BAD0BAD
 
 static tForState*  pFS;  /* Current "FOR" information (state) */
 
@@ -312,10 +313,10 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
         tDefEntry* pLast = (pFoundDef->pEndTwin != NULL)
                            ? pFoundDef->pEndTwin : pFoundDef;
 
-        if (pFS->for_from == 0x7BAD0BAD)
+        if (pFS->for_from == UNASSIGNED)
             pFS->for_from = (invert) ? pLast->index : pFoundDef->index;
 
-        if (pFS->for_to == 0x7BAD0BAD)
+        if (pFS->for_to == UNASSIGNED)
             pFS->for_to = (invert) ? pFoundDef->index : pLast->index;
 
         /*
@@ -731,7 +732,7 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
      */
     if (pT->pzTemplText[ pMac->ozText ] == '(') {
         pFS->for_from  = \
-        pFS->for_to    = 0x7BAD0BAD;
+        pFS->for_to    = UNASSIGNED;
 
         pFS->for_loading = AG_TRUE;
         (void) eval(pT->pzTemplText + pMac->ozText);

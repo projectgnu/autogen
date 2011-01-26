@@ -4,6 +4,12 @@
 	specified, then getopt(3posix) is used in preference to
 	getopt_long(3GNU)
 	* autoopts/test/getopt.test: adjust
+	* autoopts/tpl/agman-cmd.tpl: remove common code
+	* autoopts/tpl/agmdoc-cmd.tpl: likewise
+	* autoopts/tpl/cmd-doc.tlib: common command code
+	* autoopts/tpl/mdoc2man.pl: remove it - it was broken
+	* autoopts/tpl/mdoc2man.sh: simple sed command
+	* autoopts/test/keyword.test: adjust
 
 2011-01-24  Bruce Korb  <bkorb@gnu.org>
 
