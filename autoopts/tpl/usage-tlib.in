@@ -25,6 +25,9 @@
  ;;
  (make-tmp-dir)
  (out-push-new (shellf "echo ${tmp_dir}/%s.def" (get "prog-name")))
+ (define libs    "@LIBS@")
+ (define inc-dir "@includedir@")
+ (define lib-dir "@libdir@")
 
 =]
 AutoGen Definitions options.tpl;
@@ -110,18 +113,14 @@ ENDFOR flag
 while :
 do
     ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
-    test -f "${ldflags}" && {
-        ls /usr/lib/libgen.so >/dev/null
-        test $? -eq 0 && ldflags="$ldflags -lgen"
-        break
-    }
-
-    ldflags=`autoopts-config static-libs | sed 's/ //g'`
     test -f "${ldflags}" && break
-    die "Cannot locate libopts.a"
+
+    ldflags='[=(. lib-dir)=]/libopts.a'
+    test -f "${ldflags}" || die "Cannot locate libopts.a"
 done
 
-cfg=`exec 2>/dev/null;autoopts-config cflags`
+ldflags="$ldflags [=(. libs)=]"
+cfg='-I[=(. inc-dir)=]'
 inc=
 test -d "${top_builddir}" && \
     inc="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts"

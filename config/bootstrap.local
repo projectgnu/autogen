@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-12-09 14:57:21 bkorb"
+# Time-stamp:        "2011-01-26 18:56:27 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -61,26 +61,25 @@ config_configurables()
 {
     exec 4> configure.files
     local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
-    find ${tops} -type f -name '*-tpl.in' | \
-        egrep -v '/CVS/|/SCCS/' | \
-            while read f
-            do
-                g=${f%-tpl.in}.tpl
-                printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
-            done >&4
-
-    echo "AC_CONFIG_FILES([\\" >&4
-    for f in $(
-        find ${tops} -name 'Makefile.am' -o -name '*.in' | \
-            sed 's,\.\(am\|in\)$,,;/^configure$/d' | \
-            sort -u)
+    local inf=$(find ${tops} -type f -name '*.in')
+    local in_list
+    for f in $inf
     do
-        echo "    ${f}"
+        case "$f" in
+        *-tpl.in )  g=${f%-tpl.in}.tpl ;;
+        *-tlib.in ) g=${f%-tlib.in}.tlib ;;
+        *.in )      in_list=${in_list}${f%.in}$'\n' ; continue ;;
+        esac
+        printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
     done >&4
-    echo '])' >&4
+    {
+        echo "$in_list"
+        find ${tops} -name 'Makefile.am' | sed 's/\.am$//'
+    } | columns --first='AC_CONFIG_FILES([' --end='])' -I4 >&4
     exec 4>&-
 
     sed="-e 's/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/'"
+    sed="${sed} -e '/dnl Local Variables:/,\$d'"
     case "${AG_PATCHLEVEL}" in
     ( *[0-9]pre[1-9]* ) : ;;
     ( * ) sed="${sed} -e '/^case .*GCC.* in/,/^esac/d'" ;;
