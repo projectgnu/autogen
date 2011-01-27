@@ -10,6 +10,10 @@
 	* autoopts/tpl/mdoc2man.pl: remove it - it was broken
 	* autoopts/tpl/mdoc2man.sh: simple sed command
 	* autoopts/test/keyword.test: adjust
+	* autoopts/install-options-h: make sure installed scripts are executable
+	* autoopts/test/rc.test: Solaris "tr" doesn't work
+	* autoopts/tpl/usage.tlib: if libgen exists on the system, then
+	link with "-lgen", too.
 
 2011-01-24  Bruce Korb  <bkorb@gnu.org>
 

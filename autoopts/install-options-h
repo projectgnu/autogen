@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-12-10 15:25:12 bkorb"
+# Time-stamp:        "2011-01-26 15:03:24 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -83,10 +83,17 @@ s%(setenv "SHELL" .*%(setenv "SHELL" "'${CONFIG_SHELL}'")%
 / test_exe ".*\/columns"/s%"[^"]*"%"'${bindir}'/columns"%'
 
     cd ${DESTpkgdatadir}
-    for f in ag*.tpl options.tpl
-    do  sed "${sedcmd}" $f > $f.tmp
-        # touch -r $f $f.tmp
-        mv -f $f.tmp $f
+    for f in *
+    do  case "$f" in
+        ag*.tpl | options.tpl )
+           sed "${sedcmd}" $f > $f.tmp
+           mv -f $f.tmp $f
+           ;;
+
+        *.pl | *.sh )
+           chmod a+x $f
+           ;;
+        esac
     done
 }
 

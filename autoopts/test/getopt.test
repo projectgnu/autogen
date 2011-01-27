@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-26 09:00:44 bkorb"
+# Time-stamp:        "2011-01-26 15:58:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -37,14 +37,14 @@ INC=''
 export AUTOGEN_TEMPL_DIRS=${TMPDIR}
 
 compile_getopt() {
-  opts="-L${TMPDIR} -b${testname}-bn"
+  agopt="-L${TMPDIR} -b${testname}-bn"
   ${VERBOSE} && \
-    opts="${opts} --trace=every --trace-out='>>'${TMPDIR}/runag-log"
+    agopt="${agopt} --trace=every --trace-out='>>'${TMPDIR}/runag-log"
 
-  run_ag opts ${opts} ${testname}.def || \
+  run_ag opts ${agopt} ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  run_ag getopt ${opts} -Tgetopt.tpl ${testname}.def || \
+  run_ag getopt ${agopt} -Tgetopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
 
   # Remove the variable comments so we can test against the expected result

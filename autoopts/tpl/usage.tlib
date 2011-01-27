@@ -110,14 +110,21 @@ ENDFOR flag
 while :
 do
     ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
-    test -f "${ldflags}" && break
+    test -f "${ldflags}" && {
+        ls /usr/lib/libgen.so >/dev/null
+        test $? -eq 0 && ldflags="$ldflags -lgen"
+        break
+    }
+
     ldflags=`autoopts-config static-libs | sed 's/ //g'`
     test -f "${ldflags}" && break
     die "Cannot locate libopts.a"
 done
 
-cfg=`autoopts-config cflags`
-inc="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts "
+cfg=`exec 2>/dev/null;autoopts-config cflags`
+inc=
+test -d "${top_builddir}" && \
+    inc="-I${top_builddir} -I${top_builddir}/autoopts -I${top_srcdir}/autoopts"
 
 flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
      =]_OPTS=1 ${inc} ${cfg} ${CFLAGS}"

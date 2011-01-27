@@ -3,7 +3,7 @@
 
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-12-06 17:20:20 bkorb"
+# Time-stamp:        "2011-01-26 16:29:12 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -37,7 +37,7 @@ set -x
 
 : "creating ${testname}.def in `pwd`"
 
-TESTNAME=`echo ${testname} | tr '[a-z]' '[A-Z]'`
+TESTNAME=RC
 export TESTNAME
 
 test_main="yes" \
