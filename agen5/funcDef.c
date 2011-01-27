@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2011-01-20 16:08:34 bkorb"
+ *  Time-stamp:        "2011-01-27 12:32:10 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -761,7 +761,7 @@ mLoad_Define(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc* papLP = papLoadProc;
+    tpLoadProc const * papLP = papLoadProc;
     static tpLoadProc apDefineLoad[ FUNC_CT ] = { NULL };
 
     if (pMac->ozText == 0)

@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2011-01-26 12:22:17 bkorb"
+ *  Time-stamp:        "2011-01-27 12:36:37 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -772,7 +772,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc* papLP = papLoadProc;
+    tpLoadProc const * papLP = papLoadProc;
 
     static tpLoadProc apForLoad[ FUNC_CT ] = { NULL };
 

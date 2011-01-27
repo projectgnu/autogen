@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-26 15:58:45 bkorb"
+# Time-stamp:        "2011-01-26 19:09:17 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -85,9 +85,9 @@ go_init()
   esac
 
   cd ${top_srcdir}/autoopts/tpl
-  cp *.tpl *.tlib *.pl ${TMPDIR}/.
+  cp *.tpl *.tlib *.pl *.sh ${TMPDIR}/.
   cd ${top_builddir}/autoopts/tpl
-  cp *.tpl ${TMPDIR}/.
+  cp *.tpl *.tlib ${TMPDIR}/.
   chmod u+w ${TMPDIR}/*
 
   cd ${builddir}/testdir

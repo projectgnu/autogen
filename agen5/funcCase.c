@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2011-01-20 16:20:28 bkorb"
+ *  Time-stamp:        "2011-01-27 12:31:40 bkorb"
  */
 /*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
 
@@ -1068,7 +1068,7 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc*    papLP = papLoadProc;
+    tpLoadProc const * papLP = papLoadProc;
 
     /*
      *  IF there is no associated text expression
@@ -1170,10 +1170,10 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 static tMacro*
 mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
 {
-    char const *    pzScan = *ppzScan;  /* text after macro */
-    char*          pzCopy = pT->pNext; /* next text dest   */
-    char const *    pzSrc  = (char*)pMac->ozText; /* macro text */
-    long           srcLen = pMac->res;           /* macro len  */
+    char const *  pzScan = *ppzScan;  /* text after macro */
+    char*         pzCopy = pT->pNext; /* next text dest   */
+    char const *  pzSrc  = (char*)pMac->ozText; /* macro text */
+    long          srcLen = pMac->res;           /* macro len  */
 
     static char const zInvSel[] = "Invalid selection clause";
     int  typ       = (int)FTYP_SELECT_COMPARE_FULL;

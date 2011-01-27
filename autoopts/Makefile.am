@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2010-12-07 09:07:29 bkorb"
+## Time-stamp:      "2011-01-27 10:49:49 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -61,8 +61,6 @@ CSRC        = $(GEN_SRC) \
 
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
-
-TPL_FILES   = \
 DEF_FILES   = genshell.def $(srcdir)/funcs.def
 MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in \
 		parse-duration.h parse-duration.c

@@ -1,7 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
 
-#  Time-stamp:        "2011-01-24 15:48:42 bkorb"
+#  Time-stamp:        "2011-01-27 12:48:16 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -23,12 +23,15 @@
 
 =]
 [=
-(define decl-list "")
-(define temp-txt  "")
-(define func-name "")
-(define func-str-off 0)
+(define decl-list        "")
+(define load-list        "\nmLoad_Ending")
+(define handle-list      "")
+(define temp-txt         "")
+(define func-name        "")
+(define func-str-off     0)
+(define output-file-name (out-name))
 
-(dne " *  " "/*  ")=]
+(dne "-d" " *  " "/*  ")=]
  *
  *  Tables of Text Functions for AutoGen
  *
@@ -94,16 +97,29 @@ ENDFOR macfunc =]
 
 #define FUNC_CT    [= (count "macfunc") =]
 
-extern char const * const apzFuncNames[ FUNC_CT ];
-
 /*
  *  Enumerate all the function types, whether they have
  *  implementation functions or not.
  */
 typedef enum {[=
-FOR macfunc =]
-    FTYP_[=% name (sprintf "%%-13s" (string-upcase! "%s,"))=] /* [=what=] */[=
-ENDFOR macfunc =]
+
+FOR macfunc                             
+=][=
+
+   (define func-name (string-capitalize! (get "name")))
+   (if (exist? "handler-proc")
+       (set! handle-list (string-append handle-list
+                        "\nmFunc_" func-name )) )
+
+   (if (exist? "load-proc")
+       (set! load-list (string-append load-list
+                        "\nmLoad_" func-name )) )
+
+   (sprintf "\n    FTYP_%-13s /* %-50s */"
+    (string-append (string-upcase! func-name) ",")
+    (get "what") )                      =][=
+
+ENDFOR                                  =]
 
     FTYP_SELECT_COMPARE_FULL          = 0x8000,  /* *==* */
     FTYP_SELECT_COMPARE_SKP_START     = 0x8001,  /* *==  */
@@ -132,35 +148,31 @@ ENDFOR macfunc =]
 
 /*
  *  The function processing procedures.
- */[=
-
-FOR macfunc =][=
-  IF (exist? "handler_proc") =]
-tHdlrProc mFunc_[=% name (string-capitalize! "%s") =];[=
-  ENDIF =][=
-ENDFOR macfunc =]
+ */
+[=
+(shell (string-append
+"columns --first=tHdlrProc -S, -I4 --end=';' <<_EOList_"
+    handle-list "\n_EOList_"
+)      ) =]
 
 /*
  *  Template Loading Functions
  */
-tLoadProc mLoad_Ending; /* generic block loading ending */[=
-
-FOR macfunc =][=
-  IF (and (exist? "load_proc")
-          (= (string-length (get "load_proc")) 0) ) =]
-tLoadProc mLoad_[=% name (string-capitalize! "%s")=];[=
-  ENDIF =][=
-ENDFOR macfunc =]
+[=
+(shell (string-append
+"columns --first=tLoadProc -S, -I4 --end=';' <<_EOList_"
+    load-list "\n_EOList_"
+)      ) =]
 
 /* tpParse.c use only * * * * * * * * * * * * * * * *
  *
  *  Parsing function tables for load processing (template scanning phase)
  */
-tpLoadProc apLoadProc[ FUNC_CT ] = {[=
+static tpLoadProc const apLoadProc[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s" =]*/ mLoad_[=
-  IF   (> (len "load_proc") 0)=][=% load_proc (string-capitalize! "%s") =][=
-  ELIF (exist? "load_proc")   =][=% name (string-capitalize! "%s") =][=
+  IF   (> (len "load-proc") 0)=][=% load-proc (string-capitalize! "%s") =][=
+  ELIF (exist? "load-proc")   =][=% name (string-capitalize! "%s") =][=
   ELIF (exist? "in-context")  =]Bogus   /*dynamic*/[=
   ELSE                        =]Unknown /*default*/[=
   ENDIF =][=
@@ -172,7 +184,7 @@ ENDFOR macfunc =]
  *  The block functions (CASE, DEFINE, FOR, and IF) change this to point
  *  to their tables that include relevant additional functions.
  */
-tpLoadProc* papLoadProc = apLoadProc;
+tpLoadProc const * papLoadProc = apLoadProc;
 
 /*
  *  name-to-function type mapping table.
@@ -192,14 +204,12 @@ struct name_type {
  *  ASCII values.
  */[=
  (set! func-name "")
- (set! decl-list "") =][=
+ (set! decl-list "")          =][=
 
-FOR macfunc =][=
+FOR macfunc                   =][=
   IF (not (exist? "unnamed")) =][=
     IF (exist? "alias")       =][=
-      FOR alias
-
-=][=
+      FOR alias               =][=
 
         (set! func-name (string-append func-name
                  "\"" (if (== (get "alias") "\"") "\\\""
@@ -233,7 +243,7 @@ ENDFOR macfunc
 =][=
 
  (shellf "file=%s.tmp ; cat > ${file} <<\\_EOF_\n%s_EOF_" (out-name) decl-list)
- (emit (sprintf "\nstatic char const zFnStrg[%d] =\n" func-str-off))
+ (ag-fprintf 0 "\nstatic char const zFnStrg[%d] =\n" func-str-off)
  (shellf "columns -I4 --spread=1<<\\_EOF_\n%s_EOF_" func-name)
 
 =];
@@ -256,7 +266,7 @@ cat <<_EOF_
  *
  *  And now, the table separated by aliasing and then sorted by string content
  */
-tNameType nameTypeTable[ FUNCTION_NAME_CT ] = {
+static tNameType const nameTypeTable[ FUNCTION_NAME_CT ] = {
 _EOF_
 egrep -v '^[A-Z]' $file | sort | sed -e 's/^.*:://'
 echo
@@ -264,7 +274,7 @@ egrep    '^[A-Z]' $file | sort | sed -e 's/^.*:://' -e '$s/,$//'
 
 rm -f $file ` =] };
 
-char const * const apzFuncNames[ FUNC_CT ] = {
+static char const * const apzFuncNames[ FUNC_CT ] = {
 [=(out-push-new) =][=
 
 FOR macfunc "\n"    =]echo [=
@@ -283,17 +293,6 @@ ENDFOR macfunc      =][=
 (shell (string-append "( " (out-pop #t) " ) | columns -I4 -S, --spread=1"))
 
 =] };
-
-[=
-
-(shellf
-"set -- `sum %s`
-sum=`echo $1 | sed 's/^0*//'`
-test -z \"$sum\" && sum=0
-sum=`printf '((unsigned short)0x%%04X)' ${1}`
-echo \"#define FUNCTION_CKSUM ${sum}\"
-rm -f $file"
-(out-name)) =]
 
 /* * * * * * * * tpProcess.c use only * * * * * * * * * * * * * *
  *
@@ -322,7 +321,7 @@ ENDFOR macfunc =]
  */[=
     (set! decl-list "") (set! temp-txt "") =][=
 
-FOR macfunc =][=
+FOR macfunc     =][=
     (set! func-name (string-append
           "mUnload_" (string-capitalize (get "name"))))
 
@@ -332,16 +331,23 @@ FOR macfunc =][=
 	  (set! temp-txt  (string-append temp-txt  func-name "\n"))
 	)
         (set! temp-txt (string-append temp-txt "NULL\n"))
-    ) =][=
-ENDFOR =]
+    )           =][=
+ENDFOR
 
+=]
 tUnloadProc [= (shellf "echo '%s'|sed 's/, $//'" decl-list) =];
 
 static tpUnloadProc  apUnloadProc[ FUNC_CT ] = {
 [= (shellf "columns -I4 --sep=, --spread=1<<_EOF_\n%s_EOF_" temp-txt) =]
-};[=
+};
 
- #
+[= (out-push-new) =]
+set -- `sum [=(. output-file-name)=]`
+sum=`echo $1 | sed 's/^0*\([0-9]\)/\1/'`
+printf '#define FUNCTION_CKSUM ((unsigned short)0x%04X)\n' ${sum}
+[= (shell (out-pop #t)) =]
 
-end of functions.tpl =]
 #endif /* [= (. header-guard) =] */
+/* [=(. output-file-name)=] ends here */[=
+
+# functions.tpl ends here =]

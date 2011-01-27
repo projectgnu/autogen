@@ -2,7 +2,7 @@
 /**
  * \file funcIf.c
  *
- *  Time-stamp:        "2011-01-20 16:08:14 bkorb"
+ *  Time-stamp:        "2011-01-27 12:39:51 bkorb"
  *
  *  This module implements the _IF text function.
  *
@@ -337,11 +337,10 @@ mLoad_Ending(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 tMacro*
 mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
-    tIfStack       save_stack = current_if;
-    tpLoadProc*    papLP = papLoadProc;
-    tMacro*        pEndifMac;
+    size_t              srcLen     = (size_t)pMac->res; /* macro len  */
+    tIfStack            save_stack = current_if;
+    tpLoadProc const *  papLP      = papLoadProc;
+    tMacro *            pEndifMac;
 
     /*
      *  While processing an "IF" macro,
@@ -400,13 +399,12 @@ mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 }
 
 
-tMacro*
+tMacro *
 mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    size_t         srcLen = (size_t)pMac->res;         /* macro len  */
-
-    tpLoadProc*    papLP = papLoadProc;
-    tMacro*        pEndMac;
+    size_t              srcLen = (size_t)pMac->res; /* macro len  */
+    tpLoadProc const *  papLP  = papLoadProc;
+    tMacro *            pEndMac;
 
     /*
      *  While processing an "IF" macro,

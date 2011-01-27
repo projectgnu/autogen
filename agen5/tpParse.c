@@ -3,7 +3,7 @@
  *  tpParse.c
  *
  *
- * Time-stamp:        "2011-01-20 16:18:29 bkorb"
+ * Time-stamp:        "2011-01-27 12:50:33 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -51,10 +51,10 @@ find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan);
 static teFuncType
 func_code(char const ** ppzScan)
 {
-    char const *   pzFuncName = *ppzScan;
-    int           hi, lo, av;
-    tNameType*    pNT;
-    int           cmp;
+    tNameType const * pNT;
+    char const *      pzFuncName = *ppzScan;
+    int               hi, lo, av;
+    int               cmp;
 
     /*
      *  IF the name starts with a punctuation, then it is some sort of

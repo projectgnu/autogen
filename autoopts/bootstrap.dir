@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-01-19 13:25:03 bkorb"
+# Time-stamp:      "2011-01-27 11:49:21 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -56,7 +56,13 @@ burn_aover() {
     cd tpl
     for f in *.in
     do
-        sed "${sedcmd}" $f > ${f%.in}
+        case "$f" in
+        ( *-tlib.in ) d=${f%-tlib.in}.tlib ;;
+        ( *-tpl.in  ) d=${f%-tpl.in}.tpl ;;
+        ( * ) d='' ;;
+        esac
+        test ${#d} -gt 0 && \
+            sed "${sedcmd}" $f > ${d}
     done
     for f in *
     do
@@ -64,7 +70,7 @@ burn_aover() {
         *~ )
             rm -f $f ;;
 
-        *.tpl* | *.def | *.tlib )
+        *.tpl* | *.def | *.tlib* )
             chmod 644 $f ;;
 
         * ) chmod 755 $f ;;
@@ -81,27 +87,49 @@ add_files_to_mf() {
     ${AGexe} -Tagman3.tpl funcs.def || \
         die "FAILED: ${AGexe} -Tagman3.tpl funcs.def"
 
-    local dtpl_files=$(
-        for f in tpl/*.tpl
+    local tmpl=$(ls -1 tpl/*)
+    tmpl=$(PS4='>aftmf-tmpl> '
+        nd=''
+        d=''
+        i=''
+        for f in $tmpl
         do
-            test -f ${f}.in || echo $f
+            d=${d}${f}' '
+
+            case $f in
+            ( *.in )
+                g=$(echo $f | sed 's/-\(t[a-z]*\).in$/.\1/')
+                test "X$g" = "X$f" || {
+                    nd=${nd}${g}$'\n'
+                    i=${i}${g}$'\n'
+                }
+                ;;
+
+            ( * )
+                i=${i}${f}$'\n'
+                ;;
+            esac
         done
-        echo tpl/*.tlib tpl/std*.def tpl/*.pl tpl/*.sh
-    )
-    local ndtpl_files=$(
-        for f in tpl/*.tpl
-        do
-            test -f ${f}.in && echo $f
-        done)
-    sedcmd='/^TPL_FILES *=/a\\'$(ls -1 ${dtpl_files} | \
-        columns -I4 --spread=1 --line=' \\\'
-    )$'\n\n/^GENMAN /a\\\n'$(
+
+        echo "local dtpl_files='${d% }'"
+        echo "local ndtpl_files='${nd% }'"
+        echo "local itpl_files='${i% }'" )
+
+    eval "$tmpl"
+
+    sedcmd=$'/^GENMAN /a\\\n'"$(
         ls -1 *.3 | \
             sed '/^pathfind.3$/d' | \
             columns -I4 --spread=1 --line=' \\\'
-    )$'\\\n\\\nINST_ND_PKGDATA = $(libsrc) \\\\\\\n'$(
-        ls -1 ${ndtpl_files} | columns -I4 --spread=1 --line=' \\\'
-    )
+
+    )"$'\\\n\\\nINST_ND_PKGDATA = \$(libsrc) \\\\\\\n'"$(
+        echo "${ndtpl_files}" | columns -I4 --spread=1 --line=' \\\'
+
+    )"$'\\\n\\\nTPL_FILES = \\\\\\\n'"$(
+        echo "${itpl_files}" | \
+            sort -u | \
+            columns -I4 --spread=1 --line=' \\\'
+    )"
 
     rm -f *.3
     sed -i "${sedcmd}" Makefile.am

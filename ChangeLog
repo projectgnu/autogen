@@ -14,6 +14,10 @@
 	* autoopts/test/rc.test: Solaris "tr" doesn't work
 	* autoopts/tpl/usage.tlib: if libgen exists on the system, then
 	link with "-lgen", too.
+	* autoopts/bootstrap.dir: adjust the handling lists for templates
+	* autoopts/tpl/options.tpl.in: rename to autoopts/tpl/options-tpl.in and
+	move all the validation code to optlib.tlib.
+	* agen5/*: constify immutable tables and adjust references.
 
 2011-01-24  Bruce Korb  <bkorb@gnu.org>
 
