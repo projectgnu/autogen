@@ -9,8 +9,6 @@ my ($count,$tableitemcount);
 
 $optlist = 0;       ### 1 = bullet, 2 = enum, 3 = tag, 4 = item
 $oldoptlist = 0;
-my $data_file = 'mdoc2texi.txt';
-#open DATA, "$data_file" or die "can't open $data_file $!";
 
 while ($line = <STDIN>)
 {
@@ -114,18 +112,6 @@ sub ParseMacro #line
                 }
                 print $retval."\n";
                 print $columnline;
-                #for($count=0 ; $count < scalar(@words) ; $count++ )
-                #{
-                #   $columnline = $words[$count];
-                #   if ($columnline !~ /^"./ &&
-                #      $columnline !~ /-column/ &&
-                #       $columnline !~ /indent/ &&
-                #       $columnline !~ /-offset/)
-                #   {
-                #       print $words[$count];
-                #       print " \@tab ";
-                #   }
-                #}
                 last;
             }
         }

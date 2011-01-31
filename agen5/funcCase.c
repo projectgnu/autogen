@@ -4,10 +4,8 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2011-01-27 12:31:40 bkorb"
+ *  Time-stamp:        "2011-01-31 12:18:34 bkorb"
  */
-/*=--subblock=exparg=arg_name,arg_desc,arg_optional,arg_list=*/
-
 /*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved

@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-01-27 11:49:21 bkorb"
+# Time-stamp:      "2011-01-31 08:48:53 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -48,36 +48,10 @@ burn_aover() {
         sedcmd=${sedcmd}$'\n'"s%@${f}@%${v}%g"
     done
 
-    ${VERBOSE} && {
-        : sedcmd $sedcmd
-        : on files: $(ls *.in)
-    } || :
-
     cd tpl
-    for f in *.in
-    do
-        case "$f" in
-        ( *-tlib.in ) d=${f%-tlib.in}.tlib ;;
-        ( *-tpl.in  ) d=${f%-tpl.in}.tpl ;;
-        ( * ) d='' ;;
-        esac
-        test ${#d} -gt 0 && \
-            sed "${sedcmd}" $f > ${d}
-    done
-    for f in *
-    do
-        case "$f" in
-        *~ )
-            rm -f $f ;;
-
-        *.tpl* | *.def | *.tlib* )
-            chmod 644 $f ;;
-
-        * ) chmod 755 $f ;;
-        esac
-    done
+    sed "${sedcmd}" tpl-config-tlib.in > tpl-config.tlib
+    chmod +x *.pl *.sh
     cd -
-    ${VERBOSE} && set -x || :
 }
 
 add_files_to_mf() {
@@ -87,12 +61,9 @@ add_files_to_mf() {
     ${AGexe} -Tagman3.tpl funcs.def || \
         die "FAILED: ${AGexe} -Tagman3.tpl funcs.def"
 
-    local tmpl=$(ls -1 tpl/*)
-    tmpl=$(PS4='>aftmf-tmpl> '
-        nd=''
-        d=''
-        i=''
-        for f in $tmpl
+    local tmpl=$(nd='' d='' i=''
+
+        for f in tpl/*
         do
             d=${d}${f}' '
 
@@ -113,7 +84,8 @@ add_files_to_mf() {
 
         echo "local dtpl_files='${d% }'"
         echo "local ndtpl_files='${nd% }'"
-        echo "local itpl_files='${i% }'" )
+        echo "local itpl_files='${i% }'"
+)
 
     eval "$tmpl"
 

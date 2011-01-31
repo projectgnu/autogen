@@ -3,7 +3,7 @@
  *
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2010-08-04 20:49:50 bkorb"
+ *  Time-stamp:        "2011-01-31 13:06:12 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -739,12 +739,11 @@ printEntries(FILE* fp)
 
     for (;;) {
         char* pz = *(ppz++);
-        if (--ct < 0)
-            break;
         fputs(pz, fp);
         free((void*)pz);
-        if (ct > 0)
-            fputc('\n', fp);
+        if (--ct <= 0)
+            break;
+        fputc('\n', fp);
     }
     free((void*)papzBlocks);
 }

@@ -5,7 +5,7 @@ texi
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2011-01-28 09:14:08 bkorb"
+## Time-stamp:        "2011-01-31 12:09:40 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -139,16 +139,39 @@ Please see the ``Add-on packages for AutoGen'' section for additional
 programs and libraries associated with AutoGen.
 
 This edition documents version [=`echo ${AG_REVISION}, ${UPDATED}.`=]
+
+[=`cat autogen-intro.texi`=]
+
+@node Directives
+@section Controlling What Gets Processed
+@cindex directives
+
+Definition processing directives can @strong{only} be processed
+if the '#' character is the first character on a line.  Also, if you
+want a '#' as the first character of a line in one of your string
+assignments, you should either escape it by preceding it with a
+backslash @samp{\}, or by embedding it in the string as in @code{"\n#"}.
+
+All of the normal C preprocessing directives are recognized, though
+several are ignored.  There is also an additional @code{#shell} -
+@code{#endshell} pair.  Another minor difference is that AutoGen
+directives must have the hash character (@code{#}) in column 1.
+
+The final tweak is that @code{#!} is treated as a comment line.
+Using this feature, you can use:  @samp{#! /usr/local/bin/autogen}
+as the first line of a definitions file, set the mode to executable
+and "run" the definitions file as if it were a direct invocation of
+AutoGen.  This was done for its hack value.
+
+The ignored directives are:
 [=
 
-INVOKE  get-text tag = main
+FOR directive       =][=
 
-=]
-[=
-FOR directive =][=
   (if (exist? "dummy")
-      (string-downcase! (sprintf "@samp{#%s}, " (get "name")))) =][=
-ENDFOR directive=] and @samp{#if}.
+      (string-downcase! (sprintf "@code{#%s}, " (get "name")))) =][=
+
+ENDFOR directive    =]and @code{#if}.
 Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
 including the @code{#else} clause.

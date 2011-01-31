@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2010-08-04 20:50:01 bkorb"
+ *  Time-stamp:        "2011-01-31 11:51:45 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -30,7 +30,7 @@ static char*
 compressOptionText( char* pzS, char* pzE );
 
 static char*
-fixupSubblockString( tCC* pzSrc );
+fixupSubblockString(char const * pzSrc);
 
 static void
 loadStdin( void );
@@ -110,33 +110,33 @@ compressOptionText( char* pzS, char* pzE )
  *  fixupSubblockString
  */
 static char*
-fixupSubblockString( tCC* pzSrc )
+fixupSubblockString(char const * pzSrc)
 {
-    char*   pzString;
-    char*   pzDest;
-    char*   pzCopy;
+    char *  pzString;
+    char *  pzDest;
+    char *  pzCopy;
 
-    pzString = strdup( pzSrc );
+    pzString = strdup(pzSrc);
 
     /*
      *  Make sure we find the '=' separator
      */
     {
-        char* p = strchr( pzString, '=' );
+        char * p = strchr(pzString, '=');
         if (p == NULL)
             die(zNoList, pzString);
 
         /*
-         *  NUL the equal char
+         *  Trim the name
          */
-        *p++ = NUL;
-
-        pzDest = p;
+        pzDest = p++;
+        while ((pzDest > pzString) && IS_HORIZ_WHITE_CHAR(pzDest[-1])) pzDest--;
+        *(pzDest++) = NUL;
 
         /*
          *  Make sure at least one attribute name is defined
          */
-        while (isspace( *p )) p++;
+        while (IS_WHITESPACE_CHAR(*p)) p++;
         if (*p == NUL)
             die(zNoList, pzString);
 
@@ -147,7 +147,7 @@ fixupSubblockString( tCC* pzSrc )
         /*
          *  Attribute names must start with an alpha
          */
-        if (! isalpha( *pzCopy )) {
+        if (! IS_ALPHABETIC_CHAR( *pzCopy )) {
             fprintf(stderr, "ERROR:  attribute names must start "
                     "with an alphabetic character:\n\t%s\n",
                     pzString);
@@ -155,23 +155,24 @@ fixupSubblockString( tCC* pzSrc )
         }
 
         /*
-         *  Copy the name.  (maybe.  "p" and "pz" may be equal)
+         *  Copy the name.
          */
-        while (isalnum( *pzCopy ) || (*pzCopy == '_'))
+        while (IS_OPTION_NAME_CHAR(*pzCopy))
             *pzDest++ = *pzCopy++;
 
         /*
-         *  Skip over one comma (optional) and any white space
+         *  Skip over one comma (optional) and any white space.
+         *  If there is a newline, it must be after the comma.
          */
-        while (isspace( *pzCopy )) pzCopy++;
+        while (IS_HORIZ_WHITE_CHAR(*pzCopy)) pzCopy++;
         if (*pzCopy == ',')
             pzCopy++;
 
-        while (isspace( *pzCopy )) pzCopy++;
+        while (IS_WHITESPACE_CHAR(*pzCopy)) pzCopy++;
         if (*pzCopy == NUL)
             break;
         /*
-         *  The final string contains only one space
+         *  The final string contains only one space between attributes
          */
         *pzDest++ = ' ';
     }

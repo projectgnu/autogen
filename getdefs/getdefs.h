@@ -2,7 +2,7 @@
  *
  *    getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2010-07-16 15:20:23 bkorb"
+ *  Time-stamp:        "2011-01-31 11:35:48 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -32,7 +32,7 @@
 #include <stdarg.h>
 
 #include REGEX_HEADER
-
+#include "ag-char-map.h"
 #include "opts.h"
 
 /*

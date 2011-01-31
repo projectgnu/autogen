@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2011-01-18 11:12:20 bkorb"
+# Time-stamp:        "2011-01-31 13:18:34 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -86,16 +86,18 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
     The remaining attributes are specified in the comment, per
     the getdefs documentation.
 
-=][=
+=]
+/* -*- Mode: C -*-
+[=
 (define ix 0)
 (define scm-prefix
         (if (exist? "group")
             (string-append (get "group") "_scm_")
             "scm_" ))
 (out-push-new (string-append (base-name) ".h"))
-(dne " *  " "/*  ")=]
+(dne " *  ")=]
  *
- *  copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -139,13 +141,13 @@ extern SCM [= (string-append scm-prefix "sym_" (get "name") ";") =][=
 ENDFOR symbol   =]
 
 #endif /* [=(. header-guard)=] */
+[= (out-pop) \=]
+/* -*- Mode: C -*-
 [=
-(out-pop)
-=][=
 
 (dne " *  " "/*  ")=]
  *
- *  copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
 [=
 (string-table-new "g_nm")
@@ -212,10 +214,10 @@ agrelay_scm_[= (get "name")     =]([=
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
   scm_c_define_gsubr((char*)(_As),          \
-                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)agrelay_scm_ ## _An)
+                   _Ar, _Ao, _Ax, (scm_callback_t)(void*)agrelay_scm_ ## _An)
 #else
-#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
-  gh_new_procedure((char*)(_As), (gh_callback_t)(void*)agrelay_scm_ ## _An, \
+#define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                    \
+  gh_new_procedure((char*)(_As), (scm_callback_t)(void*)agrelay_scm_ ## _An, \
                    _Ar, _Ao, _Ax)
 #endif
 
@@ -227,14 +229,14 @@ ENDIF debug-enabled exists
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
   scm_c_define_gsubr((char*)(_As),          \
-                   _Ar, _Ao, _Ax, (gh_callback_t)(void*)ag_scm_ ## _An)
+                   _Ar, _Ao, _Ax, (scm_callback_t)(void*)ag_scm_ ## _An)
 #else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
-  gh_new_procedure((char*)(_As), (gh_callback_t)(void*)ag_scm_ ## _An,      \
+  gh_new_procedure((char*)(_As), (scm_callback_t)(void*)ag_scm_ ## _An,     \
                    _Ar, _Ao, _Ax)
 #endif
 [= (if (exist? "debug-enabled") "#endif\n") \=]
-typedef SCM (*gh_callback_t)(void);
+typedef SCM (*scm_callback_t)(void);
 void [=(. init-proc)=](void);
 
 /*
@@ -276,12 +278,7 @@ void
       (prefix "    " (get "fini-code")) "") =]
 }
 #undef NEW_PROC
-/*
- * Local Variables:
- * mode:C
- * End:
- *
- * end of [= (out-name) =] */
+/* end of [= (out-name) =] */
 [= #
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

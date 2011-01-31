@@ -29,7 +29,7 @@ copyright = {
 prog-name     = "getdefs";
 prog-title    = "AutoGen Definition Extraction Tool";
 package       = 'GNU AutoGen';
-version       = "1.4";
+version       = "1.5";
 homerc        = /dev/null;
 explain       = <<- EndExplanation
 	If no @code{input} argument is provided or is set to simply "-", and if
@@ -349,115 +349,56 @@ flag = {
  *  Program Documentation
  */
 
-detail =
-"This program extracts AutoGen definitions from a list of source files.
-Definitions are delimited by `/*=<entry-type> <entry-name>\\n' and
-`=*/\\n'.  From that, this program creates a definition of the
-following form:\n
-    #line nnn \"source-file-name\"
-    entry_type = {
-        name = entry_name;
-        ...
-    };\n
-The ellipsis '...' is filled in by text found between the two
-delimiters, with everything up through the first sequence of
-asterisks deleted on every line.
-
-There are two special ``entry types'':
-
-*  The entry_type enclosure and the name entry will be omitted
-   and the ellipsis will become top-level definitions.
-
--- The contents of the comment must be a single getdefs option.
-   The option name must follow the double hyphen and its argument
-   will be everything following the name.  This is intended for use
-   with the ``subblock'' and ``listattr'' options.";
-
-
 /* * * * * MAN PAGE DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
-prog_man_descrip = <<- END_MAN_DESCRIP
-	This program extracts \fBAutoGen\fP definitions from a list of
-	source files.  Definitions are delimited by "/*=<entry-type>
-	<entry-name>\n" and "=*/\n".  From that, this program creates
-	a definition of the following form:
+doc-section = {
+    ds-type     = "SEE ALSO";
+    ds-format   = texi;
+    ds-text     = <<- _EndOfMan_
+	This program is documented more fully in the Getdefs section
+	of the Add-On chapter in the @code{AutoGen} Info system documentation.
+	_EndOfMan_;
+};
 
-	    #line nnn "source-file-name"
-	    entry_type = {
-	        name = entry_name;
-	        ...
-	    };
+/* * * * * DOC DESCRIPTION * * * * * * * * * * * * * * * * * * * */
 
-	The ellipsis `...' is filled in by text found between the two
-	delimiters, with everything up through the first sequence of
-	asterisks deleted on every line.  Additionally, if the
-	`<entry-name>' is followed by a comma, the word `ifdef' (or
-	`ifndef') and a name `if_name', then the above entry will
-	appear as:
+option-doc-format = texi;
 
-	.nf
-	.na
-	    #ifdef if_name
-	    #line nnn "source-file-name"
-	    entry_type = {
-	        name = entry_name;
-	        ...
-	    };
-	    #endif
+detail = <<- _EOF_
+	This program extracts AutoGen definitions from a list of source files.
+	Definitions are delimited by @code{/*=<entry-type> <entry-name>\n} and
+	@code{=*/\n}.
+	_EOF_;
 
-	There are two special ``entry types'':
-
-	*   The entry_type enclosure and the name entry will be omitted
-	    and the ellipsis will become top-level definitions.
-
-	--  The contents of the comment must be a single getdefs option.
-	    The option name must follow the double hyphen and its argument
-	    will be everything following the name.  This is intended for use
-	    with the @code{subblock} and @code{listattr} options.
-	END_MAN_DESCRIP;
-
-man_doc = '.SH "SEE ALSO"
-This program is documented more fully in the Getdefs section
-of the Add-On chapter in the
-.IR AutoGen
-Info system documentation.';
-
-
-/* * * * * INFO DOC DESCRIPTION * * * * * * * * * * * * * * * * * * * */
-
-prog_info_descrip = <<_EOF_
+prog_descrip = <<_EOF_
 This program extracts AutoGen definitions from a list of source files.
-Definitions are delimited by `/*=<entry-type> <entry-name>\n' and `=*/\n'.
-From that, this program creates a definition of the following form:
+Definitions are delimited by @code{/*=<entry-type> <entry-name>\n} and
+@code{=*/\n}.  From that, this program creates a definition of the following
+form:
 
-@format
+@example
     #line nnn "source-file-name"
     entry_type = @{
         name = entry_name;
         ...
     @};
-@end format
-
-The ellipsis ``...'' is filled in by text found between the two delimiters,
-using the following rules:
+@end example
 
 @enumerate
 @item
-Each entry is located by the pattern "\n[^*\n]*\\*[ \t]*([a-z][a-z0-9_]*):".
-Fundamentally, it finds a line that, after the first asterisk on the line,
-contains whitespace then a name and is immediately followed by a colon.
-The name becomes the name of the attribute and what follows, up to the
-next attribute, is its value.
+The ellipsis @code{...} is filled in by text found between the two
+delimiters.  Each line of text is stripped of anything before the first
+asterisk, then leading asterisks, then any leading or trailing white space.
+
 @item
-If the first character of the value is either a single or double quote,
-then you are responsible for quoting the text as it gets inserted into
-the output definitions.
+If what is left starts with what looks like a name followed by a colon, then
+it is interpreted as a name followed by a value.
+
 @item
-All the leading text on a line is stripped from the value.
-The leading text is everything before the first asterisk,
-the asterisk and all the whitespace characters that immediately
-follow it.  If you want whitespace at the beginnings of the lines
-of text, you must do something like this:
+If the first character of the value is either a single or double quote, then
+you are responsible for quoting the text as it gets inserted into the output
+definitions.  So, if you want whitespace at the beginnings of the lines of
+text, you must do something like this:
 
 @example
  * mumble:
@@ -466,15 +407,24 @@ of text, you must do something like this:
 @end example
 
 @item
-If the `<entry-name>' is followed by a comma, the word `ifdef'
-(or `ifndef') and a name `if_name', then the above entry will appear as:
+If the @code{<entry-name>} is followed by a comma, the word @code{ifdef} (or
+@code{ifndef}) and a name @code{if_name}, then the above entry will be under
+@code{ifdef} control.
 
 @example
-#ifdef if_name
+/*=group entry_name, ifdef FOO
+ * attr: attribute value
+=*/
+@end example
+
+Will produce the following:
+
+@example
+#ifdef FOO
 #line nnn "source-file-name"
-entry_type = @{
+group = @{
     name = entry_name;
-    ...
+    attr = 'attribute value';
 @};
 #endif
 @end example
@@ -487,7 +437,7 @@ value, @xref{getdefs subblock}.  That is, this text:
  * arg:  int, this, what-it-is
 @end example
 
-with the `--subblock=arg=type,name,doc' option would yield:
+with the @code{--subblock=arg=type,name,doc} option would yield:
 
 @example
 arg = @{ type = int; name = this; doc = what-it-is; @};

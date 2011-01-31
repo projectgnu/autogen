@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-01-30 14:47:53 bkorb"
+## Time-stamp:        "2011-01-30 17:42:34 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -221,7 +221,7 @@ Any option that is not marked as @i{not presettable}
 (@pxref{opt-attr no-preset,no preset}) may be preset by loading values from [=
  (if home-rc-files (string-append
      "configuration (\"rc\" or \"ini\") files"
-     (if environ-init ", and values from ") ))
+     (if environ-init ", and values from " "") ))
 =][=
   IF (. environ-init)
     =]environment variables named @code{[=(. UP-PROG-NAME)=]} and @code{[=

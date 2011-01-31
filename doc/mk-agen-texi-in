@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-01-28 11:44:57 bkorb"
+# Time-stamp:        "2011-01-31 12:30:06 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -81,7 +81,8 @@ set_config_values()
     `" $LIBS"
   # Give preference to configured SHELL
   #
-  for SHELL in @CONFIG_SHELL@ @SHELL@ `which bash` `which sh` /bin/sh
+  for SHELL in @CONFIG_SHELL@ @SHELL@ `which bash` \
+    /usr/xpg4/bin/sh `which sh` /bin/sh
   do test -x ${SHELL} && break ; done
   export CC CFLAGS LIBS MAKE SHELL LOG_FILE tmp_dir
 }
@@ -109,39 +110,30 @@ setup_exports()
   CLexe=@CLexe@
 
   OPTIONS_DEF=${AGsrc}/opts.def
-  DIRECTIVESRC=${AGsrc}/defDirect.c
-  GETDEF_SRC=`
-    echo ${AGsrc}/func*.c \
-      ${AGsrc}/exp*.c \
-      ${AGsrc}/schemedef.scm \
-      ${DIRECTIVESRC} `
+  GETDEF_SRC=`grep -F -l '/*=' ${AGsrc}/*.[ch] ${AGsrc}/*.scm`
 
   AGEN_TEXI=${top_builddir}/agen5/invoke-autogen.texi
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt
 
-  ADDON_MENU=`
-    for f in columns getdefs xml2ag
-    do
-      if test -f ${top_builddir}/${f}/${f}.menu
-      then echo ${top_builddir}/${f}/${f}.menu
-      else echo ${top_builddir}/${f}/invoke-${f}.menu
-      fi
-    done`\ ${top_srcdir}/doc/snprintfv.menu
+  ADDON_MENU="
+    ${top_builddir}/columns/invoke-columns.menu
+    ${top_builddir}/getdefs/getdefs.menu
+    ${top_builddir}/xml2ag/invoke-xml2ag.menu
+    ${top_srcdir}/doc/snprintfv.menu"
 
-  ADDON_TEXI=`
-    for f in columns getdefs xml2ag
-    do
-      if test -f ${top_builddir}/${f}/${f}.texi
-      then echo ${top_builddir}/${f}/${f}.texi
-      else echo ${top_builddir}/${f}/invoke-${f}.texi
-      fi
-    done
-    echo ${top_srcdir}/doc/snprintfv.texi`
+  ADDON_TEXI="
+    ${top_builddir}/columns/invoke-columns.texi
+    ${top_builddir}/getdefs/getdefs.texi
+    ${top_builddir}/xml2ag/invoke-xml2ag.texi
+    ${top_srcdir}/doc/snprintfv.texi"
 
-  DOC_INCLUDES=`
-    echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h \
-     ${top_builddir}/agen5/invoke-autogen.menu ${AGEN_TEXI} \
-     ${top_builddir}/autoopts/libopts.texi `
+  DOC_INCLUDES="
+    ${AGsrc}/defParse-fsm.c
+    ${AGsrc}/opts.h
+    ${top_builddir}/agen5/invoke-autogen.menu
+    ${top_builddir}/autoopts/libopts.texi
+    ${top_srcdir}/doc/autogen-intro.texi
+    ${AGEN_TEXI}"
 
   DOC_TEMPLATE=${top_builddir}/doc/auto_gen.tpl
 
@@ -166,6 +158,7 @@ run_getdefs()
 	linenum
 	template    auto_gen.tpl
 	assign      ag-texi = invoke-autogen.texi
+	subblock    exparg  = arg_name,arg_desc,arg_optional,arg_list
 	EOCat
 
   tf=invoke-autogen.texi
@@ -215,6 +208,7 @@ sanity_check()
   #
   for f in ${DOC_DEPENDS}
   do test -f ${f} || die cannot find doc file: ${f}
+     test -f `basename $f` || ln -s $f .
   done
 
   cmd=${AGexe}

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-18 11:03:45 bkorb"
+## Time-stamp:      "2011-01-30 17:33:35 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -64,7 +64,7 @@ stamp-fork  : fork.tpl xmlopts.def $(CLexe)
 
 $(TARG).texi $(TARG).menu : stamp-texi
 stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
-	$(RUNAG) -Taginfo -b$(TARG) -DLEVEL=section
+	$(RUNAG) -Tagtexi-cmd -DLEVEL=section
 
 $(TARG).1   : stamp-man
 stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
