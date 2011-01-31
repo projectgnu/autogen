@@ -1,6 +1,6 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2011-01-31 13:18:34 bkorb"
+# Time-stamp:        "2011-01-31 14:16:48 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -86,16 +86,15 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
     The remaining attributes are specified in the comment, per
     the getdefs documentation.
 
-=]
-/* -*- Mode: C -*-
-[=
+=][=
+
 (define ix 0)
 (define scm-prefix
         (if (exist? "group")
             (string-append (get "group") "_scm_")
             "scm_" ))
 (out-push-new (string-append (base-name) ".h"))
-(dne " *  ")=]
+(dne " *  " "/* ")=]
  *
  *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
@@ -141,11 +140,12 @@ extern SCM [= (string-append scm-prefix "sym_" (get "name") ";") =][=
 ENDFOR symbol   =]
 
 #endif /* [=(. header-guard)=] */
-[= (out-pop) \=]
-/* -*- Mode: C -*-
 [=
 
-(dne " *  " "/*  ")=]
+(out-pop)
+(dne " *  " "/* ")
+
+=]
  *
  *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
@@ -165,7 +165,18 @@ ENDFOR symbol   =]
  *  Guile Initializations - [=% group (string-capitalize! "%s ")
                             =]Global Variables
  */
-#include "[= (. header-file) =]"[=
+#include "[= (. header-file) =]"
+typedef SCM (*scm_callback_t)(void);
+void [=
+(define init-proc
+      (if (exist? "init")
+          (get "init")
+          (if (exist? "group")
+              (string-append (get "group") "_init")
+              "scm_init")))
+
+   init-proc    =](void);
+[=
 
   FOR symbol =][=
     (sprintf "\n%s SCM %ssym_%-18s = SCM_BOOL_F;"
@@ -173,18 +184,9 @@ ENDFOR symbol   =]
              scm-prefix (get "name") )  =][=
   ENDFOR symbol
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-=]
-[=
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */=][=
 
-IF (define init-proc
-      (if (exist? "init")
-          (get "init")
-          (if (exist? "group")
-              (string-append (get "group") "_init")
-              "scm_init")))
-
-   (exist? "debug-enabled")     =]
+IF (exist? "debug-enabled")     =]
 #ifdef DEBUG_ENABLED[=
 
   FOR     gfunc
@@ -209,7 +211,6 @@ agrelay_scm_[= (get "name")     =]([=
     }
     return ag_scm_[= name =]([= (. pass-list) =]);
 }
-
 [= ENDFOR  gfunc                =]
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
@@ -235,10 +236,7 @@ ENDIF debug-enabled exists
   gh_new_procedure((char*)(_As), (scm_callback_t)(void*)ag_scm_ ## _An,     \
                    _Ar, _Ao, _Ax)
 #endif
-[= (if (exist? "debug-enabled") "#endif\n") \=]
-typedef SCM (*scm_callback_t)(void);
-void [=(. init-proc)=](void);
-
+[= (if (exist? "debug-enabled") "#endif /* DEBUG_ENABLED */\n") =]
 /*
  * [=group=] Initialization procedure.
  */

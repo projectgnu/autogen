@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2010-08-04 20:50:11 bkorb"
+ *  Time-stamp:        "2011-01-31 14:22:29 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -25,19 +25,19 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-compressDef( char* pz );
+compressDef(char* pz);
 
 static char*
-emitListattr( char* pzText, char* pzOut );
+emitListattr(char* pzText, char* pzOut);
 
 static char*
-emitQuote( char** ppzText, char* pzOut );
+emitQuote(char** ppzText, char* pzOut);
 
 static char*
-emitSubblock( tCC* pzDefList, char* pzText, char* pzOut );
+emitSubblock(const char * pzDefList, char* pzText, char* pzOut);
 
 static char*
-emitSubblockString( char** ppzText, u_int sepChar, char* pzOut );
+emitSubblockString(char** ppzText, u_int sepChar, char* pzOut);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -57,7 +57,7 @@ emitSubblockString( char** ppzText, u_int sepChar, char* pzOut );
  *  that prefix before we go ahead and try to parse it.
  */
 static void
-compressDef( char* pz )
+compressDef(char * pz)
 {
     char* pzStrt = pz;
     char* pzDest = pz;
@@ -179,7 +179,7 @@ compressDef( char* pz )
  *  emitDefinition
  */
 LOCAL char*
-emitDefinition( char* pzDef, char* pzOut )
+emitDefinition(char* pzDef, char* pzOut)
 {
     char   sep_char;
     char   zEntryName[ MAXNAMELEN ];
@@ -194,7 +194,7 @@ emitDefinition( char* pzDef, char* pzOut )
         while (AG_NAME_CHAR(*pzDef))
             *p++ = *pzOut++ = *pzDef++;
 
-        if (p >= zEntryName + sizeof( zEntryName ))
+        if (p >= zEntryName + sizeof(zEntryName))
             die("names are constrained to %d bytes\n", MAXNAMELEN);
 
         *p = NUL;
@@ -205,30 +205,30 @@ emitDefinition( char* pzDef, char* pzOut )
      *  (viz., the "^.*\*" text, except that it is a shortest match
      *  instead of longest match).  Skip the ':' before starting.
      */
-    compressDef( ++pzDef );
+    compressDef(++pzDef);
 
     if (HAVE_OPT( SUBBLOCK )) {
         int    ct  = STACKCT_OPT(  SUBBLOCK );
-        tCC**  ppz = STACKLST_OPT( SUBBLOCK );
+        const char **  ppz = STACKLST_OPT( SUBBLOCK );
 
         do  {
-            tCC* pz = *ppz++;
-            if (strcmp( pz, zEntryName ) == 0)
-                return emitSubblock( pz, pzDef, pzOut );
+            const char * pz = *ppz++;
+            if (strcmp(pz, zEntryName) == 0)
+                return emitSubblock(pz, pzDef, pzOut);
         } while (--ct > 0);
     }
 
     if (HAVE_OPT( LISTATTR )) {
         int    ct  = STACKCT_OPT(  LISTATTR );
-        tCC**  ppz = STACKLST_OPT( LISTATTR );
+        const char **  ppz = STACKLST_OPT( LISTATTR );
 
         do  {
-            if (strcmp( *ppz++, zEntryName ) == 0)
-                return emitListattr( pzDef, pzOut );
+            if (strcmp(*ppz++, zEntryName) == 0)
+                return emitListattr(pzDef, pzOut);
         } while (--ct > 0);
     }
 
-    if (isspace( *pzDef ))
+    if (isspace(*pzDef))
          sep_char = *pzDef++;
     else sep_char = ' ';
 
@@ -245,7 +245,7 @@ emitDefinition( char* pzDef, char* pzOut )
          *  sprintf is safe because we are copying strings around
          *  and *always* making the result smaller than the original
          */
-        pzOut += sprintf( pzOut, " =%c%s;\n", sep_char, pzDef );
+        pzOut += sprintf(pzOut, " =%c%s;\n", sep_char, pzDef);
         break;
 
     default:
@@ -278,23 +278,24 @@ emitDefinition( char* pzDef, char* pzOut )
  *  emitListattr
  */
 static char*
-emitListattr( char* pzText, char* pzOut )
+emitListattr(char* pzText, char* pzOut)
 {
-    tSCC  zStart[]  = " = ";
+    static char const  zStart[]  = " = ";
+
     u_int sepChar   = ',';
     int   FirstAttr = 1;
 
-    strcpy( pzOut, zStart );
-    pzOut += sizeof( zStart ) - 1;
+    strcpy(pzOut, zStart);
+    pzOut += sizeof(zStart) - 1;
 
     /*
      *  See if there is an alternate separator character.
      *  It must be a punctuation character that is not also
      *  a quote character.
      */
-    if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
+    if (ispunct(*pzText) && (*pzText != '"') && (*pzText != '\''))
         sepChar = (u_int)*(pzText++);
-    while (isspace( *pzText )) pzText++;
+    while (isspace(*pzText)) pzText++;
 
     /*
      *  Loop for as long as we have text entries
@@ -320,14 +321,14 @@ emitListattr( char* pzText, char* pzOut )
          *  Emit whatever we have.  The call will consume any trailing
          *  separator character.
          */
-        pzOut = emitSubblockString( &pzText, sepChar, pzOut );
+        pzOut = emitSubblockString(&pzText, sepChar, pzOut);
     }
 
     /*
      *  IF there were no definitions, THEN emit an empty one
      */
     if (FirstAttr)
-        pzOut -= sizeof( zStart ) - 1;
+        pzOut -= sizeof(zStart) - 1;
 
     *(pzOut++) = ';';
     *(pzOut++) = '\n';
@@ -341,7 +342,7 @@ emitListattr( char* pzText, char* pzOut )
  *  characters are not used to end the quoted text.
  */
 static char*
-emitQuote( char** ppzText, char* pzOut )
+emitQuote(char** ppzText, char* pzOut)
 {
     char*  pzText = *ppzText;
     char   svch   = (*pzOut++ = *pzText++);
@@ -378,27 +379,28 @@ quoteDone:
  *  emitSubblock
  */
 static char*
-emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
+emitSubblock(const char * pzDefList, char* pzText, char* pzOut)
 {
-    tSCC  zStart[]  = " = {";
-    tSCC  zAttr[]   = "\n        ";
-    tSCC  zEnd[]    = "\n    };\n";
+    static char const zStart[]  = " = {";
+    static char const zAttr[]   = "\n        ";
+    static char const zEnd[]    = "\n    };\n";
+
     u_int sepChar   = ',';
     int   FirstAttr = 1;
 
     /*
      *  Advance past subblock name to the entry name list
      */
-    pzDefList += strlen( pzDefList ) + 1;
-    strcpy( pzOut, zStart );
-    pzOut += sizeof( zStart ) - 1;
+    pzDefList += strlen(pzDefList) + 1;
+    strcpy(pzOut, zStart);
+    pzOut += sizeof(zStart) - 1;
 
     /*
      *  See if there is an alternate separator character.
      *  It must be a punctuation character that is not also
      *  a quote character.
      */
-    if (ispunct( *pzText ) && (*pzText != '"') && (*pzText != '\''))
+    if (ispunct(*pzText) && (*pzText != '"') && (*pzText != '\''))
         sepChar = (u_int)*(pzText++);
 
     /*
@@ -426,14 +428,14 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
         /*
          *  Skip leading white space in the attribute and check for done.
          */
-        while (isspace( *pzText )) pzText++;
+        while (isspace(*pzText)) pzText++;
         if (*pzText == NUL) {
             /*
              *  IF there were no definitions, THEN emit one anyway
              */
             if (FirstAttr) {
-                strcpy( pzOut, zAttr );
-                pzOut += sizeof( zAttr );
+                strcpy(pzOut, zAttr);
+                pzOut += sizeof(zAttr);
                 for (;;) {
                     *pzOut++ = *pzDefList++;
                     switch (*pzDefList) {
@@ -450,8 +452,8 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
         /*
          *  Copy out the attribute name
          */
-        strcpy( pzOut, zAttr );
-        pzOut += sizeof( zAttr )-1;
+        strcpy(pzOut, zAttr);
+        pzOut += sizeof(zAttr)-1;
         FirstAttr = 0;
 
         for (;;) {
@@ -478,12 +480,12 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
          *  Copy out the assignment operator and emit the string
          */
         *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
-        pzOut = emitSubblockString( &pzText, sepChar, pzOut );
+        pzOut = emitSubblockString(&pzText, sepChar, pzOut);
         *pzOut++ = ';';
 
-    } while (isalpha( *pzDefList ));
-    strcpy( pzOut, zEnd );
-    return pzOut + sizeof( zEnd ) - 1;
+    } while (isalpha(*pzDefList));
+    strcpy(pzOut, zEnd);
+    return pzOut + sizeof(zEnd) - 1;
 }
 
 
@@ -492,7 +494,7 @@ emitSubblock( tCC* pzDefList, char* pzText, char* pzOut )
  *  correctly reconstruct it.
  */
 static char*
-emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
+emitSubblockString(char** ppzText, u_int sepChar, char* pzOut)
 {
     char*  pzText  = *ppzText;
     char*  pcComma;
@@ -501,23 +503,23 @@ emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
     /*
      *  Skip leading space
      */
-    while (isspace( *pzText )) pzText++;
+    while (isspace(*pzText)) pzText++;
 
     /*
      *  IF the text is already quoted,
      *  THEN call the quoted text emitting routine
      */
     if ((*pzText == '"') || (*pzText == '\'')) {
-        pzOut = emitQuote( &pzText, pzOut );
+        pzOut = emitQuote(&pzText, pzOut);
 
         /*
          *  Make sure we strip off trailing white space and any
          *  separation character.
          */
-        while (isspace( *pzText )) pzText++;
+        while (isspace(*pzText)) pzText++;
         if (*pzText == sepChar) {
             pzText++;
-            while (isspace( *pzText )) pzText++;
+            while (isspace(*pzText)) pzText++;
         }
         *ppzText = pzText;
         return pzOut;
@@ -530,9 +532,9 @@ emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
      *  are to resume our text scan.  (i.e. at the comma, or the
      *  last character in the string)
      */
-    pcComma = strchr( pzText, (int)sepChar );
+    pcComma = strchr(pzText, (int)sepChar);
     if (pcComma == (char*)NULL) {
-        pcEnd = pzText + strlen( pzText );
+        pcEnd = pzText + strlen(pzText);
         pcComma = pcEnd-1;
     } else {
         pcEnd = pcComma;
@@ -541,7 +543,7 @@ emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
     /*
      *  Clean off trailing white space.
      */
-    while ((pcEnd > pzText) && isspace( pcEnd[-1] )) pcEnd--;
+    while ((pcEnd > pzText) && isspace(pcEnd[-1])) pcEnd--;
 
     /*
      *  Copy the text, surrounded by single quotes
@@ -568,7 +570,7 @@ emitSubblockString( char** ppzText, u_int sepChar, char* pzOut )
     }
 
     *pzOut++ = '\'';
-    while (isspace( *pzText )) pzText++;
+    while (isspace(*pzText)) pzText++;
     *ppzText = pzText;
     return pzOut;
 }
