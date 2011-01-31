@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-01-20 15:58:10 bkorb"
+ *  Time-stamp:        "2011-01-28 16:12:33 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -103,21 +103,21 @@ explain =
 "AutoGen creates text files from templates using external definitions.";
 
 detail = <<-  _END_DETAIL
-	The definitions file (`<def-file>') can be specified with the
-	`definitions' option or as the command argument, but not both.
-	Omitting it or specifying `-' will result in reading definitions from
-	standard input.
+	The definitions file (@code{<def-file>}) can be specified with the
+	@code{definitions} option or as the command argument, but not both.
+	Omitting it or specifying @code{-} will result in reading definitions
+	from standard input.
 
 	The output file names are based on the template, but generally use the
 	base name of the definition file.  If standard in is read for the
-	definitions, then `stdin' will be used for that base name.  The
+	definitions, then @code{stdin} will be used for that base name.  The
 	suffixes to the base name are gotten from the template.  However, the
 	template file may specify the entire output file name.  The generated
 	files are always created in the current directory.  If you need to
-	place output in an alternate directory, `cd' to that directory and use
-	the `--templ_dirs' option to search the original directory.
+	place output in an alternate directory, @code{cd} to that directory and
+	use the @code{--templ_dirs} option to search the original directory.
 
-	`loop-limit' is used in debugging to stop runaway expansions.
+	@code{loop-limit} is used in debugging to stop runaway expansions.
 	_END_DETAIL;
 #endif /* XML2AG */
 
@@ -130,7 +130,10 @@ exit-desc[3]  = 'The definitions could not be deciphered.';
 exit-name[4]  = load-error;
 exit-desc[4]  = 'An error was encountered during the load phase.';
 exit-name[5]  = signal;
-exit-desc[5]  = 'Program exited due to catching a signal.';
+exit-desc[5]  = 'Program exited due to catching a signal.
+If your template includes string formatting, a number argument
+to a "%s" formatting element will trigger a segmentation fault.
+Autogen will catch the seg fault signal and exit with code 5.';
 
 flag = {
     name      = templ-dirs;
@@ -882,18 +885,20 @@ flag = {
  */
 
 #ifndef XML2AG
+option-doc-format = texi;
+
 detail = <<- _EndOfDetail_
 	AutoGen is a tool designed for generating program files that contain
-	repetitive text with varied substitutions.  Details in the info doc.
+	repetitive text with varied substitutions.
 	_EndOfDetail_;
 
-prog-man-descrip = <<-  _END_MAN_DESCRIP
-	\fBAutoGen\fP is designed for generating program files that contain
+prog-descrip = <<-  _END_MAN_DESCRIP
+	@code{AutoGen} is designed for generating program files that contain
 	repetitive text with varied substitutions.  The goal is to simplify the
 	maintenance of programs that contain large amounts of repetitious text.
 	This is especially valuable if there are several blocks of such text
 	that must be kept synchronized.
-	.PP
+
 	One common example is the problem of maintaining the code required for
 	processing program options.  Processing options requires a minimum of
 	four different constructs be kept in proper order in different places
@@ -901,31 +906,35 @@ prog-man-descrip = <<-  _END_MAN_DESCRIP
 	string, code to process the flag when it is encountered, a global
 	state variable or two, and a line in the usage text.
 	You will need more things besides this if you choose to implement
-	long option names, rc/ini file processing, environment variables
+	long option names, configuration file processing, environment variables
 	and so on.
 
 	All of this can be done mechanically; with the proper templates
 	and this program.
 	_END_MAN_DESCRIP;
 
-man-doc = <<- _EndOfMan_
-	.SH "SEE ALSO"
-	This program is documented more fully in the
-	.IR AutoGen
-	Info system documentation.
-
-	.SH "EXAMPLES"
-	.ti +4
-	autogen -T man.tpl --base-name=autogen opts.def
-	.sp
+doc-section = {
+    ds-type     = EXAMPLES;
+    ds-format   = texi;
+    ds-text     = <<- _EndOfMan_
+	Here is how the man page is produced:
+	@example
+	autogen -Tagman-cmd.tpl -MFman-dep -MTstamp-man opts.def
+	@end example
 
 	This command produced this man page from the AutoGen option definition
-	file.  It overrides the template specified in \fIopts.def\fP (normally
-	\fIoptions.tpl\fP) and uses \fIman.tpl\fP.  It also overrides the
-	\fBbase-name\fP of the output file, which is normally derived from
-	the input definition file name (viz. \fIopts\fP).
-	_EndOfMan_;
+	file.  It overrides the template specified in @file{opts.def} (normally
+	@file{options.tpl}) and uses @file{agman-cmd.tpl}.  It also sets the
+	make file dependency output to @file{man-dep} and the sentinel file
+	(time stamp file) to @file{man-stamp}.  The base of the file name is
+	derived from the defined @code{prog-name}.
 
+	The texi invocation document is produced via:
+	@example
+	autogen -Tagtexi-cmd.tpl -MFtexi-dep -MTtexi-stamp opts.def
+	@end example
+	_EndOfMan_;
+};
 #endif /* XML2AG */
 
 /* end of opts.def */

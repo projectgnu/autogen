@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2010-02-24 08:39:57 bkorb"
+# Time-stamp:        "2011-01-30 09:10:50 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -104,8 +104,8 @@ noitpircseD    emaN-noitpO grA glF
    -?  on pleh           tixe dna noitamrofni egasu dednetxe yalpsiD
    -!  on pleh-erom      regap urht dessap noitamrofni egasu dednetxE
 
-.retcarahc galf eht dna nehpyh elgnis a yb ro
-eman rieht dna snehpyh delbuod yb deificeps era snoitpO
+.retcarahc galf eht dna nehpyh
+elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 _EOF_
 
 compile_with_nls 1
@@ -124,15 +124,15 @@ USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 _EOF_
 echo '_EOF_;' >&3
 exec 3>&-
 
 cat > ${testname}-2.hlp <<'_EOF_'
-.retcarahc galf eht dna nehpyh elgnis a yb ro
-eman rieht dna snehpyh delbuod yb deificeps era snoitpO
+.retcarahc galf eht dna nehpyh
+elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 
 regap urht dessap noitamrofni egasu dednetxE      pleh-erom  on !-
 tixe dna noitamrofni egasu dednetxe yalpsiD           pleh  on ?-

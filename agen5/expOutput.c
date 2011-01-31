@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-01-20 16:14:29 bkorb"
+ *  Time-stamp:        "2011-01-30 10:07:42 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -289,17 +289,15 @@ ag_scm_out_pop(SCM ret_contents)
 
     if (AG_SCM_BOOL_P(ret_contents) && AG_SCM_NFALSEP(ret_contents)) {
         unsigned long pos = ftell(pCurFp->pFile);
+        char * pz = ag_scribble((size_t)pos + 1);
 
-        if (pos == 0)
-            res = AG_SCM_STR2SCM("", 0);
-
-        else {
-            char* pz = ag_scribble((size_t)pos);
+        if (pos > 0) {
             rewind(pCurFp->pFile);
             if (fread(pz, (size_t)pos, (size_t)1, pCurFp->pFile) != 1)
                 AG_CANT("re-read output", pCurFp->pzOutName);
-            res = AG_SCM_STR2SCM(pz, pos);
         }
+
+        res = AG_SCM_STR2SCM(pz, pos);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)

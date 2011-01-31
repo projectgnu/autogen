@@ -29,9 +29,9 @@ AutoGen5 template man=%s.1
 ##
 ##  These files have the following md5sums:
 ##
-##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 :+]
 .TH [+: % prog-name (string-upcase! "%s") :+] 1 [+:

@@ -3,7 +3,7 @@
 
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2011-01-26 16:29:12 bkorb"
+# Time-stamp:        "2011-01-28 17:45:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -70,8 +70,8 @@ USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ..../${testname}.rc/rc.file

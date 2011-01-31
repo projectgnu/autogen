@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-01-06 11:44:24 bkorb"
+ *  Time-stamp:        "2011-01-28 17:53:38 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *
@@ -160,7 +160,7 @@ flag = {
 	    one   two \
 	    three four
 	@end example
-	_EODoc_;
+	_EODoc_; // '
 };
 
 flag = {
@@ -287,49 +287,39 @@ flag = {
  *
  *  Program Documentation
  */
-
-detail =
-
-'This program was designed for the purpose of generating compact,
-columnized tables.  It will read a list of text items from standard
-in or a specified input file and produce a columnized listing of
-all the non-blank lines.  Leading white space on each line is
-preserved, but trailing white space is stripped.  Methods of
-applying per-entry and per-line embellishments are provided.
-See the formatting and separation arguments below.
-
-This program is used by AutoGen to help clean up and organize
-its output.';
+option-doc-format = texi;
 
 /* prog_man_descrip = -- unchanged; */
 
-man_doc = '.SH "SEE ALSO"
-This program is documented more fully in the Columns section
-of the Add-On chapter in the
-.IR AutoGen
-Info system documentation.';
+doc-section = {
+    ds-type     = "SEE ALSO";
+    ds-format   = texi;
+    ds-text     = <<- _EndOfMan_
+	This program is documented more fully in the Columns section
+	of the Add-On chapter in the @code{AutoGen} Info system documentation.
+	_EndOfMan_;
+};
 
+prog_descrip = <<- _EndOfMan_
+	This program was designed for the purpose of generating compact,
+	columnized tables.  It will read a list of text items from standard
+	in or a specified input file and produce a columnized listing of
+	all the non-blank lines.  Leading white space on each line is
+	preserved, but trailing white space is stripped.  Methods of
+	applying per-entry and per-line embellishments are provided.
+	See the formatting and separation arguments below.
 
-prog_info_descrip =
+	This program is used by AutoGen to help clean up and organize
+	its output.
 
-'This program was designed for the purpose of generating compact,
-columnized tables.  It will read a list of text items from standard
-in or a specified input file and produce a columnized listing of
-all the non-blank lines.  Leading white space on each line is
-preserved, but trailing white space is stripped.  Methods of
-applying per-entry and per-line embellishments are provided.
-See the formatting and separation arguments below.
+	See @file{autogen/agen5/fsm.tpl} and the generated output
+	@file{pseudo-fsm.h}.
 
-This program is used by AutoGen to help clean up and organize
-its output.
+	This function was not implemented as an expression function because
+	either it would have to be many expression functions, or a provision
+	would have to be added to provide options to expression functions.
+	Maybe not a bad idea, but it is not being implemented at the moment.
 
-See @file{autogen/agen5/fsm.tpl} and the generated output
-@file{pseudo-fsm.h}.
-
-This function was not implemented as an expression function because
-either it would have to be many expression functions, or a provision
-would have to be added to provide options to expression functions.
-Maybe not a bad idea, but it is not being implemented at the moment.
-
-A side benefit is that you can use it outside of AutoGen to columnize
-input, a la the @code{ls} command.';
+	A side benefit is that you can use it outside of @code{autogen} to
+	columnize input, a la the @code{ls} command.
+	_EndOfMan_;

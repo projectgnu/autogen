@@ -24,26 +24,29 @@
 @chapter Automated Option Processing
 @cindex autoopts
 
-AutoOpts [=`
+AutoOpts [=
+(make-tmp-dir)
+(out-push-new)
+=]
+test ${#AGexe} -eq 0 -o ${#top_srcdir} -eq 0 -o ${top_builddir} -eq 0 && \
+     die "AGexe, top_srcdir and top_builddir must be set"
+ag_cmd="${AGexe} -L${top_srcdir}/autoopts/tpl"
+test "X${top_srcdir}" = "X${top_builddir}" || \
+     ag_cmd="${ag_cmd} -L${top_builddir}/autoopts/tpl"
+readonly ag_cmd
+
 run_ag() {
-    echo ${AGexe} -L${top_srcdir}/autoopts/tpl \
-        -L${top_builddir}/autoopts/tpl "$@" >&2
-
-    ${AGexe} -L${top_srcdir}/autoopts/tpl -L${top_builddir}/autoopts/tpl "$@"
+    echo ${ag_cmd} "$@" >&2
+    ${ag_cmd} "$@"
 }
 
-test -z "$tmp_dir" && tmp_dir=${TMPDIR-/tmp}/agdoc-$$
-test -d "$tmp_dir" || {
-  rm -rf "$tmp_dir"
-  mkdir "$tmp_dir" || die cannot midir "$tmp_dir"
-  cleanup() { rm -rf ${tmp_dir} ; }
-  trap cleanup 0
-}
-
-eval "\`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION\`" 2> /dev/null
+eval "`egrep '^AO_[A-Z]*=' ${top_srcdir}/VERSION`" 2> /dev/null
 echo ${AO_CURRENT}.${AO_REVISION}
+[=
 
-`=] is bundled with AutoGen.  It is a tool that virtually eliminates the
+(shell (out-pop #t))
+
+=] is bundled with AutoGen.  It is a tool that virtually eliminates the
 hassle of processing options and keeping man pages, info docs and usage text
 up to date.  This package allows you to specify several program attributes, up
 to a hundred option types and many option attributes.  From this, it then

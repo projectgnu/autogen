@@ -3,7 +3,7 @@
 #
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2010-07-10 17:09:53 bkorb"
+# Time-stamp:        "2011-01-28 17:46:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -100,8 +100,8 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
 The valid "omega" option keywords are:
   uno dos tres mucho
@@ -191,8 +191,8 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ..../testdir/.test_equivrc

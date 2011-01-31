@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-12-04 14:42:55 bkorb"
+# Time-stamp:        "2011-01-28 17:42:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -74,8 +74,8 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 Operands and options may be intermixed.  They will be reordered.
 
 The following option preset mechanisms are supported:
@@ -94,8 +94,8 @@ USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
    -> opt save-opts      Save the option state to a config file
    -< Str load-opts      Load options from a config file
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 Operands and options may be intermixed.  They will be reordered.
 _EOF_
 

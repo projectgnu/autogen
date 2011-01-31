@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-26 19:09:17 bkorb"
+# Time-stamp:        "2011-01-28 17:55:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -492,8 +492,8 @@ USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
        --min-val              option with min ct\n\
        --version              Output version information and exit\n\
    -h, --help                 Display extended usage information and exit\n\n\
-Options are specified by doubled hyphens and their name\n\
-or by a single hyphen and the flag character.\n\n\
+Options are specified by doubled hyphens and their name or by a single\n\
+hyphen and the flag character.\n\n\
 please send bug reports to:  bkorb@gnu.org\n"), stdout);
     }
 

@@ -1,7 +1,7 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
 
-#  Time-stamp:        "2011-01-27 12:48:16 bkorb"
+#  Time-stamp:        "2011-01-27 13:09:59 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -301,7 +301,7 @@ ENDFOR macfunc      =][=
  *  Pointers to the procedure to call when the function code
  *  is encountered.
  */
-static tpHdlrProc  apHdlrProc[ FUNC_CT ] = {[=
+static tpHdlrProc const apHdlrProc[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s"=]*/ mFunc_[=
   IF (exist? "handler_proc")
@@ -337,7 +337,7 @@ ENDFOR
 =]
 tUnloadProc [= (shellf "echo '%s'|sed 's/, $//'" decl-list) =];
 
-static tpUnloadProc  apUnloadProc[ FUNC_CT ] = {
+static tpUnloadProc const apUnloadProc[ FUNC_CT ] = {
 [= (shellf "columns -I4 --sep=, --spread=1<<_EOF_\n%s_EOF_" temp-txt) =]
 };
 

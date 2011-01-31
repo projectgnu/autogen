@@ -4,7 +4,7 @@ autogen definitions options;
 /**
  * \file genshell.def
  *
- * Time-stamp:      "2011-01-06 11:44:32 bkorb"
+ * Time-stamp:      "2011-01-28 17:07:18 bkorb"
  *
  *  This module generates shell scripts with AutoOpts supported command line
  *  option processing.  This program is licensed separately from the AutoOpts
@@ -78,12 +78,18 @@ flag = {
     descrip   =  "character case of variable names";
 };
 #endif /* LATER */
-explain =
-"Note that `shell' is only useful if the output file does not already
-exist.  If it does, then the shell name and optional first argument
-will be extracted from the script file.";
 
-detail =
-"If the script file already exists and contains Automated Option Processing
-text, the second line of the file through the ending tag will be replaced
-by the newly generated text.  The first `#!' line will be regenerated.";
+option-doc-format = texi;
+
+explain =<<- _EOF_
+	Note that @code{shell} is only useful if the output file does not
+	already exist.  If it does, then the shell name and optional first
+	argument will be extracted from the script file.
+	_EOF_;
+
+detail =<<- _EOF_
+	If the script file already exists and contains Automated Option
+	Processing text, the second line of the file through the ending tag
+	will be replaced by the newly generated text.  The first @code{#!}
+	line will be regenerated.
+	_EOF_;

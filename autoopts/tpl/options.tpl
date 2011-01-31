@@ -3,7 +3,7 @@
 h
 c
 
-# Time-stamp:      "2011-01-27 09:40:42 bkorb"
+# Time-stamp:      "2011-01-28 10:30:50 bkorb"
 
 # This file contains the templates used to generate the
 # option descriptions for client programs, and it declares
@@ -28,13 +28,6 @@ c
 ##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
-
-(define ao-version      "@AO_CURRENT@:@AO_REVISION@:@AO_AGE@")
-(define ao-template-ver "@AO_TEMPLATE_VERSION@")
-(define inst-prefix     "@prefix@")
-(define exec-prefix     "@exec_prefix@")
-(define inst-bin-dir    "@bindir@")
-(setenv "SHELL"         "@CONFIG_SHELL@")
 
 =][= (dne " *  " "/*  ")    =][=
 

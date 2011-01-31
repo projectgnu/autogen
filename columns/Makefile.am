@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-01-02 17:00:38 bkorb"
+## Time-stamp:      "2011-01-30 09:36:20 bkorb"
 ## Copyright (c) 1992-2011 by Bruce Korb
 ##
 ## This file is part of AutoGen.
@@ -31,7 +31,7 @@ BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
 
 RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
-	-L$(top_builddir)/autoopts/tpl -bcolumns -MF$@
+	-L$(top_builddir)/autoopts/tpl -MF$@
 man_MANS        = columns.1
 
 INCLUDES        = @INCLIST@
@@ -58,11 +58,11 @@ cols.c : Makefile
 
 stamp-aginfo : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
-	$(RUNAG) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+	$(RUNAG) -Tagtexi-cmd.tpl -DLEVEL=section $(srcdir)/opts.def
 
 stamp-agman  : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
-	$(RUNAG) -Tagman-cmd $(srcdir)/opts.def
+	$(RUNAG) -Tagman-cmd.tpl $(srcdir)/opts.def
 
 .NOTPARALLEL:
 

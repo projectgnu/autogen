@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-01-17 17:36:54 bkorb"
+# Time-stamp:        "2011-01-28 16:04:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -240,7 +240,7 @@ make_texi()
 {
     test -z "${CLexe}" && die "Cannot locate columns"
 
-    eopt="-Taginfo -DLEVEL=chapter -bautogen"
+    eopt="-Tagtexi-cmd.tpl -DLEVEL=chapter -binvoke-autogen"
     run_ag texi ${eopt} ${srcdir}/opts.def
 }
 
@@ -252,7 +252,7 @@ make_man()
 {
     test -z "${CLexe}" && die "Cannot locate columns"
 
-    run_ag man -Tagman-cmd -DMAN_SECTION=1 -bautogen ${srcdir}/opts.def
+    run_ag man -Tagman-cmd -DMAN_SECTION=1 ${srcdir}/opts.def
 
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
     run_ag fmem fmemopen.def

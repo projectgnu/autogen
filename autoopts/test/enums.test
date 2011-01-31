@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-02-24 08:40:07 bkorb"
+# Time-stamp:        "2011-01-28 17:46:20 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -268,8 +268,8 @@ USAGE:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
    -? no  help           opt  Display extended usage information and exit
    -! no  more-help      opt  Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
 The valid "print" option keywords are:
   one two three four five six seven eight nine ten

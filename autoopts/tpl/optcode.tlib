@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-01-19 10:08:43 bkorb"
+# Time-stamp:      "2011-01-30 15:12:30 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -18,9 +18,9 @@
 ##
 ##  These files have the following md5sums:
 ##
-##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =][=
 
@@ -437,7 +437,7 @@ s/^@item *$/\
 /[=
 
 (define patch-text-sed
-  (sprintf "sed %s <<\\_EODetail_\n"
+  (sprintf "sed %s <<\\_EODetail_ | fmt -w 75\n"
     (raw-shell-str (out-pop #t)) ) )
 
 (define patch-text (lambda (t-name)

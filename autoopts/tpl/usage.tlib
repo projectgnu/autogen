@@ -18,16 +18,13 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=][=
+=][= INCLUDE "tpl-config.tlib" =][=
 
  ;; This template is designed to emit help text from the current set
  ;; of option definitions.
  ;;
  (make-tmp-dir)
  (out-push-new (shellf "echo ${tmp_dir}/%s.def" (get "prog-name")))
- (define libs    "@LIBS@")
- (define inc-dir "@includedir@")
- (define lib-dir "@libdir@")
 
 =]
 AutoGen Definitions options.tpl;

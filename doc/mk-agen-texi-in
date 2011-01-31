@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-01-24 12:59:57 bkorb"
+# Time-stamp:        "2011-01-28 11:44:57 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -116,28 +116,34 @@ setup_exports()
       ${AGsrc}/schemedef.scm \
       ${DIRECTIVESRC} `
 
-  AGEN_TEXI=${top_builddir}/agen5/autogen.texi
+  AGEN_TEXI=${top_builddir}/agen5/invoke-autogen.texi
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt
 
   ADDON_MENU=`
     for f in columns getdefs xml2ag
     do
-      echo ${top_builddir}/${f}/${f}.menu
+      if test -f ${top_builddir}/${f}/${f}.menu
+      then echo ${top_builddir}/${f}/${f}.menu
+      else echo ${top_builddir}/${f}/invoke-${f}.menu
+      fi
     done`\ ${top_srcdir}/doc/snprintfv.menu
 
   ADDON_TEXI=`
     for f in columns getdefs xml2ag
     do
-      echo ${top_builddir}/${f}/${f}.texi
+      if test -f ${top_builddir}/${f}/${f}.texi
+      then echo ${top_builddir}/${f}/${f}.texi
+      else echo ${top_builddir}/${f}/invoke-${f}.texi
+      fi
     done
     echo ${top_srcdir}/doc/snprintfv.texi`
 
   DOC_INCLUDES=`
     echo ${AGsrc}/defParse-fsm.c ${AGsrc}/opts.h \
-     ${top_builddir}/agen5/autogen.menu ${AGEN_TEXI} \
+     ${top_builddir}/agen5/invoke-autogen.menu ${AGEN_TEXI} \
      ${top_builddir}/autoopts/libopts.texi `
 
-  DOC_TEMPLATE=${srcdir}/auto_gen.tpl
+  DOC_TEMPLATE=${top_builddir}/doc/auto_gen.tpl
 
   DOC_DEPENDS=`
     echo ${DOC_TEMPLATE} ${OPTIONS_DEF} ${ADDON_MENU} ${ADDON_TEXI} \
@@ -159,15 +165,19 @@ run_getdefs()
 	srcfile
 	linenum
 	template    auto_gen.tpl
-	assign      ag-texi = invoke-`basename ${AGEN_TEXI}`
+	assign      ag-texi = invoke-autogen.texi
 	EOCat
 
-  tf=invoke-`basename ${AGEN_TEXI}`
+  tf=invoke-autogen.texi
   test -f ${tf} || ln -s ${AGEN_TEXI} ${tf}
 
   for f in ${ADDON_TEXI}
   do
-    tf=invoke-`basename ${f}`
+    tf=`basename ${f}`
+    case "$tf" in
+    invoke-* ) : ;;
+    * ) tf=invoke-$tf ;;
+    esac
     test -f ${tf} || ln -s ${f} ${tf}
     echo "assign      addon-texi = ${tf}"
   done >&3

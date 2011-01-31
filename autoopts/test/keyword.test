@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-01-26 14:03:40 bkorb"
+# Time-stamp:        "2011-01-28 17:56:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -71,7 +71,6 @@ ${AG_L} ${testname}.def || \
 
 compile "-X"
 
-
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.res-help
@@ -90,8 +89,8 @@ USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- disabled as --no-load-opts
 				- may appear multiple times
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
 The following option preset mechanisms are supported:
  - reading file ./keyword.cfg
@@ -165,6 +164,10 @@ cmp -s ${testname}.t1-* || \
   failure "`diff ${testname}.t1-*`"
 
 ${AG_L} -T agman-cmd.tpl ${testname}.def
+test -f test_${testname}.1 || \
+    failure "'test_${testname}.1' was not produced"
+mv test_${testname}.1 ${testname}.1
+
 cat > ${testname}-base.1 <<\_EOMan_
 test_keyword \- Test AutoOpts for keyword
 .SH SYNOPSIS

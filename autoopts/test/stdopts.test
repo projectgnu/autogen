@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2010-11-30 15:32:36 bkorb"
+# Time-stamp:        "2011-01-28 17:55:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -73,8 +73,8 @@ cat > ${testname}.hbase <<- _EOF_
 	   -? no  help           Display extended usage information and exit
 	   -! no  more-help      Extended usage information passed thru pager
 
-	Options are specified by doubled hyphens and their name
-	or by a single hyphen and the flag character.
+	Options are specified by doubled hyphens and their name or by a single
+	hyphen and the flag character.
 
 	The valid "verbose" option keywords are:
 	  silent quiet brief informative verbose
@@ -128,8 +128,8 @@ cat > ${testname}.hbase <<- _EOF_
 	   -! no  more-help      Extended usage information passed thru pager
 	   -u no  usage          Abbreviated usage to stdout
 
-	Options are specified by doubled hyphens and their name
-	or by a single hyphen and the flag character.
+	Options are specified by doubled hyphens and their name or by a single
+	hyphen and the flag character.
 	_EOF_
 
 #  When building with DEBUG set, we get an unanticipated option:

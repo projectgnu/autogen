@@ -2,7 +2,7 @@
 #
 # alias.test     ---  test option aliasing
 #
-# Time-stamp:        "2010-07-18 11:01:06 bkorb"
+# Time-stamp:        "2011-01-28 17:46:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -71,8 +71,8 @@ USAGE:  alias [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg [...]
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 _EOF_
 
 cmp -s ${testname}-1.help ${testname}.help || \

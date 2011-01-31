@@ -1,8 +1,8 @@
 #! /bin/sh
 
-## agman-lib.tpl -- Template for command line man pages
+## texi2man.sh -- script to convert texi-isms to man page isms
 ##
-## Time-stamp:      "2010-12-15 16:38:14 bkorb"
+## Time-stamp:      "2011-01-28 13:09:24 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -21,9 +21,9 @@
 ##
 ##  These files have the following md5sums:
 ##
-##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 ## This "library" converts texi-isms into man-isms.  It gets included
 ## by the man page template at the point where texi-isms might start appearing

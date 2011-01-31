@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2010-12-09 16:47:25 bkorb"
+## Time-stamp:      "2011-01-30 15:55:13 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -43,14 +43,6 @@ X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LGFRp.hlp ==============
@@ -62,14 +54,6 @@ X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LGFoA.hlp ==============
@@ -82,14 +66,6 @@ X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage should be in GNU style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LGFop.hlp ==============
@@ -101,14 +77,6 @@ X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
 X   -?, --help                 Display extended usage information and exit
 X   -!, --more-help            Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage should be in GNU style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LGsRA.hlp ==============
@@ -120,13 +88,6 @@ X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LGsRp.hlp ==============
@@ -138,13 +99,6 @@ X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LGsoA.hlp ==============
@@ -156,13 +110,6 @@ X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage should be in GNU style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LGsop.hlp ==============
@@ -174,13 +121,6 @@ X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
 X   --help                 Display extended usage information and exit
 X   --more-help            Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage should be in GNU style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LaFRA.hlp ==============
@@ -193,14 +133,6 @@ X   -L Str check-dirs     YES  Checkout directory list
 X      opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LaFRp.hlp ==============
@@ -212,14 +144,6 @@ X   -L no  check-dirs     YES  Checkout directory list
 X      no  show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LaFoA.hlp ==============
@@ -232,14 +156,6 @@ X   -L Str check-dirs     Checkout directory list
 X      opt show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LaFop.hlp ==============
@@ -251,14 +167,6 @@ X   -L no  check-dirs     Checkout directory list
 X      no  show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
-X
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
-X
-Long and short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LasRA.hlp ==============
@@ -270,13 +178,6 @@ X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_LasRp.hlp ==============
@@ -288,13 +189,6 @@ X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_LasoA.hlp ==============
@@ -306,13 +200,6 @@ X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_Lasop.hlp ==============
@@ -324,13 +211,6 @@ X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
-X
-Options are specified by single or double hyphens and their name.
-X
-Only long options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sGFRA.hlp ==============
@@ -342,12 +222,6 @@ X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sGFRp.hlp ==============
@@ -359,12 +233,6 @@ X   -L         Checkout directory list
 X   -s         Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage should be in GNU style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sGFoA.hlp ==============
@@ -376,12 +244,6 @@ X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage should be in GNU style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sGFop.hlp ==============
@@ -393,12 +255,6 @@ X   -L         Checkout directory list
 X   -s         Show the definition tree
 X   -?         Display extended usage information and exit
 X   -!         Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage should be in GNU style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sGsRA.hlp ==============
@@ -410,13 +266,6 @@ X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage should be in GNU style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sGsRp.hlp ==============
@@ -428,13 +277,6 @@ X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage should be in GNU style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sGsoA.hlp ==============
@@ -446,13 +288,6 @@ X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage should be in GNU style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sGsop.hlp ==============
@@ -464,13 +299,6 @@ X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
 X   help                   Display extended usage information and exit
 X   more-help              Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage should be in GNU style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_saFRA.hlp ==============
@@ -482,12 +310,6 @@ X   -L Str check-dirs     YES  Checkout directory list
 X   -s opt show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_saFRp.hlp ==============
@@ -499,12 +321,6 @@ X   -L no  check-dirs     YES  Checkout directory list
 X   -s no  show-defs      opt  Show the definition tree
 X   -? no  help           opt  Display extended usage information and exit
 X   -! no  more-help      opt  Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_saFoA.hlp ==============
@@ -516,12 +332,6 @@ X   -L Str check-dirs     Checkout directory list
 X   -s opt show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_saFop.hlp ==============
@@ -533,12 +343,6 @@ X   -L no  check-dirs     Checkout directory list
 X   -s no  show-defs      Show the definition tree
 X   -? no  help           Display extended usage information and exit
 X   -! no  more-help      Extended usage information passed thru pager
-X
-X
-Only short (flag) options are accepted.
-Usage is in AutoOpts traditional style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sasRA.hlp ==============
@@ -550,13 +354,6 @@ X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sasRp.hlp ==============
@@ -568,13 +365,6 @@ X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
 X   no  help           opt  Display extended usage information and exit
 X   no  more-help      opt  Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage is in AutoOpts traditional style.
-The check-dirs option is required.
-No options require arguments.
 SHAR_EOF
 
 # ============= usage_sasoA.hlp ==============
@@ -586,13 +376,6 @@ X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage is in AutoOpts traditional style.
-There are no required options.
-Some options require arguments.
 SHAR_EOF
 
 # ============= usage_sasop.hlp ==============
@@ -604,18 +387,10 @@ X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
 X   no  help           Display extended usage information and exit
 X   no  more-help      Extended usage information passed thru pager
-X
-All arguments are named options.
-X
-All command line arguments must be named options.
-Usage is in AutoOpts traditional style.
-There are no required options.
-No options require arguments.
 SHAR_EOF
 
 # # # # # # # # # # DEFINITIONS FILES # # # # # # # # #
-nl='
-'
+
 emit_defs()
 {
   exec 4> $1.def
@@ -718,30 +493,14 @@ run_usage_test() {
 
   sed -e '1,/definition names looked up/d' \
     -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
+      ${defnames_raw} >> ${defnames_file}
   compile ${helpstr}
+  sed   -e '/Extended usage information passed thru pager/q' \
+      ${testname}.help > XXX
+  mv XXX ${testname}.help
   cmp -s ${testname}.help ${testname}.hlp || \
     failure "FAILED ${testname} hlp -> help
 `diff ${testname}.hlp ${testname}.help`"
-
-  if ${gnu_usage}
-  then
-    f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1a\\2/"`
-    sed "s/${f}/${testname}/g;\
-         s/is in AutoOpts traditional/should be in GNU/" ${f}.hlp > \
-      ${testname}.alt.hlp
-    AUTOOPTS_USAGE=autoopts ./${testname} ${helpstr} \
-      > ${testname}.alt.help
-  else
-    f=`echo ${testname} | sed "s/\\(${tname}_.\\).\\(.*\\)/\\1G\\2/"`
-    sed "s/${f}/${testname}/g;\
-         s/should be in GNU/is in AutoOpts traditional/" ${f}.hlp \
-      > ${testname}.alt.hlp
-    AUTOOPTS_USAGE=gnu ./${testname} ${helpstr} \
-      > ${testname}.alt.help
-  fi
-  cmp -s ${testname}.alt.help ${testname}.alt.hlp || \
-    failure "FAILED ${testname} alt [$f] hlp -> help
-`diff ${testname}.alt.help ${testname}.alt.hlp`"
 }
 
 test_list=""

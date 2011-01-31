@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-01-20 16:28:27 bkorb"
+ *  Time-stamp:        "2011-01-30 15:07:00 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -468,21 +468,23 @@ MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
  *  GLOBAL STRINGS
  */
 #define MKSTRING(_n, _v) \
-        MODE char const z ## _n[sizeof(_v)] VALUE(_v)
+        MODE char const _n[sizeof(_v)] VALUE(_v)
 
-MKSTRING(AllocErr,   "Allocation Failure");
-MKSTRING(AllocWhat,  "Could not allocate a %d byte %s\n");
-MKSTRING(Cannot,     "fserr %d: cannot %s %s:  %s\n");
-MKSTRING(DevNull,    "/dev/null");
-MKSTRING(Empty,      "");
-MKSTRING(FileFormat, "%s%s\0%s.%s");
-MKSTRING(FileLine,   "\tfrom %s line %d\n");
-MKSTRING(Format,     "format");
-MKSTRING(MemFile,    "in-mem file");
-MKSTRING(Nil,        "");
-MKSTRING(NotStr,     "ERROR: %s is not a string\n");
-MKSTRING(ShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
-MKSTRING(TplWarn,    "Warning in template %s, line %d\n\t%s\n");
+MKSTRING(zAllocErr,   "Allocation Failure");
+MKSTRING(zAllocWhat,  "Could not allocate a %d byte %s\n");
+MKSTRING(zCannot,     "fserr %d: cannot %s %s:  %s\n");
+MKSTRING(zDevNull,    "/dev/null");
+MKSTRING(zEmpty,      "");
+MKSTRING(zFileFormat, "%s%s\0%s.%s");
+MKSTRING(zFileLine,   "\tfrom %s line %d\n");
+MKSTRING(zFormat,     "format");
+MKSTRING(zMemFile,    "in-mem file");
+MKSTRING(zNil,        "");
+MKSTRING(zNotStr,     "ERROR: %s is not a string\n");
+MKSTRING(zShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
+MKSTRING(zTplWarn,    "Warning in template %s, line %d\n\t%s\n");
+
+#undef MKSTRING
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

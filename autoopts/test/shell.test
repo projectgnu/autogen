@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-02-24 08:39:55 bkorb"
+# Time-stamp:        "2011-01-30 09:07:32 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -61,8 +61,8 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 _EOF_
 
 cmp -s ${testname}.h*lp || \
@@ -119,16 +119,16 @@ USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 
-Note that `shell' is only useful if the output file does not already
-exist.  If it does, then the shell name and optional first argument
-will be extracted from the script file.
+Note that ``shell'' is only useful if the output file does not already
+exist.  If it does, then the shell name and optional first argument will
+be extracted from the script file.
 
 If the script file already exists and contains Automated Option Processing
 text, the second line of the file through the ending tag will be replaced
-by the newly generated text.  The first `#!' line will be regenerated.
+by the newly generated text.  The first ``#!''  line will be regenerated.
 
 please send bug reports to:  autogen-users@lists.sourceforge.net
 
@@ -146,8 +146,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.
 _EOF_
 
 files=${testname}.hlp\ ${testname}.help
@@ -169,8 +169,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.'
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
@@ -181,8 +181,8 @@ USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
    -? no  help           Display extended usage information and exit
    -! no  more-help      Extended usage information passed thru pager
 
-Options are specified by doubled hyphens and their name
-or by a single hyphen and the flag character.'
+Options are specified by doubled hyphens and their name or by a single
+hyphen and the flag character.'
 
 
 TEST_SHELL_OPTION="${TEST_SHELL_OPTION}"

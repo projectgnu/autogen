@@ -1,7 +1,7 @@
 /**
  * \file expExtract.c
  *
- *  Time-stamp:        "2011-01-20 16:16:28 bkorb"
+ *  Time-stamp:        "2011-01-28 10:22:33 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -322,7 +322,7 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
 SCM
 ag_scm_find_file(SCM file, SCM suffix)
 {
-    static char const zFun[] = "ag_scm_find_file";
+    static char const zFun[] = "find-file";
     SCM res = SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P(file))

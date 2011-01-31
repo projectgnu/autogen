@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-01-17 17:45:22 bkorb"
+## Time-stamp:      "2011-01-27 17:06:36 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -24,7 +24,7 @@ SUBDIRS         = test
 INCLUDES        = @INCLIST@
 TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
-CLEANFILES      = autogen.texi autogen.menu autogen.1
+CLEANFILES      = invoke-autogen.texi invoke-autogen.menu autogen.1
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm \
                   stamp-man stamp-parse
@@ -124,7 +124,7 @@ stamp-man : opts.def $(AGnam)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 autogen.1       : stamp-man
-autogen.texi    : stamp-texi
+invoke-autogen.texi    : stamp-texi
 gen      : stamp-texi
 
 ../snprintfv/snprintfv.h :

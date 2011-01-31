@@ -193,8 +193,8 @@ utxt = { ut-name = FiveSpaces;
 
 utxt = { ut-name = FlagOkay;
          ut-text =
-"Options are specified by doubled hyphens and their name\n\
-or by a single hyphen and the flag character.\n";
+"Options are specified by doubled hyphens and their name or by a single\n\
+hyphen and the flag character.\n";
 };
 
 utxt = { ut-name = FmtFmt;

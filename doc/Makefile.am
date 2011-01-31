@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-07 09:06:58 bkorb"
+## Time-stamp:      "2011-01-28 09:17:37 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -33,9 +33,7 @@ all : $(INFO_DEPS)
 
 BUILT_SOURCES   = autogen.texi
 info_TEXINFOS   = $(BUILT_SOURCES)
-
-EXTRA_DIST	= auto_gen.tpl snprintfv.texi snprintfv.menu \
-		mk-agen-texi-in autogen-texi.txt auto-opts.tpl
+EXTRA_DIST	= snprintfv.texi snprintfv.menu autogen-texi.txt auto-opts.tpl
 
 MAINTAINERCLEANFILES  = MakeDep.inc
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'

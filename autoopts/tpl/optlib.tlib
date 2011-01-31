@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-01-27 09:52:10 bkorb"
+# Time-stamp:      "2011-01-28 10:33:16 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -23,6 +23,8 @@
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =][=
+
+INCLUDE "tpl-config.tlib"               =][=
 
 DEFINE init-and-validate                =][=
 
