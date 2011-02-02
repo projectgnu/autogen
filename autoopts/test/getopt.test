@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-01-28 17:55:45 bkorb"
+# Time-stamp:        "2011-02-01 15:30:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -59,8 +59,14 @@ compile_getopt() {
   ${CC} ${CFLAGS} -c ${testname}${1}-getopt.c || \
     failure "could not compile ${testname}1-getopt.c"
 
-  cmp -s ${testname}${1}-base.c ${testname}${1}-getopt.c || { set +x ; \
-    failure "`diff -c ${testname}${1}-base.c ${testname}${1}-getopt.c`" ; }
+  sed '/Packaged by /d
+       s@^Report .* bugs to.*"@\\n"@
+       s@^please send bug.*"@\\n"@
+       s@\\n\\n\\n\\$@\\n\\n\\@
+       s@\(and the flag character\.\\n.\)n\\$@\1@' ${testname}${1}-getopt.c \
+         >  ${testname}${1}-res.c
+  cmp -s ${testname}${1}-base.c ${testname}${1}-res.c || { set +x ; \
+    failure "`diff -c ${testname}${1}-base.c ${testname}${1}-res.c`" ; }
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -242,8 +248,8 @@ USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
    -M         option with min ct\n\
    -2         option with min ct\n\
    -v         Output version information and exit\n\
-   -h         Display extended usage information and exit\n\n\n\
-please send bug reports to:  bkorb@gnu.org\n"), stdout);
+   -h         Display extended usage information and exit\n\n\
+\n"), stdout);
     }
 
   exit (status);
@@ -493,8 +499,8 @@ USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
        --version              Output version information and exit\n\
    -h, --help                 Display extended usage information and exit\n\n\
 Options are specified by doubled hyphens and their name or by a single\n\
-hyphen and the flag character.\n\n\
-please send bug reports to:  bkorb@gnu.org\n"), stdout);
+hyphen and the flag character.\n\
+\n"), stdout);
     }
 
   exit (status);

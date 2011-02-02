@@ -18,6 +18,14 @@
 	* autoopts/tpl/options.tpl.in: rename to autoopts/tpl/options-tpl.in and
 	move all the validation code to optlib.tlib.
 	* agen5/*: constify immutable tables and adjust references.
+	* autoopts/test/shell.test: FreeBSD's sed cannot cope with a two line
+	search expression.  Use a shell loop.
+	* autoopts/usage.c (print_usage_details): now includes packager info
+	* autoopts/version.c (printVersion): likewise
+	* config/confmacs.tlib (try-with-group): add "with-group" macro that
+	adds a series of ``--with-whatever...'' options.
+	* config/misc.def: use with-group to add packager options
+	* autoopts/tpl/optcode.tlib (pzPackager): add packager info to options
 
 2011-01-24  Bruce Korb  <bkorb@gnu.org>
 

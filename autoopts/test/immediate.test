@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2010-02-24 08:40:01 bkorb"
+# Time-stamp:        "2011-02-01 15:33:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -74,6 +74,7 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
+sedcmd="/All arguments are named options./q"
 compile "help"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
@@ -90,8 +91,6 @@ USAGE:  immediate [ <option-name>[{=| }<val>] ]...
    no  more-help      Extended usage information passed thru pager
 
 All arguments are named options.
-
-please send bug reports to:  autogen-users@lists.sourceforge.net
 _EOF_
 
 cmp -s ${testname}.help ${testname}.hlp || { set +x ; \

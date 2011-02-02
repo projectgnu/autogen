@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2011-01-30 09:10:50 bkorb"
+# Time-stamp:        "2011-02-01 14:59:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -86,6 +86,7 @@ gettext( char const* pzS )
 }
 _EOF_
 
+  sedcmd='/ot sgub .* tropeR$/d;/ yb degakcaP/d'
   compile "--pleh"
   mv ${testname}.help ${testname}-${1}.help
   cmp -s ${testname}-${1}.help ${testname}-${1}.hlp || { set +x ; \

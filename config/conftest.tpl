@@ -2,7 +2,7 @@
 
 null
 
-##  Time-stamp:        "2010-11-29 15:27:39 bkorb"
+##  Time-stamp:        "2011-02-01 12:33:54 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -37,7 +37,13 @@ null
 
 =][=
 
-INCLUDE "confmacs.tpl"  =][=
+INCLUDE "confmacs.tlib"  =][=
+
+(define group-id    (string-downcase! (get "group")))
+(if (= (string-length group-id) 0)
+    (set! group-id "ac")
+    (string->c-name! group-id)  )
+(define group-pfx   (string-append    group-id "_"))
 
 (if (exist? "output-file")
     (begin
@@ -87,14 +93,17 @@ dnl  This macro will invoke the AutoConf macros specified in [=(def-file)=]
 dnl  that have not been disabled with "omit-invocation".
 dnl[=
 
-(if (not separate-macros) (out-push-new)) =]
+(if (not separate-macros) (out-push-new))
+
+=]
 AC_DEFUN([[=(. do-all-name)=]],[[=
 
 (if (exist? "do-first")
     (string-append "\n  AC_REQUIRE([" do-all-name "_FIRST])")) =][=
 
-FOR test        =][=
-  preamble      =][=
+FOR test            =][=
+  (define author-name (get "author"))
+  (set-ctx (get "name"))
   (if separate-macros
      (begin
         (set! ofile (string-append (string-downcase mac-name) ".m4" ))
@@ -102,21 +111,21 @@ FOR test        =][=
         (set! ofile-list (string-append ofile-list "\n" ofile))
      )
      (out-suspend "main-macro")
-  )             =][=
+  )                 =][=
 
-  emit-macro    =]
+  INVOKE emit-macro =]
 [=(if separate-macros (out-pop) (out-resume "main-macro"))    =][=
 
   IF (not (exist? "omit-invocation")) =]
   # Check to see if [=check=].
-  [=(. mac-name)=]
-[=ENDIF         =][=
-ENDFOR test     =][=
+  [=(. mac-name)    =]
+[=ENDIF             =][=
+ENDFOR test         =][=
 (if (not separate-macros)
-    (out-pop #t)) =][=
+    (out-pop #t))   =][=
 (if (exist? "do-always")
     (string-append "\n  " do-all-name "_LAST"))
 =]
 ]) # end AC_DEFUN of [=(. do-all-name)=][=
 
-# end conftest.tpl     =]
+# end conftest.tpl  =]

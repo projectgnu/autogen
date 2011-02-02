@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-01-31 14:22:29 bkorb"
+ *  Time-stamp:        "2011-02-01 12:44:11 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -25,7 +25,7 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-compressDef(char* pz);
+compressDef(char * pz);
 
 static char*
 emitListattr(char* pzText, char* pzOut);

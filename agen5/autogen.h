@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-01-30 15:07:00 bkorb"
+ *  Time-stamp:        "2011-02-01 07:39:49 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -42,6 +42,13 @@
 #include "autoopts/autoopts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
+
+#if defined(SHELL_ENABLED) || defined(DAEMON_ENABLED)
+#  ifndef HAVE_WORKING_FORK
+#    error SHELL is enabled and fork() does not work
+     choke me
+#  endif
+#endif
 
 #ifndef STR
 #  define _STR(s) #s

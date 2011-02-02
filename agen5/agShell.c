@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2011-01-20 16:29:32 bkorb"
+ *  Time-stamp:        "2011-02-01 07:38:34 bkorb"
  *
  *  Manage a server shell process
  *
@@ -23,15 +23,6 @@
  */
 #ifndef SHELL_ENABLED
  void  closeServer(void) { }
-
- int   chainOpen(int stdinFd, char const ** ppArgs, pid_t* pChild) {
-     return -1; }
-
- pid_t openServer(tFdPair* pPair, char const ** ppArgs) {
-     return NOPROCESS; }
-
- pid_t openServerFP(tpfPair* pfPair, char const ** ppArgs) {
-     return NOPROCESS; }
 
  char* runShell(char const* pzCmd) {
      char* pz;
@@ -57,6 +48,15 @@ handle_signal(int signo);
 
 static void
 server_setup(void);
+
+static int
+chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild);
+
+static pid_t
+server_open(tFdPair* pPair, char const ** ppArgs);
+
+static pid_t
+server_fp_open(tpfPair* pfPair, char const ** ppArgs);
 
 static void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len);
@@ -215,8 +215,8 @@ server_setup(void)
  *  for the new process and, optionally, a pointer to a place
  *  to store the child's process id.
  */
-LOCAL int
-chainOpen(int stdinFd, char const ** ppArgs, pid_t * pChild)
+static int
+chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
 {
     tFdPair   stdoutPair = { -1, -1 };
     pid_t     chId;
@@ -332,8 +332,8 @@ chainOpen(int stdinFd, char const ** ppArgs, pid_t * pChild)
  *  process should write to "writeFd" and read from "readFd".
  *  The return value is the process id of the created process.
  */
-LOCAL pid_t
-openServer(tFdPair* pPair, char const ** ppArgs)
+static pid_t
+server_open(tFdPair* pPair, char const ** ppArgs)
 {
     pid_t chId = NOPROCESS;
 
@@ -345,7 +345,7 @@ openServer(tFdPair* pPair, char const ** ppArgs)
     if (pipe((int*)pPair) < 0)
         return NOPROCESS;
 
-    pPair->readFd = chainOpen(pPair->readFd, ppArgs, &chId);
+    pPair->readFd = chain_open(pPair->readFd, ppArgs, &chId);
     if (chId == NOPROCESS)
         close(pPair->writeFd);
 
@@ -354,14 +354,14 @@ openServer(tFdPair* pPair, char const ** ppArgs)
 
 
 /**
- *  Identical to "openServer()", except that the "fd"'s are "fdopen(3)"-ed
+ *  Identical to "server_open()", except that the "fd"'s are "fdopen(3)"-ed
  *  into file pointers instead.
  */
-LOCAL pid_t
-openServerFP(tpfPair* pfPair, char const ** ppArgs)
+static pid_t
+server_fp_open(tpfPair* pfPair, char const ** ppArgs)
 {
     tFdPair   fdPair;
-    pid_t     chId = openServer(&fdPair, ppArgs);
+    pid_t     chId = server_open(&fdPair, ppArgs);
 
     if (chId == NOPROCESS)
         return chId;
@@ -496,7 +496,7 @@ runShell(char const*  pzCmd)
     if (serv_id == NULLPROCESS) {
         static char pz4_z[] = "PS4=>ag> ";
         putenv(pz4_z);
-        serv_id = openServerFP(&serv_pair, serverArgs);
+        serv_id = server_fp_open(&serv_pair, serverArgs);
         if (serv_id > 0)
             server_setup();
     }

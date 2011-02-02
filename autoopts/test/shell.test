@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-01-30 09:07:32 bkorb"
+# Time-stamp:        "2011-02-02 08:52:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -95,7 +95,7 @@ _EOF_
 cmp -s ${testname}.test ${testname}.out || \
   failure "`diff ${testname}.out ${testname}.test`"
 
-sed '/test-main/s/yes/optionParseShell/' ${testname}.def > XX
+${SED} '/test-main/s/yes/optionParseShell/' ${testname}.def > XX
 mv -f XX ${testname}.def
 
 echo ${AG_L} ${testname}.def
@@ -130,8 +130,6 @@ If the script file already exists and contains Automated Option Processing
 text, the second line of the file through the ending tag will be replaced
 by the newly generated text.  The first ``#!''  line will be regenerated.
 
-please send bug reports to:  autogen-users@lists.sourceforge.net
-
 = = = = = = = =
 
 This incarnation of genshell will produce
@@ -150,6 +148,19 @@ Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 _EOF_
 
+while IFS='' read -r line
+do
+  test "X${line}" = X || {
+    echo "$line"
+    continue
+  }
+  IFS='' read -r line || break
+  case "${line}" in
+  'please send bug '* ) ;;
+  * ) echo "${nl}${line}" ;;
+  esac
+done < ${testname}.help > ${testname}.HELP
+mv -f ${testname}.HELP ${testname}.help
 files=${testname}.hlp\ ${testname}.help
 cmp -s ${files} || \
   failure "script generator help output mismatch: `diff -c ${files}`"
@@ -437,7 +448,14 @@ exec 3>&-
 rm -f ${testname}.sh
 ./${testname} -o ${testname}.sh
 
-sed '2,9d'  ${testname}.sh > XXX
+sedcmd='2,9d'
+grep -F 'Packaged by '  ${testname}.sh >/dev/null && {
+    sedcmd=${sedcmd}${nl}'/^Packaged by /d
+    /^Report .* bugs to /d
+    /and the flag character\.$/s/$/'"'/"
+}
+
+${SED} "$sedcmd"  ${testname}.sh > XXX
 mv -f XXX ${testname}.sh
 cmp -s ${testname}.sh* || \
   failure "`diff ${testname}.sh ${testname}.sht`"

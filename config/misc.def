@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-01-21 16:51:09 bkorb"
+/*  Time-stamp:        "2011-02-01 12:45:40 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -24,8 +24,8 @@ autogen definitions conftest.tpl;
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-group = ag;
-version = "$Revision: 4.29 $";
+group       = ag;
+version     = "$Revision: 4.29 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -50,8 +50,12 @@ test = {
     type   = test;
     check  = 'using shell scripts';
 
-    code   = 'test "x$ac_cv_func_fork_works" = xyes '
-                '&& test "x$ag_cv_enable_shell" = xyes || exit 1 ; echo yes';
+    code   = <<- _EOF_
+	test "x$ac_cv_func_fork_works" != xyes && \
+	    test "x$ac_cv_func_vfork_works" != xyes && exit 1
+	test "x$ag_cv_enable_shell" = xyes || exit 1
+	echo yes
+	_EOF_;
     code-quoting  = asis;
 
     action = { act-type = script; asis;
@@ -243,8 +247,8 @@ test   = {
 };
 
 test   = {
-  name     = "xml2";
-  type     = "withlib";
+  name     = xml2;
+  type     = withlib;
   check    = "a working libxml2 can be found";
   code     = <<- _END_OF_CODE_
 	#include <libxml/parser.h>
@@ -259,8 +263,8 @@ test   = {
                         '    LIBS="${ag_save_LIBS}"' "\n"
                         '    ';
            };
-  run-mode   =  "link";
 
+  run-mode    =  link;
   conditional = HAVE_XML_LIB;
 
   doc = <<- _END_OF_DOC_
@@ -271,16 +275,16 @@ test   = {
 };
 
 test   = {
-  name          = "fattach";
-  type          = "run";
+  name     = fattach;
+  type     = run;
   check    = "fattach runs";
   code     = <<- _END_OF_CODE_
-        int fds[2];
-        pipe(fds);
-        return fattach(fds[0],__FILE__);
-_END_OF_CODE_;
-  run-mode      =  "null";
-  code-mode     =  "body";
+	int fds[2];
+	pipe(fds);
+	return fattach(fds[0],__FILE__);
+	_END_OF_CODE_;
+  run-mode      =  null;
+  code-mode     =  body;
 
   action   = { yes; act-type=define; act-text = "1"; };
 
@@ -314,7 +318,7 @@ test = {
     code   = <<-  _EOF_
 	#include <string.h>
 	int main (int argc, char** argv) {
-	   char zRej[] = "reject";
+	   char zRej[] = reject;
 	   char zAcc[] = "a-ok-eject";
 	   return strcspn( zAcc, zRej ) - 5;
 	}
@@ -377,24 +381,24 @@ test = {
 };
 
 test   = {
-  name     = "ldflags";
-  type     = "test";
+  name     = ldflags;
+  type     = test;
   check    = "runtime library dirs can be specified";
   code     = <<- _END_OF_CODE_
-        echo 'int main() { return 0; }' > conftest.$ac_ext
-        libs="${LIBS}"
-        LIBS="${LIBS} -Wl,-R/tmp"
-        if (eval $ac_link) > /dev/null 2>&1
-        then echo '-Wl,-R' ; rm -f conftest* ; exit 0 ; fi
-        LIBS="${libs} -R/tmp"
-        if (eval $ac_link) > /dev/null 2>&1
-        then echo '-R' ; rm -f conftest* ; exit 0 ; fi
-        rm -f conftest* ; exit 1
+	echo 'int main() { return 0; }' > conftest.$ac_ext
+	libs="${LIBS}"
+	LIBS="${LIBS} -Wl,-R/tmp"
+	if (eval $ac_link) > /dev/null 2>&1
+	then echo '-Wl,-R' ; rm -f conftest* ; exit 0 ; fi
+	LIBS="${libs} -R/tmp"
+	if (eval $ac_link) > /dev/null 2>&1
+	then echo '-R' ; rm -f conftest* ; exit 0 ; fi
+	rm -f conftest* ; exit 1
 	_END_OF_CODE_;
   code-quoting  = asis;
 
   action   = { yes; act-type=subst;
-               act-text = "${ag_cv_test_ldflags}"; };
+      act-text = "${ag_cv_test_ldflags}"; };
 
   doc = <<- _END_OF_DOC_
 	This test determines whether `-R/path/to/libs' or
@@ -425,6 +429,32 @@ test = {
 	viz., --show-defs (dump out the definition tree)
 	and --show-shell (trace all shell commands via `set -x')
 	_EOF_; // '
+};
+
+test = {
+    name    = packager;
+    type    = with-group;
+    check   = 'name of the packager of this software is supplied';
+    action  = { act-type = define; act-text = '"${withval}"'; unquoted; };
+
+    subgroup = {
+       subtype = version;
+       subtext = 'packager-specific version information is supplied';
+    };
+    subgroup = {
+       subtype = bug-reports;
+       subtext = 'bug reporting URI/e-mail/etc. is supplied';
+    };
+    grp-valid = {
+      grp-test = <<- _EOF_
+	test "X$with_packager" != "X" || \
+	    test "X$with_packager_version$with_packager_bug_reports" = "X"
+	_EOF_;
+      grp-action = { no; act-type = script; asis;
+        act-text = 'AC_MSG_ERROR('
+           '[--with-packager-{bug-reports,version} require --with-packager])';
+      };
+    };
 };
 
 do-always = <<- _END_ALWAYS_

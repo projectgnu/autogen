@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2011-01-18 11:35:37 bkorb"
+ *  Time-stamp:        "2011-02-01 14:31:45 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -84,7 +84,6 @@ inner_main(
 #endif
     int argc, char ** argv)
 {
-    ag_scribble_init();
     atexit(done_check);
     initialize(argc, argv);
 

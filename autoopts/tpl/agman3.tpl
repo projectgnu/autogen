@@ -4,7 +4,7 @@ null
 
 ## agman3.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-01-19 10:58:28 bkorb"
+## Time-stamp:      "2011-02-01 06:38:37 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -35,16 +35,16 @@ null
 
 +}{+
 
-FOR export_func     +}{+
+FOR export-func     +}{+
   (if (not (exist? "private"))
       (set! see-also (string-append see-also
             (get "name") "(3) " ))  )
   +}{+
 
-ENDFOR export_func  +}{+
+ENDFOR export-func  +}{+
 
 
-FOR export_func                +}{+
+FOR export-func                +}{+
   IF (not (exist? "private"))  +}{+
 
     (out-push-new (string-append
@@ -67,7 +67,7 @@ FOR export_func                +}{+
 #include <\fI{+header+}\fP>
 .br{+
   ENDIF+}
-cc [...] -o outfile infile.c -l{+library+} [...]
+cc [...] -o outfile infile.c -l\fB{+library+}\fP [...]
 .sp 1
 {+ ?% ret-type "%s" void
 +} \fB{+name+}\fP({+
@@ -120,7 +120,7 @@ emit-man-text
 
 +}
 .SH SEE ALSO
-The \fIinfo\fP documentation for the \fI-l{+library+}\fP library.
+The \fIinfo\fP documentation for the -l\fI{+library+}\fP library.
 .br
 {+
 (define tmp-txt (get "see"))
@@ -136,7 +136,7 @@ sed 's@%s(3) @@;s/3) $/3)/;s/(3) /(3), /g;s/, *,/,/g;s/^, *//'"
 
   ENDIF private  +}{+
 
-ENDFOR  export_func
+ENDFOR  export-func
 
 
 +}

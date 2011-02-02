@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2010-12-20 13:56:53 bkorb"
+# Time-stamp:     "2011-02-02 09:16:18 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -51,7 +51,9 @@ cfg_vals()
   esac
 
   set -a
-  SED=`which sed`
+  SED=`exec 2>/dev/null;which gsed`
+  test -x "${SED}" || SED=/bin/xpg4/bin/sed
+  test -x "${SED}" || SED=`which sed`
   test -x "${SED}" || SED=/bin/sed
   test -x "${SED}" || SED=/usr/bin/sed
 
@@ -271,6 +273,12 @@ cfg_inc()
   ${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
 }
 
+clean_pkg() {
+  test "X${sedcmd}" = X && s= || s=${nl}${sedcmd}
+  s="/^Packaged by/d${nl}/^Report .* bugs to/d${s}"
+  ${SED} "${s}"
+}
+
 compile()
 {
   ${setx}
@@ -282,15 +290,11 @@ compile()
   cc_cmd="${CC} ${CFLAGS} -D$d ${INC} -o ${Cexe} ${Csrc}.c ${LIB}"
   eval ${cc_cmd} || \
     failure cannot compile ${Csrc}.c
-
   if test $# -gt 0
   then
-    if test "X${sedcmd}" = "X"
-    then ./${Cexe} ${*} ${dosed} || \
+    ./${Cexe} ${*} ${dosed} || \
       failure cannot obtain help output for ${Csrc}
-    else ./${Cexe} ${*} ${dosed} | ${SED} "${sedcmd}"
-    fi > ${Csrc}.help    
-  fi
+  fi | clean_pkg > ${Csrc}.help    
   Csrc='' Cexe='' Dnam=''
 }
 

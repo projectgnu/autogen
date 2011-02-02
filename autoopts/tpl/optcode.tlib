@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-01-30 15:12:30 bkorb"
+# Time-stamp:      "2011-02-01 14:34:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -532,6 +532,22 @@ static void * const original[=(. pname-cap)=]Cookies[ [=
 # define PKGDATADIR ""
 #endif
 
+#ifndef  WITH_PACKAGER
+# define [=(. pname)=]_packager_info NULL
+#else
+static char const [=(. pname)=]_packager_info[] =
+    "Packaged by " WITH_PACKAGER
+
+# ifdef WITH_PACKAGER_VERSION
+        " ("WITH_PACKAGER_VERSION")"
+# endif
+
+# ifdef WITH_PACKAGER_BUG_REPORTS
+    "\nReport [=(. pname)=] bugs to " WITH_PACKAGER_BUG_REPORTS
+# endif
+    "\n";
+#endif
+
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
     0, NULL,                    /* original argc + argv    */
@@ -555,7 +571,7 @@ tOptions [=(. pname)=]Options = {
     zExplain,     zDetail,      optDesc,
     zBugsAddr,                  /* address to send bugs to */
     NULL, NULL,                 /* extensions/saved state  */
-    [= (. usage-proc) =],       /* usage procedure */
+    [= (. usage-proc)       =], /* usage procedure */
     translate_option_strings,   /* translation procedure */
     /*
      *  Indexes to special options
@@ -580,7 +596,7 @@ tOptions [=(. pname)=]Options = {
 [= ELSE \=]
     NULL, NULL,
 [= ENDIF \=]
-    PKGDATADIR
+    PKGDATADIR, [=(. pname)=]_packager_info
 };
 [=
 
@@ -682,7 +698,6 @@ translate_option_strings(void)
      *  been changed by the first pass through this code.  One shot only.
      */
     if (option_usage_text.field_ct != 0) {
-
         /*
          *  Do the translations.  The first pointer follows the field count
          *  field.  The field count field is the size of a pointer.
@@ -696,12 +711,9 @@ translate_option_strings(void)
             *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
 [=
-
   FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle pzExplain
-               pzDetail         =][=
-
-    (sprintf "\n        COERSION(%s);" (get "field"))  =][=
-
+               pzDetail    pzPackager   =]
+        COERSION([= field =]);[=
   ENDFOR                        =][=
 
   IF (exist? "full-usage")      =]

@@ -3,7 +3,7 @@
 #
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2011-01-28 17:46:14 bkorb"
+# Time-stamp:        "2011-02-01 15:06:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -112,7 +112,6 @@ cmp -s ${testname}*.help || \
   failure "`diff ${testname}-base.help ${testname}.help`"
 
 cat > ${testname}-base.out <<_EOF_
-21 117 798 /tmp/use
 OPTION_CT=3
 export OPTION_CT
 TEST_EQUIV_SECOND=2 # 0x2
@@ -152,8 +151,6 @@ export TEST_EQUIV_OMEGA
 _EOF_
 
 ( set -e +x
-  PAGER=wc ./${testname} --more | \
-    sed 's,/use\..*,/use,;s,[ 	][ 	]*, ,g;s/^ //'
   ./${testname} --alpha -s 2
   echo === --beta 5 -o opt ===
   ./${testname} --beta 5 -o opt

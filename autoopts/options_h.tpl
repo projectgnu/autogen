@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-01-02 17:15:41 bkorb"
+# Time-stamp:      "2011-02-01 13:07:58 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -351,6 +351,7 @@ struct options {
     optArgBucket_t const * const originalOptArgArray;
     void * const * const originalOptArgCookie;
     char const * const  pzPkgDataDir;
+    char const * const  pzPackager;
 };
 
 /*

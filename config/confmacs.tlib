@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2010-02-24 08:39:02 bkorb"
+## Time-stamp:        "2011-02-01 13:25:26 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -28,121 +28,64 @@ AutoGen5 Template
     (string-substitute t
         '("["     "]"     "$"     "#"     )
         '("@<:@"  "@:>@"  "@S|@"  "@%:@"  ))  )
-=][=
 
-DEFINE preamble
+(define test-name    "")
+(define up-name      "")
+(define down-name    "")
+(define hyphen-name  "")
+(define mac-name     "")
+(define sub-name     "")
+(define cv-name      "")
+(define good-text    "")
+(define bad-text     "")
 
-=][=
+(define set-ctx (lambda (my-name) (begin
+  (set! test-name    (string->c-name! my-name))
 
-  (define test-name (get "name"))
-  (if (= (string-length test-name) 0)
-      (set! test-name "test_name")
-      (string->c-name! test-name) )
+  (set! good-text    "")
+  (set! bad-text     "")
 
-  (define author-name (get "author"))
-  (define up-name     (string-upcase    test-name))
-  (define down-name   (string-downcase  test-name))
-  (define group-id    (string-downcase! (get "group")))
-  (if (= (string-length group-id) 0)
-      (set! group-id "ac")
-      (string->c-name! group-id)  )
-  (define group-pfx   (string-append    group-id "_"))
-  (define mac-name    (string-upcase!   (string-append group-pfx
-                      (get "type") "_" up-name)))
-  (define sub-name    (string-upcase!   (string-append group-pfx down-name)))
-  (define cv-name     (string-downcase! (string-append group-pfx "cv_"
-                      (get "type") "_" down-name)))
-
-=][=
-
-ENDDEF   preamble
+  (set! up-name      (string-upcase   test-name))
+  (set! down-name    (string-downcase test-name))
+  (set! hyphen-name  (string-tr       down-name "_" "-"))
+  (set! mac-name     (string->c-name! (string-upcase! (string-append
+                     group-pfx (get "type") "_" up-name))) )
+  (set! cv-name      (string->c-name! (string-downcase! (string-append
+                     group-pfx "cv_" (get "type") "_" down-name))) )
+  (set! sub-name     (string-upcase!   (string-append group-pfx up-name)))
+)))
 
 =][=
 
-DEFINE  emit-macro       =][=
+# # # # # # # # # # EMIT MACRO # # # # # # # #  =][=
 
-  CASE    type           =][=
-  ~~  compile|run|link|test   =][=
+DEFINE  emit-macro                              =][=
+
+  CASE    type                                  =][=
+  ~~  compile|run|link|test                     =][=
       (define bad-define-name   "NEED_%s")
-      (define good-define-name  "HAVE_%s")     =][=
-  ~~  enable|disable     =][=
+      (define good-define-name  "HAVE_%s")      =][=
+
+  ~~  enable|disable                            =][=
       (define bad-define-name   "%s_DISABLED")
-      (define good-define-name  "%s_ENABLED")  =][=
-  ~~  with|without       =][=
+      (define good-define-name  "%s_ENABLED")   =][=
+
+  ~~  with|without|with-group                   =][=
       (define bad-define-name   "WITHOUT_%s")
-      (define good-define-name  "WITH_%s")     =][=
-  ~~  withlib|withconf   =][=
+      (define good-define-name  "WITH_%s")      =][=
+     
+  ~~  withlib|withconf                          =][=
       (define lib-name          (string-append "lib" down-name))
       (define bad-define-name   "WITHOUT_LIB%s")
-      (define good-define-name  "WITH_LIB%s")     =][=
-  ESAC  =][=
+      (define good-define-name  "WITH_LIB%s")   =][=
 
-  IF  (define good-text  "")
-      (define bad-text   "")
-      (. separate-macros)    =][=
+  * =][= (error (string-append "unknown macro type: " (get "type"))) =][=
+      
+  ESAC                                          =][=
 
-(dne "dnl " "dnl ")      =]
-dnl
-dnl @synopsis  [=(. mac-name)=]
-dnl
-dnl @success-result[=
-    IF (<= (count "action") (count "action.no"))
-      =]:  there is no output[=
-    ELSE         =]
-dnl[=
-      FOR action =][=
-        IF (not (exist? "no"))  =][=
-          CASE  act-type  =][=
-          ==  define      =]
-dnl   * [=(sprintf good-define-name up-name)
-          =] is #defined as [=?% act-text "%s" "1"=][=
-          ==  subst       =]
-dnl   * @[=(.  sub-name)=]@ is replaced by [=act-text=][=
-          ==  script      =]
-dnl   * a short script is run[=
-          ESAC   =][=
-        ENDIF    =][=
-      ENDFOR     =][=
-    ENDIF (<= (count "action") (count "action.no")) =]
-dnl
-dnl @failure-result[=
-    IF (= (count "action.no") 0)
-      =]:  there is no output[=
-    ELSE         =]
-dnl[=
-      FOR action =][=
-        IF (exist? "no")  =][=
-          CASE  act-type  =][=
-          ==  define      =]
-dnl   * [=(sprintf bad-define-name up-name)
-           =] is #defined as [=?% act-text "%s" "1"=][=
-          ==  subst       =]
-dnl   * @[=(. sub-name)=]@ is replaced by [=act-text=][=
-          ==  script      =]
-dnl   * a short script is run[=
-          ESAC   =][=
-        ENDIF    =][=
-      ENDFOR     =][=
-    ENDIF (= (count "action.no") 0) =][=
+  IF  (. separate-macros)                       =][=
 
-    IF   (define doc-text (get "doc"))
-      (> (string-length doc-text) 0) =]
-dnl
-dnl @description
-[=(prefix "dnl " doc-text) =][=
-    ENDIF =][=
-
-    IF  (> (string-length author-name) 0) =]
-dnl
-dnl @version "[=
-
- (strftime "%d-%B-%Y at %H:%M"
-           (localtime (current-time)) ) =]"
-dnl
-dnl @author [=(. author-name)=][=
-
-    ENDIF     =]
-dnl[=
+    INVOKE macro-header                         =][=
 
   ENDIF separate-macros
 
@@ -160,12 +103,11 @@ AC_DEFUN([[=
 
   (. mac-name)    =]],[[=
 
-  IF (ag-function? fcn-name) =][=
-    INVOKE (. fcn-name) =][=
+  IF (ag-function? fcn-name)    =][=
+    INVOKE (. fcn-name)         =][=
+  ELSE                          =][=
 
-  ELSE   =]
-
-ERROR:  invalid conftest function:   ``[= (. fcn-name) =]''[=
+    (error (string-append "invalid conftest function:   " fcn-name)) =][=
 
   ENDIF  =]
 [=(prefix "  " (join "\n" (stack "always")))
@@ -173,7 +115,76 @@ ERROR:  invalid conftest function:   ``[= (. fcn-name) =]''[=
 ]) # end of AC_DEFUN of [=(. mac-name)=]
 [=
 
-ENDDEF  emit-macro   =][=
+ENDDEF  emit-macro
+
+# # # # # # # # # # # macro file header # # # # # # # # # # =][=
+
+DEFINE  macro-header                            =][=
+
+(dne "dnl " "dnl ") =]
+dnl
+dnl @synopsis  [=(. mac-name)=]
+dnl
+dnl @success-result[=
+    IF (<= (count "action") (count "action.no"))
+      =]:  there is no output[=
+    ELSE            =]
+dnl[=
+      FOR action    =][=
+        IF (not (exist? "no"))  =][=
+          CASE  act-type    =][=
+          ==  define        =]
+dnl   * [=(sprintf good-define-name up-name)
+          =] is #defined as [=?% act-text "%s" "1"=][=
+          ==  subst         =]
+dnl   * @[=(.  sub-name)=]@ is replaced by [=act-text=][=
+          ==  script        =]
+dnl   * a short script is run[=
+          ESAC              =][=
+        ENDIF exist? "no"   =][=
+      ENDFOR        =][=
+    ENDIF (<= (count "action") (count "action.no")) =]
+dnl
+dnl @failure-result[=
+    IF (= (count "action.no") 0)
+      =]:  there is no output[=
+    ELSE            =]
+dnl[=
+      FOR action    =][=
+        IF (exist? "no")  =][=
+          CASE  act-type  =][=
+          ==  define      =]
+dnl   * [=(sprintf bad-define-name up-name)
+           =] is #defined as [=?% act-text "%s" "1"=][=
+          ==  subst       =]
+dnl   * @[=(. sub-name)=]@ is replaced by [=act-text=][=
+          ==  script      =]
+dnl   * a short script is run[=
+          ESAC      =][=
+        ENDIF       =][=
+      ENDFOR        =][=
+    ENDIF (= (count "action.no") 0) =][=
+
+    IF   (define doc-text (get "doc"))
+      (> (string-length doc-text) 0) =]
+dnl
+dnl @description
+[=(prefix "dnl " doc-text) =][=
+    ENDIF           =][=
+
+    IF  (> (string-length author-name) 0) =]
+dnl
+dnl @version "[=
+
+ (strftime "%d-%B-%Y at %H:%M"
+           (localtime (current-time)) ) =]"
+dnl
+dnl @author [=(. author-name)=][=
+
+    ENDIF           =]
+dnl[=
+
+ENDDEF  macro-header
 
 # # # # # # # # # # # C-Feature # # # # # # # # # #
 
@@ -191,7 +202,61 @@ DEFINE  end-feat-test  =][=
   AC_MSG_RESULT([${[=(. cv-name)=]}])[=
   emit-results         =][=
 
-ENDDEF  end-feat-test  =][=
+ENDDEF  end-feat-test
+
+# # # # # # # # # # COLLECT ACTIONS # # # # # # # # # # =][=
+
+DEFINE  collect-act   =][=
+
+  CASE (set! tmp-text (get "act-text"))
+       (set! TMP-text (string-upcase tmp-text))
+       (string-append
+         (if (exist? "no") "no-" "yes-")
+         (get "act-type"))
+    =][=
+
+  == yes-define        =][=
+    (set! good-text (string-append good-text
+          "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
+          "([" (sprintf good-define-name up-name) "],["
+          (if (> (string-length tmp-text) 0) tmp-text "1")
+          "],\n        [Define this if " (protect-text (get "check")) "])" ))
+    =][=
+
+  == yes-subst         =][=
+    (set! good-subst 1)
+    (set! good-text (string-append good-text
+                 "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
+    =][=
+
+  == yes-script        =][=
+    (set! good-text (string-append good-text "\n    "
+          (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
+    =][=
+
+  ==  no-define        =][=
+    (set! bad-text (string-append bad-text
+          "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
+          "([" (sprintf bad-define-name up-name) "],["
+          (if (> (string-length tmp-text) 0) tmp-text "1")
+          "],\n        [Define this if '" (protect-text (get "check"))
+                                     "' is not true])" ))
+    =][=
+
+  ==  no-subst         =][=
+    (set! bad-subst  1)
+    (set! bad-text (string-append bad-text
+                 "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
+    =][=
+
+  ==  no-script        =][=
+    (set! bad-text (string-append bad-text "\n    "
+          (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
+    =][=
+
+  ESAC                 =][=
+
+ENDDEF  collect-act
 
 # # # # # # # # # # EMIT RESULTS # # # # # # # # # # =][=
 
@@ -226,54 +291,7 @@ DEFINE  emit-results   =][=
   ENDIF  type is withlib =][=
 
   FOR     action         =][=
-
-    CASE (set! tmp-text (get "act-text"))
-         (set! TMP-text (string-upcase tmp-text))
-         (string-append
-           (if (exist? "no") "no-" "yes-")
-           (get "act-type"))
-      =][=
-
-    == yes-define        =][=
-      (set! good-text (string-append good-text
-            "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
-            "([" (sprintf good-define-name up-name) "],["
-            (if (> (string-length tmp-text) 0) tmp-text "1")
-            "],\n        [Define this if " (protect-text (get "check")) "])" ))
-      =][=
-
-    == yes-subst         =][=
-      (set! good-subst 1)
-      (set! good-text (string-append good-text
-                   "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
-      =][=
-
-    == yes-script        =][=
-      (set! good-text (string-append good-text "\n    "
-            (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
-      =][=
-
-    ==  no-define        =][=
-      (set! bad-text (string-append bad-text
-            "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
-            "([" (sprintf bad-define-name up-name) "],["
-            (if (> (string-length tmp-text) 0) tmp-text "1")
-            "],\n        [Define this if '" (protect-text (get "check"))
-                                       "' is not true])" ))
-      =][=
-
-    ==  no-subst         =][=
-      (set! bad-subst  1)
-      (set! bad-text (string-append bad-text
-                   "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
-      =][=
-
-    ==  no-script        =][=
-      (set! bad-text (string-append bad-text "\n    "
-            (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
-      =][=
-
-    ESAC                 =][=
+    INVOKE collect-act   =][=
   ENDFOR  action         =][=
 
   (if (> good-subst 0)
@@ -286,7 +304,6 @@ DEFINE  emit-results   =][=
   )
 
 =]
-
   if test "X${[=(. cv-name)=]}" [=
 
   IF (> (string-length good-text) 0)
@@ -311,28 +328,25 @@ DEFINE  emit-results   =][=
   AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" != Xno])[=
   ENDFOR cond..   =][=
 
-ENDDEF  emit-results   =][=
+ENDDEF  emit-results
 
 # # # # # # # # # # ENABLEMENT # # # # # # # # # # =][=
 
 DEFINE  emit-enablement
 
   =]
-  AC_ARG_[=arg-name=]([[=(string-tr down-name "_" "-")=]],
-    AC_HELP_STRING([--[=type=]-[=(string-tr test-name "_A-Z" "-a-z")
-                   =]], [[=check=]]),
+  AC_ARG_[=arg-name=]([[=(. hyphen-name)=]],
+    AS_HELP_STRING([--[=type=]-[=(. hyphen-name)=]], [[=check=]]),
     [[=(. cv-name)=]=${[=(string-downcase! (get "arg-name"))
-      =]_[=(string-tr test-name "-A-Z" "_a-z")=]}],
+      =]_[=(. down-name)=]}],
     AC_CACHE_CHECK([whether [=check=]], [=(. cv-name)=],
       [=(. cv-name)=]=[=
          (if (~~ (get "type") "with|enable") "no" "yes") =])
   ) # end of AC_ARG_[=arg-name=][=
 
-  emit-results =][=
+  INVOKE emit-results =][=
 
 ENDDEF  emit-enablement
-
-=][=
 
 # # # # # # # # # SET-LANGUAGE # # # # # # # # =][=
 
@@ -370,7 +384,7 @@ DEFINE  set-language
 
   ENDIF   libs exists           =][=
 
-ENDDEF  set-language            =][=
+ENDDEF  set-language
 
 # # # # # # # # # # WITH # # # # # # # # # =][=
 
@@ -386,6 +400,50 @@ DEFINE  try-without             =][=
   INVOKE emit-enablement
        arg-name  = WITH         =][=
 ENDDEF  try-without             =][=
+
+# # # # # # # WITH-GROUP # # # # # #  =][=
+
+DEFINE  try-with-group          =][=
+  (define group-name (string-downcase (string->c-name! (get "name"))))
+  =][=
+
+  INVOKE emit-enablement
+       type      = with
+       arg-name  = WITH         =][=
+  (define save-mname mac-name)  =][=
+
+  FOR  subgroup                 =][=
+    (set-ctx (string-append group-name "_" (get "subtype")))
+    =][=
+    INVOKE emit-enablement
+       type      = with
+       arg-name  = WITH
+       check     = (get "subtext")
+    =][=
+  ENDFOR subgroup               =][=
+
+  (set! mac-name   save-mname)
+  (set! good-subst 0)
+  (set! bad-subst  0)
+  (set! good-text  "")
+  (set! bad-text   "")          =][=
+
+  FOR  grp-valid                =]
+  if [= (get "grp-test")       =]
+  then[=
+    FOR  grp-action             =][=
+      INVOKE collect-act        =][=
+    ENDFOR grp-action           =][=
+    (emit (if (> (string-length good-text) 1)
+        (string-append "\n" good-text)
+        " :"))
+    (if (> (string-length bad-text) 1)
+        (string-append "\n  else\n" bad-text) "")
+    =]
+  fi[=
+  ENDFOR  grp-valid             =][=
+
+ENDDEF  try-with-group          =][=
 
 # # # # # # # # # # ENABLE # # # # # # # # # =][=
 
@@ -413,7 +471,7 @@ DEFINE  try-withlib             =][=
     (set! cv-name  (string-append group-pfx "cv_with_lib" down-name))
     (set! lib-name (string-append "lib" down-name))
     lib-name =]],
-    AC_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
+    AS_HELP_STRING([--with-lib[=(string-tr down-name "_" "-")
         =]], [[=(. lib-name)=] installation prefix]),
     [[=(. cv-name)=]_root=${with_lib[=(string-tr down-name "-" "_")=]}],
     AC_CACHE_CHECK([whether with-[=(. lib-name)=] was specified], [=
@@ -421,7 +479,7 @@ DEFINE  try-withlib             =][=
       [=(. cv-name)=]_root=no)
   ) # end of AC_ARG_WITH [=(. lib-name)=]
 
-  if test "${with_libguile+set}" = set && \
+  if test "${with_[=(. lib-name)=]+set}" = set && \
      test "${withval}" = no
   then ## disabled by request
     [=(. cv-name)=]_root=no
@@ -430,7 +488,7 @@ DEFINE  try-withlib             =][=
   else
 
   AC_ARG_WITH([[=(. lib-name)=]-cflags],
-    AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
+    AS_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
         =]-cflags], [[=(. lib-name)=] compile flags]),
     [[=(. cv-name)=]_cflags=${with_[=(string-tr test-name "-A-Z" "_a-z")
                                    =]_cflags}],
@@ -440,7 +498,7 @@ DEFINE  try-withlib             =][=
   ) # end of AC_ARG_WITH [=(. lib-name)=]-cflags
 
   AC_ARG_WITH([[=(. lib-name)=]-libs],
-    AC_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
+    AS_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
         =]-libs], [[=(. lib-name)=] link command arguments]),
     [[=(. cv-name)=]_libs=${with_[=(string-tr test-name "-A-Z" "_a-z")
                                    =]_libs}],
@@ -561,9 +619,7 @@ DEFINE  try-test                =][=
   AC_CACHE_VAL([[=(. cv-name)=]],[
     [=(. cv-name)=]=[= (sub-shell-str
       (string-append "exec 2> /dev/null\n" (get "code")) ) =]
-    if test $? -ne 0
-    then [=(. cv-name)=]=no
-    elif test -z "$[=(. cv-name)=]"
+    if test $? -ne 0 || test -z "$[=(. cv-name)=]"
     then [=(. cv-name)=]=no
     fi
   ]) # end of CACHE_VAL of [=(. cv-name)=]

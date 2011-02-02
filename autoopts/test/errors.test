@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-01-28 17:42:21 bkorb"
+# Time-stamp:        "2011-02-01 15:15:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -126,8 +126,9 @@ echo "second bumble" > ${testname}RC/.test_errorsrc
 ./${testname} --ignored > ${testname}.ignored 2>&1 && \
   failure "${testname} accepted --ignored"
 
-cmp -s ${testname}.ignored* || \
-  failure "${testname}.ignored error:  `diff ${testname}.ignored*`"
+clean_pkg < ${testname}.ignored > ${testname}.ignored-result
+cmp -s ${testname}.ignored-* || \
+  failure "${testname}.ignored error:  `diff ${testname}.ignored-*`"
 
 mv ${testname}RC/.test_errorsrc ${testname}RC/test_errors.rc
 ./${testname} --load=${testname}RC/test_errors.rc -o mumble > /dev/null || \
