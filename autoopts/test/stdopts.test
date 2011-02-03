@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2011-01-28 17:55:00 bkorb"
+# Time-stamp:        "2011-02-02 11:54:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -106,7 +106,7 @@ cmp -s ${testname}.o* || \
 
 # # # # # # # # # # USAGE OPTION # # # # # # # # # # #
 
-( sed "s/${testname}/${testname}-2/g" ${testname}.def
+( ${SED} "s/${testname}/${testname}-2/g" ${testname}.def
   echo 'usage-opt;'
 ) > ${testname}-2.def
 

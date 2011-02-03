@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-21 12:11:47 bkorb"
+## Time-stamp:      "2011-02-03 08:59:03 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -80,7 +80,7 @@ stamp-doc :
 	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
 	$(AG_ENV) ; \
 	$(RUNAG) $(MAN_DEP) -Tagman-cmd $(srcdir)/opts.def ; \
-	$(RUNAG) $(INF_DEP) -Taginfo -DLEVEL=section $(srcdir)/opts.def
+	$(RUNAG) $(INF_DEP) -Tagtexi-cmd -DLEVEL=section $(srcdir)/opts.def
 
 .NOTPARALLEL:
 

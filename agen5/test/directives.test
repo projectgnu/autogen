@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # directives.test --- test definition directives
 #
-# Time-stamp:        "2010-06-26 16:06:22 bkorb"
+# Time-stamp:        "2011-02-02 12:09:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -42,7 +42,7 @@ _EOF_
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 echo creating ${testname}.inc
-sed 's/^ *[0-9]*: //' > ${testname}.inc <<_EOF_
+${SED} 's/^ *[0-9]*: //' > ${testname}.inc <<_EOF_
       1: autogen definitions ${testname};
       2: 
       3: #option templ-dir \$LDIR/subdir
@@ -61,7 +61,7 @@ sed 's/^ *[0-9]*: //' > ${testname}.inc <<_EOF_
 _EOF_
 
 echo creating ${testname}.def
-sed 's/^ *[0-9]*: //' > ${testname}.def <<_EOF_
+${SED} 's/^ *[0-9]*: //' > ${testname}.def <<_EOF_
       1: autogen definitions ${testname};
       2: 
       3: #include ${testname}.inc

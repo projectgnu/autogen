@@ -3,7 +3,7 @@
 
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2011-01-28 17:45:00 bkorb"
+# Time-stamp:        "2011-02-02 11:55:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,7 +80,7 @@ _EOF_
 
 mkdir ${testname}.rc ${testname}.run
 compile "--help"
-sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+${SED} 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
     ${testname}.help > ${testname}-res1.help
 cmp ${testname}-*1.help || \
   failure "`diff ${testname}-*.help`"
@@ -177,7 +177,7 @@ cmp  ${testname}.cmds ${testname}.test || {
 }
 
 mv ../${testname}.rc/${testname}.file ../${testname}.rc/${testname}.save
-( sed '/^[TEST_MUMBLE]/,$d' ../${testname}.rc/${testname}.save
+( ${SED} '/^[TEST_MUMBLE]/,$d' ../${testname}.rc/${testname}.save
   cat <<- _EOF_
 	<?program test-mumble>
 	second    fourth
@@ -212,7 +212,7 @@ ${AG_L} ${testname}.def || \
   failure AutoGen could not process B
 
 compile "--help"
-sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+${SED} 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
     ${testname}.help > ${testname}-res2.help
 egrep -v ' save-opts  +Save ' ${testname}-base1.help > ${testname}-base2.help
 
@@ -225,10 +225,10 @@ ${AG_L} ${testname}.def || \
   failure AutoGen could not process B
 
 compile "--help"
-sed 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
+${SED} 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
     ${testname}.help > ${testname}-res3.help
 
-sed -e '/ load-opts   *Load /,/multiple times$/d' \
+${SED} -e '/ load-opts   *Load /,/multiple times$/d' \
     -e '/ save-opts   *Save /d' \
     ${testname}-base1.help > ${testname}-base3.help
 

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # time.test ---  test time duration argument
 #
-# Time-stamp:        "2010-02-24 08:39:53 bkorb"
+# Time-stamp:        "2011-02-02 12:05:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -76,7 +76,7 @@ time_val=213791
 
 ck() {
     tim=`./${testname} -t "$*" | \
-        sed -n 's/.* represents \([0-9]*\) seconds/\1/p'`
+        ${SED} -n 's/.* represents \([0-9]*\) seconds/\1/p'`
     test -z "${tim}" && failure ${testname} could not parse "$*"
     test ${tim} -eq ${time_val} || \
         failure ${testname} misevaluated "$*"

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2011-02-01 15:33:29 bkorb"
+# Time-stamp:        "2011-02-02 12:06:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -66,9 +66,9 @@ main = {
 
 _EOF_
 
-INC=`echo ${INC} | sed 's/-lguile//;s/-lqthreads//'`
+INC=`echo ${INC} | ${SED} 's/-lguile//;s/-lqthreads//'`
 CFLAGS="-g`echo ' '${CFLAGS}' ' | \
-  sed 's, -O2 , ,;s/ -g[^ ]* / /'`"
+  ${SED} 's, -O2 , ,;s/ -g[^ ]* / /'`"
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \

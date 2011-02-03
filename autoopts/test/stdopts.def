@@ -1,6 +1,6 @@
 #! /bin/sh
 
-## Time-stamp:      "2010-07-10 16:44:43 bkorb"
+## Time-stamp:      "2011-02-02 11:54:36 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -45,27 +45,27 @@ test -n "${long_opts}" && echo "long-opts;" >&5
 
 for flag
 do
-    fname=`echo "${flag}" | sed 's/[^a-zA-Z0-9_-].*//'`
-    flag=`echo "${flag}"  | sed "s/^${fname}//"`
+    fname=`echo "${flag}" | ${SED} 's/[^a-zA-Z0-9_-].*//'`
+    flag=`echo "${flag}"  | ${SED} "s/^${fname}//"`
 
     case "${flag}" in
     :* )
-        aval=`echo $flag | sed 's/^://'`
+        aval=`echo $flag | ${SED} 's/^://'`
         arg="    arg-type = string;"
         test -n "${aval}" && arg="${arg} arg_default = '${aval}';"
         ;;
 
     =* )
-        aval=`echo $flag | sed 's/=//'`
+        aval=`echo $flag | ${SED} 's/=//'`
         arg="    arg-type = number;"
         test -n "${aval}" && arg="${arg} arg_default = '${aval}';"
         ;;
 
     @* )
-        arg=`echo $flag  | sed 's/@//'`
+        arg=`echo $flag  | ${SED} 's/@//'`
         case "${arg}" in
-        *=* ) default=`echo $flag | sed 's/.*=//'`
-              arg=`echo $arg | sed 's/=.*//'`
+        *=* ) default=`echo $flag | ${SED} 's/.*=//'`
+              arg=`echo $arg | ${SED} 's/=.*//'`
               arg="    arg-type = '${arg}'; arg-default='${default}';"
               ;;
 
@@ -87,7 +87,7 @@ do
 	_EOF_
 
     ${use_flags} && {
-        fname=`echo ${fname} | sed 's/\(.\).*/\1/'`
+        fname=`echo ${fname} | ${SED} 's/\(.\).*/\1/'`
         echo "    value = '${fname}';"
     }
     test -n "${arg}" && echo "${arg}"

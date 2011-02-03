@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-01-31 12:30:06 bkorb"
+# Time-stamp:        "2011-02-03 09:07:54 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -117,13 +117,13 @@ setup_exports()
 
   ADDON_MENU="
     ${top_builddir}/columns/invoke-columns.menu
-    ${top_builddir}/getdefs/getdefs.menu
+    ${top_builddir}/getdefs/invoke-getdefs.menu
     ${top_builddir}/xml2ag/invoke-xml2ag.menu
     ${top_srcdir}/doc/snprintfv.menu"
 
   ADDON_TEXI="
     ${top_builddir}/columns/invoke-columns.texi
-    ${top_builddir}/getdefs/getdefs.texi
+    ${top_builddir}/getdefs/invoke-getdefs.texi
     ${top_builddir}/xml2ag/invoke-xml2ag.texi
     ${top_srcdir}/doc/snprintfv.texi"
 

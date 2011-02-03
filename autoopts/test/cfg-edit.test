@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-08-20 15:32:56 bkorb"
+# Time-stamp:        "2011-02-02 11:56:47 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -31,7 +31,7 @@
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-test_name=`echo ${testname} | sed 's/-/_/g'`
+test_name=`echo ${testname} | ${SED} 's/-/_/g'`
 cfg_file=`basename ${TMPDIR}`/${testname}.cfg
 
 exec 5> ${testname}.def
@@ -207,21 +207,21 @@ The valid "enumerate" option keywords are:
   or an integer from 0 through 7
 _EOF_
 
-sed "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
+${SED} "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
     ${testname}.help > X$$
 mv -f X$$ ${testname}.help
 cmp -s ${basehelp} ${testname}.help || \
   failure "`diff ${basehelp} ${testname}.help`"
 
 ./${testname} -m 'one + three + seven' '->'
-members=`sed -n 's/^members *//p' ${cfg_file}`
+members=`${SED} -n 's/^members *//p' ${cfg_file}`
 case "${members}" in
 'none + one + three + five + seven' ) : ;;
 * ) failure "members not set to one, three, five and seven" ;;
 esac
 
 ./${testname} -R '*' '->'
-members=`sed -n 's/^members *//p' ${cfg_file}` 2>/dev/null
+members=`${SED} -n 's/^members *//p' ${cfg_file}` 2>/dev/null
 case "${members}" in
 '' ) : ;;
 * ) failure "members entry not removed"
@@ -229,7 +229,7 @@ esac
 
 arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
-dir=`echo ${TMPDIR} | sed "s@^\`pwd\`//*@@"`
+dir=`echo ${TMPDIR} | ${SED} "s@^\`pwd\`//*@@"`
 out_file=${dir}/${testname}-out-file
 rm -f ${out_file}
 ./${testname} -m 'one + three' -b true -m 'seven' \
@@ -238,7 +238,7 @@ rm -f ${out_file}
     -O ${out_file} \
     -T ${dir}/${testname}-test-file \
    '->'
-sed '/^#/d' ${cfg_file} > ${testname}-X
+${SED} '/^#/d' ${cfg_file} > ${testname}-X
 mv -f ${testname}-X ${cfg_file}
 cat > ${testname}.sample-cfg <<- \_EOF_
 	<struct type=nested>
@@ -273,7 +273,7 @@ cmp ${pair} || \
 
 rm -f ${out_file}
 ./${testname} ${cfg_file}-2
-sed '/^#/d' ${cfg_file}-2 > ${testname}-X
+${SED} '/^#/d' ${cfg_file}-2 > ${testname}-X
 mv -f ${testname}-X ${cfg_file}-2
 cmp ${cfg_file} ${cfg_file}-2 || \
     failure "mismatched: re-saved config${nl}`diff ${cfg_file} ${cfg_file}-2`"
@@ -305,7 +305,7 @@ do
 done
 
 ./${testname} -k alpha -k beta -k omega ${cfg_file}-XX
-sed '/^#/d' ${cfg_file}-XX > ${cfg_file}-2
+${SED} '/^#/d' ${cfg_file}-XX > ${cfg_file}-2
 cat > ${cfg_file}-3 <<- _EOF_
 	stacking            alpha
 	stacking            beta

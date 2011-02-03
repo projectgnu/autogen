@@ -4,7 +4,7 @@
 # defs --- define the environment for autogen tests.
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-17 09:46:46 bkorb"
+# Time-stamp:        "2011-02-02 12:04:19 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -44,8 +44,15 @@ test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
 LD_LIBRARY_PATH=${lo_dir}:${LD_LIBRARY_PATH-/dev/null}
 export LD_LIBRARY_PATH
 
-progname=`echo "$0" | sed 's,^.*/,,'`
-testname=`echo "$progname" | sed 's,\..*$,,'`
+for SED in `exec 2>/dev/null;which gsed` \
+  /bin/xpg4/bin/sed \
+  `which sed` \
+  /bin/sed \
+  /usr/bin/sed
+do test -x "${SED}" && break ; done
+
+progname=`echo "$0" | ${SED} 's,^.*/,,'`
+testname=`echo "$progname" | ${SED} 's,\..*$,,'`
 testsubdir=${testsubdir-testdir}
 
 # User can set VERBOSE to prevent output redirection

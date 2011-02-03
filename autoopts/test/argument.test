@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-02-24 08:40:10 bkorb"
+# Time-stamp:        "2011-02-02 12:08:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -75,7 +75,7 @@ cmp -s ${testname}.h*lp || \
 # # # # # # # # # # T E S T   2 # # # # # # # # # # #
 
 exec 3> ${testname}2.def
-sed '/arg-type = number/q' ${testname}.def >&3
+${SED} '/arg-type = number/q' ${testname}.def >&3
 cat >&3 <<- _EOF_
 	    arg-range = "-1";
 	    arg-range = "3->021";
@@ -88,7 +88,7 @@ exec 3>&-
 
 ${AG_L} ${testname}2.def || \
   failure AutoGen could not process
-( sed '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT2_/' ${testname}2.c
+( ${SED} '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT2_/' ${testname}2.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );
@@ -135,7 +135,7 @@ cmp -s ${testname}2.hlp ${testname}2.help || \
 # # # # # # # # # # T E S T   3 # # # # # # # # # # #
 
 exec 3> ${testname}3.def
-sed '/value = .s.;/q' ${testname}.def >&3
+${SED} '/value = .s.;/q' ${testname}.def >&3
 cat >&3 <<- _EOF_
 	    arg-type    = file;
 	    file-exists = yes;
@@ -147,7 +147,7 @@ exec 3>&-
 
 ${AG_L} ${testname}3.def || \
   failure AutoGen could not process
-( sed '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT3_/' ${testname}3.c
+( ${SED} '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT3_/' ${testname}3.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );

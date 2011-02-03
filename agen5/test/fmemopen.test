@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # fmemopen.test --- fmemopen code
 #
-# Time-stamp:        "2010-06-26 16:05:54 bkorb"
+# Time-stamp:        "2011-02-02 12:09:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -41,7 +41,7 @@ do printf '#include %s\n' "${f}" ; done >&5
 
 echo >&5
 
-sed -n '/#ifdef ENABLE_FMEMOPEN/,/#endif/p' \
+${SED} -n '/#ifdef ENABLE_FMEMOPEN/,/#endif/p' \
     ${top_srcdir}/agen5/autogen.h >&5
 
 cat >&5  <<_EOF_

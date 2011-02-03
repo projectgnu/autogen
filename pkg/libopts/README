@@ -65,8 +65,8 @@ Usage Instructions for autoconf/automake/libtoolized projects:
      prog.1 : prog-opts.def
          autogen -Tagman-cmd.tpl -bprog prog-opts.def
 
-     prog-invoke.texi : prog-opts.def
-         autogen -Taginfo.tpl -bprog-invoke prog-opts.def
+     invoke-prog.texi : prog-opts.def
+         autogen -Tagtexi-cmd.tpl prog-opts.def
 
 If your package does not utilize the auto* tools, then you
 will need to hand craft the rules for building the library.

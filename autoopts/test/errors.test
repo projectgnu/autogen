@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-01 15:15:29 bkorb"
+# Time-stamp:        "2011-02-02 11:56:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -42,7 +42,7 @@ ${SHELLX} ${stdopts} option second:fumble ignored || \
     failure "Could not run stdopts.def"
 
 echo 'reorder-args;' >> ${testname}.def
-sed -e '/"second"/a\
+${SED} -e '/"second"/a\
     must-set;' \
     -e '/"ignored"/a\
     omitted-usage = "we have dumped this"; ifdef = IGNORE_THIS;' \
@@ -100,7 +100,7 @@ Operands and options may be intermixed.  They will be reordered.
 _EOF_
 
 dir=`pwd -P` || dir=`pwd`
-sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+${SED} "s#${dir}/##" ${testname}.help > ${testname}.bas-help
 cmp -s ${testname}.*-help || \
   failure "help output: `diff ${testname}.*-help`"
 
@@ -144,7 +144,7 @@ ${AG_L} ${testname}.def || \
 
 compile "--help"
 
-sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+${SED} "s#${dir}/##" ${testname}.help > ${testname}.bas-help
 cmp -s ${testname}.*-help || \
   failure "help output: `diff ${testname}.*-help`"
 
@@ -155,7 +155,7 @@ cmp -s ${testname}.*-help || \
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-sed '/second option/a\
+${SED} '/second option/a\
     max = "10";' ${testname}.def > XX
 mv -f XX ${testname}.def
 cat >> ${testname}.def << '_EOF_'
@@ -215,7 +215,7 @@ not-good-enough )
   ;;
 
 * )
-  sed '/ value /s/Y/X/;s/ ifndef =.*//' ${testname}.def > ${testname}-2.def
+  ${SED} '/ value /s/Y/X/;s/ ifndef =.*//' ${testname}.def > ${testname}-2.def
   ${AG_L} ${testname}-2.def && \
     failure AutoGen processed conflicting flag values
   ;;

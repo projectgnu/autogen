@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # line.test --- test (tpl-file-line) functionality
 #
-# Time-stamp:        "2010-06-30 17:20:11 bkorb"
+# Time-stamp:        "2011-02-02 12:09:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -28,7 +28,7 @@
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating ${testname}.tpl
-sed 's/^ *[0-9]*: //' > ${testname}.tpl <<  _EOTPL_
+${SED} 's/^ *[0-9]*: //' > ${testname}.tpl <<  _EOTPL_
  1: [= AutoGen5 Template txt =]
  2: ${testname} Test
  3: [= (define ix 0) (define ct 63) =]

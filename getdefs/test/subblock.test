@@ -4,7 +4,7 @@
 # subblock.test --- test the subblock parameter to getdefs
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-17 09:46:36 bkorb"
+# Time-stamp:        "2011-02-02 12:04:51 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -24,7 +24,7 @@
 
 # Common definitions
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    srcdir=`echo "$0" | ${SED} 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1

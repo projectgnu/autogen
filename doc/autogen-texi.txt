@@ -4941,7 +4941,7 @@ Extraction from autogen.texi
 @cindex AutoInfo
 
 AutoOpts provides two templates for producing @file{.texi} documentation.
-@file{aginfo.tpl} for the invoking section, and @file{aginfo3.tpl} for
+@file{agtexi-cmd.tpl} for the invoking section, and @file{aginfo3.tpl} for
 describing exported library functions and macros.
 
 For both types of documents, the documentation level is selected by
@@ -4982,7 +4982,7 @@ of the library.
 @subsection ``invoking'' info docs
 
 Using the option definitions for an AutoOpt client program, the
-@file{aginfo.tpl} template will produce texinfo text that documents the
+@file{agtexi-cmd.tpl} template will produce texinfo text that documents the
 invocation of your program.  The text emitted is designed to be included
 in the full texinfo document for your product.  It is not a stand-alone
 document.  The usage text for the @ref{autogen usage},
@@ -4997,7 +4997,7 @@ boilerplate introductory paragraph.
 These files are produced by invoking the following command:
 
 @example
-autogen -L $@{prefix@}/share/autogen -T aginfo.tpl \
+autogen -L $@{prefix@}/share/autogen -Tagtexi-cmd.tpl \
         -DLEVEL=section your-opts.def
 @end example
 

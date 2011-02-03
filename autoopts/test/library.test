@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # library.test     ---  test library options
 #
-# Time-stamp:        "2011-02-01 15:15:08 bkorb"
+# Time-stamp:        "2011-02-02 12:06:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -92,7 +92,7 @@ ${AG_L} ${testname}-prog.def || \
 
 for f in lib prog
 do
-  sed -e '1,/include <autoopts\/options.h>/d' \
+  ${SED} -e '1,/include <autoopts\/options.h>/d' \
       -e '/endif .* AUTOOPTS_.*_H_GUARD/,$d' \
       -e 's/near line [0-9]*/near line XXX/' \
       ${testname}-${f}.h > ${testname}-${f}.h-res || \

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-01-30 09:36:20 bkorb"
+## Time-stamp:      "2011-02-03 09:19:08 bkorb"
 ## Copyright (c) 1992-2011 by Bruce Korb
 ##
 ## This file is part of AutoGen.
@@ -46,7 +46,7 @@ all : gen
 
 ## opts.h cannot be built until columns is built, so no rules for it.
 
-columns.menu columns.texi : stamp-aginfo
+columns.menu columns.texi : stamp-agtexi
 columns.1                 : stamp-agman
 
 cols.c : Makefile
@@ -56,7 +56,7 @@ cols.c : Makefile
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
-stamp-aginfo : opts.def columns$(EXEEXT)
+stamp-agtexi : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
 	$(RUNAG) -Tagtexi-cmd.tpl -DLEVEL=section $(srcdir)/opts.def
 

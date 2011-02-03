@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # strxform.test --- test string transformation functionality
 #
-# Time-stamp:        "2010-06-26 16:30:40 bkorb"
+# Time-stamp:        "2011-02-02 12:02:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -29,7 +29,7 @@
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating ${testname}.tpl
-sed 's/^ *[0-9]*: //' > ${testname}.tpl <<-  _EOTPL_
+${SED} 's/^ *[0-9]*: //' > ${testname}.tpl <<-  _EOTPL_
  1: [= AutoGen5 Template test =]
  2: string input:       [= in-str =]
  3: 

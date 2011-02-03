@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2010-02-24 08:40:08 bkorb"
+# Time-stamp:        "2011-02-02 12:10:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -179,7 +179,7 @@ cat > ${testname}.res <<-  \_EOResult_
   failure "Cannot run ${testname}"
 }
 
-sed '/ -- nested:/s/0x.*/0xXXXXXXXX/' \
+${SED} '/ -- nested:/s/0x.*/0xXXXXXXXX/' \
     ${testname}.tmp-out > ${testname}.out
 cmp ${testname}.out ${testname}.res || {
   failure "`diff -c ${testname}.out ${testname}.res`"

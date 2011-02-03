@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # heredef.test --- definition reference testing
 #
-# Time-stamp:        "2010-06-26 16:05:27 bkorb"
+# Time-stamp:        "2011-02-02 12:09:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -28,7 +28,7 @@
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-sed 's/^ *[0-9]*:  //' > ${testname}.tpl <<\_EOF_
+${SED} 's/^ *[0-9]*:  //' > ${testname}.tpl <<\_EOF_
  1:  <= AutoGen5 template test =>
  2:  <=
  3:  
@@ -63,7 +63,7 @@ _EOF_
 
 # Create the files we need in the test environment
 echo "AutoGen definitions ${testname};" > ${testname}.def
-sed 's/^ *[0-9]*:  //' >> ${testname}.def <<\_EOF_
+${SED} 's/^ *[0-9]*:  //' >> ${testname}.def <<\_EOF_
  2:  #ifdef BOGUS
  3:  /* Line 3 */
  4:  #else

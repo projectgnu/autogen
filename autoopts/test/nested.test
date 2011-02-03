@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2010-11-30 14:45:57 bkorb"
+# Time-stamp:        "2011-02-02 11:55:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -159,7 +159,7 @@ The following option preset mechanisms are supported:
  - reading file ${testname}.cfg
 _EOF_
 
-sed "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
+${SED} "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
     ${testname}.help > X$$
 mv -f X$$ ${testname}.help
 
@@ -179,7 +179,7 @@ cat > ${testname}-res1.base <<- _EOF_
 	_EOF_
 
 ./${testname} -s 'stumble, foo, <bar type=integer>1234</bar> able' | \
-sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' > ${testname}-res1.out || \
+${SED} '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' > ${testname}-res1.out || \
   failure "FAILED: \
 ./${testname} -s 'stumble, foo, <bar type=integer>1234</bar> baz'"
 
@@ -191,7 +191,7 @@ cmp -s ${testname}-res1.* || \
 arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 (./${testname} -s "${arg1}" -s "${arg2}" \
-    | sed '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
+    | ${SED} '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \
   failure "FAILED:  ./${testname} ${arg1} ${arg2}"
 
 cat > ${testname}-res2.base <<- _EOF_
@@ -217,7 +217,7 @@ cmp -s ${testname}-res2.* || \
   failure "`diff ${testname}-res2.*`"
 
 ./${testname} -s "${arg1}" -s "${arg2}" '->'
-sed -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg > ${testname}.XX
+${SED} -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg > ${testname}.XX
 mv -f ${testname}.XX ${testname}.d/${testname}.cfg
 cat > ${testname}-res3.base <<- _EOF_
 	#  test_nested - Test AutoOpts for nested
@@ -247,7 +247,7 @@ cmp -s ${files} || \
 # Copy the config file and verify that the contents are the same.
 #
 ./${testname} "->${testname}.d/${testname}.cfg2"
-sed -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2 > ${testname}.XX
+${SED} -e '3s/.*/#  ***DATE***/' ${testname}.d/${testname}.cfg2 > ${testname}.XX
 mv -f ${testname}.XX ${testname}.d/${testname}.cfg2
 files=${testname}.d/${testname}.cfg\ ${testname}.d/${testname}.cfg2
 cmp -s ${files} || \

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-01-28 17:56:47 bkorb"
+# Time-stamp:        "2011-02-02 11:58:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -109,7 +109,7 @@ all.  Multiple entries may be passed as an option argument list.
 _EOF_
 
 dir=`pwd -P` || dir=`pwd`
-sed "s#${dir}/##" ${testname}.help > ${testname}.bas-help
+${SED} "s#${dir}/##" ${testname}.help > ${testname}.bas-help
 cmp -s ${testname}.*-help || \
   failure "help output: `diff ${testname}.*-help`"
 
@@ -274,14 +274,14 @@ This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
 _EOMan_
 
-sed '1,/^\.SH NAME/d' ${testname}.1 > ${testname}-res.1
+${SED} '1,/^\.SH NAME/d' ${testname}.1 > ${testname}-res.1
 cmp -s ${testname}-base.1 ${testname}-res.1 || \
   failure "`diff ${testname}-base.1 ${testname}-res.1`"
 
 # # # # # # # # # # CHECK OUT VAL2STR # # # # # # # # # # #
 
 exec 3> ${testname}_2.def
-sed '/^prog-name/s/";/_2";/;/^main *=/,$d' ${testname}.def >&3
+${SED} '/^prog-name/s/";/_2";/;/^main *=/,$d' ${testname}.def >&3
 cat >&3 <<- \_EOF_
 	include = '#include <stdio.h>';
 	main = {

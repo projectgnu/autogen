@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-02-01 15:30:59 bkorb"
+# Time-stamp:        "2011-02-02 12:07:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -49,7 +49,7 @@ compile_getopt() {
 
   # Remove the variable comments so we can test against the expected result
   #
-  sed '2,/and the template file/d
+  ${SED} '2,/and the template file/d
       /\$''Id.*\$/d
       /Last template edit:/d' getopt-test_${testname}.c \
         > ${testname}${1}-getopt.c
@@ -59,7 +59,7 @@ compile_getopt() {
   ${CC} ${CFLAGS} -c ${testname}${1}-getopt.c || \
     failure "could not compile ${testname}1-getopt.c"
 
-  sed '/Packaged by /d
+  ${SED} '/Packaged by /d
        s@^Report .* bugs to.*"@\\n"@
        s@^please send bug.*"@\\n"@
        s@\\n\\n\\n\\$@\\n\\n\\@
@@ -97,7 +97,7 @@ go_init()
   chmod u+w ${TMPDIR}/*
 
   cd ${builddir}/testdir
-  sed -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
+  ${SED} -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
     -e "/^ldflags=/s@=.*@='${aolib}'@" \
     ${TMPDIR}/usage.tlib > ${TMPDIR}/usage.tlib-XX
   mv -f ${TMPDIR}/usage.tlib-XX ${TMPDIR}/usage.tlib
@@ -680,7 +680,7 @@ compile_getopt 1
 
 grep 'getopt_long' /usr/include/getopt.h >/dev/null && {
     CFLAGS="${CFLAGS} -D_GNU_SOURCE=1"
-    sed '/REMOVE/d;$a\
+    ${SED} '/REMOVE/d;$a\
 long-opts;\
 version-value;
 ' ${testname}.def > ${testname}2.def

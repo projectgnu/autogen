@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2011-01-30 15:55:13 bkorb"
+## Time-stamp:      "2011-02-02 11:58:46 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -34,7 +34,7 @@ kill_delay=90
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 # ============= usage_LGFRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGFRA.hlp'
 test_usage_LGFRA - Checkout usage_LGFRA Options
 USAGE:  usage_LGFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
@@ -46,7 +46,7 @@ X   -!, --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGFRp.hlp'
 test_usage_LGFRp - Checkout usage_LGFRp Options
 USAGE:  usage_LGFRp { -<flag> | --<name> }... cmd-arg ...
 X
@@ -57,7 +57,7 @@ X   -!, --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGFoA.hlp'
 test_usage_LGFoA - Checkout usage_LGFoA Options
 USAGE:  usage_LGFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
@@ -69,7 +69,7 @@ X   -!, --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGFop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGFop.hlp'
 test_usage_LGFop - Checkout usage_LGFop Options
 USAGE:  usage_LGFop [ -<flag> | --<name> ]... cmd-arg ...
 X
@@ -80,7 +80,7 @@ X   -!, --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGsRA.hlp'
 test_usage_LGsRA - Checkout usage_LGsRA Options
 USAGE:  usage_LGsRA { --<name>[{=| }<val>] }... cmd-arg ...
 X
@@ -91,7 +91,7 @@ X   --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGsRp.hlp'
 test_usage_LGsRp - Checkout usage_LGsRp Options
 USAGE:  usage_LGsRp { --<name> }... cmd-arg ...
 X
@@ -102,7 +102,7 @@ X   --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGsoA.hlp'
 test_usage_LGsoA - Checkout usage_LGsoA Options
 USAGE:  usage_LGsoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X
@@ -113,7 +113,7 @@ X   --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LGsop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LGsop.hlp'
 test_usage_LGsop - Checkout usage_LGsop Options
 USAGE:  usage_LGsop [ --<name> ]... cmd-arg ...
 X
@@ -124,7 +124,7 @@ X   --more-help            Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LaFRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LaFRA.hlp'
 test_usage_LaFRA - Checkout usage_LaFRA Options
 USAGE:  usage_LaFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
@@ -136,7 +136,7 @@ X   -! no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LaFRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LaFRp.hlp'
 test_usage_LaFRp - Checkout usage_LaFRp Options
 USAGE:  usage_LaFRp { -<flag> | --<name> }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
@@ -147,7 +147,7 @@ X   -! no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LaFoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LaFoA.hlp'
 test_usage_LaFoA - Checkout usage_LaFoA Options
 USAGE:  usage_LaFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
@@ -159,7 +159,7 @@ X   -! no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LaFop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LaFop.hlp'
 test_usage_LaFop - Checkout usage_LaFop Options
 USAGE:  usage_LaFop [ -<flag> | --<name> ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
@@ -170,7 +170,7 @@ X   -! no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LasRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LasRA.hlp'
 test_usage_LasRA - Checkout usage_LasRA Options
 USAGE:  usage_LasRA { --<name>[{=| }<val>] }... cmd-arg ...
 X   Arg Option-Name   Req?  Description
@@ -181,7 +181,7 @@ X   no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LasRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LasRp.hlp'
 test_usage_LasRp - Checkout usage_LasRp Options
 USAGE:  usage_LasRp { --<name> }... cmd-arg ...
 X   Arg Option-Name   Req?  Description
@@ -192,7 +192,7 @@ X   no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_LasoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_LasoA.hlp'
 test_usage_LasoA - Checkout usage_LasoA Options
 USAGE:  usage_LasoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X   Arg Option-Name    Description
@@ -203,7 +203,7 @@ X   no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_Lasop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_Lasop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_Lasop.hlp'
 test_usage_Lasop - Checkout usage_Lasop Options
 USAGE:  usage_Lasop [ --<name> ]... cmd-arg ...
 X   Arg Option-Name    Description
@@ -214,7 +214,7 @@ X   no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGFRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGFRA.hlp'
 test_usage_sGFRA - Checkout usage_sGFRA Options
 USAGE:  usage_sGFRA { -<flag> [<val>] }... cmd-arg ...
 X
@@ -225,7 +225,7 @@ X   -!         Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGFRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGFRp.hlp'
 test_usage_sGFRp - Checkout usage_sGFRp Options
 USAGE:  usage_sGFRp { -<flag> }... cmd-arg ...
 X
@@ -236,7 +236,7 @@ X   -!         Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGFoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGFoA.hlp'
 test_usage_sGFoA - Checkout usage_sGFoA Options
 USAGE:  usage_sGFoA [ -<flag> [<val>] ]... cmd-arg ...
 X
@@ -247,7 +247,7 @@ X   -!         Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGFop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGFop.hlp'
 test_usage_sGFop - Checkout usage_sGFop Options
 USAGE:  usage_sGFop [ -<flag> ]... cmd-arg ...
 X
@@ -258,7 +258,7 @@ X   -!         Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGsRA.hlp'
 test_usage_sGsRA - Checkout usage_sGsRA Options
 USAGE:  usage_sGsRA { <option-name>[{=| }<val>] }...
 X
@@ -269,7 +269,7 @@ X   more-help              Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGsRp.hlp'
 test_usage_sGsRp - Checkout usage_sGsRp Options
 USAGE:  usage_sGsRp { <option-name> }...
 X
@@ -280,7 +280,7 @@ X   more-help              Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGsoA.hlp'
 test_usage_sGsoA - Checkout usage_sGsoA Options
 USAGE:  usage_sGsoA [ <option-name>[{=| }<val>] ]...
 X
@@ -291,7 +291,7 @@ X   more-help              Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sGsop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sGsop.hlp'
 test_usage_sGsop - Checkout usage_sGsop Options
 USAGE:  usage_sGsop [ <option-name> ]...
 X
@@ -302,7 +302,7 @@ X   more-help              Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_saFRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_saFRA.hlp'
 test_usage_saFRA - Checkout usage_saFRA Options
 USAGE:  usage_saFRA { -<flag> [<val>] }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
@@ -313,7 +313,7 @@ X   -! no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_saFRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_saFRp.hlp'
 test_usage_saFRp - Checkout usage_saFRp Options
 USAGE:  usage_saFRp { -<flag> }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
@@ -324,7 +324,7 @@ X   -! no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_saFoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_saFoA.hlp'
 test_usage_saFoA - Checkout usage_saFoA Options
 USAGE:  usage_saFoA [ -<flag> [<val>] ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
@@ -335,7 +335,7 @@ X   -! no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_saFop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_saFop.hlp'
 test_usage_saFop - Checkout usage_saFop Options
 USAGE:  usage_saFop [ -<flag> ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
@@ -346,7 +346,7 @@ X   -! no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasRA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sasRA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sasRA.hlp'
 test_usage_sasRA - Checkout usage_sasRA Options
 USAGE:  usage_sasRA { <option-name>[{=| }<val>] }...
 X   Arg Option-Name   Req?  Description
@@ -357,7 +357,7 @@ X   no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasRp.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sasRp.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sasRp.hlp'
 test_usage_sasRp - Checkout usage_sasRp Options
 USAGE:  usage_sasRp { <option-name> }...
 X   Arg Option-Name   Req?  Description
@@ -368,7 +368,7 @@ X   no  more-help      opt  Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasoA.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sasoA.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sasoA.hlp'
 test_usage_sasoA - Checkout usage_sasoA Options
 USAGE:  usage_sasoA [ <option-name>[{=| }<val>] ]...
 X   Arg Option-Name    Description
@@ -379,7 +379,7 @@ X   no  more-help      Extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasop.hlp ==============
-sed 's/^X//' << 'SHAR_EOF' > 'usage_sasop.hlp'
+${SED} 's/^X//' << 'SHAR_EOF' > 'usage_sasop.hlp'
 test_usage_sasop - Checkout usage_sasop Options
 USAGE:  usage_sasop [ <option-name> ]...
 X   Arg Option-Name    Description
@@ -491,11 +491,11 @@ run_usage_test() {
     failure "AutoGen could not process $testname"
   }
 
-  sed -e '1,/definition names looked up/d' \
+  ${SED} -e '1,/definition names looked up/d' \
     -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
       ${defnames_raw} >> ${defnames_file}
   compile ${helpstr}
-  sed   -e '/Extended usage information passed thru pager/q' \
+  ${SED}   -e '/Extended usage information passed thru pager/q' \
       ${testname}.help > XXX
   mv XXX ${testname}.help
   cmp -s ${testname}.help ${testname}.hlp || \

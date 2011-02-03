@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-01 14:06:13 bkorb"
+# Time-stamp:        "2011-02-02 11:58:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -87,11 +87,11 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-sed '/START =/a\
+${SED} '/START =/a\
 SampleCode();\
 XXX-REMOVE-XXX' ${testname}.c > ${testname}.tmp
 chmod 644 ${testname}.c
-sed -e '/^XXX-REMOVE-XXX$/d;s/XXX-REMOVE-XXX//' \
+${SED} -e '/^XXX-REMOVE-XXX$/d;s/XXX-REMOVE-XXX//' \
     ${testname}.tmp > ${testname}.c
 
 ${AG_L} ${testname}.def || \
@@ -101,7 +101,7 @@ ${AG_L} ${testname}.def || \
 # The template line numbers and time stamps and all that cruft
 # vary too much, so sed them away.
 #
-sed -e '1,/Create the static procedure(s) declared above/d' \
+${SED} -e '1,/Create the static procedure(s) declared above/d' \
     -e '/extracted from.*near line/d' -e '/^#line/d' \
     ${testname}.c > ${testname}.test
 

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # defref.test --- definition reference testing
 #
-# Time-stamp:        "2010-06-26 16:06:26 bkorb"
+# Time-stamp:        "2011-02-02 12:09:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -28,7 +28,7 @@
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
-sed 's/^ *[0-9]*://;s/^ //' > ${testname}.tpl <<_EOF_
+${SED} 's/^ *[0-9]*://;s/^ //' > ${testname}.tpl <<_EOF_
  1: <= AutoGen5 template test =>
  2: The last of each list:<=
  3: FOR list =>

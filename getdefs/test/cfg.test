@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # cfg.test --- test config file processing
 #
-## Time-stamp:      "2010-07-16 15:19:27 bkorb"
+## Time-stamp:      "2011-02-02 12:03:18 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -22,7 +22,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if test -z "$srcdir"; then
-    srcdir=`echo "$0" | sed 's,[^/]*$,,'`
+    srcdir=`echo "$0" | ${SED} 's,[^/]*$,,'`
     test -z "$srcdir" && srcdir=.
     test "$srcdir" = "$0" && srcdir=.
     test "${VERBOSE+set}" != set && VERBOSE=1

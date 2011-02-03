@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # daemon.test --- test functionality of `for' function
 #
-# Time-stamp:        "2010-06-26 16:06:36 bkorb"
+# Time-stamp:        "2011-02-02 12:00:31 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -91,7 +91,7 @@ do_run() {
 cmd="${ag} --daemon daemon-io  -b dmn"
 do_run daemon-io-in daemon-io-out
 
-tmp=$(echo ${tdir} | sed 's,.*/\.,,;s/\.d$//')
+tmp=$(echo ${tdir} | ${SED} 's,.*/\.,,;s/\.d$//')
 pipe=$PWD/${tmp}
 
 cmd="${ag} --daemon unix:${pipe}  -b dmn"
