@@ -1,4 +1,6 @@
-New in __CURRENT_VERSION__ December 2010
+New in __CURRENT_VERSION__ February 2011
+
+* Cope with Guile version number 2.0
 
 * XML character encodings are parsed in config files, thus
   <opt-name>...&lt;...</opt-name> yields "...<..."
