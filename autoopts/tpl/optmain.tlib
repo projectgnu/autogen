@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2010-12-10 12:22:42 bkorb"
+# Time-stamp:      "2011-02-17 16:39:46 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -254,67 +254,73 @@ extern int [= handler-proc =]([=(. handler-arg-type)=]);[=
 
 ENDIF
 
-=][=
-(tpl-file-line extract-fmt)
-=][=
+=][= (tpl-file-line extract-fmt)                =][=
 
-IF (exist? "handler-type")  =]
+IF (exist? "handler-type")                      =]
 
-static int
+static [=
+
+(define file-fail-code (get "file-fail-code" "FAILURE"))
+(define emit-failing-printf (= file-fail-code "success"))
+
+(set!   file-fail-code  (string-append pname-up "_EXIT_"
+        (string->c-name! (string-upcase file-fail-code)) ))
+
+ pname-down =]_exit_code_t
 validate_fname(char const* pz_fname)
 {
     char const* pz_fs_err =
         _("fs error %d (%s) %s-ing %s\n");[=
 
-  IF (*=* (get "handler-type") "text") =]
+  IF (*=* (get "handler-type") "text")          =]
     char*  file_text;
     size_t text_size;
     int    res;[=
-  ENDIF =]
+  ENDIF                                         =]
 
     {
         struct stat sb;
-        if (stat(pz_fname, &sb) < 0) {
+        if (stat(pz_fname, &sb) < 0) {[=
+  IF (. emit-failing-printf)                    =]
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "stat",
-                    pz_fname);
-            return 1;
+                    pz_fname);[=
+  ENDIF                                         =]
+            return [= (. file-fail-code)        =];
         }[=
 
-  IF (*=* (get "handler-type") "text") =]
+  IF (*=* (get "handler-type") "text")          =]
 
-        if (! S_ISREG(sb.st_mode)) {
+        if (! S_ISREG(sb.st_mode)) {[=
+    IF (. emit-failing-printf)                  =]
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                    "not regular file:", pz_fname);
-            return 1;
+                    "not regular file:", pz_fname);[=
+    ENDIF                                       =]
+            return [= (. file-fail-code)        =];
         }[=
 
-    IF (=* (get "handler-type") "some-text") =]
+    IF (=* (get "handler-type") "some-text")    =]
 
-        if (sb.st_size == 0) {
+        if (sb.st_size == 0) {[=
+      IF (. emit-failing-printf)                =]
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                    "empty file:", pz_fname);
-            return 1;
+                    "empty file:", pz_fname);[=
+      ENDIF                                     =]
+            return [= (. file-fail-code)        =];
         }[=
 
-    ENDIF  =]
+    ENDIF                                       =]
 
         text_size = sb.st_size;[=
 
-  ENDIF
-
-=]
+  ENDIF                                         =]
     }[=
 
 CASE handler-type =][=
-=*  name         =][=
-    (tpl-file-line extract-fmt)
-    =]
+=*  name         =]    [= (tpl-file-line extract-fmt) =]
 
     return [= handler-proc =](pz_fname);[=
 
-=*  file         =][=
-    (tpl-file-line extract-fmt)
-    =]
+=*  file         =]    [= (tpl-file-line extract-fmt) =]
     {
         int res;
         FILE* fp = fopen(pz_fname, "[=
@@ -323,16 +329,14 @@ CASE handler-type =][=
         if (fp == NULL) {
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "fopen",
                     pz_fname);
-            return 1;
+            return [= (. file-fail-code) =];
         }
         res = [= handler-proc =](pz_fname, fp);
         fclose(fp);
         return res;
     }[=
 
-*=*  text        =][=
-    (tpl-file-line extract-fmt)
-    =]
+*=*  text        =]    [= (tpl-file-line extract-fmt) =]
     file_text = malloc(text_size + 1);
     if (file_text == NULL) {
         fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
@@ -350,7 +354,7 @@ CASE handler-type =][=
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "open",
                     pz_fname);
             free(file_text);
-            return 1;
+            return [= (. file-fail-code) =];
         }
 
         while (sz > 0) {
@@ -389,9 +393,7 @@ CASE handler-type =][=
 ESAC             =]
 }[=
 
-ENDIF handler-type exists
-
-=][=
+ENDIF handler-type exists  =][=
 
 (tpl-file-line extract-fmt)
 
@@ -406,12 +408,10 @@ main(int argc, char** argv)
         argc -= ct;
         argv += ct;
     }[=
-
-    (def-file-line "main-init" extract-fmt) =][=
-    main-init =][=
-    (tpl-file-line extract-fmt)
-
-=]
+    (if (exist? "main-init") (string-append
+    "\n    " (def-file-line "main-init" extract-fmt) "\n" (get "main-init")))
+    \=]
+    [= (tpl-file-line extract-fmt) =]
     /*
      *  Input list from command line
      */
@@ -460,12 +460,9 @@ main(int argc, char** argv)
                    =] Warning:  no input lines were read\n"), stderr);
         free(buf);
     }[=
-
-    (def-file-line "main-fini" extract-fmt) =][=
-    main-fini =][=
-    (tpl-file-line extract-fmt)
-
-=]
+    (if (exist? "main-fini") (string-append
+    "\n    " (def-file-line "main-fini" extract-fmt) "\n" (get "main-init")))
+    \=]
 
     return res;
 }[=

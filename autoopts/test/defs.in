@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-02-02 11:52:12 bkorb"
+# Time-stamp:     "2011-02-03 16:22:18 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,7 +80,8 @@ cfg_vals()
   INC="@LIBGUILE_CFLAGS@"
   LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
   DEBUG_ENABLED='@DEBUG_ENABLED@'
-  ulimit -c unlimited
+  ( exec 2>/dev/null; ulimit -c unlimited ) && \
+    ulimit -c unlimited
 
   test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
   test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'

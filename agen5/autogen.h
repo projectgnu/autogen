@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-02-01 07:39:49 bkorb"
+ *  Time-stamp:        "2011-02-17 15:34:31 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -42,6 +42,8 @@
 #include "autoopts/autoopts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
+
+#define  LOG10_2to32  10  /* rounded up */
 
 #if defined(SHELL_ENABLED) || defined(DAEMON_ENABLED)
 #  ifndef HAVE_WORKING_FORK

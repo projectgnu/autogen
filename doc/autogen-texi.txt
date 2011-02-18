@@ -2506,7 +2506,7 @@ int @i{my_handler}( char const* pz_fname, FILE* entry_fp );
 @item  text-of-file
 @itemx some-text-of-file
 Before calling your procedure, the contents of the file are read into memory.
-(Excessively large files may cause problems.)  The ``@samp{some-text-of-file}''
+(Excessively large files may cause problems.)  The @samp{some-text-of-file}
 disallows empty files.  Both require regular files.  In this case, the profile
 for your procedure must be:
 
@@ -2523,6 +2523,14 @@ the file contents.  Also, the memory allocated to hold the text is
 The file contents need not be text, as the data are read with the @code{read(2)}
 system call.
 @end table
+
+If you select one of these file type handlers, then on access or usage errors
+the @code{PROGRAM_EXIT_FAILURE} exit code will, by default, be or-ed
+into the final exit code.  This can be changed by specifying the
+global @code{file-fail-code} attribute and naming a different value.
+That is, something other than @code{failure}.  You may choose @code{success},
+in which case file access issues will not affect the exit code and the error
+message will not be printed.
 
 @item @i{my_handler}-code
 @vindex MYHANDLER-code
@@ -4159,7 +4167,7 @@ automatically.  This routine is expected to call @code{exit(3)} with
 the provided exit code.
 
 The @code{optionUsage} routine also behaves differently depending
-on the exit code.:
+on the exit code:
 
 @table @code
 @item EXIT_SUCCESS (the value zero)

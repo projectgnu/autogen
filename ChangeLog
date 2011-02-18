@@ -1,3 +1,14 @@
+2011-02-17  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c (do_tpl_file_line): trim the path name in the
+	tpl-file-line/def-file-line functions.
+	* autoopts/test/defs.in (ulimit): if you cannot do it, be quiet about it
+	* autoopts/tpl/optmain.tlib (file-fail-code): now that we're emitting
+	an exit code enumeration, return the enum value and allow it to be
+	specified with:  file-fail-code = name;
+	* autoopts/tpl/texi2mdoc.sh: Fix some BASH-isms.
+	* config/misc.def (SCM_*_VERSION): 2.0 is okay.
+
 2011-01-26  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/getopt.tpl (3GNU): not always -- if "long-opts" is not

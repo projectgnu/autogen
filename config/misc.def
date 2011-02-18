@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-02-01 12:45:40 bkorb"
+/*  Time-stamp:        "2011-02-17 15:01:59 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -138,8 +138,8 @@ test   = {
   check    = "a working libguile can be found";
   code     = <<- _END_OF_CODE_
 	#include <libguile.h>
-	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 109
-	This has not been tested with Guile 1.10.  Remove this line to proceed.
+	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 200
+	This has not been tested with Guile 2.1.  Remove this line to proceed.
 	#endif
 	int main () {
 	  SCM fumble = SCM_UNDEFINED;

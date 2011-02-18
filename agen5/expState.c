@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2011-01-20 16:21:06 bkorb"
+ *  Time-stamp:        "2011-02-17 15:33:17 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -729,20 +729,20 @@ ag_scm_tpl_file(SCM full)
 static SCM
 do_tpl_file_line(int line_delta, char const * fmt)
 {
-    char * buf;
+    void * args[2] = {
+        [0] = (void*)pCurTemplate->pzTplFile,
+        [1] = (void*)((long)pCurMacro->lineNo + line_delta)
+    };
+    char * buf = strrchr(args[0], DIRCH);
+    if (buf != NULL)
+        args[0] = buf + 1;
 
     {
-        size_t sz = strlen(fmt) + strlen(pCurTemplate->pzTplFile) + 24;
+        size_t sz = strlen(fmt) + strlen(args[0]) + 24;
         buf = ag_scribble(sz);
     }
 
-    {
-        void * args[2];
-        args[0] = (void*)pCurTemplate->pzTplFile;
-        args[1] = (void*)((long)pCurMacro->lineNo + line_delta);
-        sprintfv(buf, fmt, (snv_constpointer*)args);
-    }
-
+    sprintfv(buf, fmt, (snv_constpointer*)args);
     return AG_SCM_STR02SCM(buf);
 }
 
@@ -828,13 +828,10 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
 {
     static char const zFmt[]  = "from %s line %d";
     char const * pzFmt = zFmt;
-    char    zScribble[ 1024 ];
-    char*   pzScrib = zScribble;
-
-    tDefEntry*  pE;
+    char * buf;
     ag_bool     x;
 
-    pE = findDefEntry(ag_scm2zchars(obj, "ag value"), &x);
+    tDefEntry * pE = findDefEntry(ag_scm2zchars(obj, "ag value"), &x);
 
     /*
      *  IF we did not find the entry we are looking for
@@ -847,26 +844,22 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
         pzFmt = ag_scm2zchars(fmt, "file/line format");
 
     {
-        size_t maxlen = strlen(pE->pzSrcFile)
-                      + strlen(pzFmt) + 4 * sizeof(int);
-        if (maxlen >= sizeof(zScribble))
-            pzScrib = (char*)AGALOC(maxlen, "file-line buffer");
+        void * args[2] = {
+            (void*)pE->pzSrcFile,
+            (void*)(long)pE->srcLineNum
+        };
+        size_t maxlen;
+
+        buf = strrchr(args[0], DIRCH);
+        if (buf != NULL)
+            args[0] = buf + 1;
+
+        maxlen = strlen(args[0]) + strlen(pzFmt) + LOG10_2to32 + 1;
+        buf = ag_scribble(maxlen);
+        sprintfv(buf, pzFmt, (snv_constpointer*)args);
     }
 
-    {
-        void* args[2];
-        args[0] = (void*)pE->pzSrcFile;
-        args[1] = (void*)(long)pE->srcLineNum;
-        sprintfv(pzScrib, pzFmt, (snv_constpointer*)args);
-    }
-
-    {
-        SCM res = AG_SCM_STR02SCM(pzScrib);
-        if (pzScrib != zScribble)
-            AGFREE((void*)pzScrib);
-
-        return res;
-    }
+    return AG_SCM_STR02SCM(buf);
 }
 /*
  * Local Variables:

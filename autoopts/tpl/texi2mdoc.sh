@@ -2,12 +2,12 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-01-28 14:50:14 bkorb"
+## Time-stamp:      "2011-02-03 16:16:33 bkorb"
 ## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2011 Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -34,8 +34,31 @@
 ##
 ## And run the entire output through "sed" to convert texi-isms
 
+# /bin/sh on Solaris is too horrible for words
+#
+case "$0" in
+/bin/sh ) test -x /usr/xpg4/bin/sh && exec /usr/xpg4/bin/sh ${1+"$@"} ;;
+esac
+
 parent_pid=$$
-prog=$(basename $0 .sh)
+prog=`basename $0 .sh`
+
+fixfont='
+s;@code{\([^}]*\)};\\fB\1\\fP;g
+s;@var{\([^}]*\)};\\fB\1\\fP;g
+s;@samp{\([^}]*\)};\\fB\1\\fP;g
+s;@i{\([^}]*\)};\\fI\1\\fP;g
+s;@file{\([^}]*\)};\\fI\1\\fP;g
+s;@emph{\([^}]*\)};\\fI\1\\fP;g
+s;@strong{\([^}]*\)};\\fB\1\\fP;g
+s/@\([{@}]\)/\1/g
+s,^[@$]\*$,.br,
+s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
+s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
+s/ -/ \\-/g
+/^\.[A-Z][a-z] /s@ \\-@ -@g'"
+s/^'/\\'/"
+readonly fixfont
 
 die() {
     echo "$prog error:  $*" >&2
@@ -46,22 +69,6 @@ die() {
     exit 1
 }
 
-readonly fixfont='
-s;@code{\([^}]*\)};\\fB\1\\fP;g
-s;@var{\([^}]*\)};\\fB\1\\fP;g
-s;@samp{\([^}]*\)};\\fB\1\\fP;g
-s;@i{\([^}]*\)};\\fI\1\\fP;g
-s;@file{\([^}]*\)};\\fI\1\\fP;g
-s;@emph{\([^}]*\)};\\fI\1\\fP;g
-s;@strong{\([^}]*\)};\\fB\1\\fP;g
-s/@\([{}]\)/\1/g
-s,^[@$]\*$,.br,
-s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
-s/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\(lq\1\\(rq/g
-s/ -/ \\-/g
-/^\.[A-Z][a-z] /s@ \\-@ -@g'"
-s/^'/\\'/"
-
 do_example() {
     echo '.Bd -offset indent'
     res=0
@@ -70,7 +77,7 @@ do_example() {
     do
         IFS='' read -r line || die "incomplete example"
         case "$line" in
-        ( '@end '*example ) break ;;
+        '@end '*example ) break ;;
         esac
 
         do_line
@@ -90,7 +97,7 @@ do_enumerate() {
     do
         IFS='' read -r line || die "incomplete enumerate"
         case "$line" in
-        ( '@end '*enumerate ) break ;;
+        '@end '*enumerate ) break ;;
         esac
 
         do_line
@@ -111,7 +118,7 @@ do_table() {
     do
         IFS='' read -r line || die "incomplete table"
         case "$line" in
-        ( '@end '*table ) break ;;
+        '@end '*table ) break ;;
         esac
 
         do_line
@@ -128,7 +135,7 @@ do_itemize() {
     do
         IFS='' read -r line || die "incomplete itemize"
         case "$line" in
-        ( '@end '*itemize ) break ;;
+        '@end '*itemize ) break ;;
         esac
 
         do_line
@@ -144,14 +151,14 @@ do_item() {
 
 do_line() {
     case "${line}" in
-    ( '@'* )
-        typ=$(echo "$line" | egrep '@[a-z]*\{')
+    '@'* )
+        typ=`echo "$line" | egrep '@[a-z]*\{'`
         test ${#typ} -gt 0 && echo "$line" && return 0
-        typ=$(echo "$line" | sed 's/@ *//;s/[^a-z].*//')
+        typ=`echo "$line" | sed 's/@ *//;s/[^a-z].*//'`
         eval do_${typ} || die "do_${typ} failed"
         ;;
 
-    ( * )
+    * )
         echo "$line"
         ;;
     esac
