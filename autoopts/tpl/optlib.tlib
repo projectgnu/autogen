@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-01-28 10:33:16 bkorb"
+# Time-stamp:      "2011-02-24 10:29:55 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -62,7 +62,7 @@ test_exe "${CLexe}" || \
   test_exe columns || \
   die "cannot locate columns program:  ${tried}"
 [=
-
+(make-tmp-dir)
 (shell (out-pop #t))
 
 (define get-opt-value (lambda (val)
@@ -142,14 +142,14 @@ test_exe "${CLexe}" || \
 
 (define descriptor "")
 (define opt-name   "")
+(define tmp-val    "")
+(define added-hdr  "")
+
 (define flg-name   "")
 (define UP-name    "")
 (define cap-name   "")
 (define low-name   "")
-(define tmp-val    "")
 (define enum-pfx   "")
-(define added-hdr  "")
-(make-tmp-dir)
 
 (define set-flag-names (lambda () (begin
     (set! flg-name (get "name"))
@@ -161,42 +161,39 @@ test_exe "${CLexe}" || \
                        (string-append UP-prefix UP-name "_") ))
 ) ) )
 
-(if (exist? "prefix")
- (begin
-   (define UP-prefix  (string-append (string-upcase! (get "prefix")) "_"))
-   (define Cap-prefix (string-capitalize UP-prefix))
-   (define OPT-pfx    (string-append UP-prefix "OPT_"))
-   (define INDEX-pfx  (string-append "INDEX_" OPT-pfx))
-   (define VALUE-pfx  (string-append "VALUE_" OPT-pfx))
- )
- (begin
-   (define UP-prefix  "")
-   (define Cap-prefix "")
-   (define OPT-pfx    "OPT_")
-   (define INDEX-pfx  "INDEX_OPT_")
-   (define VALUE-pfx  "VALUE_OPT_")
- )  )
+(define UP-prefix  "")
+(define Cap-prefix "")
+(define OPT-pfx    "OPT_")
+(define INDEX-pfx  "INDEX_OPT_")
+(define VALUE-pfx  "VALUE_OPT_")
 
- (define up-c-name  (lambda (ag-name)
+(if (exist? "prefix")
+   (begin
+     (set! UP-prefix  (string-append (string-upcase! (get "prefix")) "_"))
+     (set! Cap-prefix (string-capitalize UP-prefix))
+     (set! OPT-pfx    (string-append UP-prefix "OPT_"))
+     (set! INDEX-pfx  (string-append "INDEX_" OPT-pfx))
+     (set! VALUE-pfx  (string-append "VALUE_" OPT-pfx))
+ ) )
+
+(define up-c-name    (lambda (ag-name)
     (string-upcase! (string->c-name! (get ag-name)))  ))
 
- (define cap-c-name  (lambda (ag-name)
+(define cap-c-name   (lambda (ag-name)
     (string-capitalize! (string->c-name! (get ag-name)))  ))
 
- (define down-c-name  (lambda (ag-name)
+(define down-c-name  (lambda (ag-name)
     (string-downcase! (string->c-name! (get ag-name)))  ))
 
-(define index-name (lambda (i-name)
+(define index-name   (lambda (i-name)
    (string-append INDEX-pfx (up-c-name i-name))  ))
 
+(define optname-from "A-Z_^")
+(define optname-to   "a-z--")
 (if (exist? "preserve-case")
    (begin
-     (define optname-from "_^")
-     (define optname-to   "--")
-   )
-   (begin
-     (define optname-from "A-Z_^")
-     (define optname-to   "a-z--")
+     (set! optname-from "_^")
+     (set! optname-to   "--")
 )  )
 
 (define version-text (string-append prog-name
@@ -602,16 +599,16 @@ static char const [= (. usage-text-name) =][] =
 
 ENDDEF usage-text
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-Emit the #define's for a single option  =][=
+#define's for a single option     =][=
 
-DEFINE Option_Defines             =][=
+DEFINE Option_Defines             =]
+#define VALUE_[=
   (define value-desc (string-append UP-prefix "DESC("
           (if (exist? "equivalence")
               (up-c-name "equivalence")
-              UP-name) ")" ))     =]
-#define VALUE_[=
+              UP-name) ")" ))
   (define tmp-val (for-index))
   (sprintf "%-18s" opt-name)=] [=
 

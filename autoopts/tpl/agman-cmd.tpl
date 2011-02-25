@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-01-26 14:00:25 bkorb"
+## Time-stamp:      "2011-02-24 15:16:00 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,7 +32,9 @@
 #
 :+][+:
 
-INCLUDE "cmd-doc.tlib"                      :+][+:
+INCLUDE "cmd-doc.tlib"
+
+:+][+:
 
 (sprintf "\n.TH %s %s \"%s\" \"%s\" \"%s\"\n"
         (get "prog-name") man-sect
@@ -40,60 +42,17 @@ INCLUDE "cmd-doc.tlib"                      :+][+:
 :+]
 .\"
 .SH NAME
-[+: prog-name :+] \- [+: prog-title :+]
-.SH SYNOPSIS
-.B [+: prog-name :+][+:
+[+: prog-name :+] \- [+: prog-title :+][+:
 
-  IF (define use-flags  (exist? "flag.value"))
-     (define named-mode (not (or use-flags (exist? "long-opts") )))
-     use-flags
-                                            :+][+:
-    IF (exist? "long-opts")                 :+]
-.\" Mixture of short (flag) options and long options
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:
-#:+] " [[=| ]\fIvalue\fP]]..."[+:
+(out-push-new)            :+][+:
 
-    ELSE no long options:                   :+]
-.\" Short (flag) options only
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]..."[+:
-    ENDIF                                               
-                                            :+][+:
-  ELIF (exist? "long-opts")                             
-                                            :+]
-.\" Long options only
-.RB [ \-\-\fIopt\-name\fP [ = "| ] \fIvalue\fP]]..."[+:
-
-  ELIF  (not (exist? "argument"))           :+]
-.RI [ opt\-name "[\fB=\fP" value ]]...
-.PP
-All arguments are named options.[+:
-  ENDIF                                     :+][+:
-
-  IF (exist? "argument")                    :+][+:
-    argument                                :+][+:
-
-    IF (exist? "reorder-args")              :+]
-.PP
-Operands and options may be intermixed.  They will be reordered.
-[+: ENDIF                                   :+][+:
-
-  ELIF (or (exist? "long-opts") use-flags) 
-
-:+]
-.PP
-All arguments must be options.[+:
-
-  ENDIF                                     :+][+:
-
-(out-push-new)                              :+][+:
-
-INVOKE describe-cmd                         :+][+:
+INVOKE build-doc          :+][+:
 
   (shell (string-append
     "fn='" (find-file "mdoc2man.sh") "'\n"
     "test -f ${fn} || die mdoc2man not found from $PWD\n"
     "${fn} <<\\_EndOfMdoc_ || die ${fn} failed in $PWD\n"
     (out-pop #t)
-    "\n_EndOfMdoc_" ))                      :+][+: #
+    "\n_EndOfMdoc_" ))    :+][+: #
 
-agman-cmd.tpl ends here :+]
+agman-cmd.tpl ends here   :+]

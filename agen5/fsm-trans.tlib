@@ -17,23 +17,30 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =][=
+(define get-up (lambda (nm)
+    (string-upcase! (string->c-name! (get nm)))  ))
 
-(define event-string "")  =][=
+(define get-down (lambda (nm)
+    (string-downcase! (string->c-name! (get nm)))  ))
+
+(define stack-up (lambda (nm)
+    (string-upcase! (string->c-name! (join "\n" (stack nm)))) ))
+
+(define event-string "")    =][=
 
 DEFINE state-table  =]
 
   /* STATE [= (get "st_ix") =]:  [=
-              (. PFX)=]_ST_[= (string-upcase! (get "state")) =] */
+  (define STATE-NAME (get-up "state"))
+  (shellf "state=%s" STATE-NAME)
+  (string-append PFX "_ST_" STATE-NAME) =] */
   { [=
-  (shellf "state=%s" (string-upcase! (get "state"))) =][=
 
   FOR event "\n    "  =][=
-    (set! fmt (shellf "eval echo \\\"\\$FSM_TRANS_${state}_%s%s\\\""
-              (string-upcase! (get "event"))
-              (if (last-for?) "" ",")  ))
-    (set! event-string (if (exist? (get "event"))
-                           (get (get "event"))
-                           (get "event")  ))
+    (set! event-string (get-up "event"))
+    (set! fmt (shellf "echo ${FSM_TRANS_%s_%s}%s"
+          STATE-NAME event-string (if (last-for?) "" ",")  ))
+    (if (exist? event-string) (set! event-string (get event-string)))
     (sprintf "%-47s /* EVT:  %s */" fmt event-string ) =][=
 
   ENDFOR
@@ -162,13 +169,16 @@ ENDDEF callback-transitions
 
 DEFINE machine-step  =][=
 
-  (if (=* (get "method") "case")
-      (begin (define trans-name "trans")
-             (define trans-field "transition")
-             (define trans-valu (string-append PFX "_TR_INVALID"))  )
-      (begin (define trans-name "pT   ")
-             (define trans-field "trans_proc")
-             (define trans-valu (string-append pfx "_do_invalid"))  ))
+(define trans-name  "trans")
+(define trans-field "transition")
+(define trans-valu  (string-append PFX "_TR_INVALID"))
+
+(if (not (=* (get "method") "case")) (begin
+    (set! trans-name "pT   ")
+    (set! trans-field "trans_proc")
+    (set! trans-valu (string-append pfx "_do_invalid"))
+)   )
+
 =]
 #ifndef __COVERITY__
     if (trans_evt >= [=(. PFX)=]_EV_INVALID) {
@@ -333,4 +343,4 @@ DEFINE stepping-machine
 
 ENDDEF stepping-machine
 
-# end of agen5/fsm-trans.tpl =]
+# end of agen5/fsm-trans.tlib =]

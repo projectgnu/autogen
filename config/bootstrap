@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2010-12-02 13:17:39 bkorb"
+# Time-stamp:      "2011-02-23 12:03:29 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -46,14 +46,14 @@
 # no longer has to maintain generated files under source control, they
 # can be generated after checkout using this bootstrap procedure.
 
-PS4='>${FUNCNAME:-bsl}> '
+PS4='>bsl-${FUNCNAME}> '
 top_srcdir=$(
     cd $(dirname $0)/.. >/dev/null
     pwd )
 top_builddir=${top_srcdir}
 
 . config/bootstrap.shlib
-PS4='>${FUNCNAME:-bs}> '
+PS4='>bs-${FUNCNAME}> '
 
 config_tools()
 {
@@ -154,7 +154,7 @@ pre_local()
     BOOTSTRAP=pre
     export BOOTSTRAP
 
-    local PS4='>pre-bsl-${FUNCNAME}> '
+    local PS4='>pbs-${FUNCNAME}> '
     . ${conf_dir}/bootstrap.local ${1+"$@"} || \
         die FAILED: ${conf_dir}/bootstrap.local
 
@@ -170,13 +170,13 @@ post_local()
         (   ${setx} ; cd $(dirname $f)
             srcdir=.
             echo running POST-bootstrap.dir in ${PWD}
-            PS4='>post-bsl> '
+            PS4='>Abs-${FUNCNAME}> '
             . ./bootstrap.dir recursive || :
         )
     done
 
     local BOOTSTRAP=post
-    local PS4='>post-bsl-${FUNCNAME}> '
+    local PS4='>Abs-${FUNCNAME}> '
     . ${conf_dir}/bootstrap.local ${1+"$@"}
 }
 

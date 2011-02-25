@@ -4,7 +4,7 @@
 
   pot
 
-# Time-stamp:        "2010-02-24 08:39:47 bkorb"
+# Time-stamp:        "2011-02-24 10:22:30 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -30,7 +30,8 @@
 
 ==  h               =][=
 
-(define cch-ct 0)
+(define ref-list "")
+(define cch-ct   0)
 (dne " *  " "/*  ") =]
  *
  *  This file handles all the bookkeeping required for tracking all the little
@@ -77,10 +78,10 @@ extern usage_text_t option_usage_text;
  */[=
 
 (string-table-new  "usage_txt")
-(define str-ix 0)
-(set! cch-ct 0)
+(define str-ix     0)
 (define const-list "")
-(define typed-list "")  =][=
+(define typed-list "")
+(set! cch-ct 0)    =][=
 
 FOR utxt        =]
 #define z[= (sprintf "%-20s" (get "ut-name"))
@@ -164,10 +165,6 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 [=
-
-(define ref-list "")
-
-=][=
 
 FOR utxt
   =][=

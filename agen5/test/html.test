@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2010-02-24 08:41:49 bkorb"
+# Time-stamp:      "2011-02-24 10:53:02 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -39,7 +39,8 @@ Content-Type: text/plain
 The submitted form does not contain a valid template<?
   IF (exist? "template") ?> (<?template?>) <?ENDIF?>.<?
 ENDDEF                                             ?><?
-  (if (exist? "break") (define foo bogus))         ?><?
+  (define foo "")
+  (if (exist? "break") (set! foo bogus))           ?><?
 IF (not (exist? "template"))                       ?><?
   form-error                                       ?><?
 
@@ -105,7 +106,8 @@ Scheme evaluation error.  AutoGen ABEND-ing in template
 	cgi.tpl on line 9
 Failing Guile command:  = = = = =
 
-(if (exist? "break") (define foo bogus))
+(define foo "")
+  (if (exist? "break") (set! foo bogus))
 
 =================================
 _EOF_

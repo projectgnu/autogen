@@ -4,7 +4,7 @@ null
 
 ## agman3.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-02-01 06:38:37 bkorb"
+## Time-stamp:      "2011-02-24 10:39:17 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -29,9 +29,9 @@ null
 
 +}{+
 
+(define see-also "")
 (if (exist? "see-also")
-    (define see-also (string-append (get "see-also") " "))
-    (define see-also "")  )
+    (set! see-also (string-append (get "see-also") " ")) )
 
 +}{+
 

@@ -17,8 +17,8 @@ usr/share/autogen/optmain.tpl
 usr/share/autogen/rc-sample.tpl
 usr/share/autogen/stdoptions.def
 usr/share/autogen/fsm.tpl
-usr/share/autogen/fsm-macro.tpl
-usr/share/autogen/fsm-trans.tpl
+usr/share/autogen/fsm-macro.tlib
+usr/share/autogen/fsm-trans.tlib
 usr/share/man/man1/autogen.1
 usr/share/man/man1/getdefs.1
 usr/share/man/man1/columns.1

@@ -2,7 +2,7 @@
 /**
  *  \file expGuile.c
  *
- *  Time-stamp:        "2011-01-20 16:14:27 bkorb"
+ *  Time-stamp:        "2011-02-25 11:37:54 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -45,64 +45,35 @@ LOCAL SCM
 ag_scm_c_eval_string_from_file_line(
     char const * pzExpr, char const * pzFile, int line)
 {
-    SCM port;
+    SCM port = scm_open_input_string(AG_SCM_STR02SCM(pzExpr));
 
-    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
         fprintf(pfTrace, "eval from file %s line %d:\n%s\n", pzFile, line,
                 pzExpr);
-    }
 
-#if GUILE_VERSION < 106000
     {
-        static char const zEx[] = "eval-string-from-file-line";
-        SCM  expr  = scm_makfrom0str(pzExpr);
-        port = scm_mkstrport(SCM_INUM0, expr, SCM_OPN | SCM_RDNG, zEx);
-    }
-#else
-    port = scm_open_input_string(AG_SCM_STR02SCM(pzExpr));
-#endif
-
-#if GUILE_VERSION < 107000
-    {
-        static SCM   file = SCM_UNDEFINED;
-        static char* pzFl = NULL;
-
-        scm_t_port* pt;
-
-        if (  (pzFl == NULL)
-           || (strcmp(AG_SCM_CHARS(file), pzFile) != 0) )  {
-            if (pzFl != NULL)
-                AGFREE(pzFl);
-            AGDUPSTR(pzFl, pzFile, "eval file name");
-            file = AG_SCM_STR02SCM(pzFile);
-        }
-
-        pt = SCM_PTAB_ENTRY(port);
-        pt->line_number = line - 1;
-        pt->file_name   = file;
-    }
-
-#else
-    {
-        static SCM file = SCM_UNDEFINED;
-        static char* pzOldFile = NULL;
+        static SCM    file      = SCM_UNDEFINED;
+        static char * pzOldFile = NULL;
 
         if ((pzOldFile == NULL) || (strcmp(pzOldFile, pzFile) != 0)) {
             if (pzOldFile != NULL)
                 AGFREE(pzOldFile);
-
-            AGDUPSTR(pzOldFile, pzFile, "scheme file source");
-            file = scm_from_locale_string(pzFile);
+            AGDUPSTR(pzOldFile, pzFile, "scheme source");
+            file = AG_SCM_STR02SCM(pzFile);
         }
 
-        scm_set_port_filename_x(port, file);
-    }
-
-    {
-        SCM ln = scm_from_int(line);
-        scm_set_port_line_x(port, ln);
-    }
+        {
+#if GUILE_VERSION < 107000
+            scm_t_port * pt = SCM_PTAB_ENTRY(port);
+            pt->line_number = line - 1;
+            pt->file_name   = file;
+#else
+            SCM ln = scm_from_int(line);
+            scm_set_port_filename_x(port, file);
+            scm_set_port_line_x(port, ln);
 #endif
+        }
+    }
 
     {
         SCM ans = SCM_UNSPECIFIED;

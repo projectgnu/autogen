@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-02-17 15:01:59 bkorb"
+/*  Time-stamp:        "2011-02-23 13:26:36 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -228,7 +228,7 @@ test   = {
   check     = "scm_primitive_eval_x links";
   cflags    = "${ag_cv_with_libguile_cflags}";
   libs      = "${ag_cv_with_libguile_libs}";
-  code      = "#include <guile/gh.h>\n#include <libguile.h>\n"
+  code      = "#include <libguile.h>\n"
               "SCM res = scm_primitive_eval_x( SCM_UNDEFINED );";
 
   action    = { no; asis;

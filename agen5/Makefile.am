@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-01-27 17:06:36 bkorb"
+## Time-stamp:      "2011-02-22 10:29:01 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -22,13 +22,14 @@
 
 SUBDIRS         = test
 INCLUDES        = @INCLIST@
-TEMPLATES       = directive.tpl fsm-macro.tpl fsm-trans.tpl fsm.tpl snarf.tpl
+FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
+TEMPLATES       = directive.tpl snarf.tpl $(FSMTPL)
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
 CLEANFILES      = invoke-autogen.texi invoke-autogen.menu autogen.1
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm \
                   stamp-man stamp-parse
-pkgdata_DATA    = fsm.tpl fsm-macro.tpl fsm-trans.tpl
+pkgdata_DATA    = $(FSMTPL)
 nodist_man_MANS = autogen.1
 
 DISTCLEANFILES  = $(STAMPS) ag.c
@@ -100,11 +101,11 @@ stamp-exprini : $(EXPRLIST) snarf.tpl
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-fsm GEN-RULE
-stamp-fsm : pseudo.def fsm.tpl fsm-macro.tpl fsm-trans.tpl
+stamp-fsm : pseudo.def $(FSMTPL)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-parse GEN-RULE
-stamp-parse : defParse.def fsm.tpl fsm-macro.tpl fsm-trans.tpl
+stamp-parse : defParse.def $(FSMTPL)
 	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE

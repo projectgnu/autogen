@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-02-17 16:39:46 bkorb"
+# Time-stamp:      "2011-02-19 11:28:07 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,6 +24,31 @@
 
 =][=
 
+IF (== (get "main.main-type" "") "for-each") 
+
+=]
+#define  _XOPEN_SOURCE 500
+#define  _BSD_SOURCE     1
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+[= ELSE =]
+#include <sys/types.h>
+
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+[= ENDIF =][=
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
    BUILD GUILE MAIN
@@ -32,9 +57,8 @@
 
 DEFINE build-guile-main
 
-=][=
-(tpl-file-line extract-fmt)
-=]
+=][= (tpl-file-line extract-fmt) \=]
+
 int    original_argc;
 char** original_argv;
 
@@ -103,9 +127,8 @@ ENDDEF build-guile-main
 
 DEFINE build-test-main
 
-=][=
-(tpl-file-line extract-fmt)
-=]
+=][= (tpl-file-line extract-fmt) \=]
+
 #if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */[=
 
   IF (= (get "test-main") "optionParseShell")
@@ -130,7 +153,7 @@ extern void [= (. option-emitter-proc) =](tOptions*);[=
 =]
 
 int
-main(int argc, char** argv)
+main(int argc, char ** argv)
 {
     int res = EXIT_SUCCESS;[=
 
@@ -191,16 +214,6 @@ DEFINE for-each-main            =][=
   (tpl-file-line extract-fmt)
 
 =]
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 static char*
 trim_input_line(char* pz_s)
 {
@@ -269,14 +282,16 @@ static [=
  pname-down =]_exit_code_t
 validate_fname(char const* pz_fname)
 {
-    char const* pz_fs_err =
-        _("fs error %d (%s) %s-ing %s\n");[=
+    static char const * pz_fs_err = NULL;[=
 
   IF (*=* (get "handler-type") "text")          =]
     char*  file_text;
     size_t text_size;
     int    res;[=
   ENDIF                                         =]
+
+    if (pz_fs_err == NULL)
+        pz_fs_err = _("fs error %d (%s) %s-ing %s\n");
 
     {
         struct stat sb;
@@ -316,11 +331,11 @@ validate_fname(char const* pz_fname)
     }[=
 
 CASE handler-type =][=
-=*  name         =]    [= (tpl-file-line extract-fmt) =]
+=*  name          =][= (tpl-file-line extract-fmt) =]
 
     return [= handler-proc =](pz_fname);[=
 
-=*  file         =]    [= (tpl-file-line extract-fmt) =]
+=*  file          =][= (tpl-file-line extract-fmt) =]
     {
         int res;
         FILE* fp = fopen(pz_fname, "[=
@@ -336,7 +351,7 @@ CASE handler-type =][=
         return res;
     }[=
 
-*=*  text        =]    [= (tpl-file-line extract-fmt) =]
+*=*  text         =][= (tpl-file-line extract-fmt) =]
     file_text = malloc(text_size + 1);
     if (file_text == NULL) {
         fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
@@ -410,8 +425,8 @@ main(int argc, char** argv)
     }[=
     (if (exist? "main-init") (string-append
     "\n    " (def-file-line "main-init" extract-fmt) "\n" (get "main-init")))
-    \=]
-    [= (tpl-file-line extract-fmt) =]
+
+    =][= (tpl-file-line extract-fmt) =]
     /*
      *  Input list from command line
      */
@@ -461,7 +476,7 @@ main(int argc, char** argv)
         free(buf);
     }[=
     (if (exist? "main-fini") (string-append
-    "\n    " (def-file-line "main-fini" extract-fmt) "\n" (get "main-init")))
+    "\n    " (def-file-line "main-fini" extract-fmt) "\n" (get "main-fini")))
     \=]
 
     return res;

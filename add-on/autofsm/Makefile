@@ -1,6 +1,6 @@
 
 SRCDIR  = ../../agen5
-TPL     = fsm-macro.tpl fsm-trans.tpl fsm.tpl
+TPL     = fsm-macro.tlib fsm-trans.tlib fsm.tpl
 DEF     = example.def
 EXTRA   = run.sh Makefile README
 CLEAN   = *-fsm.[cho] [cn]*-*.def *~ *-stamp *.samp *.out .fsm.* $(BASE)*

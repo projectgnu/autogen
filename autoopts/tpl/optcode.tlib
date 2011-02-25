@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-02-01 14:34:14 bkorb"
+# Time-stamp:      "2011-02-19 11:24:38 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -88,12 +88,7 @@
 
 INCLUDE "optmain.tlib"
 
-=]
-#include <sys/types.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-[=
+=][=
 
 IF (exist? "flag.arg-range")
 

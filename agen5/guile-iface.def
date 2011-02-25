@@ -14,13 +14,13 @@ iface = {
   i-args    = '_op, _f, _tst';
   i-impl    = { i-end = '108'; i-code = 'gh_call2(_op, _f, _tst)'; };
   i-impl    = { i-end = '201';
-     i-code = 'scm_apply(_op, _f, scm_cons(_tst, scm_listofnull))'; };
+     i-code = 'scm_apply(_op, _f, scm_cons(_tst, AG_SCM_LISTOFNULL()))'; };
 };
 
 iface = {
   i-name    = bool_p;
   i-args    = '_b';
-  i-impl    = { i-end = '106'; i-code = 'gh_boolean_p(_b)'; };
+//  i-impl    = { i-end = '106'; i-code = 'gh_boolean_p(_b)'; };
   i-impl    = { i-end = '108'; i-code = 'SCM_BOOLP(_b)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_bool(_b)'; };
 };
@@ -98,6 +98,12 @@ iface = {
 };
 
 iface = {
+  i-name    = listofnull;
+  i-impl    = { i-end = '109'; i-code = 'scm_listofnull'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_list_1(SCM_EOL)'; };
+};
+
+iface = {
   i-name    = long2scm;
   i-args    = '_i';
   i-impl    = { i-end = '108'; i-code = 'gh_long2scm(_i)'; };
@@ -114,7 +120,7 @@ iface = {
 iface = {
   i-name    = nullp;
   i-args    = '_m';
-  i-impl    = { i-end = '106'; i-code = 'SCM_NULLP(_m)'; };
+//  i-impl    = { i-end = '106'; i-code = 'SCM_NULLP(_m)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_null(_m)'; };
 };
 
@@ -156,7 +162,7 @@ iface = {
 iface = {
   i-name    = strlen;
   i-args    = '_s';
-  i-impl    = { i-end = '106'; i-code = 'SCM_LENGTH(_s)'; };
+//  i-impl    = { i-end = '106'; i-code = 'SCM_LENGTH(_s)'; };
   i-impl    = { i-end = '108'; i-code = 'SCM_STRING_LENGTH(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_c_string_length(_s)'; };
 };

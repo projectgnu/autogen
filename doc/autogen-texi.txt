@@ -2505,14 +2505,15 @@ int @i{my_handler}( char const* pz_fname, FILE* entry_fp );
 
 @item  text-of-file
 @itemx some-text-of-file
-Before calling your procedure, the contents of the file are read into memory.
+Before calling your procedure, the contents of the file are read or mapped into memory.
 (Excessively large files may cause problems.)  The @samp{some-text-of-file}
 disallows empty files.  Both require regular files.  In this case, the profile
 for your procedure must be:
 
 @example
-int @i{my_handler}( char const* pz_fname, char* file_text,
-                size_t text_size );
+program_exit_code_t
+@i{my_handler}(char const* pz_fname, char* file_text,
+           size_t text_size);
 @end example
 
 @noindent

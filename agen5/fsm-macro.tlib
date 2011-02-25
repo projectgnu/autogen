@@ -1,23 +1,22 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#  Time-stamp:        "2010-08-04 20:52:14 bkorb"
-##
-## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
-##
-## AutoGen is free software: you can redistribute it and/or modify it
-## under the terms of the GNU General Public License as published by the
-## Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## AutoGen is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-## See the GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License along
-## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
+#; Time-stamp:        "2011-02-24 11:43:09 bkorb"
+#;
+#; This file is part of AutoGen.
+#; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#;
+#; AutoGen is free software: you can redistribute it and/or modify it
+#; under the terms of the GNU General Public License as published by the
+#; Free Software Foundation, either version 3 of the License, or
+#; (at your option) any later version.
+#;
+#; AutoGen is distributed in the hope that it will be useful, but
+#; WITHOUT ANY WARRANTY; without even the implied warranty of
+#; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#; See the GNU General Public License for more details.
+#;
+#; You should have received a copy of the GNU General Public License along
+#; with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =][=
 
@@ -52,7 +51,7 @@ DEFINE emit-invalid-msg =][=
 =][=
 
   FOR   state   =][=
-    (add-tbl-str (string-downcase! (get "state"))) =][=
+    (add-tbl-str (get-down "state")) =][=
   ENDFOR state  =][=
 
   (ag-fprintf 0 "\nstatic const size_t asz%sStates[%d] = {\n"
@@ -135,7 +134,7 @@ static int
 
 ENDDEF  emit-invalid-msg
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE emit-cookie-args   =][=
   FOR cookie              =]
@@ -143,7 +142,7 @@ DEFINE emit-cookie-args   =][=
   ENDFOR                  =][=
 ENDDEF emit-cookie-args
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE build-callback     =][=
 
@@ -199,7 +198,7 @@ DEFINE run-callback
 
 ENDDEF run-callback
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE build-switch    =]
     case [=cb_prefix=]_[=cb_name=]:[=
@@ -221,7 +220,7 @@ DEFINE build-switch    =]
 
 ENDDEF build-switch
 
-# # # # # # # =][=
+;;; # # # # # =][=
 
 DEFINE run-switch         =][=
 
@@ -245,25 +244,32 @@ DEFINE run-switch         =][=
 
 ENDDEF run-switch
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE preamble
+DEFINE preamble                =][=
+
+IF (emit (dne " *  " "/*  "))
+   (== (suffix) "c")           =][=
+
+(set! fsm-source (string-append tmp-dir "/fsm.code"))
+(set-writable)                 =][=
+
+ELSE                           =][=
+
+(make-tmp-dir)
+(define fsm-source (string-append tmp-dir "/fsm.header"))
+(shellf "test -f %1$s-fsm.h && cp %1$s-fsm.h ${tmp_dir}/fsm.header
+         test -f %1$s-fsm.c && cp %1$s-fsm.c ${tmp_dir}/fsm.code" (base-name))
+
+(define pfx        (string->c-name! (string-downcase!
+                   (if (exist? "prefix") (get "prefix") (base-name))  )))
+(define PFX        (string-upcase pfx))
+(define Pfx        (string-capitalize pfx))
+(define t-trans    (string-append "t_" pfx "_transition"))
 
 =][=
 
-  (if (== (suffix) "c")
-      (begin
-        (set! fsm-source ".fsm.code")
-        (set-writable) )
-      (begin
-        (define pfx     (string->c-name! (string-downcase!
-                        (if (exist? "prefix") (get "prefix") (base-name))  )))
-        (define PFX     (string-upcase pfx))
-        (define Pfx     (string-capitalize pfx))
-        (define t-trans (string-append "t_" pfx "_transition"))
-        (define fsm-source ".fsm.head") )
-  )
-  (dne " *  " "/*  ")  =]
+ENDIF  =]
  *
  *  Automated Finite State Machine
  *
@@ -274,13 +280,13 @@ DEFINE preamble
 
 ENDDEF  preamble
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+;;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE compute-transitions     =][=
 
 ;;; Initialize every possible transition as invalid
 ;;;
-(define tr_name (if (=* (get "method") "call")
+(define tr-name (if (=* (get "method") "call")
                 (string-append pfx "_do_invalid")
                 (string-append PFX "_TR_INVALID")  ))
 (shellf
@@ -290,9 +296,9 @@ DEFINE compute-transitions     =][=
        export FSM_TRANS_${g}_${f}
    done ; done"
 
-   (string-upcase! (join " " (stack "event")))
-   (string-upcase! (join " " (stack "state")))
-   PFX tr_name )
+   (stack-up "event")
+   (stack-up "state")
+   PFX tr-name )
 
 (define tev   "")
 (define tst   "")
@@ -302,6 +308,7 @@ DEFINE compute-transitions     =][=
   (lambda (tp)
     (if (= tp "noop") "NULL"
         (string-downcase! (string-append pfx "_do_" tp))  )))
+
 =][=#
 ;;; Now replace the initial values with proper ones gotten from
 ;;; the trasition definitions.
@@ -309,9 +316,9 @@ DEFINE compute-transitions     =][=
 ;;; It is actually possible to have multiple specifications for a
 ;;; single state/event pair, however the last state/event assignment
 ;;; will supply the value for the transition table.  Different
-;;; transitions may also specify the same transition method.  For
-;;; that, we unique sort the list and eliminate dups that way.  The
-;;; unique-ified list is used to produce the callout table.
+;;; transitions may also specify the same transition method.
+;;; For that, we unique sort the list and eliminate dups.
+;;; The unique-ified list is used to produce the callout table.
 ;;;
 =][=
 FOR   transition              =][=
@@ -320,61 +327,61 @@ FOR   transition              =][=
 
      ;;  This transition applies for all states
      ;;
-     (set! tev (string-upcase! (get "tev")))
+     (set! tev (get-up "tev"))
      (set! ttype (if (exist? "ttype") (get "ttype")
                      (string-append "${f}_" tev)  ))
 
-     (set! tr_name (if (=* (get "method") "call")
+     (set! tr-name (if (=* (get "method") "call")
                    (proc-ptr-type ttype)
                    (string-upcase!   (string-append PFX "_TR_" ttype))  ))
-     (set! next (if (exist? "next") (string-upcase! (get "next")) "${f}"))
+     (set! next (if (exist? "next") (get-up "next") "${f}"))
 
      (shellf
        "for f in ${st_list} ; do F=${f}
        eval FSM_TRANS_${f}_%s=\"'{ %s_ST_%s, %s }'\"
        done"
-       tev PFX next tr_name ) =][=
+       tev PFX next tr-name ) =][=
 
    ELIF (== (get "tev") "*")  =][=
 
      ;;  This transition applies for all transitions in a certain state
      ;;
-     (set! tst  (string-upcase! (get "tst")))
+     (set! tst  (get-up "tst"))
      (set! ttype (if (exist? "ttype")
-           (string-upcase! (get "ttype")) (string-append tst "_${f}")  ))
+           (get-up "ttype") (string-append tst "_${f}")  ))
 
-     (set! tr_name (if (=* (get "method") "call")
+     (set! tr-name (if (=* (get "method") "call")
                    (proc-ptr-type ttype)
                    (string-append PFX "_TR_" ttype)  ))
 
-     (set! next (if (exist? "next") (string-upcase! (get "next")) tst))
+     (set! next (if (exist? "next") (get-up "next") tst))
 
      (shellf
        "for f in ${ev_list} ; do
        eval FSM_TRANS_%s_${f}=\"'{ %s_ST_%s, %s }'\"
        done"
-       tst PFX next tr_name)  =][=
+       tst PFX next tr-name)  =][=
 
    ELSE                       =][=
 
      FOR tst                  =][=
 
-       (set! tst  (string-upcase! (get "tst")))
-       (set! next (if (exist? "next") (string-upcase! (get "next")) tst))
+       (set! tst  (get-up "tst"))
+       (set! next (if (exist? "next") (get-up "next") tst))
 
                               =][=
        FOR tev                =][=
 
-         (set! tev   (string-upcase! (get "tev")))
+         (set! tev   (get-up "tev"))
          (set! ttype (string-downcase! (if (exist? "ttype") (get "ttype")
                      (string-append tst "_" tev)  )))
 
-         (set! tr_name (if (=* (get "method") "call")
+         (set! tr-name (if (=* (get "method") "call")
                    (proc-ptr-type ttype)
                    (string-upcase!   (string-append PFX "_TR_" ttype))  ))
 
          (shellf "FSM_TRANS_%s_%s=\"{ %s_ST_%s, %s }\""
-          tst tev PFX next tr_name) =][=
+          tst tev PFX next tr-name) =][=
 
        ENDFOR  tev            =][=
      ENDFOR    tst            =][=
@@ -394,4 +401,4 @@ ENDFOR   transition           =][=
 
 ENDDEF compute-transitions
 
-# end of agen5/fsm-macro.tpl =]
+# end of agen5/fsm-macro.tlib =]

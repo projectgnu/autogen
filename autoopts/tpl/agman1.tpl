@@ -180,17 +180,16 @@ ENDIF - "main" exists
 ;;
 ;; Describe each option
 ;;
-(define opt-arg  "")
-(define dis-name "")
-(define opt-name "")
+(define opt-arg      "")
+(define dis-name     "")
+(define opt-name     "")
+(define optname-from "A-Z_^")
+(define optname-to   "a-z--")
 (if (exist? "preserve-case")
-    (begin
+   (begin
       (define optname-from "_^")
-      (define optname-to   "--") )
-    (begin
-      (define optname-from "A-Z_^")
-      (define optname-to   "a-z--") )
-)
+      (define optname-to   "--")
+)  )
 (if (exist? "option-info")
     (string-append "\n.PP\n" (get "option-info") "\n") ) :+][+:
 

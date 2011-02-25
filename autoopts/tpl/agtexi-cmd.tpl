@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-01-30 17:42:34 bkorb"
+## Time-stamp:        "2011-02-24 10:38:11 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -176,17 +176,15 @@ This is the automatically generated usage text for [=prog-name=]:
 
 #  FOR all options, except the `documentation' options, ...  =][=
 
-IF (define opt-name       "")
-   (define extra-ct       0)
-   (define extra-text     "")
+(define opt-name       "")
+(define extra-ct       0)
+(define extra-text     "")
+(define optname-from "A-Z_^")
+(define optname-to   "a-z--")
 
-   (exist? "preserve-case")     =][=
-   (define optname-from "_^")
-   (define optname-to   "--")   =][=
-ELSE                            =][=
-  (define optname-from "A-Z_^")
-  (define optname-to   "a-z--") =][=
-ENDIF                           =][=#
+(if (exist? "preserve-case") (begin
+   (set! optname-from "_^")
+   (set! optname-to   "--") ))  =][=#
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 

@@ -2,15 +2,18 @@
 [=
 
 (out-push-new)  =]
-set -- $(sort -u <<_EOF_
+set -- $(sort -n -u <<_EOF_
 [=  (join "\n" (stack "iface.i-impl.i-end")) =]
 _EOF_
 )
 v_list="$*"
+r_list=$(ix=$# ; while (( ix > 0 )) ; do eval echo \${$ix}
+         (( ix = ix - 1 )) ; done)
 i_list="[= (join " " (stack "iface.i-name")) =]"
+PS4='>${FUNC_NAME:-ag}> '
 
 fill_in() {
-  for v in $v_list
+  for v in $r_list
   do
     eval f=\"\${${name}_vals[$v]}\"
     if test ${#f} -gt 0

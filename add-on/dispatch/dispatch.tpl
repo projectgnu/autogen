@@ -119,12 +119,12 @@ DEFINE Initialize   =][=
      (string-upcase! (string->c-name! (get "invalid"))) "INVALID" )))
 
    (define proc-mode (if (exist? "static") "static" "extern"))
-   (define name-len 0)
-   (define max-len  0)
-   (define min-len  256)
-   (define cmd-ct   (count "cmd"))
-   (define clist    (string->c-name! (join "\n" (stack "cmd"))))
-   (define cmd-name "")
+   (define name-len  0)
+   (define max-len   0)
+   (define min-len   256)
+   (define cmd-ct    (count "cmd"))
+   (define clist     (string->c-name! (join "\n" (stack "cmd"))))
+   (define cmd-name  "")
    (out-push-new)   =][=
 
    FOR cmd          =][=
@@ -146,7 +146,7 @@ DEFINE Initialize   =][=
    (define special-char-handling (out-pop #t))
    (if (not (defined? 'special-char-handling ;; '
        )    )
-       (define special-char-handling "") ) =][=
+       (set! special-char-handling "") ) =][=
 
 ENDDEF Initialize
 
@@ -585,7 +585,7 @@ DEFINE Handler          =][=
 
  (out-push-new (string-append (base-name) "-hdlr.c"))
  (define fmt-fmt (sprintf
- "handling %%-%ds (%%d) cmd - args:  '%%%%s'\\n" max-len))
+    "handling %%-%ds (%%d) cmd - args:  '%%%%s'\\n" max-len))
  
  (set-writable)
 

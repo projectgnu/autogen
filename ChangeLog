@@ -1,4 +1,40 @@
+2011-02-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-macro.tpl: rename to fsm-macro.tlib, fix it so that
+	events and fsm state names my be hyphenated.
+	* agen5/fsm-trans.tpl: rename to fsm-trans.tlib
+	* agen5/Makefile.am: adjust
+	* agen5/expGuile.c (ag_scm_c_eval_string_from_file_line):
+	remove code used only for Guile 1.4.  Condense a bit of dup code.
+	* agen5/expState.c (ag_scm_version_compare): scm_listofnull was
+	removed from the interface in Guile 2.0.  By accident.
+	* agen5/guile-iface.def (listofnull): new interface macro.
+	(i-end = 106;): obsolete
+	* autoopts/tpl/agman-cmd.tpl: reworked
+	* autoopts/tpl/agmdoc-cmd.tpl: also
+	* autoopts/tpl/cmd-doc.tlib: also
+	* autoopts/tpl/mdoc2man.sh: new patches added
+	* autoopts/tpl/texi2mdoc.sh: convert the "@*" lines correctly (".br")
+	* config/misc.def: do not try to include gh.h in feature test
+
+	Throughout: fix nested guile "define" invocations:
+	* agen5/test/endmac.test: fixed.
+	* agen5/test/html.test: fixed
+	* autoopts/tpl/aginfo.tpl: fixed
+	* autoopts/tpl/agman1.tpl: fixed
+	* autoopts/tpl/agman3.tpl: fixed
+	* autoopts/tpl/agtexi-cmd.tpl: fixed
+	* autoopts/tpl/optlib.tlib: fixed
+	* autoopts/tpl/usage-txt.tpl: fixed
+
+2011-02-22  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optmain.tlib (#include): put 'em all at the top.
+	(validate_fname): allow for translation of fs error message
+
 2011-02-17  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.6 release
 
 	* agen5/expState.c (do_tpl_file_line): trim the path name in the
 	tpl-file-line/def-file-line functions.

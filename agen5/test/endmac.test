@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # endmac.test --- test variations on the end macro marker
 #
-# Time-stamp:        "2010-06-26 16:06:08 bkorb"
+# Time-stamp:        "2011-02-24 10:53:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -51,7 +51,7 @@ echo first successful $testname test succeeded
 
 cat > ${testname}3.tpl <<EOF
 <+AutoGen5 template test+>>
-ENDMAC 3 <+(define foo "print this message")  (. foo) +>>
+ENDMAC 3 <+(define foo "print this message")  foo +>>
 <+# comment The '+' is not joined because it is neither '=' nor
             a legal file name character +>>
 This is a test

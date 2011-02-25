@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2011-01-05 14:59:46 bkorb"
+#  Time-stamp:      "2011-02-24 10:47:55 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -26,10 +26,6 @@ c=%s-fsm.c
 
 (setenv "SHELL" "/bin/sh")
 (define fmt "")
-(shellf "test -f %1$s-fsm.h && mv -f %1$s-fsm.h .fsm.head
-         test -f %1$s-fsm.c && mv -f %1$s-fsm.c .fsm.code" (base-name))
-
-(add-cleanup "rm -f .fsm.head .fsm.code")
 
 =]
 [=
@@ -38,8 +34,8 @@ CASE (suffix) =][=
 
 == h =][=
 
-  INCLUDE "fsm-trans.tpl" =][=
-  INCLUDE "fsm-macro.tpl" =][=
+  INCLUDE "fsm-trans.tlib" =][=
+  INCLUDE "fsm-macro.tlib" =][=
 
   INVOKE  preamble
 
@@ -78,7 +74,7 @@ INIT
 %s
 INVALID
 DONE
-_EOF_" PFX (string-upcase! (join "\n" (stack "state"))) )=]
+_EOF_" PFX (stack-up "state") )=]
 } te_[=(. pfx)=]_state;
 
 /*
@@ -92,7 +88,7 @@ typedef enum {
   (shellf "${CLexe-columns} --spread=1 -I4 -S, -f'%s_EV_%%s' <<_EOF_
 %s
 INVALID
-_EOF_" PFX (string-upcase! (join "\n" (stack "event"))) )=]
+_EOF_" PFX (stack-up "event") )=]
 } te_[=(. pfx)=]_event;
 [=
 

@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2011-02-17 15:33:17 bkorb"
+ *  Time-stamp:        "2011-02-23 11:04:37 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -306,7 +306,7 @@ ag_scm_version_compare(SCM op, SCM v1, SCM v2)
     ver_type_t val2 = str2int_ver(ag_scm2zchars(v2, zVer));
     v1 = SCM_FROM(val1);
     v2 = SCM_FROM(val2);
-    return scm_apply(op, v1, scm_cons(v2, scm_listofnull));
+    return scm_apply(op, v1, scm_cons(v2, AG_SCM_LISTOFNULL()));
 }
 
 

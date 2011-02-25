@@ -494,7 +494,7 @@ runShell(char const*  pzCmd)
      *  THEN try to start it.
      */
     if (serv_id == NULLPROCESS) {
-        static char pz4_z[] = "PS4=>ag> ";
+        static char pz4_z[] = "PS4=>${FUNCNAME:-ag}> ";
         putenv(pz4_z);
         serv_id = server_fp_open(&serv_pair, serverArgs);
         if (serv_id > 0)
