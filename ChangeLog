@@ -1,8 +1,8 @@
 2011-02-25  Bruce Korb  <bkorb@gnu.org>
 
-	* agen5/fsm-macro.tpl: rename to fsm-macro.tlib, fix it so that
+	* agen5/fsm-macro.tpl: rename to fsm-macro.tlib.  Fix it so that
 	events and fsm state names my be hyphenated.
-	* agen5/fsm-trans.tpl: rename to fsm-trans.tlib
+	* agen5/fsm-trans.tpl: likewise
 	* agen5/Makefile.am: adjust
 	* agen5/expGuile.c (ag_scm_c_eval_string_from_file_line):
 	remove code used only for Guile 1.4.  Condense a bit of dup code.
@@ -17,7 +17,7 @@
 	* autoopts/tpl/texi2mdoc.sh: convert the "@*" lines correctly (".br")
 	* config/misc.def: do not try to include gh.h in feature test
 
-	Throughout: fix nested guile "define" invocations:
+	Throughout: fix nested Guile "define" invocations:
 	* agen5/test/endmac.test: fixed.
 	* agen5/test/html.test: fixed
 	* autoopts/tpl/aginfo.tpl: fixed

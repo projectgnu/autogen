@@ -17,7 +17,7 @@ s/^\.Pp/.PP/
 .fi/
 
 /^\.Bl .*\(enum\|tag\)/,/^\.El/{
-  s/^\.It /.TP\
+  s/^\.It  */.TP\
 .BR /
   /^\.[BE]l/d
 }
@@ -28,6 +28,7 @@ s/^\.Pp/.PP/
   /^\.[BE]l/d
 }
 
+s/^\.Op Ar  */.BR /
 '
 
 sed "$sedcmd"

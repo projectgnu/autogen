@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-02-24 13:27:49 bkorb"
+## Time-stamp:      "2011-02-26 17:09:55 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,6 +32,8 @@
 #
 :+][+:
 
+(define output-form "mdoc") :+][+:
+
 INCLUDE "cmd-doc.tlib"
 
 :+]
@@ -44,6 +46,64 @@ INCLUDE "cmd-doc.tlib"
 .Nm [+: prog-name         :+]
 .Nd [+: prog-title        :+][+:
 
-INVOKE build-doc          :+][+:
+INVOKE build-doc          :+][+:#
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  S Y N O P S I S
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE synopsis
+
+:+]
+.Sh SYNOPSIS
+.Nm [+: (. PROG_NAME) :+][+:
+
+  IF (define use-flags  (exist? "flag.value"))
+     (define named-mode (not (or use-flags (exist? "long-opts") )))
+     use-flags
+                                            :+][+:
+    IF (exist? "long-opts")                 :+]
+.\" Mixture of short (flag) options and long options
+.Op Fl flags
+.Op Fl flag Ar value
+.Op Fl \-option-name Ar value[+:
+
+    ELSE no long options:                   :+]
+.Op Fl flags
+.Op Fl flag Ar value[+:
+    ENDIF                                               
+                                            :+][+:
+  ELIF (exist? "long-opts")                             
+                                            :+]
+.Op Fl \-option-name
+.Op Fl \-option-name Ar value[+:
+
+  ELIF  (not (exist? "argument"))           :+]
+.Op Ar option\-name Ar value
+.Pp
+All arguments are named options.[+:
+  ENDIF                                     :+][+:
+
+  IF (exist? "argument")                    :+][+:
+    argument                                :+][+:
+
+    IF (exist? "reorder-args")              :+]
+.Pp
+Operands and options may be intermixed.  They will be reordered.
+[+: ENDIF                                   :+][+:
+
+  ELIF (or (exist? "long-opts") use-flags) 
+
+:+]
+.Pp
+All arguments must be options.[+:
+
+  ENDIF                                     :+][+:
+
+FOR explain   "\n.Pp\n"                     :+][+:
+  explain                                   :+][+:
+ENDFOR                                      :+][+:
+
+ENDDEF synopsis
 
 agmdoc-cmd.tpl ends here  :+]

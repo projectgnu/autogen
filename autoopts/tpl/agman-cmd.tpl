@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-02-24 15:16:00 bkorb"
+## Time-stamp:      "2011-02-26 17:09:18 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,6 +32,8 @@
 #
 :+][+:
 
+(define output-form "man") :+][+:
+
 INCLUDE "cmd-doc.tlib"
 
 :+][+:
@@ -54,5 +56,62 @@ INVOKE build-doc          :+][+:
     "${fn} <<\\_EndOfMdoc_ || die ${fn} failed in $PWD\n"
     (out-pop #t)
     "\n_EndOfMdoc_" ))    :+][+: #
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  S Y N O P S I S
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE synopsis
+
+:+]
+.Sh SYNOPSIS
+.Nm [+: (. PROG_NAME) :+][+:
+
+  IF (define use-flags  (exist? "flag.value"))
+     (define named-mode (not (or use-flags (exist? "long-opts") )))
+     use-flags
+                                            :+][+:
+    IF (exist? "long-opts")                 :+]
+.\" Mixture of short (flag) options and long options
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:
+#:+] " [[=| ]\fIvalue\fP]]..."[+:
+
+    ELSE no long options:                   :+]
+.\" Short (flag) options only
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]..."[+:
+    ENDIF                                               
+                                            :+][+:
+  ELIF (exist? "long-opts")                             
+                                            :+]
+.\" Long options only
+.RB [ \-\-\fIopt\-name\fP [ = "| ] \fIvalue\fP]]..."[+:
+
+  ELIF  (not (exist? "argument"))           :+]
+.RI [ opt\-name "[\fB=\fP" value ]]...
+.PP
+All arguments are named options.[+:
+  ENDIF                                     :+][+:
+
+  IF (exist? "argument")                    :+][+:
+    argument                                :+][+:
+
+    IF (exist? "reorder-args")              :+]
+.PP
+Operands and options may be intermixed.  They will be reordered.
+[+: ENDIF                                   :+][+:
+
+  ELIF (or (exist? "long-opts") use-flags) 
+
+:+]
+.PP
+All arguments must be options.[+:
+
+  ENDIF                                     :+][+:
+
+FOR explain   "\n.PP\n"                     :+][+:
+  explain                                   :+][+:
+ENDFOR                                      :+][+:
+
+ENDDEF synopsis
 
 agman-cmd.tpl ends here   :+]
