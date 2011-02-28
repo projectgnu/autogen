@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-01-30 10:07:42 bkorb"
+ *  Time-stamp:        "2011-02-28 14:58:46 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -29,6 +29,8 @@
  */
 #  define S_IAMB      (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)
 #endif
+
+#define WRITE_MASK ((unsigned)(~(S_IWUSR|S_IWGRP|S_IWOTH)))
 
 typedef struct {
     char const *  pzSuspendName;
@@ -122,7 +124,7 @@ do_output_file_line(int line_delta, char const * fmt)
 LOCAL void
 make_readonly(int fd)
 {
-    struct stat    sbuf;
+    struct stat sbuf;
 
     /*
      *  If the output is supposed to be writable, then also see if
@@ -138,14 +140,13 @@ make_readonly(int fd)
      *  Set our usage mask to all all the access
      *  bits that do not provide for write access
      */
-#   define USE_MASK ((unsigned)(~(S_IWUSR|S_IWGRP|S_IWOTH)))
     fstat(fd, &sbuf);
 
     /*
      *  Mask off the write permission bits, but ensure that
      *  the user read bit is set.
      */
-    sbuf.st_mode = ((unsigned)sbuf.st_mode & USE_MASK) | S_IRUSR;
+    sbuf.st_mode = ((unsigned)sbuf.st_mode & WRITE_MASK) | S_IRUSR;
     fchmod(fd, sbuf.st_mode & S_IAMB);
 }
 
@@ -171,6 +172,17 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
         if ((unlink(pz) != 0) && (errno != ENOENT))
             AG_CANT("unlink", pz);
+    }
+
+    {
+        static int const w_ok = ~WRITE_MASK;
+        struct stat sbuf;
+        if (stat(fname, &sbuf) == 0) {
+            if ((sbuf.st_mode & w_ok) == 0) {
+                sbuf.st_mode |= w_ok;
+                chmod(fname, sbuf.st_mode & 07777);
+            }
+        }
     }
 
     p->pFile = fopen(pz, mode);

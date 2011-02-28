@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-02-26 17:03:06 bkorb"
+## Time-stamp:      "2011-02-28 15:09:21 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -246,17 +246,15 @@ ENDDEF ao-sections
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
 DEFINE description                    :+]
-.Sh DESCRIPTION[+:
-
-    IF   (exist? "prog-man-descrip")  :+]
+.Sh DESCRIPTION
 [+:
-      FOR prog-man-descrip  "\n.Pp\n" :+][+:
-        prog-man-descrip              :+][+:
-      ENDFOR                          :+][+:
-    ELSE                              :+]
-There is no description for this command.[+:
 
-    ENDIF                             :+][+:
+  (if (exist? "prog-man-descrip")
+      (join "\n.Pp\n" (stack "prog-man-descrip"))
+      (if (exist? "detail")
+          (join "\n.Pp\n" (stack "detail"))
+          "There is no description for this command."
+  )   )                               :+][+:
 
 ENDDEF description
 
@@ -394,7 +392,7 @@ ENDIF                                 :+]
 (define cvt-cmd (string-append (get "option-doc-format") "2mdoc.sh"))
 (if (exist? "option-doc-format")
     (shell (string-append
-    "set -x;fn='" (find-file cvt-cmd)
+    "fn='" (find-file cvt-cmd)
     "'\ntest -f ${fn} || die '" cvt-cmd " not found'\n"
     "${fn} <<\\_EndOfMdoc_ || die ${fn} failed in $PWD\n"
     (out-pop #t)

@@ -1,3 +1,15 @@
+2011-02-28  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/mk-tpl-config.sh: new script to insert a definition of
+	"extension-defines" in tpl-config.tlib after config.h is built.
+	* autoopts/Makefile.am: invoke it before constructing libopts.c
+	and distribute this script.
+	* autoopts/tpl/optmain.tlib: use this string instead of hard wired
+	#defines that do not work for all platforms.
+	* agen5/expOutput.c (open_output_file): appending to a file closed
+	and set to read-only needs to be re-open read/write.
+	* autoopts/tpl/mdoc2man.sh: fix for BSD and Solaris "sed" program.
+
 2011-02-25  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/fsm-macro.tpl: rename to fsm-macro.tlib.  Fix it so that

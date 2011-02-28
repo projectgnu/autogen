@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-01-28 16:12:33 bkorb"
+ *  Time-stamp:        "2011-02-28 14:45:20 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -98,27 +98,6 @@ export = <<- _EOExport_
 	extern char const * pzTemplFileName;
 	extern ag_bool      trace_is_to_pipe;
 	_EOExport_;
-
-explain =
-"AutoGen creates text files from templates using external definitions.";
-
-detail = <<-  _END_DETAIL
-	The definitions file (@code{<def-file>}) can be specified with the
-	@code{definitions} option or as the command argument, but not both.
-	Omitting it or specifying @code{-} will result in reading definitions
-	from standard input.
-
-	The output file names are based on the template, but generally use the
-	base name of the definition file.  If standard in is read for the
-	definitions, then @code{stdin} will be used for that base name.  The
-	suffixes to the base name are gotten from the template.  However, the
-	template file may specify the entire output file name.  The generated
-	files are always created in the current directory.  If you need to
-	place output in an alternate directory, @code{cd} to that directory and
-	use the @code{--templ_dirs} option to search the original directory.
-
-	@code{loop-limit} is used in debugging to stop runaway expansions.
-	_END_DETAIL;
 #endif /* XML2AG */
 
 exit-name[1]  = option-error;
@@ -714,7 +693,6 @@ flag = {
 	then the input pipe will be suffixed with "-in" and the output pipe
 	suffixed with "-out" and only one client may connect at a time.
 	@end table
-
 	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";
@@ -883,16 +861,39 @@ flag = {
  *
  *  Program Documentation
  */
-
 #ifndef XML2AG
 option-doc-format = texi;
+
+explain =
+"AutoGen creates text files from templates using external definitions.";
 
 detail = <<- _EndOfDetail_
 	AutoGen is a tool designed for generating program files that contain
 	repetitive text with varied substitutions.
 	_EndOfDetail_;
 
-prog-descrip = <<-  _END_MAN_DESCRIP
+detail = <<- _EndOfDetail_
+	The definitions (@code{<def-file>}) can be specified with the
+	@code{definitions} option or as the command argument, but not both.
+	Omitting it or specifying @code{-} will result in reading definitions
+	from standard input.
+
+	The output file names are based on the template, but generally use the
+	base name of the definition file.  If standard in is read for the
+	definitions, then @code{stdin} will be used for that base name.  The
+	suffixes to the base name are gotten from the template.  However, the
+	template file may specify the entire output file name.  The generated
+	files are always created in the current directory.  If you need to
+	place output in an alternate directory, @code{cd} to that directory and
+	use the @code{--templ_dirs} option to search the original directory.
+
+	@code{loop-limit} is used in debugging to stop runaway expansions.
+	_EndOfDetail_;
+
+doc-section = {
+    ds-type   = DESCRIPTION;
+    ds-format = texi;
+    ds-text   = <<- _END_MAN_DESCRIP
 	@code{AutoGen} is designed for generating program files that contain
 	repetitive text with varied substitutions.  The goal is to simplify the
 	maintenance of programs that contain large amounts of repetitious text.
@@ -912,6 +913,7 @@ prog-descrip = <<-  _END_MAN_DESCRIP
 	All of this can be done mechanically; with the proper templates
 	and this program.
 	_END_MAN_DESCRIP;
+};
 
 doc-section = {
     ds-type     = EXAMPLES;

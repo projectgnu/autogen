@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-01-27 10:49:49 bkorb"
+## Time-stamp:      "2011-02-28 12:40:53 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -84,7 +84,7 @@ libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
-EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) autogen.map \
+EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) autogen.map mk-tpl-config.sh \
 	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
@@ -113,12 +113,8 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 ##
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-libopts.c : $(HDRS) $(CSRC)
-	{ echo '#define AUTOOPTS_INTERNAL' ; \
-	echo '#include "compat/compat.h"' ; \
-	echo '#define LOCAL static' ; \
-	for f in $(HDRS) $(CSRC) ; do echo "#include \"$$f\"" ; \
-	done ; } > $@
+libopts.c : $(HDRS) $(CSRC) $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
+	$(SHELL) -x $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
@@ -164,10 +160,6 @@ install-data-hook:
 	CONFIG_SHELL='$(CONFIG_SHELL)'  \
 	bindir='$(bindir)' \
 	$(SHELL) $(srcdir)/install-options-h
-
-libopts.i : libopts.o
-	$(COMPILE) -E libopts.c > libopts-lines.i
-	egrep -v $$'^[ \t]*(#|$$)' libopts-lines.i > $@
 
 .NOTPARALLEL:
 

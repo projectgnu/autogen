@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-02-26 17:09:18 bkorb"
+## Time-stamp:      "2011-02-28 13:08:19 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -92,8 +92,8 @@ DEFINE synopsis
 All arguments are named options.[+:
   ENDIF                                     :+][+:
 
-  IF (exist? "argument")                    :+][+:
-    argument                                :+][+:
+  IF (exist? "argument")
+    :+] [+: argument                        :+][+:
 
     IF (exist? "reorder-args")              :+]
 .PP
@@ -108,9 +108,9 @@ All arguments must be options.[+:
 
   ENDIF                                     :+][+:
 
-FOR explain   "\n.PP\n"                     :+][+:
-  explain                                   :+][+:
-ENDFOR                                      :+][+:
+(if (exist? "explain")
+    (string-append "\n.PP\n"
+      (join "\n.PP\n" (stack "explain"))) ) :+][+:
 
 ENDDEF synopsis
 

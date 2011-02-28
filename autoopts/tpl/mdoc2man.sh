@@ -16,7 +16,13 @@ s/^\.Pp/.PP/
 /^\.Ed/s/.Ed.*/.in -4\
 .fi/
 
-/^\.Bl .*\(enum\|tag\)/,/^\.El/{
+/^\.Bl .*enum/,/^\.El/{
+  s/^\.It  */.TP\
+.BR /
+  /^\.[BE]l/d
+}
+
+/^\.Bl .*tag/,/^\.El/{
   s/^\.It  */.TP\
 .BR /
   /^\.[BE]l/d
