@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2011-01-20 16:16:50 bkorb"
+# Time-stamp:        "2011-03-02 11:40:21 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -189,6 +189,7 @@ mk_tmp_dir() {
     ` 2>/dev/null
 }
 exec 2>&8
+export AG_pid
 AG_pid=[=
  (define init-str (out-pop #t))
  (kr-string init-str)=] "\000........."; /* ' // " // */

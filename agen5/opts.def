@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-02-28 14:45:20 bkorb"
+ *  Time-stamp:        "2011-03-01 13:11:27 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -763,7 +763,7 @@ flag = {
     no-preset;
     settable;
     doc = <<- _EOF_
-	Just like 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing
+	Similar to 'C', AutoGen uses @code{#ifdef/#ifndef} preprocessing
 	directives.  This option will cause the matching names to be
 	removed from the list of defined values.
 	_EOF_ ;

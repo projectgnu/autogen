@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-02-28 15:09:21 bkorb"
+## Time-stamp:      "2011-03-02 13:53:40 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -50,8 +50,8 @@
     "the agman-cmd template only produces section 1, 6 and 8 man pages")
 ))))
 (set! tmp-val (getenv "SECTION_NAME"))
-(if (defined? 'tmp-val)
-    (set! section-name tmp-val))
+(if (defined? 'tmp-val) (if (string? tmp-val)
+    (set! section-name tmp-val) ))
 
 (out-move (string-append (get "prog-name") "." man-sect))
 
@@ -79,6 +79,7 @@
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.\n")
 
+(emit (head-line))
 (dne ".\\\"  ")                       :+][+:#
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -90,7 +91,7 @@ DEFINE build-doc                      :+][+:
 INVOKE doc-sections                   :+][+:
 INVOKE ao-sections                    :+][+:
 
-(out-push-new)                       \:+]
+(out-push-new (string-append tmp-dir "/.assemble")) \:+]
 cat_n_rm() {
   test -f ${tmp_dir}/$1 || return 0
   cat ${tmp_dir}/$1
@@ -98,6 +99,7 @@ cat_n_rm() {
 }
 for f in synopsis description options option-presets exit-status
 do cat_n_rm $f ; done
+test -f ${tmp_dir}/name && rm -f ${tmp_dir}/name
 
 for f in errors environment files conforming-to notes bugs \
            example see-also author
@@ -106,7 +108,8 @@ do cat_n_rm $f ; done > ${tmp_dir}/.fini
 set  -- ${tmp_dir}/*
 test -f "$1" && cat $*
 cat  ${tmp_dir}/.fini
-[+: (shell (out-pop #t))              :+][+:
+[+: (out-pop)
+    (shell ". ${tmp_dir}/.assemble")  :+][+:
 
 ENDDEF build-doc
 
@@ -205,10 +208,11 @@ or every non\-comment line in a list read from stdin.
 The input list comments[+:
 
   *                                     :+][+:
-  (error "the main specification of this program is mal-formed.") :+][+:
+  (error "the 'for-each' main has in invalid handler-type.") :+][+:
   ESAC                                 \:+]
  are blank lines or lines beginning with a '[+:
-  ?% comment-char "%s" "#" :+]' character.[+:
+  ?% comment-char "%s" "#" :+]' character.
+[+:
 
 ENDIF - "main" exists                   :+][+:
 (out-pop)                               :+][+:
@@ -254,8 +258,8 @@ DEFINE description                    :+]
       (if (exist? "detail")
           (join "\n.Pp\n" (stack "detail"))
           "There is no description for this command."
-  )   )                               :+][+:
-
+  )   )                               :+]
+[+:
 ENDDEF description
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -266,15 +270,21 @@ DEFINE options
 
 :+][+:
 
-(if (exist? "option-doc-format") (out-push-new))
 (set! tmp-val (string-append tmp-dir "/options"))
 (out-push-new tmp-val)
 
-(define opt-arg      "")
-(define dis-name     "")
-(define opt-name     "")
-(define optname-from "A-Z_^")
-(define optname-to   "a-z--")
+(define opt-arg       "")
+(define dis-name      "")
+(define opt-name      "")
+(define optname-from  "A-Z_^")
+(define optname-to    "a-z--")
+(define cvt-cmd       "")
+(define formatted-doc (exist? "option-doc-format"))
+
+(if formatted-doc (begin
+    (out-push-new)
+    (set! cvt-cmd (string-append (get "option-doc-format") "2mdoc.sh"))
+)   )
 
 (if (exist? "preserve-case")
    (begin
@@ -389,8 +399,7 @@ ENDIF                                 :+]
 .El
 [+:
 
-(define cvt-cmd (string-append (get "option-doc-format") "2mdoc.sh"))
-(if (exist? "option-doc-format")
+(if formatted-doc
     (shell (string-append
     "fn='" (find-file cvt-cmd)
     "'\ntest -f ${fn} || die '" cvt-cmd " not found'\n"

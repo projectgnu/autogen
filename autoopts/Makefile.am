@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-02-28 12:40:53 bkorb"
+## Time-stamp:      "2011-02-28 15:15:52 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -114,7 +114,7 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 libopts.c : $(HDRS) $(CSRC) $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
-	$(SHELL) -x $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
+	$(SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
@@ -128,7 +128,7 @@ install-data-local : install-man3
 
 $(GENMAN) : $(MAN_STAMP)
 $(MAN_STAMP) : $(srcdir)/funcs.def
-	@if [ -x ../agen5/autogen ] ; then \
+	@if test -x ../agen5/autogen ; then \
 	  touch tmp-$@ ; \
 	  opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Tagman3.tpl' ; \
 	  echo ! $(AGexe) $${opts} $(srcdir)/funcs.def ; \

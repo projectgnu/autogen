@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-02-26 17:09:55 bkorb"
+## Time-stamp:      "2011-03-02 13:05:42 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,16 +32,20 @@
 #
 :+][+:
 
-(define output-form "mdoc") :+][+:
+`set -- \`date '+%B %d %Y' | sed 's/ 0/ /'\`
+    echo ".Dd $1 $2, $3"
+    echo .Os \`uname -sr\`
+
+` :+][+:
+
+(define head-line (lambda()
+   (string-append ".Dt " PROG_NAME " " man-sect " " section-name) ))
+
+:+][+:
 
 INCLUDE "cmd-doc.tlib"
 
 :+]
-.\"
-[+: `set -- \`date '+%B %d %Y' | sed 's/ 0/ /'\`
-    echo ".Dd $1 $2, $3"` :+]
-.Os [+: `uname -sr`       :+]
-.Dt [+: (string-append PROG_NAME " " man-sect " " section-name) :+]
 .Sh NAME
 .Nm [+: prog-name         :+]
 .Nd [+: prog-title        :+][+:
@@ -98,7 +102,9 @@ Operands and options may be intermixed.  They will be reordered.
 .Pp
 All arguments must be options.[+:
 
-  ENDIF                                     :+][+:
+  ENDIF                                     :+]
+.Pp
+[+:
 
 FOR explain   "\n.Pp\n"                     :+][+:
   explain                                   :+][+:

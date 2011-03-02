@@ -1,4 +1,4 @@
-2011-02-28  Bruce Korb  <bkorb@gnu.org>
+2011-03-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/mk-tpl-config.sh: new script to insert a definition of
 	"extension-defines" in tpl-config.tlib after config.h is built.

@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-02-24 12:11:31 bkorb"
+# Time-stamp:        "2011-03-02 13:55:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -178,6 +178,7 @@ test_keyword \- Test AutoOpts for keyword
 All arguments must be options.
 .SH DESCRIPTION
 There is no description for this command.
+
 .SH OPTIONS
 .TP
 .BR \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP

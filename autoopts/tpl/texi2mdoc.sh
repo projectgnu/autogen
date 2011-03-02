@@ -2,8 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-02-25 11:49:04 bkorb"
-## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
+## Time-stamp:      "2011-03-02 13:21:45 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -42,23 +41,6 @@ esac
 
 parent_pid=$$
 prog=`basename $0 .sh`
-
-fixfont='
-s;@code{\([^}]*\)};\\fB\1\\fP;g
-s;@var{\([^}]*\)};\\fB\1\\fP;g
-s;@samp{\([^}]*\)};\\fB\1\\fP;g
-s;@i{\([^}]*\)};\\fI\1\\fP;g
-s;@file{\([^}]*\)};\\fI\1\\fP;g
-s;@emph{\([^}]*\)};\\fI\1\\fP;g
-s;@strong{\([^}]*\)};\\fB\1\\fP;g
-s/@\([{@}]\)/\1/g
-s,^[@$]\*$,.br,
-s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
-s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
-s/ -/ \\-/g
-/^\.[A-Z][a-z] /s@ \\-@ -@g'"
-s/^'/\\'/"
-readonly fixfont
 
 die() {
     echo "$prog error:  $*" >&2
@@ -150,10 +132,9 @@ do_item() {
 }
 
 do_line() {
-    PS4='>dln> '
     case "${line}" in
-    '@*' ) echo ".br" ;;
-
+    '@*' ) echo .br ;;
+    ''   ) echo .sp ;;
     '@'* )
         typ=`echo "$line" | egrep '@[a-z]*\{'`
         test ${#typ} -gt 0 && echo "$line" && return 0
@@ -168,9 +149,29 @@ do_line() {
     return 0
 }
 
-(
+fixfont='
+s;@code{\([^}]*\)};\\fB\1\\fP;g
+s;@var{\([^}]*\)};\\fB\1\\fP;g
+s;@samp{\([^}]*\)};\\fB\1\\fP;g
+s;@i{\([^}]*\)};\\fI\1\\fP;g
+s;@file{\([^}]*\)};\\fI\1\\fP;g
+s;@emph{\([^}]*\)};\\fI\1\\fP;g
+s;@strong{\([^}]*\)};\\fB\1\\fP;g
+s/@\([{@}]\)/\1/g
+s,^[@$]\*$,.br,
+s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
+s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
+s/\([^\\]\)-/\1\\-/g
+s/\([^\\]\)-/\1\\-/g
+/^\.in  *-/s/\.in *-/.in /'"
+s/^'/\\'/"
+readonly fixfont
+
+{
     while IFS='' read -r line
     do
         do_line
     done
-) | sed "${fixfont}"
+} | sed "${fixfont}"
+
+exit 0
