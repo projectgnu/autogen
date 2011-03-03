@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-03-02 13:21:45 bkorb"
+## Time-stamp:      "2011-03-02 16:50:33 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -52,7 +52,7 @@ die() {
 }
 
 do_example() {
-    echo '.Bd -offset indent'
+    echo '.Bd -literal -offset indent'
     res=0
 
     while :
@@ -157,14 +157,17 @@ s;@i{\([^}]*\)};\\fI\1\\fP;g
 s;@file{\([^}]*\)};\\fI\1\\fP;g
 s;@emph{\([^}]*\)};\\fI\1\\fP;g
 s;@strong{\([^}]*\)};\\fB\1\\fP;g
+s;@pxref{\([^}]*\)};see: \1;g
+s;@xref{\([^}]*\)};see: \1;g
 s/@\([{@}]\)/\1/g
 s,^[@$]\*$,.br,
 s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
 s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
 s/\([^\\]\)-/\1\\-/g
 s/\([^\\]\)-/\1\\-/g
-/^\.in  *-/s/\.in *-/.in /'"
-s/^'/\\'/"
+/^\.\(Bl\|Bd\|in\) /s/ \\-/ -/g'"
+s/^'/\\'/
+/^$/d"
 readonly fixfont
 
 {

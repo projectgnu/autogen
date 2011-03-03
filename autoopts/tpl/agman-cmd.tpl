@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-03-02 13:07:42 bkorb"
+## Time-stamp:      "2011-03-02 17:07:43 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -44,7 +44,8 @@ INCLUDE "cmd-doc.tlib"
 :+]
 .\"
 .SH NAME
-[+: prog-name :+] \- [+: prog-title :+][+:
+[+: prog-name :+] \- [+: prog-title :+]
+[+:
 
 (out-push-new)            :+][+:
 

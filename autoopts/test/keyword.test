@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-03-02 13:55:45 bkorb"
+# Time-stamp:        "2011-03-02 17:11:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -178,7 +178,6 @@ test_keyword \- Test AutoOpts for keyword
 All arguments must be options.
 .SH DESCRIPTION
 There is no description for this command.
-
 .SH OPTIONS
 .TP
 .BR \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP
@@ -252,7 +251,6 @@ Load options from \fIrcfile\fP.
 The \fIno-load-opts\fP form will disable the loading
 of earlier RC/INI files.  \fI\-\-no-load-opts\fP is handled early,
 out of order.
-
 .SH "OPTION PRESETS"
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
@@ -267,10 +265,8 @@ Successful program execution.
 .TP
 .B 1
 The operation failed or the command syntax was not valid.
-
 .SH FILES
 See \fBOPTION PRESETS\fP for configuration files.
-
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.

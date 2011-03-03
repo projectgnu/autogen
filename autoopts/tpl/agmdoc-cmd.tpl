@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-03-02 13:05:42 bkorb"
+## Time-stamp:      "2011-03-02 16:19:14 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -39,7 +39,7 @@
 ` :+][+:
 
 (define head-line (lambda()
-   (string-append ".Dt " PROG_NAME " " man-sect " " section-name) ))
+   (string-append "\n.Dt " PROG_NAME " " man-sect " " section-name "\n") ))
 
 :+][+:
 
