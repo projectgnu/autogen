@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-02-23 13:26:36 bkorb"
+/*  Time-stamp:        "2011-03-04 13:55:51 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -458,10 +458,11 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
-	AC_CHECK_HEADERS(libio.h ctype.h assert.h sys/resource.h)
+	AC_CHECK_HEADERS([libio.h ctype.h assert.h sys/resource.h])
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
-	AC_CHECK_FUNCS(fopencookie funopen, break)
+	AC_CHECK_FUNCS([putenv getdate_r])
+	AC_CHECK_FUNCS([fopencookie funopen], [break])
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
 	*yes* )
 	   AC_DEFINE([ENABLE_FMEMOPEN], 1, "Define if we can use it")
@@ -488,7 +489,7 @@ do-always = <<- _END_ALWAYS_
 	        typedef ssize_t cookie_read_function_t (void *, char *, size_t);
 	        ], [], ag_cv_cookie_function_t="newlib",
 	        AC_MSG_ERROR([Unknown flavor of cookie_XXX_t types])))])
-	fi	  
+	fi
 	if test "X${ag_cv_cookie_function_t}" = Xbsd; then
 	  AC_DEFINE([NEED_COOKIE_FUNCTION_TYPEDEFS], [1],
 	    [Define if typedefs for the funopen function pointers are required.])
@@ -504,7 +505,7 @@ do-always = <<- _END_ALWAYS_
 	         [define to static or static inline])
 	[if test "X${libopts_cv_with_libregex}" = Xno
 	then
-	  echo "I cannot detect POSIX compliant regcomp/regexec routines.
+	  echo "A POSIX compliant regcomp/regexec routine is required.
 		These are required for AutoGen to work correctly.  If you have
 		such a library present on your system, you must specify it by
 		setting the LIBS environment variable, e.g., \"LIBS='-lregex'\".

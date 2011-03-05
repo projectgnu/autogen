@@ -1,3 +1,21 @@
+2011-03-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c (ag_scm_get_c_name): use ag_scm_get() instead of
+	duplicating its text.
+	* agen5/tpProcess.c (closeOutput): add tracing output.
+	* autoopts/mk-tpl-config.sh: make certain our shell scripts never,
+	ever, *EVER* use the Solaris /bin/sh.  "read -r" is totally broken.
+	* autoopts/test/keyword.test: test the mdoc output, too.
+	* autoopts/time.c: do not directly include parse-duration.c.
+	It gets pulled from gnulib and listed as a first-class source file.
+	* columns/columns.c (pad_indentation): zero needs to be an acceptable
+	indentation.
+	* autoopts/install-options-h: make sure pathfind() is only declared
+	if we supply the function.
+	* autoopts/tpl/optmain.tlib: support date/time arguments
+	* autoopts/usage-txt.def: likewise
+	* doc/autogen-texi.txt: doc this stuff
+
 2011-03-02  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/mk-tpl-config.sh: new script to insert a definition of

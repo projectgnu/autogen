@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2011-02-23 12:03:29 bkorb"
+# Time-stamp:      "2011-03-03 12:34:10 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -119,29 +119,6 @@ config_tools()
 
     echo bootstrapping in ${PWD}
     set +e
-}
-
-run_gnulib()
-{
-    local modlist='
-	unlocked-io
-	extensions
-'
-
-    local gltool=$(
-        while : ; do
-            f=~gnu/proj/gnulib/gnulib-tool
-            test -x "$f" && break
-
-            f=$(which gnulib-tool)
-            test -x "$f" && break
-
-            die "cannot locate gnulib-tool"
-        done
-        echo $f
-    )
-    local glopts=''
-    ${gltool} ${glopts} --import ${modlist}
 }
 
 # Source any local scripts which add to the bootstrap procedure.

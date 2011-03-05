@@ -1,5 +1,14 @@
 New in __CURRENT_VERSION__ February 2011
 
+* *Really* cope with Guile version number 2.0.
+  Some interfaces were "accidentally" removed between
+  version 1.9 and 2.0.  Oops.
+
+* AutoOpts argument types of "time and date" have been added
+  to the current support for time duration.
+
+New in 5.11.6 February 2011
+
 * Cope with Guile version number 2.0
 
 * XML character encodings are parsed in config files, thus

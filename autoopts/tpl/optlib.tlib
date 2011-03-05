@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-02-24 10:29:55 bkorb"
+# Time-stamp:      "2011-03-04 12:35:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -130,7 +130,7 @@ test_exe "${CLexe}" || \
 ;;  Establish a number of variations on the spelling of the
 ;;  program name.  Use these Scheme defined values throughout.
 ;;
-(define pname           (string->c-name!    (get "prog-name")))
+(define pname           (get-c-name "prog-name"))
 (define pname-cap       (string-capitalize  pname))
 (define pname-up        (string-upcase      pname))
 (define pname-down      (string-downcase    pname))
@@ -153,11 +153,11 @@ test_exe "${CLexe}" || \
 
 (define set-flag-names (lambda () (begin
     (set! flg-name (get "name"))
-    (set! UP-name  (up-c-name "name"))
+    (set! UP-name  (get-up-name "name"))
     (set! cap-name (string-capitalize UP-name ))
     (set! low-name (string-downcase   UP-name ))
     (set! enum-pfx (if (exist? ".prefix-enum")
-                       (up-c-name (string-append (get "prefix-enum") "_"))
+                       (string-append (get-up-name "prefix-enum") "_")
                        (string-append UP-prefix UP-name "_") ))
 ) ) )
 
@@ -169,24 +169,18 @@ test_exe "${CLexe}" || \
 
 (if (exist? "prefix")
    (begin
-     (set! UP-prefix  (string-append (string-upcase! (get "prefix")) "_"))
+     (set! UP-prefix  (string-append (get-up-name "prefix") "_"))
      (set! Cap-prefix (string-capitalize UP-prefix))
      (set! OPT-pfx    (string-append UP-prefix "OPT_"))
      (set! INDEX-pfx  (string-append "INDEX_" OPT-pfx))
      (set! VALUE-pfx  (string-append "VALUE_" OPT-pfx))
  ) )
 
-(define up-c-name    (lambda (ag-name)
-    (string-upcase! (string->c-name! (get ag-name)))  ))
-
 (define cap-c-name   (lambda (ag-name)
-    (string-capitalize! (string->c-name! (get ag-name)))  ))
-
-(define down-c-name  (lambda (ag-name)
-    (string-downcase! (string->c-name! (get ag-name)))  ))
+    (string-capitalize! (get-c-name ag-name))  ))
 
 (define index-name   (lambda (i-name)
-   (string-append INDEX-pfx (up-c-name i-name))  ))
+   (string-append INDEX-pfx (get-up-name i-name))  ))
 
 (define optname-from "A-Z_^")
 (define optname-to   "a-z--")
@@ -391,6 +385,13 @@ DEFINE save-name-morphs
 
     =*   num                    =][=
          (set! proc-name "optionNumericVal")
+         (set! is-lib-cb #t)
+         (set! test-name proc-name)
+         (set! is-extern #t)
+         (set! have-proc #t)    =][=
+
+    =    time-date              =][=
+         (set! proc-name "optionTimeDate")
          (set! is-lib-cb #t)
          (set! test-name proc-name)
          (set! is-extern #t)
@@ -607,7 +608,7 @@ DEFINE Option_Defines             =]
 #define VALUE_[=
   (define value-desc (string-append UP-prefix "DESC("
           (if (exist? "equivalence")
-              (up-c-name "equivalence")
+              (get-up-name "equivalence")
               UP-name) ")" ))
   (define tmp-val (for-index))
   (sprintf "%-18s" opt-name)=] [=
@@ -707,7 +708,7 @@ test $? -eq 0 || die ${CLexe} failed"
   ESAC           =][=
 
 
-  IF (== (up-c-name "equivalence") UP-name) =]
+  IF (== (get-up-name "equivalence") UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
                  =] ([=(. descriptor)=].optActualValue)
 #define WHICH_[=(. UP-prefix)=]IDX_[=(sprintf "%-14s" UP-name)
@@ -719,16 +720,16 @@ test $? -eq 0 || die ${CLexe} failed"
 
       set-defines
            set-desc  = (string-append UP-prefix "DESC("
-                           (up-c-name "unstack-arg") ")" )
+                           (get-up-name "unstack-arg") ")" )
            set-index = (index-name "unstack-arg")
            opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
     ELIF (and (exist? "equivalence")
-              (not (== (up-c-name "equivalence") UP-name))) =][=
+              (not (== (get-up-name "equivalence") UP-name))) =][=
 
       set-defines
            set-desc  = (string-append UP-prefix "DESC("
-                           (up-c-name "equivalence") ")" )
+                           (get-up-name "equivalence") ")" )
            set-index = (index-name "equivalence")
            opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
 
@@ -767,7 +768,7 @@ DEFINE   emit-alias-option
 static char const z[=(. cap-name)=]Text[]   = "This is an alias for '[=aliases=]'";
 #define z[=(. cap-name)=]_NAME    NULL
 static char const z[=(. cap-name)=]_Name[]  = "[=name=]";
-#define [=(. UP-name)=]_FLAGS    [= (up-c-name "aliases") =]_FLAGS[=
+#define [=(. UP-name)=]_FLAGS    [= (get-up-name "aliases") =]_FLAGS[=
 
 ENDDEF   emit-alias-option
 
@@ -857,7 +858,7 @@ static char const z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
        =* key                   =]
 #define [=(. def-arg-name)=]((char const*)[=
           (emit (if (=* (get "arg-default") enum-pfx) "" enum-pfx))
-          (up-c-name "arg-default") =])[=
+          (get-up-name "arg-default") =])[=
 
        =* set                   =]
 #define [=(. def-arg-name)=]NULL
@@ -866,7 +867,7 @@ static char const z[=    (sprintf "%-26s" (string-append cap-name "_Name[]"))
          ELSE =][=
            FOR    arg-default | =][=
              (string->c-name! (string-append UP-prefix UP-name "_"
-                   (string-upcase! (get "arg-default")) ))  =][=
+                   (get-up-name "arg-default") ))  =][=
            ENDFOR arg-default   =][=
          ENDIF =])[=
 
@@ -1143,7 +1144,7 @@ DEFINE opt-desc         =][=
   {  /* entry idx, value */ [=(for-index)=], [=
                               (string-append VALUE-pfx UP-name)=],
      /* equiv idx, value */ [=
-          IF (== (up-c-name "equivalence") UP-name)
+          IF (== (get-up-name "equivalence") UP-name)
               =]NO_EQUIVALENT, 0[=
           ELIF (or (exist? "equivalence") (exist? "unstack-arg"))
               =]NOLIMIT, NOLIMIT[=
@@ -1154,7 +1155,7 @@ DEFINE opt-desc         =][=
          (if (exist? "unstack-arg")
              (index-name "unstack-arg")
              (if (and (exist? "equivalence")
-                      (not (== (up-c-name "equivalence") UP-name)) )
+                      (not (== (get-up-name "equivalence") UP-name)) )
                  (index-name "equivalence")
                  "NO_EQUIVALENT"
          )   ) =],

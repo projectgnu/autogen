@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-02-01 08:28:43 bkorb"
+# Time-stamp:      "2011-03-04 13:42:07 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,6 +33,7 @@ test "X${mainpid}" = X && {
 
 export AGexe=${AGexe-autogen}\ -L${top_srcdir}/autoopts/tpl
 noag=`${AGexe} -v > /dev/null 2>&1 && echo false || echo true`
+nl=$'\n'
 
 burn_aover() {
     agvars=$(egrep '^A[GO]_' ../VERSION)
@@ -45,12 +46,16 @@ burn_aover() {
     for f in $(echo "${agvars}" | sed 's/=.*//')
     do
         eval v=\${$f}
-        sedcmd=${sedcmd}$'\n'"s%@${f}@%${v}%g"
+        sedcmd="${sedcmd}${nl}s%@${f}@%${v}%g"
     done
 
     cd tpl
     sed "${sedcmd}" tpl-config-tlib.in > tpl-config.tlib
-    chmod +x *.sh
+    for f in *.sh *.pl
+    do  g=${f%.sh} ; g=${g%.pl}
+        cat $f > $g
+        chmod +x $g
+    done
     cd -
 }
 
@@ -61,31 +66,36 @@ add_files_to_mf() {
     ${AGexe} -Tagman3.tpl funcs.def || \
         die "FAILED: ${AGexe} -Tagman3.tpl funcs.def"
 
-    local tmpl=$(nd='' d='' i=''
+    local tmpl=$(
+        ndst=""
+        pdta="autoopts.m4${nl}"
+        edta="${pdta}bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
+        edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
+        edta="${edta}install-options-h${nl}po${nl}"
 
-        for f in tpl/*
+        for f in tpl/*.*
         do
-            d=${d}${f}' '
-
             case $f in
-            ( *.in )
-                g=$(echo $f | sed 's/-\(t[a-z]*\).in$/.\1/')
-                test "X$g" = "X$f" || {
-                    nd=${nd}${g}$'\n'
-                    i=${i}${g}$'\n'
-                }
+            ( *.in | *.pl | *.sh )
+                g=$(echo $f | sed 's/\...$//;s/-tlib$/.tlib/')
+                ndst=${ndst}${g}${nl}    # installed file
+                edta=${edta}${f}${nl}    # distributed file
                 ;;
 
-            ( * )
-                i=${i}${f}$'\n'
-                ;;
+            ( *tpl-config.tlib ) : ;;
+
+            ( tpl/usage* )
+                edta=${edta}${f}${nl} ;; # distribute only file
+
+            ( *.tlib | *.tpl | *.def )
+                pdta=${pdta}${f}${nl} ;; # installed & distributed file
             esac
         done
 
-        echo "local dtpl_files='${d% }'"
-        echo "local ndtpl_files='${nd% }'"
-        echo "local itpl_files='${i% }'"
-)
+        echo "local edta='${edta%${nl}}'"
+        echo "local ndst='${ndst%${nl}}'"
+        echo "local pdta='${pdta%${nl}}'"
+    )
 
     eval "$tmpl"
 
@@ -94,17 +104,20 @@ add_files_to_mf() {
             sed '/^pathfind.3$/d' | \
             columns -I4 --spread=1 --line=' \\\'
 
-    )"$'\\\n\\\nINST_ND_PKGDATA = \$(libsrc) \\\\\\\n'"$(
-        echo "${ndtpl_files}" | columns -I4 --spread=1 --line=' \\\'
+    )"$'\\\n\\\nnodist_pkgdata_DATA = \$(libsrc) \\\\\\\n'"$(
+        echo "${ndst}" | sort -u | columns -I4 --spread=1 --line=' \\\'
 
-    )"$'\\\n\\\nTPL_FILES = \\\\\\\n'"$(
-        echo "${itpl_files}" | \
-            sort -u | \
-            columns -I4 --spread=1 --line=' \\\'
+    )"$'\\\n\\\npkgdata_DATA = \\\\\\\n'"$(
+        echo "${pdta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
+
+    )"$'\\\n\\\nEXTRA_DATA = \$(pkgdata_DATA) \\\\\\\n'"$(
+        echo "${edta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
     )"
 
     rm -f *.3
     sed -i "${sedcmd}" Makefile.am
+
+    cp ~gnu/proj/gnulib/lib/parse-duration.[ch] .
 }
 
 make_funcs_def()

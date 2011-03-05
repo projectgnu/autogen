@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2011-01-20 15:56:01 bkorb"
+ * Time-stamp:        "2011-03-04 10:35:02 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -282,6 +282,9 @@ closeOutput(ag_bool purge)
 {
     if ((pCurFp->flags & FPF_NOCHMOD) == 0)
         make_readonly(fileno(pCurFp->pFile));
+
+    if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
+        fprintf(pfTrace, "closeOutput '%s'\n", pCurFp->pzOutName);
 
     fclose(pCurFp->pFile);
 

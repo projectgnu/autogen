@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-03-02 17:07:43 bkorb"
+## Time-stamp:      "2011-03-04 09:49:25 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -52,11 +52,16 @@ INCLUDE "cmd-doc.tlib"
 INVOKE build-doc          :+][+:
 
   (shell (string-append
-    "fn='" (find-file "mdoc2man.sh") "'\n"
+    "fn='" (find-file "mdoc2man") "'\n"
     "test -f ${fn} || die mdoc2man not found from $PWD\n"
     "${fn} <<\\_EndOfMdoc_ || die ${fn} failed in $PWD\n"
     (out-pop #t)
-    "\n_EndOfMdoc_" ))    :+][+: #
+    "\n_EndOfMdoc_" ))
+
+:+][+:
+
+(out-move (string-append (get "prog-name") "."
+          man-sect))      :+][+: #
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  S Y N O P S I S
@@ -66,7 +71,7 @@ DEFINE synopsis
 
 :+]
 .Sh SYNOPSIS
-.Nm [+: (. PROG_NAME) :+][+:
+.Nm [+: (. UP-PROG-NAME) :+][+:
 
   IF (define use-flags  (exist? "flag.value"))
      (define named-mode (not (or use-flags (exist? "long-opts") )))
@@ -74,8 +79,8 @@ DEFINE synopsis
                                             :+][+:
     IF (exist? "long-opts")                 :+]
 .\" Mixture of short (flag) options and long options
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:
-#:+] " [[=| ]\fIvalue\fP]]..."[+:
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:#
+:+] " [[=| ]\fIvalue\fP]]..."[+:
 
     ELSE no long options:                   :+]
 .\" Short (flag) options only

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-02-28 15:15:52 bkorb"
+## Time-stamp:      "2011-03-04 13:19:12 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -44,14 +44,14 @@ TEXI_STAMP  = texi-stamp
 
 GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h \
 	xat-attribute.h value-type.h ag-char-map.h
-HDRS        = $(GENHDRS) autoopts.h proto.h
+HDRS        = $(GENHDRS) autoopts.h proto.h parse-duration.h
 GEN_SRC     = value-type.c xat-attribute.c
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the
-## documentation.
+## documentation.  Files without documentation are on the CSRC = line.
 ##
-CSRC        = $(GEN_SRC) \
+CSRC        = parse-duration.c $(GEN_SRC) \
     autoopts.c  \
     boolean.c configfile.c cook.c      enumeration.c environment.c \
     file.c    genshell.c   load.c      makeshell.c   nested.c  numeric.c \
@@ -62,9 +62,6 @@ CSRC        = $(GEN_SRC) \
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 DEF_FILES   = genshell.def $(srcdir)/funcs.def
-MISC_FILES  = autoopts.m4 bootstrap.dir autoopts-config.in \
-		parse-duration.h parse-duration.c
-
 pkgconfigdir=$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -84,11 +81,9 @@ libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
-EXTRA_DIST = $(SRC) $(pkgdata_DATA) $(man_MANS) autogen.map mk-tpl-config.sh \
-	$(MISC_FILES) $(DEF_FILES) install-options-h mk-autoopts-pc.in po
+EXTRA_DIST = $(SRC) $(EXTRA_DATA) $(man_MANS) $(DEF_FILES)
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
-INST_M4DATA               = autoopts.m4
 INST_PKGCFG               = pkgconfig/autoopts.pc
 INST_PKGDATA              = autoopts.m4 $(TPL_FILES)
 INST_LIBS                 = libopts.la
@@ -96,16 +91,16 @@ INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
 INST_SH                   = autoopts-config
 
 man_MANS                  = $(INST_MANS)
-m4data_DATA               = $(INST_M4DATA)
-nodist_pkgdata_DATA       = $(INST_ND_PKGDATA)
+m4data_DATA               = autoopts.m4
 nobase_data_DATA          = $(INST_PKGCFG)
-pkgdata_DATA              = $(INST_PKGDATA)
 lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
-BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
+BOOTENV  = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
+	srcdir="$(srcdir)" builddir="$(builddir)" \
+	AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
+	CONFIG_SHELL="$(CONFIG_SHELL)"
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -114,12 +109,13 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 libopts.c : $(HDRS) $(CSRC) $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
-	$(SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
+	$(BOOTENV) \
+	  $(SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
 	@$(BOOTENV) \
-	$(SHELL) $(srcdir)/bootstrap.dir $@
+	  $(SHELL) $(srcdir)/bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c
@@ -146,8 +142,8 @@ $(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
 libsrc : $(libsrc)
 $(libsrc) :
 	@$(BOOTENV) \
-	AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
-	$(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
+	  AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
+	  $(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
 
 pkgconfig/autoopts.pc : mk-autoopts-pc
 	$(SHELL) mk-autoopts-pc $@

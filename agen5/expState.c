@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2011-02-23 11:04:37 bkorb"
+ *  Time-stamp:        "2011-03-04 09:29:20 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -518,17 +518,8 @@ ag_scm_get(SCM agName, SCM altVal)
 SCM
 ag_scm_get_c_name(SCM agName)
 {
-    tDefEntry*  pE;
-    ag_bool     x;
-
-    if (! AG_SCM_STRING_P(agName))
-         pE = NULL;
-    else pE = findDefEntry(ag_scm2zchars(agName, "ag value"), &x);
-
-    if ((pE == NULL) || (pE->valType != VALTYP_TEXT))
-        return AG_SCM_STR02SCM(zNil);
-
-    return ag_scm_string_to_c_name_x(AG_SCM_STR02SCM(pE->val.pzText));
+    return ag_scm_string_to_c_name_x(
+        ag_scm_get(agName, SCM_UNDEFINED));
 }
 
 

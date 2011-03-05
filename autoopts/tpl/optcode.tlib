@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-02-19 11:24:38 bkorb"
+# Time-stamp:      "2011-03-04 11:31:51 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -151,7 +151,7 @@ tSCC zCopyright[] =
 
 (emit (def-file-line "copyright.text" extract-fmt))
 (set! tmp-text (shell (string-append
-"${CLexe} --fill <<\\_EOF_\n" tmp-text "\n_EOF_")))
+"(sed 's/^[ \t]*//'|fmt -w 72)<<\\_EOF_\n" tmp-text "\n_EOF_")))
 
 (sprintf ";\ntSCC zCopyrightNotice[%d] =\n%s;\n"
  (+ (string-length tmp-text) 1) (kr-string tmp-text)  ) =][=

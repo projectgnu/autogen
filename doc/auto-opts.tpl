@@ -199,12 +199,14 @@ Yields a program which, when run with @file{--help}, prints out:
 
 @example
 [= (out-push-new) \=]
+set -x
+log_file=${HOME}/default-test-log.txt
+exec 7>&2 ; exec 2>> ${log_file}
 
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 OPTDIR=${TOPDIR}/autoopts
 
-exec 3>&1
-(
+{
   cd ${tmp_dir}
   echo 'config-header = "config.h";' >> default-test.def
   HOME='' run_ag default-test.def
@@ -214,15 +216,14 @@ exec 3>&1
   ${CC:-cc} ${CFLAGS} ${opts} default-test.c ${LIBS}
 
   test -x ./default-test || die 'NO default-test EXECUTABLE'
-) > ${tmp_dir}/default-test.log 2>&1
+} >&2
 
-test $? -eq 0 || {
-  die Check ${tmp_dir}/default-test.log file
-}
+test $? -eq 0 || die "Check log file ${log_file}"
+
 HOME='$HOME/.default_testrc' ${tmp_dir}/default-test --help | \
    sed 's,	,        ,g;s,\([@{}]\),@\1,g'
 
-exec 3>&-
+exec 2>&7 7>&-
 [=
  (shell (out-pop #t))
 =]

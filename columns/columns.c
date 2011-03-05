@@ -2,7 +2,7 @@
 /*
  *  \file columns.c
  *
- *  Time-stamp:        "2011-01-02 17:03:44 bkorb"
+ *  Time-stamp:        "2011-03-04 10:17:17 bkorb"
  *
  *  Columns Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -196,24 +196,28 @@ static uint32_t
 pad_indentation(char const * pzIndentArg, char const ** pfx)
 {
     char * pz;
-    unsigned int colCt = (unsigned int)strtoul(pzIndentArg, &pz, 0);
+    unsigned int cct;
+
+    errno = 0;
+    cct = (unsigned int)strtoul(pzIndentArg, &pz, 0);
 
     /*
      *  IF the indent argument is a number
      */
-    if ((*pz == NUL) && (colCt > 0) && (colCt < OPT_VALUE_WIDTH)) {
+    if ((*pz == NUL) && (errno == 0) && (cct < OPT_VALUE_WIDTH)) {        
         char * p;
 
         /*
          *  Allocate a string to hold the line prefix
          */
-        *pfx = p = malloc_or_die( (size_t)colCt + 1 );
+        *pfx = p = malloc_or_die( (size_t)cct + 1 );
 
         /*
          *  Set it to a NUL terminated string of spaces
          */
-        memset(p, ' ', (size_t)colCt);
-        p[colCt] = NUL;
+        if (cct > 0)
+            memset(p, ' ', (size_t)cct);
+        p[cct] = NUL;
 
     } else {
         /*
@@ -223,7 +227,7 @@ pad_indentation(char const * pzIndentArg, char const ** pfx)
          */
         char const * p = pzIndentArg;
         *pfx = pzIndentArg;
-        colCt     =  0;
+        cct     =  0;
 
         for (;;) {
             /*
@@ -234,18 +238,18 @@ pad_indentation(char const * pzIndentArg, char const ** pfx)
                 goto colsCounted;
 
             case '\t':
-                colCt += OPT_VALUE_TAB_WIDTH;
-                colCt -= (colCt % OPT_VALUE_TAB_WIDTH);
+                cct += OPT_VALUE_TAB_WIDTH;
+                cct -= (cct % OPT_VALUE_TAB_WIDTH);
                 break;
 
             case '\n':
             case '\f':
             case '\r':
-                colCt = 0;
+                cct = 0;
                 break;
 
             default:
-                colCt++;
+                cct++;
                 break;
 
             case '\a':
@@ -254,7 +258,7 @@ pad_indentation(char const * pzIndentArg, char const ** pfx)
         } colsCounted:;
     }
 
-    return colCt;
+    return cct;
 }
 
 

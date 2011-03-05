@@ -1363,6 +1363,8 @@ an enumeration (membership) set (@pxref{arg-type set membership})
 @item
 a list of name/value pairs (option ``subopts'') (@pxref{arg-type hierarchy})
 @item
+a time duration or a specific time and date
+@item
 validated file name (@pxref{arg-type file name})
 @item
 optional option argument (@pxref{arg-optional})
@@ -3007,7 +3009,8 @@ sufficient.
 * arg-type set membership:: Arg Type Set Membership
 * arg-type hierarchy::      Arg Type Hierarchical
 * arg-type file name::      Arg Type File Name
-* arg-type time::           Arg Type Time Duration
+* arg-type time-duration::  Arg Type Time Duration
+* arg-type time-date::      Arg Type Time and Date
 
 Supporting attributes for particular argument types:
 
@@ -3213,9 +3216,9 @@ type.
 @end table
 
 
-@node arg-type time
+@node arg-type time-duration
 @subsubsection Arg Type Time Duration
-@code{arg-type = time;}
+@code{arg-type = time-duration;}
 
 The argument will be converted into a number of seconds.  It may be
 a multi-part number with different parts being multiplied into a seconds
@@ -3263,6 +3266,28 @@ of seconds.  There are actually more (many) accepted time duration strings.
 The full documentation can be found with ISO-8601 documentation and the
 more extedded documentation when ``parse_duration()'' becomes more widely
 available.
+
+
+@node arg-type time-date
+@subsubsection Arg Type Time and Date
+@code{arg-type = time-date;}
+
+The argument will be converted into the number of seconds since the epoch.
+The conversion rules are very complicated, please see the @file{getdate_r(3GNU)}
+man page.  There are some additional restrictions:
+
+@enumerate
+@item
+Your project must be compiled with @code{PKGDATADIR} defined and naming a
+valid directory.
+@item
+The @code{DATEMSK} environment variable will be set to the @file{datemsk} file
+within that directory.
+@end enumerate
+
+If that file is not accessible for any reason, the string will be
+parsed as a time duration (@pxref{arg-type time-duration}) instead of a
+specific date and time.
 
 @node arg-keyword
 @subsubsection Keyword list

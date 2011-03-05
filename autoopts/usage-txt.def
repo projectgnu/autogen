@@ -425,6 +425,14 @@ utxt = { ut-name = NotNumber;
          ut-text = "%s error:  `%s' is not a recognizable number\n";
 };
 
+utxt = { ut-name = NotDate;
+         ut-text = "%s error:  `%s' is not a recognizable date/time\n";
+};
+
+utxt = { ut-name = NotDuration;
+         ut-text = "%s error:  `%s' is not a recognizable time duration\n";
+};
+
 utxt = { ut-name = NrmOptFmt;
          ut-text = " %3s %s";
 };

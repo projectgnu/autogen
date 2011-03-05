@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-01-19 10:25:39 bkorb"
+# Time-stamp:      "2011-03-04 09:39:44 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -68,7 +68,7 @@ typedef enum {[=
 FOR flag                                =][=
   (if (exist? "documentation")
       (set! option-ct (+ option-ct 1))
-      (add-opt-index (up-c-name "name"))
+      (add-opt-index (get-up-name "name"))
   )
   =][=
 ENDFOR flag                             =][=
@@ -100,7 +100,7 @@ ENDIF (exist? version) =]
 /*
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
  *  option name (as in the te[=(. Cap-prefix)=]OptIndex enumeration above).
- *  e.g. HAVE_[=(. UP-prefix)=]OPT([= (up-c-name "flag[].name") =])
+ *  e.g. HAVE_[=(. UP-prefix)=]OPT([= (get-up-name "flag[].name") =])
  */[=
 
 IF (exist? "library")
@@ -224,7 +224,7 @@ CASE guard-option-names               =][=
  *  Make sure there are no #define name conflicts with the option names
  */[=
     FOR  flag                         =]
-#undef [= (up-c-name "name")          =][=
+#undef [= (get-up-name "name")          =][=
     ENDFOR flag                       =][=
 
 *                                     =][=
@@ -243,7 +243,7 @@ CASE guard-option-names               =][=
 #ifndef     NO_OPTION_NAME_WARNINGS[=
     FOR  flag       =][=
 
-    (set! opt-name   (up-c-name "name"))
+    (set! opt-name   (get-up-name "name"))
     (set! undef-list (string-append undef-list "\n# undef " opt-name))
     (sprintf conf-warn-fmt opt-name)
     =][=

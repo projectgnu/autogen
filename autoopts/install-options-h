@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-01-26 15:03:24 bkorb"
+# Time-stamp:        "2011-03-04 15:47:10 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -73,7 +73,15 @@ else
     echo "#endif /* HAVE_UINTPTR_T */"
 fi >&3
 
-sed '1,/endif.*HAVE_SYSEXITS_H/d' ${opthdrsrc} >&3
+sedcmd='1,/endif.*HAVE_SYSEXITS_H/d'
+
+if egrep 'define +HAVE_PATHFIND' ${cfgf} >/dev/null
+then sedcmd="${sedcmd};/ifndef HAVE_PATHFIND/,/endif.*HAVE_PATHFIND/d"
+else sedcmd="${sedcmd};/ HAVE_PATHFIND/d"
+fi >&3
+
+
+sed "${sedcmd}" ${opthdrsrc} >&3
 
 exec 3>&-
 

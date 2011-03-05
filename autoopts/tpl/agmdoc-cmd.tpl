@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-03-02 16:19:14 bkorb"
+## Time-stamp:      "2011-03-04 10:05:17 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,14 +32,10 @@
 #
 :+][+:
 
-`set -- \`date '+%B %d %Y' | sed 's/ 0/ /'\`
-    echo ".Dd $1 $2, $3"
-    echo .Os \`uname -sr\`
-
-` :+][+:
-
-(define head-line (lambda()
-   (string-append "\n.Dt " PROG_NAME " " man-sect " " section-name "\n") ))
+(define head-line (lambda() (string-append
+   ".Dd "   (shell "date '+%B %e %Y' | sed 's/  */ /g'")
+   "\n.Dt " UP-PROG-NAME " " man-sect " " section-name
+   "\n.Os " (shell "uname -sr") "\n") ))
 
 :+][+:
 
@@ -50,7 +46,10 @@ INCLUDE "cmd-doc.tlib"
 .Nm [+: prog-name         :+]
 .Nd [+: prog-title        :+][+:
 
-INVOKE build-doc          :+][+:#
+INVOKE build-doc          :+][+:
+
+(out-move (string-append (get "prog-name") "."
+          man-sect))      :+][+:#
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  S Y N O P S I S
@@ -60,7 +59,7 @@ DEFINE synopsis
 
 :+]
 .Sh SYNOPSIS
-.Nm [+: (. PROG_NAME) :+][+:
+.Nm [+: (. UP-PROG-NAME) :+][+:
 
   IF (define use-flags  (exist? "flag.value"))
      (define named-mode (not (or use-flags (exist? "long-opts") )))

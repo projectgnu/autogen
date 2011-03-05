@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-03-02 16:57:55 bkorb"
+## Time-stamp:      "2011-03-04 11:08:00 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,8 +33,9 @@
 #
 :+][+:
 
-(define down_prog-name (string-downcase! (get "prog-name")))
-(define PROG_NAME      (string-upcase! (get "prog-name")))
+(define down-prog-name (string-downcase! (get "prog-name")))
+(define UP-PROG-NAME   (get-up-name "prog-name"))
+
 (define tmp-val        (getenv "MAN_SECTION"))
 (define man-sect       (if (exist? "cmd-section") (get "cmd-section") "1"))
 
@@ -52,8 +53,6 @@
 (set! tmp-val (getenv "SECTION_NAME"))
 (if (defined? 'tmp-val) (if (string? tmp-val)
     (set! section-name tmp-val) ))
-
-(out-move (string-append (get "prog-name") "." man-sect))
 
 (define package-text "")
 (define package+version (and (exist? "package") (exist? "version")))
@@ -125,14 +124,17 @@ DEFINE doc-sections                   :+][+:
 
 FOR doc-section                       :+][+:
 
+  CASE
     (define sec-type (string-upcase (get "ds-type")))
     (define sec-name (name-to-fname sec-type))
     (out-push-new (string-append tmp-dir "/" sec-name))
     (define cvt-fn (find-file (string-append
-         (get "ds-format" "man") "2mdoc.sh")))
-    :+][+:
+         (get "ds-format" "man") "2mdoc")))
+    (if (not (defined? 'cvt-fn))
+        (error (sprintf "Cannot locate converter for %s"
+               (get "ds-format" "man"))))
+    sec-type                          :+][+:
 
-    CASE (. sec-type)                 :+][+:
     *==* " "                          :+]
 .Sh "[+: (. sec-type)                 :+]"[+:
     == ""                             :+][+:
@@ -230,19 +232,37 @@ IF (or home-rc-files environ-init)      :+][+:
 
 ENDIF                                   :+][+:
 
-(set! tmp-val "\n.Sh %s%s")
+(define sec-fmt "\n.Sh %s%s")
 
-(if (. environ-init) (begin
-    (out-push-new (string-append tmp-dir "/environment"))
-    (ag-fprintf 0 tmp-val "ENVIRONMENT" environ-text)
+(if environ-init
+  (begin
+    (set! tmp-val (string-append tmp-dir "/environment"))
+    (if (access? tmp-val R_OK)
+      (begin
+        (out-push-add tmp-val)
+        (emit environ-text)
+      )
+      (begin
+        (out-push-new tmp-val)
+        (ag-fprintf 0 sec-fmt "ENVIRONMENT" environ-text)
+    ) )
     (out-pop)
-)   )
+) )
 
-(if (. home-rc-files) (begin
-    (out-push-new (string-append tmp-dir "/files"))
-    (ag-fprintf 0 tmp-val "FILES" home-rc-text)
+(if home-rc-files
+  (begin
+    (set! tmp-val (string-append tmp-dir "/files"))
+    (if (access? tmp-val R_OK)
+      (begin
+        (out-push-add tmp-val)
+        (emit home-rc-text)
+      )
+      (begin
+        (out-push-new tmp-val)
+        (ag-fprintf 0 sec-fmt "FILES" home-rc-text)
+    ) )
     (out-pop)
-)   )                                   :+][+:
+) )                                   :+][+:
 
 ENDDEF ao-sections
 
@@ -284,7 +304,7 @@ DEFINE options
 
 (if formatted-doc (begin
     (out-push-new)
-    (set! cvt-cmd (string-append (get "option-doc-format") "2mdoc.sh"))
+    (set! cvt-cmd (string-append (get "option-doc-format") "2mdoc"))
 )   )
 
 (if (exist? "preserve-case")
@@ -427,13 +447,13 @@ Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from [+:
   IF (. home-rc-files)
     :+]configuration ("RC" or ".INI") file(s)[+:
-    IF environ-init :+] and values from
+    IF (. environ-init) :+] and values from
 [+:
     ENDIF                             :+][+:
   ENDIF                               :+][+:
-  IF environ-init :+]environment variables named:
+  IF (. environ-init) :+]environment variables named:
 .nf
-  \fB[+: (. PROG_NAME) :+]_<option-name>\fP or \fB[+: (. PROG_NAME) :+]\fP
+  \fB[+: (. UP-PROG-NAME) :+]_<option-name>\fP or \fB[+: (. UP-PROG-NAME) :+]\fP
 .fi
 .ad[+:
     IF (. home-rc-files)              :+]
@@ -445,14 +465,21 @@ the configuration files.[+:
 
   CASE
     (define rc-file
-       (if (exist? "rcfile") (get "rcfile")
-           (string-append "." (get "prog-name") "rc") ) )
+       (get "rcfile" (string-append "." (get "prog-name") "rc")) )
     (count "homerc")                  :+][+:
+
   == "0"                              :+][+:
-  == "1"                              :+]
+  == "1"                              :+][+:
+
+    CASE homerc                       :+][+:
+    ~~ '\.|\$HOME'                    :+]
+The file "\fI[+: (string-append (get "homerc") "/" rc-file)
+:+]\fP" will be used, if present.[+:
+    *                                 :+]
 The \fIhomerc\fP file is "\fI[+:homerc:+]\fP", unless that is a directory.
 In that case, the file "\fI[+: (. rc-file) :+]\fP"
 is searched for within that directory.[+:
+    ESAC                              :+][+:
 
   *                                   :+]
 The \fIhomerc\fP files are [+:
@@ -479,18 +506,21 @@ DEFINE exit-status                 :+][+:
 :+]
 .Sh "EXIT STATUS"
 One of the following exit values will be returned:
+.Bl -tag
 [+:
-(ag-fprintf 0 ".TP\n.B 0\n%s\n"
+(ag-fprintf 0 ".It 0\n%s\n"
     (get "exit-desc[0]" "Successful program execution.") )
 
-(ag-fprintf 0 ".TP\n.B 1\n%s\n"
+(ag-fprintf 0 ".It 1\n%s\n"
     (get "exit-desc[1]"
     "The operation failed or the command syntax was not valid.")) :+][+:
 
 FOR exit-desc (for-from 2)            :+][+:
-  (sprintf ".TP\n.B %d\n%s\n"
+  (sprintf ".It %d\n%s\n"
     (for-index) (get "exit-desc"))    :+][+:
-ENDFOR exit-desc    :+][+: (out-pop)  :+][+:
+ENDFOR exit-desc                      :+]
+.El
+[+: (out-pop)                         :+][+:
 
 ENDDEF exit-status
 
@@ -724,7 +754,7 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: (shellf "${CLexe:-columns} --indent='' --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  )   :+]
 .fi
 or their numeric equivalent.

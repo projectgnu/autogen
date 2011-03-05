@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-03-02 13:42:02 bkorb"
+## Time-stamp:      "2011-03-03 16:06:14 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -69,7 +69,7 @@ do_enum() {
     do
         case "${line}" in
         .It* ) printf '.ti -4\n%d\n\t' $ix
-               (( ix += 1 ))
+               ix=`expr $ix + 1`
                ;;
 
         .Bl' '*enum* )   do_nest_enum      ;;
@@ -225,7 +225,7 @@ do_nest_arg() {
 }
 
 do_arg() {
-    line=$(echo ${line#.Ar})
+    line=`echo ${line} | sed 's/^.Ar *//'`
     echo "\\fI${line}\\fR"
 }
 

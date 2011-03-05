@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-02-28 11:30:44 bkorb"
+# Time-stamp:      "2011-03-04 12:22:53 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -537,16 +537,17 @@ DEFINE decl-callbacks
   (define decl-type "")
   (define extern-proc-list (string-append
 
-    "optionPagedUsage\n"
-    "optionStackArg\n"
-    "optionUnstackArg\n"
     "optionBooleanVal\n"
-    "optionNumericVal\n"
-    "optionTimeVal\n"
     "optionNestedVal\n"
-    "optionVersionStderr\n"
+    "optionNumericVal\n"
+    "optionPagedUsage\n"
     "optionPrintVersion\n"
     "optionResetOpt\n"
+    "optionStackArg\n"
+    "optionTimeDate\n"
+    "optionTimeVal\n"
+    "optionUnstackArg\n"
+    "optionVersionStderr\n"
 
   ) )
 
@@ -643,7 +644,7 @@ DEFINE decl-callbacks
     (if (not (= (hash-ref cb-proc-name  flg-name)
                (hash-ref test-proc-name flg-name)))
         (set! static-proc-list (string-append static-proc-list
-              "#define " (up-c-name "name") "_OPT_PROC "
+              "#define " (get-up-name "name") "_OPT_PROC "
                      (hash-ref cb-proc-name flg-name) "\n"))  )
     =][=
   ENDFOR  flag                                  =][=
@@ -665,7 +666,7 @@ DEFINE decl-callbacks
       IF (set! flg-name (get "name"))
          (not (= (hash-ref cb-proc-name   flg-name)
                  (hash-ref test-proc-name flg-name))) =]
-#define [=(up-c-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
+#define [=(get-up-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
       ENDIF                                     =][=
     ENDFOR  flag                                =]
 #endif /* defined([=(. main-guard)=]) */[=
@@ -697,7 +698,7 @@ DEFINE emit-testing-defines
       (if (not (= (hash-ref cb-proc-name  flg-name)
                  (hash-ref test-proc-name flg-name)))
           (set! static-test-list (string-append static-test-list
-                "#define " (up-c-name "name") "_OPT_PROC "
+                "#define " (get-up-name "name") "_OPT_PROC "
                        (hash-ref test-proc-name flg-name) "\n"))  )
       =][=
     ENDFOR  flag                                =][=
@@ -890,7 +891,7 @@ ENDDEF   range-option-code
 
 DEFINE alias-option-code       \=]
     optionAlias(pOptions, pOptDesc, [=
-        (string-append INDEX-pfx (up-c-name "aliases")) =]);
+        (string-append INDEX-pfx (get-up-name "aliases")) =]);
 [=
 
 ENDDEF   alias-option-code
@@ -943,8 +944,8 @@ DEFINE   keyword-code           =][=
     if (pOptDesc->optArg.argString == NULL)
         pOptDesc->optArg.argEnum = [=
              (string-append UP-name "_"    (if (> (len "arg-optional") 0)
-                (up-c-name "arg-optional") (if (exist? "arg-default")
-                (up-c-name "arg-default")
+                (get-up-name "arg-optional") (if (exist? "arg-default")
+                (get-up-name "arg-default")
                 "UNDEFINED"  ))) =];
     else
         pOptDesc->optArg.argEnum =
