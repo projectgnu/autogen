@@ -2,7 +2,7 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2011-01-26 14:15:31 bkorb"
+## Time-stamp:      "2011-03-06 14:55:54 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -50,10 +50,14 @@ egrep "#define HAVE_PARSE_DURATION" ${top_builddir}/config.h >/dev/null || \
 
 for f in libopts.c ${files}
 do
-  if test -f ${f}
-  then cp -f ${f} ${tagd}/${f}
-  else cp -f ${top_srcdir}/autoopts/${f} ${tagd}/${f}
-  fi
+  test -f ${f} &&
+    cp -f ${f} ${tagd}/${f} && continue
+
+  test -f ${top_srcdir}/autoopts/${f} &&
+    cp -f ${top_srcdir}/autoopts/${f} ${tagd}/${f} && continue
+
+  test -f ${top_srcdir}/${f} &&
+    cp -f ${top_srcdir}/${f} ${tagd}/${f} && continue
 done
 
 cp -f ${top_srcdir}/pkg/libopts/COPYING.* ${tagd}/.

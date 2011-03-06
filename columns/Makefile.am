@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-02-03 09:19:08 bkorb"
+## Time-stamp:      "2011-03-06 14:06:37 bkorb"
 ## Copyright (c) 1992-2011 by Bruce Korb
 ##
 ## This file is part of AutoGen.
@@ -51,9 +51,10 @@ columns.1                 : stamp-agman
 
 cols.c : Makefile
 	exec > $@ ; \
-	echo '#include "config.h"' ; \
 	echo '#undef   PKGDATADIR' ; \
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	echo ; echo '#define  DEFINING 1' ; \
+	echo '#include "autoopts/project.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
 stamp-agtexi : opts.def columns$(EXEEXT)

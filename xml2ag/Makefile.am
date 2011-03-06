@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-01-30 17:33:35 bkorb"
+## Time-stamp:      "2011-03-06 14:06:59 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -48,9 +48,10 @@ gen 	    : $(gsrcs) $(DOCFILES)
 
 x.c 	    : $(gsrcs) $(csrcs)
 	exec > $@ ; \
-	echo '#include "config.h"' ; \
 	echo '#undef   PKGDATADIR' ; \
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	echo ; echo '#define  DEFINING 1' ; \
+	echo '#include "autoopts/project.h"' ; \
 	for f in $(gsrcs) $(csrcs) ; \
 	do echo "#include \"$$f\"" ; done
 

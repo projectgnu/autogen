@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2010-11-29 15:22:45 bkorb"
+ *  Time-stamp:        "2011-03-06 14:12:39 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -146,7 +146,7 @@ test = {
 	the value may be obtained from pathconf(3C), but that value might be
 	unallocatable.  So, without a sane PATH_MAX, we won't be able to use
 	realpath(3C).
-	_EODoc_;
+	_EODoc_; //'
 };
 
 test = {
@@ -342,4 +342,23 @@ do-first = <<-_EOF_
 	AC_FUNC_FORK
 	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
 	               strrchr strsignal])
+	[
+	while :
+	do
+	    POSIX_SHELL=`which bash`
+	    test -x "$POSIX_SHELL" && break
+	    POSIX_SHELL=`which dash`
+	    test -x "$POSIX_SHELL" && break
+	    POSIX_SHELL=/usr/xpg4/bin/sh
+	    test -x "$POSIX_SHELL" && break
+	    POSIX_SHELL=`/bin/sh -c '
+	        exec 2>/dev/null
+	        if ! true ; then exit 1 ; fi
+	        echo /bin/sh'`
+	    test -x "$POSIX_SHELL" && break
+	    ]AC_ERROR([Cannot locate a working POSIX shell])[
+	done]
+	AC_DEFINE_UNQUOTED([POSIX_SHELL], ["${POSIX_SHELL}"],
+	         [define to a working POSIX compliant shell])
+	AC_SUBST([POSIX_SHELL])
 	_EOF_;

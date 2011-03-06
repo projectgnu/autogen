@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-02-17 15:34:31 bkorb"
+ *  Time-stamp:        "2011-03-06 12:20:36 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -25,7 +25,6 @@
 #ifndef AUTOGEN_BUILD
 #define AUTOGEN_BUILD 1
 
-#include "config.h"
 #include "compat/compat.h"
 #include "compat/unlocked-io.h"
 
@@ -50,19 +49,6 @@
 #    error SHELL is enabled and fork() does not work
      choke me
 #  endif
-#endif
-
-#ifndef STR
-#  define _STR(s) #s
-#  define STR(s)  _STR(s)
-#endif
-
-#ifdef DEFINING
-#  define VALUE( s )  = s
-#  define MODE
-#else
-#  define VALUE( s )
-#  define MODE extern
 #endif
 
 #ifndef DIRCH
@@ -94,8 +80,6 @@ typedef struct {
 #define NULLPROCESS ((pid_t)0)
 
 typedef unsigned char * tpChar;
-
-#define STRSIZE( s )  (sizeof(s)-1)
 
 #include "cgi-fsm.h"
 #include "defParse-fsm.h"

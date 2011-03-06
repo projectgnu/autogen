@@ -2,7 +2,7 @@
  *
  *    getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2011-01-31 11:35:48 bkorb"
+ *  Time-stamp:        "2011-03-06 12:23:11 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -35,47 +35,11 @@
 #include "ag-char-map.h"
 #include "opts.h"
 
-/*
- *  Procedure success codes
- *
- *  USAGE:  define procedures to return "tSuccess".  Test their results
- *          with the SUCCEEDED, FAILED and HADGLITCH macros.
- *
- *  Microsoft sticks its nose into user space here, so for Windows' sake,
- *  make sure all of these are undefined.
- */
-#undef  SUCCESS
-#undef  FAILURE
-#undef  PROBLEM
-#undef  SUCCEEDED
-#undef  SUCCESSFUL
-#undef  FAILED
-#undef  HADGLITCH
-
-#define SUCCESS  ((tSuccess) 0)
-#define FAILURE  ((tSuccess)-1)
-#define PROBLEM  ((tSuccess) 1)
-
-typedef int tSuccess;
-
-#define SUCCEEDED( p )     ((p) == SUCCESS)
-#define SUCCESSFUL( p )    SUCCEEDED( p )
-#define FAILED( p )        ((p) <  SUCCESS)
-#define HADGLITCH( p )     ((p) >  SUCCESS)
-
 #define EXPORT
-
-#define MAXNAMELEN 256
-
+#define MAXNAMELEN     256
 #define MAX_SUBMATCH   1
 #define COUNT(a)       (sizeof(a)/sizeof(a[0]))
-
-#define MARK_CHAR ':'
-
-#ifndef STR
-#  define __STR(s)  #s
-#  define STR(s)    __STR(s)
-#endif
+#define MARK_CHAR      ':'
 
 #define AG_NAME_CHAR(c) (zUserNameCh[(unsigned)(c)] & 2)
 #define USER_NAME_CH(c) (zUserNameCh[(unsigned)(c)] & 1)
@@ -97,7 +61,7 @@ tCC*     pzAutogen   = "autogen";
 /*
  *  const global strings
  */
-#define DEF_STRING(n,s) tCC n[] = s
+#define DEF_STRING(n,s) char const n[] = s
 DEF_STRING( zGlobal,     "\n/* GLOBALDEFS */\n" );
 DEF_STRING( zLineId,     "\n#line %d \"%s\"\n" );
 DEF_STRING( zMallocErr,  "Error:  could not allocate %d bytes for %s\n" );
@@ -122,15 +86,15 @@ DEF_STRING( zDne,
  *  The patterns we accept for output may specify a particular group,
  *  certain members within certain groups or all members of all groups
  */
-tCC*    pzDefPat   = NULL;
-regex_t define_re;
-regex_t attrib_re;
+char const *    pzDefPat   = NULL;
+regex_t         define_re;
+regex_t         attrib_re;
 
 /*
  *  The output file pointer.  It may be "stdout".
  *  It gets closed when we are done.
  */
-FILE*  evtFp       = (FILE*)NULL;
+FILE * evtFp       = (FILE*)NULL;
 
 /*
  *  The output file modification time.  Only used if we

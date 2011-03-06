@@ -1,7 +1,7 @@
 [= Autogen5 Template configuration -*- Mode: scheme -*- =]
 [=
 
-# Time-stamp:      "2011-01-28 11:06:22 bkorb"
+# Time-stamp:      "2011-03-06 14:29:16 bkorb"
 
 # This file contains configure stuff used by various templates.
 
@@ -68,6 +68,6 @@
 
 (define pkgdatadir      (shell "echo \"${datadir}/${package}\""))
 
-(setenv "SHELL"         "@CONFIG_SHELL@")
+(setenv "SHELL"         "@POSIX_SHELL@")
 
 \=]

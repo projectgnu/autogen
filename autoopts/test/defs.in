@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-02-03 16:22:18 bkorb"
+# Time-stamp:     "2011-03-06 15:14:52 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -73,7 +73,7 @@ cfg_vals()
   GREP="@GREP@"
   EGREP="@EGREP@"
   FGREP="@FGREP@"
-  SHELL="@CONFIG_SHELL@"
+  SHELL="@POSIX_SHELL@"
   AGexe="@AGexe@"
   CLexe="@CLexe@"
   GDexe="@GDexe@"
@@ -153,7 +153,6 @@ init_tests()
   set_exe GDexe
   set_exe CLexe
 
-  set -x
   builddir=`pwd`
   testsubdir=testdir
   INCS="-I${top_builddir} -I${top_builddir}/autoopts"
@@ -237,7 +236,7 @@ be_verbose()
     local tfile=${testname}-aglog-${1}-$$.log
     shift
     local opts=''
-    local tr="--trace=every --trace-out='>>${tfile}'"
+    local tr="--trace=every --trace-out=>>${tfile}"
 
     case " $* " in
     *' -L'* ) : ;;
@@ -341,6 +340,9 @@ cfg_vals $0
 case "${VERBOSE}" in
 '' | [Nn]* | 0 | [Ff]* )
     be_silent ;;
+
+[Yy]* | [0-9] | [Tt]* )
+    be_verbose ;;
 
 * )
     case "$-" in

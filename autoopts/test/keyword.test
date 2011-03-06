@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-03-04 15:25:35 bkorb"
+# Time-stamp:        "2011-03-06 11:59:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -282,7 +282,6 @@ test -f test_${testname}.1 || \
 mv test_${testname}.1 ${testname}.mdoc
 
 cat > ${testname}-base.mdoc <<\_EOMan_
-.Dd March 4 2011
 .Dt TEST_KEYWORD 1 User Commands
 .Sh NAME
 .Nm test_keyword
@@ -384,8 +383,8 @@ This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
 _EOMan_
 
-${SED} '/DO NOT EDIT/,/and the template file/d;/^\.Os /d' ${testname}.mdoc \
-    > ${testname}-res.mdoc
+${SED} '/DO NOT EDIT/,/and the template file/d;/^\.Os /d;/^\.Dd /d' \
+    ${testname}.mdoc > ${testname}-res.mdoc
 cmp -s ${testname}-base.mdoc ${testname}-res.mdoc || \
   failure "`diff ${testname}-base.mdoc ${testname}-res.mdoc`"
 

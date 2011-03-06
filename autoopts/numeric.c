@@ -2,7 +2,7 @@
 /**
  * \file numeric.c
  *
- *  Time-stamp:      "2010-07-10 10:57:10 bkorb"
+ *  Time-stamp:      "2011-03-05 10:31:18 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -165,6 +165,7 @@ optionNumericVal(tOptions* pOpts, tOptDesc* pOD )
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
         (*(pOpts->pUsageProc))(pOpts, EXIT_FAILURE);
 
+    errno = EINVAL;
     pOD->optArg.argInt = ~0;
 }
 

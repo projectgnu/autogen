@@ -25,13 +25,15 @@ done
 
 {
     cat <<- _EOF_
+	#include "autoopts/project.h"
 	#define  AUTOOPTS_INTERNAL
 	#include "compat/compat.h"
 	#define  LOCAL static
 	_EOF_
 
     while test $# -gt 0
-    do  printf '#include "%s"\n' $1
+    do  test "X$1" = "Xproject.h" || \
+            printf '#include "%s"\n' $1
         shift
     done
 } > ${target}
@@ -55,10 +57,10 @@ grep 'extension-defines' tpl-config.tlib >/dev/null || {
 case `uname -s` in
 SunOS )
   while : ; do
-    CONFIG_SHELL=`which bash`
-    test -x "${CONFIG_SHELL}" && break
-    CONFIG_SHELL=/usr/xpg4/bin/sh
-    test -x "${CONFIG_SHELL}" && break
+    POSIX_SHELL=`which bash`
+    test -x "${POSIX_SHELL}" && break
+    POSIX_SHELL=/usr/xpg4/bin/sh
+    test -x "${POSIX_SHELL}" && break
     die "You are hosed.  You are on Solaris and have no usable shell."
   done
   ;;
@@ -74,7 +76,7 @@ do
              sed 1d $f
              ;;
 
-    */sh )   echo '#!' ${CONFIG_SHELL}
+    */sh )   echo '#!' ${POSIX_SHELL}
              sed 1d $f
              ;;
 
@@ -84,14 +86,14 @@ do
     chmod 755 $d
 done
 
-CONFIG_SHELL=`which cat`
+POSIX_SHELL=`which cat`
 
 for f in man mdoc texi
 do
     for g in man mdoc texi
     do
         test -f ${f}2${g} || {
-            echo '#!' ${CONFIG_SHELL} > ${f}2${g}
+            echo '#!' ${POSIX_SHELL} > ${f}2${g}
             chmod 755 ${f}2${g}
         }
     done

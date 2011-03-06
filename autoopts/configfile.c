@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-01-06 16:11:24 bkorb"
+ *  Time-stamp:      "2011-03-06 13:41:17 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1362,6 +1362,8 @@ validateOptionsStruct(tOptions* pOpts, char const* pzProgram)
        && (  (pOpts->structVersion > OPTIONS_STRUCT_VERSION  )
           || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
+        static char const aover[] =
+            __STR(AO_CURRENT)":"__STR(AO_REVISION)":"__STR(AO_AGE)"\n";
 
         fprintf(stderr, zAO_Err, pzProgram, NUM_TO_VER(pOpts->structVersion));
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )
@@ -1369,9 +1371,7 @@ validateOptionsStruct(tOptions* pOpts, char const* pzProgram)
         else
             fputs(zAO_Sml, stderr);
 
-        fputs(ShellAsString(AO_CURRENT)  ":"
-              ShellAsString(AO_REVISION) ":"
-              ShellAsString(AO_AGE)      "\n", stderr);
+        fwrite(aover, sizeof(aover) - 1, 1, stderr);
         return FAILURE;
     }
 

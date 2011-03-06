@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-02-22 10:29:01 bkorb"
+## Time-stamp:      "2011-03-06 14:04:15 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -71,13 +71,13 @@ AM_YFLAGS = -d
 
 ag.c : Makefile
 	exec > $@ ; \
-	echo '#include "config.h"' ; \
 	echo '#undef   PKGDATADIR' ; \
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
-	echo '#define  DEFINING' ; \
-	echo '#include "autogen.h"' ; \
 	mk=`set -- $(MAKE) ; which $$1` ; \
 	echo 'static char const zMakeProg[] = "'$$mk'";' ; \
+	echo ; echo '#define  DEFINING' ; \
+	echo '#include "autoopts/project.h"' ; \
+	echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
 ## Funny build rules for extracting definitions.  "Makefile.in"

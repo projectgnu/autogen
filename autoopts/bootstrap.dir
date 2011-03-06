@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-03-04 13:42:07 bkorb"
+# Time-stamp:      "2011-03-06 14:15:58 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -171,6 +171,7 @@ make_funcs_def()
     ${AGexe} funcs.def || die "FAILED: ${AGexe} funcs.def"
     test -f options.h || die "options.h not created"
     mv options.h autoopts/.
+    cp project.h autoopts/.
     add_files_to_mf
     make_proto
 

@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2010-12-16 14:09:32 bkorb"
+ * Time-stamp:      "2011-03-06 14:31:51 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -396,7 +396,7 @@ optionParseShell(tOptions* pOpts)
     else if ((pzShell = getenv("SHELL")),
              pzShell == NULL)
 
-        pzShell = DEFAULT_SHELL;
+        pzShell = POSIX_SHELL;
 
     /*
      *  Check for a specified output file

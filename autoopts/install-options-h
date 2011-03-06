@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-03-04 15:47:10 bkorb"
+# Time-stamp:        "2011-03-06 14:28:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,7 +28,7 @@ egrep '#undef +AUTOOPTS_ENABLED' ${top_builddir}/config.h >/dev/null && \
 srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 
-test -z "${CONFIG_SHELL}" && CONFIG_SHELL=/bin/sh
+test -z "${POSIX_SHELL}" && exit 1
 
 rm -f ${DESTdestdir}/options.h
 exec 3> ${DESTdestdir}/options.h
@@ -86,8 +86,8 @@ sed "${sedcmd}" ${opthdrsrc} >&3
 exec 3>&-
 
 test -d "${DESTpkgdatadir}" && {
-    sedcmd='/^#!\//s@.*@#!'${CONFIG_SHELL}'@
-s%(setenv "SHELL" .*%(setenv "SHELL" "'${CONFIG_SHELL}'")%
+    sedcmd='/^#!\//s@.*@#!'${POSIX_SHELL}'@
+s%(setenv "SHELL" .*%(setenv "SHELL" "'${POSIX_SHELL}'")%
 / test_exe ".*\/columns"/s%"[^"]*"%"'${bindir}'/columns"%'
 
     cd ${DESTpkgdatadir}

@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-02-01 13:07:58 bkorb"
+# Time-stamp:      "2011-03-06 12:03:03 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -230,21 +230,6 @@ typedef tUsageProc* tpUsageProc;
 #define OPTION_LIMIT     SHRT_MAX
 #define NO_EQUIVALENT    (OPTION_LIMIT+1)
 
-/*
- *  Special values for optValue.  It must not be generatable from the
- *  computation "optIndex +96".  Since "optIndex" is limited to 100, ...
- */
-#define NUMBER_OPTION    '#'
-
-typedef struct argList tArgList;
-#define MIN_ARG_ALLOC_CT   6
-#define INCR_ARG_ALLOC_CT  8
-struct argList {
-    int             useCt;
-    int             allocCt;
-    tCC*            apzArgs[ MIN_ARG_ALLOC_CT ];
-};
-
 typedef union {
     char const *    argString;
     uintptr_t       argEnum;
@@ -252,7 +237,7 @@ typedef union {
     long            argInt;
     unsigned long   argUint;
     unsigned int    argBool;
-    FILE*           argFp;
+    FILE *          argFp;
     int             argFd;
 } optArgBucket_t;
 

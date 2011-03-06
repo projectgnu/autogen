@@ -1,3 +1,20 @@
+2011-03-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/project.h: new header for common defines that are not to be
+	installed with autoopts/options.h.
+	* */Makefile.am: use it
+	* */*.h: remove the common stuff
+	* autoopts/bootstrap.dir: copy it to the libopts header staging directory
+	* autoopts/configfile.c (validateOptionsStruct): use the common
+	stringifier macro
+	* autoopts/numeric.c (optionNumericVal): if the value string is not
+	a valid number, then set errno to EINVAL.
+	* autoopts/tpl/optmain.tlib: do not generate code that duplicates
+	functionality in the libopts library.
+	Allow time duration arguments to have range limits.
+	* config/libopts.def (POSIX_SHELL): look for one and emit it into
+	both config.h and make it available to the Makefile-s.
+
 2011-03-04  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expState.c (ag_scm_get_c_name): use ag_scm_get() instead of

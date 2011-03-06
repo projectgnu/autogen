@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-03-04 13:19:12 bkorb"
+## Time-stamp:      "2011-03-06 15:11:39 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -44,7 +44,7 @@ TEXI_STAMP  = texi-stamp
 
 GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h \
 	xat-attribute.h value-type.h ag-char-map.h
-HDRS        = $(GENHDRS) autoopts.h proto.h parse-duration.h
+HDRS        = $(GENHDRS) autoopts.h proto.h parse-duration.h project.h
 GEN_SRC     = value-type.c xat-attribute.c
 
 ## The primary source (autoopts.c) must be listed first and on a separate
@@ -100,7 +100,7 @@ bin_SCRIPTS               = $(INST_SH)
 BOOTENV  = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
 	srcdir="$(srcdir)" builddir="$(builddir)" \
 	AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
-	CONFIG_SHELL="$(CONFIG_SHELL)"
+	POSIX_SHELL="$(POSIX_SHELL)"
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -153,7 +153,7 @@ install-data-hook:
 	DESTpkgdatadir='$(DESTDIR)$(pkgdatadir)' \
 	top_builddir='$(top_builddir)' \
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
-	CONFIG_SHELL='$(CONFIG_SHELL)'  \
+	POSIX_SHELL='$(POSIX_SHELL)'  \
 	bindir='$(bindir)' \
 	$(SHELL) $(srcdir)/install-options-h
 

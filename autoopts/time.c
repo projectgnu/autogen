@@ -2,7 +2,7 @@
 /**
  * \file time.c
  *
- *  Time-stamp:      "2011-03-04 15:51:13 bkorb"
+ *  Time-stamp:      "2011-03-06 11:52:23 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -71,13 +71,9 @@ optionTimeVal(tOptions * pOpts, tOptDesc * pOD)
 void
 optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
 {
-#if ! defined(HAVE_GETDATE_R) || ! defined(HAVE_PUTENV)
-    optionTimeVal(pOpts, pOD);
-#else
-    if ((! HAS_pzPkgDataDir(pOpts)) || (pOpts->pzPkgDataDir == NULL)) {
-        optionTimeVal(pOpts, pOD);
-        return;
-    }
+#if defined(HAVE_GETDATE_R) && defined(HAVE_PUTENV)
+    if ((! HAS_pzPkgDataDir(pOpts)) || (pOpts->pzPkgDataDir == NULL))
+        goto default_action;
 
     /*
      *  Export the DATEMSK environment variable.  getdate_r() uses it to
@@ -91,13 +87,12 @@ optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
             static char const fmt[] = "DATEMSK=%s/datemsk";
             envptr = AGALOC(sizeof(fmt) + strlen(pOpts->pzPkgDataDir), fmt);
             sprintf(envptr, fmt, pOpts->pzPkgDataDir);
-            if (access(envptr+8, R_OK) != 0) {
-                optionTimeVal(pOpts, pOD);
-                return;
-            }
 
             putenv(envptr);
         }
+
+        if (access(envptr+8, R_OK) != 0)
+            goto default_action;
     }
 
     /*
@@ -124,7 +119,14 @@ optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
 
         pOD->optArg.argInt = tm;
     }
+    return;
+
+default_action:
+
 #endif
+    optionTimeVal(pOpts, pOD);
+    if (pOD->optArg.argInt != BAD_TIME)
+        pOD->optArg.argInt += (unsigned long)time(NULL);
 }
 /*
  * Local Variables:

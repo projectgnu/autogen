@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-03-04 11:31:51 bkorb"
+# Time-stamp:      "2011-03-06 15:06:54 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -111,17 +111,12 @@ IF (or (= "shell-process"  (get "main.main-type"))
 ENDIF
 =]
 #define OPTION_CODE_COMPILE 1
-#include "[=
-
- (define lib-externs "")
-
- header-file =]"
+#include "[= (define lib-externs "") header-file =]"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-[=
- IF (exist? "flag.aliases") =]
+[= IF (exist? "flag.aliases") =]
 extern void optionAlias(tOptions* pOpts, tOptDesc* pOD, unsigned int alias);
 [= ENDIF =]
 /* TRANSLATORS: choose the translation for option names wisely because you
@@ -224,11 +219,11 @@ ENDIF
  *
  *  Define the [=(. pname-cap)=] Option Descriptions.
  */
-static tOptDesc optDesc[ [=
+static tOptDesc optDesc[[=
 (define default-text   "")
 (define default-cookie "")
 UP-prefix
-=]OPTION_CT ] = {[=
+=]OPTION_CT] = {[=
 
 FOR flag "\n"           =][=
 
