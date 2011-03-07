@@ -14,6 +14,8 @@
 	Allow time duration arguments to have range limits.
 	* config/libopts.def (POSIX_SHELL): look for one and emit it into
 	both config.h and make it available to the Makefile-s.
+	* everywhere: replace SHELL and CONFIG_SHELL with POSIX_SHELL,
+	where it makes sense.
 
 2011-03-04  Bruce Korb  <bkorb@gnu.org>
 

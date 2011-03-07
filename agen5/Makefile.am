@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-03-06 14:04:15 bkorb"
+## Time-stamp:      "2011-03-06 16:14:12 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -90,39 +90,39 @@ BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION $(CLexe)
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-fsm GEN-RULE
 stamp-fsm : pseudo.def $(FSMTPL)
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-parse GEN-RULE
 stamp-parse : defParse.def $(FSMTPL)
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE
 proto.h :
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-texi GEN-RULE
 stamp-texi : $(AGnam)
 	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
 	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-man GEN-RULE
 stamp-man : opts.def $(AGnam)
 	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
 	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(BOOTENV) $(SHELL) $(srcdir)/bootstrap.dir $@
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 autogen.1       : stamp-man
 invoke-autogen.texi    : stamp-texi

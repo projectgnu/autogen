@@ -2,7 +2,7 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2011-03-06 14:55:54 bkorb"
+## Time-stamp:      "2011-03-06 15:24:16 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -25,8 +25,8 @@ set -e
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
 
-[ -x ${top_builddir}/agen5/autogen ] || exit 0
-[ -x ${top_builddir}/columns/columns ] || exit 0
+test -x ${top_builddir}/agen5/autogen   || exit 0
+test -x ${top_builddir}/columns/columns || exit 0
 
 ao_rev=${AO_CURRENT}.${AO_REVISION}.${AO_AGE}
 tag=libopts-${ao_rev}

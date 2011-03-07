@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-01-31 13:20:20 bkorb"
+# Time-stamp:        "2011-03-06 16:15:30 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -114,7 +114,7 @@ set_defaults()
     #  disable any $HOME defaults
     #
     HOME=/dev/null
-    SHELL=/bin/sh
+    SHELL=${POSIX_SHELL-/bin/sh}
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #
