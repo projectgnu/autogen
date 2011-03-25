@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-02 11:58:11 bkorb"
+# Time-stamp:        "2011-03-12 14:06:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -231,7 +231,8 @@ AO_gettext(char const* pz)
     return pzRes;
 }
 
-static void coerce_it(void** s) { *s = AO_gettext(*s); }
+static void coerce_it(void** s) { *s = AO_gettext(*s);
+}
 #define COERSION(_f) \
   coerce_it((void*)&(handlerOptions._f))
 

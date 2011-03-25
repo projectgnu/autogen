@@ -1,8 +1,8 @@
-/* -*- Mode: Text -*- */
+/* -*- Mode: conf -*- */
 
 autogen definitions options;
 
-// Time-stamp:        "2010-03-04 16:19:54 bkorb"
+// Time-stamp:        "2011-03-24 23:19:16 bkorb"
 
 /*
  *  This file is part of AutoGen.

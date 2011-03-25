@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-03-06 14:05:26 bkorb"
+## Time-stamp:      "2011-03-25 16:34:14 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -65,6 +65,8 @@ gd.c : $(gdsrcs)
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
 	echo ; echo '#define  DEFINING 1' ; \
 	echo '#include "autoopts/project.h"' ; \
+	echo '#define AUTOOPTS_INTERNAL 1' ; \
+	echo '#include "autoopts/ag-char-map.h"' ; \
 	for f in opts.c $(gdsrcs) ; \
 	do echo "#include \"$$f\"" ; done
 

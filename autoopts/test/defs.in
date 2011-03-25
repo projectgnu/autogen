@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-03-06 15:14:52 bkorb"
+# Time-stamp:     "2011-03-25 08:49:13 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -303,11 +303,11 @@ cleanup()
 {
   trap '' 15
   ${setx}
-  if ${VERBOSE} ; then : ; else
+  ${VERBOSE} || {
     cd ${builddir}
     purge testdir
     test -d testdir && mv testdir ZZJUNK-$$
-  fi
+  }
   ${msg} ${testname} done
 }
 

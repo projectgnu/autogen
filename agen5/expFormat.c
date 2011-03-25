@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2011-01-20 16:15:53 bkorb"
+ *  Time-stamp:        "2011-03-11 11:28:06 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -103,11 +103,10 @@ static char const zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-static char const zOwnLen[]  = "owner length";
-static char const zPfxLen[]  = "prefix length";
-static char const zProgLen[] = "program name length";
-static char const zPfxMsg[]  = "%s may not exceed %d chars\n";
-
+static char const zOwnLen[]   = "owner length";
+static char const zPfxLen[]   = "prefix length";
+static char const zProgLen[]  = "program name length";
+static char const zPfxMsg[]   = "%s may not exceed %d chars\n";
 static char const zFmtAlloc[] = "asprintf allocation";
 
 /*=gfunc dne

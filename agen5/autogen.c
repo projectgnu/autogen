@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2011-02-01 14:31:45 bkorb"
+ *  Time-stamp:        "2011-03-24 17:43:17 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -624,15 +624,6 @@ ao_realloc (void *p, size_t sz)
     }
     return res;
 }
-
-
-LOCAL void
-ao_free (void *p)
-{
-    if (p != NULL)
-        free(p);
-}
-
 
 LOCAL char *
 ao_strdup (char const * str)

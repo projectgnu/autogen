@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-03-06 15:06:54 bkorb"
+# Time-stamp:      "2011-03-25 14:08:10 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -645,6 +645,30 @@ ENDIF "test/guile main"
 
 =][=
 (tpl-file-line extract-fmt)
+=][=
+
+IF (exist? "usage-message")     =]
+void
+[=(. lc-prefix)=]usage_messagev(char const * fmt, va_list ap)
+{
+    char const * er_fmt = _("%s usage error:\n");
+    fprintf(stderr, er_fmt, [=(. pname)=]Options.pzProgName);
+    vfprintf(stderr, fmt, ap);
+    [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
+    /* NOTREACHED */
+}
+
+void
+[=(. lc-prefix)=]usage_message(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    [=(. lc-prefix)=]usage_messagev(fmt, ap);
+    /* NOTREACHED */
+    va_end(ap);
+}
+[=
+ENDIF have usage-message
 =]
 #if ENABLE_NLS
 #include <stdio.h>
@@ -673,7 +697,8 @@ AO_gettext(char const* pz)
     return pzRes;
 }
 
-static void coerce_it(void** s) { *s = AO_gettext(*s); }
+static void coerce_it(void** s) { *s = AO_gettext(*s);
+}
 #define COERSION(_f) \
   coerce_it((void*)&([= (. pname) =]Options._f))
 

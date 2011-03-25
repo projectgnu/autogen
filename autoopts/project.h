@@ -47,13 +47,4 @@ typedef int tSuccess;
 #  define MODE extern
 #endif
 
-typedef struct argList tArgList;
-#define MIN_ARG_ALLOC_CT   6
-#define INCR_ARG_ALLOC_CT  8
-struct argList {
-    int             useCt;
-    int             allocCt;
-    char const *    apzArgs[MIN_ARG_ALLOC_CT];
-};
-
 #endif /* AUTOGEN_PROJECT_H */

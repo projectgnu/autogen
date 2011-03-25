@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-01-20 16:24:31 bkorb"
+ *  Time-stamp:        "2011-03-25 14:18:41 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -240,8 +240,7 @@ doOptions(int arg_ct, char ** arg_vec)
             /* FALLTHROUGH */
 
         default:
-            fprintf(stderr, one_src, pzProg);
-            USAGE(EXIT_FAILURE);
+            usage_message(one_src, pzProg);
             /* NOTREACHED */
 
         case 0:

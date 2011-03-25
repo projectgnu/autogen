@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-03-06 11:58:01 bkorb"
+# Time-stamp:      "2011-03-25 15:01:11 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -216,9 +216,9 @@ static char*
 trim_input_line(char* pz_s)
 {
     char* pz_e = pz_s + strlen(pz_s);
-    while ((pz_e > pz_s) && isspace(pz_e[-1]))  pz_e--;
+    while ((pz_e > pz_s) && isspace((unsigned int)pz_e[-1]))  pz_e--;
     *pz_e = '\0';
-    while (isspace(*pz_s))  pz_s++;
+    while ((unsigned int)isspace(*pz_s))  pz_s++;
 
     switch (*pz_s) {
     case '\0':
@@ -579,34 +579,44 @@ DEFINE decl-callbacks
     "\n# define %4$s NULL"
     "\n#endif /* def/not %2$s */"))
 
+  (define make-proc-decl #t)
+
   (define set-ifdef (lambda(n-or-def ifdef-cb ifdef-name) (begin
      (set! decl-type (if (hash-ref is-ext-cb-proc flg-name) "extern" "static"))
+     (set! make-proc-decl #f)
      (ag-fprintf 0 ifdef-fmt n-or-def ifdef-name decl-type ifdef-cb )
   )))
 
   (define set-cb-decl (lambda() (begin
+
+     (set! make-proc-decl #t)
+     (set! tmp-val (hash-ref cb-proc-name flg-name))
+
+     (if (exist? "ifdef")
+         (set-ifdef ""  tmp-val (get "ifdef"))
+
+         (if (exist? "ifndef")
+             (set-ifdef "n" tmp-val (get "ifndef"))
+
+             (if (hash-ref is-ext-cb-proc flg-name)
+                 (set! extern-proc-list (string-append
+                       extern-proc-list tmp-val "\n" ))
+
+                 (set! static-proc-list (string-append
+                       static-proc-list tmp-val "\n" ))
+     )  )  )
+
      (if make-test-main (begin
          (set! tmp-val (hash-ref test-proc-name flg-name))
          (if (hash-ref is-ext-cb-proc flg-name)
              (set! extern-test-list (string-append extern-test-list
                    tmp-val "\n" ))
 
-             (set! static-test-list (string-append static-test-list
-                   tmp-val "\n" ))
-         )
+             (if make-proc-decl
+                 (set! static-test-list
+                       (string-append static-test-list tmp-val "\n") ) ) )
      )   )
 
-     (set! tmp-val (hash-ref cb-proc-name flg-name))
-
-     (if (exist? "ifdef")  (set-ifdef ""  tmp-val (get "ifdef"))
-     (if (exist? "ifndef") (set-ifdef "n" tmp-val (get "ifdef"))
-     (if (hash-ref is-ext-cb-proc flg-name)
-         (set! extern-proc-list (string-append
-               extern-proc-list tmp-val "\n" ))
-
-         (set! static-proc-list (string-append
-               static-proc-list tmp-val "\n" ))
-     )))
   )))
   =][=
 

@@ -1,7 +1,7 @@
 
 %guard          autoopts_internal
 %file           ag-char-map.h
-%table          option-char-category
+%static-table   option-char-category
 
 %comment
   This file contains the character classifications

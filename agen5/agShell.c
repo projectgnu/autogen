@@ -1,7 +1,7 @@
 /**
  * \file agShell
  *
- *  Time-stamp:        "2011-02-01 07:38:34 bkorb"
+ *  Time-stamp:        "2011-03-12 14:30:57 bkorb"
  *
  *  Manage a server shell process
  *
@@ -22,13 +22,14 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef SHELL_ENABLED
- void  closeServer(void) { }
+ void  closeServer(void) {
+}
 
- char* runShell(char const* pzCmd) {
+ char * runShell(char const* pzCmd) {
      char* pz;
      AGDUPSTR(pz, pzCmd, "dummy shell command");
      return pz;
- }
+}
 #else
 
 /*

@@ -1868,6 +1868,20 @@ typedef enum @{
 @noindent
 which will be augmented by any @code{exit-name} definitions beyond ``1''.
 
+@item usage-message
+@vindex usage-message
+This attribute will cause two procedures to be added to the code file:
+@code{usage_message} and @code{usage_messagev}, with any applicable prefix
+(see @xref{programming attributes}, above).  They are declared in the
+generated header, thus:
+@example
+extern void usage_messagev(char const * fmt, va_list ap);
+extern void usage_message(char const * fmt, ...);
+@end example
+@noindent
+These functions print the message to @file{stderr} and invoke the usage
+function with the exit code set to @code{1} (@code{EXIT_FAILURE}).
+
 @item export
 @vindex export
 This string is inserted into the .h interface file.  Generally used for

@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-03-04 09:39:44 bkorb"
+# Time-stamp:      "2011-03-25 14:07:19 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -31,7 +31,9 @@
  */
 [= (make-header-guard "autoopts")       =][=
 % config-header "\n#include \"%s\""     =]
-#include <autoopts/options.h>
+#include <autoopts/options.h>[=
+(if (exist? "usage-message")
+    "\n#include <stdarg.h>") =]
 [= IF
 
   (define option-ct 0)
@@ -183,14 +185,19 @@ ENDIF prefix/not    =]
 typedef enum {[=
 
   (set! tmp-val "")
+  (define fail-exit-code (string-append pname-up "_EXIT_FAILURE"))
+
   (if (not (exist? "exit-name[0]"))
       (set! tmp-val (string-append
             "\n    " pname-up "_EXIT_SUCCESS = 0" )) )
 
-  (if (not (exist? "exit-name[1]"))
+  (if (exist? "exit-name[1]")
+      (set! fail-exit-code (string-append
+            pname-up "_EXIT_" (get-up-name "exit-name[1]") ))
+
       (set! tmp-val (string-append tmp-val
             (if (> (string-length tmp-val) 1) "," "")
-            "\n    " pname-up "_EXIT_FAILURE = 1" )) )
+            "\n    " fail-exit-code " = 1" )) )
 
   (if (and (exist? "exit-name") (> (string-length tmp-val) 1))
       (set! tmp-val (string-append tmp-val ",")) )
@@ -198,21 +205,10 @@ typedef enum {[=
   tmp-val                             =][=
 
   FOR exit-name ,                     =]
-    [= (. pname-up) =]_EXIT_[=
-       (string-upcase! (string->c-name! (get "exit-name")))
+    [= (. pname-up) =]_EXIT_[= (get-up-name "exit-name")
        =] = [= (for-index)            =][=
   ENDFOR                              =]
 } [= (. pname-down) =]_exit_code_t;[=
-
-  IF (exist? "export")                =]
-
-/* * * * * *
- *
- *  Globals exported from the [=prog_title=] option definitions
- */
-[=  (join "\n\n" (stack "export"))    =][=
-  ENDIF  export? =]
-[=
 
 CASE guard-option-names               =][=
 !E                                    =][=
@@ -438,15 +434,29 @@ ENDIF is not a library
 IF (not (exist? "library"))
 
 =]
+#ifdef  __cplusplus
+extern "C" {
+#endif[=
+
+  IF (exist? "export")                =]
+
+/* * * * * *
+ *
+ *  Globals exported from the [=prog_title=] option definitions
+ */
+[=  (join "\n\n" (stack "export"))    =][=
+  ENDIF  export? =][=
+
+  IF (exist? "usage-message")         =]
+extern void [=(. lc-prefix)=]usage_messagev(char const * fmt, va_list ap);
+extern void [=(. lc-prefix)=]usage_message(char const * fmt, ...);
+[=ENDIF have usage-message =]
+
 /* * * * * *
  *
  *  Declare the [=prog-name=] option descriptor.
  */
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
-extern tOptions   [=(. pname)=]Options;[=
+extern tOptions [=(. pname)=]Options;[=
 
  (if (> (string-length added-hdr) 0)
      (begin

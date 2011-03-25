@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2011-02-02 12:07:57 bkorb"
+# Time-stamp:        "2011-03-25 16:37:56 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -59,11 +59,10 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-compile "-?"
-set -x
-
 # # # # # # # # # # FIRST TEST # # # # # # # # #
 
+compile "-?"
+mv ${testname} ${testname}-1
 echo creating ${testname}-1.help
 cat > ${testname}-1.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
@@ -78,15 +77,16 @@ USAGE:  cond [ -<flag> [<val>] ]...
 _EOF_
 
 cmp -s ${testname}-1.help ${testname}.help || \
-  failure "`diff ${testname}-1.help ${testname}.help`"
+  failure "TEST 1 FAILED${nl}`diff ${testname}-1.help ${testname}.help`"
 
-./${testname} -c 123 && \
+./${testname}-1 -c 123 && \
     failure "*DID* process -c option"
 
 # # # # # # # # # # SECOND TEST # # # # # # # # #
 
 INC="${INC} -DCOND=1"
 compile "-?"
+mv ${testname} ${testname}-2
 cat > ${testname}-2.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
@@ -101,7 +101,7 @@ USAGE:  cond [ -<flag> [<val>] ]...
 _EOF_
 
 cmp -s ${testname}-2.help ${testname}.help || \
-  failure "`diff ${testname}-2.help ${testname}.help`"
+  failure "TEST 2 FAILED${nl}`diff ${testname}-2.help ${testname}.help`"
 
 # # # # # # # # # # THIRD TEST # # # # # # # # #
 
@@ -122,19 +122,68 @@ cmp -s ${testname}-??.log || \
 
 # # # # # # # # # # FOURTH TEST # # # # # # # # #
 
-${SED} '/value = c/s/$/ deprecated;/' ${testname}.def > ${testname}.def3
-mv -f  ${testname}.def3  ${testname}.def
-echo ${AG_L} ${testname}.def
-${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+${SED} '/value = c/s/$/ deprecated;/' ${testname}.def > ${testname}.def4
+
+echo ${AG_L} ${testname}.def4
+${AG_L} ${testname}.def4 || \
+  failure AutoGen could not process ${testname}.def4
 
 compile "-?"
-
+mv ${testname} ${testname}-4
 cmp -s ${testname}-1.help ${testname}.help || \
-  failure "`diff ${testname}-1.help ${testname}.help`"
+  failure "TEST 4 FAILED${nl}`diff ${testname}-1.help ${testname}.help`"
 
-./${testname} -c 123 || \
+./${testname}-4 -c 123 || \
     failure "could not process -c option"
+
+# # # # # # # # # # FIFTH TEST # # # # # # # # #
+
+${SED} '/deprecated/s/deprecated.*/arg-range = "0->1000";/' \
+    ${testname}.def4 > ${testname}.def5
+
+echo ${AG_L} ${testname}.def5
+${AG_L} ${testname}.def5 || \
+  failure AutoGen could not process ${testname}.def5
+
+compile "-?"
+mv ${testname} ${testname}-5
+cat > ${testname}-5.help <<'_EOF_'
+test_cond - Test AutoOpts for cond
+USAGE:  cond [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o Str option         The option option descrip
+   -s Num second         The second option descrip
+   -c Num condition      cond test
+				- It must be in the range:
+				  0 to 1000
+   -I Num interfere      cond interference test
+   -? no  help           Display extended usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${testname}-5.help ${testname}.help || \
+  failure "TEST 5 FAILED${nl}`diff -u ${testname}-5.help ${testname}.help`"
+
+# # # # # # # # # # SIXTH TEST # # # # # # # # #
+
+INC=`echo ${INC} | sed 's/ -DCOND=1//'`
+compile "-?"
+mv ${testname} ${testname}-6
+cat > ${testname}-6.help <<'_EOF_'
+test_cond - Test AutoOpts for cond
+USAGE:  cond [ -<flag> [<val>] ]...
+  Flg Arg Option-Name    Description
+   -o Str option         The option option descrip
+   -s Num second         The second option descrip
+   -I Num interfere      cond interference test
+   -? no  help           Display extended usage information and exit
+   -! no  more-help      Extended usage information passed thru pager
+
+_EOF_
+
+cmp -s ${testname}-6.help ${testname}.help || \
+  failure "TEST 6 FAILED${nl}`diff -u ${testname}-6.help ${testname}.help`"
 
 cleanup
 

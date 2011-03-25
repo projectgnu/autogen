@@ -1,3 +1,22 @@
+2011-03-25  Bruce Korb  <bkorb@gnu.org>
+
+	* add-on/char-mapper/char-mapper.c (table_name): add option to make
+	the table be "static".  Ought to have been so already....
+	* autoopts/autogen.map (static-table): specify that the character
+	classification table is to be static scope.
+	* agen5/Makefile.am (ag-char-map.h): libopts no longer exports the
+	table, so define it in autogen, too.
+	* getdefs/Makefile.am: likewise
+	* autoopts/tpl/optcode.tlib (usage_message): emit new function if
+	"usage-message" has been defined.
+	* autoopts/tpl/opthead.tlib: declare these new functions
+	* doc/autogen-texi.txt: doc the new attribute
+	* agen5/agInit.c (dep_usage): use usage_message() function
+	* agen5/agUtils.c (doOptions): likewise
+	* agen5/opts.def (load-scheme): likewise
+	* autoopts/numeric.c (optionShowRange): remove unnecessary nesting.
+	* autoopts/test/cond.test: adjust and enhance conditional option tests
+
 2011-03-06  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/project.h: new header for common defines that are not to be

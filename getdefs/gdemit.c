@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-02-01 12:44:11 bkorb"
+ *  Time-stamp:        "2011-03-12 16:21:23 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -33,8 +33,14 @@ emitListattr(char* pzText, char* pzOut);
 static char*
 emitQuote(char** ppzText, char* pzOut);
 
+static void
+next_def_entry(char ** txt_pp, char const ** def_pp);
+
+static void
+emit_attribute(char const ** def_pp, char ** out_pp);
+
 static char*
-emitSubblock(const char * pzDefList, char* pzText, char* pzOut);
+emitSubblock(char const * pzDefList, char* pzText, char* pzOut);
 
 static char*
 emitSubblockString(char** ppzText, u_int sepChar, char* pzOut);
@@ -181,8 +187,8 @@ compressDef(char * pz)
 LOCAL char*
 emitDefinition(char* pzDef, char* pzOut)
 {
-    char   sep_char;
-    char   zEntryName[ MAXNAMELEN ];
+    char sep_char;
+    char zEntryName[ MAXNAMELEN ];
 
     /*
      *  Indent attribute definitions four spaces
@@ -209,10 +215,10 @@ emitDefinition(char* pzDef, char* pzOut)
 
     if (HAVE_OPT( SUBBLOCK )) {
         int    ct  = STACKCT_OPT(  SUBBLOCK );
-        const char **  ppz = STACKLST_OPT( SUBBLOCK );
+        char const **  ppz = STACKLST_OPT( SUBBLOCK );
 
         do  {
-            const char * pz = *ppz++;
+            char const * pz = *ppz++;
             if (strcmp(pz, zEntryName) == 0)
                 return emitSubblock(pz, pzDef, pzOut);
         } while (--ct > 0);
@@ -220,7 +226,7 @@ emitDefinition(char* pzDef, char* pzOut)
 
     if (HAVE_OPT( LISTATTR )) {
         int    ct  = STACKCT_OPT(  LISTATTR );
-        const char **  ppz = STACKLST_OPT( LISTATTR );
+        char const ** ppz = STACKLST_OPT( LISTATTR );
 
         do  {
             if (strcmp(*ppz++, zEntryName) == 0)
@@ -374,15 +380,55 @@ quoteDone:
     return pzOut;
 }
 
+static void
+next_def_entry(char ** txt_pp, char const ** def_pp)
+{
+    char const * p = *def_pp;
+    (*txt_pp)++;
+    for (;;) {
+        switch (*++p) {
+        case ' ': p++; /* FALLTHROUGH */
+        case NUL:
+            *def_pp = p;
+            return;
+        }
+    }
+}
+
+static void
+emit_attribute(char const ** def_pp, char ** out_pp)
+{
+    static char const pfx[]   = "\n        ";
+
+    char * out = *out_pp;
+    char const * def = *def_pp;
+
+    memcpy(out, pfx, sizeof(pfx) - 1);
+    out += sizeof(pfx) - 1;
+
+    for (;;) {
+        *out++ = *def++;
+        switch (*def) {
+        case ' ': def++; /* FALLTHROUGH */
+        case NUL:
+            goto leave_emit_attribute;
+        }
+    }
+
+leave_emit_attribute:
+
+    *out++  = ';';
+    *out_pp = out;
+    *def_pp = def;
+}
 
 /*
  *  emitSubblock
  */
 static char*
-emitSubblock(const char * pzDefList, char* pzText, char* pzOut)
+emitSubblock(char const * pzDefList, char * pzText, char * pzOut)
 {
     static char const zStart[]  = " = {";
-    static char const zAttr[]   = "\n        ";
     static char const zEnd[]    = "\n    };\n";
 
     u_int sepChar   = ',';
@@ -413,15 +459,7 @@ emitSubblock(const char * pzDefList, char* pzText, char* pzOut)
          *  THEN this entry is skipped.
          */
         if ((u_int)*pzText == sepChar) {
-            pzText++;
-            for (;;) {
-                switch (*++pzDefList) {
-                case ' ':
-                    pzDefList++;
-                case NUL:
-                    goto def_list_skip_done;
-                }
-            } def_list_skip_done:;
+            next_def_entry(&pzText, &pzDefList);
             continue;
         }
 
@@ -433,45 +471,23 @@ emitSubblock(const char * pzDefList, char* pzText, char* pzOut)
             /*
              *  IF there were no definitions, THEN emit one anyway
              */
-            if (FirstAttr) {
-                strcpy(pzOut, zAttr);
-                pzOut += sizeof(zAttr);
-                for (;;) {
-                    *pzOut++ = *pzDefList++;
-                    switch (*pzDefList) {
-                    case ' ':
-                    case NUL:
-                        goto single_def_entry_done;
-                    }
-                } single_def_entry_done:;
-                *pzOut++ = ';';
-            }
+            if (FirstAttr)
+                emit_attribute(&pzDefList, &pzOut);
+
             break;
         }
 
         /*
          *  Copy out the attribute name
          */
-        strcpy(pzOut, zAttr);
-        pzOut += sizeof(zAttr)-1;
+        emit_attribute(&pzDefList, &pzOut);
         FirstAttr = 0;
-
-        for (;;) {
-            *pzOut++ = *pzDefList++;
-            switch (*pzDefList) {
-            case ' ':
-                pzDefList++;
-            case NUL:
-                goto def_name_copied;
-            }
-        } def_name_copied:;
 
         /*
          *  IF there are no data for this attribute,
-         *  THEN we emit an empty definition.
+         *  THEN we leave the definition empty.
          */
         if ((u_int)*pzText == sepChar) {
-            *pzOut++ = ';';
             pzText++;
             continue;
         }
@@ -479,12 +495,13 @@ emitSubblock(const char * pzDefList, char* pzText, char* pzOut)
         /*
          *  Copy out the assignment operator and emit the string
          */
-        *pzOut++ = ' '; *pzOut++ = '='; *pzOut++ = ' ';
+        pzOut[-1] = ' '; *pzOut++ = '='; *pzOut++ = ' ';
         pzOut = emitSubblockString(&pzText, sepChar, pzOut);
         *pzOut++ = ';';
 
     } while (isalpha(*pzDefList));
-    strcpy(pzOut, zEnd);
+
+    memcpy(pzOut, zEnd, sizeof(zEnd));
     return pzOut + sizeof(zEnd) - 1;
 }
 

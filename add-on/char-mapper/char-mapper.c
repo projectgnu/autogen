@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2010-07-16 13:52:39 bkorb"
+ *  Time-stamp:        "2011-03-25 16:37:31 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -38,6 +38,10 @@
 #  define NUL '\0'
 #endif
 
+#ifndef NBBY
+#  define NBBY 8
+#endif
+
 static char const usage_txt[] =
     "USAGE:  char-mapper [ -h | --help | <input-file> ]\n"
     "If the '<input-file>' is not specified, it is read from standard input.\n"
@@ -61,7 +65,8 @@ static char const usage_txt[] =
     "\tThe default is:  char-mapper Character Classifications\n\n"
 
     "  %table\n"
-    "\tspecifies the name of the output table.\n"
+    "\tspecifies the name of the output table.  Normally, it is a global,\n"
+    "\tbut may be made static scope with %static-table.\n"
     "\tThe default is:  char_type_table\n\n"
 
     "Otherwise, input lines that are blank or start with a hash ('#') are\n"
@@ -134,10 +139,14 @@ static char const leader_z[] = "/*\n\
 
 static char const check_class_inline[] =
 "typedef %3$s %1$s_mask_t;\n"
-"extern %1$s_mask_t const %1$s[128];\n\n"
+"%4$s %1$s_mask_t const %1$s[%5$d];\n\n"
 "static inline int is_%1$s_char(char ch, %1$s_mask_t mask) {\n"
 "    unsigned int ix = (unsigned char)ch;\n"
-"    return ((ix < 0x7F) && ((%1$s[ix] & mask) != 0)); }\n\n";
+"    return ((ix < %5$d) && ((%1$s[ix] & mask) != 0)); }\n\n";
+
+static char const start_table_fmt[] = "\
+#ifdef %1$s\n\
+%3$s%2$s_mask_t const %2$s[%4$d] = {";
 
 static char const endif_fmt[] = "#endif /* %s */\n";
 static char const mask_fmt_fmt[] = "0x%%0%dX";
@@ -147,6 +156,10 @@ static char const * data_guard = "CHAR_MAPPER_DEFINE";
 static char const * file_guard = "CHAR_MAPPER_H_GUARD";
 static char const * commentary = " *  char-mapper Character Classifications\n";
 static char const * table_name = "char_type_table";
+static int          table_is_static = 0;
+#define TABLE_SIZE  (1 << (NBBY - 1))
+static int const    table_size = TABLE_SIZE;
+
 char in_macro_name[CLASS_NAME_LIMIT+7] = "IN_CHAR_TYPE_TABLE";
 
 static char buffer[BUF_SIZE];
@@ -159,7 +172,7 @@ struct value_map_s {
     char            vname[CLASS_NAME_LIMIT+1];
     int             bit_no;
     value_bits_t    mask;
-    value_bits_t    values[128];
+    value_bits_t    values[TABLE_SIZE];
 };
 
 value_map_t all_map = { NULL, "total", 0, 0, { 0 }};
@@ -343,7 +356,10 @@ emit_macros(int bit_count)
         default: die("too many char types (31 max)\n");
         }
 
-        printf(check_class_inline, table_name, in_macro_name, type_pz);
+        printf(check_class_inline,
+               table_name, in_macro_name, type_pz,
+               table_is_static ? "static" : "extern",
+               table_size);
     }
 
     if (max_name_len < CLASS_NAME_LIMIT-2)
@@ -366,11 +382,6 @@ emit_macros(int bit_count)
 void
 emit_table(int bit_count)
 {
-    static char const start_table_fmt[] = "\
-#ifdef %1$s\n\
-%2$s_mask_t const %2$s[128] = {\
-";
-
     char const * type_pz;
     char * fmt;
 
@@ -379,9 +390,11 @@ emit_table(int bit_count)
     int entry_ct = 0;
     int init_ct  = (bit_count > 32) ? 2 : 4;
 
-    printf(start_table_fmt, data_guard, table_name);
+    printf(start_table_fmt, data_guard, table_name,
+           table_is_static ? "static " : "",
+           table_size);
 
-    while (ix < 128) {
+    while (ix < TABLE_SIZE) {
 
         if (! need_cm)
             need_cm = 1;
@@ -773,6 +786,24 @@ handle_table(char * scan)
 }
 
 char *
+handle_static_table(char * scan)
+{
+    char * pz;
+
+    if (! isspace(*scan)) die(bad_directive, scan-5);
+
+    while (isspace(*scan))   scan++;
+    table_name = pz = strdup(scan);
+    for (;*pz; pz++) {
+        if (! isalnum((int)*pz))
+            *pz = '_';
+    }
+
+    table_is_static = 1;
+    return scan + strlen(scan);
+}
+
+char *
 handle_invalid(char * scan)
 {
     die(bad_directive, scan);
@@ -789,9 +820,16 @@ parse_directive(char * scan)
     if (! isalpha(*scan))
         die("directives must begin with an alphabetic character:  %s\n", scan);
 
-    while (! isspace(scan[++len]))
-        if (scan[len] == NUL)
-            break;
+    for (;;) {
+        char ch = scan[++len];
+        switch (ch) {
+        case ' ': case '\t':
+        case NUL: goto have_name;
+        case '-': scan[len] = '_'; break;
+        case 'A' ... 'Z':
+            scan[len] = _tolower((unsigned int)ch); break;
+        }
+    } have_name:;
 
     return disp_cm_opt(scan, len, scan + len);
 }

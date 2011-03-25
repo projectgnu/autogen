@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2010-12-15 17:33:14 bkorb"
+ *  Time-stamp:      "2011-03-25 14:20:39 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -156,8 +156,8 @@ dep_usage(char const * fmt, ...)
         va_end(ap);
     }
 
-    fprintf(stderr, "invalid make dependency option:  %s", msg);
-    USAGE(EXIT_FAILURE);
+    usage_message("invalid make dependency option:  %s", msg);
+    /* NOTREACHED */
 }
 
 /**

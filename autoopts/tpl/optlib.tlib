@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-03-04 12:35:23 bkorb"
+# Time-stamp:      "2011-03-25 13:49:57 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -162,6 +162,7 @@ test_exe "${CLexe}" || \
 ) ) )
 
 (define UP-prefix  "")
+(define lc-prefix  "")
 (define Cap-prefix "")
 (define OPT-pfx    "OPT_")
 (define INDEX-pfx  "INDEX_OPT_")
@@ -170,6 +171,7 @@ test_exe "${CLexe}" || \
 (if (exist? "prefix")
    (begin
      (set! UP-prefix  (string-append (get-up-name "prefix") "_"))
+     (set! lc-prefix  (string-downcase   UP-prefix))
      (set! Cap-prefix (string-capitalize UP-prefix))
      (set! OPT-pfx    (string-append UP-prefix "OPT_"))
      (set! INDEX-pfx  (string-append "INDEX_" OPT-pfx))

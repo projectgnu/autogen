@@ -1,9 +1,9 @@
-// -*- Mode: C -*-
+/* -*- Mode: conf -*- */
 
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-01-28 17:53:38 bkorb"
+ *  Time-stamp:        "2011-03-24 23:18:58 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *

@@ -2,7 +2,7 @@
 /**
  * \file autoopts.c
  *
- *  Time-stamp:      "2011-01-06 12:44:21 bkorb"
+ *  Time-stamp:      "2011-03-24 17:42:36 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -92,17 +92,6 @@ ao_realloc(void *p, size_t sz)
 }
 #undef  realloc
 #define realloc(_p,_s) ao_realloc(_p,_s)
-
-
-LOCAL void
-ao_free(void *p)
-{
-    if (p != NULL)
-        free(p);
-}
-#undef  free
-#define free(_p) ao_free(_p)
-
 
 LOCAL char *
 ao_strdup(char const *str)

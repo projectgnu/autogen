@@ -2,7 +2,7 @@
 /*
  *  \file autoopts.h
  *
- *  Time-stamp:      "2011-03-06 14:31:53 bkorb"
+ *  Time-stamp:      "2011-03-24 22:28:49 bkorb"
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -185,7 +185,7 @@ typedef struct {
 
 #define AGALOC(c, w)          ao_malloc((size_t)c)
 #define AGREALOC(p, c, w)     ao_realloc((void*)p, (size_t)c)
-#define AGFREE(_p)            do{void*X=(void*)_p;ao_free(X);}while(0)
+#define AGFREE(_p)            free((void *)_p)
 #define AGDUPSTR(p, s, w)     (p = ao_strdup(s))
 
 static void *
@@ -194,8 +194,7 @@ ao_malloc(size_t sz);
 static void *
 ao_realloc(void *p, size_t sz);
 
-static void
-ao_free(void *p);
+#define ao_free(_p) free((void *)_p)
 
 static char *
 ao_strdup(char const *str);

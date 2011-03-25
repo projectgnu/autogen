@@ -1,9 +1,9 @@
-/* -*- Mode: Text -*- */
+/* -*- Mode: conf -*- */
 
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-03-06 16:17:10 bkorb"
+ *  Time-stamp:        "2011-03-25 14:21:41 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -40,6 +40,7 @@ prog-title     = "The Automated Program Generator";
 homerc         =  $HOME, ".";
 environrc;
 usage-opt;
+usage-message;
 
 #else
 prog-name      = xml2ag;
@@ -258,9 +259,9 @@ flag = {
 	    if (! SUCCESSFUL(
 	        findFile(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {
 
-	        fprintf(stderr, "Cannot locate scheme file `%s'\n",
-	                pOptDesc->optArg.argString);
-	        USAGE(EXIT_FAILURE);
+	        usage_message("Cannot locate scheme file `%s'\n",
+	                      pOptDesc->optArg.argString);
+	        /* NOTREACHED */
 	    }
 
 	    pz = aprf("(load \"%s\")", zPath);

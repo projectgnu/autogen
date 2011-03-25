@@ -499,12 +499,8 @@ utxt = { ut-name = RangeLie;
          ut-text = "%sIt must lie in one of the ranges:\n";
 };
 
-utxt = { ut-name = RangeBadLie;
-         ut-text = "%sThis option must lie in one of the ranges:\n";
-};
-
 utxt = { ut-name = RangeOnly;
-         ut-text = "%sit must be:  ";
+         ut-text = "%sIt must be in the range:\n";
 };
 
 utxt = { ut-name = RangeOr;

@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-03-06 12:03:03 bkorb"
+# Time-stamp:      "2011-03-11 13:26:46 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -126,6 +126,15 @@ typedef union {
     int             file_flags;
     char const *    file_mode;
 } tuFileMode;
+
+typedef struct argList tArgList;
+#define MIN_ARG_ALLOC_CT   6
+#define INCR_ARG_ALLOC_CT  8
+struct argList {
+    int             useCt;
+    int             allocCt;
+    char const *    apzArgs[MIN_ARG_ALLOC_CT];
+};
 
 /*
  *  Bits in the fOptState option descriptor field.
@@ -393,7 +402,8 @@ typedef struct {
 #define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) ==  (void*)MAP_FAILED)
 
 #ifdef  __cplusplus
-extern "C" {
+#define CPLUSPLUS_OPENER extern "C" {
+CPLUSPLUS_OPENER
 #define CPLUSPLUS_CLOSER }
 #else
 #define CPLUSPLUS_CLOSER
