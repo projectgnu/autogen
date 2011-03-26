@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-03-25 14:08:10 bkorb"
+# Time-stamp:      "2011-03-25 17:27:11 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -649,7 +649,7 @@ ENDIF "test/guile main"
 
 IF (exist? "usage-message")     =]
 void
-[=(. lc-prefix)=]usage_messagev(char const * fmt, va_list ap)
+[=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap)
 {
     char const * er_fmt = _("%s usage error:\n");
     fprintf(stderr, er_fmt, [=(. pname)=]Options.pzProgName);
@@ -663,7 +663,7 @@ void
 {
     va_list ap;
     va_start(ap, fmt);
-    [=(. lc-prefix)=]usage_messagev(fmt, ap);
+    [=(. lc-prefix)=]vusage_message(fmt, ap);
     /* NOTREACHED */
     va_end(ap);
 }

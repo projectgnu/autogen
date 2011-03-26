@@ -2,7 +2,7 @@
 /*
  *  \file autoopts.h
  *
- *  Time-stamp:      "2011-03-24 22:28:49 bkorb"
+ *  Time-stamp:      "2011-03-25 17:51:34 bkorb"
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -129,8 +129,6 @@ typedef enum {
     PAGER_STATE_READY,
     PAGER_STATE_CHILD
 } tePagerState;
-
-extern tePagerState pagerState;
 
 typedef enum {
     ENV_ALL,

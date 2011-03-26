@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-03-25 15:01:11 bkorb"
+# Time-stamp:      "2011-03-25 18:53:43 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -135,7 +135,7 @@ DEFINE build-test-main
 
 extern tOptions  genshelloptOptions;
 extern void      optionParseShell(tOptions*);
-extern tOptions* pShellParseOptions;[=
+extern tOptions* optionParseShellOptions;[=
 
   ELIF (not (exist? "main-text"))  =][=
 
@@ -160,7 +160,7 @@ main(int argc, char ** argv)
      *  Stash a pointer to the options we are generating.
      *  `genshellUsage()' will use it.
      */
-    pShellParseOptions = &[=(. pname)=]Options;
+    optionParseShellOptions = &[=(. pname)=]Options;
     (void)optionProcess(&genshelloptOptions, argc, argv);
     optionParseShell(&[=(. pname)=]Options);[=
 

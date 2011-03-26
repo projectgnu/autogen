@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-03-25 14:07:19 bkorb"
+# Time-stamp:      "2011-03-25 17:27:03 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -448,7 +448,7 @@ extern "C" {
   ENDIF  export? =][=
 
   IF (exist? "usage-message")         =]
-extern void [=(. lc-prefix)=]usage_messagev(char const * fmt, va_list ap);
+extern void [=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap);
 extern void [=(. lc-prefix)=]usage_message(char const * fmt, ...);
 [=ENDIF have usage-message =]
 

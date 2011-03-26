@@ -412,19 +412,13 @@ log=${tmp_dir}/genshellopt.log
   test $? -eq 0 || die "could not compile genshellopt.c - See ${log}"
 ) > ${log} 2>&1
 
-` =][= `
-
 test -x ${tmp_dir}/genshellopt || \
   die "NO GENSHELLOPT PROGRAM - See ${log}"
 
 ${tmp_dir}/genshellopt --help > ${tmp_dir}/genshellopt.hlp
 
-` =][= `
-
 ${tmp_dir}/genshellopt -o ${tmp_dir}/genshellopt.sh || \
   die cannot create ${tmp_dir}/genshellopt.sh
-
-` =][= `
 
 sedcmd='s,\t,        ,g;s,\\([@{}]\\),@\\1,g'
 sed "${sedcmd}" ${tmp_dir}/genshellopt.hlp

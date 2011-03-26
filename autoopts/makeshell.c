@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2011-03-06 14:31:51 bkorb"
+ * Time-stamp:      "2011-03-25 18:51:55 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -28,7 +28,7 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
-tOptions*  pShellParseOptions = NULL;
+tOptions * optionParseShellOptions = NULL;
 
 /* * * * * * * * * * * * * * * * * * * * *
  *
@@ -1025,7 +1025,7 @@ openOutput(char const* pzFile)
  *  and create shell script variables containing the two types of text.
 =*/
 void
-genshelloptUsage(tOptions*  pOpts, int exitCode)
+genshelloptUsage(tOptions * pOpts, int exitCode)
 {
 #if ! defined(HAVE_WORKING_FORK)
     optionUsage(pOpts, exitCode);
@@ -1071,8 +1071,8 @@ genshelloptUsage(tOptions*  pOpts, int exitCode)
      */
     {
         char *  pz;
-        char ** pp = (char **)(void *)&(pShellParseOptions->pzProgName);
-        AGDUPSTR(pz, pShellParseOptions->pzPROGNAME, "program name");
+        char ** pp = (char **)(void *)&(optionParseShellOptions->pzProgName);
+        AGDUPSTR(pz, optionParseShellOptions->pzPROGNAME, "program name");
         *pp = pz;
         while (*pz != NUL) {
             *pz = tolower(*pz);
@@ -1083,7 +1083,7 @@ genshelloptUsage(tOptions*  pOpts, int exitCode)
     /*
      *  Separate the makeshell usage from the client usage
      */
-    fprintf(option_usage_fp, zGenshell, pShellParseOptions->pzProgName);
+    fprintf(option_usage_fp, zGenshell, optionParseShellOptions->pzProgName);
     fflush(option_usage_fp);
 
     /*
@@ -1094,7 +1094,7 @@ genshelloptUsage(tOptions*  pOpts, int exitCode)
         pagerState = PAGER_STATE_CHILD;
         /*FALLTHROUGH*/
     case -1:
-        optionUsage(pShellParseOptions, EXIT_FAILURE);
+        optionUsage(optionParseShellOptions, EXIT_FAILURE);
 
     default:
     {

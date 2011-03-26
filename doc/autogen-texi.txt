@@ -1834,7 +1834,7 @@ default: .<prog-name>rc
 @subsubsection Programming Details
 
 These attributes affect some of the ways that the option data are
-made available to the program.
+used and made available to the program.
 
 @table @samp
 @item config-header
@@ -1871,11 +1871,11 @@ which will be augmented by any @code{exit-name} definitions beyond ``1''.
 @item usage-message
 @vindex usage-message
 This attribute will cause two procedures to be added to the code file:
-@code{usage_message} and @code{usage_messagev}, with any applicable prefix
-(see @xref{programming attributes}, above).  They are declared in the
+@code{usage_message} and @code{vusage_message}, with any applicable prefix
+(see @code{prefix}, below).  They are declared in the
 generated header, thus:
 @example
-extern void usage_messagev(char const * fmt, va_list ap);
+extern void vusage_message(char const * fmt, va_list ap);
 extern void usage_message(char const * fmt, ...);
 @end example
 @noindent
@@ -1889,7 +1889,7 @@ global variables or @code{#include} directives required by
 @code{flag-code} text and shared with other program text.
 Do not specify your configuration header (@file{config.h}) in this
 attribute or the @code{include} attribute, however.  Instead, use
-@code{config-header}, above.n.
+@code{config-header}, above.
 
 @item guard-option-names
 @vindex guard-option-names
