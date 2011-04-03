@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-03-25 18:53:43 bkorb"
+# Time-stamp:      "2011-03-27 17:17:48 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -72,7 +72,7 @@ inner_main(int argc, char** argv)
 
         if (new_argv == NULL) {
             fputs(_("[=(. pname)=] cannot allocate new argv\n"), stderr);
-            exit(EXIT_FAILURE);
+            exit([=(. nomem-exit-code)=]);
         }
 
         /*
@@ -94,7 +94,7 @@ inner_main(int argc, char** argv)
 
 (def-file-line "copyright.text" extract-fmt) =]
 [= guile-main =]
-    exit(EXIT_SUCCESS);[=
+    exit([=(. succ-exit-code)=]);[=
   ELSE  =]
 
     export_options_to_guile(&[=(. pname)=]Options);
@@ -153,7 +153,7 @@ extern void [= (. option-emitter-proc) =](tOptions*);[=
 int
 main(int argc, char ** argv)
 {
-    int res = EXIT_SUCCESS;[=
+    int res = [=(. succ-exit-code)=];[=
 
   IF (= (get "test-main") "optionParseShell") =]
     /*
@@ -271,11 +271,7 @@ IF (exist? "handler-type")                      =]
 
 static [=
 
-(define file-fail-code (get "file-fail-code" "FAILURE"))
-(define emit-failing-printf (= file-fail-code "success"))
-
-(set!   file-fail-code  (string-append pname-up "_EXIT_"
-        (string->c-name! (string-upcase file-fail-code)) ))
+(define emit-failing-printf (not (= (get "file-fail-code") "success")))
 
  pname-down =]_exit_code_t
 validate_fname(char const* pz_fname)
@@ -298,7 +294,7 @@ validate_fname(char const* pz_fname)
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "stat",
                     pz_fname);[=
   ENDIF                                         =]
-            return [= (. file-fail-code)        =];
+            return [= (. file-fail-exit-code)   =];
         }[=
 
   IF (*=* (get "handler-type") "text")          =]
@@ -308,7 +304,7 @@ validate_fname(char const* pz_fname)
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
                     "not regular file:", pz_fname);[=
     ENDIF                                       =]
-            return [= (. file-fail-code)        =];
+            return [= (. file-fail-exit-code)   =];
         }[=
 
     IF (=* (get "handler-type") "some-text")    =]
@@ -318,7 +314,7 @@ validate_fname(char const* pz_fname)
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
                     "empty file:", pz_fname);[=
       ENDIF                                     =]
-            return [= (. file-fail-code)        =];
+            return [= (. file-fail-exit-code)   =];
         }[=
 
     ENDIF                                       =]
@@ -342,7 +338,7 @@ CASE handler-type =][=
         if (fp == NULL) {
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "fopen",
                     pz_fname);
-            return [= (. file-fail-code) =];
+            return [= (. file-fail-exit-code) =];
         }
         res = [= handler-proc =](pz_fname, fp);
         fclose(fp);
@@ -354,7 +350,7 @@ CASE handler-type =][=
     if (file_text == NULL) {
         fprintf(stderr, _("cannot allocate %d bytes for %s file text\n"),
                 text_size+1, pz_fname);
-        exit(EXIT_FAILURE);
+        exit([=(. nomem-exit-code)=]);
     }
 
     {
@@ -367,7 +363,7 @@ CASE handler-type =][=
             fprintf(stderr, pz_fs_err, errno, strerror(errno), "open",
                     pz_fname);
             free(file_text);
-            return [= (. file-fail-code) =];
+            return [= (. file-fail-exit-code) =];
         }
 
         while (sz > 0) {
@@ -387,7 +383,7 @@ CASE handler-type =][=
 
                 fprintf(stderr, pz_fs_err, errno, strerror(errno), "read",
                         pz_fname);
-                exit(EXIT_FAILURE);
+                exit([=(. file-fail-exit-code)=]);
             }
             pz += rd_ct;
             sz -= rd_ct;
@@ -439,7 +435,7 @@ main(int argc, char** argv)
      */
     else if (isatty(STDIN_FILENO)) {
         fputs(_("[=(. prog-name)=] ERROR: input list is a tty\n"), stderr);
-        [= (. UP-prefix) =]USAGE(EXIT_FAILURE);
+        [= (. UP-prefix) =]USAGE([=(. file-fail-exit-code)=]);
         /* NOTREACHED */
     }
 
@@ -453,7 +449,7 @@ main(int argc, char** argv)
         if (buf == NULL) {
             fputs(_("[=(. prog-name)
                    =] ERROR: no memory for input list\n"), stderr);
-            return EXIT_FAILURE;
+            return [=(. nomem-exit-code)=];
         }
 
         for (;;) {

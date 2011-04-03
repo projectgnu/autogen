@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-03-06 14:28:23 bkorb"
+# Time-stamp:        "2011-03-25 20:18:38 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -98,7 +98,8 @@ s%(setenv "SHELL" .*%(setenv "SHELL" "'${POSIX_SHELL}'")%
            mv -f $f.tmp $f
            ;;
 
-        *.pl | *.sh )
+        *.* ) : ;;
+        * )
            chmod a+x $f
            ;;
         esac

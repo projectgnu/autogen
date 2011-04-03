@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-02-24 10:38:11 bkorb"
+## Time-stamp:        "2011-03-04 12:01:28 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -215,8 +215,8 @@ IF
 @node [= (. down-prog-name) =] option presets
 @[=(. sub-level)=] presetting/configuring [=prog-name=]
 
-Any option that is not marked as @i{not presettable}
-(@pxref{opt-attr no-preset,no preset}) may be preset by loading values from [=
+Any option that is not marked as @i{not presettable} may be preset by
+loading values from [=
  (if home-rc-files (string-append
      "configuration (\"rc\" or \"ini\") files"
      (if environ-init ", and values from " "") ))
@@ -268,7 +268,7 @@ yielding an @code{option-name.sub-opt} string value of
 
 @code{Autogen} does not track suboptions.  You simply note that it is a
 hierarchicly valued option.  @code{libopts} does provide a means for searching
-the associated name/value pair list (@pxref{libopts-optionFindValue}).
+the associated name/value pair list (see: optionFindValue).
 [=
   ENDIF home-rc-files                   =][=
 ENDIF                                   =][=#

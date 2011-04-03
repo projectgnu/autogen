@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-03-25 17:27:03 bkorb"
+# Time-stamp:      "2011-03-27 18:37:26 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -174,7 +174,7 @@ ELSE we have a prefix:
                     %1$sDESC(n).fOptState |= OPTST_DISABLED; \\
                 %1$sDESC(n).optCookie = NULL )"
 
-  UP-prefix pname ) =][=
+  UP-prefix ) =][=
 
 ENDIF prefix/not    =]
 
@@ -183,28 +183,48 @@ ENDIF prefix/not    =]
  *  Enumeration of [= prog-name =] exit codes
  */
 typedef enum {[=
-
+ #/*
+  ;; Assume no definitions for exit-name[0] and [1].  If not true,
+  ;; then change the strings associated with the ones defined to the
+  ;; specified name.  If the assumption is correct, we'll need to
+  ;; emit the a default value into the enumeration..
+  =][= ;;  */
   (set! tmp-val "")
-  (define fail-exit-code (string-append pname-up "_EXIT_FAILURE"))
+  (define succ-exit-code (string-append pname-up "_EXIT_SUCCESS"))
+  (if (exist? "exit-name[0]")
+      (set! succ-exit-code (string-append
+            pname-up "_EXIT_" (get-up-name "exit-name[0]") ))
 
-  (if (not (exist? "exit-name[0]"))
       (set! tmp-val (string-append
-            "\n    " pname-up "_EXIT_SUCCESS = 0" )) )
+            "\n    " pname-up "_EXIT_SUCCESS = 0" ))
+  )
 
+  (define fail-exit-code (string-append pname-up "_EXIT_FAILURE"))
   (if (exist? "exit-name[1]")
       (set! fail-exit-code (string-append
             pname-up "_EXIT_" (get-up-name "exit-name[1]") ))
 
       (set! tmp-val (string-append tmp-val
             (if (> (string-length tmp-val) 1) "," "")
-            "\n    " fail-exit-code " = 1" )) )
+            "\n    " pname-up "_EXIT_FAILURE = 1" ))
+  )
+
+  (define nomem-exit-code
+     (if (exist? "nomem-fail-code")
+         (string-append pname-up "_EXIT_" (get-up-name "nomem-fail-code"))
+         fail-exit-code))
+
+  (define file-fail-exit-code
+     (if (exist? "file-fail-code")
+         (string-append pname-up "_EXIT_" (get-up-name "file-fail-code"))
+         fail-exit-code))
 
   (if (and (exist? "exit-name") (> (string-length tmp-val) 1))
       (set! tmp-val (string-append tmp-val ",")) )
 
   tmp-val                             =][=
 
-  FOR exit-name ,                     =]
+  FOR exit-name ","                   =]
     [= (. pname-up) =]_EXIT_[= (get-up-name "exit-name")
        =] = [= (for-index)            =][=
   ENDFOR                              =]

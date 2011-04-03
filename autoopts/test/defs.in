@@ -99,8 +99,13 @@ cfg_vals()
   use_flags=true
 
   TERM=''
-  test -z "${BASH_VERSION}" && local() { eval "$@" ; }
-
+  (
+    test_local() {
+      local local_works=yes
+    }
+    test_local
+  ) || eval 'local() { : ; }'
+ 
   vars=`set | ${SED} -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
   test "X$vars" = X || unset $vars
 }

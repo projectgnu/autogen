@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-03-02 16:50:33 bkorb"
+## Time-stamp:      "2011-03-30 15:13:15 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -135,6 +135,7 @@ do_line() {
     case "${line}" in
     '@*' ) echo .br ;;
     ''   ) echo .sp ;;
+    '@'[{}]* ) echo "${line}" | sed 's/@\([{}]\)/\1/g' ;;
     '@'* )
         typ=`echo "$line" | egrep '@[a-z]*\{'`
         test ${#typ} -gt 0 && echo "$line" && return 0

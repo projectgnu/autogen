@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-03-25 17:27:11 bkorb"
+# Time-stamp:      "2011-03-27 17:09:45 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -173,12 +173,6 @@ ENDIF "include exists"
 =]
 #ifndef NULL
 #  define NULL 0
-#endif
-#ifndef EXIT_SUCCESS
-#  define  EXIT_SUCCESS 0
-#endif
-#ifndef EXIT_FAILURE
-#  define  EXIT_FAILURE 1
 #endif[=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =]
@@ -603,9 +597,7 @@ ENDFOR
  *  Create the static procedure(s) declared above.
  */
 static void
-doUsageOpt(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 {[=
   IF (exist? "resettable") =]
     if ((pOptDesc->fOptState & OPTST_RESET) != 0)
@@ -613,13 +605,13 @@ doUsageOpt(
 [=ENDIF=][=
   IF (exist? "usage-opt") =]
     int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
-        ? EXIT_SUCCESS : EX_USAGE;
+        ? [=(. succ-exit-code)=] : EX_USAGE;
     (void)pOptions;
     [= (. UP-prefix) =]USAGE(ex_code);[=
 
   ELSE   =]
     (void)pOptions;
-    [= (. UP-prefix) =]USAGE(EXIT_SUCCESS);[=
+    [= (. UP-prefix) =]USAGE([=(. succ-exit-code)=]);[=
   ENDIF  =]
 }[=
 
@@ -692,7 +684,7 @@ AO_gettext(char const* pz)
     pzRes = strdup(pzRes);
     if (pzRes == NULL) {
         fputs(_("No memory for duping translated strings\n"), stderr);
-        exit(EXIT_FAILURE);
+        exit([=(. nomem-exit-code)=]);
     }
     return pzRes;
 }

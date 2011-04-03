@@ -142,9 +142,7 @@ extern int __tz_compute __P ((time_t timer, const struct tm *tm));
 #  define gmtime_r my_gmtime_r
 static struct tm *gmtime_r __P ((const time_t *, struct tm *));
 static struct tm *
-gmtime_r (t, tp)
-     const time_t *t;
-     struct tm *tp;
+gmtime_r (const time_t *t, struct tm *tp)
 {
   struct tm *l = gmtime (t);
   if (! l)
@@ -158,9 +156,7 @@ gmtime_r (t, tp)
 #  define localtime_r my_localtime_r
 static struct tm *localtime_r __P ((const time_t *, struct tm *));
 static struct tm *
-localtime_r (t, tp)
-     const time_t *t;
-     struct tm *tp;
+localtime_r (const time_t *t, struct tm *tp)
 {
   struct tm *l = localtime (t);
   if (! l)
@@ -239,10 +235,7 @@ static char const spaces[16] = "                ";
 static char *memcpy_lowcase __P ((char *dest, char const *src, size_t len));
 
 static char *
-memcpy_lowcase (dest, src, len)
-     char *dest;
-     char const *src;
-     size_t len;
+memcpy_lowcase (char *dest, char const *src, size_t len)
 {
   while (len-- > 0)
     dest[len] = TOLOWER (src[len]);
@@ -252,10 +245,7 @@ memcpy_lowcase (dest, src, len)
 static char *memcpy_uppcase __P ((char *dest, char const *src, size_t len));
 
 static char *
-memcpy_uppcase (dest, src, len)
-     char *dest;
-     char const *src;
-     size_t len;
+memcpy_uppcase (char *dest, char const *src, size_t len)
 {
   while (len-- > 0)
     dest[len] = TOUPPER (src[len]);
@@ -267,9 +257,7 @@ memcpy_uppcase (dest, src, len)
    measured in seconds, ignoring leap seconds.  */
 static int tm_diff __P ((const struct tm *, const struct tm *));
 static int
-tm_diff (a, b)
-     const struct tm *a;
-     const struct tm *b;
+tm_diff (const struct tm *a, const struct tm *b)
 {
   /* Compute intervening leap days correctly even if year is negative.
      Take care to avoid int overflow in leap day calculations,
@@ -304,9 +292,7 @@ static int iso_week_days __P ((int, int));
 inline
 #endif
 static int
-iso_week_days (yday, wday)
-     int yday;
-     int wday;
+iso_week_days (int yday, int wday)
 {
   /* Add enough to the first operand of % to make it nonnegative.  */
   int big_enough_multiple_of_7 = (-YDAY_MINIMUM / 7 + 2) * 7;
@@ -345,7 +331,7 @@ static char const month_name[][10] =
     struct tm tmcopy;
     tmcopy = *tp;
     return _strftime_copytm (s, maxsize, format, &tmcopy);
-  }
+}
 # ifdef strftime
 #  undef strftime
 # endif
@@ -361,11 +347,7 @@ static char const month_name[][10] =
    anywhere, so to determine how many characters would be
    written, use NULL for S and (size_t) UINT_MAX for MAXSIZE.  */
 size_t
-strftime (s, maxsize, format, tp)
-      char *s;
-      size_t maxsize;
-      char const *format;
-      const struct tm *tp;
+strftime (char *s, size_t maxsize, char const *format, const struct tm *tp)
 {
   int hour12 = tp->tm_hour;
 #ifdef _NL_CURRENT

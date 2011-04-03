@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-03-12 14:06:56 bkorb"
+# Time-stamp:        "2011-03-27 13:48:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -111,12 +111,10 @@ echo creating ${testname}.sample
 cat > ${testname}.sample <<\_EOF_
  */
 static void
-doUsageOpt(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 {
     (void)pOptions;
-    USAGE(EXIT_SUCCESS);
+    USAGE(HANDLER_EXIT_SUCCESS);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -226,7 +224,7 @@ AO_gettext(char const* pz)
     pzRes = strdup(pzRes);
     if (pzRes == NULL) {
         fputs(_("No memory for duping translated strings\n"), stderr);
-        exit(EXIT_FAILURE);
+        exit(HANDLER_EXIT_FAILURE);
     }
     return pzRes;
 }

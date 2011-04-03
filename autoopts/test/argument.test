@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-02 12:08:37 bkorb"
+# Time-stamp:        "2011-03-27 13:57:06 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -88,7 +88,8 @@ exec 3>&-
 
 ${AG_L} ${testname}2.def || \
   failure AutoGen could not process
-( ${SED} '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT2_/' ${testname}2.c
+( ${SED} '/TEST MAIN PROCEDURE:/,$d;/^#/s/_ARGUMENT_/_ARGUMENT2_/' \
+    ${testname}2.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );
@@ -147,7 +148,8 @@ exec 3>&-
 
 ${AG_L} ${testname}3.def || \
   failure AutoGen could not process
-( ${SED} '/TEST MAIN PROCEDURE:/,$d;s/_ARGUMENT_/_ARGUMENT3_/' ${testname}3.c
+( ${SED} '/TEST MAIN PROCEDURE:/,$d;/^#/s/_ARGUMENT_/_ARGUMENT3_/' \
+    ${testname}3.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );

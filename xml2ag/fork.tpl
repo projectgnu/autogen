@@ -1,5 +1,5 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2010-02-25 14:16:21 bkorb"
+[= # Time-stamp:        "2011-04-03 13:51:36 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -112,7 +112,7 @@ forkAutogen(char const* pzInput)
         return;
 
     {
-        tSCC zAg[] = "autogen";
+        static char const zAg[] = "autogen";
         char*  pzArg;
         int    ix    = 1;
 
@@ -135,12 +135,12 @@ forkAutogen(char const* pzInput)
           IF (define opt-name (up-c-name "name"))
              (not (~~ opt-name "OVERRIDE_TPL|OUTPUT") ) =]
 
-             if (HAVE_OPT([=(. opt-name)=])) {[=
+        if (HAVE_OPT([=(. opt-name)=])) {[=
 
           CASE arg-type            =][=
 
           ==*  key                 =]
-            tSCC* kwlist[] = {
+            static char const * kwlist[] = {
 [=(shellf "${CLexe:-columns} -I16 -f'\"%%s\"' -S, --spread=2 <<_EOF_\n%s\n_EOF_"
    (join "\n" (stack "keyword"))  )=] };
             pzArg = malloc([= (+ 4 (string-length (get "name")))
@@ -162,10 +162,10 @@ forkAutogen(char const* pzInput)
 
           ==*  str                 =][=
                IF (exist? "max")   =]
-            int    optCt = STACKCT_OPT([=(. opt-name)=]);
-            char const**  ppOA  = STACKLST_OPT([=(. opt-name)=]);
+            int  optCt = STACKCT_OPT([=(. opt-name)=]);
+            char const ** ppOA  = STACKLST_OPT([=(. opt-name)=]);
             do  {
-                char const* pA = *(ppOA++);
+                char const * pA = *(ppOA++);
                 pzArg = malloc([= (+ 4 (string-length (get "name")))
                                 =] + strlen(pA));
                 sprintf(pzArg, "--[=name=]=%s", pA);

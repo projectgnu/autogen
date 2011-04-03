@@ -1,3 +1,14 @@
+2011-03-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optcode.tlib: use the program specific exit codes
+	instead of EXIT_SUCCESS/FAILURE.
+	* autoopts/tpl/opthead.tlib: likewise
+	* autoopts/tpl/optmain.tlib: likewise
+	* autoopts/tpl/optcode.tlib: adjust test
+	* autoopts/test/handler.test: likewise
+	* autoopts/test/argument.test: likewise
+	* autoopts/test/defs.in (local): bash is not the only shell with local
+
 2011-03-25  Bruce Korb  <bkorb@gnu.org>
 
 	* add-on/char-mapper/char-mapper.c (table_name): add option to make
@@ -18,6 +29,8 @@
 	* autoopts/test/cond.test: adjust and enhance conditional option tests
 
 2011-03-06  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.8 released
 
 	* autoopts/project.h: new header for common defines that are not to be
 	installed with autoopts/options.h.
