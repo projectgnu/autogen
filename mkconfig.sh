@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # ----------------------------------------------------------------------
 timestamp=$(set -- \
-  Time-stamp:        "2010-08-18 15:52:20 bkorb"
+  Time-stamp:        "2011-04-04 17:55:39 bkorb"
   echo ${2} | sed 's/:[0-9][0-9] .*//;s/[^0-9]//g')
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
@@ -31,24 +31,27 @@ die() {
 
 ${VERBOSE:-false} && set -x
 
-prog=$(basename ${0})
+prog=$(basename ${0} .sh)
 sd=$(\cd $(dirname $0) > /dev/null 2>&1 && pwd -P)
 test -n "${sd}" || die "Cannot locate source directory for $0"
-program=${sd}/${prog}
+program=${sd}/$(basename ${0})
 
 tmpag=$(mktemp -d ${TMPDIR:-/tmp}/agcfg-XXXXXX) 2>/dev/null
 test -d "${tmpag}" || die "Cannot make directory ${tmpag}"
-trap "rm -rf ${tmpag}" EXIT
+exec 4> ${tmpag}/.$prog-log.txt
+BASH_XTRACEFD=4
+set -x
+trap "echo preserving temp directory: ${tmpag}" EXIT
+
+cfgfile=$(mktemp ${TMPDIR:-/tmp}/noag-boot-XXXXXX.sh)
+exec 5> ${cfgfile}
 
 cd ${tmpag} || die "cannot cd to ${tmpag}"
-rm -f ${TMPDIR:-/tmp}/noag-boot-*.sh
-cfgfile=$(mktemp ${TMPDIR:-/tmp}/noag-boot-XXXXXX.sh)
-chmod 700 ${cfgfile}
-exec 5> ${cfgfile}
 cp -frp ${sd}/* .
 
 find * -type f | xargs chmod u+w
 find * -type d | xargs chmod 755
+chmod 700 ${cfgfile}
 
 bstr=$(set -- c*f*g/bootstrap ; echo $1)
 test -f ${bstr} || die "Cannot locate bootstrap file"
@@ -58,7 +61,7 @@ nl=$'\n'
 GENLIST=''
 PROTOLIST=''
 
-for f in $(find * -type f | sort | egrep -v '^stamp-h')
+for f in $(find * -type f | sort | egrep -v '^stamp-h|/\.fsm\.')
 do
   test -f ${sd}/${f} && continue
 
@@ -173,18 +176,8 @@ done >&5
 
 exec 5>&-
 
-if cmp ${cfgfile} ${sd}/noag-boot.sh
-then
-  echo noag-boot.sh is unchanged
-  rm -f ${cfgfile}
+mv -f ${cfgfile} ${sd}/noag-boot.sh
 
-elif test -t 1
-then
-  ( cd $sd
-    echo noag-boot.sh would change:
-    echo diff -c noag-boot.sh ${cfgfile}
-    diff -c noag-boot.sh ${cfgfile}
-  ) | ${PAGER-more}
-fi
-
+trap "echo rm -rf ${tmpag}" EXIT
+exit  0
 # mkconfig.sh ends here

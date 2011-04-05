@@ -1,5 +1,7 @@
 New in __CURRENT_VERSION__ February 2011
 
+* BASH-ism fix.
+
 New in 5.11.8 March 2011
 
 * *Really* cope with Guile version number 2.0.

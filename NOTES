@@ -2,10 +2,6 @@
     bootstrap script.  The standard "configure" script is edited to
     produce a working script.
 
-2.  You _must_ have a very recent libtool.  There are always more fixes,
-    but it is still easier than trying to write your own link
-    commands....
-
-3.  If you have pulled the sources from CVS, there are a number of files
+2.  If you have pulled the sources from GIT, there are a number of files
     that are required to build, but not part of the archive.  The needed
     sources are contained within a shar archive named "noag-boot.sh".
