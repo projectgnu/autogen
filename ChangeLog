@@ -10,6 +10,10 @@
 	* config/confmacs.tlib (link): wrap "AC_LINK_IFELSE" source code
 	in a "AC_LANG_SOURCE" macro.  Not needed, but it partially shuts up
 	autoconf.
+	* agen5/agUtils.c (strlcpy): remove
+	* agen5/tpLoad.c (findFile): use memcpy, not strlcpy.
+	* agen5/cgi-fsm.c (cgi_run_fsm): buffer sanity check added
+	* agen5/fsm-trans.tlib (looping-machine): preserve cookie args
 
 2011-03-26  Bruce Korb  <bkorb@gnu.org>
 

@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-03-25 14:18:41 bkorb"
+ *  Time-stamp:        "2011-04-06 14:39:25 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -35,33 +35,6 @@ start_dep_file(void);
 static char const *
 skipQuote(char const * pzQte);
 /* = = = END-STATIC-FORWARD = = = */
-
-#ifndef HAVE_STRLCPY
-size_t
-strlcpy(char* dest, char const * src, size_t n)
-{
-    char* pz = dest;
-    char const * ps = src;
-    size_t sz = 0;
-
-    for (;;) {
-        if ((*(pz++) = *(src++)) == NUL)
-            break;
-
-        /*
-         *  This is the unusual condition.  Do the exceptional work here.
-         */
-        if (--n <= 0) {
-            pz[-1] = NUL;
-            sz = strlen(src) + 1; /* count of chars not copied out */
-            break;
-        }
-    }
-
-    return sz + (src - ps);
-}
-#endif
-
 
 LOCAL char *
 aprf(char const * pzFmt, ...)

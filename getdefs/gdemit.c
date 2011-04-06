@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-03-12 16:21:23 bkorb"
+ *  Time-stamp:        "2011-04-06 13:24:50 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -27,11 +27,11 @@
 static void
 compressDef(char * pz);
 
-static char*
-emitListattr(char* pzText, char* pzOut);
+static char *
+emitListattr(char * pzText, char * pzOut);
 
-static char*
-emitQuote(char** ppzText, char* pzOut);
+static char *
+emitQuote(char ** ppzText, char * pzOut);
 
 static void
 next_def_entry(char ** txt_pp, char const ** def_pp);
@@ -39,11 +39,11 @@ next_def_entry(char ** txt_pp, char const ** def_pp);
 static void
 emit_attribute(char const ** def_pp, char ** out_pp);
 
-static char*
-emitSubblock(char const * pzDefList, char* pzText, char* pzOut);
+static char *
+emitSubblock(char const * pzDefList, char * pzText, char * pzOut);
 
-static char*
-emitSubblockString(char** ppzText, u_int sepChar, char* pzOut);
+static char *
+emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -65,10 +65,10 @@ emitSubblockString(char** ppzText, u_int sepChar, char* pzOut);
 static void
 compressDef(char * pz)
 {
-    char* pzStrt = pz;
-    char* pzDest = pz;
-    char* pzSrc  = pz;
-    int   nlCt   = 0;
+    char * pzStrt = pz;
+    char * pzDest = pz;
+    char * pzSrc  = pz;
+    int    nlCt   = 0;
 
     /*
      *  Search until we find a line that contains an asterisk
@@ -283,8 +283,8 @@ emitDefinition(char* pzDef, char* pzOut)
 /*
  *  emitListattr
  */
-static char*
-emitListattr(char* pzText, char* pzOut)
+static char *
+emitListattr(char * pzText, char * pzOut)
 {
     static char const  zStart[]  = " = ";
 
@@ -347,8 +347,8 @@ emitListattr(char* pzText, char* pzOut)
  *  The text is quoted, so copy it as is, ensuring that escaped
  *  characters are not used to end the quoted text.
  */
-static char*
-emitQuote(char** ppzText, char* pzOut)
+static char *
+emitQuote(char ** ppzText, char * pzOut)
 {
     char*  pzText = *ppzText;
     char   svch   = (*pzOut++ = *pzText++);
@@ -511,11 +511,11 @@ emitSubblock(char const * pzDefList, char * pzText, char * pzOut)
  *  correctly reconstruct it.
  */
 static char*
-emitSubblockString(char** ppzText, u_int sepChar, char* pzOut)
+emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut)
 {
-    char*  pzText  = *ppzText;
-    char*  pcComma;
-    char*  pcEnd;
+    char * pzText  = *ppzText;
+    char * pcComma;
+    char * pcEnd;
 
     /*
      *  Skip leading space

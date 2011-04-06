@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-03-06 12:20:36 bkorb"
+ *  Time-stamp:        "2011-04-06 13:52:20 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -478,14 +478,6 @@ MKSTRING(zShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
 MKSTRING(zTplWarn,    "Warning in template %s, line %d\n\t%s\n");
 
 #undef MKSTRING
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  GLOBAL PROCEDURES
- */
-#ifndef HAVE_STRLCPY
-extern size_t strlcpy( char* dest, char const* src, size_t n);
-#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

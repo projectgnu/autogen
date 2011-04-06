@@ -274,7 +274,19 @@ DEFINE looping-machine
 {
     te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
     te_[=(. pfx)=]_event trans_evt;[=
-    INVOKE fsm-proc-variables  =]
+    INVOKE fsm-proc-variables  =][=
+  IF (exist? "cookie") =]
+[= (shell (string-append
+    "cookies='" (stack-join "\n" "cookie") "'
+    echo \"$cookies\" | \
+        sed -e 's/^/    /' \
+            -e 's@\\([a-zA-Z0-9_]*\\)*$@saved_\\1 = \\1;@'
+    echo \"$cookies\" | \
+        sed -e 's@.*[^a-z0-9_A-Z]\\([a-zA-Z0-9_]*\\)*$@\\1;@' \
+            -e 's/^/    (void)saved_/'" ))
+    
+  =][=
+  ENDIF=]
 
     while ([=(. pfx)=]_state < [=(. PFX)=]_ST_INVALID) {
 [=IF (exist? "handler-file")=]

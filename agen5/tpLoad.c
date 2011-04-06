@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2011-01-20 16:18:51 bkorb"
+ * Time-stamp:        "2011-04-06 14:47:12 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -173,8 +173,13 @@ findFile(char const * pzFName,
             }
 
             if ((*pzFName == '/') || (pzDir == curdir)) {
-                strlcpy(pzFullName, pzFName, AG_PATH_MAX - MAX_SUFFIX_LEN);
-                pzEnd = pzFullName + strlen(pzFullName);
+                size_t nln = strlen(pzFName);
+                if (nln >= AG_PATH_MAX - MAX_SUFFIX_LEN)
+                    break;
+
+                memcpy(pzFullName, pzFName, nln);
+                pzEnd  = pzFullName + nln;
+                *pzEnd = NUL;
             }
             else {
                 pzEnd = pzFullName

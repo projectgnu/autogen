@@ -82,38 +82,38 @@ static const t_cgi_transition
 cgi_trans_table[ CGI_STATE_CT ][ CGI_EVENT_CT ] = {
 
   /* STATE 0:  CGI_ST_INIT */
-  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  name_char */
+  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  ALPHA */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  NAME_CHAR */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  = */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  + */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  % */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  OTHER */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  & */
-    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
+    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  END */
   },
 
 
   /* STATE 1:  CGI_ST_NAME */
-  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  alpha */
-    { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  name_char */
+  { { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  ALPHA */
+    { CGI_ST_NAME, CGI_TR_STASH },                  /* EVT:  NAME_CHAR */
     { CGI_ST_VALUE, CGI_TR_NAME_EQUAL },            /* EVT:  = */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  + */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  % */
-    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  other */
+    { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  OTHER */
     { CGI_ST_INVALID, CGI_TR_INVALID },             /* EVT:  & */
-    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  end */
+    { CGI_ST_INVALID, CGI_TR_INVALID }              /* EVT:  END */
   },
 
 
   /* STATE 2:  CGI_ST_VALUE */
-  { { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  alpha */
-    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  name_char */
+  { { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  ALPHA */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  NAME_CHAR */
     { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  = */
     { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  + */
     { CGI_ST_VALUE, CGI_TR_VALUE_ESCAPE },          /* EVT:  % */
-    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  other */
+    { CGI_ST_VALUE, CGI_TR_STASH },                 /* EVT:  OTHER */
     { CGI_ST_INIT, CGI_TR_SEPARATE },               /* EVT:  & */
-    { CGI_ST_DONE, CGI_TR_SEPARATE }                /* EVT:  end */
+    { CGI_ST_DONE, CGI_TR_SEPARATE }                /* EVT:  END */
   }
 };
 
@@ -189,6 +189,14 @@ cgi_run_fsm(
     te_cgi_event trans_evt;
     te_cgi_state nxtSt;
     te_cgi_trans trans;
+    char const* saved_pzSrc = pzSrc;
+    int saved_inlen = inlen;
+    char* saved_pzOut = pzOut;
+    int saved_outlen = outlen;
+    (void)saved_pzSrc;
+    (void)saved_inlen;
+    (void)saved_pzOut;
+    (void)saved_outlen;
 
     while (cgi_state < CGI_ST_INVALID) {
 
@@ -201,7 +209,11 @@ cgi_run_fsm(
 
         } else {
             if (outlen < 4) {
-                strcpy( pzOut, "output space exhausted\n" );
+                static char const exhaustion[] =
+                    "output space exhausted\n";
+                if (saved_outlen > sizeof(exhaustion))
+                    memcpy(saved_pzOut, exhaustion, sizeof(exhaustion));
+
                 return CGI_ST_INVALID;
             }
             curCh = *(pzSrc++);
