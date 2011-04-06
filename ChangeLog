@@ -1,3 +1,16 @@
+2011-04-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/configfile.c (program_directive): replace "strcpy" with
+	"memcpy".
+	(internalFileLoad): likewise
+	* autoopts/enumeration.c (set_memb_names): likewise
+	* autoopts/environment.c (doEnvPresets): likewise
+	* autoopts/save.c (findDirName): likewise
+	(findFileName): likewise
+	* config/confmacs.tlib (link): wrap "AC_LINK_IFELSE" source code
+	in a "AC_LANG_SOURCE" macro.  Not needed, but it partially shuts up
+	autoconf.
+
 2011-03-26  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/optcode.tlib: use the program specific exit codes

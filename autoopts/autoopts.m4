@@ -3,7 +3,7 @@ dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
 dnl
 dnl Author:            Gary V. Vaughan <gvaughan@localhost>
-dnl Time-stamp:        "2010-02-24 08:41:23 bkorb"
+dnl Time-stamp:        "2011-04-06 09:26:16 bkorb"
 dnl
 dnl  This file is part of AutoOpts, a companion to AutoGen.
 dnl  AutoOpts is free software.
@@ -132,7 +132,7 @@ int
 main ()
 {
     int current, revision;
-    char tmp_version[16];
+    char tmp_version[256];
 
     system ("touch conf.optstest");
 

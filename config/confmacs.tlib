@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2011-02-01 13:25:26 bkorb"
+## Time-stamp:        "2011-04-06 11:12:16 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -94,14 +94,12 @@ AC_DEFUN([[=
   (define fcn-name (string-append "try-" (get "type")))
   (define c-text (get "code"))  =][=
 
-  CASE code-mode  =][=
-  = body  =][=
+  IF (= (get "code-mode") "body")               =][=
     (set! c-text (string-append "int main(int argc,char** argv) {\n"
           c-text "\nreturn 0; }" )) =][=
-  = all   =][=
-  ESAC    =][=
+  ENDIF                         =][=
 
-  (. mac-name)    =]],[[=
+  (. mac-name)                  =]],[[=
 
   IF (ag-function? fcn-name)    =][=
     INVOKE (. fcn-name)         =][=
@@ -594,7 +592,8 @@ DEFINE  try-withlib             =][=
   ==   link                     =]
   AC_MSG_CHECKING([whether [=(. lib-name)=] can be linked with])[=
   set-language                  =]
-  AC_LINK_IFELSE([[[=(protect-text c-text)=]]],
+  AC_LINK_IFELSE(
+    [AC_LANG_SOURCE([[[=(protect-text c-text)=]]])],
     [[=(. cv-name)=]=yes],
     [[=(. cv-name)=]=no]) # end of AC_LINK_IFELSE [=
 
