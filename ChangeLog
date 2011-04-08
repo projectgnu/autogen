@@ -1,5 +1,10 @@
 2011-04-06  Bruce Korb  <bkorb@gnu.org>
 
+	thanks to Ryan Hill <dirtyepic@gentoo.org>
+	* autoopts/test/cond.test (undefining SECOND): adapt to new GCC.
+
+2011-04-06  Bruce Korb  <bkorb@gnu.org>
+
 	* autoopts/configfile.c (program_directive): replace "strcpy" with
 	"memcpy".
 	(internalFileLoad): likewise

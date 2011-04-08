@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2011-03-25 16:37:56 bkorb"
+# Time-stamp:        "2011-04-08 08:24:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -107,18 +107,15 @@ cmp -s ${testname}-2.help ${testname}.help || \
 
 echo guard-option-names\; >> ${testname}.def
 echo ${AG_L} ${testname}.def
-${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+${AG_L} ${testname}.def || failure AutoGen could not process
 
 ( eval `echo ${cc_cmd} | \
   ${SED} 's/-Werror//;s/-DTEST_TEST/-DSECOND -DTEST_TEST/' ` 2>&1 ) \
-  | ${SED} -n 's/.*# *warning:*/#warning/p' > ${testname}-cc.log
+  | ${SED} -n '/undefining SECOND due to option name conflict/p' \
+    > ${testname}-cc.log
 
-echo '#warning undefining SECOND due to option name conflict' \
-  > ${testname}-xx.log
-
-cmp -s ${testname}-??.log || \
-  failure "warning diffs:  `diff ${testname}-??.log`"
+test -s ${testname}-cc.log || \
+    failure "warning diffs:  'undefining SECOND' not found"
 
 # # # # # # # # # # FOURTH TEST # # # # # # # # #
 
