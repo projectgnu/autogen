@@ -1,4 +1,11 @@
-2011-04-06  Bruce Korb  <bkorb@gnu.org>
+2011-04-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c (textToVariable): clean up some nits
+	(emit_var_text): new procedure with some old textToVariable code.
+	* autoopts/tpl/agtexi-cmd.tpl (homerc): include the list in the
+	generated doc.
+
+2011-04-07  Bruce Korb  <bkorb@gnu.org>
 
 	thanks to Ryan Hill <dirtyepic@gentoo.org>
 	* autoopts/test/cond.test (undefining SECOND): adapt to new GCC.
@@ -29,6 +36,8 @@
 	* autoopts/tpl/optcode.tlib: adjust test
 	* autoopts/test/handler.test: likewise
 	* autoopts/test/argument.test: likewise
+
+	thanks to Jonathan Nieder <jrnieder@gmail.com>
 	* autoopts/test/defs.in (local): bash is not the only shell with local
 
 2011-03-25  Bruce Korb  <bkorb@gnu.org>

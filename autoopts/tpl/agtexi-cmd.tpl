@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-03-04 12:01:28 bkorb"
+## Time-stamp:        "2011-04-11 18:45:40 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -217,6 +217,7 @@ IF
 
 Any option that is not marked as @i{not presettable} may be preset by
 loading values from [=
+ (define explain-pkgdatadir #f)
  (if home-rc-files (string-append
      "configuration (\"rc\" or \"ini\") files"
      (if environ-init ", and values from " "") ))
@@ -230,6 +231,56 @@ the command line.  The remaining variables are tested for existence and their
 values are treated like option arguments[=
   ENDIF  have environment inits         =].
 [=IF (. home-rc-files)                  =]
+
+@code{libopts} will search in [=
+
+    IF (define rc-count (count "homerc"))
+       (define cfg-file-name "")
+       (> rc-count 1)           =][=
+       rc-count =] places for configuration files:
+@itemize @bullet[=
+       FOR homerc                       =][=
+         CASE homerc                    =][=
+         ==*  '$@'                      =][=
+              (set! explain-pkgdatadir #t)
+              (set! cfg-file-name (string-substitute (get "homerc")
+                 "$@" "$(pkgdatadir)")) =][=
+         *                              =][=
+              (set! cfg-file-name (get "homerc"))  =][=
+         ESAC                           =]
+@item
+[= (. cfg-file-name)                    =][=
+       ENDFOR homerc                    =]
+@end itemize
+For any that are plain files, it is processed.
+For any that are directories, then a file named @file{[=
+ (if (exist? "rcfile") (get "rcfile")
+     (string-append "." (get "prog-name") "rc"))=]} is searched for and processed.
+Leading environment variables are expanded at run time[=
+(if explain-pkgdatadir
+    ",\nand @code{$(pkgdatadir)} is expanded at build time")=].[=
+
+    
+    ELSE                                =][=
+         CASE homerc                    =][=
+         ==*  '$@'                      =][=
+              (set! explain-pkgdatadir #t)
+              (set! cfg-file-name (string-substitute (get "homerc")
+                 "$@" "$(pkgdatadir)")) =][=
+         *                              =][=
+              (set! cfg-file-name (get "homerc"))  =][=
+         ESAC                           =]@file{[=
+         (. cfg-file-name)              =]} for configuration.
+If this is a directory, then a file named @file{[=
+(if (exist? "rcfile") (get "rcfile")
+     (string-append "." (get "prog-name") "rc"))
+=]} is used within that directory.[=
+(if explain-pkgdatadir
+    "\nThe @code{$(pkgdatadir)} is expanded at build time.")=].[=
+    ENDIF (> rc-count 1)
+
+=]
+
 Configuration files may be in a wide variety of formats.
 The basic format is an option name followed by a value (argument) on the
 same line.  Values may be separated from the option name with a colon,
@@ -247,25 +298,21 @@ or by
 @example
 <?program [= prog-name =]>
 @end example
-
 @noindent
 Do not mix these within one configuration file.
 
 Compound values and carefully constructed string values may also be
 specified using XML syntax:
-
 @example
 <option-name>
    <sub-opt>...&lt;...&gt;...</sub-opt>
 </option-name>
 @end example
-
 @noindent
 yielding an @code{option-name.sub-opt} string value of
 @example
 "...<...>..."
 @end example
-
 @code{Autogen} does not track suboptions.  You simply note that it is a
 hierarchicly valued option.  @code{libopts} does provide a means for searching
 the associated name/value pair list (see: optionFindValue).
