@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-04-11 18:45:40 bkorb"
+## Time-stamp:        "2011-04-12 17:27:07 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -39,8 +39,8 @@ ENDFOR
  (out-push-new (string-substitute (out-name) ".texi" ".menu"))
 
  (ag-fprintf 0 "* %-32s Invoking %s\n"
-  (string-append (get "prog-name") " Invocation::")
-  (get "prog-name") )
+  (string-append program-name " Invocation::")
+  program-name )
 
  (out-pop)
 
@@ -85,7 +85,7 @@ ENDIF =]
             (if (exist? "help-value") (get "help-value") "?") ")")) )
 
   (ag-fprintf 0 "* %s %-24s %s usage help%s\n"
-      down-prog-name "usage::" (get "prog-name") flag-val-str)
+      down-prog-name "usage::" program-name flag-val-str)
   (out-push-new)
   =][=
 
@@ -169,7 +169,7 @@ This is the automatically generated usage text for [=prog-name=]:
             -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' \
             -e 's/\t/        /g' "
 
-    (get "prog-name") help-opt
+    program-name help-opt
 )  =]
 @end example
 @exampleindent 4[=
@@ -202,123 +202,15 @@ FOR flag                        =][=
 ENDFOR flag                     =][=
 
 `cat ${tmp_dir}/opt-text-*
-rm -rf ${tmp_dir}`              =][=#
-@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+rm -rf ${tmp_dir}`              =][=
 
 IF
    (define home-rc-files (exist? "homerc"))
    (define environ-init  (exist? "environrc"))
    (or home-rc-files environ-init)
-
-  =]
-
-@node [= (. down-prog-name) =] option presets
-@[=(. sub-level)=] presetting/configuring [=prog-name=]
-
-Any option that is not marked as @i{not presettable} may be preset by
-loading values from [=
- (define explain-pkgdatadir #f)
- (if home-rc-files (string-append
-     "configuration (\"rc\" or \"ini\") files"
-     (if environ-init ", and values from " "") ))
-=][=
-  IF (. environ-init)
-    =]environment variables named @code{[=(. UP-PROG-NAME)=]} and @code{[=
-(. UP-PROG-NAME)=]_<OPTION_NAME>}. ``@code{<OPTION_NAME>}'' must be one of
-the options listed above in upper case and segmented with underscores.
-The @code{[=(. UP-PROG-NAME)=]} variable will be tokenized and parsed like
-the command line.  The remaining variables are tested for existence and their
-values are treated like option arguments[=
-  ENDIF  have environment inits         =].
-[=IF (. home-rc-files)                  =]
-
-@code{libopts} will search in [=
-
-    IF (define rc-count (count "homerc"))
-       (define cfg-file-name "")
-       (> rc-count 1)           =][=
-       rc-count =] places for configuration files:
-@itemize @bullet[=
-       FOR homerc                       =][=
-         CASE homerc                    =][=
-         ==*  '$@'                      =][=
-              (set! explain-pkgdatadir #t)
-              (set! cfg-file-name (string-substitute (get "homerc")
-                 "$@" "$(pkgdatadir)")) =][=
-         *                              =][=
-              (set! cfg-file-name (get "homerc"))  =][=
-         ESAC                           =]
-@item
-[= (. cfg-file-name)                    =][=
-       ENDFOR homerc                    =]
-@end itemize
-For any that are plain files, it is processed.
-For any that are directories, then a file named @file{[=
- (if (exist? "rcfile") (get "rcfile")
-     (string-append "." (get "prog-name") "rc"))=]} is searched for and processed.
-Leading environment variables are expanded at run time[=
-(if explain-pkgdatadir
-    ",\nand @code{$(pkgdatadir)} is expanded at build time")=].[=
-
-    
-    ELSE                                =][=
-         CASE homerc                    =][=
-         ==*  '$@'                      =][=
-              (set! explain-pkgdatadir #t)
-              (set! cfg-file-name (string-substitute (get "homerc")
-                 "$@" "$(pkgdatadir)")) =][=
-         *                              =][=
-              (set! cfg-file-name (get "homerc"))  =][=
-         ESAC                           =]@file{[=
-         (. cfg-file-name)              =]} for configuration.
-If this is a directory, then a file named @file{[=
-(if (exist? "rcfile") (get "rcfile")
-     (string-append "." (get "prog-name") "rc"))
-=]} is used within that directory.[=
-(if explain-pkgdatadir
-    "\nThe @code{$(pkgdatadir)} is expanded at build time.")=].[=
-    ENDIF (> rc-count 1)
-
-=]
-
-Configuration files may be in a wide variety of formats.
-The basic format is an option name followed by a value (argument) on the
-same line.  Values may be separated from the option name with a colon,
-equal sign or simply white space.  Values may be continued across multiple
-lines by escaping the newline with a backslash.
-
-Multiple programs may also share the same initialization file.
-Common options are collected at the top, followed by program specific
-segments.  The segments are separated by lines like:
-@example
-[[=(. UP-PROG-NAME)=]]
-@end example
-@noindent
-or by
-@example
-<?program [= prog-name =]>
-@end example
-@noindent
-Do not mix these within one configuration file.
-
-Compound values and carefully constructed string values may also be
-specified using XML syntax:
-@example
-<option-name>
-   <sub-opt>...&lt;...&gt;...</sub-opt>
-</option-name>
-@end example
-@noindent
-yielding an @code{option-name.sub-opt} string value of
-@example
-"...<...>..."
-@end example
-@code{Autogen} does not track suboptions.  You simply note that it is a
-hierarchicly valued option.  @code{libopts} does provide a means for searching
-the associated name/value pair list (see: optionFindValue).
-[=
-  ENDIF home-rc-files                   =][=
-ENDIF                                   =][=#
+   =][=
+   INVOKE emit-presets          =][=
+ENDIF                           =][=#
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =]
 
 @node [= (. down-prog-name) =] exit codes
@@ -469,6 +361,186 @@ ENDDEF emit-opt-text
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
+DEFINE set-home-rc-vars          =][=
+  CASE homerc                    =][=
+  ==*  '$@'                      =][=
+       (set! explain-pkgdatadir #t)
+       (set! cfg-file-name (string-substitute (get "homerc")
+          "$@" "$(pkgdatadir)")) =][=
+
+  ==   '.'                       =][=
+       (set! cfg-file-name "$PWD")
+       (set! env-var-list (string-append env-var-list "PWD, "))
+       =][=
+
+  ==*  './'                      =][=
+       (set! explain-pkgdatadir #t)
+       (set! env-var-list  (string-append env-var-list "PWD, "))
+       (set! cfg-file-name (string-append "$PWD" (substring (get "homerc") 1)))
+       =][=
+
+  ~~*  '\$[A-Za-z]'              =][=
+       (set! cfg-file-name (get "homerc"))
+       (set! env-var-list (string-append env-var-list
+             (shellf "echo '%s' | sed 's/^.//;s#/.*##'" cfg-file-name)
+             ", " ))
+       =][=
+
+  *                              =][=
+       (set! cfg-file-name (get "homerc"))  =][=
+  ESAC                           =][=
+
+ENDDEF set-home-rc-vars
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-multiple-rc         \=]
+[=
+  (define explain-pkgdatadir #f)
+  (define env-var-list       "")
+  rc-count =] places for configuration files:
+@itemize @bullet[=
+FOR homerc                       =][=
+  INVOKE set-home-rc-vars        =]
+@item
+[= (. cfg-file-name)             =][=
+ENDFOR homerc                    =]
+@end itemize[=
+ (if explain-pkgdatadir (ag-fprintf 0
+"\nThe value for @code{$(pkgdatadir)} is recorded at package configure time
+and replaced by @file{libopts} when @file{%s} runs." program-name))
+
+(if (> (string-length env-var-list) 1)
+    (shell (string-append
+"list='@code{'`echo '" env-var-list "' | \
+  sed -e 's#, $##' \
+      -e 's#, #}, @code{#g' \
+      -e 's#, \\([^ ][^ ]*\\)$#, and \\1#'`\\}
+echo
+echo 'The environment variables' ${list}
+echo 'are expanded and replaced when @file{" program-name "} runs.'"
+))  ) =]
+For any of these that are plain files, they are simply processed.
+For any that are directories, then a file named @file{[=
+ (if (exist? "rcfile") (get "rcfile")
+     (string-append "." program-name "rc"))=]} is searched for
+within that directory and processed.
+[=
+
+ENDDEF emit-multiple-rc
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-one-rc-dir              =][=
+  (define env-var-list       "")
+  (define explain-pkgdatadir #f)    =][=
+  INVOKE set-home-rc-vars
+
+=]@file{[=(. cfg-file-name) =]} for configuration.[=
+  IF (. explain-pkgdatadir)         =]
+The value for @code{$(pkgdatadir)} is recorded at package configure time
+and replaced by @file{libopts} when @file{[=prog-name=]} runs.
+[=ENDIF=][=
+(if (> (string-length env-var-list) 1)
+    (sprintf
+"\nThe environment variable @code{%s} is expanded and replaced when
+the program runs" env-var-list)) =]
+If this is a plain file, it is simply processed.
+If it is a directory, then a file named @file{[=
+(if (exist? "rcfile") (get "rcfile")
+     (string-append "." program-name "rc"))
+=]} is searched for within that directory.[=
+
+ENDDEF emit-one-rc-dir
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-rc-file-info                =]
+
+@code{libopts} will search in [=
+
+    IF (define rc-count (count "homerc"))
+       (define cfg-file-name "")
+       (> rc-count 1)           =][=
+
+       INVOKE emit-multiple-rc  =][=
+    
+    ELSE                        =][=
+       INVOKE emit-one-rc-dir   =][=
+    ENDIF (> rc-count 1)
+
+=]
+
+Configuration files may be in a wide variety of formats.
+The basic format is an option name followed by a value (argument) on the
+same line.  Values may be separated from the option name with a colon,
+equal sign or simply white space.  Values may be continued across multiple
+lines by escaping the newline with a backslash.
+
+Multiple programs may also share the same initialization file.
+Common options are collected at the top, followed by program specific
+segments.  The segments are separated by lines like:
+@example
+[[=(. UP-PROG-NAME)=]]
+@end example
+@noindent
+or by
+@example
+<?program [= prog-name =]>
+@end example
+@noindent
+Do not mix these within one configuration file.
+
+Compound values and carefully constructed string values may also be
+specified using XML syntax:
+@example
+<option-name>
+   <sub-opt>...&lt;...&gt;...</sub-opt>
+</option-name>
+@end example
+@noindent
+yielding an @code{option-name.sub-opt} string value of
+@example
+"...<...>..."
+@end example
+@code{AutoOpts} does not track suboptions.  You simply note that it is a
+hierarchicly valued option.  @code{AutoOpts} does provide a means for searching
+the associated name/value pair list (see: optionFindValue).[=
+
+ENDDEF emit-rc-file-info
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-presets                     =]
+
+@node [= (. down-prog-name) =] option presets
+@[=(. sub-level)=] presetting/configuring [=prog-name=]
+
+Any option that is not marked as @i{not presettable} may be preset by
+loading values from [=
+IF
+   (if home-rc-files (emit
+       "configuration (\"rc\" or \"ini\") files"))
+   environ-init
+  =][=
+  (if home-rc-files (emit ", and values from "))
+  =]environment variables named @code{[=(. UP-PROG-NAME)=]} and @code{[=
+(. UP-PROG-NAME)=]_<OPTION_NAME>}. ``@code{<OPTION_NAME>}'' must be one of
+the options listed above in upper case and segmented with underscores.
+The @code{[=(. UP-PROG-NAME)=]} variable will be tokenized and parsed like
+the command line.  The remaining variables are tested for existence and their
+values are treated like option arguments[=
+  ENDIF  have environment inits         =].
+[=
+
+  IF (. home-rc-files)                  =][=
+     INVOKE emit-rc-file-info           =][=
+  ENDIF home-rc-files                   =][=
+
+ENDDEF emit-presets
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
 DEFINE header                          \=]
 \input texinfo
 @c -*-texinfo-*-
@@ -520,8 +592,9 @@ ENDDEF header
 
 DEFINE initialization                   =][=
   (make-tmp-dir)
-  (define down-prog-name (string-downcase! (get "prog-name")))
-  (define UP-PROG-NAME   (string-upcase!   (get "prog-name")))
+  (define program-name   (get "prog-name"))
+  (define down-prog-name (string-downcase program-name))
+  (define UP-PROG-NAME   (string-upcase   program-name))
   (define doc-level (getenv "LEVEL"))
   (if (not (string? doc-level))
       (set! doc-level "section"))
