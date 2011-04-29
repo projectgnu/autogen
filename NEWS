@@ -1,5 +1,7 @@
-New in __CURRENT_VERSION__ February 2011
+New in __CURRENT_VERSION__ April 2011
 
+* licenses have been moved to separate files.  They are no longer
+  hard coded in autogen.  Consequently, clients may add their own.
 * BASH-ism fix.
 
 New in 5.11.8 March 2011
@@ -35,37 +37,3 @@ New in 5.11.6 February 2011
   will look for a file named "config" in that directory.
   "help" and "version" information will now include any
   --with-packager stuff.
-
-New in 5.11.5 - December 2010
-
-* When "columns" puts a special prefix on the first line, it now
-  tests to see if it is longer than the indentation.  If so, that
-  first prefix has the line separator, new line and indentation
-  strings appended to it.
-* Fixed a fence post bug triggered by creating temporary strings
-  8160 through 8163 bytes long.
-* dependency output files should be readable by everyone.
-
-New in 5.11.4 December 2010
-
-* various test fixes:
-  accommodate some severe brokenness in Solaris shells
-* Fix a seg fault on Solaris
-* Do not install .m4 files used to create configure script
-
-New in 5.11.3 - November 2010
-
-* new man page templates were added
-* usage information on usage errors may be suppressed
-* asprintf was introduced into libopts, but is not on all
-  platforms.  It has been removed.
-
-New in 5.11.1 - July 2010
-
-* Fix (kill) orphaned shell program
-* add file-next-line functions to facilitate #line "C" directives
-* simplify some snprintfv code
-
-New in 5.11 July 2010
-
-* implement dependency generation in autogen output.

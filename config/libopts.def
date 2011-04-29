@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2011-03-06 14:12:39 bkorb"
+ *  Time-stamp:        "2011-04-29 15:43:49 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -329,9 +329,9 @@ do-first = <<-_EOF_
 	# =====
 	# sizes
 	# =====
-	AC_CHECK_SIZEOF(char*, 4)
+	AC_CHECK_SIZEOF(char*, 8)
 	AC_CHECK_SIZEOF(int,   4)
-	AC_CHECK_SIZEOF(long,  4)
+	AC_CHECK_SIZEOF(long,  8)
 	AC_CHECK_SIZEOF(short, 2)
 
 	# ----------------------------------------------------------------------
@@ -342,8 +342,8 @@ do-first = <<-_EOF_
 	AC_FUNC_FORK
 	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
 	               strrchr strsignal])
-	[
-	while :
+	AC_PROG_SED
+	[while :
 	do
 	    POSIX_SHELL=`which bash`
 	    test -x "$POSIX_SHELL" && break

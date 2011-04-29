@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-04-20 12:28:40 bkorb"
+# Time-stamp:     "2011-04-29 15:41:51 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -51,12 +51,7 @@ cfg_vals()
   esac
 
   set -a
-  for SED in `exec 2>/dev/null;which gsed` \
-    /bin/xpg4/bin/sed \
-    `which sed` \
-    /bin/sed \
-    /usr/bin/sed
-  do test -x "${SED}" && break ; done
+  SED="@SED@"
 
   progname=`echo "$1" | ${SED} 's,^.*/,,'`
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`

@@ -1,5 +1,7 @@
 2011-04-29  Bruce Korb  <bkorb@gnu.org>
 
+	5.11.9 released
+
 	* agen5/expString.c (sub_count): new function
 	(do_multi_subs): now used by expFormat.c
 	(ag_scm_string_substitute): use scribble space.  do not allocate
