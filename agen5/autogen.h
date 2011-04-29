@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-04-06 13:52:20 bkorb"
+ *  Time-stamp:        "2011-04-20 14:25:17 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -78,6 +78,8 @@ typedef struct {
 
 #define NOPROCESS   ((pid_t)-1)
 #define NULLPROCESS ((pid_t)0)
+#define NL          '\n'
+#define TAB         '\t'
 
 typedef unsigned char * tpChar;
 

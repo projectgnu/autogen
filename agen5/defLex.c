@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2011-01-20 16:22:57 bkorb"
+ *  Time-stamp:        "2011-04-20 14:26:11 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -100,7 +100,7 @@ static void
 trim_whitespace(void)
 {
     char* pz = pCurCtx->pzScan;
-    if (*pz == '\n')
+    if (*pz == NL)
         pCurCtx->lineNo++;
     *(pz++) = NUL;
 
@@ -109,7 +109,7 @@ trim_whitespace(void)
      *  are NUL terminated.
      */
     while (IS_WHITESPACE_CHAR(*pz)) {
-        if (*pz == '\n')
+        if (*pz == NL)
             pCurCtx->lineNo++;
         pz++;
     }
@@ -176,7 +176,7 @@ lex_comment(void)
         if (pz != NULL) {
             char* p = pCurCtx->pzScan+1;
             for (;;) {
-                p = strchr(p+1, '\n');
+                p = strchr(p+1, NL);
                 if ((p == NULL) || (p > pz))
                     break;
                 pCurCtx->lineNo++;
@@ -188,7 +188,7 @@ lex_comment(void)
     }
     case '/':
     {
-        char* pz = strchr(pCurCtx->pzScan+2, '\n');
+        char* pz = strchr(pCurCtx->pzScan+2, NL);
         if (pz != NULL) {
             pCurCtx->pzScan = pz+1;
             pCurCtx->lineNo++;
@@ -609,7 +609,7 @@ assembleHereString(char* pzScan)
      *  Skip white space up to the marker or EOL
      */
     while (IS_WHITESPACE_CHAR(*pzScan)) {
-        if (*pzScan++ == '\n')
+        if (*pzScan++ == NL)
             AG_ABEND(aprf(zErrMsg, pzProg, "HereString missing the mark",
                           pCurCtx->pzCtxFname, pCurCtx->lineNo));
     }
@@ -639,7 +639,7 @@ assembleHereString(char* pzScan)
     /*
      *  Skip forward to the EOL after the marker.
      */
-    pzScan = strchr(pzScan, '\n');
+    pzScan = strchr(pzScan, NL);
     if (pzScan == NULL)
         AG_ABEND(aprf(zErrMsg, pzProg, endless, pCurCtx->pzCtxFname,
                       pCurCtx->lineNo));
@@ -651,7 +651,7 @@ assembleHereString(char* pzScan)
     pzScan++;
 
     if (trimTabs)
-        while (*pzScan == '\t')  ++pzScan;
+        while (*pzScan == TAB)  ++pzScan;
 
     /*
      *  FOR as long as the text does not match the mark
@@ -663,7 +663,7 @@ assembleHereString(char* pzScan)
 
         for (;;) {
             switch (*(pzDest++) = *(pzScan++)) {
-            case '\n':
+            case NL:
                 pCurCtx->lineNo++;
                 goto lineDone;
 
@@ -674,7 +674,7 @@ assembleHereString(char* pzScan)
         } lineDone:;
 
         if (trimTabs)
-            while (*pzScan == '\t')  ++pzScan;
+            while (*pzScan == TAB)  ++pzScan;
     } /* while strncmp ... */
 
     /*

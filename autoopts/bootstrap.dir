@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-03-06 14:15:58 bkorb"
+# Time-stamp:      "2011-04-20 10:26:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -87,7 +87,7 @@ add_files_to_mf() {
             ( tpl/usage* )
                 edta=${edta}${f}${nl} ;; # distribute only file
 
-            ( *.tlib | *.tpl | *.def )
+            ( *.tlib | *.tpl | *.def | *.lic )
                 pdta=${pdta}${f}${nl} ;; # installed & distributed file
             esac
         done

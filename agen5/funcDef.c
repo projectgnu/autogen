@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2011-01-27 12:32:10 bkorb"
+ *  Time-stamp:        "2011-04-21 16:51:41 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -208,7 +208,7 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
         default:
             AG_ABEND_IN(pT, pMac, "name not followed by '='");
 
-        case ' ': case '\t': case '\n': case '\f':
+        case ' ': case TAB: case NL: case '\f':
             *(pzScan++) = NUL;
             while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
 
@@ -395,7 +395,7 @@ prep_invoke_args(tMacro* pMac)
  *      helpful, but not crucial.  Please contact the author if you think you
  *      might actually want to use this.
 =*/
-tMacro*
+tMacro *
 mFunc_Debug(tTemplate* pT, tMacro* pMac)
 {
     static int dummy = 0;
@@ -438,7 +438,7 @@ mFunc_Debug(tTemplate* pT, tMacro* pMac)
     }
     if (IS_GRAPHIC_CHAR(dummy))
         fprintf(pfTrace, " (%c)", dummy);
-    putc('\n', pfTrace);
+    putc(NL, pfTrace);
     return pMac+1;
 }
 
@@ -466,7 +466,7 @@ build_defs(int defCt, tDefList* pList)
         switch (*(pList->pzExpr)) {
         case ';':
         {
-            char* pz = strchr(pList->pzExpr, '\n');
+            char* pz = strchr(pList->pzExpr, NL);
             if (pz != NULL) {
                 while (IS_WHITESPACE_CHAR(*++pz))  ;
                 pList->pzExpr = pz;

@@ -1,7 +1,7 @@
 
 /*
  *
- *  Time-stamp:        "2011-01-27 12:36:37 bkorb"
+ *  Time-stamp:        "2011-04-20 14:25:32 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -537,7 +537,7 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
             for (;;) {
                 char ch = *(pz++);
                 switch (ch) {
-                case ' ': case '\t': case '\f': case '\v': case '\n':
+                case ' ': case TAB: case '\f': case '\v': case NL:
                     pz[-1] = NUL;
                     if (*pz != ',')
                         break;

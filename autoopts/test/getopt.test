@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-02-02 12:07:02 bkorb"
+# Time-stamp:        "2011-04-20 13:26:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -37,14 +37,10 @@ INC=''
 export AUTOGEN_TEMPL_DIRS=${TMPDIR}
 
 compile_getopt() {
-  agopt="-L${TMPDIR} -b${testname}-bn"
-  ${VERBOSE} && \
-    agopt="${agopt} --trace=every --trace-out='>>'${TMPDIR}/runag-log"
-
-  run_ag opts ${agopt} ${testname}.def || \
+  run_ag opts -b${testname}-bn ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
 
-  run_ag getopt ${agopt} -Tgetopt.tpl ${testname}.def || \
+  run_ag getopt -b${testname}-bn -Tgetopt.tpl ${testname}.def || \
     failure "could not generate getopt-test_${testname}.c"
 
   # Remove the variable comments so we can test against the expected result
@@ -52,18 +48,19 @@ compile_getopt() {
   ${SED} '2,/and the template file/d
       /\$''Id.*\$/d
       /Last template edit:/d' getopt-test_${testname}.c \
-        > ${testname}${1}-getopt.c
+	> ${testname}${1}-getopt.c
 
   # Finally, compile this thing:
   #
   ${CC} ${CFLAGS} -c ${testname}${1}-getopt.c || \
     failure "could not compile ${testname}1-getopt.c"
 
-  ${SED} '/Packaged by /d
-       s@^Report .* bugs to.*"@\\n"@
-       s@^please send bug.*"@\\n"@
-       s@\\n\\n\\n\\$@\\n\\n\\@
-       s@\(and the flag character\.\\n.\)n\\$@\1@' ${testname}${1}-getopt.c \
+  ${SED} "${sed_omit_license}"'
+	/Packaged by /d
+	s@^Report .* bugs to.*"@\\n"@
+	s@^please send bug.*"@\\n"@
+	s@\\n\\n\\n\\$@\\n\\n\\@
+	s@\(and the flag character\.\\n.\)n\\$@\1@' ${testname}${1}-getopt.c \
          >  ${testname}${1}-res.c
   cmp -s ${testname}${1}-base.c ${testname}${1}-res.c || { set +x ; \
     failure "`diff -c ${testname}${1}-base.c ${testname}${1}-res.c`" ; }
@@ -91,9 +88,11 @@ go_init()
   esac
 
   cd ${top_srcdir}/autoopts/tpl
-  cp *.tpl *.tlib *.pl *.sh ${TMPDIR}/.
+  cp *.* ${TMPDIR}/.
+  chmod u+w ${TMPDIR}/*
+
   cd ${top_builddir}/autoopts/tpl
-  cp *.tpl *.tlib ${TMPDIR}/.
+  cp *.* ${TMPDIR}/.
   chmod u+w ${TMPDIR}/*
 
   cd ${builddir}/testdir
@@ -192,22 +191,6 @@ _EOF_
 echo creating ${testname}1-base.c
 
 cat > ${testname}1-base.c <<\_EndOfSample_
-/*  -*- buffer-read-only: t -*- vi: set ro:
- *
- *  test_getopt is free software: you can redistribute it and/or modify it
- *  under the terms of the GNU Lesser General Public License as published
- *  by the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *  
- *  test_getopt is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
- *  
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -425,22 +408,6 @@ _EndOfSample_
 echo creating ${testname}2-base.c
 
 cat > ${testname}2-base.c <<\_EndOfSample_
-/*  -*- buffer-read-only: t -*- vi: set ro:
- *
- *  test_getopt is free software: you can redistribute it and/or modify it
- *  under the terms of the GNU Lesser General Public License as published
- *  by the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *  
- *  test_getopt is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
- *  
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>

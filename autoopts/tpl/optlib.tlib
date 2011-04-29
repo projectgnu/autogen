@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-03-25 13:49:57 bkorb"
+# Time-stamp:      "2011-04-19 14:46:03 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -196,9 +196,8 @@ test_exe "${CLexe}" || \
         (if (exist? "package")
             (string-append " (" (get "package") ")")
             "" )
-        " - " (get "prog-title")
         (if (exist? "version")
-            (string-append " - Ver. " (get "version"))
+            (string-append " " (get "version"))
             "" ) ))
 
 (if (exist? "flag.value")

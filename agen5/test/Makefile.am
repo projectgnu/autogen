@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-02-02 12:00:20 bkorb"
+## Time-stamp:      "2011-04-20 14:56:07 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -41,7 +41,7 @@ EXPRLIST    	= expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 
 TESTS_ENVIRONMENT = TERM='' \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
-	EXPRLIST="$(EXPRLIST)" SHELL=$(SHELL)
+	EXPRLIST="$(EXPRLIST)" SHELL="$(SHELL)" srcdir="$(srcdir)"
 
 distclean-local:
 	-rm -rf testdir FAILURES

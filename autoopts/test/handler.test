@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-03-27 13:48:34 bkorb"
+# Time-stamp:        "2011-04-15 16:37:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -231,8 +231,6 @@ AO_gettext(char const* pz)
 
 static void coerce_it(void** s) { *s = AO_gettext(*s);
 }
-#define COERSION(_f) \
-  coerce_it((void*)&(handlerOptions._f))
 
 /*
  *  This invokes the translation code (e.g. gettext(3)).
@@ -240,6 +238,8 @@ static void coerce_it(void** s) { *s = AO_gettext(*s);
 static void
 translate_option_strings(void)
 {
+    tOptions * const pOpt = &handlerOptions;
+
     /*
      *  Guard against re-translation.  It won't work.  The strings will have
      *  been changed by the first pass through this code.  One shot only.
@@ -249,33 +249,33 @@ translate_option_strings(void)
          *  Do the translations.  The first pointer follows the field count
          *  field.  The field count field is the size of a pointer.
          */
-        tOptDesc* pOD = handlerOptions.pOptDesc;
-        char**    ppz = (char**)(void*)&(option_usage_text);
-        int       ix  = option_usage_text.field_ct;
+        tOptDesc * pOD = pOpt->pOptDesc;
+        char **    ppz = (char**)(void*)&(option_usage_text);
+        int        ix  = option_usage_text.field_ct;
 
         do {
             ppz++;
             *ppz = AO_gettext(*ppz);
         } while (--ix > 0);
 
-        COERSION(pzCopyright);
-        COERSION(pzCopyNotice);
-        COERSION(pzFullVersion);
-        COERSION(pzUsageTitle);
-        COERSION(pzExplain);
-        COERSION(pzDetail);
-        COERSION(pzPackager);
+        coerce_it((void*)&(pOpt->pzCopyright));
+        coerce_it((void*)&(pOpt->pzCopyNotice));
+        coerce_it((void*)&(pOpt->pzFullVersion));
+        coerce_it((void*)&(pOpt->pzUsageTitle));
+        coerce_it((void*)&(pOpt->pzExplain));
+        coerce_it((void*)&(pOpt->pzDetail));
+        coerce_it((void*)&(pOpt->pzPackager));
         option_usage_text.field_ct = 0;
 
-        for (ix = handlerOptions.optCt; ix > 0; ix--, pOD++)
+        for (ix = pOpt->optCt; ix > 0; ix--, pOD++)
             coerce_it((void*)&(pOD->pzText));
     }
 
-    if ((handlerOptions.fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
-        tOptDesc* pOD = handlerOptions.pOptDesc;
-        int       ix;
+    if ((pOpt->fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
+        tOptDesc * pOD = pOpt->pOptDesc;
+        int        ix;
 
-        for (ix = handlerOptions.optCt; ix > 0; ix--, pOD++) {
+        for (ix = pOpt->optCt; ix > 0; ix--, pOD++) {
             coerce_it((void*)&(pOD->pz_Name));
             coerce_it((void*)&(pOD->pz_DisableName));
             coerce_it((void*)&(pOD->pz_DisablePfx));

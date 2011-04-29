@@ -4,7 +4,7 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2011-02-24 10:47:55 bkorb"
+#  Time-stamp:      "2011-04-20 17:32:26 bkorb"
 
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -25,7 +25,6 @@ c=%s-fsm.c
 ## NB:  THIS FILE IS GPL.  THE OUTPUT OF THIS FILE IS LICENSED MBSD.
 
 (setenv "SHELL" "/bin/sh")
-(define fmt "")
 
 =]
 [=
@@ -34,6 +33,8 @@ CASE (suffix) =][=
 
 == h =][=
 
+  (define fmt     "")
+  (define fsm-ver "0.1")   =][=
   INCLUDE "fsm-trans.tlib" =][=
   INCLUDE "fsm-macro.tlib" =][=
 
@@ -69,12 +70,13 @@ ENDFOR
 #define [=(. PFX)=]_STATE_CT  [=(+ 1 (count "state"))=]
 typedef enum {
 [=
-  (shellf "${CLexe-columns} --spread=1 -I4 -S, -f'%s_ST_%%s' <<_EOF_
+ (shell (string-append
+ "${CLexe-columns} --spread=1 -I4 -S, -f'" PFX "_ST_%s' <<_EOF_
 INIT
-%s
+" (stack-up "state") "
 INVALID
 DONE
-_EOF_" PFX (stack-up "state") )=]
+_EOF_" )) =]
 } te_[=(. pfx)=]_state;
 
 /*

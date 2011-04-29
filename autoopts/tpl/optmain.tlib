@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-03-27 17:17:48 bkorb"
+# Time-stamp:      "2011-04-26 16:59:21 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -71,7 +71,7 @@ inner_main(int argc, char** argv)
         char** new_argv = (char**)malloc((argc - ct + 2)*sizeof(char*));
 
         if (new_argv == NULL) {
-            fputs(_("[=(. pname)=] cannot allocate new argv\n"), stderr);
+            fprintf(stderr, zNoArgv, [=(. pname)=]Options.pzProgName);
             exit([=(. nomem-exit-code)=]);
         }
 

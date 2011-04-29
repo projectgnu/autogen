@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2011-03-11 11:28:06 bkorb"
+ *  Time-stamp:        "2011-04-22 14:32:06 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -22,68 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-static char const zGpl[] =
-"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
-"%2$sunder the terms of the GNU General Public License as published by the\n"
-"%2$sFree Software Foundation, either version 3 of the License, or\n"
-"%2$s(at your option) any later version.\n%2$s\n"
-"%2$s%1$s is distributed in the hope that it will be useful, but\n"
-"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"%2$sSee the GNU General Public License for more details.\n%2$s\n"
-"%2$sYou should have received a copy of the GNU General Public License along\n"
-"%2$swith this program.  If not, see <http://www.gnu.org/licenses/>.";
-
-static char const zAgpl[] =
-"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
-"%2$sunder the terms of the GNU General Public License as published by the\n"
-"%2$sFree Software Foundation, either version 3 of the License, or\n"
-"%2$s(at your option) any later version.\n%2$s\n"
-"%2$s%1$s is distributed in the hope that it will be useful, but\n"
-"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"%2$sSee the GNU Affero General Public License for more details.\n%2$s\n"
-"%2$sYou should have received a copy of the GNU Affero General Public License"
-"\n%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
-
-static char const zLgpl[] =
-"%2$s%1$s is free software: you can redistribute it and/or modify it\n"
-"%2$sunder the terms of the GNU Lesser General Public License as published\n"
-"%2$sby the Free Software Foundation, either version 3 of the License, or\n"
-"%2$s(at your option) any later version.\n%2$s\n"
-"%2$s%1$s is distributed in the hope that it will be useful, but\n"
-"%2$sWITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"%2$sMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"%2$sSee the GNU Lesser General Public License for more details.\n%2$s\n"
-"%2$sYou should have received a copy of the GNU Lesser General Public License"
-"\n%2$salong with this program.  If not, see <http://www.gnu.org/licenses/>.";
-
-static char const zBsd[] =
-"%2$s%1$s is free software copyrighted by %3$s.\n%2$s\n"
-"%2$sRedistribution and use in source and binary forms, with or without\n"
-"%2$smodification, are permitted provided that the following conditions\n"
-"%2$sare met:\n"
-"%2$s1. Redistributions of source code must retain the above copyright\n"
-"%2$s   notice, this list of conditions and the following disclaimer.\n"
-"%2$s2. Redistributions in binary form must reproduce the above copyright\n"
-"%2$s   notice, this list of conditions and the following disclaimer in the\n"
-"%2$s   documentation and/or other materials provided with the distribution.\n"
-"%2$s3. Neither the name ``%3$s'' nor the name of any other\n"
-"%2$s   contributor may be used to endorse or promote products derived\n"
-"%2$s   from this software without specific prior written permission.\n"
-"%2$s\n"
-"%2$s%1$s IS PROVIDED BY %3$s ``AS IS'' AND ANY EXPRESS\n"
-"%2$sOR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n"
-"%2$sWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n"
-"%2$sARE DISCLAIMED.  IN NO EVENT SHALL %3$s OR ANY OTHER CONTRIBUTORS\n"
-"%2$sBE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n"
-"%2$sCONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n"
-"%2$sSUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR\n"
-"%2$sBUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,\n"
-"%2$sWHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR\n"
-"%2$sOTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF\n"
-"%2$sADVISED OF THE POSSIBILITY OF SUCH DAMAGE.";
 
 static char const zDne1[] =
 "%s -*- buffer-read-only: t -*- vi: set ro:\n"
@@ -338,29 +276,195 @@ ag_scm_error(SCM res)
     return SCM_UNDEFINED;
 }
 
-static SCM
-mk_license(SCM prog, SCM pfx, char const * lic, char const * owner)
+static char *
+find_lic_text(int segment, SCM lic, size_t * txt_len)
 {
-    /*
-     *  Get the addresses of the program name prefix and owner strings.
-     *  Make sure they are reasonably sized (less than
-     *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
-     */
-    if (AG_SCM_STRLEN(prog) >= SCRIBBLE_SIZE)
-        AG_ABEND(aprf(zPfxMsg, zProgLen, SCRIBBLE_SIZE));
+    static char const * const lic_sfx[] = { "lic", NULL };
 
-    if (AG_SCM_STRLEN(pfx) >= SCRIBBLE_SIZE)
-        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
+    char const * lic_pz = ag_scm2zchars(lic, "license");
+    char fname[ AG_PATH_MAX ];
+    char * ftext;
+    size_t flen;
+
+    /*
+     * auto-convert "bsd" into "mbsd" for compatibility.
+     */
+    if (strcmp(lic_pz, "bsd") == 0)
+        lic_pz = "mbsd";
+
+    if (! SUCCESSFUL(findFile(lic_pz, fname, lic_sfx, NULL)))
+        return NULL;
 
     {
-        char const * pzPfx = ag_scm2zchars(pfx,  "lic prefix");
-        char const * pzPrg = ag_scm2zchars(prog, "prog name");
-        char const * pzRes = aprf(lic, pzPrg, pzPfx, owner);
-        SCM res = AG_SCM_STR02SCM(pzRes);
-
-        AGFREE((void*)pzRes);
-        return res;
+        struct stat stbf;
+        if (stat(fname, &stbf) != 0)
+            AG_CANT("stat file", fname);
+        if (! S_ISREG(stbf.st_mode)) {
+            errno = EINVAL;
+            AG_CANT("not regular file", fname);
+        }
+        flen = stbf.st_size;
     }
+
+    ftext = ag_scribble(flen + 1);
+    *txt_len = flen;
+
+    {
+        FILE * fp = fopen(fname, "r");
+
+        if (fp == NULL)
+            AG_CANT("open", fname);
+
+        if (fread(ftext, 1, flen, fp) != flen)
+            AG_CANT("read full file", fname);
+
+        ftext[flen] = NUL;
+        fclose(fp);
+    }
+
+    {
+        char * p = strstr(ftext, "\n\n");
+
+        if (p == NULL)
+            AG_ABEND(aprf("invalid license file: %s", fname));
+
+        switch (segment) {
+        case 0: p[1] = NUL; break;
+        case 1: p += 2; while (*p == NL) p++; ftext = p; break;
+        }
+    }
+
+    return ftext;
+}
+
+static SCM
+construct_license(int seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
+{
+    static SCM subs  = SCM_UNDEFINED;
+    static SCM empty = SCM_UNDEFINED;
+
+    SCM vals = SCM_UNDEFINED;
+    char * lic_text;
+    size_t text_len;
+
+    if (subs == SCM_UNDEFINED) {
+        static char const * const slst[] = {
+            "<program>", "<PFX>", "<owner>", "<years>"
+        };
+        subs = scm_gc_protect_object(
+            scm_list_4(AG_SCM_STR02SCM(slst[0]), AG_SCM_STR02SCM(slst[1]),
+                       AG_SCM_STR02SCM(slst[2]), AG_SCM_STR02SCM(slst[3])));
+
+        empty = scm_gc_protect_object(AG_SCM_STR02SCM(""));
+    }
+
+    if (! AG_SCM_STRING_P(lic))
+        AG_ABEND("license name is not a string");
+
+    lic_text = find_lic_text(seg, lic, &text_len);
+    if (lic_text == NULL)
+        AG_ABEND(aprf("There is no %s license.", ag_scm2zchars(lic, "lic")));
+
+    if (! AG_SCM_STRING_P(owner))   owner = empty;
+    if (! AG_SCM_STRING_P(years))   years = empty;
+    vals = scm_list_4(prog, pfx, owner, years);
+
+    do_multi_subs(&lic_text, &text_len, subs, vals);
+
+    return AG_SCM_STR02SCM(lic_text);
+}
+
+/*=gfunc license_full
+ *
+ * what:  Emit the licensing information and description
+ * general_use:
+ *
+ * exparg: license,   name of license type
+ * exparg: prog-name, name of the program under the GPL
+ * exparg: prefix,    String for starting each output line
+ * exparg: owner,     owner of the program, optional
+ * exparg: years,     copyright years, optional
+ *
+ * doc:
+ *
+ *  Emit all the text that @code{license-info} and @code{license-description}
+ *  would emit (@pxref{SCM license-info, @code{license-info}},
+ *  and @pxref{SCM license-description, @code{license-description}}),
+ *  with all the same substitutions.
+ *
+ *  All of these depend upon the existence of a license file named
+ *  after the @code{license} argument with a @code{.lic} suffix.
+ *  That file should contain two blocks of text separated by two or more
+ *  newline characters.
+ *
+ *  @example
+ *  <PFX>Copyright (C) <years> <owner>, all rights reserved.
+ *  <PFX>This is free software. It is licensed for use,
+ *  <PFX>modification and redistribution under the terms
+ *  <PFX>of the GNU General Public License, version 3 or later
+ *  <PFX>    <http://gnu.org/licenses/gpl.html>
+ *  
+ *  <PFX><program> is free software: you can redistribute it
+ *  <PFX>and/or modify it under the terms of the GNU General
+ *  <PFX>Public License as published by the Free Software ...
+ *  @end example
+ *
+=*/
+SCM
+ag_scm_license_full(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
+{
+    return construct_license(3, lic, prog, pfx, owner, years);
+}
+
+/*=gfunc license_description
+ *
+ * what:  Emit a license description
+ * general_use:
+ *
+ * exparg: license,   name of license type
+ * exparg: prog-name, name of the program under the GPL
+ * exparg: prefix,    String for starting each output line
+ * exparg: owner,     owner of the program, optional
+ *
+ * doc:
+ *
+ *  Emit a string that contains a detailed license description, with
+ *  substitutions for program name, copyright holder and a per-line prefix.
+ *  This is the text typically used as part of a source file header.
+ *  For more details, @xref{SCM license-full, the license-full command}.
+ *
+=*/
+SCM
+ag_scm_license_description(SCM lic, SCM prog, SCM pfx, SCM owner)
+{
+    return construct_license(1, lic, prog, pfx, owner, SCM_UNDEFINED);
+}
+
+/*=gfunc license_info
+ *
+ * what:  Emit the licensing information and copyright years
+ * general_use:
+ *
+ * exparg: license,   name of license type
+ * exparg: prog-name, name of the program under the GPL
+ * exparg: prefix,    String for starting each output line
+ * exparg: owner,     owner of the program, optional
+ * exparg: years,     copyright years, optional
+ *
+ * doc:
+ *
+ *  Emit a string that contains the licensing description, with some
+ *  substitutions for program name, copyright holder, a list of years when the
+ *  source was modified, and a per-line prefix.  This text typically includes a
+ *  brief license description and is often printed out when a program starts
+ *  running or as part of the @code{--version} output.
+ *  For more details, @xref{SCM license-full, the license-full command}.
+ *
+=*/
+SCM
+ag_scm_license_info(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
+{
+    return construct_license(0, lic, prog, pfx, owner, years);
 }
 
 /*=gfunc gpl
@@ -374,17 +478,17 @@ mk_license(SCM prog, SCM pfx, char const * lic, char const * owner)
  * doc:
  *
  *  Emit a string that contains the GNU General Public License.
- *  It takes two arguments:
- *  @code{prefix} contains the string to start each output line, and
- *  @code{prog_name} contains the name of the program the copyright is
- *  about.
+ *  This function is now deprecated.  Please @xref{SCM license-description}.
 =*/
 SCM
 ag_scm_gpl(SCM prog_name, SCM prefix)
 {
-    return mk_license(prog_name, prefix, zGpl, zNil);
-}
+    static SCM lic = SCM_UNDEFINED;
 
+    if (lic == SCM_UNDEFINED)
+        lic = scm_gc_protect_object(AG_SCM_STR02SCM("gpl"));
+    return ag_scm_license_description(lic, prog_name, prefix, SCM_UNDEFINED);
+}
 
 /*=gfunc agpl
  *
@@ -397,15 +501,16 @@ ag_scm_gpl(SCM prog_name, SCM prefix)
  * doc:
  *
  *  Emit a string that contains the GNU Affero General Public License.
- *  It takes two arguments:
- *  @code{prefix} contains the string to start each output line, and
- *  @code{prog_name} contains the name of the program the copyright is
- *  about.
+ *  This function is now deprecated.  Please @xref{SCM license-description}.
 =*/
 SCM
 ag_scm_agpl(SCM prog_name, SCM prefix)
 {
-    return mk_license(prog_name, prefix, zAgpl, zNil);
+    static SCM lic = SCM_UNDEFINED;
+
+    if (lic == SCM_UNDEFINED)
+        lic = scm_gc_protect_object(AG_SCM_STR02SCM("agpl"));
+    return ag_scm_license_description(lic, prog_name, prefix, SCM_UNDEFINED);
 }
 
 
@@ -421,15 +526,16 @@ ag_scm_agpl(SCM prog_name, SCM prefix)
  * doc:
  *
  *  Emit a string that contains the GNU Library General Public License.
- *  It takes three arguments:  @code{prefix} contains the string to
- *  start each output line.  @code{owner} contains the copyright owner.
- *  @code{prog_name} contains the name of the program the copyright is about.
+ *  This function is now deprecated.  Please @xref{SCM license-description}.
 =*/
 SCM
 ag_scm_lgpl(SCM prog_name, SCM owner, SCM prefix)
 {
-    char const * own = ag_scm2zchars(owner, "owner");
-    return mk_license(prog_name, prefix, zLgpl, own);
+    static SCM lic = SCM_UNDEFINED;
+
+    if (lic == SCM_UNDEFINED)
+        lic = scm_gc_protect_object(AG_SCM_STR02SCM("lgpl"));
+    return ag_scm_license_description(lic, prog_name, prefix, owner);
 }
 
 
@@ -445,19 +551,18 @@ ag_scm_lgpl(SCM prog_name, SCM owner, SCM prefix)
  * doc:
  *
  *  Emit a string that contains the Free BSD Public License.
- *  It takes three arguments:
- *  @code{prefix} contains the string to start each output line.
- *  @code{owner} contains the copyright owner.
- *  @code{prog_name} contains the name of the program the copyright is about.
+ *  This function is now deprecated.  Please @xref{SCM license-description}.
  *
 =*/
 SCM
 ag_scm_bsd(SCM prog_name, SCM owner, SCM prefix)
 {
-    char const * own = ag_scm2zchars(owner, "owner");
-    return mk_license(prog_name, prefix, zBsd, own);
-}
+    static SCM lic = SCM_UNDEFINED;
 
+    if (lic == SCM_UNDEFINED)
+        lic = scm_gc_protect_object(AG_SCM_STR02SCM("mbsd"));
+    return ag_scm_license_description(lic, prog_name, prefix, owner);
+}
 
 /*=gfunc license
  *
@@ -470,12 +575,8 @@ ag_scm_bsd(SCM prog_name, SCM owner, SCM prefix)
  * exparg: prefix, String for starting each output line
  *
  * doc:
- *  Emit a string that contains the named license.  The license text
- *  is read from a file named, @code{lic_name}.lic, searching the standard
- *  directories.  The file contents are used as a format argument
- *  to @code{printf}(3), with @code{prog_name} and @code{owner} as
- *  the two string formatting arguments.  Each output line is automatically
- *  prefixed with the string @code{prefix}.
+ *  Emit a string that contains the named license.
+ *  This function is now deprecated.  Please @xref{SCM license-description}.
 =*/
 SCM
 ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
@@ -567,7 +668,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
             switch (*(pzScan++)) {
             case NUL:
                 goto exit_count;
-            case '\n':
+            case NL:
                 out_size += pfx_size;
                 /* FALLTHROUGH */
             default:
@@ -589,7 +690,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
             case NUL:
                 goto exit_copy;
 
-            case '\n':
+            case NL:
                 strcpy(pzOut, pzPfx);
                 pzOut += pfx_size;
                 break;

@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2011-03-25 14:20:39 bkorb"
+ *  Time-stamp:      "2011-04-20 15:20:27 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -164,7 +164,7 @@ dep_usage(char const * fmt, ...)
  * Configure dependency option
  */
 LOCAL void
-config_dep(tOptions* pOptions, tOptDesc* pOptDesc)
+config_dep(tOptions * pOptions, tOptDesc * pOptDesc)
 {
     static char const dup_targ[] = "duplicate make target";
 
@@ -181,7 +181,7 @@ config_dep(tOptions* pOptions, tOptDesc* pOptDesc)
 retry:
 
     switch (*popt) {
-    case ' ': case '\t': case '\r': case '\n':
+    case ' ': case TAB: case '\r': case NL:
         while (isspace((int)*(++popt)))  ;
         goto retry;
 

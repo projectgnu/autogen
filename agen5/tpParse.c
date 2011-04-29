@@ -3,7 +3,7 @@
  *  tpParse.c
  *
  *
- * Time-stamp:        "2011-01-27 12:50:33 bkorb"
+ * Time-stamp:        "2011-04-20 14:20:36 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -153,7 +153,7 @@ find_mac_end(char const ** ppzMark)
      *  Set our pointers to the start of the macro text
      */
     while (IS_WHITESPACE_CHAR(*pzMark)) {
-        if (*(pzMark++) == '\n')
+        if (*(pzMark++) == NL)
             templLineNo++;
     }
 
@@ -227,7 +227,7 @@ find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl)
 #endif
 
     do  {
-        if ((*(pzCopy++) = *(pz++)) == '\n')
+        if ((*(pzCopy++) = *(pz++)) == NL)
             templLineNo++;
     } while (pz < pzEnd);
 
@@ -267,7 +267,7 @@ find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan)
         char const *  pz       = pzMark;
 
         for (;;pz++) {
-            pz = strchr(pz, '\n');
+            pz = strchr(pz, NL);
             if ((pz == NULL) || (pz > pzMacEnd))
                 break;
             templLineNo++;
@@ -303,7 +303,7 @@ find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan)
          *  will suppress the feature.
          */
         while (IS_WHITESPACE_CHAR(*pz)) {
-            if (*(pz++) == '\n') {
+            if (*(pz++) == NL) {
                 templLineNo++;
                 pzScan = pz;
                 break;

@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#; Time-stamp:        "2011-02-24 11:43:09 bkorb"
+#; Time-stamp:        "2011-04-22 07:48:18 bkorb"
 #;
 #; This file is part of AutoGen.
 #; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -273,9 +273,7 @@ ENDIF  =]
  *
  *  Automated Finite State Machine
  *
- *  copyright (c) 2001-2011 by Bruce Korb - all rights reserved
- *
-[=(bsd "AutoFSM" "Bruce Korb" " *  ")=]
+[=(license-description "mbsd" "AutoFSM" " * " "Bruce Korb")=]
  */[=
 
 ENDDEF  preamble

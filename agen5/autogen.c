@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2011-03-24 17:43:17 bkorb"
+ *  Time-stamp:        "2011-04-20 14:23:54 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -476,8 +476,8 @@ ag_abend_at(char const * pzMsg
     }
     fputs(pzMsg, stderr);
     pzMsg += strlen(pzMsg);
-    if (pzMsg[-1] != '\n')
-        fputc('\n', stderr);
+    if (pzMsg[-1] != NL)
+        fputc(NL, stderr);
 
     {
         teProcState oldState = procState;

@@ -2,7 +2,7 @@
 /*
  *  expMake.c
  *
- *  Time-stamp:        "2011-01-20 16:22:01 bkorb"
+ *  Time-stamp:        "2011-04-20 14:26:01 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -107,22 +107,22 @@ ag_scm_makefile_script(SCM text)
      *  in the source string.
      */
     if (! isspace(*pzText))
-        tabch = '\t';
+        tabch = TAB;
     else {
         while (isspace(*++pzText))  ;
-        tabch  = (pzText[-1] == '\t') ? NUL : '\t';
+        tabch  = (pzText[-1] == TAB) ? NUL : TAB;
     }
 
     if (*pzText == NUL)
         return AG_SCM_STR02SCM(zNil);
 
     {
-        char*  pz  = strchr(pzText, '\n');
-        size_t inc = ((*pzText == '\t') ? 0 : 1) + sizeof(zNl) - 1;
+        char*  pz  = strchr(pzText, NL);
+        size_t inc = ((*pzText == TAB) ? 0 : 1) + sizeof(zNl) - 1;
 
         while (pz != NULL) {
             sz += inc;
-            pz = strchr(pz+1, '\n');
+            pz = strchr(pz+1, NL);
         }
 
         pz = strchr(pzText, '$');
@@ -140,16 +140,16 @@ ag_scm_makefile_script(SCM text)
         /*
          *  Force the initial line to start with a tab.
          */
-        *(pzOut++) = '\t';
+        *(pzOut++) = TAB;
 
         for (;;) {
             char ch = *(pzScn++);
             switch (ch) {
-            case '\n':
+            case NL:
                 /*
                  *  Backup past trailing white space (other than newline).
                  */
-                while (isspace(pzOut[ -1 ]) && (pzOut[ -1 ] != '\n'))
+                while (isspace(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
                     pzOut--;
 
                 /*
@@ -159,7 +159,7 @@ ag_scm_makefile_script(SCM text)
                 {
                     char* pz = pzScn;
                     while (isspace(*pz)) {
-                        if (*(pz++) == '\n')
+                        if (*(pz++) == NL)
                             pzScn = pz;
                     }
                 }
@@ -176,7 +176,7 @@ ag_scm_makefile_script(SCM text)
                      *  The newline is already escaped, so don't
                      *  insert our extra command termination.
                      */
-                    *(pzOut++) = '\n';
+                    *(pzOut++) = NL;
                     break;
 
                 case '&':

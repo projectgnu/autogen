@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-02-28 14:58:46 bkorb"
+ *  Time-stamp:        "2011-04-20 14:23:32 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -76,7 +76,7 @@ current_line(FILE * fp)
 
     while (! feof(fp)) {
         int ch = getc(fp);
-        if (ch == '\n')
+        if (ch == NL)
             lnno++;
     }
 
@@ -791,7 +791,7 @@ ag_scm_out_line(void)
             unsigned char ch = ich;
             if (ich < 0)
                 break;
-            if (ch == (unsigned char)'\n')
+            if (ch == (unsigned char)NL)
                 lineNum++;
         } while (--pos > 0);
         fseek(pCurFp->pFile, svpos, SEEK_SET);

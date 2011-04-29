@@ -1,7 +1,7 @@
 /**
  * \file defDirect.c
  *
- *  Time-stamp:        "2011-01-20 16:26:43 bkorb"
+ *  Time-stamp:        "2011-04-20 14:19:01 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -67,7 +67,7 @@ processDirective(char* pzScan)
      *  Replace "\\\n" sequences with "  ".
      */
     for (;;) {
-        pzEnd = strchr(pzScan, '\n');
+        pzEnd = strchr(pzScan, NL);
 
         if (pzEnd == NULL) {
             /*
@@ -229,7 +229,7 @@ skipToEndif(char* pzStart)
             /*
              *  We found the endif we are interested in
              */
-            char* pz = strchr(pzScan, '\n');
+            char* pz = strchr(pzScan, NL);
             if (pz != NULL)
                  pzRet = pz+1;
             else pzRet = pzScan + strlen(pzScan);
@@ -254,7 +254,7 @@ skipToEndif(char* pzStart)
 
  leave_func:
     while (pzStart < pzRet) {
-        if (*(pzStart++) == '\n')
+        if (*(pzStart++) == NL)
             pCurCtx->lineNo++;
     }
     return pzRet;
@@ -289,7 +289,7 @@ skipToEndmac(char* pzStart)
             /*
              *  We found the endmac we are interested in
              */
-            char* pz = strchr(pzScan, '\n');
+            char* pz = strchr(pzScan, NL);
             if (pz != NULL)
                  pzRet = pz+1;
             else pzRet = pzScan + strlen(pzScan);
@@ -298,7 +298,7 @@ skipToEndmac(char* pzStart)
     }
 
     while (pzStart < pzRet) {
-        if (*(pzStart++) == '\n')
+        if (*(pzStart++) == NL)
             pCurCtx->lineNo++;
     }
     return pzRet;
@@ -352,7 +352,7 @@ skipToElseEnd(char* pzStart)
              *  skipping (or we dropped in from above).
              *  Start processing the text.
              */
-            char* pz = strchr(pzScan, '\n');
+            char* pz = strchr(pzScan, NL);
             if (pz != NULL)
                  pzRet = pz+1;
             else pzRet = pzScan + strlen(pzScan);
@@ -379,7 +379,7 @@ skipToElseEnd(char* pzStart)
 
  leave_func:
     while (pzStart < pzRet) {
-        if (*(pzStart++) == '\n')
+        if (*(pzStart++) == NL)
             pCurCtx->lineNo++;
     }
     return pzRet;
@@ -957,7 +957,7 @@ doDir_shell(char* pzArg, char* pzScan)
             AG_ABEND(aprf(noend, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
         while (pzScan < pz) {
-            if (*(pzScan++) == '\n') pCurCtx->lineNo++;
+            if (*(pzScan++) == NL) pCurCtx->lineNo++;
         }
 
         *pzScan = NUL;
@@ -968,7 +968,7 @@ doDir_shell(char* pzArg, char* pzScan)
      *  IF there is no such line,
      *  THEN the scan will resume on a zero-length string.
      */
-    pzScan = strchr(pzScan + STRSIZE(zEndShell), '\n');
+    pzScan = strchr(pzScan + STRSIZE(zEndShell), NL);
     if (pzScan == NULL)
         pzScan = (void*)zNil;
 

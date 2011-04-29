@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2011-02-02 12:06:43 bkorb"
+# Time-stamp:        "2011-04-22 13:04:25 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -107,7 +107,7 @@ test "$f" = "invocation_ct = 2" || \
 f=`./${testname} help version=c | ${FGREP} 'USAGE:'`
 test -z "${f}" && failure "no USAGE: in help text"
 
-f=`./${testname} version=c help | ${FGREP} 'copyright (c)'`
+f=`./${testname} version=c help | ${FGREP} -i 'copyright (c)'`
 test -z "${f}" && failure "no 'copyright (c)' in version text"
 
 cleanup

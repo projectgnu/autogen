@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-02-03 09:07:54 bkorb"
+# Time-stamp:        "2011-04-20 11:54:22 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -227,8 +227,7 @@ exec 3> ${tmp_dir}/ag.ini
 cat >&3 <<- _EOF_
 	timeout     ${timer}
 	templ-dirs  ${srcdir}
-	templ-dirs  ${top_srcdir}
-	templ-dirs  ${top_srcdir}/autoopts
+	templ-dirs  ${top_srcdir}/autoopts/tpl
 	base-name   ${GEN_BASE}
 	_EOF_
 ${VERBOSE} && {

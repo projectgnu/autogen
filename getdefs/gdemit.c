@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-04-06 13:24:50 bkorb"
+ *  Time-stamp:        "2011-04-22 12:47:57 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -25,13 +25,13 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-compressDef(char * pz);
+compress_def(char * pz);
 
 static char *
-emitListattr(char * pzText, char * pzOut);
+list_attrib(char * pzText, char * pzOut);
 
 static char *
-emitQuote(char ** ppzText, char * pzOut);
+emit_quote(char ** ppzText, char * pzOut);
 
 static void
 next_def_entry(char ** txt_pp, char const ** def_pp);
@@ -39,15 +39,15 @@ next_def_entry(char ** txt_pp, char const ** def_pp);
 static void
 emit_attribute(char const ** def_pp, char ** out_pp);
 
-static char *
-emitSubblock(char const * pzDefList, char * pzText, char * pzOut);
+static char*
+emit_subblock(char const * pzDefList, char * pzText, char * pzOut);
 
-static char *
-emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut);
+static char*
+subblock_str(char ** ppzText, u_int sepChar, char * pzOut);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
- *  compressDef
+ *  compress_def
  *
  *  Compress the definition text.  Each input line has some prefix
  *  stuff to ensure it is a comment as seen by the normal processor
@@ -63,7 +63,7 @@ emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut);
  *  that prefix before we go ahead and try to parse it.
  */
 static void
-compressDef(char * pz)
+compress_def(char * pz)
 {
     char * pzStrt = pz;
     char * pzDest = pz;
@@ -75,7 +75,8 @@ compressDef(char * pz)
      *  and is followed by something other than whitespace.
      */
     nlCt =  0;
- skip_leading_space:
+
+skip_leading_space:
     while (isspace( *pzSrc )) {
         if (*(pzSrc++) == '\n') {
             nlCt++;
@@ -211,7 +212,7 @@ emitDefinition(char* pzDef, char* pzOut)
      *  (viz., the "^.*\*" text, except that it is a shortest match
      *  instead of longest match).  Skip the ':' before starting.
      */
-    compressDef(++pzDef);
+    compress_def(++pzDef);
 
     if (HAVE_OPT( SUBBLOCK )) {
         int    ct  = STACKCT_OPT(  SUBBLOCK );
@@ -220,7 +221,7 @@ emitDefinition(char* pzDef, char* pzOut)
         do  {
             char const * pz = *ppz++;
             if (strcmp(pz, zEntryName) == 0)
-                return emitSubblock(pz, pzDef, pzOut);
+                return emit_subblock(pz, pzDef, pzOut);
         } while (--ct > 0);
     }
 
@@ -230,7 +231,7 @@ emitDefinition(char* pzDef, char* pzOut)
 
         do  {
             if (strcmp(*ppz++, zEntryName) == 0)
-                return emitListattr(pzDef, pzOut);
+                return list_attrib(pzDef, pzOut);
         } while (--ct > 0);
     }
 
@@ -281,10 +282,10 @@ emitDefinition(char* pzDef, char* pzOut)
 
 
 /*
- *  emitListattr
+ *  list_attrib
  */
 static char *
-emitListattr(char * pzText, char * pzOut)
+list_attrib(char * pzText, char * pzOut)
 {
     static char const  zStart[]  = " = ";
 
@@ -327,7 +328,7 @@ emitListattr(char * pzText, char * pzOut)
          *  Emit whatever we have.  The call will consume any trailing
          *  separator character.
          */
-        pzOut = emitSubblockString(&pzText, sepChar, pzOut);
+        pzOut = subblock_str(&pzText, sepChar, pzOut);
     }
 
     /*
@@ -348,7 +349,7 @@ emitListattr(char * pzText, char * pzOut)
  *  characters are not used to end the quoted text.
  */
 static char *
-emitQuote(char ** ppzText, char * pzOut)
+emit_quote(char ** ppzText, char * pzOut)
 {
     char*  pzText = *ppzText;
     char   svch   = (*pzOut++ = *pzText++);
@@ -423,10 +424,10 @@ leave_emit_attribute:
 }
 
 /*
- *  emitSubblock
+ *  emit_subblock
  */
 static char*
-emitSubblock(char const * pzDefList, char * pzText, char * pzOut)
+emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
 {
     static char const zStart[]  = " = {";
     static char const zEnd[]    = "\n    };\n";
@@ -496,7 +497,7 @@ emitSubblock(char const * pzDefList, char * pzText, char * pzOut)
          *  Copy out the assignment operator and emit the string
          */
         pzOut[-1] = ' '; *pzOut++ = '='; *pzOut++ = ' ';
-        pzOut = emitSubblockString(&pzText, sepChar, pzOut);
+        pzOut = subblock_str(&pzText, sepChar, pzOut);
         *pzOut++ = ';';
 
     } while (isalpha(*pzDefList));
@@ -511,7 +512,7 @@ emitSubblock(char const * pzDefList, char * pzText, char * pzOut)
  *  correctly reconstruct it.
  */
 static char*
-emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut)
+subblock_str(char ** ppzText, u_int sepChar, char * pzOut)
 {
     char * pzText  = *ppzText;
     char * pcComma;
@@ -527,7 +528,7 @@ emitSubblockString(char ** ppzText, u_int sepChar, char * pzOut)
      *  THEN call the quoted text emitting routine
      */
     if ((*pzText == '"') || (*pzText == '\'')) {
-        pzOut = emitQuote(&pzText, pzOut);
+        pzOut = emit_quote(&pzText, pzOut);
 
         /*
          *  Make sure we strip off trailing white space and any

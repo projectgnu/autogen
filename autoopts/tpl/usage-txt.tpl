@@ -4,7 +4,7 @@
 
   pot
 
-# Time-stamp:        "2011-02-24 10:22:30 bkorb"
+# Time-stamp:        "2011-04-26 17:04:24 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -169,7 +169,7 @@ msgstr ""
 FOR utxt
   =][=
   (set! ref-list (shellf
-     "list=`grep -n -E -w z%s *.c [agpo]*.h | \\
+     "list=`grep -n -E -w z%s *.c [agpo]*.h tpl/opt*.t* | \\
          sed -n 's/\\([^:]*:[^:]*\\):.*/\\1/p'`
      echo ${list}" (get "ut-name")))
 

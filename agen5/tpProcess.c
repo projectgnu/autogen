@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2011-03-04 10:35:02 bkorb"
+ * Time-stamp:        "2011-04-20 14:22:43 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -88,11 +88,11 @@ trace_macro(tTemplate * pT, tMacro * pMac)
             char ch = *(pz++);
             if (ch == NUL)
                 break;
-            if (ch == '\n')
+            if (ch == NL)
                 break;
             putc(ch, pfTrace);
         }
-        putc('\n', pfTrace);
+        putc(NL, pfTrace);
     }
 }
 

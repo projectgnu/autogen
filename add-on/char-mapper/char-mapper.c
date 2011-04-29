@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2011-03-25 16:37:31 bkorb"
+ *  Time-stamp:        "2011-04-20 10:13:05 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -144,9 +144,13 @@ static char const check_class_inline[] =
 "    unsigned int ix = (unsigned char)ch;\n"
 "    return ((ix < %5$d) && ((%1$s[ix] & mask) != 0)); }\n\n";
 
+static char const start_static_table_fmt[] = "\
+#if 1 /* def %1$s */\n\
+static %2$s_mask_t const %2$s[%3$d] = {";
+
 static char const start_table_fmt[] = "\
 #ifdef %1$s\n\
-%3$s%2$s_mask_t const %2$s[%4$d] = {";
+%2$s_mask_t const %2$s[%3$d] = {";
 
 static char const endif_fmt[] = "#endif /* %s */\n";
 static char const mask_fmt_fmt[] = "0x%%0%dX";
@@ -353,7 +357,7 @@ emit_macros(int bit_count)
         case 17 ... 32: type_pz = "uint32_t"; break;
         case 33 ... 64: type_pz = "uint64_t"; break;
 
-        default: die("too many char types (31 max)\n");
+        default: die("too many char types (63 max)\n");
         }
 
         printf(check_class_inline,
@@ -390,9 +394,8 @@ emit_table(int bit_count)
     int entry_ct = 0;
     int init_ct  = (bit_count > 32) ? 2 : 4;
 
-    printf(start_table_fmt, data_guard, table_name,
-           table_is_static ? "static " : "",
-           table_size);
+    printf(table_is_static ? start_static_table_fmt : start_table_fmt,
+           data_guard, table_name, table_size);
 
     while (ix < TABLE_SIZE) {
 

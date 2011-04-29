@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-03-25 16:29:15 bkorb"
+## Time-stamp:      "2011-04-20 16:09:40 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -77,7 +77,6 @@ ag.c : Makefile
 	echo 'static char const zMakeProg[] = "'$$mk'";' ; \
 	echo ; echo '#define  DEFINING' ; \
 	echo '#include "autoopts/project.h"' ; \
-	echo '#define AUTOOPTS_INTERNAL 1' ; \
 	echo '#include "autoopts/ag-char-map.h"' ; \
 	echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done

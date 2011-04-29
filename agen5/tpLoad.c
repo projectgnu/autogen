@@ -2,7 +2,7 @@
 /**
  * \file tpLoad.c
  *
- * Time-stamp:        "2011-04-06 14:47:12 bkorb"
+ * Time-stamp:        "2011-04-19 17:26:12 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -83,9 +83,9 @@ findFile(char const * pzFName,
          char const * const * papSuffixList,
          char const * pzReferrer)
 {
-    char*   pzRoot;
-    char*   pzSfx;
-    void*   deallocAddr = NULL;
+    char * pzRoot;
+    char * pzSfx;
+    void * deallocAddr = NULL;
 
     tSuccess res = SUCCESS;
 

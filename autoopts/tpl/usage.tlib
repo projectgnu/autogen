@@ -107,14 +107,11 @@ ENDFOR flag
 (out-push-new)
 
 \=]
-while :
-do
-    ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
-    test -f "${ldflags}" && break
-
+ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
+test -f "${ldflags}" || {
     ldflags='[=(. lib-dir)=]/libopts.a'
     test -f "${ldflags}" || die "Cannot locate libopts.a"
-done
+}
 
 ldflags="$ldflags [=(. libs)=]"
 cfg='-I[=(. inc-dir)=]'

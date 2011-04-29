@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2011-04-09 08:28:03 bkorb"
+ * Time-stamp:      "2011-04-20 11:06:57 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -343,6 +343,9 @@ static char*  pzTrailer = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
+emit_var_text(char const * prog, char const * var, int fdin);
+
+static void
 textToVariable(tOptions * pOpts, teTextTo whichVar, tOptDesc * pOD);
 
 static void
@@ -387,10 +390,10 @@ optionParseShell(tOptions* pOpts)
      *  IF the output file contains the "#!" magic marker,
      *  it will override anything we do here.
      */
-    if (HAVE_OPT(SHELL))
-        pzShell = OPT_ARG(SHELL);
+    if (HAVE_GENSHELL_OPT(SHELL))
+        pzShell = GENSHELL_OPT_ARG(SHELL);
 
-    else if (! ENABLED_OPT(SHELL))
+    else if (! ENABLED_GENSHELL_OPT(SHELL))
         pzShell = NULL;
 
     else if ((pzShell = getenv("SHELL")),
@@ -401,8 +404,8 @@ optionParseShell(tOptions* pOpts)
     /*
      *  Check for a specified output file
      */
-    if (HAVE_OPT(SCRIPT))
-        openOutput(OPT_ARG(SCRIPT));
+    if (HAVE_GENSHELL_OPT(SCRIPT))
+        openOutput(GENSHELL_OPT_ARG(SCRIPT));
 
     emitUsage(pOpts);
     emitSetup(pOpts);
@@ -464,7 +467,7 @@ optionParseShell(tOptions* pOpts)
     printf(zLoopEnd, pOpts->pzPROGNAME, zTrailerMarker);
     if ((pzTrailer != NULL) && (*pzTrailer != '\0'))
         fputs(pzTrailer, stdout);
-    else if (ENABLED_OPT(SHELL))
+    else if (ENABLED_GENSHELL_OPT(SHELL))
         printf("\nenv | grep '^%s_'\n", pOpts->pzPROGNAME);
 
     fflush(stdout);
@@ -626,8 +629,8 @@ emitUsage(tOptions* pOpts)
             strftime(zTimeBuf, AO_NAME_SIZE, "%A %B %e, %Y at %r %Z", pTime );
         }
 
-        if (HAVE_OPT(SCRIPT))
-             pzOutName = OPT_ARG(SCRIPT);
+        if (HAVE_GENSHELL_OPT(SCRIPT))
+             pzOutName = GENSHELL_OPT_ARG(SCRIPT);
         else pzOutName = zStdout;
 
         if ((pzLeader == NULL) && (pzShell != NULL))

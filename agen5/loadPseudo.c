@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2011-01-20 16:19:25 bkorb"
+ *  Time-stamp:        "2011-04-20 14:20:23 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -73,7 +73,7 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
     pCurMacro = pCM;
     *pzEnd    = ch;
     while (pzData < pzEnd)
-        if (*(pzData++) == '\n')
+        if (*(pzData++) == NL)
             templLineNo++;
     return (char const *)pzEnd;
 }
@@ -211,7 +211,7 @@ doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
 static char const *
 handle_hash_line(char const * pz)
 {
-    char const * res = strchr(pz, '\n');
+    char const * res = strchr(pz, NL);
     if (res == NULL)
         AG_ABEND("Invalid template file");
 
@@ -270,7 +270,7 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
 
  skipWhiteSpace:
     while (IS_WHITESPACE_CHAR(*pzData)) {
-        if (*(pzData++) == '\n') {
+        if (*(pzData++) == NL) {
             line_start = AG_TRUE;
             templLineNo++;
 
@@ -428,7 +428,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         case PM_TR_SKIP_ED_MODE:
         {
             char* pzEnd = strstr(pzData + 3, "-*-");
-            char* pzNL  = strchr(pzData + 3, '\n');
+            char* pzNL  = strchr(pzData + 3, NL);
             if ((pzEnd == NULL) || (pzNL < pzEnd))
                 BAD_MARKER("invalid edit mode marker");
 

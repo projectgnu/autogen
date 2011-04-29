@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-03-25 14:21:41 bkorb"
+ *  Time-stamp:        "2011-04-20 15:19:19 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -367,7 +367,7 @@ flag = {
 #ifndef XML2AG
     disable    = no;
     doc = <<-  _EOF_
-	If you stamp your output files with the `DNE' macro output, then
+	If you stamp your output files with the @code{DNE} macro output, then
 	your output files will always be different, even if the content has
 	not really changed.  If you use this option, then the modification
 	time of the output files will change only if the input files change.
@@ -588,29 +588,6 @@ flag = {
 	preceeding the file name with two greater-than characters (@code{>>}).
 	_EOF_;
 
-    flag-code = <<- FLAG_CODE_END
-	    char const * fname = pOptDesc->optArg.argString;
-	    trace_is_to_pipe = (*fname == '|');
-	    if (trace_is_to_pipe)
-	        pfTrace = popen(++fname, "w");
-
-	    else if ((fname[0] == '>') && (fname[1] == '>')) {
-	        fname += 2;
-	        while (isspace((int)(*fname)))  fname++;
-	        pfTrace = fopen(fname, "a");
-	        fputs("\nAutoGen starts\n", pfTrace);
-	    }
-
-	    else
-	        pfTrace = fopen(fname, "w");
-
-	    if (pfTrace == NULL) {
-	        fprintf(stderr, "Error %d (%s) opening `%s' for output",
-	                errno, strerror(errno), fname);
-	        exit(EXIT_FAILURE);
-	    }
-	    setvbuf(pfTrace, NULL, _IONBF, 0);
-	FLAG_CODE_END ;
 #else
     doc = "Pass-through AutoGen argument";
 #endif

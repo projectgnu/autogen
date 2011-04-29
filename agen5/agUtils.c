@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-04-06 14:39:25 bkorb"
+ *  Time-stamp:        "2011-04-29 10:30:02 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -190,6 +190,50 @@ start_dep_file(void)
     fprintf(pfDepends, "%s_TList =", pz_targ_base);
 }
 
+/**
+ *  Open trace output file.
+ *
+ *  If the name starts with a pipe character (vertical bar), then
+ *  use popen on the command.  If it starts with ">>", then append
+ *  to the file name that  follows that.
+ *
+ *  The trace output starts with the command and arguments used to
+ *  start autogen.
+ */
+LOCAL void
+open_trace_file(char ** av, tOptDesc * odsc)
+{
+    char const * fname = odsc->optArg.argString;
+
+    trace_is_to_pipe = (*fname == '|');
+    if (trace_is_to_pipe)
+        pfTrace = popen(++fname, "w");
+
+    else if ((fname[0] == '>') && (fname[1] == '>')) {
+        fname += 2;
+        while (isspace((int)(*fname)))  fname++;
+        pfTrace = fopen(fname, "a");
+    }
+
+    else
+        pfTrace = fopen(fname, "w");
+
+    if (pfTrace == NULL) {
+        fprintf(stderr, "Error %d (%s) opening `%s' for output",
+                errno, strerror(errno), fname);
+        exit(EXIT_FAILURE);
+    }
+
+#ifdef _IONBF
+    setvbuf(pfTrace, NULL, _IONBF, 0);
+#endif
+
+    fprintf(pfTrace, "\nAutoGen starts:  %s", *av);
+    while (*(++av) != NULL)
+        fprintf(pfTrace, " '%s'", *av);
+    putc(NL, pfTrace);
+}
+
 LOCAL void
 doOptions(int arg_ct, char ** arg_vec)
 {
@@ -222,6 +266,9 @@ doOptions(int arg_ct, char ** arg_vec)
             break;
         }
     }
+
+    if ((OPT_VALUE_TRACE > TRACE_NOTHING) && HAVE_OPT(TRACE_OUT))
+        open_trace_file(arg_vec, &DESC(TRACE_OUT));
 
     startTime = time(NULL);
 
@@ -397,7 +444,7 @@ count_nl(char const * pz)
 {
     int ct = 0;
     for (;;) {
-        char const * p = strchr(pz, '\n');
+        char const * p = strchr(pz, NL);
         if (p == NULL)
             break;
         ct++;
@@ -419,7 +466,7 @@ skipExpression(char const * pzSrc, size_t len)
         return pzEnd;
     switch (*pzSrc) {
     case ';':
-        pzSrc = strchr(pzSrc, '\n');
+        pzSrc = strchr(pzSrc, NL);
         if (pzSrc == NULL)
             return pzEnd;
         goto guess_again;

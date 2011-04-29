@@ -26,7 +26,7 @@ done
 {
     cat <<- _EOF_
 	#include "autoopts/project.h"
-	#define  AUTOOPTS_INTERNAL
+	#define  AUTOOPTS_INTERNAL 1
 	#include "compat/compat.h"
 	#define  LOCAL static
 	_EOF_

@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2011-01-17 13:36:12 bkorb"
+ *  Time-stamp:        "2011-04-20 14:25:50 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -37,6 +37,9 @@ stringify_for_sh(char * pzNew, u_int qt, char const * pzDta, size_t dtaSize);
 static SCM
 shell_stringify(SCM obj, u_int qt);
 
+static int
+sub_count(char const * haystack, char const * needle);
+
 static void
 do_substitution(
     char const * pzStr,
@@ -45,9 +48,6 @@ do_substitution(
     SCM          repl,
     char **      ppzRes,
     scm_sizet *  pResLen );
-
-static void
-do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl);
 /* = = = END-STATIC-FORWARD = = = */
 
 static size_t
@@ -78,11 +78,11 @@ string_size(char const * pzScn, size_t newLineSize)
         case NUL:
             return dtaSize;
 
-        case '\n':
+        case NL:
             dtaSize += newLineSize;
             break;
 
-        case '\t':
+        case TAB:
         case '\a':
         case '\b':
         case '\f':
@@ -130,11 +130,11 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
         case NUL:
             goto copyDone;
 
-        case '\n':
+        case NL:
             /*
              *  place contiguous new-lines on a single line
              */
-            while (pzScn[1] == '\n') {
+            while (pzScn[1] == NL) {
                 *(pzDta++) = '\\';
                 *(pzDta++) = 'n';
                 pzScn++;
@@ -177,7 +177,7 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
             *(pzDta++) = 'r';
             break;
 
-        case '\t':
+        case TAB:
             *(pzDta++) = '\\';
             *(pzDta++) = 't';
             break;
@@ -314,6 +314,20 @@ shell_stringify(SCM obj, u_int qt)
     }
 }
 
+static int
+sub_count(char const * haystack, char const * needle)
+{
+    int repCt = 0;
+    size_t needle_len = strlen(needle);
+
+    for (;;) {
+        haystack = strstr(haystack, needle);
+        if (haystack == NULL) break;
+        repCt++;
+        haystack += needle_len;
+    }
+    return repCt;
+}
 
 /* * * * *
  *
@@ -336,18 +350,10 @@ do_substitution(
     int   replL   = AG_SCM_STRLEN(repl);
     int   endL    = strLen;
 
-    int   repCt   = 0;
+    int   repCt   = sub_count(pzStr, pzMatch);
     char const * pz = pzStr;
     char * pzRes;
     char * pzScan;
-
-    for (;;) {
-        char const * pzNxt = strstr(pz, pzMatch);
-        if (pzNxt == NULL)
-            break;
-        repCt++;
-        pz = pzNxt + matchL;
-    }
 
     /*
      *  No substitutions -- no work.  The caller will have to track
@@ -357,7 +363,7 @@ do_substitution(
         return;
 
     endL   = endL + (replL * repCt) - (matchL * repCt);
-    pzScan = pzRes = AGALOC(endL + 1, "substitution");
+    pzScan = pzRes = ag_scribble(endL + 1);
     pz     = pzStr;
 
     for (;;) {
@@ -384,11 +390,10 @@ do_substitution(
  *  be done in the order found in the tree walk of list values.
  *  The "match" and "repl" trees *must* be identical in structure.
  */
-static void
+LOCAL void
 do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl)
 {
     char* pzStr = *ppzStr;
-    char* pzOri = pzStr;
     char* pzNxt = pzStr;
 
     /*
@@ -407,14 +412,6 @@ do_multi_subs(char ** ppzStr, scm_sizet * pStrLen, SCM match, SCM repl)
         if (AG_SCM_STRING_P(matchCar)) {
             do_substitution(pzStr, *pStrLen, matchCar, replCar,
                             &pzNxt, pStrLen);
-
-            /*
-             *  Be sure to free intermediate results.
-             *  passed-in values are freed by the caller.
-             */
-            if ((pzStr != pzOri) && (pzStr != pzNxt))
-                // coverity[freed_arg] -- invalid alias analysis
-                AGFREE(pzStr);
 
             // coverity[use_after_free] -- invalid alias analysis
             pzStr = pzNxt;
@@ -645,7 +642,7 @@ ag_scm_prefix(SCM prefix, SCM text)
         switch (*(pzText++)) {
         case NUL:
             goto exit_count;
-        case '\n':
+        case NL:
             out_size += pfx_size;
             /* FALLTHROUGH */
         default:
@@ -669,7 +666,7 @@ ag_scm_prefix(SCM prefix, SCM text)
 
             return AG_SCM_STR2SCM(pzRes, out_size);
 
-        case '\n':
+        case NL:
             *pzDta    = ch;
             strcpy(pzDta+1, pzPfx);
             pzDta    += pfx_size;
@@ -1160,19 +1157,11 @@ ag_scm_string_substitute(SCM Str, SCM Match, SCM Repl)
     len   = AG_SCM_STRLEN(Str);
 
     if (AG_SCM_STRING_P(Match))
-        do_substitution(pzStr, len, Match, Repl,
-                        (char**)&pzStr, &len);
+        do_substitution(pzStr, len, Match, Repl, (char**)&pzStr, &len);
     else
         do_multi_subs((char**)&pzStr, &len, Match, Repl);
 
     res = AG_SCM_STR2SCM(pzStr, len);
-
-    /*
-     *  IF we have an allocated intermediate result,
-     *  THEN we must free it.  We might have our original string.
-     */
-    if (pzStr != AG_SCM_CHARS(Str))
-        AGFREE((char*)pzStr);
     return res;
 }
 

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-03-27 17:09:45 bkorb"
+# Time-stamp:      "2011-04-22 12:37:17 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -82,7 +82,17 @@
     (get "argument")
   ))
 )
-(define usage-text (string-append version-text "\n" usage-line "\n"))
+
+(define usage-text (string-append prog-name
+        (if (exist? "package")
+            (string-append " (" (get "package") ")")
+            "" )
+        " - " (get "prog-title")
+        (if (exist? "version")
+            (string-append " - Ver. " (get "version"))
+            "" )
+        "\n" usage-line "\n"
+))
 
 =][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -93,8 +103,7 @@ INCLUDE "optmain.tlib"
 IF (exist? "flag.arg-range")
 
 \=]
-#include <errno.h>
-extern FILE * option_usage_fp;[=
+#include <errno.h>[=
 
 ENDIF                     =][=
 
@@ -116,42 +125,60 @@ ENDIF
 #ifdef  __cplusplus
 extern "C" {
 #endif
+extern FILE * option_usage_fp;
 [= IF (exist? "flag.aliases") =]
 extern void optionAlias(tOptions* pOpts, tOptDesc* pOD, unsigned int alias);
 [= ENDIF =]
 /* TRANSLATORS: choose the translation for option names wisely because you
                 cannot ever change your mind. */[=
 
-IF (not (exist? "copyright") )
+IF (not (exist? "copyright"))
 
 =]
 #define zCopyright       NULL
 #define zCopyrightNotice NULL[=
-ELSE  =]
-tSCC zCopyright[] =
-       [= (set! tmp-text (kr-string
-       (sprintf "%s copyright (c) %s %s, all rights reserved" (. prog-name)
-                (get "copyright.date") (get "copyright.owner") )))
-       tmp-text =][=
-
+ELSE  =][=
+  (define cright-owner (get "copyright.owner" (get "copyright.author")))
+  =][=
   CASE (get "copyright.type") =][=
+    = note  =][=
+      (set! tmp-text (get  "copyright.text"))
+      (define ext-text tmp-text)            =][=
 
-    =  gpl  =][=(set! tmp-text (gpl  prog-name "" ))=][=
-    = lgpl  =][=(set! tmp-text (lgpl prog-name (get "copyright.owner") ""))=][=
-    =  bsd  =][=(set! tmp-text (bsd  prog-name (get "copyright.owner") ""))=][=
-    = note  =][=(set! tmp-text (get  "copyright.text"))=][=
-    *       =][=(set! tmp-text "Copyrighted")=][=
+    ~~* .   =][=
+      (define ext-text
+         (license-description (get "copyright.type")
+            prog-name "" cright-owner ) )
+
+      (set! tmp-text
+         (license-info (get "copyright.type")
+            prog-name "" cright-owner (get "copyright.date") ) )
+    =][=
+
+    *       =][=
+      (set! tmp-text (sprintf
+              "Copyright (C) %s %s, all rights reserved"
+              (get "copyright.date") cright-owner  ))
+      (define ext-text tmp-text)            =][=
 
   ESAC =][=
 
-(emit (def-file-line "copyright.text" extract-fmt))
-(set! tmp-text (shell (string-append
-"(sed 's/^[ \t]*//'|fmt -w 72)<<\\_EOF_\n" tmp-text "\n_EOF_")))
+(set! tmp-text (string-append version-text "\n" tmp-text))
+(ag-fprintf 0 "\nstatic char const zCopyright[%d] =\n%s;\n"
+ (+ (string-length tmp-text) 1) (kr-string tmp-text))
 
-(sprintf ";\ntSCC zCopyrightNotice[%d] =\n%s;\n"
- (+ (string-length tmp-text) 1) (kr-string tmp-text)  ) =][=
+(if (= tmp-text ext-text)
+    "#define zCopyrightNotice zCopyright\n"
+    (begin
+     (set! ext-text (string-append (shell (string-append
+           "fmt -w 75 <<_EOF_\n" ext-text "_EOF_" )) "\n" ))
 
-ENDIF "copyright notes"
+     (sprintf "static char const zCopyrightNotice[%d] =\n%s;\n"
+             (+ (string-length ext-text) 1)
+             (kr-string ext-text)  )
+)   ) =][=
+
+ENDIF "copyright"
 
 =]
 extern tUsageProc [=
@@ -691,8 +718,6 @@ AO_gettext(char const* pz)
 
 static void coerce_it(void** s) { *s = AO_gettext(*s);
 }
-#define COERSION(_f) \
-  coerce_it((void*)&([= (. pname) =]Options._f))
 
 /*
  *  This invokes the translation code (e.g. gettext(3)).
@@ -700,6 +725,8 @@ static void coerce_it(void** s) { *s = AO_gettext(*s);
 static void
 translate_option_strings(void)
 {
+    tOptions * const pOpt = &[=(. pname)=]Options;
+
     /*
      *  Guard against re-translation.  It won't work.  The strings will have
      *  been changed by the first pass through this code.  One shot only.
@@ -709,9 +736,9 @@ translate_option_strings(void)
          *  Do the translations.  The first pointer follows the field count
          *  field.  The field count field is the size of a pointer.
          */
-        tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
-        char**    ppz = (char**)(void*)&(option_usage_text);
-        int       ix  = option_usage_text.field_ct;
+        tOptDesc * pOD = pOpt->pOptDesc;
+        char **    ppz = (char**)(void*)&(option_usage_text);
+        int        ix  = option_usage_text.field_ct;
 
         do {
             ppz++;
@@ -720,27 +747,27 @@ translate_option_strings(void)
 [=
   FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle pzExplain
                pzDetail    pzPackager   =]
-        COERSION([= field =]);[=
+        coerce_it((void*)&(pOpt->[= field =]));[=
   ENDFOR                        =][=
 
   IF (exist? "full-usage")      =]
-        COERSION(pzFullUsage);[=
+        coerce_it((void*)&(pOpt->pzFullUsage));[=
   ENDIF                         =][=
 
   IF (exist? "short-usage")     =]
-        COERSION(pzShortUsage);[=
+        coerce_it((void*)&(pOpt->pzShortUsage));[=
   ENDIF                         =]
         option_usage_text.field_ct = 0;
 
-        for (ix = [=(. pname)=]Options.optCt; ix > 0; ix--, pOD++)
+        for (ix = pOpt->optCt; ix > 0; ix--, pOD++)
             coerce_it((void*)&(pOD->pzText));
     }
 
-    if (([= (. pname) =]Options.fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
-        tOptDesc* pOD = [=(. pname)=]Options.pOptDesc;
-        int       ix;
+    if ((pOpt->fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
+        tOptDesc * pOD = pOpt->pOptDesc;
+        int        ix;
 
-        for (ix = [=(. pname)=]Options.optCt; ix > 0; ix--, pOD++) {[=
+        for (ix = pOpt->optCt; ix > 0; ix--, pOD++) {[=
 
   FOR field IN pz_Name pz_DisableName pz_DisablePfx  =][=
 

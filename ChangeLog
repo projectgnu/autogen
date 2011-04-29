@@ -1,3 +1,44 @@
+2011-04-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c (sub_count): new function
+	(do_multi_subs): now used by expFormat.c
+	(ag_scm_string_substitute): use scribble space.  do not allocate
+	* agen5/expFormat.c (zGpl): remove
+	(zAgpl): remove
+	(zLgpl): remove
+	(zBsd): remove
+	(find_lic_text): new function for obtaining license text
+	(construct_license): use that function for constructing results
+	(ag_scm_license_full, ag_scm_license_info, ag_scm_license_description):
+	new scheme functions for selecting the flavor of text derivable
+	from the license text files.
+	(ag_scm_gpl, ag_scm_agpl, ag_scm_lgpl, ag_scm_bsd):
+	modified to use the above functions.
+	* agen5/test/*.test: trim licensing text from all comparisons.
+	It is too variable now for validation.
+
+	* agen5/opts.def (trace-out): defer opening the file.  Do not
+	leave trace file around when only options are processed.
+	* agen5/agUtils.c (open_trace_file): new function
+	(doOptions): use it when --trace-out is specified
+
+	* add-on/char-mapper/char-mapper.c: we handle 64 bits in a word now.
+	* add-on/cright-update/opts.def: correct license name to mbsd.
+
+	* agen5/autogen.h (NL): new #define
+	(TAB): also
+	* agen5/agInit.c: use them
+	* agen5/autogen.c: likewise
+	* agen5/defDirect.c: likewise
+	* agen5/defLex.c: likewise
+	* agen5/expMake.c: likewise
+	* agen5/expOutput.c: likewise
+	* agen5/funcDef.c: likewise
+	* agen5/funcFor.c: likewise
+	* agen5/functions.c: likewise
+	* agen5/loadPseudo.c: likewise
+	* agen5/expString.c: likewise
+
 2011-04-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/makeshell.c (textToVariable): clean up some nits

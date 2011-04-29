@@ -2,7 +2,7 @@
 /**
  *  \file functions.c
  *
- *  Time-stamp:        "2011-01-20 16:03:37 bkorb"
+ *  Time-stamp:        "2011-04-20 14:22:51 bkorb"
  *
  *  This module implements text functions.
  *
@@ -265,7 +265,7 @@ mLoad_Unknown(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
          *  Strip off scheme comments
          */
         do  {
-            while (--srcLen, (*++pzSrc != '\n')) {
+            while (--srcLen, (*++pzSrc != NL)) {
                 if (srcLen <= 0)
                     goto return_emtpy_expression;
             }

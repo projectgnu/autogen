@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2011-03-12 16:03:03 bkorb"
+# Time-stamp:      "2011-04-20 13:46:56 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -60,7 +60,7 @@ then
 	    tfile=ag-\${1}-$$.log
 	    tag="-MF${testname}-stamp-\${1} --trace=every --trace-out=\${tfile}"
 	    shift
-	    ${AGexe} \${tag} "\$@"
+	    ${AGexe} -L${top_srcdir}/autoopts/tpl \${tag} "\$@"
 	}
 	_EOF_
 else
@@ -70,7 +70,7 @@ else
 	    tag="-MF${testname}-stamp-\${1}"
 	    shift
 	    echo ${AGexe} "\$@"
-	    ${AGexe} \${tag} "\$@"
+	    ${AGexe} -L${top_srcdir}/autoopts/tpl \${tag} "\$@"
 	}
 	_EOF_
 fi
@@ -79,8 +79,8 @@ ${SED} -n '/^make_exprini()/,/^[}]$/p' ${top_srcdir}/agen5/bootstrap.dir | \
   ${SED} 's/rm -f /echo rm -f/' >&3
 cat >&3 <<- _EOF_
 	make_exprini
-	${SED} '/DO NOT EDIT/,/and the template/d' expr.ini > \${srcdir}/expr.res
-	${SED} '/DO NOT EDIT/,/and the template/d' ${top_srcdir}/agen5/expr.ini \
+	${SED} "${sed_omit_license}" expr.ini > \${srcdir}/expr.res
+	${SED} "${sed_omit_license}" ${top_srcdir}/agen5/expr.ini \
 	    > \${srcdir}/expr.base
 	_EOF_
 exec 3>&-

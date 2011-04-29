@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2011-03-04 11:17:02 bkorb"
+# Time-stamp:        "2011-04-29 12:05:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -49,6 +49,7 @@ _EOF_
 # # # # # # # # # # ANTICIPATED RESULTS # # # # # # # # #
 
 cat > ${testname}.base1 <<\_EOF_
+
 eval from file agInit.c line XXX:
 (debug-enable 'backtrace)
 Definition Load:
@@ -148,6 +149,7 @@ fi
 run_ag x1 ${trace_args} ${testname}.def || failure AutoGen failed
 ${SED} -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
     -e '/Called ag_scm_for_index/d' \
+    -e '/^AutoGen starts:/d' \
     ${traceout} > ${testname}.trace1
 cmp -s ${testname}.base1 ${testname}.trace1 || \
   failure "`diff -c ${testname}.base1 ${testname}.trace1`"
