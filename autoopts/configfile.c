@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-04-06 09:31:24 bkorb"
+ *  Time-stamp:      "2011-05-02 12:03:39 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -25,9 +25,6 @@
  *  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
-
-static void
-set_usage_flags(tOptions * opts, char const * flg_txt);
 
 /* = = = START-STATIC-FORWARD = = = */
 static void

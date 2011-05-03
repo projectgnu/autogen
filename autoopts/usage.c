@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2011-02-01 14:42:37 bkorb"
+ * Time-stamp:      "2011-05-02 12:04:40 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -38,9 +38,6 @@
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
 
 /* = = = START-STATIC-FORWARD = = = */
-static void
-set_usage_flags(tOptions * opts, char const * flg_txt);
-
 static inline ag_bool
 do_gnu_usage(tOptions * pOpts);
 
@@ -85,7 +82,7 @@ setStdOptFmts(tOptions* pOpts, tCC** ppT);
     _aof_(no_misuse_usage, OPTPROC_MISUSE   )   \
     _aof_(misuse_usage,    ~OPTPROC_MISUSE  )
 
-static void
+LOCAL void
 set_usage_flags(tOptions * opts, char const * flg_txt)
 {
     typedef struct {
@@ -112,8 +109,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
 
     if (flg_txt == NULL) {
         flg_txt = getenv("AUTOOPTS_USAGE");
-        if (flg_txt == NULL)
-            return;
+        if (flg_txt == NULL) return;
     }
 
     while (IS_WHITESPACE_CHAR(*flg_txt))  flg_txt++;

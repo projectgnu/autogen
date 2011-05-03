@@ -1284,6 +1284,13 @@ programs by partitioning it with lines containing,
 ``@code{[PROGRAM_NAME]}'' or ``@code{<?program-name>}'', @xref{loading rcfile}.
 
 @item
+Config files may contain AutoOpts directives.
+``@code{<?auto-options [[option-text]]>}'' may be used to set @code{AutoOpts}
+option processing options.  Viz., @code{GNU} usage layout versus @code{AutoOpts}
+conventional layout, and @code{misuse-usage} versus @code{no-misuse-usage},
+@xref{usage attributes}.
+
+@item
 Options may be marked as @code{@i{dis}-abled} with a disablement prefix.
 Such options may default to either an enabled or a disabled state.  You
 may also provide an enablement prefix, too, e.g., @code{--allow-mumble}
@@ -1482,6 +1489,8 @@ list of the following strings:
 @item gnu
 @cindex gnu
 The format of the extended usage text will be displayed in GNU-normal form.
+The default display for @code{--version} will be to include a note
+on licensing terms.
 
 @item autoopts
 @cindex autoopts
@@ -4868,6 +4877,24 @@ file.  All text before the first segmentation line is processed, then only
 the segment that applies:
 
 @table @samp
+@item <?auto-options ...>
+The @code{...} ellipsis may contain AutoOpts option processing options.
+Currently, that consists of one or both of:
+
+@table @code
+@item gnu
+@itemx autoopts
+to indicate GNU-standard or AutoOpts-standard layout of usage and
+version information, and/or
+
+@item misuse-usage
+@itemx no-misuse-usage
+to indicate whether the available options should be listed when
+an invalid option appears on the command line.
+@end table
+@noindent
+Anything else will be silently ignored.
+
 @item <?program prog-name>
 The @code{<?} marker indicates an XML directive.
 The file is partitioned by these lines and the options are processed

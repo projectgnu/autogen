@@ -1,6 +1,18 @@
-2011-04-29  Bruce Korb  <bkorb@gnu.org>
+2011-05-02  Bruce Korb  <bkorb@gnu.org>
 
 	5.11.9 released
+
+	* autoopts/usage.c (set_usage_flags): make "local" instead of "static"
+	* autoopts/version.c (print_ver): use "set_usage_flags" to decide if
+	we should, by default, include licensing information with version.
+	* doc/autogen-texi.txt (<?auto-options>): discuss how this works in
+	config files
+
+	Thanks to Dave Hart:
+	* autoopts/tpl/optcode.tlib (zCopyrightNotice): newline needed
+	before closing here-doc marker.
+
+2011-04-29  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expString.c (sub_count): new function
 	(do_multi_subs): now used by expFormat.c

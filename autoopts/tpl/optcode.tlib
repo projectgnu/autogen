@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-04-22 12:37:17 bkorb"
+# Time-stamp:      "2011-05-03 12:37:09 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -171,7 +171,7 @@ ELSE  =][=
     "#define zCopyrightNotice zCopyright\n"
     (begin
      (set! ext-text (string-append (shell (string-append
-           "fmt -w 75 <<_EOF_\n" ext-text "_EOF_" )) "\n" ))
+           "fmt -w 75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
 
      (sprintf "static char const zCopyrightNotice[%d] =\n%s;\n"
              (+ (string-length ext-text) 1)
