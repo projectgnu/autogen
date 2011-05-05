@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-01-19 11:41:34 bkorb"
+;;; Time-stamp:        "2011-05-05 11:05:08 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -216,7 +216,6 @@
 ;;; /*=gfunc   string_table_add
 ;;;  *
 ;;;  * what:   Add an entry to a string table
-;;;  * general-use:
 ;;;  *
 ;;;  * exparg: st-name , the name of the array of characters
 ;;;  * exparg: str-val , the (possibly) new value to add
@@ -270,7 +269,6 @@
 ;;; /*=gfunc   emit_string_table
 ;;;  *
 ;;;  * what:   output a string table
-;;;  * general-use:
 ;;;  *
 ;;;  * exparg: st-name , the name of the array of characters
 ;;;  *

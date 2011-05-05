@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2011-01-20 16:07:46 bkorb"
+ *  Time-stamp:        "2011-05-05 11:02:50 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -323,7 +323,6 @@ ag_scm_error_source_line(void)
 /*=gfunc emit
  *
  * what: emit the text for each argument
- * general_use:
  *
  * exparg: alist, list of arguments to stringify and emit, , list
  *

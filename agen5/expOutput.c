@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-04-20 14:23:32 bkorb"
+ *  Time-stamp:        "2011-05-05 11:01:03 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -456,7 +456,6 @@ ag_scm_out_emit_suspended(SCM susp_nm)
 /*=gfunc ag_fprintf
  *
  * what:  format to autogen stream
- * general_use:
  *
  * exparg: ag-diversion, AutoGen diversion name or number
  * exparg: format,       formatting string
