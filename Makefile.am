@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-02-01 11:32:49 bkorb"
+## Time-stamp:      "2011-05-05 10:04:15 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -39,7 +39,6 @@ SUBDIRS       += xml2ag
 endif
 endif
 
-misc_extra     = VERSION NOTES config/bootstrap* config/*.m4
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tlib config/liboptschk.m4
 EXTRA_DIST     = $(misc_extra) $(pkgdata_DATA)
 DISTCLEANFILES = stamp-h
@@ -52,6 +51,11 @@ configure   : VERSION
 pkg         : package
 package     :
 	cd pkg && $(MAKE) $@ pkgtype="$(pkgtype)"
+
+docs        : gnudocs
+gnudoc      : gnudocs
+gnudocs     :
+	cd doc && $(MAKE) gnudocs
 
 usage-txt.po: gettext
 gettext     :
@@ -66,5 +70,6 @@ release     :
 endif
 
 .NOTPARALLEL:
+.PHONY: pkg package docs gnudoc gnudocs
 
 ## Makefile.am ends here

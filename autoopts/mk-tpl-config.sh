@@ -86,14 +86,25 @@ do
     chmod 755 $d
 done
 
-POSIX_SHELL=`which cat`
+while :
+do
+    \unalias -a
+    unset -f command cat which
+    POSIX_CAT=`which cat`
+    test -x "$POSIX_CAT" && break
+    POSIX_CAT=`
+        PATH=\`command -p getconf CS_PATH\`
+        command -v cat `
+    test -x "${POSIX_CAT}" && break
+    die "cannot locate 'cat' command"
+done
 
 for f in man mdoc texi
 do
     for g in man mdoc texi
     do
         test -f ${f}2${g} || {
-            echo '#!' ${POSIX_SHELL} > ${f}2${g}
+            echo '#!' ${POSIX_CAT} > ${f}2${g}
             chmod 755 ${f}2${g}
         }
     done

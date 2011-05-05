@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-07 09:06:21 bkorb"
+## Time-stamp:      "2011-05-05 08:54:39 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -21,11 +21,11 @@
 
 DISTCLEANFILES = autogen.lsm
 
-DEBIAN_FILES  = mkpkg.debian ALL SOURCES IN debian DIRECTORY
+DEBIAN_FILES  = mkpkg.debian + ALL SOURCES IN debian DIRECTORY
 LIBOPTS_FILES = ALL SOURCES IN pkg/libopts DIRECTORY
 TPL_FILES     = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
 PKG_FILES     = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in $(DEBIAN_FILES)
-EXTRA_DIST    = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES) mkgnudoc.sh
+EXTRA_DIST    = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES)
 DOCENV        = MAKE="$(MAKE)"
 
 all : $(DISTCLEANFILES)
@@ -45,15 +45,6 @@ package :
 	$(DOCENV) $(SHELL) $(srcdir)/mkpkg.sh
 
 pkg     : package
-
-##  The following targets only work from CVS sources
-##
-gnudoc  :
-	pkgsrcdir=`cd $(srcdir) ; pwd` ; \
-	cd $(top_builddir)/doc ; \
-	$(DOCENV) $(SHELL) $${pkgsrcdir}/mkgnudoc.sh \
-		"$(PACKAGE)" "$(PACKAGE_VERSION)" \
-		The Automated Program Generator
 
 .NOTPARALLEL:
 

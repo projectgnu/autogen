@@ -7,6 +7,13 @@
 	we should, by default, include licensing information with version.
 	* doc/autogen-texi.txt (<?auto-options>): discuss how this works in
 	config files
+	* autoopts/mk-tpl-config.sh (POSIX_CAT): make really, really sure
+	we have the full path of the POSIX program "cat".
+	* install several gnulib programs and sources
+	* pkg/mkgnudoc.sh: remove -- gotten from gnulib now
+	* pkg/Makefile.am (gnudoc): removed to doc directory
+	* doc/Makefile.am (gnudocs): new target -- uses gendocs.sh from gnulib
+	* Makefile.am (docs): new phony target
 
 	Thanks to Dave Hart:
 	* autoopts/tpl/optcode.tlib (zCopyrightNotice): newline needed

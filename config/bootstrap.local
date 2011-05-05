@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-01-26 18:56:27 bkorb"
+# Time-stamp:        "2011-05-05 09:37:32 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -114,11 +114,11 @@ config_versions()
       mv -f X NEWS
     fi
 
-    ( cd ${srcdir}/config
-      ${AGexe} -L. libopts.def
-      ${AGexe} -L. misc.def
-    ) || exit 1
-    cp ${srcdir}/snprintfv/snprintfv.m4 ${srcdir}/config/.
+    cd ${srcdir}/config
+    ${AGexe} -L. libopts.def || exit 1
+    ${AGexe} -L. misc.def    || exit 1
+    cd ..
+    cp snprintfv/snprintfv.m4 config/.
 
     marker='=== Component Todo:'
     rm -f TODO
@@ -132,34 +132,39 @@ config_versions()
     done >&3
     exec 3>&-
 
-    ( cd ${srcdir}/pkg/debian
-      debver=$(echo 1:${AG_VERSION}-1 | sed 's/pre/~pre/')
-      fgrep "(${debver})" changelog && exit 0
+    cd pkg/debian
+    debver=$(echo 1:${AG_VERSION}-1 | sed 's/pre/~pre/')
+    fgrep "(${debver})" changelog && exit 0
 
-      reltype=$(
+    reltype=$(
         case "${AG_VERSION}" in
-          ( *pre* ) echo prerelease ;;
-          ( * ) echo release ;;
+        ( *pre* ) echo prerelease ;;
+        ( * ) echo release ;;
         esac
-      )
-      uname=$(finger $(id -n -u) | sed 's/.*Name: *//;1q')
-      exec 3> changelog-new
-      cat >&3 <<- _EOF_
+    )
+    uname=$(finger $(id -n -u) | sed 's/.*Name: *//;1q')
+    exec 3> changelog-new
+    cat >&3 <<- _EOF_
 	autogen (${debver}) experimental; urgency=low
 
 	  * New ${reltype}.
 	_EOF_
-      sed '1,2d;/^$/q;s/^/  /' ${srcdir}/NEWS >&3
-      cat >&3 <<- _EOF_
+    sed '1,2d;/^$/q;s/^/  /' ${srcdir}/NEWS >&3
+    cat >&3 <<- _EOF_
 
 	 -- ${uname} <${EADDR}>  $(date -R)
 
 	_EOF_
-      cat changelog >&3
-      rm -f changelog
-      exec 3>&-
-      mv changelog-new changelog
-    )
+    cat changelog >&3
+    rm -f changelog
+    exec 3>&-
+    mv changelog-new changelog
+    cd ${srcdir}
+
+    GNULIBDIR=~gnu/proj/gnulib
+    cp ${GNULIBDIR}/lib/parse-duration.[ch] autoopts/.
+    cp  ${GNULIBDIR}/build-aux/gendocs.sh \
+        ${GNULIBDIR}/doc/gendocs_template doc/.
 }
 
 check_tools()
@@ -178,29 +183,34 @@ tweak_Makefile_am()
     #
     test -z "${srcdir}" && \
         srcdir=$(\cd $(dirname $0) ; \cd .. ; pwd)
+    cd ${srcdir}
 
-    MISSING=${MISSING-${srcdir}/config/missing}
+    {
+        sed '/^EXTRA_DIST /{ ; s/.*/misc_extra     = \\/ ; q ; }' Makefile.am
+        find VERSION NOTES config/bootstrap* config/*.m4 \
+               autoopts/parse-duration.[ch] doc/gendocs* \
+            -type f | \
+            columns --spread=1 -I4 --line=' \'
 
-    sed "/^misc_extra /s@=.*@= $(
-        echo VERSION NOTES config/bootstrap* config/*.m4
-        )@" ${srcdir}/Makefile.am > XXX$$
-    mv -f XXX$$ ${srcdir}/Makefile.am
+        sed -n '/^EXTRA_DIST /,$p' Makefile.am
+    } > XXX$$
+    mv -f XXX$$ Makefile.am
 
-    exec 3> XXX$$
-    sed '/^DEBIAN_FILES *=/,$d' ${srcdir}/pkg/Makefile.am >&3
+    cd pkg
+    {
+        sed '/^DEBIAN_FILES  *=/{ ; s/=.*/= \\/ ; q ; }' Makefile.am
+        find mkpkg.debian debian/* -type f | \
+            columns --spread=1 -I4 --line=' \'
+        printf '\nLIBOPTS_FILES = \\\n'
 
-    (\cd ${srcdir}/pkg ; ls -1d libopts/* ) | \
-        egrep -v '^libopts/(CVS|SCCS)$' | \
-        columns --spread=1 --first='LIBOPTS_FILES =' -I16 --line=" \\" >&3
-    echo >&3
-    (\cd ${srcdir}/pkg ; ls -1d mkpkg.debian debian/* ) | \
-        egrep -v '^debian/(CVS|SCCS)$' | \
-        columns --spread=1 --first='DEBIAN_FILES =' -I16 --line=" \\" >&3
+        find libopts -type f | \
+            columns --spread=1 -I4 --line=" \\"
+        echo
 
-    sed '1,/LIBOPTS_FILES *=/d' ${srcdir}/pkg/Makefile.am >&3
-    exec 3>&-
-
-    mv -f XXX$$ ${srcdir}/pkg/Makefile.am
+        sed '1,/LIBOPTS_FILES *=/d' Makefile.am
+    } > XXX$$
+    mv -f XXX$$ Makefile.am
+    cd ${srcdir}
 }
 
 case "${BOOTSTRAP}" in

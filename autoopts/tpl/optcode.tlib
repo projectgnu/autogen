@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-05-03 12:37:09 bkorb"
+# Time-stamp:      "2011-05-03 14:08:02 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -135,8 +135,8 @@ extern void optionAlias(tOptions* pOpts, tOptDesc* pOD, unsigned int alias);
 IF (not (exist? "copyright"))
 
 =]
-#define zCopyright       NULL
-#define zCopyrightNotice NULL[=
+#define zCopyright      NULL
+#define zLicenseDescrip NULL[=
 ELSE  =][=
   (define cright-owner (get "copyright.owner" (get "copyright.author")))
   =][=
@@ -168,12 +168,12 @@ ELSE  =][=
  (+ (string-length tmp-text) 1) (kr-string tmp-text))
 
 (if (= tmp-text ext-text)
-    "#define zCopyrightNotice zCopyright\n"
+    "#define zLicenseDescrip zCopyright\n"
     (begin
      (set! ext-text (string-append (shell (string-append
            "fmt -w 75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
 
-     (sprintf "static char const zCopyrightNotice[%d] =\n%s;\n"
+     (sprintf "static char const zLicenseDescrip[%d] =\n%s;\n"
              (+ (string-length ext-text) 1)
              (kr-string ext-text)  )
 )   ) =][=
@@ -577,7 +577,7 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_MISUSE[=     ENDIF=] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         zPROGNAME,
-    zRcName,      zCopyright,   zCopyrightNotice,
+    zRcName,      zCopyright,   zLicenseDescrip,
     zFullVersion, apzHomeList,  zUsageTitle,
     zExplain,     zDetail,      optDesc,
     zBugsAddr,                  /* address to send bugs to */

@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-04-20 10:26:14 bkorb"
+# Time-stamp:      "2011-05-03 17:31:36 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -116,8 +116,6 @@ add_files_to_mf() {
 
     rm -f *.3
     sed -i "${sedcmd}" Makefile.am
-
-    cp ~gnu/proj/gnulib/lib/parse-duration.[ch] .
 }
 
 make_funcs_def()
