@@ -1,4 +1,8 @@
-New in __CURRENT_VERSION__ April 2011
+New in __CURRENT_VERSION__ May 2011
+
+* new stuff
+
+New in 5.11.9 May 2011
 
 * licenses have been moved to separate files.  They are no longer
   hard coded in autogen.  Consequently, clients may add their own.

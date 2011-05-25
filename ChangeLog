@@ -1,3 +1,11 @@
+2011-05-24  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c: make it smaller
+	* autoopts/check.c: new
+	* autoopts/find.c: new
+	* autoopts/enum.c: renamed from enumeration.c
+	* autoopts/env.c:  renamed from environment.c
+
 2011-05-02  Bruce Korb  <bkorb@gnu.org>
 
 	5.11.9 released

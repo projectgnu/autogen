@@ -1,7 +1,7 @@
 
 /**
  *  \file load.c
- *  Time-stamp:      "2010-12-18 11:46:07 bkorb"
+ *  Time-stamp:      "2011-05-24 18:05:28 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -372,7 +372,7 @@ loadOptionLine(
     {
         char* pzArg = assembleArgValue(pzLine, load_mode);
 
-        if (! SUCCESSFUL(longOptionFind(pOpts, pzLine, pOS)))
+        if (! SUCCESSFUL(opt_find_long(pOpts, pzLine, pOS)))
             return;
         if (pOS->flags & OPTST_NO_INIT)
             return;

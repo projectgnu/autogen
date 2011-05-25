@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-03-06 15:11:39 bkorb"
+## Time-stamp:      "2011-05-24 17:35:13 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -53,11 +53,11 @@ GEN_SRC     = value-type.c xat-attribute.c
 ##
 CSRC        = parse-duration.c $(GEN_SRC) \
     autoopts.c  \
-    boolean.c configfile.c cook.c      enumeration.c environment.c \
-    file.c    genshell.c   load.c      makeshell.c   nested.c  numeric.c \
-    pgusage.c putshell.c   reset.c     restore.c     save.c    sort.c    \
-    stack.c   streqvcmp.c  text_mmap.c tokenize.c    time.c    usage.c   \
-    version.c
+    boolean.c configfile.c cook.c      check.c     enum.c      env.c     \
+    file.c    find.c       genshell.c  load.c      makeshell.c nested.c  \
+    numeric.c pgusage.c    putshell.c  reset.c     restore.c   save.c    \
+    sort.c    stack.c      streqvcmp.c text_mmap.c tokenize.c  time.c    \
+    usage.c   version.c
 
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
 STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
