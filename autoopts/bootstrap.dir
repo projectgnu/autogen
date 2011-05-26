@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-05-03 17:31:36 bkorb"
+# Time-stamp:      "2011-05-26 08:40:10 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -68,10 +68,10 @@ add_files_to_mf() {
 
     local tmpl=$(
         ndst=""
-        pdta="autoopts.m4${nl}"
-        edta="${pdta}bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
+        pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
+        edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
         edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
-        edta="${edta}install-options-h${nl}po${nl}"
+        edta="${edta}install-options-h${nl}po${nl}tpl/usage-txt.tpl${nl}"
 
         for f in tpl/*.*
         do
@@ -82,19 +82,16 @@ add_files_to_mf() {
                 edta=${edta}${f}${nl}    # distributed file
                 ;;
 
-            ( *tpl-config.tlib ) : ;;
-
-            ( tpl/usage* )
-                edta=${edta}${f}${nl} ;; # distribute only file
+            ( *tpl-config.tlib | *tpl/usage* ) : ;;
 
             ( *.tlib | *.tpl | *.def | *.lic )
                 pdta=${pdta}${f}${nl} ;; # installed & distributed file
             esac
         done
 
-        echo "local edta='${edta%${nl}}'"
         echo "local ndst='${ndst%${nl}}'"
         echo "local pdta='${pdta%${nl}}'"
+        echo "local edta='${edta%${nl}}'"
     )
 
     eval "$tmpl"

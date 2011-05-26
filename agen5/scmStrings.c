@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2010-12-09 15:01:34 bkorb"
+ * Time-stamp:        "2011-05-26 08:50:37 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -144,8 +144,6 @@ ag_scribble(ssize_t size)
     return buf;
 }
 
-
-#if GUILE_VERSION >= 107000
 /**
  *  As of Guile 1.7.x, access to the NUL terminated string referenced by
  *  an SCM is no longer guaranteed.  Therefore, we must extract the string
@@ -158,6 +156,16 @@ ag_scribble(ssize_t size)
 char *
 ag_scm2zchars(SCM s, const char * type)
 {
+#if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
+
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf(zNotStr, type));
+
+    if (SCM_SUBSTRP(s))
+        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
+    return SCM_CHARS(s);
+
+#else
     static char const bad_val[] =
         "scm_string_length returned wrong value: %d != %d\n";
     size_t len;
@@ -182,8 +190,8 @@ ag_scm2zchars(SCM s, const char * type)
 
     buf[len] = NUL;
     return buf;
-}
 #endif
+}
 
 /*
  * Local Variables:

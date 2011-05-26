@@ -488,10 +488,10 @@ extern tOptions [=(. pname)=]Options;[=
 #if defined(ENABLE_NLS)
 # ifndef _
 #   include <stdio.h>
-    static inline char* aoGetsText(char const* pz) {
-        if (pz == NULL) return NULL;
-        return (char*)gettext(pz);
-    }
+static inline char* aoGetsText(char const* pz) {
+    if (pz == NULL) return NULL;
+    return (char*)gettext(pz);
+}
 #   define _(s)  aoGetsText(s)
 # endif /* _() */
 

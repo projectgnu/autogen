@@ -1,3 +1,14 @@
+2011-05-26  Bruce Korb  <bkorb@gnu.org>
+
+	Thanks to Ivo Shopov <ivoshopov@users.sourceforge.net>
+	* autoopts/bootstrap.dir (edta): remove tpl/usage.tlib and
+	add to pdta instead.  (It needs to be installed.)
+
+	* autoopts/find.c (parse_opt): new function, extracted from:
+	(opt_find_long): make it smaller
+	* agen5/guile-iface.tpl (ag_scm2zchars): remove pre-Guile 1.7 version
+	* agen5/scmStrings.c (ag_scm2zchars): add pre-1.7 code to function
+
 2011-05-24  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c: make it smaller

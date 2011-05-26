@@ -79,23 +79,7 @@ ENDFOR iface    =][=
 #error unknown GUILE_VERSION
 #endif
 
-#if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
-
-  static inline char * ag_scm2zchars(SCM s, char const * type)
-  {
-    if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(zNotStr, type));
-
-    if (SCM_SUBSTRP(s))
-        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
-    return SCM_CHARS(s);
-  }
-
-#else /* Guile 1.7 and following */
-
-  extern char * ag_scm2zchars(SCM s, char const * type);
-
-#endif
+extern char * ag_scm2zchars(SCM s, char const * type);
 
 static inline SCM ag_eval(char const * pzStr)
 {

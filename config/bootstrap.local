@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-05-05 09:37:32 bkorb"
+# Time-stamp:        "2011-05-26 09:11:40 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -224,7 +224,7 @@ case "${BOOTSTRAP}" in
     ;;
 
 ( post )
-    rm -f  ${dummy_texi}
+    test ${#dummy_texi} -gt 0 && rm -f ${dummy_texi}
     ;;
 esac
 
