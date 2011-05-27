@@ -1,6 +1,6 @@
 /*
  *
- *  Time-stamp:        "2010-12-06 13:18:05 bkorb"
+ *  Time-stamp:        "2011-05-26 10:58:37 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
@@ -24,14 +24,12 @@
  */
 
 #ifndef SHELL_ENABLED
-SCM
-ag_scm_make_gperf(SCM name, SCM hlist)
+HIDE_FN(SCM ag_scm_make_gperf(SCM name, SCM hlist))
 {
     return SCM_UNDEFINED;
 }
 
-SCM
-ag_scm_gperf(SCM name, SCM str)
+HIDE_FN(SCM ag_scm_gperf(SCM name, SCM str))
 {
     return SCM_UNDEFINED;
 }

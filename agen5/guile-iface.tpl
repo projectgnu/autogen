@@ -79,8 +79,6 @@ ENDFOR iface    =][=
 #error unknown GUILE_VERSION
 #endif
 
-extern char * ag_scm2zchars(SCM s, char const * type);
-
 static inline SCM ag_eval(char const * pzStr)
 {
     SCM res;

@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2011-05-26 08:50:37 bkorb"
+ * Time-stamp:        "2011-05-26 11:24:05 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -96,7 +96,7 @@ new_scribble_block(size_t min_size)
     /*
      * Allocate and link into list.  Advance pointer to next entry.
      */
-    *next_strbuf = res = AGALOC(min_size, "SCM String Buffer");
+    *next_strbuf = res = AGALOC(min_size, "scribble buf");
     next_strbuf  = &(res->next_p);
     res->next_p  = NULL;
     res->sb_off  = 0;
@@ -117,8 +117,11 @@ new_scribble_block(size_t min_size)
  *  the space to still be usable at the end of the block macro.
  *  These allocations are intended for temporary space needs that cannot
  *  be kept on the stack.  Expression processing.
+ *
+ *  @param  size  the number of bytes needed
+ *  @return the memory as a pointer to character
  */
-LOCAL char*
+LOCAL char *
 ag_scribble(ssize_t size)
 {
     string_buf_t* sb = ag_strbufs;
@@ -149,11 +152,11 @@ ag_scribble(ssize_t size)
  *  an SCM is no longer guaranteed.  Therefore, we must extract the string
  *  into one of our "scribble" buffers.
  *
- * @param s the string to convert
- * @param type a string describing the string
- * @returns a NUL terminated string, or it aborts.
+ * @param  s     the string to convert
+ * @param  type  a string describing the string
+ * @return a NUL terminated string, or it aborts.
  */
-char *
+LOCAL char *
 ag_scm2zchars(SCM s, const char * type)
 {
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */

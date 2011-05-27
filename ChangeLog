@@ -4,8 +4,15 @@
 	* autoopts/bootstrap.dir (edta): remove tpl/usage.tlib and
 	add to pdta instead.  (It needs to be installed.)
 
-	* autoopts/find.c (parse_opt): new function, extracted from:
-	(opt_find_long): make it smaller
+	* autoopts/find.c (parse_opt): new function, extracted from opt_find_long
+	(opt_ambiguities): likewise
+	(opt_match_ct): likewise
+	(opt_set): likewise
+	(opt_unknown): likewise
+	(opt_ambiguous): likewise, also add code to print 2 - 4 matching
+	options.  Beyond that, use --help option.
+	(opt_find_long): make it smaller. Much smaller.
+	* autoopts/usage-txt.def: two new messages
 	* agen5/guile-iface.tpl (ag_scm2zchars): remove pre-Guile 1.7 version
 	* agen5/scmStrings.c (ag_scm2zchars): add pre-1.7 code to function
 

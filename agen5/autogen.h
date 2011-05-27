@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-04-20 14:25:17 bkorb"
+ *  Time-stamp:        "2011-05-26 10:58:17 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -525,6 +525,11 @@ MODE v2c_t p2p VALUE( { NULL } );
  *  Code variations based on the version of Guile:
  */
 #include "guile-iface.h"
+
+/*
+ * Hide dummy functions from complexity measurement tools
+ */
+#define HIDE_FN(_t)  _t
 
 #endif /* AUTOGEN_BUILD */
 /*

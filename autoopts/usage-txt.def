@@ -107,8 +107,16 @@ utxt = { ut-name = AmbigKey;
          ut-text = "%s error:  the keyword `%s' is ambiguous for %s\n";
 };
 
+utxt = { ut-name = AmbigList;
+         ut-text = "  The following options match:\n";
+};
+
 utxt = { ut-name = AmbigOptStr;
-         ut-text = "%s: ambiguous option -- %s\n";
+         ut-text = "%s: ambiguous option name: %s (matches %d options)\n";
+};
+
+utxt = { ut-name = Ambiguous;
+         ut-text = "  %s%s\n";
 };
 
 utxt = { ut-name = ArgsMust;

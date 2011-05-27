@@ -3,7 +3,7 @@
  *
  * @brief Hunt for options in the option descriptor list
  *
- *  Time-stamp:      "2011-05-24 21:29:56 bkorb"
+ *  Time-stamp:      "2011-05-26 16:30:30 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -61,22 +61,50 @@ parse_opt(char ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
 }
 
 /**
- *  Find the long option descriptor for the current option
+ *  print out the options that match the given name.
+ *
+ * @param pOpts      option data
+ * @param opt_name   name of option to look for
  */
-LOCAL tSuccess
-opt_find_long(tOptions * pOpts, char * opt_name, tOptState * pOptState)
+static void
+opt_ambiguities(tOptions * opts, char * name, int nm_len)
 {
-    char       name_buf[128];
-    char *     opt_arg;
-    int        nm_len =
-        parse_opt(&opt_name, &opt_arg, name_buf, sizeof(name_buf));
+    char const * const hyph =
+        NAMED_OPTS(opts) ? "" : "--";
 
-    ag_bool    disable  = AG_FALSE;
-    tOptDesc * pOD      = pOpts->pOptDesc;
-    int        idx      = 0;
-    int        idxLim   = pOpts->optCt;
-    int        matchCt  = 0;
-    int        matchIdx = 0;
+    tOptDesc * pOD = opts->pOptDesc;
+    int        idx = 0;
+
+    fputs(zAmbigList, stderr);
+    do  {
+        if (strneqvcmp(name, pOD->pz_Name, nm_len) == 0)
+            fprintf(stderr, zAmbiguous, hyph, pOD->pz_Name);
+
+        else if (  (pOD->pz_DisableName != NULL)
+                && (strneqvcmp(name, pOD->pz_DisableName, nm_len) == 0)
+                )
+            fprintf(stderr, zAmbiguous, hyph, pOD->pz_DisableName);
+    } while (pOD++, (++idx < opts->optCt));
+}
+
+/**
+ *  Determine the number of options that match the name
+ *
+ * @param pOpts      option data
+ * @param opt_name   name of option to look for
+ * @param nm_len     length of provided name
+ * @param index      pointer to int for option index
+ * @param disable    pointer to bool to mark disabled option
+ * @return count of options that match
+ */
+static int
+opt_match_ct(tOptions * opts, char * name, int nm_len,
+             int * ixp, ag_bool * disable)
+{
+    int   matchCt  = 0;
+    int   idx      = 0;
+    int   idxLim   = opts->optCt;
+    tOptDesc * pOD = opts->pOptDesc;
 
     do  {
         /*
@@ -89,117 +117,195 @@ opt_find_long(tOptions * pOpts, char * opt_name, tOptState * pOptState)
            && (pOD->fOptState != (OPTST_OMITTED | OPTST_NO_INIT)))
             continue;
 
-        if (strneqvcmp(opt_name, pOD->pz_Name, nm_len) == 0) {
+        if (strneqvcmp(name, pOD->pz_Name, nm_len) == 0) {
             /*
              *  IF we have a complete match
              *  THEN it takes priority over any already located partial
              */
             if (pOD->pz_Name[ nm_len ] == NUL) {
-                matchCt  = 1;
-                matchIdx = idx;
-                break;
+                *ixp = idx;
+                return 1;
             }
         }
 
         /*
          *  IF       there is a disable name
-         *     *AND* no argument value has been supplied
-         *              (disabled options may have no argument)
          *     *AND* the option name matches the disable name
          *  THEN ...
          */
         else if (  (pOD->pz_DisableName != NULL)
-                && (strneqvcmp(opt_name, pOD->pz_DisableName, nm_len) == 0)
+                && (strneqvcmp(name, pOD->pz_DisableName, nm_len) == 0)
                 )  {
-            disable  = AG_TRUE;
+            *disable = AG_TRUE;
 
             /*
              *  IF we have a complete match
              *  THEN it takes priority over any already located partial
              */
             if (pOD->pz_DisableName[ nm_len ] == NUL) {
-                matchCt  = 1;
-                matchIdx = idx;
-                break;
+                *ixp = idx;
+                return 1;
             }
         }
 
         else
-            continue;
+            continue; /* does not match any option */
 
         /*
-         *  We found a partial match, either regular or disabling.
+         *  We found a full or partial match, either regular or disabling.
          *  Remember the index for later.
          */
-        matchIdx = idx;
-
-        if (++matchCt > 1)
-            break;
+        *ixp = idx;
+        ++matchCt;
 
     } while (pOD++, (++idx < idxLim));
 
-    /*
-     *  Make sure we either found an exact match or found only one partial
-     */
-    if (matchCt == 1) {
-        pOD = pOpts->pOptDesc + matchIdx;
+    return matchCt;
+}
 
-        if (SKIP_OPT(pOD)) {
-            fprintf(stderr, zDisabledErr, pOpts->pzProgName, pOD->pz_Name);
-            if (pOD->pzText != NULL)
-                fprintf(stderr, " -- %s", pOD->pzText);
-            fputc('\n', stderr);
-            (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
-            /* NOTREACHED */
-        }
+/**
+ *  Set the option to the indicated option number.
+ *
+ * @param opts      option data
+ * @param arg       option argument (if glued to name)
+ * @param idx       option index
+ * @param disable   mark disabled option
+ * @param st        state about current option
+ */
+static tSuccess
+opt_set(tOptions * opts, char * arg, int idx, ag_bool disable, tOptState * st)
+{
+    tOptDesc * pOD = opts->pOptDesc + idx;
 
-        /*
-         *  IF we found a disablement name,
-         *  THEN set the bit in the callers' flag word
-         */
-        if (disable)
-            pOptState->flags |= OPTST_DISABLED;
+    if (SKIP_OPT(pOD)) {
+        if ((opts->fOptSet & OPTPROC_ERRSTOP) == 0)
+            return FAILURE;
 
-        pOptState->pOD      = pOD;
-        pOptState->pzOptArg = opt_arg;
-        pOptState->optType  = TOPT_LONG;
-        return SUCCESS;
+        fprintf(stderr, zDisabledErr, opts->pzProgName, pOD->pz_Name);
+        if (pOD->pzText != NULL)
+            fprintf(stderr, " -- %s", pOD->pzText);
+        fputc('\n', stderr);
+        (*opts->pUsageProc)(opts, EXIT_FAILURE);
+        /* NOTREACHED */
+        _exit(EXIT_FAILURE); /* to be certain */
     }
 
+    /*
+     *  IF we found a disablement name,
+     *  THEN set the bit in the callers' flag word
+     */
+    if (disable)
+        st->flags |= OPTST_DISABLED;
+
+    st->pOD      = pOD;
+    st->pzOptArg = arg;
+    st->optType  = TOPT_LONG;
+
+    return SUCCESS;
+}
+
+/**
+ *  An option was not found.  Check for default option and set it
+ *  if there is one.  Otherwise, handle the error.
+ *
+ * @param opts   option data
+ * @param name   name of option to look for
+ * @param arg    option argument
+ * @param st     state about current option
+ *
+ * @return success status
+ */
+static tSuccess
+opt_unknown(tOptions * opts, char * name, char * arg, tOptState * st)
+{
     /*
      *  IF there is no equal sign
      *     *AND* we are using named arguments
      *     *AND* there is a default named option,
      *  THEN return that option.
      */
-    if (  (opt_arg == NULL)
-       && NAMED_OPTS(pOpts)
-       && (pOpts->specOptIdx.default_opt != NO_EQUIVALENT)) {
-        pOptState->pOD = pOpts->pOptDesc + pOpts->specOptIdx.default_opt;
+    if (  (arg == NULL)
+       && NAMED_OPTS(opts)
+       && (opts->specOptIdx.default_opt != NO_EQUIVALENT)) {
 
-        pOptState->pzOptArg = opt_name;
-        pOptState->optType  = TOPT_DEFAULT;
+        st->pOD      = opts->pOptDesc + opts->specOptIdx.default_opt;
+        st->pzOptArg = name;
+        st->optType  = TOPT_DEFAULT;
         return SUCCESS;
     }
 
-    /*
-     *  IF we are to stop on errors (the default, actually)
-     *  THEN call the usage procedure.
-     */
-    if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-        fprintf(stderr, (matchCt == 0) ? zIllOptStr : zAmbigOptStr,
-                pOpts->pzProgPath, opt_name);
-        (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
+    if ((opts->fOptSet & OPTPROC_ERRSTOP) != 0) {
+        fprintf(stderr, zIllOptStr, opts->pzProgPath, name);
+        (*opts->pUsageProc)(opts, EXIT_FAILURE);
+        /* NOTREACHED */
+        _exit(EXIT_FAILURE); /* to be certain */
     }
 
     return FAILURE;
 }
 
-
-/*
- *  opt_find_short
+/**
+ *  Several options match the provided name.
  *
+ * @param opts      option data
+ * @param name      name of option to look for
+ * @param match_ct  number of matching options
+ *
+ * @return success status (always FAILURE, if it returns)
+ */
+static tSuccess
+opt_ambiguous(tOptions * opts, char * name, int match_ct)
+{
+    if ((opts->fOptSet & OPTPROC_ERRSTOP) != 0) {
+        fprintf(stderr, zAmbigOptStr, opts->pzProgPath, name, match_ct);
+        if (match_ct <= 4)
+            opt_ambiguities(opts, name, strlen(name));
+        (*opts->pUsageProc)(opts, EXIT_FAILURE);
+        /* NOTREACHED */
+        _exit(EXIT_FAILURE); /* to be certain */
+    }
+    return FAILURE;
+}
+
+/**
+ *  Find the option descriptor by full name.
+ *
+ * @param pOpts      option data
+ * @param opt_name   name of option to look for
+ * @param pOptState  state about current option
+ *
+ * @return success status
+ */
+LOCAL tSuccess
+opt_find_long(tOptions * pOpts, char * opt_name, tOptState * pOptState)
+{
+    char       name_buf[128];
+    char *     opt_arg;
+    int        nm_len =
+        parse_opt(&opt_name, &opt_arg, name_buf, sizeof(name_buf));
+
+    int     matchIdx = 0;
+    ag_bool disable  = AG_FALSE;
+    int     match_ct =
+        opt_match_ct(pOpts, opt_name, nm_len, &matchIdx, &disable);
+
+    /*
+     *  See if we found one match, no matches or multiple matches.
+     */
+    switch (match_ct) {
+    case 1:  return opt_set(pOpts, opt_arg, matchIdx, disable, pOptState);
+    case 0:  return opt_unknown(pOpts, opt_name, opt_arg, pOptState);
+    default: return opt_ambiguous(pOpts, opt_name, match_ct);
+    }
+}
+
+
+/**
  *  Find the short option descriptor for the current option
+ *
+ * @param pOpts      option data
+ * @param optValue   option flag character
+ * @param pOptState  state about current option
  */
 LOCAL tSuccess
 opt_find_short(tOptions* pOpts, uint_t optValue, tOptState* pOptState)
@@ -223,6 +329,7 @@ opt_find_short(tOptions* pOpts, uint_t optValue, tOptState* pOptState)
                 fputc('\n', stderr);
                 (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
                 /* NOTREACHED */
+                _exit(EXIT_FAILURE); /* to be certain */
             }
             goto short_opt_error;
         }
@@ -257,15 +364,15 @@ short_opt_error:
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
         fprintf(stderr, zIllOptChr, pOpts->pzProgPath, optValue);
         (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
+        /* NOTREACHED */
+        _exit(EXIT_FAILURE); /* to be certain */
     }
 
     return FAILURE;
 }
 
 
-/*
- *  findOptDesc
- *
+/**
  *  Find the option descriptor for the current option
  */
 LOCAL tSuccess
