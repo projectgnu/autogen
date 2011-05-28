@@ -41,7 +41,7 @@ EXPRLIST    	= expFormat.c expGuile.c expOutput.c  expPrint.c  expState.c \
 
 TESTS_ENVIRONMENT = TERM='' \
 	COMPILE='$(COMPILE)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' \
-	EXPRLIST="$(EXPRLIST)" SHELL="$(SHELL)" srcdir="$(srcdir)"
+	EXPRLIST="$(EXPRLIST)" SHELL="$(POSIX_SHELL)" srcdir="$(srcdir)"
 
 distclean-local:
 	-rm -rf testdir FAILURES

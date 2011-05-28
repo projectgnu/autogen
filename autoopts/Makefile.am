@@ -110,12 +110,12 @@ BOOTENV  = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
 
 libopts.c : $(HDRS) $(CSRC) $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
 	$(BOOTENV) \
-	  $(SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
+	  $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
 	@$(BOOTENV) \
-	  $(SHELL) $(srcdir)/bootstrap.dir $@
+	  $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c
@@ -143,10 +143,10 @@ libsrc : $(libsrc)
 $(libsrc) :
 	@$(BOOTENV) \
 	  AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
-	  $(SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
+	  $(POSIX_SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
 
 pkgconfig/autoopts.pc : mk-autoopts-pc
-	$(SHELL) mk-autoopts-pc $@
+	$(POSIX_SHELL) mk-autoopts-pc $@
 
 install-data-hook:
 	@DESTdestdir='$(DESTDIR)$(includedir)/autoopts' \
@@ -155,7 +155,7 @@ install-data-hook:
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
 	POSIX_SHELL='$(POSIX_SHELL)'  \
 	bindir='$(bindir)' \
-	$(SHELL) $(srcdir)/install-options-h
+	$(POSIX_SHELL) $(srcdir)/install-options-h
 
 .NOTPARALLEL:
 

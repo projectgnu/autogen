@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-03-04 11:08:00 bkorb"
+## Time-stamp:      "2011-05-27 17:51:16 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -38,6 +38,8 @@
 
 (define tmp-val        (getenv "MAN_SECTION"))
 (define man-sect       (if (exist? "cmd-section") (get "cmd-section") "1"))
+(define file-name      "")
+(define tmp-str        "")
 
 (if (defined? 'tmp-val)
     (if (string? tmp-val)
@@ -97,12 +99,12 @@ cat_n_rm() {
   grep -E -v '^[ 	]*$' ${tmp_dir}/$1
   rm -f ${tmp_dir}/$1
 }
-for f in synopsis description options option-presets exit-status
+for f in synopsis description options option-presets
 do cat_n_rm $f ; done
 test -f ${tmp_dir}/name && rm -f ${tmp_dir}/name
 
-for f in errors environment files conforming-to notes bugs \
-           examples see-also author
+for f in implementation-notes environment files examples exit-status errors \
+	compatibility notes see-also conforming-to history authors bugs
 do cat_n_rm $f ; done > ${tmp_dir}/.fini
 
 set  -- ${tmp_dir}/*
@@ -221,10 +223,10 @@ ENDIF - "main" exists                   :+][+:
 (out-pop)                               :+][+:
 
 
-
 INVOKE options                          :+][+:
 INVOKE exit-status                      :+][+:
-INVOKE author                           :+][+:
+INVOKE authors                          :+][+:
+INVOKE bugs                             :+][+:
 
 IF (or home-rc-files environ-init)      :+][+:
 
@@ -498,7 +500,7 @@ ENDDEF option-presets
 .\"  E X I T   S T A T U S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE exit-status                 :+][+:
+DEFINE exit-status                    :+][+:
 
 (set! tmp-val (string-append tmp-dir "/exit-status"))
 (out-push-new tmp-val)
@@ -525,32 +527,58 @@ ENDFOR exit-desc                      :+]
 ENDDEF exit-status
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  A U T H O R
+.\"  A U T H O R S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE author :+][+:
+DEFINE authors                        :+][+:
 
-IF (set! tmp-val (string-append tmp-dir "/author"))
-   (out-push-new tmp-val)
-   (set! tmp-val (get "copyright.author" (get "copyright.owner")))
-   (> (string-length tmp-val) 0) :+]
-.Sh AUTHOR
-[+: (. tmp-val) :+][+:
+IF (set! file-name (string-append tmp-dir "/authors"))
+   (not (access? file-name R_OK))     :+][+:
 
- (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
- (if (> (string-length tmp-val) 0)
-   (string-append "\n.br\nPlease send bug reports to:  " tmp-val) ) :+][+:
+   (out-push-new file-name)
+   (define remove-authors #t)
+
+   (set! tmp-val
+         (get "copyright.author" (get "copyright.owner")) )
+
+  (if (> (string-length tmp-val) 1)
+      (ag-fprintf 0 ".Sh AUTHORS\n%s\n" tmp-val))
+
+  (out-pop)                           :+][+:
+ENDIF copyright author/owner          :+][+:
+
+ENDDEF authors
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  B U G S
+.\"
+.\"  This section is guaranteed to be the last section in the man page
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE bugs                           :+][+:
+
+IF  (set! file-name (string-append tmp-dir "/bugs"))
+    (access? file-name R_OK)          :+][+:
+    (out-push-add file-name)          :+][+:
+ELSE                                  :+][+:
+    (out-push-new file-name)
+    (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
+    (if (> (string-length tmp-val) 1)
+        (ag-fprintf 0 ".Sh BUGS\nPlease send bug reports to: %s\n" tmp-val))
+:+][+:
+ENDIF                                 :+][+:
 
   CASE copyright.type :+][+:
    =  gpl  :+]
 .Pp
-Released under the GNU General Public License.[+:
+This program is released under the GNU General Public License.[+:
    = lgpl  :+]
 .Pp
-Released under the GNU General Public License with Library Extensions.[+:
+This program is released under the GNU General Public License
+with Library Extensions.[+:
    =  bsd  :+]
 .Pp
-Released under the Free BSD License.[+:
+This program is released under the Free BSD License.[+:
    *       :+][+:
     IF (exist? "copyright.text")
            :+]
@@ -564,15 +592,14 @@ Released under the Free BSD License.[+:
 .Pp
 Released under an unspecified copyright license.[+:
     ENDIF                             :+][+:
-  ESAC                                :+][+:
-ENDIF copyright author/owner          :+]
+  ESAC                                :+]
 .Pp
 This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.[+:
 
 (out-pop) :+][+:
 
-ENDDEF author
+ENDDEF bugs
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  E M I T   F L A G   T E X T

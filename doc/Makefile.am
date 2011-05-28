@@ -59,6 +59,6 @@ clobber : maintainer-clean
 gnudocs             : $(srcdir)/gendocs_template agdoc.texi
 	title=`sed -n 's/^@title  *//p' agdoc.texi` ; \
 	opts='--texi2html' ; \
-	$(SHELL) $(srcdir)/gendocs.sh $$opts autogen "$$title"
+	$(POSIX_SHELL) $(srcdir)/gendocs.sh $$opts autogen "$$title"
 
 # doc/Makefile.am ends here

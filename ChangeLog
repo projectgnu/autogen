@@ -1,3 +1,21 @@
+2011-05-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/opts.test: adjust for changes in string names
+	* autoopts/Makefile.am (SHELL): replace with $(POSIX_SHELL)
+	* doc/Makefile.am: likewise
+	* pkg/Makefile.am: likewise
+
+2011-05-27  Bruce Korb  <bkorb@gnu.org>
+
+	Thanks to Harlen Stenn:
+	* autoopts/tpl/cmd-doc.tlib (bugs): separate bugs section from
+	"authors" section and make it last.
+	* doc/autogen-texi.txt (prog-*-descrip): make it clearer that these
+	are *deprecated*.
+	(detail): describe how it defaults for the DESCRIPTION section in man
+	* autoopts/test/keyword.test: adjust test.  ".Sh FILES" precedes
+	the exit status section.
+
 2011-05-26  Bruce Korb  <bkorb@gnu.org>
 
 	Thanks to Ivo Shopov <ivoshopov@users.sourceforge.net>

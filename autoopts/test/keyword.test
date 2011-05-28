@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-05-24 18:03:35 bkorb"
+# Time-stamp:        "2011-05-27 17:47:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -255,6 +255,8 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
+.SH FILES
+See \fBOPTION PRESETS\fP for configuration files.
 .SH "EXIT STATUS"
 One of the following exit values will be returned:
 .TP
@@ -263,8 +265,6 @@ Successful program execution.
 .TP
 .BR 1
 The operation failed or the command syntax was not valid.
-.SH FILES
-See \fBOPTION PRESETS\fP for configuration files.
 .PP
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
@@ -369,6 +369,8 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
+.Sh FILES
+See \fBOPTION PRESETS\fP for configuration files.
 .Sh "EXIT STATUS"
 One of the following exit values will be returned:
 .Bl -tag
@@ -377,8 +379,6 @@ Successful program execution.
 .It 1
 The operation failed or the command syntax was not valid.
 .El
-.Sh FILES
-See \fBOPTION PRESETS\fP for configuration files.
 .Pp
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.

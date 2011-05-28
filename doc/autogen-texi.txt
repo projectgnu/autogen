@@ -3505,13 +3505,6 @@ Options marked with the ``documentation'' attribute are for documenting
 the usage text.  All other options should have the ``doc'' attribute in
 order to document the usage of the option in the generated man pages.
 
-@item man-doc
-@vindex man-doc
-Finally, if you need to add man page sections like @code{SEE ALSO} or
-@code{USAGE} or other, put that text in a @code{man-doc} definition.  This
-text will be inserted verbatim in the man page after the @code{OPTIONS}
-section and before the @code{AUTHOR} section.
-
 @item option-info
 @vindex option-info
 This text will be inserted as a lead-in paragraph in the @code{OPTIONS}
@@ -3546,14 +3539,16 @@ doc-section = @{
 @itemx prog-info-descrip
 @vindex prog-man-descrip
 @vindex prog-info-descrip
-These attributes are now deprecated.  Please use @code{doc-section} stanzas.
+These attributes are now deprecated.
+Please use a @code{doc-section} stanza with a @code{ds-type}
+attribute set to @code{DESCRIPTION} instead.
 
-Then, you need to supply a brief description of what your program does.
-If you already have a @code{detail} definition, this may be sufficient.
-If not, or if you need special formatting for one of the manual formats,
-then you will need either a definition for @code{prog-man-descrip} or
-@code{prog-info-descrip} or both.  These will be inserted verbatim
-in the man page document and the info document, respectively.
+@item detail
+@vindex detail
+This attribute is used to add a very short explanation about what
+a program is used for when the ``title'' attribute is insufficient.
+If there is no ``doc-section'' stanza of type ``DESCRIPTION'', then
+this text is used for the man page DESCRIPTION section, too.
 @end table
 
 @node automatic options

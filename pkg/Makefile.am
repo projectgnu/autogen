@@ -42,7 +42,7 @@ autogen.spec : $(top_srcdir)/VERSION spec.tpl
 package :
 	pkgtype=$(pkgtype) \
 	DESTDIR=`cd $(top_builddir) > /dev/null ; pwd`/stage-pkg \
-	$(DOCENV) $(SHELL) $(srcdir)/mkpkg.sh
+	$(DOCENV) $(POSIX_SHELL) $(srcdir)/mkpkg.sh
 
 pkg     : package
 
