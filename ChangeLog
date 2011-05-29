@@ -1,3 +1,9 @@
+2011-05-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/agtexi-cmd.tpl (exit status): include any "doc-section"
+	documentation pertaining to exit status.
+	* autoopts/tpl/cmd-doc.tlib (exit status): likewise
+
 2011-05-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/opts.test: adjust for changes in string names

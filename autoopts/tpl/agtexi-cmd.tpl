@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-04-12 17:27:07 bkorb"
+## Time-stamp:        "2011-05-29 13:57:55 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -117,20 +117,13 @@ IF
 
 ENDIF                                 =][=
 
-(sprintf "\n* %s %-24s %s" down-prog-name "exit codes::"
-         (string-append down-prog-name " exit codes") )
+(shell (string-append
+"{ sort -u | while read line ; do test -n \"${line}\" && \
+     printf '\\n* " down-prog-name " %-24s %s' \"${line}::\" \"${line}\"
+   done } <<-\\_EOF_\nexit status\n"
+   (string-capitalize! (stack-join "\n" "doc-section.ds-type"))
+ "\n_EOF_" ))                         =][=#
 
-=][=
-
-FOR doc-section                         =][=
-
-(define opt-name (string-capitalize! (get "ds-type")))
-(sprintf "\n* %s %-24s %s" down-prog-name (string-append opt-name "::")
-         opt-name)                      =][=
- 
-ENDFOR  doc-section
-
-=][=#
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =]
 @end menu
 
@@ -213,35 +206,39 @@ IF
 ENDIF                           =][=#
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =]
 
-@node [= (. down-prog-name) =] exit codes
-@[=(. sub-level)=] [=prog-name=] exit codes
+@node [= (. down-prog-name) =] exit status
+@[=(. sub-level)=] [=prog-name=] exit status
 
 One of the following exit values will be returned:
 @table @samp
 @item 0
 [=(get "exit-desc[0]" "Successful program execution.")=]
 @item 1
-[=(get "exit-desc[1]"
- "The operation failed or the command syntax was not valid.")=][=
+[= (define doc-section "")
+   (get "exit-desc[1]"
+        "The operation failed or the command syntax was not valid.") =][=
 
-FOR exit-desc (for-from 2)              =][=
+FOR exit-desc (for-from 2)   =][=
 (sprintf "\n@item %d\n%s" (for-index)
- (get (sprintf "exit-desc[%d]" (for-index)))) =][=
-ENDFOR exit-desc                        =]
-@end table
-[=
+ (get (sprintf "exit-desc[%d]" (for-index))))        =][=
+ENDFOR exit-desc                        =][=
 
 FOR doc-section                         =][=
 
 (define opt-name (string-capitalize! (get "ds-type")))
-(sprintf "\n\n@node %1$s %2$s\n@%3$s %1$s %2$s\n"
-         down-prog-name opt-name sub-level)
+(set! tmp-str (sprintf "\n\n@node %1$s %2$s\n@%3$s %1$s %2$s\n"
+         down-prog-name opt-name sub-level))
+
+(if (== opt-name "Exit Status")
+    (emit tmp-str)
+    (set! doc-section (string-append doc-section tmp-str))  )
 
 =][=
- (join "\n\n" (stack "ds-text"))
-=][=
 
-ENDFOR  doc-section
+ENDFOR  doc-section  \=]
+
+@end table
+[= (. doc-section) =][=#
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
@@ -607,6 +604,7 @@ DEFINE initialization                   =][=
   (define was-diverted   #f)
   (define diversion-type "")
   (define cvt-script     "")
+  (define tmp-str        "")
 
   (define divert-convert (lambda (src-type) (begin
      (set! diversion-type (get src-type ""))
