@@ -1,8 +1,8 @@
 #! /bin/sh
 
-## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
+## mdoc2mdoc.sh -- script to convert mdoc-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-05-03 09:39:49 bkorb"
+## Time-stamp:      "2011-05-30 14:17:42 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,14 +24,14 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
-## This "library" converts texi-isms into man-isms.  It gets included
-## by the man page template at the point where texi-isms might start appearing
+## This "library" converts mdoc-isms into man-isms.  It gets included
+## by the man page template at the point where mdoc-isms might start appearing
 ## and then "emit-man-text" is invoked when all the text has been assembled.
 ##
 ## Display the command line prototype,
 ## based only on the argument processing type.
 ##
-## And run the entire output through "sed" to convert texi-isms
+## And run the entire output through "sed" to convert mdoc-isms
 
 # /bin/sh on Solaris is too horrible for words
 #
@@ -39,9 +39,9 @@ case "$0" in
 /bin/sh ) test -x /usr/xpg4/bin/sh && exec /usr/xpg4/bin/sh ${1+"$@"} ;;
 esac
 
-
 parent_pid=$$
 prog=`basename $0 .sh`
+NmName=
 
 die() {
     echo "$prog error:  $*" >&2
@@ -229,6 +229,25 @@ do_arg() {
     echo "\\fI${line}\\fR"
 }
 
+do_NmName() {
+    # do we want to downcase the line first?  Yes...
+    set -- `echo ${line#.Nm} | \
+        sed -e 's/-/\\-/g' \
+            -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+    NmNameSfx=
+
+    if test $# -gt 0
+    then case "$1" in
+	[A-Za-z]* )
+	    NmName=$1
+	    shift
+	    ;;
+	esac
+
+        test $# -gt 0 && NmNameSfx=" $*"
+    fi
+    echo ".B $NmName$NmNameSfx"
+}
 
 do_line() {
     case "${line}" in
@@ -239,6 +258,8 @@ do_line() {
     .Op' '* )        do_optional  ;;
     .Fl' '* )        do_flag      ;;
     .Ar' '* )        do_arg       ;;
+    .Nm' '* )	     do_NmName	  ;;
+    .Nm     )	     do_NmName	  ;;
     * )              echo "$line" ;;
     esac
     return 0
@@ -251,12 +272,7 @@ s/^\.Sh/.SH/
 s/^\.Em/.I/
 s/^\.Pp/.PP/
 s/^.in *\\-/.in -/
-
-/^.Nm /{
-  y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/
-  s/-/\\-/g
-  s/^.nm/.B/
-}'
+'
 
 readonly easy_fixes
 set -f

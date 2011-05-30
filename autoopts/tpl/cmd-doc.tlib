@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-05-29 13:18:04 bkorb"
+## Time-stamp:      "2011-05-30 14:24:12 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -136,8 +136,7 @@ FOR doc-section                       :+][+:
         (error (sprintf "Cannot locate converter for %s"
                (get "ds-format" "man"))))
     sec-type :+][+:
-    == "" :+][+: (error "unnamed doc-section") :+][+:
-
+    == ""    :+][+: (error "unnamed doc-section") :+][+:
     *==* " " :+].Sh "[+: (. sec-type) :+]"[+:
     *        :+].Sh [+: (. sec-type)  :+][+:
     ESAC                              :+]
@@ -501,7 +500,7 @@ ENDDEF option-presets
 DEFINE exit-status                    :+][+:
 
 (set! tmp-val (string-append tmp-dir "/exit-status"))
-(set! tmp-str (shellf "sed 1d %s 2>/dev/null" tmp-val))
+(set! tmp-str (shellf "sed 's/\\.Sh.*/.Pp/' %s 2>/dev/null" tmp-val))
 
 (out-push-new tmp-val)
 
@@ -522,7 +521,7 @@ FOR exit-desc (for-from 2)            :+][+:
     (for-index) (get "exit-desc"))    :+][+:
 ENDFOR exit-desc                      :+][+:
 (if (> (string-length tmp-str) 1)
-    (sprintf ".Pp\n%s" tmp-str)) :+]
+    (emit tmp-str)) :+]
 .El
 [+: (out-pop)                         :+][+:
 

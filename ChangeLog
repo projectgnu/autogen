@@ -1,3 +1,7 @@
+2011-05-30  Harlan Stenn  <stenn@ntp.org>
+
+	* autoopts/tpl/mdoc2man.sh (do_NmName): handle the .Nm mdoc macro
+
 2011-05-29  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/agtexi-cmd.tpl (exit status): include any "doc-section"
