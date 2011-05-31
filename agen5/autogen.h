@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-05-26 10:58:17 bkorb"
+ *  Time-stamp:        "2011-05-31 11:47:40 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -490,8 +490,6 @@ extern FILE * ag_fmemopen(void *buf, ssize_t len, char const *mode);
 extern int    ag_fmemioctl(FILE * fp, int req, ...);
 #endif
 
-#include "proto.h"
-
 typedef union {
     const void*  cp;
     void*        p;
@@ -525,6 +523,21 @@ MODE v2c_t p2p VALUE( { NULL } );
  *  Code variations based on the version of Guile:
  */
 #include "guile-iface.h"
+
+#include "proto.h"
+
+static inline SCM ag_eval(char const * pzStr)
+{
+    SCM res;
+    char const * pzSaveScheme = pzLastScheme; /* Watch for nested calls */
+    pzLastScheme = pzStr;
+
+    res = ag_scm_c_eval_string_from_file_line(
+        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
+
+    pzLastScheme = pzSaveScheme;
+    return res;
+}
 
 /*
  * Hide dummy functions from complexity measurement tools

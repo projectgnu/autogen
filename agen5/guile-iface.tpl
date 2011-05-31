@@ -23,6 +23,22 @@ fill_in() {
   done
 }
 
+emit_iface_macro() {
+  NM=$(echo $i | tr a-z- A-Z_)
+  eval NM=\"$NM\(\${${i}_args}\)\"
+  if test ${#code} -lt 40 -a ${#NM} -lt 22
+  then
+    printf '# define AG_SCM_%-21s %s\n' "${NM}" "${code}"
+  else
+    printf '# define AG_SCM_%-21s \\\n    %s\n' "${NM}" "${code}"
+  fi
+}
+
+emit_iface_type() {
+  local nm=ag_scm_$(echo $i | tr A-Z- a-z_)
+  printf '# define %-28s %s\n' $nm "$code"
+}
+
 prt_tbl() {
   if='#if  '
   for v in $v_list
@@ -32,15 +48,12 @@ prt_tbl() {
 
     for i in $i_list
     do
-      NM=$(echo $i | tr a-z- A-Z_)
-      eval NM=\"$NM\(\${${i}_args}\)\"
+      eval type=\"\${${i}_type}\"
       eval code=\"\${${i}_vals[$v]}\"
-      if test ${#code} -lt 40 -a ${#NM} -lt 22
-      then
-        printf '# define AG_SCM_%-21s %s\n' "${NM}" "${code}"
-      else
-        printf '# define AG_SCM_%-21s \\\n    %s\n' "${NM}" "${code}"
-      fi
+      case "$type" in
+      ( macro | '' ) emit_iface_macro ;;
+      ( typedef )    emit_iface_type  ;;
+      esac
     done
 
     echo
@@ -54,7 +67,9 @@ FOR iface       =][=
   (shell (string-append
     "val='" (get "i-impl[].i-code") "'\n"
     (get "i-name") "_args='" (get "i-args") "'\n"
-    "name=" (get "i-name")
+    "name=" (get "i-name") "\n"
+    (get "i-name") "_type=" (get "i-type" "macro")
+
   ))            =][=
 
   FOR i-impl    =][=
@@ -72,22 +87,6 @@ ENDFOR iface    =][=
 `prt_tbl`
 
 =]
-
-# define scm_sizet                    size_t
-
 #else
 #error unknown GUILE_VERSION
 #endif
-
-static inline SCM ag_eval(char const * pzStr)
-{
-    SCM res;
-    char const * pzSaveScheme = pzLastScheme; /* Watch for nested calls */
-    pzLastScheme = pzStr;
-
-    res = ag_scm_c_eval_string_from_file_line(
-        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
-
-    pzLastScheme = pzSaveScheme;
-    return res;
-}

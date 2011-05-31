@@ -2,7 +2,7 @@
 /**
  *  \file expFormat.c
  *
- *  Time-stamp:        "2011-04-22 14:32:06 bkorb"
+ *  Time-stamp:        "2011-05-31 11:35:42 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -345,7 +345,7 @@ construct_license(int seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 
     SCM vals = SCM_UNDEFINED;
     char * lic_text;
-    size_t text_len;
+    ag_scm_size_t text_len;
 
     if (subs == SCM_UNDEFINED) {
         static char const * const slst[] = {
