@@ -43,7 +43,6 @@ iface = {
   i-name    = chars;
   i-args    = '_s';
   i-impl    = { i-end = '107'; i-code = 'SCM_CHARS(_s)'; };
-  i-impl    = { i-end = '108'; i-code = 'SCM_STRING_CHARS(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_i_string_chars(_s)'; };
 };
 
@@ -98,7 +97,7 @@ iface = {
 
 iface = {
   i-name    = listofnull;
-  i-impl    = { i-end = '109'; i-code = 'scm_listofnull'; };
+  i-impl    = { i-end = '107'; i-code = 'scm_listofnull'; };
   i-impl    = { i-end = '201'; i-code = 'scm_list_1(SCM_EOL)'; };
 };
 
@@ -174,7 +173,7 @@ iface = {
 iface = {
   i-name    = sym_p;
   i-args    = '_s';
-  i-impl    = { i-end = '108'; i-code = 'SCM_SYMBOLP(_s)'; };
+  i-impl    = { i-end = '107'; i-code = 'SCM_SYMBOLP(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_symbol(_s)'; };
 };
 
