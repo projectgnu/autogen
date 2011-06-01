@@ -10,26 +10,10 @@ iface = {
 #endif
 
 iface = {
-  i-name    = apply2;
-  i-args    = '_op, _f, _tst';
-  i-impl    = { i-end = '107'; i-code = 'gh_call2(_op, _f, _tst)'; };
-  i-impl    = { i-end = '201';
-     i-code = 'scm_apply(_op, _f, scm_cons(_tst, AG_SCM_LISTOFNULL()))'; };
-};
-
-iface = {
   i-name    = bool_p;
   i-args    = '_b';
   i-impl    = { i-end = '107'; i-code = 'SCM_BOOLP(_b)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_bool(_b)'; };
-};
-
-iface = {
-  i-name    = boot_guile;
-  i-args    = '_ac, _av, _im';
-  i-impl    = { i-end = '107'; i-code = 'gh_enter((_ac), (_av), (_im))'; };
-  i-impl    = { i-end = '201';
-     i-code = 'scm_boot_guile((_ac), (_av), (_im), NULL)'; };
 };
 
 iface = {
@@ -44,20 +28,6 @@ iface = {
   i-args    = '_s';
   i-impl    = { i-end = '107'; i-code = 'SCM_CHARS(_s)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_i_string_chars(_s)'; };
-};
-
-iface = {
-  i-name    = char_p;
-  i-args    = '_c';
-  i-impl    = { i-end = '201'; i-code = 'SCM_CHARP(_c)'; };
-};
-
-iface = {
-  i-name    = display;
-  i-args    = '_s';
-  i-impl    = { i-end = '107'; i-code = 'gh_display(_s)'; };
-  i-impl    = { i-end = '201';
-     i-code = 'scm_display(_s, scm_current_output_port())'; };
 };
 
 iface = {
@@ -134,12 +104,6 @@ iface = {
   i-args    = '_p';
   i-impl    = { i-end = '107'; i-code = 'SCM_NFALSEP( scm_pair_p(_p))'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_true( scm_pair_p(_p))'; };
-};
-
-iface = {
-  i-name    = size_t;
-  i-type    = typedef;
-  i-impl    = { i-end = '201'; i-code = 'size_t'; };
 };
 
 iface = {

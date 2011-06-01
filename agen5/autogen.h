@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-05-31 11:47:40 bkorb"
+ *  Time-stamp:        "2011-05-31 17:15:37 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -30,10 +30,10 @@
 
 #include REGEX_HEADER
 #include <libguile/scmconfig.h>
-#if GUILE_VERSION >= 109000
-# include <libguile.h>
-#else
+#if GUILE_VERSION < 107000
 # include <guile/gh.h>
+#else
+# include <libguile.h>
 #endif
 
 #include "opts.h"
@@ -538,6 +538,21 @@ static inline SCM ag_eval(char const * pzStr)
     pzLastScheme = pzSaveScheme;
     return res;
 }
+
+/*
+ *  Extracted from guile-iface stuff.  Seems to be stable since for at least
+ *  1.6.0 through 2.0.0.  1.4.x is thoroughly dead now (May, 2011).
+ */
+#define AG_SCM_DISPLAY(_s) \
+    scm_display(_s, scm_current_output_port())
+
+#define AG_SCM_BOOT_GUILE(_ac, _av, _im) \
+    scm_boot_guile((_ac), (_av), (_im), NULL)
+
+#define AG_SCM_APPLY2(_op, _f, _tst) \
+    scm_apply(_op, _f, scm_cons(_tst, AG_SCM_LISTOFNULL()))
+
+#define AG_SCM_CHAR_P(_c)            SCM_CHARP(_c)
 
 /*
  * Hide dummy functions from complexity measurement tools

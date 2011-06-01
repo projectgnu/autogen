@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2011-04-20 14:23:54 bkorb"
+ *  Time-stamp:        "2011-05-31 16:47:03 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -47,11 +47,7 @@ static sighandler_proc_t ignore_signal, catch_sig_and_bail;
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-inner_main(
-#if GUILE_VERSION >= 108000
-    void * closure,
-#endif
-    int argc, char ** argv);
+inner_main(void * closure, int argc, char ** argv);
 
 static void
 exit_cleanup(wait_for_pclose_enum_t cl_wait);
@@ -78,11 +74,7 @@ setup_signals(sighandler_proc_t * chldHandler,
  * main routine under Guile guidance
  */
 static void
-inner_main(
-#if GUILE_VERSION >= 108000
-    void * closure,
-#endif
-    int argc, char ** argv)
+inner_main(void * closure, int argc, char ** argv)
 {
     atexit(done_check);
     initialize(argc, argv);

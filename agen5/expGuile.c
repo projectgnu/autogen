@@ -2,7 +2,7 @@
 /**
  *  \file expGuile.c
  *
- *  Time-stamp:        "2011-02-25 11:37:54 bkorb"
+ *  Time-stamp:        "2011-05-31 16:55:02 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -63,15 +63,9 @@ ag_scm_c_eval_string_from_file_line(
         }
 
         {
-#if GUILE_VERSION < 107000
-            scm_t_port * pt = SCM_PTAB_ENTRY(port);
-            pt->line_number = line - 1;
-            pt->file_name   = file;
-#else
-            SCM ln = scm_from_int(line);
+            SCM ln = AG_SCM_INT2SCM(line);
             scm_set_port_filename_x(port, file);
             scm_set_port_line_x(port, ln);
-#endif
         }
     }
 

@@ -2,7 +2,7 @@
 /**
  * \file expString.c
  *
- *  Time-stamp:        "2011-05-31 10:39:28 bkorb"
+ *  Time-stamp:        "2011-05-31 16:34:42 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -42,12 +42,12 @@ sub_count(char const * haystack, char const * needle);
 
 static void
 do_substitution(
-    char const *    pzStr,
-    ag_scm_size_t   strLen,
-    SCM             match,
-    SCM             repl,
-    char **         ppzRes,
-    ag_scm_size_t * pResLen );
+    char const * pzStr,
+    size_t       strLen,
+    SCM          match,
+    SCM          repl,
+    char **      ppzRes,
+    size_t *     pResLen);
 /* = = = END-STATIC-FORWARD = = = */
 
 static size_t
@@ -337,12 +337,12 @@ sub_count(char const * haystack, char const * needle)
  */
 static void
 do_substitution(
-    char const *    pzStr,
-    ag_scm_size_t   strLen,
-    SCM             match,
-    SCM             repl,
-    char **         ppzRes,
-    ag_scm_size_t * pResLen )
+    char const * pzStr,
+    size_t       strLen,
+    SCM          match,
+    SCM          repl,
+    char **      ppzRes,
+    size_t *     pResLen)
 {
     char* pzMatch = ag_scm2zchars(match, "match text");
     char* pzRepl  = ag_scm2zchars(repl,  "repl text");
@@ -391,7 +391,7 @@ do_substitution(
  *  The "match" and "repl" trees *must* be identical in structure.
  */
 LOCAL void
-do_multi_subs(char ** ppzStr, ag_scm_size_t * pStrLen, SCM match, SCM repl)
+do_multi_subs(char ** ppzStr, size_t * pStrLen, SCM match, SCM repl)
 {
     char* pzStr = *ppzStr;
     char* pzNxt = pzStr;
@@ -516,14 +516,14 @@ ag_scm_in_p(SCM obj, SCM list)
 SCM
 ag_scm_join(SCM sep, SCM list)
 {
-    int             l_len, sv_l_len;
-    SCM             car;
-    SCM             alist = list;
-    size_t          sep_len;
-    ag_scm_size_t   str_len;
-    char*           pzRes;
-    char const *    pzSep;
-    char*           pzScan;
+    int      l_len, sv_l_len;
+    SCM      car;
+    SCM      alist = list;
+    size_t   sep_len;
+    size_t   str_len;
+    char *   pzRes;
+    char const * pzSep;
+    char *   pzScan;
 
     if (! AG_SCM_STRING_P(sep))
         return SCM_UNDEFINED;
@@ -1117,8 +1117,8 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
 SCM
 ag_scm_string_tr(SCM Str, SCM From, SCM To)
 {
-    ag_scm_size_t lenz  = AG_SCM_STRLEN(Str);
-    SCM           res   = AG_SCM_STR2SCM(AG_SCM_CHARS(Str), lenz);
+    size_t lenz  = AG_SCM_STRLEN(Str);
+    SCM    res   = AG_SCM_STR2SCM(AG_SCM_CHARS(Str), lenz);
     return ag_scm_string_tr_x(res, From, To);
 }
 
@@ -1147,8 +1147,8 @@ SCM
 ag_scm_string_substitute(SCM Str, SCM Match, SCM Repl)
 {
     char const *  pzStr;
-    ag_scm_size_t len;
-    SCM           res;
+    size_t len;
+    SCM    res;
 
     if (! AG_SCM_STRING_P(Str))
         return SCM_UNDEFINED;
