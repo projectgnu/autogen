@@ -2,7 +2,7 @@
 /**
  *  \file functions.c
  *
- *  Time-stamp:        "2011-04-20 14:22:51 bkorb"
+ *  Time-stamp:        "2011-06-03 10:05:14 bkorb"
  *
  *  This module implements text functions.
  *
@@ -233,8 +233,8 @@ mFunc_Text(tTemplate* pT, tMacro* pMac)
  *    [+ # say what you want, but no '+' before any ']' chars +]
  *    @end example
 =*/
-tMacro*
-mLoad_Comment(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+tMacro *
+mLoad_Comment(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 {
     memset((void*)pMac, 0, sizeof(*pMac));
     return pMac;
@@ -247,8 +247,8 @@ mLoad_Comment(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
  *  Move any text into the text offset field.
  *  This is used as the default load mechanism.
  */
-tMacro*
-mLoad_Unknown(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+tMacro *
+mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 {
     char *        pzCopy = pT->pNext;
     char const *  pzSrc;

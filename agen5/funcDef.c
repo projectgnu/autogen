@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2011-04-21 16:51:41 bkorb"
+ *  Time-stamp:        "2011-06-03 10:53:36 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -338,10 +338,10 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
 }
 
 static void
-prep_invoke_args(tMacro* pMac)
+prep_invoke_args(tMacro * pMac)
 {
-    char*  pzText;
-    tTemplate* pT = pCurTemplate;
+    char * pzText;
+    tTemplate * pT = pCurTemplate;
 
     if (pMac->ozText == 0)
         AG_ABEND_IN(pT, pMac, "The INVOKE macro requires a name");
@@ -682,8 +682,8 @@ mUnload_Define(tMacro* pMac)
  *  the first time the macro is processed and evaluated again every
  *  time the macro is evaluated.
 =*/
-tMacro*
-mFunc_Invoke(tTemplate* pT, tMacro* pMac)
+tMacro *
+mFunc_Invoke(tTemplate * pT, tMacro * pMac)
 {
     char* pzText;
     SCM   macName;
@@ -735,14 +735,13 @@ mFunc_Invoke(tTemplate* pT, tMacro* pMac)
     return mFunc_Define(pT, pMac);
 }
 
-
 /* Load Debug
  *
  *  what:   Loads the debug function so you can set breakpoints
  *          at load time, too :-)
  */
-tMacro*
-mLoad_Debug(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+tMacro *
+mLoad_Debug(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 {
     if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
         return mLoad_Unknown(pT, pMac, ppzScan);
@@ -750,13 +749,13 @@ mLoad_Debug(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 }
 
 
-tMacro*
-mLoad_Define(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+tMacro *
+mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 {
     static char const zNameNeeded[] = "DEFINE requires a name";
 
-    char*        pzCopy;             /* next text dest   */
-    tTemplate*   pNewT;
+    char *       pzCopy;             /* next text dest   */
+    tTemplate *  pNewT;
 
     /*
      *  Save the global macro loading mode

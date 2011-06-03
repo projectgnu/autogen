@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2011-04-29 12:05:14 bkorb"
+# Time-stamp:        "2011-06-03 11:29:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -136,7 +136,7 @@ FOR list repeated 2 times
 	from debug.tpl line 3
 Text       (12) in debug.tpl at line 9
   
-closeOutput 'debug.test'
+out_close 'debug.test'
 _EOF_
 
 traceout=${testname}-aglog-x1-$$.log

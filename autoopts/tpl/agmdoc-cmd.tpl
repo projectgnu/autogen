@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-05-24 17:59:40 bkorb"
+## Time-stamp:      "2011-06-03 10:29:33 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -54,17 +54,13 @@ INCLUDE "cmd-doc.tlib"
 .\"  S Y N O P S I S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE synopsis
-
-:+]
+DEFINE mk-synopsis                          :+][+:
+  (out-push-new file-name)                 \:+]
 .Sh SYNOPSIS
 .Nm
 [+:
 
-  IF (define use-flags  (exist? "flag.value"))
-     (define named-mode (not (or use-flags (exist? "long-opts") )))
-     use-flags
-                                            :+][+:
+  IF (. use-flags)                          :+][+:
     IF (exist? "long-opts")                \:+]
 .\" Mixture of short (flag) options and long options
 .Op Fl flags
@@ -111,6 +107,8 @@ FOR explain   "\n.Pp\n"                     :+][+:
   explain                                   :+][+:
 ENDFOR                                      :+][+:
 
-ENDDEF synopsis
+(out-pop)                                   :+][+:
+
+ENDDEF mk-synopsis
 
 agmdoc-cmd.tpl ends here  :+]

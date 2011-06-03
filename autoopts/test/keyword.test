@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-05-27 17:47:03 bkorb"
+# Time-stamp:        "2011-06-03 11:10:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -176,9 +176,9 @@ test_keyword \- Test AutoOpts for keyword
 .RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP " [[=| ]\fIvalue\fP]]..."
 .PP
 All arguments must be options.
-.SH DESCRIPTION
+.SH "DESCRIPTION"
 There is no description for this command.
-.SH OPTIONS
+.SH "OPTIONS"
 .TP
 .BR \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP
 The option option descrip.
@@ -255,7 +255,7 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
-.SH FILES
+.SH "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .SH "EXIT STATUS"
 One of the following exit values will be returned:
@@ -265,7 +265,7 @@ Successful program execution.
 .TP
 .BR 1
 The operation failed or the command syntax was not valid.
-.PP
+.SH "NOTES"
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
 _EOMan_
@@ -295,9 +295,9 @@ cat > ${testname}-base.mdoc <<\_EOMan_
 .Pp
 All arguments must be options.
 .Pp
-.Sh DESCRIPTION
+.Sh "DESCRIPTION"
 There is no description for this command.
-.Sh OPTIONS
+.Sh "OPTIONS"
 .Bl -tag
 .It  \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP
 The option option descrip.
@@ -369,7 +369,7 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
-.Sh FILES
+.Sh "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .Sh "EXIT STATUS"
 One of the following exit values will be returned:
@@ -379,7 +379,7 @@ Successful program execution.
 .It 1
 The operation failed or the command syntax was not valid.
 .El
-.Pp
+.Sh "NOTES"
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
 _EOMan_

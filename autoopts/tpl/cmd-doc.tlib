@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-05-30 14:24:12 bkorb"
+## Time-stamp:      "2011-06-03 11:05:38 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -39,7 +39,11 @@
 (define tmp-val        (getenv "MAN_SECTION"))
 (define man-sect       (if (exist? "cmd-section") (get "cmd-section") "1"))
 (define file-name      "")
+(define sect-name      "")
+(define macro-name     "")
 (define tmp-str        "")
+(define use-flags      (exist? "flag.value"))
+(define named-mode     (not (or use-flags (exist? "long-opts") )))
 
 (if (defined? 'tmp-val)
     (if (string? tmp-val)
@@ -104,7 +108,7 @@ do cat_n_rm $f ; done
 test -f ${tmp_dir}/name && rm -f ${tmp_dir}/name
 
 for f in implementation-notes environment files examples exit-status errors \
-	compatibility notes see-also conforming-to history authors bugs
+	compatibility see-also conforming-to history authors copyright bugs notes
 do cat_n_rm $f ; done > ${tmp_dir}/.fini
 
 set  -- ${tmp_dir}/*
@@ -174,24 +178,123 @@ ENDDEF doc-sections
 .\"
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE ao-sections                      :+][+:
+DEFINE ao-sections              :+][+:
 
-IF (set! tmp-val (string-append tmp-dir "/synopsis"))
-   (not (access? tmp-val R_OK))         :+][+:
-      (out-push-new tmp-val)            :+][+:
-      INVOKE synopsis                   :+][+:
-      (out-pop)                         :+][+:
+INVOKE cond-section  sec = "OPTIONS"       mode = "replace" :+][+:
+INVOKE cond-section  sec = "SYNOPSIS"      mode = "alt"     :+][+:
+INVOKE cond-section  sec = "DESCRIPTION"   mode = "append"  :+][+:
+INVOKE cond-section  sec = "EXIT STATUS"   mode = "insert"  :+][+:
+INVOKE cond-section  sec = "AUTHORS"       mode = "alt"     :+][+:
+INVOKE cond-section  sec = "BUGS"          mode = "alt"     :+][+:
+INVOKE cond-section  sec = "NOTES"         mode = "append"  :+][+:
+
+IF (exist? "copyright")                 :+][+:
+  INVOKE cond-section   sec = "COPYRIGHT"      mode = "alt"     :+][+:
 ENDIF                                   :+][+:
 
+IF (or home-rc-files environ-init)      :+][+:
+  INVOKE cond-section   sec = "OPTION PRESETS" mode = "replace" :+][+:
 
+  IF (. home-rc-files)                  :+][+:
+    INVOKE cond-section sec = "FILES"          mode = "append"  :+][+:
+  ENDIF                                 :+][+:
 
-IF (set! tmp-val (string-append tmp-dir "/description"))
-   (access? tmp-val R_OK)               :+][+:
-      (out-push-add tmp-val)            :+][+:
-ELSE                                    :+][+:
-      (out-push-new tmp-val)            :+][+:
-      INVOKE description                :+][+:
+  IF (. environ-init)                   :+][+:
+    INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"  :+][+:
+  ENDIF                                 :+][+:
+
 ENDIF                                   :+][+:
+
+ENDDEF ao-sections
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  C O N D I T I O N A L   S E C T I O N
+.\"
+.\" Figure out what to do for AutoOpts required sections, depending on "mode"
+.\" In all cases, if the file does not exist, invoke the "mk" macro to create
+.\" a new file.  If it does exist, then:
+.\"
+.\" alt       Alternate -- emit no text
+.\" replace   throw away any pre-existing file.
+.\" append    invoke the "append" macro to emit additional text
+.\" insert    save the current contents, replacing the .Sh line with .Pp.
+.\"           invoke the "mk" macro then emit the saved text
+.\"
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE cond-section                   :+][+:
+
+  IF 
+     (set! sect-name   (string-upcase! (string-substitute
+                       (get "sec") "-" " " )))
+     (set! macro-name  (string-downcase! (string-substitute
+                       sect-name " " "-" )))
+     (set! file-name   (string-append tmp-dir "/" macro-name))
+
+     (not (access? file-name R_OK))   :+][+:
+
+     INVOKE (begin
+       (out-push-new file-name)
+       (emit (string-append ".Sh \"" sect-name "\"\n"))
+       (string-append "mk-" macro-name) )
+
+       :+][+:   (out-pop)             :+][+:
+
+  ELSE file exists                    :+][+:
+
+     CASE (get "mode")                :+][+:
+
+     ==  replace                      :+][+:
+         INVOKE (begin
+           (out-push-new file-name)
+           (emit (string-append ".Sh " sect-name))
+           (string-append "mk-" macro-name) )
+
+           :+][+:   (out-pop)         :+][+:
+
+     ==  append                       :+][+:
+         INVOKE (begin
+           (out-push-add file-name)
+           (string-append "append-" macro-name) )
+
+           :+][+:   (out-pop)         :+][+:
+
+     ==  insert                       :+][+:
+         INVOKE (begin
+           (set! tmp-str (shellf "sed '1s/.Sh .*/.Pp/'" file-name))
+           (out-push-new file-name)
+           (emit (string-append ".Sh " sect-name))
+           (string-append "mk-" macro-name) )
+
+           :+][+:
+           (emit tmp-str)
+           (out-pop)                  :+][+:
+
+     ESAC                             :+][+:
+
+  ENDIF file existence/non-existence  :+][+:
+ENDDEF cond-section
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  M K - D E S C R I P T I O N
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE mk-description                 :+][+:
+
+  (if (exist? "prog-man-descrip")
+      (join "\n.Pp\n" (stack "prog-man-descrip"))
+      (if (exist? "detail")
+          (join "\n.Pp\n" (stack "detail"))
+          "There is no description for this command."
+  )   )                               :+]
+[+:
+  INVOKE append-description           :+][+:
+
+ENDDEF mk-description
+
+.\" = = = = = APPEND TO IT:           :+][+:
+
+DEFINE append-description             :+][+:
 
 IF (= (get "main.main-type") "for-each"):+][+:
 
@@ -217,81 +320,15 @@ The input list comments[+:
 [+:
 
 ENDIF - "main" exists                   :+][+:
-(out-pop)                               :+][+:
-
-
-INVOKE options                          :+][+:
-INVOKE exit-status                      :+][+:
-INVOKE authors                          :+][+:
-INVOKE bugs                             :+][+:
-
-IF (or home-rc-files environ-init)      :+][+:
-
-   INVOKE option-presets                :+][+:
-
-ENDIF                                   :+][+:
-
-(define sec-fmt "\n.Sh %s%s")
-
-(if environ-init
-  (begin
-    (set! tmp-val (string-append tmp-dir "/environment"))
-    (if (access? tmp-val R_OK)
-      (begin
-        (out-push-add tmp-val)
-        (emit environ-text)
-      )
-      (begin
-        (out-push-new tmp-val)
-        (ag-fprintf 0 sec-fmt "ENVIRONMENT" environ-text)
-    ) )
-    (out-pop)
-) )
-
-(if home-rc-files
-  (begin
-    (set! tmp-val (string-append tmp-dir "/files"))
-    (if (access? tmp-val R_OK)
-      (begin
-        (out-push-add tmp-val)
-        (emit home-rc-text)
-      )
-      (begin
-        (out-push-new tmp-val)
-        (ag-fprintf 0 sec-fmt "FILES" home-rc-text)
-    ) )
-    (out-pop)
-) )                                   :+][+:
-
-ENDDEF ao-sections
+ENDDEF append-description
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  D E S C R I P T I O N
+.\"  M K - O P T I O N S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE description                    :+]
-.Sh DESCRIPTION
-[+:
-
-  (if (exist? "prog-man-descrip")
-      (join "\n.Pp\n" (stack "prog-man-descrip"))
-      (if (exist? "detail")
-          (join "\n.Pp\n" (stack "detail"))
-          "There is no description for this command."
-  )   )                               :+]
-[+:
-ENDDEF description
-
-.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  O P T I O N S
-.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
-
-DEFINE options
+DEFINE mk-options
 
 :+][+:
-
-(set! tmp-val (string-append tmp-dir "/options"))
-(out-push-new tmp-val)
 
 (define opt-arg       "")
 (define dis-name      "")
@@ -317,11 +354,9 @@ DEFINE options
    (set! o_nm (string-substitute o_nm "-" "\\-" ))
    o_nm )))
 
-:+]
-.Sh OPTIONS[+:
 (if (exist? "option-info")
-    (string-append "\n.Pp\n" (get "option-info") "\n") )
-:+]
+    (string-append ".Pp\n" (get "option-info") "\n") )
+\:+]
 .Bl -tag[+:
 
 FOR flag                              :+][+:
@@ -427,21 +462,13 @@ ENDIF                                 :+]
     (out-pop #t)
     "\n_EndOfMdoc_" )) )           :+][+:
 
- (out-pop)                         :+][+:
-
-ENDDEF options
+ENDDEF mk-options
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  O P T I O N   P R E S E T S
+.\"  M K - O P T I O N - P R E S E T S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE option-presets                 :+][+:
-
-(set! tmp-val (string-append tmp-dir "/option-presets"))
-(out-push-new tmp-val)
-
-:+]
-.Sh "OPTION PRESETS"
+DEFINE mk-option-presets              \:+]
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from [+:
   IF (. home-rc-files)
@@ -489,23 +516,13 @@ If any of these are directories, then the file \fI[+: (. rc-file) :+]\fP
 is searched for within those directories.[+:
   ESAC                                :+][+:
 
-(out-pop)                             :+][+:
-
-ENDDEF option-presets
+ENDDEF mk-option-presets
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  E X I T   S T A T U S
+.\"  M K - E X I T - S T A T U S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE exit-status                    :+][+:
-
-(set! tmp-val (string-append tmp-dir "/exit-status"))
-(set! tmp-str (shellf "sed 's/\\.Sh.*/.Pp/' %s 2>/dev/null" tmp-val))
-
-(out-push-new tmp-val)
-
-:+]
-.Sh "EXIT STATUS"
+DEFINE mk-exit-status                 :+]
 One of the following exit values will be returned:
 .Bl -tag
 [+:
@@ -523,84 +540,128 @@ ENDFOR exit-desc                      :+][+:
 (if (> (string-length tmp-str) 1)
     (emit tmp-str)) :+]
 .El
-[+: (out-pop)                         :+][+:
+[+:
 
 ENDDEF exit-status
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  A U T H O R S
+.\"  M K - A U T H O R S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE authors                        :+][+:
+DEFINE mk-authors                     :+][+:
 
-IF (set! file-name (string-append tmp-dir "/authors"))
-   (not (access? file-name R_OK))     :+][+:
+  (define remove-authors #t)
 
-   (out-push-new file-name)
-   (define remove-authors #t)
-
-   (set! tmp-val
-         (get "copyright.author" (get "copyright.owner")) )
+  (set! tmp-val
+      (if (exist? "copyright.author")
+          (stack-join ",\n" "copyright.author")
+          (stack-join ",\n" "copyright.owner") ))
 
   (if (> (string-length tmp-val) 1)
-      (ag-fprintf 0 ".Sh AUTHORS\n%s\n" tmp-val))
+      (string-append "\n" tmp-val "\n")
+      (shellf "rm -f %s" file-name))
 
-  (out-pop)                           :+][+:
-ENDIF copyright author/owner          :+][+:
+  :+][+:
 
-ENDDEF authors
+ENDDEF mk-authors
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  B U G S
+.\"  M K - B U G S
 .\"
 .\"  This section is guaranteed to be the last section in the man page
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE bugs                           :+][+:
+DEFINE mk-bugs                        :+][+:
 
-IF  (set! file-name (string-append tmp-dir "/bugs"))
-    (access? file-name R_OK)          :+][+:
-    (out-push-add file-name)          :+][+:
-ELSE                                  :+][+:
-    (out-push-new file-name)
     (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
     (if (> (string-length tmp-val) 1)
-        (ag-fprintf 0 ".Sh BUGS\nPlease send bug reports to: %s\n" tmp-val))
-:+][+:
-ENDIF                                 :+][+:
+        (string-append "\nPlease send bug reports to: " tmp-val "\n")
+        (shell "rm -f ${tmp_dir}/bugs"))
+    :+][+:
+
+ENDDEF mk-bugs
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  M K - C O P Y R I G H T  (+ licensing)
+.\"
+.\"  This section is guaranteed to be the last section in the man page
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE mk-copyright                        :+]
+Copyright (C) [+: copyright.date :+] [+:
+  (get "copyright.owner" (get "copyright.author" (get "copyright.eaddr")))
+  :+] all rights reserved.[+:
 
   CASE copyright.type :+][+:
    =  gpl  :+]
-.Pp
 This program is released under the GNU General Public License.[+:
    = lgpl  :+]
-.Pp
 This program is released under the GNU General Public License
 with Library Extensions.[+:
    =  bsd  :+]
-.Pp
 This program is released under the Free BSD License.[+:
    *       :+][+:
     IF (exist? "copyright.text")
            :+]
-.Pp
 .nf
 .na
 [+: copyright.text :+]
 .fi
 .ad[+:
     ELIF (exist? "copyright.date")    :+]
-.Pp
 Released under an unspecified copyright license.[+:
     ENDIF                             :+][+:
-  ESAC                                :+]
+  ESAC                                :+][+:
+ENDDEF mk-copyright
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  M K - N O T E S
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE mk-notes
+
+:+]This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
+option definitions.
+[+:
+
+ENDDEF mk-notes
+
+.\" = = = = = APPEND TO IT:           :+][+:
+
+DEFINE append-notes                   :+]
 .Pp
 This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.[+:
 
-(out-pop) :+][+:
+ENDDEF append-notes
 
-ENDDEF bugs
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  M K - E N V I R O N M E N T
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE mk-environment                 :+][+:
+  INVOKE  append-environment          :+][+:
+ENDDEF mk-environment
+
+.\" = = = = = APPEND TO IT:           :+][+:
+
+DEFINE append-environment             :+]
+[+:(. environ-text)                   :+][+:
+ENDDEF append-environment
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  M K - F I L E S
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE mk-files                       :+][+:
+  INVOKE  append-files                :+][+:
+ENDDEF mk-files
+
+.\" = = = = = APPEND TO IT:           :+][+:
+
+DEFINE append-files                   :+]
+[+:(. home-rc-text)                   :+][+:
+ENDDEF append-files
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  E M I T   F L A G   T E X T

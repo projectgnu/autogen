@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-03-04 09:49:25 bkorb"
+## Time-stamp:      "2011-06-03 11:09:16 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -67,16 +67,12 @@ INVOKE build-doc          :+][+:
 .\"  S Y N O P S I S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE synopsis
+DEFINE mk-synopsis                          :+][+:
+  (out-push-new file-name)                 \:+]
+.SH SYNOPSIS
+.B [+: prog-name :+][+:
 
-:+]
-.Sh SYNOPSIS
-.Nm [+: (. UP-PROG-NAME) :+][+:
-
-  IF (define use-flags  (exist? "flag.value"))
-     (define named-mode (not (or use-flags (exist? "long-opts") )))
-     use-flags
-                                            :+][+:
+  IF (. use-flags)                          :+][+:
     IF (exist? "long-opts")                 :+]
 .\" Mixture of short (flag) options and long options
 .RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:#
@@ -118,6 +114,8 @@ All arguments must be options.[+:
     (string-append "\n.PP\n"
       (join "\n.PP\n" (stack "explain"))) ) :+][+:
 
-ENDDEF synopsis
+(out-pop)                                   :+][+:
+
+ENDDEF mk-synopsis
 
 agman-cmd.tpl ends here   :+]

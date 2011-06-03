@@ -2,7 +2,7 @@
 /**
  * \file expOutput.c
  *
- *  Time-stamp:        "2011-05-05 11:01:03 bkorb"
+ *  Time-stamp:        "2011-06-03 11:24:34 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -197,7 +197,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     make_writable(pz);
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "open_output_file '%s' mode %s\n", fname, mode);
+        fprintf(pfTrace, "%s '%s' mode %s\n", __func__, fname, mode);
 
     /*
      * Avoid printing temporary file names in the dependency file
@@ -258,7 +258,8 @@ ag_scm_out_move(SCM new_file)
     pz[ sz ] = NUL;
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "renaming %s to %s\n",  pCurFp->pzOutName, pz);
+        fprintf(pfTrace, "%s renaming %s to %s\n", __func__,
+                pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
 
     /*
@@ -313,10 +314,10 @@ ag_scm_out_pop(SCM ret_contents)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "out-pop%s\n", (res == SCM_UNDEFINED) ? "" : " #t");
+        fprintf(pfTrace, "%s%s\n", __func__, (res == SCM_UNDEFINED) ? "" : " #t");
 
     outputDepth--;
-    closeOutput(AG_FALSE);
+    out_close(AG_FALSE);
     return res;
 }
 
@@ -391,7 +392,7 @@ ag_scm_out_suspend(SCM susp_nm)
     pSuspended[ suspendCt-1 ].pzSuspendName = AG_SCM_TO_NEWSTR(susp_nm);
     pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "suspended output to '%s'\n",
+        fprintf(pfTrace, "%s '%s'\n", __func__,
                 pSuspended[ suspendCt-1 ].pzSuspendName);
 
     pCurFp = pCurFp->pPrev;
@@ -425,7 +426,7 @@ ag_scm_out_resume(SCM susp_nm)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                fprintf(pfTrace, "resuming output to '%s'\n", pzName);
+                fprintf(pfTrace, "%s '%s'\n", __func__, pzName);
             return SCM_UNDEFINED;
         }
     }
@@ -643,7 +644,7 @@ ag_scm_out_push_new(SCM new_file)
         pCurFp    = p;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "out-push-new on temp file\n");
+            fprintf(pfTrace, "%s -- temp file\n", __func__);
         return SCM_UNDEFINED;
     }
 #endif
@@ -728,8 +729,8 @@ ag_scm_out_switch(SCM new_file)
     tbuf.modtime = outTime;
     utime(pCurFp->pzOutName, &tbuf);
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "switching output from %s to '%s'\n",
-                pCurFp->pzOutName, pzNewFile);
+        fprintf(pfTrace, "%s switching output from %s to '%s'\n",
+                __func__, pCurFp->pzOutName, pzNewFile);
     pCurFp->pzOutName = pzNewFile;  /* memory leak */
 
     return SCM_UNDEFINED;

@@ -2,7 +2,7 @@
 /*
  *  \file autogen.h
  *
- *  Time-stamp:        "2011-05-31 17:15:37 bkorb"
+ *  Time-stamp:        "2011-06-03 11:18:31 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -517,6 +517,14 @@ MODE v2c_t p2p VALUE( { NULL } );
   extern void manageAllocatedData(void* pd);
 #else
 # define manageAllocatedData(_ptr)
+#endif
+
+#if __STDC_VERSION__ < 199901L
+# if __GNUC__ >= 2
+#  define __func__ __FUNCTION__
+# else
+#  define __func__ "<unknown>"
+# endif
 #endif
 
 /*

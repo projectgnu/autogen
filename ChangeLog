@@ -1,3 +1,13 @@
+2011-06-04  Harlan Stenn  <stenn@ntp.org>
+
+	* agen5/autogen.h (__func__): #define a replacement when needed
+	* agen5/expOutput.c : use it throughout
+	* agen5/tpProcess.c (out_close): new name for closeOutput()
+	* agen5/test/debug.test: adjust for new name
+	* agen5/expOutput.c: likewise
+	* agen5/autogen.c: likewise
+	* autoopts/test/keyword.test: adjust for new templates
+
 2011-05-30  Harlan Stenn  <stenn@ntp.org>
 
 	* autoopts/tpl/mdoc2man.sh (do_NmName): handle the .Nm mdoc macro

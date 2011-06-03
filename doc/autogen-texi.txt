@@ -1974,12 +1974,16 @@ generated interface file.
 @item long-opts
 @vindex long-opts
 @cindex named option mode
-Presence indicates GNU-standard long option processing.  If any options
-do not have an option value (flag character) specified, and least one
-does specify such a value, then you must specify @code{long-opts}.  If
-none of your options specify an option value (flag character) and you do
-not specify @code{long-opts}, then command line arguments are processed
-in "named option mode".  This means that:
+Presence indicates GNU-standard long option processing.  Partial name
+matches are accepted, if they are at least two characters long and the
+partial match is unique.  The matching is not case sensitive, and the
+underscore, hyphen and carat characters are all equivalent (they match).
+
+If any options do not have an option value (flag character) specified,
+and least one does specify such a value, then you must specify
+@code{long-opts}.  If none of your options specify an option value
+(flag character) and you do not specify @code{long-opts}, then command
+line arguments are processed in "named option mode".  This means that:
 
 @itemize @bullet
 @item

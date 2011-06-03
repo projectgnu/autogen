@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2011-04-20 14:22:43 bkorb"
+ * Time-stamp:        "2011-06-03 11:25:10 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -236,7 +236,7 @@ processTemplate(tTemplate* pTF)
             generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
             do  {
-                closeOutput(AG_FALSE);  /* keep output */
+                out_close(AG_FALSE);  /* keep output */
             } while (pCurFp->pPrev != NULL);
             break;
 
@@ -245,7 +245,7 @@ processTemplate(tTemplate* pTF)
              *  We got here by a long jump.  Close/purge the open files.
              */
             do  {
-                closeOutput(AG_TRUE);  /* discard output */
+                out_close(AG_TRUE);  /* discard output */
             } while (pCurFp->pPrev != NULL);
             pzLastScheme = NULL; /* "problem" means "drop current output". */
             break;
@@ -260,7 +260,7 @@ processTemplate(tTemplate* pTF)
              *  We got here by a long jump.  Close/purge the open files.
              */
             do  {
-                closeOutput(AG_TRUE);  /* discard output */
+                out_close(AG_TRUE);  /* discard output */
             } while (pCurFp->pPrev != NULL);
 
             /*
@@ -278,13 +278,13 @@ processTemplate(tTemplate* pTF)
 
 
 LOCAL void
-closeOutput(ag_bool purge)
+out_close(ag_bool purge)
 {
     if ((pCurFp->flags & FPF_NOCHMOD) == 0)
         make_readonly(fileno(pCurFp->pFile));
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "closeOutput '%s'\n", pCurFp->pzOutName);
+        fprintf(pfTrace, "%s '%s'\n", __func__, pCurFp->pzOutName);
 
     fclose(pCurFp->pFile);
 

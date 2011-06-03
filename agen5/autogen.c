@@ -2,7 +2,7 @@
 /**
  *  \file autogen.c
  *
- *  Time-stamp:        "2011-05-31 16:47:03 bkorb"
+ *  Time-stamp:        "2011-06-03 11:24:08 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -354,9 +354,9 @@ done_check(void)
          */
         do  {
 #ifndef DEBUG_ENABLED
-            closeOutput(AG_FALSE);
+            out_close(AG_FALSE);
 #else
-            closeOutput(AG_TRUE);
+            out_close(AG_TRUE);
 #endif
         } while (pCurFp->pPrev != NULL);
         exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
