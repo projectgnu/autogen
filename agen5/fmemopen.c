@@ -1,6 +1,6 @@
 
 /**
- * \file fmemopen.c
+ * @file fmemopen.c
  *
  * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
  *

@@ -1,8 +1,8 @@
 
-/*
- *  expMake.c
+/**
+ * @file expMake.c
  *
- *  Time-stamp:        "2011-04-20 14:26:01 bkorb"
+ *  Time-stamp:        "2011-06-03 12:19:50 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -106,10 +106,10 @@ ag_scm_makefile_script(SCM text)
      *  skip all blank lines and other initial white space
      *  in the source string.
      */
-    if (! isspace(*pzText))
+    if (! IS_WHITESPACE_CHAR(*pzText))
         tabch = TAB;
     else {
-        while (isspace(*++pzText))  ;
+        while (IS_WHITESPACE_CHAR(*++pzText))  ;
         tabch  = (pzText[-1] == TAB) ? NUL : TAB;
     }
 
@@ -149,7 +149,7 @@ ag_scm_makefile_script(SCM text)
                 /*
                  *  Backup past trailing white space (other than newline).
                  */
-                while (isspace(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
+                while (IS_WHITESPACE_CHAR(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
                     pzOut--;
 
                 /*
@@ -158,7 +158,7 @@ ag_scm_makefile_script(SCM text)
                  */
                 {
                     char* pz = pzScn;
-                    while (isspace(*pz)) {
+                    while (IS_WHITESPACE_CHAR(*pz)) {
                         if (*(pz++) == NL)
                             pzScn = pz;
                     }

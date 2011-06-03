@@ -1,8 +1,8 @@
 
 /**
- * \file expOutput.c
+ * @file expOutput.c
  *
- *  Time-stamp:        "2011-06-03 11:24:34 bkorb"
+ *  Time-stamp:        "2011-06-03 11:46:31 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -258,7 +258,7 @@ ag_scm_out_move(SCM new_file)
     pz[ sz ] = NUL;
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s renaming %s to %s\n", __func__,
+        fprintf(pfTrace, "%s %s to %s\n", __func__,
                 pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
 
@@ -644,7 +644,7 @@ ag_scm_out_push_new(SCM new_file)
         pCurFp    = p;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "%s -- temp file\n", __func__);
+            fprintf(pfTrace, "%s -- temp file %s\n", __func__, pzNewFile);
         return SCM_UNDEFINED;
     }
 #endif
@@ -729,7 +729,7 @@ ag_scm_out_switch(SCM new_file)
     tbuf.modtime = outTime;
     utime(pCurFp->pzOutName, &tbuf);
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s switching output from %s to '%s'\n",
+        fprintf(pfTrace, "%s from %s to '%s'\n",
                 __func__, pCurFp->pzOutName, pzNewFile);
     pCurFp->pzOutName = pzNewFile;  /* memory leak */
 

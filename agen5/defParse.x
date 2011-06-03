@@ -1,10 +1,10 @@
 
 /**
- * \file defParse.x
+ * @file defParse.x
  *
  * Definition parser functions.
  *
- *  Time-stamp:        "2011-01-20 16:22:19 bkorb"
+ *  Time-stamp:        "2011-06-03 12:20:23 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved

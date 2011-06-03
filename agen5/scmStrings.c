@@ -1,6 +1,6 @@
 
 /**
- *  \file scmStrings.c
+ * @file scmStrings.c
  *
  *  Temporary SCM strings.
  *

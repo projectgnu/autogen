@@ -1,8 +1,8 @@
 
-/*
- *  \file autogen.h
+/**
+ * @file autogen.h
  *
- *  Time-stamp:        "2011-06-03 11:18:31 bkorb"
+ *  Time-stamp:        "2011-06-03 12:20:50 bkorb"
  *
  *  Global header file for AutoGen
  *

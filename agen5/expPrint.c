@@ -1,6 +1,6 @@
 
 /**
- * \file expPrint.c
+ * @file expPrint.c
  *
  *  Time-stamp:        "2011-01-20 16:21:45 bkorb"
  *

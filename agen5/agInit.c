@@ -1,14 +1,14 @@
 
 /**
- *  \file agInit.c
+ * @file agInit.c
  *
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2011-04-20 15:20:27 bkorb"
+ *  Time-stamp:      "2011-06-03 12:13:40 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -182,14 +182,14 @@ retry:
 
     switch (*popt) {
     case ' ': case TAB: case '\r': case NL:
-        while (isspace((int)*(++popt)))  ;
+        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
         goto retry;
 
     case 'Q':
         if (pzDepTarget != NULL)
             dep_usage(dup_targ);
 
-        while (isspace((int)*(++popt)))  ;
+        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
         pzDepTarget = make_quote_str(popt);
         break;
 
@@ -197,7 +197,7 @@ retry:
         if (pzDepTarget != NULL)
             dep_usage(dup_targ);
 
-        while (isspace((int)*(++popt)))  ;
+        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
         AGDUPSTR(pzDepTarget, popt, "make target name");
         break;
 
@@ -214,7 +214,7 @@ retry:
         if (pzDepFile != NULL)
             dep_usage(dup_targ);
 
-        while (isspace((int)*(++popt)))  ;
+        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
         pzDepFile = aprf("%s-XXXXXX", popt);
         break;
 

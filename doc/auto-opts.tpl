@@ -200,16 +200,16 @@ Yields a program which, when run with @file{--help}, prints out:
 @example
 [= (out-push-new) \=]
 set -x
-log_file=${HOME}/default-test-log.txt
+log_file=${tmp_dir}/ao-doc-log
 exec 7>&2 ; exec 2>> ${log_file}
-
 TOPDIR=`cd ${top_builddir} >/dev/null ; pwd`
 OPTDIR=${TOPDIR}/autoopts
 
 {
   cd ${tmp_dir}
+  chmod 666 *.def
   echo 'config-header = "config.h";' >> default-test.def
-  HOME='' run_ag default-test.def
+  HOME=${tmp_dir} run_ag default-test.def
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts="-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}"
@@ -218,9 +218,13 @@ OPTDIR=${TOPDIR}/autoopts
   test -x ./default-test || die 'NO default-test EXECUTABLE'
 } >&2
 
-test $? -eq 0 || die "Check log file ${log_file}"
+test $? -eq 0 || {
+  printf '\n\ncannot build default test\n'
+  cat $log_file
+  die "cannot build AutoOpts doc"
+} 2>&7 1>&7
 
-HOME='$HOME/.default_testrc' ${tmp_dir}/default-test --help | \
+HOME=${tmp_dir} ${tmp_dir}/default-test --help | \
    sed 's,	,        ,g;s,\([@{}]\),@\1,g'
 
 exec 2>&7 7>&-

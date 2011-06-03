@@ -1,13 +1,13 @@
 
 /**
- *  \file autogen.c
+ *  @file autogen.c
  *
- *  Time-stamp:        "2011-06-03 11:24:08 bkorb"
+ *  Time-stamp:        "2011-06-03 12:15:00 bkorb"
  *
  *  This is the main routine for autogen.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

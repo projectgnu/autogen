@@ -1,14 +1,14 @@
 
 /**
- *  \file expGuile.c
+ * @file expGuile.c
  *
- *  Time-stamp:        "2011-05-31 16:55:02 bkorb"
+ *  Time-stamp:        "2011-06-03 12:13:11 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -271,12 +271,12 @@ ag_scm_string_to_c_name_x(SCM str)
     pz  = (char*)(void*)AG_SCM_CHARS(str);
     while (--len >= 0) {
         char ch = *pz;
-        if (! isalnum(ch)) {
+        if (! IS_ALPHANUMERIC_CHAR(ch)) {
 
-            if (isspace(ch))
+            if (IS_WHITESPACE_CHAR(ch))
                 ;
 
-            else if (isprint(ch))
+            else if (IS_GRAPHIC_CHAR(ch))
                 *pz = '_';
 
             else
@@ -311,7 +311,7 @@ ag_scm_string_upcase_x(SCM str)
     pz  = (char*)(void*)AG_SCM_CHARS(str);
     while (--len >= 0) {
          char ch = *pz;
-        if (islower(ch))
+        if (IS_LOWER_CASE_CHAR(ch))
             *pz = toupper(ch);
         pz++;
     }
@@ -368,15 +368,15 @@ ag_scm_string_capitalize_x(SCM str)
     while (--len >= 0) {
         char ch = *pz;
 
-        if (! isalnum(ch)) {
+        if (! IS_ALPHANUMERIC_CHAR(ch)) {
             word_start = AG_TRUE;
 
         } else if (word_start) {
             word_start = AG_FALSE;
-            if (islower(ch))
+            if (IS_LOWER_CASE_CHAR(ch))
                 *pz = toupper(ch);
 
-        } else if (isupper(ch))
+        } else if (IS_UPPER_CASE_CHAR(ch))
             *pz = tolower(ch);
 
         pz++;
@@ -432,7 +432,7 @@ ag_scm_string_downcase_x(SCM str)
     pz  = (char*)(void*)AG_SCM_CHARS(str);
     while (--len >= 0) {
         char ch = *pz;
-        if (isupper(ch))
+        if (IS_UPPER_CASE_CHAR(ch))
             *pz = tolower(ch);
         pz++;
     }
@@ -492,19 +492,19 @@ ag_scm_string_to_camelcase(SCM str)
 
     while (--len >= 0) {
         unsigned int ch = *(pzs++);
-        if (islower(ch)) {
+        if (IS_LOWER_CASE_CHAR(ch)) {
             if (! cap_done) {
                 ch = toupper(ch);
                 cap_done = AG_TRUE;
             }
 
-        } else if (isupper(ch)) {
+        } else if (IS_UPPER_CASE_CHAR(ch)) {
             if (cap_done)
                 ch = tolower(ch);
             else
                 cap_done = AG_TRUE;
 
-        } else if (isdigit(ch)) {
+        } else if (IS_DEC_DIGIT_CHAR(ch)) {
             cap_done = AG_FALSE;
 
         } else {

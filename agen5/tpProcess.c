@@ -1,6 +1,6 @@
 
 /**
- *  \file tpProcess.c
+ * @file tpProcess.c
  *
  *  Parse and process the template data descriptions
  *

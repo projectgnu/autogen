@@ -1,7 +1,8 @@
 
-/*
+/**
+ * @file funcFor.c
  *
- *  Time-stamp:        "2011-04-20 14:25:32 bkorb"
+ *  Time-stamp:        "2011-06-03 12:19:38 bkorb"
  *
  *  This module implements the FOR text macro.
  *

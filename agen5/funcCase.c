@@ -1,10 +1,10 @@
 
 /**
- * \file funcCase.c
+ * @file funcCase.c
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2011-01-31 12:18:34 bkorb"
+ *  Time-stamp:        "2011-06-03 11:54:20 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -1190,7 +1190,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
      */
     if (*pzSrc == '*') {
         pzSrc++;
-        if (isspace(*pzSrc) || (*pzSrc == NUL)) {
+        if (IS_WHITESPACE_CHAR(*pzSrc) || (*pzSrc == NUL)) {
             typ    = (int)FTYP_SELECT_MATCH_ANYTHING;
             srcLen = 0;
             pMac->ozText = 0;
@@ -1235,7 +1235,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
         default:
             goto bad_sel;
         }
-        if ((pzSrc[1] != NUL) && (! isspace(pzSrc[1])))
+        if ((pzSrc[1] != NUL) && (! IS_WHITESPACE_CHAR(pzSrc[1])))
             goto bad_sel;
 
         typ = (int)((pzSrc[-1] == '!')
@@ -1259,10 +1259,10 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
         typ |= (int)FTYP_SELECT_COMPARE_SKP_END;
     }
 
-    if (! isspace(*pzSrc))
+    if (! IS_WHITESPACE_CHAR(*pzSrc))
         AG_ABEND_IN(pT, pMac, zInvSel);
 
-    while (isspace(*pzSrc)) pzSrc++;
+    while (IS_WHITESPACE_CHAR(*pzSrc)) pzSrc++;
     srcLen -= pzSrc - (char const *)pMac->ozText;
     if (srcLen <= 0)
         AG_ABEND_IN(pT, pMac, zInvSel);

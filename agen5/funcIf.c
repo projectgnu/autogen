@@ -1,6 +1,6 @@
 
 /**
- * \file funcIf.c
+ * @file funcIf.c
  *
  *  Time-stamp:        "2011-01-27 12:39:51 bkorb"
  *

@@ -3,10 +3,10 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-04-20 15:19:19 bkorb"
+ *  Time-stamp:        "2011-06-03 12:13:01 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

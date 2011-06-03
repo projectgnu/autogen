@@ -1,6 +1,6 @@
 
 /**
- * \file funcEval.c
+ * @file funcEval.c
  *
  *  This module evaluates macro expressions.
  *

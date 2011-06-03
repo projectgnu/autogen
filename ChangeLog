@@ -1,4 +1,4 @@
-2011-06-04  Harlan Stenn  <stenn@ntp.org>
+2011-06-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h (__func__): #define a replacement when needed
 	* agen5/expOutput.c : use it throughout
@@ -6,7 +6,12 @@
 	* agen5/test/debug.test: adjust for new name
 	* agen5/expOutput.c: likewise
 	* agen5/autogen.c: likewise
+	* autoopts/tpl/agman-cmd.tpl (cond-section): new macro.  Utilize it
+	throughout to "regularize" the creation of AutoOpts defined sections.
 	* autoopts/test/keyword.test: adjust for new templates
+	* agen5/*.c: change Doxygen file tag to @file
+	* doc/auto-opts.tpl (HOME): set it to our temp directory, instead
+	of emptying it.  Debian has a problem when it is empty.
 
 2011-05-30  Harlan Stenn  <stenn@ntp.org>
 

@@ -1,7 +1,8 @@
 
-/*
+/**
+ * @file defLex.c
  *
- *  Time-stamp:        "2011-04-20 14:26:11 bkorb"
+ *  Time-stamp:        "2011-06-03 12:20:36 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.

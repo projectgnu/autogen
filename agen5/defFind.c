@@ -1,5 +1,5 @@
 /**
- * \file defFind.c
+ * @file defFind.c
  *
  *  Time-stamp:        "2011-01-20 16:23:20 bkorb"
  *

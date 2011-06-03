@@ -1,12 +1,12 @@
 /**
- *  \file agUtils.c
+ * @file agUtils.c
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-04-29 10:30:02 bkorb"
+ *  Time-stamp:        "2011-06-03 12:13:25 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -184,7 +184,7 @@ start_dep_file(void)
         unsigned int ch = (unsigned int)*(pz++);
         if (ch == NUL)
             break;
-        if (! isalnum(ch))
+        if (! IS_ALPHANUMERIC_CHAR(ch))
             pz[-1] = '_';
     }
     fprintf(pfDepends, "%s_TList =", pz_targ_base);
@@ -211,18 +211,16 @@ open_trace_file(char ** av, tOptDesc * odsc)
 
     else if ((fname[0] == '>') && (fname[1] == '>')) {
         fname += 2;
-        while (isspace((int)(*fname)))  fname++;
+        while (IS_WHITESPACE_CHAR((int)(*fname)))  fname++;
         pfTrace = fopen(fname, "a");
     }
 
     else
         pfTrace = fopen(fname, "w");
 
-    if (pfTrace == NULL) {
-        fprintf(stderr, "Error %d (%s) opening `%s' for output",
-                errno, strerror(errno), fname);
-        exit(EXIT_FAILURE);
-    }
+    if (pfTrace == NULL)
+        AG_ABEND(aprf("Error %d (%s) opening `%s' for output",
+                      errno, strerror(errno), fname));
 
 #ifdef _IONBF
     setvbuf(pfTrace, NULL, _IONBF, 0);

@@ -4,10 +4,10 @@ h=%s-fsm.h
 
 c=%s-fsm.c
 
-#  Time-stamp:      "2011-04-20 17:32:26 bkorb"
+#  Time-stamp:      "2011-06-03 12:10:58 bkorb"
 
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## Copyright (c) 1992-2011 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -149,7 +149,6 @@ _EOF_" PFX (stack-up "event") )=]
 #define DEFINE_FSM
 #include "[=(. header-file)=]"
 #include <stdio.h>
-#include <ctype.h>
 [=IF (exist? "handler-file")=]
 #define FSM_USER_HEADERS
 #include "[= handler-file =]"

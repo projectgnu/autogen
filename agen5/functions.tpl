@@ -1,11 +1,10 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-
-#  Time-stamp:        "2011-01-27 13:09:59 bkorb"
+#  Time-stamp:        "2011-06-03 12:13:56 bkorb"
 
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## Copyright (c) 1992-2011 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -19,7 +18,6 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
 
 =]
 [=

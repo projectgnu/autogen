@@ -1,6 +1,6 @@
 
 /**
- * \file agCgi.c
+ * @file agCgi.c
  *
  *  Time-stamp:        "2011-01-20 16:24:54 bkorb"
  *

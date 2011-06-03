@@ -1,6 +1,6 @@
 
 /**
- * \file expState.c
+ * @file expState.c
  *
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.

@@ -1,8 +1,8 @@
 
 /**
- *  \file functions.c
+ * @file functions.c
  *
- *  Time-stamp:        "2011-06-03 10:05:14 bkorb"
+ *  Time-stamp:        "2011-06-03 11:54:40 bkorb"
  *
  *  This module implements text functions.
  *
@@ -61,7 +61,7 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
         if (pM->funcCode == FTYP_TEXT) {
             char* pz  = pNewTpl->pzTemplText + pM->ozText;
             char* pzE = pz + strlen(pz);
-            while ((pzE > pz) && isspace(pzE[-1]))  --pzE;
+            while ((pzE > pz) && IS_WHITESPACE_CHAR(pzE[-1]))  --pzE;
 
             /*
              *  IF there is no text left, remove the macro entirely
@@ -270,7 +270,7 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
                     goto return_emtpy_expression;
             }
 
-            while (--srcLen, isspace(*++pzSrc)) {
+            while (--srcLen, IS_WHITESPACE_CHAR(*++pzSrc)) {
                 if (srcLen <= 0)
                     goto return_emtpy_expression;
             }
@@ -293,7 +293,7 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
          *  Move back the source pointer.  We may have skipped blanks,
          *  so skip over however many first, then back up over the name.
          */
-        while (isspace(pzSrc[-1])) pzSrc--, srcLen++;
+        while (IS_WHITESPACE_CHAR(pzSrc[-1])) pzSrc--, srcLen++;
         remLen  = strlen(pzCopy);
         pzSrc  -= remLen;
         srcLen += remLen;

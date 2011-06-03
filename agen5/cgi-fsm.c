@@ -217,9 +217,9 @@ cgi_run_fsm(
                 return CGI_ST_INVALID;
             }
             curCh = *(pzSrc++);
-            if (isalpha( curCh ))
+            if (IS_ALPHABETIC_CHAR( curCh ))
                 trans_evt = CGI_EV_ALPHA;
-            else if (isdigit( curCh ))
+            else if (IS_DEC_DIGIT_CHAR( curCh ))
                 trans_evt = CGI_EV_NAME_CHAR;
             else switch (curCh) {
             case '_': trans_evt = CGI_EV_NAME_CHAR; break;

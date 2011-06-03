@@ -1,6 +1,6 @@
 
 /**
- * \file defLoad.c
+ * @file defLoad.c
  *
  *  Time-stamp:        "2011-01-20 16:25:52 bkorb"
  *

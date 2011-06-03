@@ -1,6 +1,6 @@
 
 /**
- * \file funcDef.c
+ * @file funcDef.c
  *
  *  This module implements the DEFINE text function.
  *

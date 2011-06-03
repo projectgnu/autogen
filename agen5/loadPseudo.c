@@ -1,6 +1,6 @@
 
 /**
- * \file loadPseudo.c
+ * @file loadPseudo.c
  *
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.

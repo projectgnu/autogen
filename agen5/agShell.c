@@ -1,5 +1,5 @@
 /**
- * \file agShell
+ * @file agShell.c
  *
  *  Time-stamp:        "2011-05-26 10:57:44 bkorb"
  *

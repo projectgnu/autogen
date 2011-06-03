@@ -1,5 +1,5 @@
 /**
- * \file expExtract.c
+ * @file expExtract.c
  *
  *  Time-stamp:        "2011-01-28 10:22:33 bkorb"
  *

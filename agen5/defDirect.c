@@ -1,5 +1,5 @@
 /**
- * \file defDirect.c
+ * @file defDirect.c
  *
  *  Time-stamp:        "2011-04-20 14:19:01 bkorb"
  *

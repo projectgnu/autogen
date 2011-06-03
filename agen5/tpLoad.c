@@ -1,13 +1,13 @@
 
 /**
- * \file tpLoad.c
+ * @file tpLoad.c
  *
- * Time-stamp:        "2011-04-19 17:26:12 bkorb"
+ * Time-stamp:        "2011-06-03 12:14:53 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
- * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ * Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

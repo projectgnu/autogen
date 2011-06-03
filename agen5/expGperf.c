@@ -1,13 +1,14 @@
-/*
+/**
+ * @file expGperf.c
  *
- *  Time-stamp:        "2011-05-26 10:58:37 bkorb"
+ *  Time-stamp:        "2011-06-03 12:20:16 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

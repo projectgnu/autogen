@@ -1,6 +1,6 @@
 
 /**
- *  \file expFormat.c
+ * @file expFormat.c
  *
  *  Time-stamp:        "2011-05-31 16:34:58 bkorb"
  *
