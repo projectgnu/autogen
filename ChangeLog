@@ -1,3 +1,9 @@
+2011-06-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fmemopen.c (ag_fmemioctl): do not compile.  GNU Hurd
+	chokes on _IOWR('m', 1, fmemc_get_buf_addr_t) by token pasting
+	weird stuff and not being able to compile.  It isn't used anyway.
+
 2011-06-05  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.h (__func__): #define a replacement when needed
