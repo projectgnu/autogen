@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-05-26 09:11:40 bkorb"
+# Time-stamp:        "2011-06-05 15:27:39 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -161,19 +161,38 @@ config_versions()
     mv changelog-new changelog
     cd ${srcdir}
 
-    GNULIBDIR=~gnu/proj/gnulib
+    GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
     cp ${GNULIBDIR}/lib/parse-duration.[ch] autoopts/.
     cp  ${GNULIBDIR}/build-aux/gendocs.sh \
         ${GNULIBDIR}/doc/gendocs_template doc/.
+
+    fmemdir=~bkorb/tools/mine/lib/fmemopen
+    if test -f ${fmemdir}/fmemopen.c
+    then
+        rm -f agen5/fmemopen.c
+        {
+            echo '#if defined(ENABLE_FMEMOPEN)'
+            echo '#include <sys/ioctl.h>'
+            echo
+            sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
+            sed -e '/#if defined(__linux)/p' \
+                -e '/=--subblock/,/^#if defined(__linux)/d' \
+                -e "s% @file .*% @file $(realpath ${fmemdir}/fmemopen.c)%" \
+                ${fmemdir}/fmemopen.c
+            echo '#endif /* ENABLE_FMEMOPEN */'
+        } > agen5/fmemopen.c
+    fi
 }
 
 check_tools()
 {
-    test -x "${AGexe}" -a -x "$GDexe" -a -x "$CLexe" || exit 1
-
-    ( $CLexe --version  && \
-      $GDexe --version  && \
-      $AGexe --version ) > /dev/null || exit 1
+    local t e
+    for t in AG GD CL
+    do
+        eval e=\${${t}exe}
+        test -x "$e" || die "Not executable: \$${t}exe == '$e'"
+        $e --version || die "$e does not work"
+    done
 }
 
 tweak_Makefile_am()
@@ -218,7 +237,7 @@ case "${BOOTSTRAP}" in
     dummy_texi=${srcdir}/doc/autogen.texi
     echo '@setfilename autogen.info' > ${dummy_texi}
     test -f ${srcdir}/configure && rm -f ${srcdir}/configure
-    check_tools
+    check_tools >/dev/null
     config_versions
     tweak_Makefile_am
     ;;

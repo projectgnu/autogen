@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-06-03 12:12:45 bkorb"
+## Time-stamp:      "2011-06-05 11:36:15 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -73,6 +73,11 @@
 
 (define name-to-fname (lambda (nm)
     (string-tr (string-downcase sec-type) " " "-") ))
+
+(define sect-line-fname (lambda () (begin
+    (out-push-new file-name)
+    (emit (string-append ".Sh \"" sect-name "\"\n"))
+    (string-append "mk-" macro-name) )))
 
 (make-tmp-dir)
 
@@ -222,7 +227,7 @@ ENDDEF ao-sections
 .\"
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE cond-section                   :+][+:
+DEFINE cond-section                     :+][+:
 
   IF 
      (set! sect-name   (string-upcase! (string-substitute
@@ -231,48 +236,35 @@ DEFINE cond-section                   :+][+:
                        sect-name " " "-" )))
      (set! file-name   (string-append tmp-dir "/" macro-name))
 
-     (not (access? file-name R_OK))   :+][+:
+     (not (access? file-name R_OK))     :+][+:
 
-     INVOKE (begin
-       (out-push-new file-name)
-       (emit (string-append ".Sh \"" sect-name "\"\n"))
-       (string-append "mk-" macro-name) )
+     INVOKE (sect-line-fname)           :+][+:
+     (out-pop)                          :+][+:
 
-       :+][+:   (out-pop)             :+][+:
+  ELSE file exists                      :+][+:
 
-  ELSE file exists                    :+][+:
+     CASE (get "mode")                  :+][+:
 
-     CASE (get "mode")                :+][+:
+     ==  replace                        :+][+:
+         INVOKE (sect-line-fname)       :+][+:
+         (out-pop)                      :+][+:
 
-     ==  replace                      :+][+:
-         INVOKE (begin
-           (out-push-new file-name)
-           (emit (string-append ".Sh " sect-name))
-           (string-append "mk-" macro-name) )
+     ==  append                         :+][+:
+         (out-push-add file-name)       :+][+:
+         INVOKE (string-append "append-" macro-name) :+][+:
+         (out-pop)                      :+][+:
 
-           :+][+:   (out-pop)         :+][+:
+     ==  insert                         :+][+:
+         (set! tmp-str (shellf "sed '1s/.Sh .*/.Pp/' %s" file-name)) :+][+:
+         INVOKE (sect-line-fname)       :+][+:
+         (emit tmp-str)
+         (out-pop)                      :+][+:
 
-     ==  append                       :+][+:
-         INVOKE (begin
-           (out-push-add file-name)
-           (string-append "append-" macro-name) )
+     # * -- otherwise, do nothing       :+][+:
 
-           :+][+:   (out-pop)         :+][+:
+     ESAC                               :+][+:
 
-     ==  insert                       :+][+:
-         INVOKE (begin
-           (set! tmp-str (shellf "sed '1s/.Sh .*/.Pp/'" file-name))
-           (out-push-new file-name)
-           (emit (string-append ".Sh " sect-name))
-           (string-append "mk-" macro-name) )
-
-           :+][+:
-           (emit tmp-str)
-           (out-pop)                  :+][+:
-
-     ESAC                             :+][+:
-
-  ENDIF file existence/non-existence  :+][+:
+  ENDIF file existence/non-existence    :+][+:
 ENDDEF cond-section
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -282,9 +274,9 @@ ENDDEF cond-section
 DEFINE mk-description                 :+][+:
 
   (if (exist? "prog-man-descrip")
-      (join "\n.Pp\n" (stack "prog-man-descrip"))
+      (stack-join "\n.Pp\n" "prog-man-descrip")
       (if (exist? "detail")
-          (join "\n.Pp\n" (stack "detail"))
+          (stack-join "\n.Pp\n" "detail")
           "There is no description for this command."
   )   )                               :+]
 [+:

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2010-09-07 17:49:08 bkorb"
+ * Time-stamp:      "2011-06-05 10:21:21 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -126,10 +126,10 @@ typedef struct {
     size_t     buf_size;
     size_t     eof;
 } fmemc_get_buf_addr_t;
-
+#if 0
 #define IOCTL_FMEMC_GET_BUF_ADDR \
     _IOWR(FMEMC_IOCTL_BASE, FMEMC_GET_BUF_ADDR, fmemc_get_buf_addr_t)
-
+#endif
 #define PROP_TABLE \
 _Prop_( read,       "Read from buffer"        ) \
 _Prop_( write,      "Write to buffer"         ) \
@@ -724,8 +724,8 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
         return res;
     }
 }
-
-/*=export_func ag_fmemioctl
+#if 0
+/* = export_func ag_fmemioctl
  *
  *  what:  perform an ioctl on a FILE* descriptor
  *
@@ -794,7 +794,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
         cookie->mode &= ~FLAG_BIT(allocated);
     return 0;
 }
-
+#endif /* comment out ag_fmemioctl */
 #endif /* ENABLE_FMEMOPEN */
 /*
  * Local Variables:

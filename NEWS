@@ -1,6 +1,11 @@
-New in __CURRENT_VERSION__ May 2011
+New in __CURRENT_VERSION__ June 2011
 
-* new stuff
+* man page templates have been regularized so it is now easier to
+  use doc-section stanzas in the option definition files.
+
+* The Guile interface glue layer has dropped Guile version 1.4 and
+  has coelesced around pre-1.7 vs. 1.7-and-later interfaces, yielding
+  only two forms for each interface.
 
 New in 5.11.9 May 2011
 
