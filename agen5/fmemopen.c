@@ -1,10 +1,33 @@
+#if defined(ENABLE_FMEMOPEN)
+#include <sys/ioctl.h>
+
+typedef enum {
+    FMEMC_INVALID       = 0,
+    FMEMC_GET_BUF_ADDR
+} fmemctl_t;
+
+typedef struct {
+    enum { FMEMC_GBUF_LEAVE_OWNERSHIP,
+           FMEMC_GBUF_TAKE_OWNERSHIP
+    }          own;
+    char *     buffer;
+    size_t     buf_size;
+    size_t     eof;
+} fmemc_get_buf_addr_t;
+
+#ifdef HURD
+#define _IOT__IOTBASE_fmemc_get_buf_addr_t sizeof(fmemc_get_buf_addr_t)
+#endif
+
+#define IOCTL_FMEMC_GET_BUF_ADDR \
+    _IOWR('m', FMEMC_GET_BUF_ADDR, fmemc_get_buf_addr_t)
 
 /**
- * @file fmemopen.c
+ * @file /old-home/bkorb/tools/mine/lib/fmemopen/fmemopen.c
  *
  * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2011-06-05 10:21:21 bkorb"
+ * Time-stamp:      "2011-06-05 17:03:38 bkorb"
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
@@ -31,54 +54,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#if defined(ENABLE_FMEMOPEN)
-
-/*=--subblock=arg=arg_type,arg_name,arg_desc =*/
-/*=*
- * library:  fmem
- * header:   libfmem.h
- *
- * lib_description:
- *
- *  This library only functions in the presence of GNU or BSD's libc.
- *  It is distributed under the Berkeley Software Distribution License.
- *  This library can only function if there is a libc-supplied mechanism
- *  for fread/fwrite/fseek/fclose to call into this code.  GNU uses
- *  fopencookie and BSD supplies funopen.
-=*/
-/*
- * ag_fmemopen() - "my" version of a string stream
- * inspired by the glibc version, but completely rewritten and
- * extended by Bruce Korb - bkorb@gnu.org
- *
- * - See the man page.
- */
-
-#if defined(__linux)
-#  if ! defined(_GNU_SOURCE)
-#    define _GNU_SOURCE
-#  endif
-
-#  define HAVE_FOPENCOOKIE 1
-#  undef  HAVE_FUNOPEN
-#endif
-
-#ifdef  _NETBSD_SOURCE
-#  undef  HAVE_FOPENCOOKIE
-#  define HAVE_FUNOPEN 1
-#endif
-
-#include <sys/ioctl.h>
-#include <sys/types.h>
-
-#include <fcntl.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #if defined(HAVE_FOPENCOOKIE)
 #  if defined(HAVE_LIBIO_H)
 #    include <libio.h>
@@ -86,14 +61,10 @@
 
    typedef off64_t * seek_off_t;
    typedef int       seek_ret_t;
-#  define FOPENCOOKIE_INTERFACE  1
-#  undef  FUNOPEN_INTERFACE
 
-#elif defined(HAVE_FUNOPEN)
+#elif  defined(HAVE_FUNOPEN)
    typedef fpos_t  seek_off_t;
    typedef fpos_t  seek_ret_t;
-#  undef  FOPENCOOKIE_INTERFACE
-#  define FUNOPEN_INTERFACE  1
 
 #  ifdef NEED_COOKIE_FUNCTION_TYPEDEFS
      typedef int     (cookie_read_function_t )(void *, char *, int);
@@ -101,35 +72,8 @@
      typedef fpos_t  (cookie_seek_function_t )(void *, fpos_t, int);
      typedef int     (cookie_close_function_t)(void *);
 #  endif /* NEED_COOKIE_FUNCTION_TYPEDEFS */
-
-#else
-#  error  OOPS
-   Choke Me.
 #endif
 
-#ifndef NUL
-# define NUL '\0'
-#endif
-
-typedef enum {
-    FMEMC_INVALID       = 0,
-    FMEMC_GET_BUF_ADDR
-} fmemctl_t;
-
-#define FMEMC_IOCTL_BASE  'm'
-
-typedef struct {
-    enum { FMEMC_GBUF_LEAVE_OWNERSHIP,
-           FMEMC_GBUF_TAKE_OWNERSHIP
-    }          own;
-    char *     buffer;
-    size_t     buf_size;
-    size_t     eof;
-} fmemc_get_buf_addr_t;
-#if 0
-#define IOCTL_FMEMC_GET_BUF_ADDR \
-    _IOWR(FMEMC_IOCTL_BASE, FMEMC_GET_BUF_ADDR, fmemc_get_buf_addr_t)
-#endif
 #define PROP_TABLE \
 _Prop_( read,       "Read from buffer"        ) \
 _Prop_( write,      "Write to buffer"         ) \
@@ -165,6 +109,14 @@ typedef struct {
     FILE *          fp;
     fmem_cookie_t * cookie;
 } cookie_fp_map_t;
+
+#ifndef AUTOGEN_BUILD
+/**
+ * invent our own boolean rather than try to work around all the ways
+ * different systems spell it.
+ */
+typedef enum { AG_FALSE = 0, AG_TRUE = 1 } ag_bool;
+#endif
 
 static cookie_fp_map_t const * map    = NULL;
 static unsigned int            map_ct = 0;
@@ -385,7 +337,7 @@ fmem_seek(void * cookie, seek_off_t offset, int dir)
     size_t new_pos;
     fmem_cookie_t *pFMC = cookie;
 
-#ifdef FOPENCOOKIE_INTERFACE
+#ifdef HAVE_FOPENCOOKIE
     /*
      *  GNU interface:  offset passed and returned by address.
      */
@@ -421,7 +373,7 @@ fmem_seek(void * cookie, seek_off_t offset, int dir)
 
     pFMC->next_ix = new_pos;
 
-#ifdef FOPENCOOKIE_INTERFACE
+#ifdef HAVE_FOPENCOOKIE
     *offset = (off64_t)new_pos;
     return 0;
 #else
@@ -687,7 +639,7 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
         cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
             ? (cookie_write_function_t*)fmem_write : NULL;
 
-#ifdef FOPENCOOKIE_INTERFACE
+#ifdef HAVE_FOPENCOOKIE
         cookie_io_functions_t iof;
         iof.read  = pRd;
         iof.write = pWr;
@@ -724,8 +676,8 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
         return res;
     }
 }
-#if 0
-/* = export_func ag_fmemioctl
+
+/*=export_func ag_fmemioctl
  *
  *  what:  perform an ioctl on a FILE* descriptor
  *
@@ -794,8 +746,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
         cookie->mode &= ~FLAG_BIT(allocated);
     return 0;
 }
-#endif /* comment out ag_fmemioctl */
-#endif /* ENABLE_FMEMOPEN */
+
 /*
  * Local Variables:
  * mode: C
@@ -803,3 +754,4 @@ ag_fmemioctl(FILE * fp, int req, ...)
  * indent-tabs-mode: nil
  * End:
  * end of agen5/fmemopen.c */
+#endif /* ENABLE_FMEMOPEN */

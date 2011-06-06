@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-06-05 15:27:39 bkorb"
+# Time-stamp:        "2011-06-05 17:04:51 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -169,14 +169,14 @@ config_versions()
     fmemdir=~bkorb/tools/mine/lib/fmemopen
     if test -f ${fmemdir}/fmemopen.c
     then
-        rm -f agen5/fmemopen.c
+        test -f agen5/fmemopen.c && rm -f agen5/fmemopen.c
         {
             echo '#if defined(ENABLE_FMEMOPEN)'
             echo '#include <sys/ioctl.h>'
             echo
             sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
-            sed -e '/#if defined(__linux)/p' \
-                -e '/=--subblock/,/^#if defined(__linux)/d' \
+            sed -e '/^#if defined(HAVE_FOPENCOOKIE)/p' \
+                -e '/=--subblock/,/^#if defined(HAVE_FOPENCOOKIE)/d' \
                 -e "s% @file .*% @file $(realpath ${fmemdir}/fmemopen.c)%" \
                 ${fmemdir}/fmemopen.c
             echo '#endif /* ENABLE_FMEMOPEN */'

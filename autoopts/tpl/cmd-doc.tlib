@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-06-05 11:36:15 bkorb"
+## Time-stamp:      "2011-06-05 15:52:55 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -108,16 +108,27 @@ cat_n_rm() {
   grep -E -v '^[ 	]*$' ${tmp_dir}/$1
   rm -f ${tmp_dir}/$1
 }
+
+#.\" Insert these sections first, in the prescribed order
+#
 for f in synopsis description options option-presets
 do cat_n_rm $f ; done
 test -f ${tmp_dir}/name && rm -f ${tmp_dir}/name
 
+#.\" These sections go last, in the prescribed order
+#
 for f in implementation-notes environment files examples exit-status errors \
-	compatibility see-also conforming-to history authors copyright bugs notes
+      compatibility see-also conforming-to history authors copyright bugs notes
 do cat_n_rm $f ; done > ${tmp_dir}/.fini
 
-set  -- ${tmp_dir}/*
-test -f "$1" && grep -E -v '^[ 	]*$' $*
+#.\" Insert the contents of all remaining files in alphabetic order,
+#.\" except remove any blank lines.
+#
+set ${tmp_dir}/*
+test -f "$1" && cat $* | grep -E -v '^[ 	]*$'
+
+#.\" Now insert the sections we squirreled away for the end.
+#
 cat  ${tmp_dir}/.fini
 [+: (out-pop)
     (shell ". ${tmp_dir}/.assemble")  :+][+:
