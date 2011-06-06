@@ -13,8 +13,6 @@ die() {
     exit 1
 }
 
-target=${1} ; shift
-
 for d in top_srcdir srcdir top_builddir builddir
 do
     eval v=\${$d}
@@ -36,7 +34,7 @@ done
             printf '#include "%s"\n' $1
         shift
     done
-} > ${target}
+} > libopts.c
 
 cd tpl
 

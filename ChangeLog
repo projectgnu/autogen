@@ -3,6 +3,10 @@
 	* agen5/fmemopen.c (ag_fmemioctl): do not compile.  GNU Hurd
 	chokes on _IOWR('m', 1, fmemc_get_buf_addr_t) by token pasting
 	weird stuff and not being able to compile.  It isn't used anyway.
+	* autoopts/bootstrap.dir (GENSCRIPTS): new list of files.
+	These must be "maintainerclean" and depend upon the mk-tpl-config.sh
+	script running.
+	* autoopts/Makefile.am (MAINTAINERCLEANFILES): use GENSCRIPTS.
 
 2011-06-05  Bruce Korb  <bkorb@gnu.org>
 

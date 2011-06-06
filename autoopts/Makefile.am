@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-05-24 17:35:13 bkorb"
+## Time-stamp:      "2011-06-06 08:18:45 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -60,7 +60,6 @@ CSRC        = parse-duration.c $(GEN_SRC) \
     usage.c   version.c
 
 SRC         = $(HDRS) $(CSRC) $(GENSRC)
-STAMP_FILES = $(MAN_STAMP) $(TEXI_STAMP)
 DEF_FILES   = genshell.def $(srcdir)/funcs.def
 pkgconfigdir=$(libdir)/pkgconfig
 
@@ -71,8 +70,8 @@ pkgconfigdir=$(libdir)/pkgconfig
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 CLEANFILES                = tmp-* libopts.c
-DISTCLEANFILES            = $(GENMAN) $(GENTEXI) $(STAMP_FILES)
-MAINTAINERCLEANFILES      = $(GENHDRS) $(GENSRC) $(srcdir)/funcs.def
+DISTCLEANFILES            = $(GENMAN) $(GENTEXI) *-stamp
+MAINTAINERCLEANFILES      = $(GENHDRS) $(GENSRC) $(GENSCRIPTS)
 m4datadir                 = $(datadir)/aclocal
 
 nodist_libopts_la_SOURCES = libopts.c
@@ -108,13 +107,18 @@ BOOTENV  = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
 ##
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-libopts.c : $(HDRS) $(CSRC) $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
+libopts.c       : tpl-config-stamp
+$(GENSCRIPTS)   : tpl-config-stamp
+
+tpl-config-stamp: $(HDRS) $(CSRC) \
+	$(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
 	$(BOOTENV) \
 	  $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
+	@touch $@
 
 makeshell.lo : genshell.c
 genshell.c : $(srcdir)/genshell.def
-	@$(BOOTENV) \
+	$(BOOTENV) \
 	  $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 strcspn.lo : $(top_srcdir)/compat/strcspn.c

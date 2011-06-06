@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-05-26 08:40:10 bkorb"
+# Time-stamp:      "2011-06-06 08:20:04 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -20,20 +20,6 @@
 ##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
-
-test "X${mainpid}" = X && {
-    \cd ${top_srcdir-..}
-    top_srcdir=`pwd`
-    . config/bootstrap.shlib
-    cd autoopts
-    free_trap=true
-} || {
-    free_trap=false
-}
-
-export AGexe=${AGexe-autogen}\ -L${top_srcdir}/autoopts/tpl
-noag=`${AGexe} -v > /dev/null 2>&1 && echo false || echo true`
-nl=$'\n'
 
 burn_aover() {
     agvars=$(egrep '^A[GO]_' ../VERSION)
@@ -68,6 +54,18 @@ add_files_to_mf() {
 
     local tmpl=$(
         ndst=""
+        sfil=''
+
+        for f in man mdoc texi
+        do
+            for g in man mdoc texi
+            do
+                sfil=${sfil}tpl/${f}2${g}${nl}
+                test -f tpl/${f}2${g}.sh || \
+                    ndst=${ndst}tpl/${f}2${g}${nl}
+            done
+        done
+
         pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
         edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
         edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
@@ -92,6 +90,7 @@ add_files_to_mf() {
         echo "local ndst='${ndst%${nl}}'"
         echo "local pdta='${pdta%${nl}}'"
         echo "local edta='${edta%${nl}}'"
+        echo "local sfil='${sfil%${nl}}'"
     )
 
     eval "$tmpl"
@@ -109,6 +108,9 @@ add_files_to_mf() {
 
     )"$'\\\n\\\nEXTRA_DATA = \$(pkgdata_DATA) \\\\\\\n'"$(
         echo "${edta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
+
+    )"$'\\\n\\\nGENSCRIPTS = \$(srcdir)/funcs.def \\\\\\\n'"$(
+        echo "${sfil}" | columns -I4 --spread=1 --line=' \\\'
     )"
 
     rm -f *.3
@@ -173,6 +175,25 @@ make_funcs_def()
     ${AGexe} aoconf.def || die "FAILED: ${AGexe} aoconf.def"
 }
 
+exec 6> /tmp/ao-boot.txt
+BASH_XTRACEFD=6
+case "$-" in ( *x* ) unsetx=false ;; ( * ) unsetx=true ;; esac
+set -x
+
+test "X${mainpid}" = X && {
+    \cd ${top_srcdir-..}
+    top_srcdir=`pwd`
+    . config/bootstrap.shlib
+    cd autoopts
+    free_trap=true
+} || {
+    free_trap=false
+}
+
+export AGexe=${AGexe-autogen}\ -L${top_srcdir}/autoopts/tpl
+noag=`${AGexe} -v > /dev/null 2>&1 && echo false || echo true`
+nl=$'\n'
+
 case "$1" in
 *genshell.c )
     if ${noag}
@@ -204,6 +225,8 @@ esac
 
 ${free_trap} && trap '' 0
 true
+$unsetx && set +x
+BASH_XTRACEFD=2
 
 # Local Variables:
 # mode:shell-script
