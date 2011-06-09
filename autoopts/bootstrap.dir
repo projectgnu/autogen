@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-06-06 08:20:04 bkorb"
+# Time-stamp:      "2011-06-06 08:50:27 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -103,13 +103,13 @@ add_files_to_mf() {
     )"$'\\\n\\\nnodist_pkgdata_DATA = \$(libsrc) \\\\\\\n'"$(
         echo "${ndst}" | sort -u | columns -I4 --spread=1 --line=' \\\'
 
-    )"$'\\\n\\\npkgdata_DATA = \\\\\\\n'"$(
+    )"$'\\\n\\\npkgdata_DATA    = \\\\\\\n'"$(
         echo "${pdta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
 
-    )"$'\\\n\\\nEXTRA_DATA = \$(pkgdata_DATA) \\\\\\\n'"$(
+    )"$'\\\n\\\nEXTRA_DATA      = \$(pkgdata_DATA) \\\\\\\n'"$(
         echo "${edta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
 
-    )"$'\\\n\\\nGENSCRIPTS = \$(srcdir)/funcs.def \\\\\\\n'"$(
+    )"$'\\\n\\\nGENSCRIPTS      = \$(srcdir)/funcs.def \\\\\\\n'"$(
         echo "${sfil}" | columns -I4 --spread=1 --line=' \\\'
     )"
 
@@ -175,11 +175,6 @@ make_funcs_def()
     ${AGexe} aoconf.def || die "FAILED: ${AGexe} aoconf.def"
 }
 
-exec 6> /tmp/ao-boot.txt
-BASH_XTRACEFD=6
-case "$-" in ( *x* ) unsetx=false ;; ( * ) unsetx=true ;; esac
-set -x
-
 test "X${mainpid}" = X && {
     \cd ${top_srcdir-..}
     top_srcdir=`pwd`
@@ -225,8 +220,6 @@ esac
 
 ${free_trap} && trap '' 0
 true
-$unsetx && set +x
-BASH_XTRACEFD=2
 
 # Local Variables:
 # mode:shell-script

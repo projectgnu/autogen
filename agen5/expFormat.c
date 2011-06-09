@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-05-31 16:34:58 bkorb"
+ *  Time-stamp:        "2011-06-08 05:53:32 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -23,6 +23,13 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+typedef enum {
+    LSEG_INFO   = 1,
+    LSEG_DESC   = 2,
+    LSEG_FULL   = 3,
+    LSEG_NAME   = 4
+} lic_segment_e_t;
+
 static char const zDne1[] =
 "%s -*- buffer-read-only: t -*- vi: set ro:\n"
 "%s\n";
@@ -41,11 +48,12 @@ static char const zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-static char const zOwnLen[]   = "owner length";
-static char const zPfxLen[]   = "prefix length";
-static char const zProgLen[]  = "program name length";
-static char const zPfxMsg[]   = "%s may not exceed %d chars\n";
-static char const zFmtAlloc[] = "asprintf allocation";
+static char const zOwnLen[]     = "owner length";
+static char const zPfxLen[]     = "prefix length";
+static char const zProgLen[]    = "program name length";
+static char const zPfxMsg[]     = "%s may not exceed %d chars\n";
+static char const zFmtAlloc[]   = "asprintf allocation";
+static char const unknown_lic[] = "an unknown license";
 
 /*=gfunc dne
  *
@@ -276,8 +284,44 @@ ag_scm_error(SCM res)
     return SCM_UNDEFINED;
 }
 
+static void
+assemble_full_desc(char * txt)
+{
+    static char const pfx[] = "<PFX>";
+    char * pd = txt + sizeof(pfx) - 1; /* prefix destination */
+    char *  d = txt; /* move destination */
+
+    txt += 2;
+    while (*txt == NL) txt++;
+    if (d != txt)
+        memmove(d, txt, strlen(txt) + 1);
+    memmove(pd, pfx, sizeof(pfx - 1));
+    txt = strstr(d, "\n\n");
+    if (txt != NULL)
+        *txt = NUL;
+    else {
+        txt += strlen(txt);
+        if (txt[-1] == NL)
+            txt[-1] = NUL;
+    }
+}
+
 static char *
-find_lic_text(int segment, SCM lic, size_t * txt_len)
+get_lic_name(char * p)
+{
+    p += 2;
+    while (*p == NL) p++;
+    p = strstr(p, "\n\n");
+    if (p == NULL) {
+        strcpy(p, unknown_lic);
+        return p;
+    }
+    while (*p == NL) p++;
+    return p;
+}
+
+static char *
+find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
 {
     static char const * const lic_sfx[] = { "lic", NULL };
 
@@ -306,7 +350,7 @@ find_lic_text(int segment, SCM lic, size_t * txt_len)
         flen = stbf.st_size;
     }
 
-    ftext = ag_scribble(flen + 1);
+    ftext = ag_scribble(flen + sizeof(unknown_lic));
     *txt_len = flen;
 
     {
@@ -329,8 +373,23 @@ find_lic_text(int segment, SCM lic, size_t * txt_len)
             AG_ABEND(aprf("invalid license file: %s", fname));
 
         switch (segment) {
-        case 0: p[1] = NUL; break;
-        case 1: p += 2; while (*p == NL) p++; ftext = p; break;
+        case LSEG_INFO:
+            p[1] = NUL;
+            break;
+
+        case LSEG_DESC:
+            p += 2;
+            while (*p == NL) p++;
+            ftext = p;
+            break;
+
+        case LSEG_FULL:
+            assemble_full_desc(p);
+            break;
+
+        case LSEG_NAME:
+            ftext = get_lic_name(p);
+            break;
         }
     }
 
@@ -338,7 +397,8 @@ find_lic_text(int segment, SCM lic, size_t * txt_len)
 }
 
 static SCM
-construct_license(int seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
+construct_license(
+    lic_segment_e_t seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 {
     static SCM subs  = SCM_UNDEFINED;
     static SCM empty = SCM_UNDEFINED;
@@ -413,7 +473,7 @@ construct_license(int seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 SCM
 ag_scm_license_full(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 {
-    return construct_license(3, lic, prog, pfx, owner, years);
+    return construct_license(LSEG_FULL, lic, prog, pfx, owner, years);
 }
 
 /*=gfunc license_description
@@ -437,7 +497,7 @@ ag_scm_license_full(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 SCM
 ag_scm_license_description(SCM lic, SCM prog, SCM pfx, SCM owner)
 {
-    return construct_license(1, lic, prog, pfx, owner, SCM_UNDEFINED);
+    return construct_license(LSEG_DESC, lic, prog, pfx, owner, SCM_UNDEFINED);
 }
 
 /*=gfunc license_info
@@ -464,7 +524,26 @@ ag_scm_license_description(SCM lic, SCM prog, SCM pfx, SCM owner)
 SCM
 ag_scm_license_info(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 {
-    return construct_license(0, lic, prog, pfx, owner, years);
+    return construct_license(LSEG_INFO, lic, prog, pfx, owner, years);
+}
+
+/*=gfunc license_name
+ *
+ * what:  Emit the name of the license
+ * general_use:
+ *
+ * exparg: license,   name of license type
+ *
+ * doc:
+ *
+ *  Emit a string that contains the full name of the license.
+=*/
+SCM
+ag_scm_license_name(SCM lic)
+{
+    size_t text_len;
+    char * txt = find_lic_text(LSEG_NAME, lic, &text_len);
+    return AG_SCM_STR02SCM(txt);
 }
 
 /*=gfunc gpl

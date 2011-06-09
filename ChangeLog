@@ -7,6 +7,14 @@
 	These must be "maintainerclean" and depend upon the mk-tpl-config.sh
 	script running.
 	* autoopts/Makefile.am (MAINTAINERCLEANFILES): use GENSCRIPTS.
+	* agen5/expFormat.c (assemble_full_desc): new extract of find_lic_text
+	(get_lic_name): procedure to return the license name from lic file
+	(find_lic_text): call that procedure when segment is "LSEG_NAME".
+	(ag_scm_license_name): implement new scheme functioon "license-name".
+	* autoopts/Makefile.am (GENSCRIPTS): new macro listing all the
+	scripts that convert one doc format to another.  They are all
+	derives from either a source file or thin air.
+	* autoopts/bootstrap.dir (GENSCRIPTS): derive this list
 
 2011-06-05  Bruce Korb  <bkorb@gnu.org>
 

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-06-06 08:18:45 bkorb"
+## Time-stamp:      "2011-06-06 08:50:00 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -25,33 +25,33 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
-SUBDIRS     = @OPTS_TESTDIR@
-INCLUDES    = @INCLIST@
-libsrc      = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
-LIBOPTS_VER = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+SUBDIRS         = @OPTS_TESTDIR@
+INCLUDES        = @INCLIST@
+libsrc          = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
+LIBOPTS_VER     = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
 if  NEED_PATHFIND
-PATHFIND_MAN= pathfind.3
+PATHFIND_MAN    = pathfind.3
 else
-PATHFIND_MAN=
+PATHFIND_MAN    =
 endif
 
-GENMAN      = $(PATHFIND_MAN) \
+GENMAN          = $(PATHFIND_MAN) \
 
-MAN_STAMP   = man3-stamp
-GENTEXI     = libopts.texi libopts.menu
-TEXI_STAMP  = texi-stamp
+MAN_STAMP       = man3-stamp
+GENTEXI         = libopts.texi libopts.menu
+TEXI_STAMP      = texi-stamp
 
-GENHDRS     = autoopts/options.h autoopts/usage-txt.h genshell.h \
+GENHDRS         = autoopts/options.h autoopts/usage-txt.h genshell.h \
 	xat-attribute.h value-type.h ag-char-map.h
-HDRS        = $(GENHDRS) autoopts.h proto.h parse-duration.h project.h
-GEN_SRC     = value-type.c xat-attribute.c
+HDRS            = $(GENHDRS) autoopts.h proto.h parse-duration.h project.h
+GEN_SRC         = value-type.c xat-attribute.c
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the
 ## documentation.  Files without documentation are on the CSRC = line.
 ##
-CSRC        = parse-duration.c $(GEN_SRC) \
+CSRC            = parse-duration.c $(GEN_SRC) \
     autoopts.c  \
     boolean.c configfile.c cook.c      check.c     enum.c      env.c     \
     file.c    find.c       genshell.c  load.c      makeshell.c nested.c  \
@@ -59,9 +59,9 @@ CSRC        = parse-duration.c $(GEN_SRC) \
     sort.c    stack.c      streqvcmp.c text_mmap.c tokenize.c  time.c    \
     usage.c   version.c
 
-SRC         = $(HDRS) $(CSRC) $(GENSRC)
-DEF_FILES   = genshell.def $(srcdir)/funcs.def
-pkgconfigdir=$(libdir)/pkgconfig
+SRC             = $(HDRS) $(CSRC) $(GENSRC)
+DEF_FILES       = genshell.def $(srcdir)/funcs.def
+pkgconfigdir    =$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##
@@ -96,8 +96,8 @@ lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
-BOOTENV  = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
-	srcdir="$(srcdir)" builddir="$(builddir)" \
+BOOTENV         = top_srcdir="$(top_srcdir)" srcdir="$(srcdir)" \
+	top_builddir="$(top_builddir)" builddir="$(builddir)" \
 	AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
 	POSIX_SHELL="$(POSIX_SHELL)"
 
@@ -111,40 +111,41 @@ libopts.c       : tpl-config-stamp
 $(GENSCRIPTS)   : tpl-config-stamp
 
 tpl-config-stamp: $(HDRS) $(CSRC) \
-	$(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
+	    $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
+	@touch tmp-$@
 	$(BOOTENV) \
-	  $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
-	@touch $@
+	    $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
+	@mv tmp-$@ $@
 
-makeshell.lo : genshell.c
-genshell.c : $(srcdir)/genshell.def
+makeshell.lo    : genshell.c
+genshell.c      : $(srcdir)/genshell.def
 	$(BOOTENV) \
-	  $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	    $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
-strcspn.lo : $(top_srcdir)/compat/strcspn.c
+strcspn.lo      : $(top_srcdir)/compat/strcspn.c
 	$(LTCOMPILE) -o $@ -c $(top_srcdir)/compat/strcspn.c
 
 install-data-local : install-man3
 
-$(GENMAN) : $(MAN_STAMP)
-$(MAN_STAMP) : $(srcdir)/funcs.def
-	@if test -x ../agen5/autogen ; then \
-	  touch tmp-$@ ; \
-	  opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Tagman3.tpl' ; \
-	  echo ! $(AGexe) $${opts} $(srcdir)/funcs.def ; \
-	  $(AGexe) $${opts} $(srcdir)/funcs.def ; \
-	  mv -f tmp-$@ $@ ; else true ; fi
+$(GENMAN)       : $(MAN_STAMP)
+$(MAN_STAMP)    : $(srcdir)/funcs.def
+	@test -x ../agen5/autogen || exit 0 ; \
+	touch tmp-$@ ; \
+	opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Tagman3.tpl' ; \
+	echo ! $(AGexe) $${opts} $(srcdir)/funcs.def ; \
+	$(AGexe) $${opts} $(srcdir)/funcs.def ; \
+	mv -f tmp-$@ $@
 
-$(GENTEXI) : $(TEXI_STAMP)
-$(TEXI_STAMP) : ../agen5/autogen $(srcdir)/funcs.def
+$(GENTEXI)      : $(TEXI_STAMP)
+$(TEXI_STAMP)   : ../agen5/autogen $(srcdir)/funcs.def
 	@touch tmp-$@ ; \
 	opts='-L$(srcdir)/tpl -L$(builddir)/tpl -Taginfo3.tpl' ; \
 	cmd="$(AGexe) $${opts} -DLEVEL=subsection -blibopts" ; \
 	cmd="$${cmd} -L$(srcdir) $(srcdir)/funcs.def" ; \
 	echo ! $$cmd ; $$cmd ; mv -f tmp-$@ $@
 
-libsrc : $(libsrc)
-$(libsrc) :
+libsrc          : $(libsrc)
+$(libsrc)       :
 	@$(BOOTENV) \
 	  AO_AGE=@AO_AGE@ AO_CURRENT=@AO_CURRENT@ AO_REVISION=@AO_REVISION@ \
 	  $(POSIX_SHELL) $(top_srcdir)/pkg/libopts/mklibsrc.sh
