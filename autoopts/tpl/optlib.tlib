@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-04-19 14:46:03 bkorb"
+# Time-stamp:      "2011-06-09 12:17:27 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -533,29 +533,17 @@ IF (exist? "copyright")                 =]
  *
  * This source file is copyrighted and licensed under the following terms:
  *
- * [=(sprintf "%s copyright (c) %s %s - all rights reserved"
-     prog-name (get "copyright.date") (get "copyright.owner") ) =][=
+[=
+  CASE copyright.type                   =][=
+  == ""   =][=
+   (sprintf " *  %s copyright (c) %s %s - all rights reserved\n *  %s"
+     prog-name (get "copyright.date") (get "copyright.owner")
+     "licensing type not specified" )   =][=
 
-  CASE (get "copyright.type")           =][=
+  = note  =][= (prefix " *  "  (get "copyright.text")) =][=
 
-    =  gpl                              =]
- *
-[=(gpl  prog-name " * " )               =][=
-
-    = lgpl                              =]
- *
-[=(lgpl prog-name (get "copyright.owner") " * " ) =][=
-
-    =  bsd                              =]
- *
-[=(bsd  prog-name (get "copyright.owner") " * " ) =][=
-
-    = note                              =]
- *
-[=(prefix " * " (get "copyright.text"))=][=
-
-    *       =] * <<indeterminate license type>>[=
-
+  *       =][= (license-full (get "copyright.type") prog-name " *  "
+                   (get "copyright.owner") (get "copyright.date")) =][=
   ESAC                                  =][=
 ENDIF "copyright exists"                =]
  */

@@ -1,7 +1,7 @@
 <PFX>Copyright (C) <years> <owner>, all rights reserved.
 <PFX>This is free software. It is licensed for use, modification and
 <PFX>redistribution under the terms of the
-<PFX>GNU Affero GPL version 3 or later  <http://gnu.org/licenses/gpl.html>
+<PFX>GNU Affero GPL, version 3 or later  <http://gnu.org/licenses/gpl.html>
 
 <PFX><program> is free software: you can redistribute it and/or modify it
 <PFX>under the terms of the GNU General Public License as published by the
@@ -15,3 +15,5 @@
 <PFX>
 <PFX>You should have received a copy of the GNU Affero General Public License
 <PFX>along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+GNU Affero GPL, version 3 or later

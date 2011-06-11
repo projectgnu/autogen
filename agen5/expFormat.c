@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-06-08 05:53:32 bkorb"
+ *  Time-stamp:        "2011-06-11 11:19:09 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -284,19 +284,38 @@ ag_scm_error(SCM res)
     return SCM_UNDEFINED;
 }
 
+/**
+ * Assemble the copyright preamble and long license description.
+ *
+ * @param txt a pointer to the first of two newlines separating
+ *            copyright information from the description.
+ */
 static void
 assemble_full_desc(char * txt)
 {
-    static char const pfx[] = "<PFX>";
-    char * pd = txt + sizeof(pfx) - 1; /* prefix destination */
-    char *  d = txt; /* move destination */
+    static char const pfx[] = "<PFX>\n";
+    static int  const pfx_len = sizeof(pfx) - 1;
+
+    /*
+     *  Preserve the first newline.  Set the move destination
+     *  out past where we will be inserting the "<PFX>" marker.
+     */
+    char * md = ++txt + pfx_len; /* move destination */
+    char * pd = txt; /* prefix destination */
 
     txt += 2;
     while (*txt == NL) txt++;
-    if (d != txt)
-        memmove(d, txt, strlen(txt) + 1);
-    memmove(pd, pfx, sizeof(pfx - 1));
-    txt = strstr(d, "\n\n");
+    /*
+     *  Maybe there were exactly enough NL characters we don't need to move
+     */
+    if (md != txt)
+        memmove(md, txt, strlen(txt) + 1);
+    memmove(pd, pfx, pfx_len);
+
+    /*
+     *  Look for a trailing license name and trim it off.
+     */
+    txt = strstr(md, "\n\n");
     if (txt != NULL)
         *txt = NUL;
     else {
@@ -306,11 +325,49 @@ assemble_full_desc(char * txt)
     }
 }
 
+/**
+ * Trim off the license name.  It is the third double-newline stanza
+ * in the license file.
+ *
+ * @param p  a pointer to the first of two newlines separating
+ *            copyright information from the description.
+ * @return pointer to second stanza, sans the license name trailer.
+ */
+static char *
+trim_lic_name(char * p)
+{
+    char * res;
+    while (*(++p) == NL) ; /* skip the leading NL's.  It starts with NL. */
+    res = p;
+    p = strstr(p, "\n\n");
+    if (p != NULL)
+        *p = NUL;
+    else {
+        p = res + strlen(res);
+        if (p[-1] == NL)
+            *p = NUL;
+    }
+
+    return res;
+}
+
+/**
+ * Extract the license name.  It is the third double-newline stanza
+ * in the license file.
+ *
+ * @param txt a pointer to the first of two newlines separating
+ *            copyright information from the description.
+ * @return pointer to the license name trailer.
+ */
 static char *
 get_lic_name(char * p)
 {
-    p += 2;
-    while (*p == NL) p++;
+    while (*(++p) == NL) ; /* skip the leading NL's.  It starts with NL. */
+
+    /*
+     * Find the third stanza.  If there.  If not, we supply some static
+     * text:  "an unknown license"
+     */
     p = strstr(p, "\n\n");
     if (p == NULL) {
         strcpy(p, unknown_lic);
@@ -320,6 +377,16 @@ get_lic_name(char * p)
     return p;
 }
 
+/**
+ * Find the kind of text being requested.  It may be "full" (the first
+ * two stanzas), "info" (the first -- copyright info + license name),
+ * "description" (the second -- a one paragraph description), or
+ * "name" -- the third stanza.
+ *
+ * @param txt a pointer to the first of two newlines separating
+ *            copyright information from the description.
+ * @return pointer to the requested text.
+ */
 static char *
 find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
 {
@@ -373,29 +440,32 @@ find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
             AG_ABEND(aprf("invalid license file: %s", fname));
 
         switch (segment) {
-        case LSEG_INFO:
-            p[1] = NUL;
-            break;
-
-        case LSEG_DESC:
-            p += 2;
-            while (*p == NL) p++;
-            ftext = p;
-            break;
-
-        case LSEG_FULL:
-            assemble_full_desc(p);
-            break;
-
-        case LSEG_NAME:
-            ftext = get_lic_name(p);
-            break;
+        case LSEG_INFO: p[1]  = NUL;              break;
+        case LSEG_DESC: ftext = trim_lic_name(p); break;
+        case LSEG_NAME: ftext = get_lic_name(p);  break;
+        case LSEG_FULL: assemble_full_desc(p);    break;
         }
     }
 
     return ftext;
 }
 
+/**
+ * Construct an SCM for the kind of text being requested.
+ *
+ * It may be "full" (the first two stanzas), "info" (the first -- copyright
+ * info + license name), "description" (the second -- a one paragraph
+ * description), or "name" -- the third stanza.
+ *
+ * @param seg    which segment of license is desired
+ * @param lic    The name of the license
+ * @param prog   the name of the program
+ * @param pfx    a per-line prefix
+ * @param owner  who owns the copyright
+ * @param years  the copyright years
+ *
+ * @return the SCM-ized string
+ */
 static SCM
 construct_license(
     lic_segment_e_t seg, SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
@@ -452,10 +522,24 @@ construct_license(
  *  and @pxref{SCM license-description, @code{license-description}}),
  *  with all the same substitutions.
  *
- *  All of these depend upon the existence of a license file named
- *  after the @code{license} argument with a @code{.lic} suffix.
- *  That file should contain two blocks of text separated by two or more
- *  newline characters.
+ *  All of these depend upon the existence of a license file named after the
+ *  @code{license} argument with a @code{.lic} suffix.  That file should
+ *  contain three blocks of text, each separated by two or more newline
+ *  characters.
+ *
+ *  The first section describes copyright attribution and the name of the usage
+ *  licence.  For GNU software, this should be the text that is to be displayed
+ *  with the program version.  Four text markers can be replaced: <PFX>,
+ *  <program>, <years> and <owner>.
+ *
+ *  The second section is a short description of the terms of the license.
+ *  This is typically the kind of text that gets displayed in the header of
+ *  source files.  The third section is strictly the name of the license
+ *  without any substitution markers.  Only the <PFX>, <owner> and <program>
+ *  markers are substituted.
+ *
+ *  The third section is strictly the name of the license.
+ *  No marker substitutions are performed.
  *
  *  @example
  *  <PFX>Copyright (C) <years> <owner>, all rights reserved.
@@ -463,12 +547,13 @@ construct_license(
  *  <PFX>modification and redistribution under the terms
  *  <PFX>of the GNU General Public License, version 3 or later
  *  <PFX>    <http://gnu.org/licenses/gpl.html>
- *  
+ *
  *  <PFX><program> is free software: you can redistribute it
  *  <PFX>and/or modify it under the terms of the GNU General
  *  <PFX>Public License as published by the Free Software ...
- *  @end example
  *
+ *  the GNU General Public License, version 3 or later
+ *  @end example
 =*/
 SCM
 ag_scm_license_full(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
@@ -543,7 +628,11 @@ ag_scm_license_name(SCM lic)
 {
     size_t text_len;
     char * txt = find_lic_text(LSEG_NAME, lic, &text_len);
-    return AG_SCM_STR02SCM(txt);
+    char * e   = txt + strlen(txt);
+    while (IS_WHITESPACE_CHAR(e[-1]) && (e > txt))  e--;
+    *e  = NUL;
+    lic = AG_SCM_STR02SCM(txt);
+    return lic;
 }
 
 /*=gfunc gpl

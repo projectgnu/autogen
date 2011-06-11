@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-05-05 08:54:39 bkorb"
+## Time-stamp:      "2011-06-11 12:02:49 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -19,14 +19,12 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-DISTCLEANFILES = autogen.lsm
-
-DEBIAN_FILES  = mkpkg.debian + ALL SOURCES IN debian DIRECTORY
-LIBOPTS_FILES = ALL SOURCES IN pkg/libopts DIRECTORY
-TPL_FILES     = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
-PKG_FILES     = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in $(DEBIAN_FILES)
-EXTRA_DIST    = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES)
-DOCENV        = MAKE="$(MAKE)"
+DISTCLEANFILES  = autogen.lsm
+LIBOPTS_FILES   = ALL SOURCES IN pkg/libopts DIRECTORY
+TPL_FILES       = lsm.tpl spec.tpl gnudir.tpl gnudoc.tpl
+PKG_FILES       = mkpkg.linux mkpkg.sh mkpkg.sun pkg-env.in
+EXTRA_DIST      = $(TPL_FILES) $(LIBOPTS_FILES) $(PKG_FILES)
+DOCENV          = MAKE="$(MAKE)"
 
 all : $(DISTCLEANFILES)
 

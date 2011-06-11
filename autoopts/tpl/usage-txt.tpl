@@ -1,10 +1,8 @@
-[= AutoGen5 Template  -*- Mode: text -*-
+[= AutoGen5 Template
 
-  h
+  h  pot
 
-  pot
-
-# Time-stamp:        "2011-04-26 17:04:24 bkorb"
+(define time-stamp "2011-06-09 13:28:06")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -41,7 +39,8 @@
  *  they may substitute translated strings using a procedure that steps through
  *  all the string pointers.
  *
-[= (lgpl "AutoOpts" "Bruce Korb" " *  ") =]
+[= (license-full "lgpl" "AutoOpts" " *  " "Bruce Korb" (shell "date +1992-%Y"))
+ =]
  */
 [=
 (make-header-guard "autoopts")
@@ -185,5 +184,12 @@ ENDFOR utxt
 [=
 
 ESAC
+
+# Local Variables:
+# Mode: text
+# time-stamp-format: "\"%:y-%02m-%02d %02H:%02M:%02S\""
+# time-stamp-pattern: "(define time-stamp "
+# time-stamp-end: ")"
+# End:
 
 \=]

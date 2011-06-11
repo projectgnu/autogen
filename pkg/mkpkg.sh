@@ -1,7 +1,7 @@
 #! /bin/sh
 set -x
 ## mkpkg.sh --      create a native package
-## Time-stamp:      "2010-07-16 15:22:13 bkorb"
+## Time-stamp:      "2011-06-11 11:52:37 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -23,11 +23,8 @@ test -f pkg-env && . pkg-env
 
 if test -z "${pkgtype}"
 then
-  if fakeroot dh_testroot 2>/dev/null 2>&1
-  then pkgtype=debian
-  else pkgtype=`sh ${top_srcdir}/config/config.guess | \
+  pkgtype=`sh ${top_srcdir}/config/config.guess | \
                 sed 's,-[^-]*$,,;s,.*-,,'`
-  fi
 fi
 
 if test ! -f ${srcdir}/mkpkg.${pkgtype}

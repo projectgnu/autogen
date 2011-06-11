@@ -1,20 +1,16 @@
-2011-06-06  Bruce Korb  <bkorb@gnu.org>
+2011-06-11  Bruce Korb  <bkorb@gnu.org>
 
-	* agen5/fmemopen.c (ag_fmemioctl): do not compile.  GNU Hurd
-	chokes on _IOWR('m', 1, fmemc_get_buf_addr_t) by token pasting
-	weird stuff and not being able to compile.  It isn't used anyway.
-	* autoopts/bootstrap.dir (GENSCRIPTS): new list of files.
-	These must be "maintainerclean" and depend upon the mk-tpl-config.sh
-	script running.
-	* autoopts/Makefile.am (MAINTAINERCLEANFILES): use GENSCRIPTS.
-	* agen5/expFormat.c (assemble_full_desc): new extract of find_lic_text
-	(get_lic_name): procedure to return the license name from lic file
-	(find_lic_text): call that procedure when segment is "LSEG_NAME".
-	(ag_scm_license_name): implement new scheme functioon "license-name".
-	* autoopts/Makefile.am (GENSCRIPTS): new macro listing all the
-	scripts that convert one doc format to another.  They are all
-	derives from either a source file or thin air.
-	* autoopts/bootstrap.dir (GENSCRIPTS): derive this list
+	* autoopts/tpl/*.lic: add license names
+	* autoopts/tpl/getopt.tpl: use the new (license-description...)
+	* autoopts/tpl/cmd-doc.tlib: likewise
+	* autoopts/tpl/optlib.tlib: likewise
+	* autoopts/tpl/rc-sample.tpl: likewise
+	* autoopts/tpl/usage-txt.tpl: likewise
+	* config/bootstrap.local: skip debian stuff
+	* pkg/Makefile.am: likewise
+	* pkg/mkpkg.sh: likewise
+	* pkg/mkpkg.debian: obsolete, removed.
+	* doc/autogen-texi.txt: document this new licensing stuff better.
 
 2011-06-05  Bruce Korb  <bkorb@gnu.org>
 
@@ -30,6 +26,21 @@
 	* agen5/*.c: change Doxygen file tag to @file
 	* doc/auto-opts.tpl (HOME): set it to our temp directory, instead
 	of emptying it.  Debian has a problem when it is empty.
+	* agen5/fmemopen.c (ag_fmemioctl): do not compile.  GNU Hurd
+	chokes on _IOWR('m', 1, fmemc_get_buf_addr_t) by token pasting
+	weird stuff and not being able to compile.  It isn't used anyway.
+	* autoopts/bootstrap.dir (GENSCRIPTS): new list of files.
+	These must be "maintainerclean" and depend upon the mk-tpl-config.sh
+	script running.
+	* autoopts/Makefile.am (MAINTAINERCLEANFILES): use GENSCRIPTS.
+	* agen5/expFormat.c (assemble_full_desc): new extract of find_lic_text
+	(get_lic_name): procedure to return the license name from lic file
+	(find_lic_text): call that procedure when segment is "LSEG_NAME".
+	(ag_scm_license_name): implement new scheme functioon "license-name".
+	* autoopts/Makefile.am (GENSCRIPTS): new macro listing all the
+	scripts that convert one doc format to another.  They are all
+	derives from either a source file or thin air.
+	* autoopts/bootstrap.dir (GENSCRIPTS): derive this list
 
 2011-05-30  Harlan Stenn  <stenn@ntp.org>
 

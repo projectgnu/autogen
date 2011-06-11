@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-01-26 09:08:32 bkorb"
+  Time-stamp:        "2011-06-09 11:34:53 bkorb"
 _EOF_
 \` `            +][+
 
@@ -34,12 +34,19 @@ _EOF_
   (define PROG-NAME (string-upcase prog-name))
   (out-move (string-append "getopt-" prog-name "." (suffix)))
   (dne " *  " "/* " ) +]
+ *[+
+
+  IF (exist? "copyright") +]
  *
-[+ CASE copyright.type +][+
-   = gpl  +][+ (gpl  prog-name " *  ") +][+
-   = lgpl +][+ (lgpl prog-name (get "copyright.owner") " *  ") +][+
-   = note +][+ (prefix " *  "  (get "copyright.text")) +][+
-   ESAC   +]
+[+
+    CASE copyright.type   +][+
+    == ""   +] *  licensing type not specified.[+
+    = note  +][+ (prefix " *  "  (get "copyright.text")) +][+
+    *       +][+
+      (license-description (get "copyright.type") prog-name " *  "
+          (get "copyright.owner"))     +][+
+    ESAC    +][+
+  ENDIF     +]
  *
  *  Last template edit: [+ `echo $stamp` +]
  */[+

@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-06-05 17:04:51 bkorb"
+# Time-stamp:        "2011-06-11 12:06:01 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -132,33 +132,6 @@ config_versions()
     done >&3
     exec 3>&-
 
-    cd pkg/debian
-    debver=$(echo 1:${AG_VERSION}-1 | sed 's/pre/~pre/')
-    fgrep "(${debver})" changelog && exit 0
-
-    reltype=$(
-        case "${AG_VERSION}" in
-        ( *pre* ) echo prerelease ;;
-        ( * ) echo release ;;
-        esac
-    )
-    uname=$(finger $(id -n -u) | sed 's/.*Name: *//;1q')
-    exec 3> changelog-new
-    cat >&3 <<- _EOF_
-	autogen (${debver}) experimental; urgency=low
-
-	  * New ${reltype}.
-	_EOF_
-    sed '1,2d;/^$/q;s/^/  /' ${srcdir}/NEWS >&3
-    cat >&3 <<- _EOF_
-
-	 -- ${uname} <${EADDR}>  $(date -R)
-
-	_EOF_
-    cat changelog >&3
-    rm -f changelog
-    exec 3>&-
-    mv changelog-new changelog
     cd ${srcdir}
 
     GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
@@ -205,7 +178,10 @@ tweak_Makefile_am()
     cd ${srcdir}
 
     {
-        sed '/^EXTRA_DIST /{ ; s/.*/misc_extra     = \\/ ; q ; }' Makefile.am
+        sed '/^EXTRA_DIST /{
+            s/.*/misc_extra     = \\/
+            q
+        }' Makefile.am
         find VERSION NOTES config/bootstrap* config/*.m4 \
                autoopts/parse-duration.[ch] doc/gendocs* \
             -type f | \
@@ -217,13 +193,13 @@ tweak_Makefile_am()
 
     cd pkg
     {
-        sed '/^DEBIAN_FILES  *=/{ ; s/=.*/= \\/ ; q ; }' Makefile.am
-        find mkpkg.debian debian/* -type f | \
-            columns --spread=1 -I4 --line=' \'
-        printf '\nLIBOPTS_FILES = \\\n'
+        sed '/^LIBOPTS_FILES  *=/{
+            s/=.*/= \\/
+            q
+        }' Makefile.am
 
-        find libopts -type f | \
-            columns --spread=1 -I4 --line=" \\"
+        find libopts -type f -name '[a-zA-Z]*' | \
+            columns --spread=1 -I4 --line=' \'
         echo
 
         sed '1,/LIBOPTS_FILES *=/d' Makefile.am

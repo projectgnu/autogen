@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-06-05 15:52:55 bkorb"
+## Time-stamp:      "2011-06-11 11:37:14 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -593,28 +593,17 @@ ENDDEF mk-bugs
 DEFINE mk-copyright                        :+]
 Copyright (C) [+: copyright.date :+] [+:
   (get "copyright.owner" (get "copyright.author" (get "copyright.eaddr")))
-  :+] all rights reserved.[+:
+  :+] all rights reserved.
+[+: CASE (get "copyright.type") :+][+:
+    = note  :+][+: (get "copyright.text") :+][+:
+    == ''   :+]This program has an unspecified license.[+:
 
-  CASE copyright.type :+][+:
-   =  gpl  :+]
-This program is released under the GNU General Public License.[+:
-   = lgpl  :+]
-This program is released under the GNU General Public License
-with Library Extensions.[+:
-   =  bsd  :+]
-This program is released under the Free BSD License.[+:
-   *       :+][+:
-    IF (exist? "copyright.text")
-           :+]
-.nf
-.na
-[+: copyright.text :+]
-.fi
-.ad[+:
-    ELIF (exist? "copyright.date")    :+]
-Released under an unspecified copyright license.[+:
-    ENDIF                             :+][+:
-  ESAC                                :+][+:
+    *       :+][+:
+    (string-append "This program is released under the terms of "
+            (license-name (get "copyright.type")) ".")    :+][+:
+
+  ESAC      :+]
+[+:
 ENDDEF mk-copyright
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
