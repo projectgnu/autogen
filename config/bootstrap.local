@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-06-11 12:06:01 bkorb"
+# Time-stamp:        "2011-06-25 09:29:54 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -154,6 +154,7 @@ config_versions()
                 ${fmemdir}/fmemopen.c
             echo '#endif /* ENABLE_FMEMOPEN */'
         } > agen5/fmemopen.c
+        
     fi
 }
 

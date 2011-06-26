@@ -7,6 +7,10 @@ New in __CURRENT_VERSION__ June 2011
   has coelesced around pre-1.7 vs. 1.7-and-later interfaces, yielding
   only two forms for each interface.
 
+* text_mmap() was hardened.
+
+* The new licensing scheme is now used in the distributed templates.
+
 New in 5.11.9 May 2011
 
 * licenses have been moved to separate files.  They are no longer

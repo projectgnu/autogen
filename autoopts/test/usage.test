@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # usage.test ---  test all the ways usage text can be printed.
 #
-## Time-stamp:      "2011-02-02 11:58:46 bkorb"
+## Time-stamp:      "2011-06-26 07:35:50 bkorb"
 # Author:           Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-kill_delay=90
+${VERBOSE} && kill_delay=10 || kill_delay=5
 . ./defs
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
@@ -491,11 +491,12 @@ run_usage_test() {
     failure "AutoGen could not process $testname"
   }
 
-  ${SED} -e '1,/definition names looked up/d' \
-    -e '/end of looked up def/,$d' ${defnames_raw} >> ${defnames_file}
-      ${defnames_raw} >> ${defnames_file}
+  ${SED} \
+      -e '1,/definition names looked up/d' \
+      -e '/end of looked up def/,$d' ${defnames_raw} \
+          ${defnames_raw} >> ${defnames_file}
   compile ${helpstr}
-  ${SED}   -e '/Extended usage information passed thru pager/q' \
+  ${SED} -e '/Extended usage information passed thru pager/q' \
       ${testname}.help > XXX
   mv XXX ${testname}.help
   cmp -s ${testname}.help ${testname}.hlp || \
@@ -513,6 +514,8 @@ case "$-" in
 *x* ) setx='set -x' ;;
 * )   setx='' ;;
 esac
+
+stime=$(date +%s)
 
 for long_opts in true false
 do
@@ -552,6 +555,7 @@ test -z "${DEBUG_USAGE}" && cleanup && exit 0
 
 sort -u -o ${defnames_file} ${defnames_file}
 cat > ${defnames_raw} <<- _EOF_
+	aliases
 	allow_errors
 	arg_default
 	arg_optional
@@ -573,10 +577,12 @@ cat > ${defnames_raw} <<- _EOF_
 	enabled
 	environrc
 	equivalence
+	exit_name
 	explain
 	export
 	extract_code
 	field
+	file_fail_code
 	flag
 	flag_code
 	flag_proc
@@ -595,6 +601,7 @@ cat > ${defnames_raw} <<- _EOF_
 	lib_name
 	library
 	long_opts
+	main
 	main_text
 	main_type
 	max
@@ -604,8 +611,11 @@ cat > ${defnames_raw} <<- _EOF_
 	name
 	no_command
 	no_libopts
+	no_misuse_usage
 	no_preset
 	no_xlate
+	nomem_fail_code
+	omitted_usage
 	package
 	prefix
 	prefix_enum
@@ -623,6 +633,7 @@ cat > ${defnames_raw} <<- _EOF_
 	translators
 	unstack_arg
 	usage
+	usage_message
 	usage_opt
 	usage_type
 	val_name

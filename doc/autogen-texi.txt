@@ -1248,6 +1248,7 @@ See the ``AutoOpts Features'' and ``Configuration File Format'' sections.
 * getopt_long::         Using getopt(3C)
 * i18n::                Internationalizing AutoOpts
 * Naming Conflicts::    Naming Conflicts
+* All Attribute Names:: All Attribute Names
 * Option Define Names:: Option Definition Name Index
 @end menu
 
@@ -3525,25 +3526,24 @@ that will be added to all output documentation.  There may be only one
 the results are undefined (it might work, it might not).
 
 There are five categories of @code{ds-type} sections.
-They are those that the documentation templates:
+They are those that the documentation templates would otherwise:
 @enumerate
 @item
-will create itself, ignoring any @code{ds-type}s by this name.
+always create itself, ignoring any @code{ds-type}s by this name.
 These are marked, below, as @code{ao-only}.
 @item
-will create, if none have been provided.
-These are marked, @code{always}.
+create, if none have been provided.
+These are marked, @code{alternate}.
 @item
-will always either create or augment.
-These are marked, @code{augmented}.
+create, but augment if the @code{doc-section} was provided.
+These are marked, @code{augments}.
 @item
-know about them and insert them into the output documentation in a
-prescribed order.
+do nothing, but inserts them into the output in a prescribed order.
 These are marked, @code{known}
 @item
-do not know about.  They will be alphabetized and inserted after the
-list of leading sections and before the list of trailing sections.
-These are not marked because I don't know their names.
+knows nothing about them.  They will be alphabetized and inserted
+after the list of leading sections and before the list of trailing
+sections.  These are not marked because I don't know their names.
 @end enumerate
 
 Some of these are emitted by the documentation templates only if
@@ -3556,9 +3556,9 @@ The output sections will appear in this order:
 @item NAME
 @code{ao-only}.
 @item SYNOPSIS
-@code{always}.
+@code{alternate}.
 @item DESCRIPTION
-@code{augmented}.
+@code{augments}.
 @item OPTIONS
 @code{ao-only}.
 @item OPTION PRESETS
@@ -3569,13 +3569,13 @@ At this point, the unknown, alphabetized sections are inserted.
 @item IMPLEMENTATION NOTES
 @code{known}
 @item ENVIRONMENT
-@code{augmented}, if environment presets have been specified.
+@code{augments}, if environment presets have been specified.
 @item FILES
-@code{augmented}, if configuration file processing has been specified.
+@code{augments}, if configuration file processing has been specified.
 @item EXAMPLES
 @code{known}
 @item EXIT STATUS
-@code{augmented}.
+@code{augments}.
 @item ERRORS
 @code{known}
 @item COMPATIBILITY
@@ -3587,15 +3587,15 @@ At this point, the unknown, alphabetized sections are inserted.
 @item HISTORY
 @code{known}
 @item AUTHORS
-@code{always}, if the @code{copyright} stanza has either
+@code{alternate}, if the @code{copyright} stanza has either
 an @code{author} or an @code{owner} attribute.
 @item COPYRIGHT
-@code{always}, if there is a @code{copyright} stanza.
+@code{alternate}, if there is a @code{copyright} stanza.
 @item BUGS
-@code{always}, if the @code{copyright} stanza has an
+@code{augments}, if the @code{copyright} stanza has an
 @code{eaddr} attribute.
 @item NOTES
-@code{augmented}.
+@code{augments}.
 @end table
 
 @item ds-format
@@ -5480,6 +5480,60 @@ for example, @code{HAVE_OPT(DEBUG)} or @code{HAVE_OPT(INTERNAL)}
 conflicts by specifying the @code{guard-option-names} attribute
 (@pxref{program attributes}).  That emitted code will also @code{#undef}-ine
 the conflicting name.
+
+@node All Attribute Names
+@section All Attribute Names
+
+This is the list of all the option attributes used in the various
+option processing templates.  There are several flavors of attributes,
+and these are not distinguished here.
+
+@itemize @bullet
+@item
+Valid, current attributes that you are encouraged to use.
+@item
+Internally generated attributes that you cannot use at all.
+I need to prefix these with a distinguished prefix.  e.g.  ``ao-''
+@item
+Valid attributes, but are deprecated.  Alternates should be documented.
+@end itemize
+
+This list is derived by running many example option definitions through the
+option generation and man page templates and noting which attributes are
+actually used.  There may be a few that are used but not exercised in my
+testing.  If so, I need to ferret those out and test them, too.
+
+@example
+aliases          allow-errors  arg-default
+arg-optional     arg-range     arg-type
+argument         call-proc     code
+config-header    copyright     default
+deprecated       descrip       detail
+disable          documentation eaddr
+enable           enabled       environrc
+equivalence      exit-name     explain
+export           extract-code  field
+file-fail-code   flag          flag-code
+flag-proc        flags-cant    flags-must
+full-usage       gnu-usage     guard-option-names
+help-value       homerc        ifdef
+ifndef           immed-disable immediate
+include          lib-name      library
+long-opts        main          main-text
+main-type        max           min
+more-help-value  must-set      name
+no-command       no-libopts    no-misuse-usage
+no-preset        no-xlate      nomem-fail-code
+omitted-usage    package       prefix
+prefix-enum      preserve-case prog-name
+prog-title       reorder-args  resettable
+scaled           settable      short-usage
+stack-arg        std-value     test-main
+translators      unstack-arg   usage
+usage-message    usage-opt     usage-type
+val-name         val-upname    value
+version
+@end example
 
 @node Option Define Names
 @section Option Definition Name Index

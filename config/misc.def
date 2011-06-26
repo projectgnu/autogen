@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-03-04 13:55:51 bkorb"
+/*  Time-stamp:        "2011-06-13 16:44:32 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -135,7 +135,7 @@ test   = {
 test   = {
   name     = guile;
   type     = withlib;
-  check    = "a working libguile can be found";
+  check    = "prefix for a working libguile installation";
   code     = <<- _END_OF_CODE_
 	#include <libguile.h>
 	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 200

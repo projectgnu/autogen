@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-06-11 11:19:09 bkorb"
+ *  Time-stamp:        "2011-06-13 08:15:05 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -48,12 +48,9 @@ static char const zDne2[] = "%6$s"
 "%1$sFrom the definitions    %4$s\n"
 "%1$sand the template file   %5$s";
 
-static char const zOwnLen[]     = "owner length";
-static char const zPfxLen[]     = "prefix length";
-static char const zProgLen[]    = "program name length";
-static char const zPfxMsg[]     = "%s may not exceed %d chars\n";
-static char const zFmtAlloc[]   = "asprintf allocation";
-static char const unknown_lic[] = "an unknown license";
+static char const pfx_txt[]   = "<PFX>\n";
+static int  const pfx_len     = sizeof(pfx_txt) - 1;
+static char const bad_lic[]   = "an unknown license";
 
 /*=gfunc dne
  *
@@ -293,9 +290,6 @@ ag_scm_error(SCM res)
 static void
 assemble_full_desc(char * txt)
 {
-    static char const pfx[] = "<PFX>\n";
-    static int  const pfx_len = sizeof(pfx) - 1;
-
     /*
      *  Preserve the first newline.  Set the move destination
      *  out past where we will be inserting the "<PFX>" marker.
@@ -310,7 +304,7 @@ assemble_full_desc(char * txt)
      */
     if (md != txt)
         memmove(md, txt, strlen(txt) + 1);
-    memmove(pd, pfx, pfx_len);
+    memmove(pd, pfx_txt, pfx_len);
 
     /*
      *  Look for a trailing license name and trim it off.
@@ -337,13 +331,32 @@ static char *
 trim_lic_name(char * p)
 {
     char * res;
-    while (*(++p) == NL) ; /* skip the leading NL's.  It starts with NL. */
+    /* skip the leading white space.  It starts with NL. */
+    while (IS_WHITESPACE_CHAR(*(++p))) ;
+    if (strncmp(p, pfx_txt, pfx_len - 1) == 0) {
+        p += pfx_len - 1;
+        while (IS_WHITESPACE_CHAR(*p))  p++;
+    }
+
+    if (*p == NUL)
+        return p;
+
     res = p;
+
+    /*
+     *  The last section ends with two consecutive new lines.
+     *  All trailing newlines are trimmed (not all white space).
+     */
     p = strstr(p, "\n\n");
     if (p != NULL)
         *p = NUL;
     else {
         p = res + strlen(res);
+
+        /*
+         * We have skipped at least two bytes:  the two leading NL chars.
+         * Therefore, we know that "p[-1]" refers to a valid byte.
+         */
         if (p[-1] == NL)
             *p = NUL;
     }
@@ -370,7 +383,7 @@ get_lic_name(char * p)
      */
     p = strstr(p, "\n\n");
     if (p == NULL) {
-        strcpy(p, unknown_lic);
+        strcpy(p, bad_lic);
         return p;
     }
     while (*p == NL) p++;
@@ -417,7 +430,7 @@ find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
         flen = stbf.st_size;
     }
 
-    ftext = ag_scribble(flen + sizeof(unknown_lic));
+    ftext = ag_scribble(flen + sizeof(bad_lic));
     *txt_len = flen;
 
     {
@@ -808,14 +821,21 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
      *  Make sure they are reasonably sized (less than
      *  SCRIBBLE_SIZE).  Copy them to the scratch buffer.
      */
-    if (AG_SCM_STRLEN(prog_name) >= SCRIBBLE_SIZE)
-        AG_ABEND(aprf(zPfxMsg, zProgLen, SCRIBBLE_SIZE));
+    {
+        static char const zPfxMsg[]   = "%s may not exceed %d chars\n";
+        static char const zProgLen[]  = "program name length";
+        static char const zOwnLen[]   = "owner length";
+        static char const zPfxLen[]   = "prefix length";
 
-    if (AG_SCM_STRLEN(prefix) >= SCRIBBLE_SIZE)
-        AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
+        if (AG_SCM_STRLEN(prog_name) >= SCRIBBLE_SIZE)
+            AG_ABEND(aprf(zPfxMsg, zProgLen, SCRIBBLE_SIZE));
 
-    if (AG_SCM_STRLEN(owner) >= SCRIBBLE_SIZE)
-        AG_ABEND(aprf(zPfxMsg, zOwnLen, SCRIBBLE_SIZE));
+        if (AG_SCM_STRLEN(prefix) >= SCRIBBLE_SIZE)
+            AG_ABEND(aprf(zPfxMsg, zPfxLen, SCRIBBLE_SIZE));
+
+        if (AG_SCM_STRLEN(owner) >= SCRIBBLE_SIZE)
+            AG_ABEND(aprf(zPfxMsg, zOwnLen, SCRIBBLE_SIZE));
+    }
 
     /*
      *  Reformat the string with the given arguments

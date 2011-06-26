@@ -4,7 +4,7 @@ in=autoopts-config.in
 
 #!/bin/sh
 
-## Time-stamp:      "2011-01-02 17:04:27 bkorb"
+## Time-stamp:      "2011-06-13 16:47:07 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -236,12 +236,11 @@ MACROS:
 DEFINE script-preamble
 
 \=]
-#! @CONFIG_[=
-#=]SHELL@
+#! @CONFIG_[=#=]SHELL@
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
-##  Autoopts Copyright (c) 1992-2011[=`date +%Y`=] by Bruce Korb
+##  Autoopts Copyright (c) [=`date +1992-%Y`=] by Bruce Korb
 ##
 [= (dne "## ") =]
 ##[=
@@ -255,10 +254,18 @@ FOR cfg  =][=
 ENDFOR
 
 =]
-test -n "${ldopts}" && {
-    ldflags="${ldopts}${libdir} ${ldflags}"
-    libs=${ldflags}
-}
+case "${libdir}" in
+/lib | /lib64 | /usr/lib | /usr/lib64 )
+    ldopts=''
+    ldflags=-lopts
+    ;;
+
+* )
+    test -n "${ldopts}" && \
+        ldflags="${ldopts}${libdir} ${ldflags}"
+    ;;
+esac
+libs=${ldflags}
 test "${includedir}" = "/usr/include" && cflags=""
 [=
 

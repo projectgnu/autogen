@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-03-11 13:26:46 bkorb"
+# Time-stamp:      "2011-06-25 11:41:13 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -378,7 +378,9 @@ typedef struct {
 #define strequate       option_strequate
 #define strtransform    option_strtransform
 
-/*
+/**
+ *  Everything needed to be known about an mmap-ed file.
+ *
  *  This is an output only structure used by text_mmap and text_munmap.
  *  Clients must not alter the contents and must provide it to both
  *  the text_mmap and text_munmap procedures.  BE ADVISED: if you are
@@ -388,15 +390,14 @@ typedef struct {
  *  is not zero, then there *may* not be a terminating NUL.
  */
 typedef struct {
-    void*       txt_data;      /* text file data   */
-    size_t      txt_size;      /* actual file size */
-    size_t      txt_full_size; /* mmaped mem size  */
-    int         txt_fd;        /* file descriptor  */
-    int         txt_zero_fd;   /* fd for /dev/zero */
-    int         txt_errno;     /* warning code     */
-    int         txt_prot;      /* "prot" flags     */
-    int         txt_flags;     /* mapping type     */
-    int         txt_alloc;     /* if we malloced memory */
+    void *      txt_data;      /*@< text file data   */
+    size_t      txt_size;      /*@< actual file size */
+    size_t      txt_full_size; /*@< mmaped mem size  */
+    int         txt_fd;        /*@< file descriptor  */
+    int         txt_zero_fd;   /*@< fd for /dev/zero */
+    int         txt_errno;     /*@< warning code     */
+    int         txt_prot;      /*@< "prot" flags     */
+    int         txt_flags;     /*@< mapping type     */
 } tmap_info_t;
 
 #define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) ==  (void*)MAP_FAILED)

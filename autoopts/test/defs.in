@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-04-29 15:41:51 bkorb"
+# Time-stamp:     "2011-06-26 07:33:22 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -52,6 +52,7 @@ cfg_vals()
 
   set -a
   SED="@SED@"
+  AG_TIMEOUT=@AG_TIMEOUT@
 
   progname=`echo "$1" | ${SED} 's,^.*/,,'`
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`
@@ -355,7 +356,8 @@ cfg_inc
 
 trap "failure 'test ${testname} killed on timeout'" 15
 ( ( exec > /dev/null 2>&1 </dev/null
-    test -z "${kill_delay}" && kill_delay=30
+    test -z "${kill_delay}" && kill_delay=3
+    kill_delay=`expr $kill_delay '*' $AG_TIMEOUT`
     sleep ${kill_delay}
     ps -p $$ || exit
     kill -15 $$

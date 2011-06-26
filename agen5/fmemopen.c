@@ -27,8 +27,6 @@ typedef struct {
  *
  * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
  *
- * Time-stamp:      "2011-06-05 17:03:38 bkorb"
- *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
  * and completely rewritten by Bruce Korb, bkorb@gnu.org
@@ -62,7 +60,7 @@ typedef struct {
    typedef off64_t * seek_off_t;
    typedef int       seek_ret_t;
 
-#elif  defined(HAVE_FUNOPEN)
+#elif defined(HAVE_FUNOPEN)
    typedef fpos_t  seek_off_t;
    typedef fpos_t  seek_ret_t;
 
@@ -700,11 +698,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
     fmem_cookie_t * cookie;
     fmemc_get_buf_addr_t * gba;
 
-    switch (req) {
-    case IOCTL_FMEMC_GET_BUF_ADDR:
-        break;
-
-    default:
+    if (req != IOCTL_FMEMC_GET_BUF_ADDR) {
         /*
          *  It is not any of the IOCTL commands we know about.
          */
@@ -753,5 +747,5 @@ ag_fmemioctl(FILE * fp, int req, ...)
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of agen5/fmemopen.c */
+ * end of fmemopen.c */
 #endif /* ENABLE_FMEMOPEN */

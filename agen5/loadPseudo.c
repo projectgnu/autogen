@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2011-04-20 14:20:23 bkorb"
+ *  Time-stamp:        "2011-06-25 09:11:38 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -81,12 +81,12 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  skipSuffixSpec
+ *  do_suffix
  *
  *  Process a suffix specification
  */
 LOCAL char const *
-doSuffixSpec(char const * const pzData, char const * pzFileName, int lineNo)
+do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
 {
     /*
      *  The following is the complete list of POSIX required-to-be-legal
@@ -467,7 +467,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
             break;
 
         case PM_TR_TEMPL_SUFFIX:
-            pzData = doSuffixSpec(pzData, pzFileName, templLineNo);
+            pzData = do_suffix(pzData, pzFileName, templLineNo);
             break;
 
         case PM_TR_TEMPL_SCHEME:

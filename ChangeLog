@@ -1,3 +1,19 @@
+2011-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c: remove some unused globals, make global some
+	const variables needed in multiple functions, localize some globals
+	used only in one function.
+	* agen5/fmemopen.c (_IOWR): static code analysis cleanup
+	* autoopts/text_mmap.c: properly use MAP_ANONYMOUS. simplify code.
+	* agen5/opts.def (skip-suffix): make conflict with select-suffix
+	* autoopts/aoconf.tpl (libdir): do not include any of the directories:
+	    /lib /lib64 /usr/lib /usr/lib64
+	in the value.  Just assume these are always searched.
+	* autoopts/tpl/cmd-doc.tlib (BUGS): if this section exists, it should
+	be appended to instead of replaced.
+	* config/misc.def (--with-guile): clarify that an installation prefix
+	is called for with this option.
+
 2011-06-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/*.lic: add license names

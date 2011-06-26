@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-06-03 12:13:01 bkorb"
+ *  Time-stamp:        "2011-06-25 09:11:49 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -321,7 +321,9 @@ flag = {
     arg-name   = suffix;
     descrip    = "Omit the file with this suffix";
     max        = NOLIMIT;
+    flags-cant = select-suffix;
     stack-arg;
+
 #ifndef XML2AG
     no-preset;
     doc = <<-  _EOF_
@@ -343,6 +345,7 @@ flag = {
     arg-optional;
     descrip    = "specify this output suffix";
     max        = NOLIMIT;
+
 #ifndef XML2AG
     no-preset;
     doc = <<-	_EOF_
@@ -351,13 +354,13 @@ flag = {
 	specification in the @ref{pseudo macro} section of the info doc.
 	_EOF_;
     flag-code = <<- _EOF_
-	    if (  (pOptDesc->optArg.argString != NULL)
-	       && (*(pOptDesc->optArg.argString) != NUL))
-	        (void)doSuffixSpec(pOptDesc->optArg.argString, NULL, -1);
+	    char const * arg = pOptDesc->optArg.argString;
+	    if ((arg != NULL) && (*arg != NUL))
+	        (void)do_suffix(arg, NULL, -1);
 	_EOF_;
 #else
-    stack-arg;
     doc = "Pass-through AutoGen argument";
+    stack-arg;
 #endif
 };
 

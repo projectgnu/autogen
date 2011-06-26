@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-06-11 11:37:14 bkorb"
+## Time-stamp:      "2011-06-13 08:30:13 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -201,7 +201,7 @@ INVOKE cond-section  sec = "SYNOPSIS"      mode = "alt"     :+][+:
 INVOKE cond-section  sec = "DESCRIPTION"   mode = "append"  :+][+:
 INVOKE cond-section  sec = "EXIT STATUS"   mode = "insert"  :+][+:
 INVOKE cond-section  sec = "AUTHORS"       mode = "alt"     :+][+:
-INVOKE cond-section  sec = "BUGS"          mode = "alt"     :+][+:
+INVOKE cond-section  sec = "BUGS"          mode = "append"  :+][+:
 INVOKE cond-section  sec = "NOTES"         mode = "append"  :+][+:
 
 IF (exist? "copyright")                 :+][+:
@@ -302,14 +302,14 @@ DEFINE append-description             :+][+:
 IF (= (get "main.main-type") "for-each"):+][+:
 
   CASE main.handler-type                :+][+:
-  ~* ^(name|file)|.*text                :+]
+  ~* ^(name|file)|.*text               \:+]
 .Pp
 This program will perform its function for every file named on the command
 line or every file named in a list read from stdin.  The arguments or input
 names must be pre\-existing files.  The input list may contain comments,
 which[+:
 
-  !E                                    :+]
+  !E                                   \:+]
 .Pp
 This program will perform its function for every command line argument
 or every non\-comment line in a list read from stdin.
@@ -525,7 +525,7 @@ ENDDEF mk-option-presets
 .\"  M K - E X I T - S T A T U S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE mk-exit-status                 :+]
+DEFINE mk-exit-status                \:+]
 One of the following exit values will be returned:
 .Bl -tag
 [+:
@@ -561,8 +561,8 @@ DEFINE mk-authors                     :+][+:
           (stack-join ",\n" "copyright.owner") ))
 
   (if (> (string-length tmp-val) 1)
-      (string-append "\n" tmp-val "\n")
-      (shellf "rm -f %s" file-name))
+      (string-append tmp-val "\n")
+      (delete-file file-name))
 
   :+][+:
 
@@ -578,11 +578,20 @@ DEFINE mk-bugs                        :+][+:
 
     (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
     (if (> (string-length tmp-val) 1)
-        (string-append "\nPlease send bug reports to: " tmp-val "\n")
-        (shell "rm -f ${tmp_dir}/bugs"))
+        (string-append "Please send bug reports to: " tmp-val "\n")
+        (delete-file file-name) )
     :+][+:
 
-ENDDEF mk-bugs
+ENDDEF mk-bugs                        :+][+:
+
+DEFINE append-bugs                    :+][+:
+
+    (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
+    (if (> (string-length tmp-val) 1)
+        (string-append "Please send bug reports to: " tmp-val "\n") )
+    :+][+:
+
+ENDDEF append-bugs
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  M K - C O P Y R I G H T  (+ licensing)
@@ -590,11 +599,11 @@ ENDDEF mk-bugs
 .\"  This section is guaranteed to be the last section in the man page
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE mk-copyright                        :+]
-Copyright (C) [+: copyright.date :+] [+:
+DEFINE mk-copyright                    \:+]
+Copyright (C) [+: copyright.date        :+] [+:
   (get "copyright.owner" (get "copyright.author" (get "copyright.eaddr")))
   :+] all rights reserved.
-[+: CASE (get "copyright.type") :+][+:
+[+: CASE (get "copyright.type")         :+][+:
     = note  :+][+: (get "copyright.text") :+][+:
     == ''   :+]This program has an unspecified license.[+:
 
@@ -610,9 +619,8 @@ ENDDEF mk-copyright
 .\"  M K - N O T E S
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE mk-notes
-
-:+]This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
+DEFINE mk-notes                       \:+]
+This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.
 [+:
 
@@ -620,7 +628,7 @@ ENDDEF mk-notes
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-notes                   :+]
+DEFINE append-notes                  \:+]
 .Pp
 This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.[+:
@@ -637,8 +645,8 @@ ENDDEF mk-environment
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-environment             :+]
-[+:(. environ-text)                   :+][+:
+DEFINE append-environment             :+][+:
+   (. environ-text)                   :+][+:
 ENDDEF append-environment
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -651,8 +659,8 @@ ENDDEF mk-files
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-files                   :+]
-[+:(. home-rc-text)                   :+][+:
+DEFINE append-files                   :+][+:
+   (. home-rc-text)                   :+][+:
 ENDDEF append-files
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
