@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2011-01-26 19:01:56 bkorb"
+dnl Time-stamp:      "2011-07-19 10:09:18 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -28,7 +28,7 @@ AC_CANONICAL_TARGET
 d=`dirname $0`
 ag_top_srcdir=`cd $d && pwd`
 ag_top_builddir=`pwd`]
-AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-bzip2])
+AM_INIT_AUTOMAKE([gnu check-news 1.5 dist-xz])
 AC_USE_SYSTEM_EXTENSIONS
 AC_LIBTOOL_WIN32_DLL    m4_define(AC_PROVIDE_AC_LIBTOOL_WIN32_DLL)
 AC_PROG_LIBTOOL

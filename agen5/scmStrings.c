@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2011-05-26 11:24:05 bkorb"
+ * Time-stamp:        "2011-07-18 16:07:07 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -175,7 +175,7 @@ ag_scm2zchars(SCM s, const char * type)
     char * buf;
 
     if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf("%s is not a string", type));
+        AG_ABEND(aprf(zNotStr, type));
 
     len = scm_c_string_length(s);
     if (len == 0) {

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2010-06-26 16:04:12 bkorb"
+# Time-stamp:        "2011-07-11 08:19:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -52,7 +52,8 @@
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
 echo creating $testname.tpl
-cat > $testname.tpl <<_EOF_
+exec 4> $testname.tpl
+cat >&4 <<_EOF_
 [= AutoGen5 Template c sh =]
 [=
 
@@ -79,12 +80,12 @@ CASE (suffix)  =][=
   (out-pop)
 
 =]
-
-char zTestFile[] = "${testname}.raw";
 _EOF_
 
-cat >> ${testname}.tpl <<'_EOF_'
-#line 77 "string.test"
+printf '\nchar zTestFile[] = "%s";\n#line %s\n' \
+    ${testname}.raw `expr $LINENO + 4` >&4
+
+cat >&4 <<'_EOF_'
 char zGened[]  = [=(c-string  (get "string"))=];
 char zKrGen[]  = [=(kr-string (get "string"))=];
 char zExpect[] = "'\f\r\b\v\t\a\n\n"
@@ -174,7 +175,8 @@ int main( int argc, char** argv )
 =]#! /bin/sh
 set -x
 _EOF_
-cat >> ${testname}.tpl <<_EOF_
+
+cat 1>&4 <<_EOF_
 ./${testname} [=(raw-shell-str (get "string"))
            =] [=(shell-str (get "string"))=] > ${testname}.out
 res=\$?
@@ -197,6 +199,7 @@ ESAC
 
 =]
 _EOF_
+exec 4>&-
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 

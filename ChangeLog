@@ -1,4 +1,12 @@
+2011-07-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (main): add "LC_ALL=C" into the enviornment.
+	This should prevent Guile from mutilating strings.
+	* agen5/test/string.test: correct source line number reference
+
 2011-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	5.12 released
 
 	* agen5/expFormat.c: remove some unused globals, make global some
 	const variables needed in multiple functions, localize some globals

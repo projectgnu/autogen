@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2011-06-03 12:15:00 bkorb"
+ *  Time-stamp:        "2011-07-18 09:29:27 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -111,19 +111,29 @@ inner_main(void * closure, int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
-    optionSaveState(&autogenOptions);
-    pfTrace = stderr;
-
     /*
-     *  IF sigsetjmp returns with a signal number,
-     *  THEN you cannot capture the value portably.  So, the jumper has
-     *  stashed it for use now.
+     *  IF we've been kicked with a signal,
+     *  THEN abort, passing the signal that whacked us.
      */
     if (sigsetjmp(abendJumpEnv, 0) != 0)
         cleanup_and_abort(abendJumpSignal);
 
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
+    optionSaveState(&autogenOptions);
+    pfTrace = stderr;
 
+    /*
+     *  as of 2.0.2, Guile will fiddle with strings all on its own accord.
+     *  Coerce the environment into being POSIX ASCII strings so it keeps
+     *  its bloody stinking nose out of our data.
+     */
+    putenv((char*)(void*)"LC_ALL=C");
+
+    /*
+     *  If GUILE_WARN_DEPRECATED has not been defined, then likely we are
+     *  not in a development environment and likely we don't want to give
+     *  our users any angst.
+     */
     if (getenv("GUILE_WARN_DEPRECATED") == NULL)
         putenv((char*)(void*)"GUILE_WARN_DEPRECATED=no");
 

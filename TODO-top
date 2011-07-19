@@ -5,3 +5,5 @@
   http://www.w3schools.com/xpath/xpath_syntax.asp
 
 * [PATCH] getopt: for ambiguous options, enumerate the possibilities.
+
+* -W vendor options, per POSIX
