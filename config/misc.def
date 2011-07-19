@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-06-13 16:44:32 bkorb"
+/*  Time-stamp:        "2011-07-19 11:56:39 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -165,17 +165,16 @@ test   = {
            };
 
   action = { no; act-type = script; asis;
-             act-text = '  AC_MSG_ERROR([Cannot find libguile.'
-                        '  libguile is required.])';
-           };
+      act-text = '  AC_MSG_ERROR([Cannot find libguile.  libguile is required.'
+                 '  Perhaps you need to install guile-devel?])';
+    };
 
   doc = <<- _END_OF_DOC_
-	AutoGen won't work without Guile, so either the methods for finding
-	the header and libraries must be provided, or guile-config must be
-	found in the executable path, or we have to find the stuff in /usr
-	or /usr/local.  Since the Guile interface changes so wildly from
-	release to release, we have to explicitly accept every new minor
-	revision.  Sorry about that.
+	AutoGen won't work without Guile, so either the methods for finding the
+	header and libraries must be provided, or guile-config must be found in
+	the executable path, or we have to find the stuff in /usr or /usr/local.
+	Since the Guile interface changes from release to release, we have to
+	explicitly accept every new minor revision.  Sorry about that.
 	_END_OF_DOC_; // '
 };
 
