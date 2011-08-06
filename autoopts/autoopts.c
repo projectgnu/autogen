@@ -2,7 +2,7 @@
 /**
  * \file autoopts.c
  *
- *  Time-stamp:      "2011-05-24 17:53:41 bkorb"
+ *  Time-stamp:      "2011-07-22 23:07:57 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -47,19 +47,19 @@ static tePagerState pagerState           = PAGER_STATE_INITIAL;
 
 /* = = = START-STATIC-FORWARD = = = */
 static tSuccess
-next_opt_arg_must(tOptions* pOpts, tOptState* pOptState);
+next_opt_arg_must(tOptions * pOpts, tOptState* pOptState);
 
 static tSuccess
-next_opt_arg_may(tOptions* pOpts, tOptState* pOptState);
+next_opt_arg_may(tOptions * pOpts, tOptState* pOptState);
 
 static tSuccess
-next_opt_arg_none(tOptions* pOpts, tOptState* pOptState);
+next_opt_arg_none(tOptions * pOpts, tOptState* pOptState);
 
 static tSuccess
-next_opt(tOptions* pOpts, tOptState* pOptState);
+next_opt(tOptions * pOpts, tOptState * pOptState);
 
 static tSuccess
-doPresets(tOptions* pOpts);
+doPresets(tOptions * pOpts);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void *
@@ -124,7 +124,7 @@ ao_strdup(char const *str)
  *  invokes the handler procedure, if any.
  */
 LOCAL tSuccess
-handle_opt(tOptions* pOpts, tOptState* pOptState)
+handle_opt(tOptions * pOpts, tOptState* pOptState)
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -243,7 +243,7 @@ handle_opt(tOptions* pOpts, tOptState* pOptState)
 }
 
 static tSuccess
-next_opt_arg_must(tOptions* pOpts, tOptState* pOptState)
+next_opt_arg_must(tOptions * pOpts, tOptState* pOptState)
 {
     /*
      *  An option argument is required.  Long options can either have
@@ -297,7 +297,7 @@ next_opt_arg_must(tOptions* pOpts, tOptState* pOptState)
 
 
 static tSuccess
-next_opt_arg_may(tOptions* pOpts, tOptState* pOptState)
+next_opt_arg_may(tOptions * pOpts, tOptState* pOptState)
 {
     /*
      *  An option argument is optional.
@@ -364,7 +364,7 @@ next_opt_arg_may(tOptions* pOpts, tOptState* pOptState)
 
 
 static tSuccess
-next_opt_arg_none(tOptions* pOpts, tOptState* pOptState)
+next_opt_arg_none(tOptions * pOpts, tOptState* pOptState)
 {
     /*
      *  No option argument.  Make sure next time around we find
@@ -394,9 +394,12 @@ next_opt_arg_none(tOptions* pOpts, tOptState* pOptState)
  *  next command line argument.  DO NOT modify the descriptor.  Put
  *  all the state in the state argument so that the option can be skipped
  *  without consequence (side effect).
+ *
+ * @param pOpts     the program option descriptor
+ * @param pOptState the state of the next found option
  */
 static tSuccess
-next_opt(tOptions* pOpts, tOptState* pOptState)
+next_opt(tOptions * pOpts, tOptState * pOptState)
 {
     {
         tSuccess res = find_opt(pOpts, pOptState);
@@ -410,38 +413,7 @@ next_opt(tOptions* pOpts, tOptState* pOptState)
         return FAILURE;
     }
 
-    pOptState->flags |= (pOptState->pOD->fOptState & OPTST_PERSISTENT_MASK);
-
-    /*
-     *  Figure out what to do about option arguments.  An argument may be
-     *  required, not associated with the option, or be optional.  We detect the
-     *  latter by examining for an option marker on the next possible argument.
-     *  Disabled mode option selection also disables option arguments.
-     */
-    {
-        enum { ARG_NONE, ARG_MAY, ARG_MUST } arg_type = ARG_NONE;
-        tSuccess res;
-
-        if ((pOptState->flags & OPTST_DISABLED) != 0)
-            arg_type = ARG_NONE;
-
-        else if (OPTST_GET_ARGTYPE(pOptState->flags) == OPARG_TYPE_NONE)
-            arg_type = ARG_NONE;
-
-        else if (pOptState->flags & OPTST_ARG_OPTIONAL)
-            arg_type = ARG_MAY;
-
-        else
-            arg_type = ARG_MUST;
-
-        switch (arg_type) {
-        case ARG_MUST: res = next_opt_arg_must(pOpts, pOptState); break;
-        case ARG_MAY:  res = next_opt_arg_may( pOpts, pOptState); break;
-        case ARG_NONE: res = next_opt_arg_none(pOpts, pOptState); break;
-        }
-
-        return res;
-    }
+    return get_opt_arg(pOpts, pOptState);
 }
 
 
@@ -463,7 +435,7 @@ next_opt(tOptions* pOpts, tOptState* pOptState)
  *  This is only called the first time through.
  */
 LOCAL tSuccess
-doImmediateOpts(tOptions* pOpts)
+immediate_opts(tOptions * pOpts)
 {
     pOpts->curOptIdx = 1;     /* start by skipping program name */
     pOpts->pzCurOpt  = NULL;
@@ -504,7 +476,7 @@ doImmediateOpts(tOptions* pOpts)
  * choose to re-invoke after a non-option.
  */
 LOCAL tSuccess
-doRegularOpts(tOptions* pOpts)
+regular_opts(tOptions * pOpts)
 {
     for (;;) {
         tOptState optState = OPTSTATE_INITIALIZER(DEFINED);
@@ -540,11 +512,11 @@ doRegularOpts(tOptions* pOpts)
  *  check for preset values from a config files or envrionment variables
  */
 static tSuccess
-doPresets(tOptions* pOpts)
+doPresets(tOptions * pOpts)
 {
     tOptDesc * pOD = NULL;
 
-    if (! SUCCESSFUL(doImmediateOpts(pOpts)))
+    if (! SUCCESSFUL(immediate_opts(pOpts)))
         return FAILURE;
 
     /*
@@ -568,22 +540,22 @@ doPresets(tOptions* pOpts)
      *  THEN do any environment presets and leave.
      */
     if (pOpts->papzHomeList == NULL) {
-        doEnvPresets(pOpts, ENV_ALL);
+        env_presets(pOpts, ENV_ALL);
     }
     else {
-        doEnvPresets(pOpts, ENV_IMM);
+        env_presets(pOpts, ENV_IMM);
 
         /*
          *  Check to see if environment variables have disabled presetting.
          */
         if ((pOD != NULL) && ! DISABLED_OPT(pOD))
-            internalFileLoad(pOpts);
+            intern_file_load(pOpts);
 
         /*
          *  ${PROGRAM_LOAD_OPTS} value of "no" cannot disable other environment
          *  variable options.  Only the loading of .rc files.
          */
-        doEnvPresets(pOpts, ENV_NON_IMM);
+        env_presets(pOpts, ENV_NON_IMM);
     }
     pOpts->fOptSet &= ~OPTPROC_PRESETTING;
 
@@ -692,7 +664,7 @@ optionProcess(tOptions * pOpts, int argCt, char ** argVect)
         pOpts->pzCurOpt  = NULL;
     }
 
-    if (! SUCCESSFUL(doRegularOpts(pOpts)))
+    if (! SUCCESSFUL(regular_opts(pOpts)))
         return pOpts->origArgCt;
 
     /*

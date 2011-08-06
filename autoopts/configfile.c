@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-05-02 12:03:39 bkorb"
+ *  Time-stamp:      "2011-07-19 16:38:35 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -405,7 +405,7 @@ file_preset(tOptions * opts, char const * fname, int dir)
 {
     tmap_info_t   cfgfile;
     tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
-    tAoUL         st_flags = optst.flags;
+    unsigned long st_flags = optst.flags;
     char *        ftext =
         text_mmap(fname, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile);
 
@@ -958,7 +958,7 @@ handle_struct(tOptions * pOpts, tOptState * pOS, char * pzText, int dir)
  *  (see "optionFileLoad()", the implementation for --load-opts)
  */
 LOCAL void
-internalFileLoad(tOptions* pOpts)
+intern_file_load(tOptions* pOpts)
 {
     uint32_t  svfl;
     int       idx;
@@ -1098,7 +1098,7 @@ optionFileLoad(tOptions* pOpts, char const* pzProgram)
         *pp = pzProgram;
     }
 
-    internalFileLoad(pOpts);
+    intern_file_load(pOpts);
     return 0;
 }
 

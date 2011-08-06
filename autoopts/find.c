@@ -3,7 +3,7 @@
  *
  * @brief Hunt for options in the option descriptor list
  *
- *  Time-stamp:      "2011-05-26 16:30:30 bkorb"
+ *  Time-stamp:      "2011-07-22 23:07:59 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -33,10 +33,10 @@
  * find the name and name length we are looking for
  */
 static int
-parse_opt(char ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
+parse_opt(char const ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
 {
     int  res = 0;
-    char * p = *nm_pp;
+    char const * p = *nm_pp;
     *arg_pp  = NULL;
 
     for (;;) {
@@ -51,7 +51,7 @@ parse_opt(char ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
 
             buf[res] = NUL;
             *nm_pp   = buf;
-            *arg_pp  = p;
+            *arg_pp  = (char *)p;
             return res;
 
         default:
@@ -67,7 +67,7 @@ parse_opt(char ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
  * @param opt_name   name of option to look for
  */
 static void
-opt_ambiguities(tOptions * opts, char * name, int nm_len)
+opt_ambiguities(tOptions * opts, char const * name, int nm_len)
 {
     char const * const hyph =
         NAMED_OPTS(opts) ? "" : "--";
@@ -98,7 +98,7 @@ opt_ambiguities(tOptions * opts, char * name, int nm_len)
  * @return count of options that match
  */
 static int
-opt_match_ct(tOptions * opts, char * name, int nm_len,
+opt_match_ct(tOptions * opts, char const * name, int nm_len,
              int * ixp, ag_bool * disable)
 {
     int   matchCt  = 0;
@@ -216,7 +216,7 @@ opt_set(tOptions * opts, char * arg, int idx, ag_bool disable, tOptState * st)
  * @return success status
  */
 static tSuccess
-opt_unknown(tOptions * opts, char * name, char * arg, tOptState * st)
+opt_unknown(tOptions * opts, char const * name, char * arg, tOptState * st)
 {
     /*
      *  IF there is no equal sign
@@ -254,7 +254,7 @@ opt_unknown(tOptions * opts, char * name, char * arg, tOptState * st)
  * @return success status (always FAILURE, if it returns)
  */
 static tSuccess
-opt_ambiguous(tOptions * opts, char * name, int match_ct)
+opt_ambiguous(tOptions * opts, char const * name, int match_ct)
 {
     if ((opts->fOptSet & OPTPROC_ERRSTOP) != 0) {
         fprintf(stderr, zAmbigOptStr, opts->pzProgPath, name, match_ct);
@@ -277,12 +277,11 @@ opt_ambiguous(tOptions * opts, char * name, int match_ct)
  * @return success status
  */
 LOCAL tSuccess
-opt_find_long(tOptions * pOpts, char * opt_name, tOptState * pOptState)
+opt_find_long(tOptions * pOpts, char const * opt_name, tOptState * pOptState)
 {
-    char       name_buf[128];
-    char *     opt_arg;
-    int        nm_len =
-        parse_opt(&opt_name, &opt_arg, name_buf, sizeof(name_buf));
+    char    name_buf[128];
+    char *  opt_arg;
+    int     nm_len = parse_opt(&opt_name, &opt_arg, name_buf, sizeof(name_buf));
 
     int     matchIdx = 0;
     ag_bool disable  = AG_FALSE;
@@ -371,12 +370,48 @@ short_opt_error:
     return FAILURE;
 }
 
+LOCAL tSuccess
+get_opt_arg(tOptions * pOpts, tOptState * pOptState)
+{
+    pOptState->flags |= (pOptState->pOD->fOptState & OPTST_PERSISTENT_MASK);
+
+    /*
+     *  Figure out what to do about option arguments.  An argument may be
+     *  required, not associated with the option, or be optional.  We detect the
+     *  latter by examining for an option marker on the next possible argument.
+     *  Disabled mode option selection also disables option arguments.
+     */
+    {
+        enum { ARG_NONE, ARG_MAY, ARG_MUST } arg_type = ARG_NONE;
+        tSuccess res;
+
+        if ((pOptState->flags & OPTST_DISABLED) != 0)
+            arg_type = ARG_NONE;
+
+        else if (OPTST_GET_ARGTYPE(pOptState->flags) == OPARG_TYPE_NONE)
+            arg_type = ARG_NONE;
+
+        else if (pOptState->flags & OPTST_ARG_OPTIONAL)
+            arg_type = ARG_MAY;
+
+        else
+            arg_type = ARG_MUST;
+
+        switch (arg_type) {
+        case ARG_MUST: res = next_opt_arg_must(pOpts, pOptState); break;
+        case ARG_MAY:  res = next_opt_arg_may( pOpts, pOptState); break;
+        case ARG_NONE: res = next_opt_arg_none(pOpts, pOptState); break;
+        }
+
+        return res;
+    }
+}
 
 /**
  *  Find the option descriptor for the current option
  */
 LOCAL tSuccess
-find_opt(tOptions* pOpts, tOptState* pOptState)
+find_opt(tOptions * pOpts, tOptState * pOptState)
 {
     /*
      *  IF we are continuing a short option list (e.g. -xyz...)
