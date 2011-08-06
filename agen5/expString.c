@@ -2,7 +2,7 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2011-05-31 16:34:42 bkorb"
+ *  Time-stamp:        "2011-08-02 12:21:12 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -1134,13 +1134,13 @@ ag_scm_string_tr(SCM Str, SCM From, SCM To)
  *
  * doc: @code{match} and  @code{repl} may be either a single string or
  *      a list of strings.  Either way, they must have the same structure
- *      and number of elements.  For example, to replace all less than
- *      and all greater than characters, do something like this:
+ *      and number of elements.  For example, to replace all amphersands,
+ *      less than and greater than characters, do something like this:
  *
  * @example
  *      (string-substitute source
- *      ("&"     "<"    ">")
- *      ("&amp;" "&lt;" "&gt;"))
+ *          (list "&"     "<"    ">")
+ *          (list "&amp;" "&lt;" "&gt;"))
  * @end example
 =*/
 SCM
