@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-04-26 16:59:21 bkorb"
+# Time-stamp:      "2011-07-19 11:15:31 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -544,6 +544,7 @@ DEFINE decl-callbacks
     "optionTimeVal\n"
     "optionUnstackArg\n"
     "optionVersionStderr\n"
+    "optionVendorOption\n"
 
   ) )
 

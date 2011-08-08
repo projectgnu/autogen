@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-05-03 14:08:02 bkorb"
+# Time-stamp:      "2011-08-07 14:47:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -260,11 +260,10 @@ IF (exist? "resettable")
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL }," ))
-        (set! default-cookie (string-append default-cookie
-               "\n    NULL," ))
+               "\n    { NULL } /* resettable */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
         INDEX-pfx =]RESET_OPTION, [= (. VALUE-pfx) =]RESET_OPTION,
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]RESET_OPTION,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
@@ -284,11 +283,10 @@ IF (exist? "version")   =]
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL }," ))
-        (set! default-cookie (string-append default-cookie
-               "\n    NULL," ))
+               "\n    { NULL } /* version */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
          INDEX-pfx =]VERSION, [= (. VALUE-pfx) =]VERSION,
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VERSION,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_VERSION_FLAGS, 0,
@@ -306,11 +304,10 @@ ENDIF =]
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL },\n    { NULL }," ))
-        (set! default-cookie (string-append default-cookie
-               "\n    NULL,\n    NULL," ))
+               "\n    { NULL } /* help */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
         INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]HELP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
@@ -324,8 +321,11 @@ ENDIF =]
 IF (not (exist? "no-libopts"))          =],
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+        (set! default-text (string-append default-text
+               "\n    { NULL } /* more-help */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]MORE_HELP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_MORE_HELP_FLAGS, 0,
@@ -342,11 +342,10 @@ IF (exist? "usage-opt")                 =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL }," ))
-        (set! default-cookie (string-append default-cookie
-               "\n    NULL," ))
+               "\n    { NULL } /* usage-opt */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
         INDEX-pfx =]USAGE, [= (. VALUE-pfx) =]USAGE,
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]USAGE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
@@ -363,14 +362,13 @@ IF (exist? "homerc")                    =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
-               "\n    { NULL },\n    { NULL }," ))
-        (set! default-cookie (string-append default-cookie
-               "\n    NULL,\n    NULL," ))
+               "\n    { NULL } /* save-opts */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
         INDEX-pfx =]SAVE_OPTS, [=
            (if (not (exist? "disable-save"))
                (string-append VALUE-pfx "SAVE_OPTS")
                "0") =],
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]SAVE_OPTS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
@@ -386,11 +384,14 @@ IF (exist? "homerc")                    =],
      /* disablement strs */ NULL, NULL },
 
   {  /* entry idx, value */ [=
-        (. INDEX-pfx) =]LOAD_OPTS, [=
+        (set! default-text (string-append default-text
+               "\n    { NULL } /* load-opts */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]LOAD_OPTS, [=
            (if (not (exist? "disable-load"))
                (string-append VALUE-pfx "LOAD_OPTS")
                "0") =],
-     /* equiv idx value  */ NO_EQUIVALENT, 0,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]LOAD_OPTS,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
@@ -407,9 +408,28 @@ IF (exist? "homerc")                    =],
     (if (exist? "disable-load") "NULL, NULL"
          "zNotLoad_Opts_Name, zNotLoad_Opts_Pfx")=] }[=
 
-ENDIF have homerc
+ENDIF have homerc                       =][=
 
-=]
+IF (exist? "vendor-opt")                =],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL } /* vendor-opt */," ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]VENDOR_OPT, [= (. VALUE-pfx) =]VENDOR_OPT,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VENDOR_OPT,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+                          | OPTST_IMM | OPTST_TWICE, 0, /* both directions */
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ optionVendorOption,
+     /* desc, NAME, name */ zVendorText, NULL, zVendor_Opt_Name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF have vendor-opt                   =]
 };
 [= (. lib-externs) =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -533,8 +553,10 @@ static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
    (substring default-text 0 (- (string-length default-text) 1)) =]
 };
 static void * const original[=(. pname-cap)=]Cookies[ [=
-(. UP-prefix) =]OPTION_CT ] = {[=
-   (substring default-cookie 0 (- (string-length default-cookie) 1)) =]
+(. UP-prefix) =]OPTION_CT ] = {
+[=
+ (shell (string-append "columns -I4 -S, <<\\_EOF_\n" default-cookie "_EOF_"))
+=]
 };
 [= ENDIF =]
 [= INVOKE usage-text usage-type = full  \=]
@@ -574,7 +596,8 @@ tOptions [=(. pname)=]Options = {
     + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
     + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
     + OPTPROC_GNUUSAGE[=   ENDIF=][=IF      (exist? "no-misuse-usage")   =]
-    + OPTPROC_MISUSE[=     ENDIF=] ),
+    + OPTPROC_MISUSE[=     ENDIF=][=IF      (exist? "vendor-opt")        =]
+    + OPTPROC_VENDOR_OPT[= ENDIF=] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         zPROGNAME,
     zRcName,      zCopyright,   zLicenseDescrip,

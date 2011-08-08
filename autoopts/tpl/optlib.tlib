@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-08-01 10:55:14 bkorb"
+# Time-stamp:      "2011-08-07 17:48:02 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -100,6 +100,18 @@ test_exe "${CLexe}" || \
 ;;
 (define flag-options-only
         (and (not (exist? "long-opts")) (exist? "flag.value")))
+
+(if (exist? "vendor-opt") (begin
+    ;; except the 'vendor-opt' attribute allows long options that do
+    ;; not have flag values, but it conflicts with 'long-opts' and requires
+    ;; at least one 'flag.value'
+    ;;
+    (if (or (exist? "long-opts") (not (exist? "flag.value")))
+        (error "'vendor-opt' conflicts with 'long-opts' and requires flag values")
+        (set! flag-options-only #f))
+    (if (exist? "library")
+        (error "'vendor-opt' conflicts with 'library'"))
+) )
 
 (if (and (exist? "reorder-args") (not (exist? "argument")) )
   (error
@@ -215,6 +227,7 @@ test_exe "${CLexe}" || \
         (join "\n" (stack "flag.value"))
         (count "flag.value") ) )
 
+(define no-flag-ct    0)
 (define lib-opt-ptr  "")
 (define max-name-len 10)                =][=
 
@@ -228,8 +241,11 @@ FOR flag                                =][=
     (if (> tmp-ct max-name-len)
         (set! max-name-len tmp-ct))
 
-    (if (< 1 (count "value"))
-        (error (sprintf "Option %s has too many `value's" (get "name"))))
+    (if (exist? "value")
+        (if (< 1 (count "value"))
+            (error (sprintf "Option %s has too many `value's" (get "name"))))
+        (set! no-flag-ct (+ 1 no-flag-ct))
+    )
 
     (if (and flag-options-only
              (not (exist? "documentation"))
@@ -287,7 +303,13 @@ FOR flag                                =][=
         (set! lib-opt-ptr (string->c-name! (string-append
               (get "lib-name") "_" (get "name") "_optDesc_p"))) )
 =][=
-ENDFOR flag                             =][=
+
+ENDFOR flag
+
+=][=
+(if (and (exist? "vendor-opt") (= no-flag-ct 0))
+    (error "'vendor-opt' requires that there be options without flag values"))
+=][=
 
 ENDDEF init-and-validate
 
@@ -716,7 +738,7 @@ ENDDEF set-option-define
 ;; be well more than 2 bytes of it.  If so, actually emit it, but first
 ;; see if it needs to be enclused in a #ifdef/#endif pair.
 ;; =][=
-DEFINE Option_Defines             =]
+DEFINE option-defines             =]
 #define VALUE_[=
   (define value-desc (string-append UP-prefix "DESC("
           (if (exist? "equivalence")
@@ -1100,6 +1122,14 @@ static char const zUsage_Name[]        = "usage";[=
 
   ENDIF (exist? "usage-opt")            =][=
 
+  IF (exist? "vendor-opt")
+
+=]
+static char const zVendorText[]        = "vendor supported additional options";
+static char const zVendor_Opt_Name[]   = "vendor-option";[=
+
+  ENDIF (exist? "vendor-opt")           =][=
+
   IF (exist? "homerc")                  =][=
 
     IF (not (exist? "disable-save"))    =]
@@ -1147,8 +1177,10 @@ DEFINE opt-desc         =][=
          ELSE                             =]NULL[=
          ENDIF =],
      /* desc, NAME, name */ z[=
-         (set! default-text (string-append default-text
-               "\n    { NULL }," )) cap-name =]Text, NULL, NULL,
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* doc opt */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        cap-name =]Text, NULL, NULL,
      /* disablement strs */ NULL, NULL },[=
 
   ELSE
@@ -1183,11 +1215,13 @@ DEFINE opt-desc         =][=
                (string-append "{ z" cap-name "DefaultArg },")
                "{ NULL }," ))
          (set! default-text (string-append default-text
-               "\n    " tmp-val ))
+               "\n    " tmp-val " /* " low-name " */"))
          tmp-val =]
      /* arg list/cookie  */ [=
-            (if (and (=* (get "arg-type") "set") (exist? "arg-default"))
-                (string-append cap-name "CookieBits") "NULL") =],
+     (set! tmp-val (if (and (=* (get "arg-type") "set") (exist? "arg-default"))
+                (string-append cap-name "CookieBits") "NULL"))
+     (set! default-cookie (string-append default-cookie tmp-val "\n" ))
+     tmp-val =],
      /* must/cannot opts */ [=
          (if (exist? "flags-must")
              (string-append "a" cap-name "MustList, ")

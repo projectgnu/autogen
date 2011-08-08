@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-03-27 18:37:26 bkorb"
+# Time-stamp:      "2011-08-07 16:42:09 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -85,6 +85,7 @@ ELSE not exists library                 =][=
   (add-opt-index "HELP")
   (if (not (exist? "no-libopts")) (add-opt-index "MORE_HELP"))
   (if (exist? "usage-opt")        (add-opt-index "USAGE"))
+  (if (exist? "vendor-opt")       (add-opt-index "VENDOR_OPT"))
 
   (if (exist? "homerc") (begin
       (add-opt-index "SAVE_OPTS")
@@ -257,14 +258,14 @@ CASE guard-option-names               =][=
  *  Make sure there are no #define name conflicts with the option names
  */
 #ifndef     NO_OPTION_NAME_WARNINGS[=
-    FOR  flag       =][=
+    FOR  flag               =][=
 
     (set! opt-name   (get-up-name "name"))
     (set! undef-list (string-append undef-list "\n# undef " opt-name))
     (sprintf conf-warn-fmt opt-name)
     =][=
 
-    ENDFOR flag     =][=
+    ENDFOR flag             =][=
 
   (. undef-list)=]
 #endif  /*  NO_OPTION_NAME_WARNINGS */
@@ -280,7 +281,7 @@ ESAC on guard-option-names
 
 FOR flag =][=
 
-  INVOKE save-name-morphs =][=
+  INVOKE save-name-morphs   =][=
 
   IF (set! opt-name   (string-append OPT-pfx UP-name))
      (set! descriptor (string-append UP-prefix "DESC(" UP-name ")" ))
@@ -294,10 +295,10 @@ FOR flag =][=
         (*([=(. descriptor)=].pOptProc))(&[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=(for-index)=])[=
 
-   ENDIF              =][=
- ELSE                 =][=
-   Option_Defines     =][=
- ENDIF                =][=
+   ENDIF                    =][=
+ ELSE                       =][=
+   INVOKE option-defines    =][=
+ ENDIF                      =][=
 ENDFOR  flag
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -367,12 +368,23 @@ IF (exist? "flag.value")                =][=
        std-value   = "u"                =][=
   ENDIF  have "usage-opt"               =][=
 
+  IF (exist? "vendor-opt")              =][=
+    INVOKE set-std-value
+       val-name    = "vendor-value"
+       val-UPNAME  = "VENDOR_OPT"
+       std-value   = "W"                =][=
+  ENDIF  have "vendor-opt"              =][=
+
   IF (exist? "homerc")                  =][=
+
     IF (not (exist? "disable-save"))    =][=
       INVOKE set-std-value
          val-name    = "save-opts-value"
          val-UPNAME  = "SAVE_OPTS"
          std-value   = ">"              =][=
+    ELSE                                =]
+#define [= (sprintf "%-23s 0" (string-append VALUE-pfx "SAVE_OPTS"))
+         =][=
     ENDIF                               =][=
     IF (not (exist? "disable-load"))    =][=
       INVOKE set-std-value
@@ -387,28 +399,34 @@ IF (exist? "flag.value")                =][=
 
 ELSE  NO "flag.value"                   =]
 [=
- (set! index-fmt (string-append
-       "\n#define " VALUE-pfx "%1$-16s " INDEX-pfx "%1$s"))
- (define std-vals (lambda (std-nm)
-                   (ag-fprintf 0 index-fmt std-nm) ))
+(set! index-fmt (string-append
+      "\n#define " VALUE-pfx "%1$-16s " INDEX-pfx "%1$s"))
+(define std-vals (lambda (std-nm)
+                  (ag-fprintf 0 index-fmt std-nm) ))
 
- (if (exist? "resettable")       (std-vals "RESET_OPTION"))
- (if (exist? "version")          (std-vals "VERSION"))
- (std-vals "HELP")
- (if (not (exist? "no-libopts")) (std-vals "MORE_HELP"))
- (if (exist? "usage-opt")        (std-vals "USAGE"))
- (if (exist? "homerc")           (begin
-    (if (not (exist? "disable-save")) (std-vals "SAVE_OPTS"))
-    (std-vals "LOAD_OPTS") ))           =][=
+(if (exist? "resettable")       (std-vals "RESET_OPTION"))
+(if (exist? "version")          (std-vals "VERSION"))
+(std-vals "HELP")
+(if (not (exist? "no-libopts")) (std-vals "MORE_HELP"))
+(if (exist? "usage-opt")        (std-vals "USAGE"))
+(if (exist? "homerc")           (begin
+    (if (not (exist? "disable-save"))
+        (std-vals "SAVE_OPTS"))
+    (if (not (exist? "disable-load"))
+        (std-vals "LOAD_OPTS"))
+)   )  =][=
 
 ENDIF    have flag.value/not            =][=
 
-IF (exist? "homerc")                    =]
+IF (and (exist? "homerc") (not (exist? "disable-save")))
+
+=]
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT_MASK; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a) )[=
-ENDIF                           =][=
+ENDIF
+=][=
 
 IF (not (exist? "library"))
 
