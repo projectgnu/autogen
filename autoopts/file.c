@@ -2,7 +2,7 @@
 /**
  * \file file.c
  *
- *  Time-stamp:      "2011-08-04 11:28:28 bkorb"
+ *  Time-stamp:      "2011-08-06 08:49:35 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -195,8 +195,8 @@ optionFileCheck(tOptions * pOpts, tOptDesc * pOD,
     switch (ftype & FTYPE_MODE_OPEN_MASK) {
     default:
     case FTYPE_MODE_NO_OPEN:  break;
-    case FTYPE_MODE_OPEN_FD:  open_file_fd(pOpts, pOD); break;
-    case FTYPE_MODE_FOPEN_FP: fopen_file_fp(pOpts, pOD); break;
+    case FTYPE_MODE_OPEN_FD:  open_file_fd( pOpts, pOD, mode); break;
+    case FTYPE_MODE_FOPEN_FP: fopen_file_fp(pOpts, pOD, mode); break;
     }
 }
 /*

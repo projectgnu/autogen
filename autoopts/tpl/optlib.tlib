@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-06-09 12:17:27 bkorb"
+# Time-stamp:      "2011-08-01 10:55:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -589,10 +589,133 @@ static char const [= (. usage-text-name) =][] =
 
 ENDDEF usage-text
 
+;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-keyword-enum          =]
+typedef enum {[=
+    (if (not (exist? "arg-default"))
+        (string-append " " enum-pfx "UNDEFINED = 0,")) =]
+[=(shellf
+"for f in %s ; do echo %s${f} ; done | \
+    ${CLexe} -I4 --spread=3 --sep=,
+test $? -eq 0 || die ${CLexe} failed"
+          (string-upcase! (string->c-name! (join " " (stack "keyword"))))
+    enum-pfx )=]
+} te_[=(string-append Cap-prefix cap-name)=];
+#define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
+                 =] optionKeywordName(&[=(. value-desc)=], (_v))
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argEnum)[=
+
+ENDDEF emit-keyword-enum
+
+;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-member-mask           =][=
+
+    (define setmember-fmt (string-append "\n#define %-24s 0x%0"
+       (shellf "expr '(' %d + 4 ')' / 4" (count "keyword")) "XUL"
+       (if (> (count "keyword") 32) "L" "")  ))
+    (define full-prefix (string-append UP-prefix UP-name) )  =][=
+
+    FOR    keyword                =][=
+
+      (sprintf setmember-fmt
+         (string->c-name! (string-append
+             full-prefix "_" (string-upcase! (get "keyword")) ))
+         (ash 1 (for-index))  ) =][=
+
+    ENDFOR keyword                =][=
+
+    (ag-fprintf 0 setmember-fmt (string->c-name! (string-append
+             full-prefix "_MEMBERSHIP_MASK"))
+             (- (ash 1 (count "keyword")) 1) )  =]
+#define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
+                   OPT-pfx UP-name value-desc)
+                 =][=
+
+ENDDEF emit-member-mask
+
+;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-value-defines         =][=
+
+  CASE arg-type  =][=
+
+  =*  num        =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argInt)[=
+
+  =*  time       =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argInt)[=
+
+  =*  key        =][=
+       INVOKE emit-keyword-enum   =][=
+
+  =*  set        =][=
+       INVOKE emit-member-mask    =][=
+
+  =*  bool       =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argBool)[=
+
+  =*  fil               =][=
+      CASE open-file    =][=
+      == ""             =][=
+      =* desc           =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argFd)[=
+      *                 =]
+#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
+                 =] ([=(. value-desc)=].optArg.argFp)[=
+      ESAC              =][=
+
+  ESAC           =][=
+
+ENDDEF emit-value-defines
+
+;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE set-option-define        =][=
+
+    IF (exist? "unstack-arg")   =][=
+
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC("
+                           (get-up-name "unstack-arg") ")" )
+           set-index = (index-name "unstack-arg")
+           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
+
+    ELIF (and (exist? "equivalence")
+              (not (== (get-up-name "equivalence") UP-name))) =][=
+
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC("
+                           (get-up-name "equivalence") ")" )
+           set-index = (index-name "equivalence")
+           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
+
+    ELSE  "is equivalenced"     =][=
+
+      set-defines
+           set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
+           set-index = (for-index)
+           opt-state = OPTST_SET  =][=
+
+    ENDIF is/not equivalenced   =][=
+
+ENDDEF set-option-define
+
 ;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-#define's for a single option     =][=
-
+;;
+;; #define's for a single option
+;;
+;; First, emit defines that are always required.  Then start collecting
+;; defines in a diverted output.  If there is any output, there will
+;; be well more than 2 bytes of it.  If so, actually emit it, but first
+;; see if it needs to be enclused in a #ifdef/#endif pair.
+;; =][=
 DEFINE Option_Defines             =]
 #define VALUE_[=
   (define value-desc (string-append UP-prefix "DESC("
@@ -620,130 +743,31 @@ DEFINE Option_Defines             =]
 
   ESAC                            =][=
   (out-push-new)                  =][=
-
-  CASE (get "arg-type")           =][=
-
-  =*   key                        =]
-typedef enum {[=
-    (if (not (exist? "arg-default"))
-        (string-append " " enum-pfx "UNDEFINED = 0,")) =]
-[=(shellf
-"for f in %s ; do echo %s${f} ; done | \
-    ${CLexe} -I4 --spread=3 --sep=,
-test $? -eq 0 || die ${CLexe} failed"
-          (string-upcase! (string->c-name! (join " " (stack "keyword"))))
-    enum-pfx )=]
-} te_[=(string-append Cap-prefix cap-name)=];[=
-
-  =*   set                        =][=
-    (define setmember-fmt (string-append "\n#define %-24s 0x%0"
-       (shellf "expr '(' %d + 4 ')' / 4" (count "keyword")) "XUL"
-       (if (> (count "keyword") 32) "L" "")  ))
-    (define full-prefix (string-append UP-prefix UP-name) )  =][=
-
-    FOR    keyword                =][=
-
-      (sprintf setmember-fmt
-         (string->c-name! (string-append
-             full-prefix "_" (string-upcase! (get "keyword")) ))
-         (ash 1 (for-index))  ) =][=
-
-    ENDFOR keyword                =][=
-
-    (sprintf setmember-fmt (string->c-name! (string-append
-             full-prefix "_MEMBERSHIP_MASK"))
-             (- (ash 1 (count "keyword")) 1) )  =][=
-
-  ESAC  (get "arg-type")
-
-=][=
-
-  CASE arg-type  =][=
-
-  =*  num        =]
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argInt)[=
-
-  =*  time       =]
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argInt)[=
-
-  =*  key        =]
-#define [= (sprintf "%-24s" (string-append OPT-pfx UP-name "_VAL2STR(_v)"))
-                 =] optionKeywordName(&[=(. value-desc)=], (_v))
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argEnum)[=
-
-  =*  set        =]
-#define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
-                   OPT-pfx UP-name value-desc)
-                 =][=
-
-  =*  bool       =]
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argBool)[=
-
-  =*  fil               =][=
-      CASE open-file    =][=
-      == ""             =][=
-      =* desc           =]
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argFd)[=
-      *                 =]
-#define [=(. OPT-pfx)=]VALUE_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. value-desc)=].optArg.argFp)[=
-      ESAC              =][=
-
-  ESAC           =][=
-
+  INVOKE emit-value-defines       =][=
 
   IF (== (get-up-name "equivalence") UP-name) =]
 #define WHICH_[=(sprintf "%-18s" opt-name)
                  =] ([=(. descriptor)=].optActualValue)
 #define WHICH_[=(. UP-prefix)=]IDX_[=(sprintf "%-14s" UP-name)
-                 =] ([=(. descriptor)=].optActualIndex)[=
-  ENDIF          =][=
-  IF (exist? "settable") =][=
+     =] ([=(. descriptor)=].optActualIndex)[=
+  ENDIF                           =][=
 
-    IF (exist? "unstack-arg") =][=
-
-      set-defines
-           set-desc  = (string-append UP-prefix "DESC("
-                           (get-up-name "unstack-arg") ")" )
-           set-index = (index-name "unstack-arg")
-           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
-
-    ELIF (and (exist? "equivalence")
-              (not (== (get-up-name "equivalence") UP-name))) =][=
-
-      set-defines
-           set-desc  = (string-append UP-prefix "DESC("
-                           (get-up-name "equivalence") ")" )
-           set-index = (index-name "equivalence")
-           opt-state = "OPTST_SET | OPTST_EQUIVALENCE" =][=
-
-    ELSE  "is equivalenced"       =][=
-
-      set-defines
-           set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
-           set-index = (for-index)
-           opt-state = OPTST_SET  =][=
-
-    ENDIF is/not equivalenced     =][=
-
+  IF (exist? "settable")          =][=
+     INVOKE set-option-define     =][=
   ENDIF settable                  =][=
 
-  (define tmp-val (out-pop #t))   =][=
-  IF (defined? 'tmp-val) =][=
-    IF (> (string-length tmp-val) 2)  =][=
-      IF (hash-ref ifdef-ed flg-name) =]
-#if[=ifndef "n"=]def [= ifdef =][= ifndef =]
-[= (. tmp-val) =]
+  IF  (define tmp-val (out-pop #t))
+      (if (defined? 'tmp-val)
+          (> (string-length tmp-val) 2)
+          #f )                    =][=
+
+    IF (hash-ref ifdef-ed flg-name)      =]
+#if[=ifndef "n"=]def [= ifdef =][= ifndef \=]
+[= (. tmp-val)  =]
 #endif /* [= ifdef =][= ifndef =] */[=
     
-      ELSE      =]
+    ELSE        =]
 [= (. tmp-val)  =][=
-      ENDIF     =][=
     ENDIF       =][=
   ENDIF         =][=
 

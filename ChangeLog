@@ -1,3 +1,15 @@
+2011-08-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c: clarify doc for (string-tr ...)
+	* autoopts/autoopts.c (next_opt): extract arg processing to find.c
+	* autoopts/file.c (check_existence): new function, modified
+	functionality -- when checking for the containing directory of
+	a "file" arg type, skip test when name has no directory component
+	[thanks to Dave Hart].
+	(open_file_fd): extract of optionFileCheck()
+	(fopen_file_fp): extract of optionFileCheck()
+	* autoopts/find.c (get_opt_arg): new -- extracted from autoopts.c
+
 2011-07-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (main): add "LC_ALL=C" into the enviornment.
