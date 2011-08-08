@@ -1833,8 +1833,25 @@ See the @code{optionMakePath(3AGEN)} man page for excruciating details.
 @vindex rcfile
 Specifies the configuration file name.  This is only useful if you
 have provided at least one @code{homerc} attribute.
-@noindent
+@example
 default: .<prog-name>rc
+@end example
+
+@item vendor-opt
+@vindex vendor-opt
+This option implements the @code{-W} vendor option command line option.
+
+For POSIX specified utilities, the options are constrained to the options
+that are specified by POSIX.  Extensions should be handled with @code{-W}
+command line options, the short flag form.  Long option name processing
+must be disabled.  In fact, the @code{long-opts} attribute must not be
+provided, and some options must be specified without flag values.
+
+The @code{-W long-name} is processed by looking up the long option
+name that follows it.  It cannot be a short flag because that would
+conflict with the POSIX flag name space.  It will be processed as if
+long options were accepted and @code{--long-name} were found on the
+command line.
 @end table
 
 @c
