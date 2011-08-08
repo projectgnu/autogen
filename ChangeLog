@@ -1,3 +1,19 @@
+2011-08-07  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (immediate_opts): mark option processing state
+	as being "immediate action".
+	* autoopts/configfile.c (validateOptionsStruct) rename to validate_struct
+	* autoopts/find.c (optionVendorOption): new function for -W option.
+	* autoopts/options_h.tpl (VENDOR_OPTION_VALUE) #define for that option
+	* autoopts/proc-state.def (immediate): define the immediate proc flag
+	(vendor-opt): define flag saying -W is supported
+	* autoopts/test/Makefile.am (vendor.test): new test
+	* autoopts/test/vendor.test: new test
+	* autoopts/test/*.test: consistently make help text consistent
+	* autoopts/usage.c: rework to handle new vendor option
+	* autoopts/usage-txt.def: new strings
+	* autoopts/tpl/*: rework option templates for vendor option
+
 2011-08-06  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expString.c: clarify doc for (string-tr ...)
