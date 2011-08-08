@@ -323,8 +323,8 @@ utxt = { ut-name = IllOptStr;
          ut-text = "%s: illegal option -- %s\n";
 };
 
-utxt = { ut-name = Illegal;
-         ut-text = "illegal";
+utxt = { ut-name = IllVendOptStr;
+         ut-text = "%s: unknown vendor extension option -- %s\n";
 };
 
 utxt = { ut-name = IntRange;
@@ -654,6 +654,14 @@ utxt = { ut-name = UpTo;
 
 utxt = { ut-name = ValidKeys;
          ut-text = "The valid \"%s\" option keywords are:\n";
+};
+
+utxt = { ut-name = VendOptsAre;
+         ut-text = "These additional options are:";
+};
+
+utxt = { ut-name = VendIntro;
+         ut-text = "The next option supports vendor supported extra options:";
 };
 
 /* End of usage-txt.def */
