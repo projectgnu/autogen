@@ -41,6 +41,7 @@ homerc         =  $HOME, ".";
 environrc;
 usage-opt;
 usage-message;
+resettable;
 
 #else
 prog-name      = xml2ag;
