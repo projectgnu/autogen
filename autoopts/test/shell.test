@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-02 08:52:43 bkorb"
+# Time-stamp:        "2011-08-07 17:33:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -51,7 +51,7 @@ compile "-?"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+clean_help > ${testname}.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
@@ -107,7 +107,7 @@ compile "-?"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-cat > ${testname}.hlp <<'_EOF_'
+clean_help > ${testname}.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description

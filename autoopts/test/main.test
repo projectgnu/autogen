@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-02 12:06:12 bkorb"
+# Time-stamp:        "2011-08-07 17:33:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -65,7 +65,7 @@ compile "-?"
 
 basehlp=${testname}.hlp
 echo creating ${basehlp}
-cat > ${basehlp} <<'_EOF_'
+clean_help > ${basehlp} <<'_EOF_'
 test_main - Test AutoOpts for main
 USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
   Flg Arg Option-Name    Description
@@ -88,7 +88,7 @@ cmp -s ${testname}.h*lp || \
 
 ./${testname} > ${testname}.out < ${testname}.hlp
 
-cat > ${testname}.base <<\_EOF_
+clean_help > ${testname}.base <<\_EOF_
 test_main - Test AutoOpts for main
 USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
 Flg Arg Option-Name    Description

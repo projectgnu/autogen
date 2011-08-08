@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-06-25 11:41:13 bkorb"
+# Time-stamp:      "2011-08-07 10:22:27 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -151,6 +151,8 @@ rm  -f opt-state.h
 # undef  OPTST_ARG_OPTIONAL
 # define OPTST_ARG_OPTIONAL   0
 #endif
+
+#define VENDOR_OPTION_VALUE   'W'
 
 #define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)
 
@@ -301,11 +303,10 @@ struct optSpecIndex {
 typedef void (tOptionXlateProc)(void);
 
 /*
- * Everything marked "PUBLIC" is also marked "const".
- * Public access is not a license to modify.  Other fields
- * are used and modified by the library.  They are also
- * subject to change without any notice.  Do not even
- * look at these outside of libopts.
+ * Everything marked "PUBLIC" is also marked "const".  Public access is not
+ * a license to modify.  Other fields are used and modified by the library.
+ * They are also subject to change without any notice.
+ * Do not even look at these outside of libopts.
  */
 struct options {
     int const           structVersion;

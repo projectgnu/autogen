@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2011-02-02 11:56:47 bkorb"
+# Time-stamp:        "2011-08-07 17:39:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -161,7 +161,7 @@ compile "-?"
 
 basehelp=${testname}-base.help
 echo creating ${basehelp}
-cat > ${basehelp} <<_EOF_
+clean_help > ${basehelp} <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
 USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
   Flg Arg Option-Name    Description

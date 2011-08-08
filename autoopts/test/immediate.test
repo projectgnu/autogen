@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2011-04-22 13:04:25 bkorb"
+# Time-stamp:        "2011-08-07 17:32:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,7 +80,7 @@ compile "help"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-cat > ${testname}.hlp << '_EOF_'
+clean_help > ${testname}.hlp << '_EOF_'
 test_immediate - Test AutoOpts for immediate - Ver. 1.0
 USAGE:  immediate [ <option-name>[{=| }<val>] ]...
    Arg Option-Name    Description

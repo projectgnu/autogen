@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2011-02-01 14:59:33 bkorb"
+# Time-stamp:        "2011-08-07 17:36:29 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -96,7 +96,7 @@ _EOF_
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-cat > ${testname}-1.hlp <<'_EOF_'
+clean_help > ${testname}-1.hlp <<'_EOF_'
 test_nls - Test AutoOpts for nls
 USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 noitpircseD    emaN-noitpO grA glF
@@ -116,7 +116,7 @@ mv ${testname}.def  ${testname}-1.def
 exec 3> ${testname}.def
 cat ${testname}-1.def >&3
 echo 'full-usage = <''<''- _EOF_' >&3
-cat >&3 <<'_EOF_'
+clean_help >&3 <<'_EOF_'
 test_nls - Test AutoOpts for nls
 USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -131,7 +131,7 @@ _EOF_
 echo '_EOF_;' >&3
 exec 3>&-
 
-cat > ${testname}-2.hlp <<'_EOF_'
+clean_help > ${testname}-2.hlp <<'_EOF_'
 .retcarahc galf eht dna nehpyh
 elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 

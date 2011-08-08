@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-06-26 07:33:22 bkorb"
+# Time-stamp:     "2011-08-07 17:27:50 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -86,7 +86,7 @@ cfg_vals()
   test -z "${CC}"         && echo "No CC configured" && exit 1
   test -z "${PAGER}"      && PAGER=more
   nl='
-'
+' ht='	'
 
   set +a
 
@@ -275,10 +275,11 @@ cfg_inc()
   ${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
 }
 
-clean_pkg() {
+clean_help() {
   test "X${sedcmd}" = X && s= || s=${nl}${sedcmd}
   s="/^Packaged by/d${nl}/^Report .* bugs to/d${s}"
-  ${SED} "${s}"
+  s="/[Pp]lease send bug reports/d${nl}${s}"
+  ${SED} "${s}" | egrep -v '^[ 	]*$'
 }
 
 compile()
@@ -296,7 +297,7 @@ compile()
   then
     ./${Cexe} ${*} ${dosed} || \
       failure cannot obtain help output for ${Csrc}
-  fi | clean_pkg > ${Csrc}.help    
+  fi | clean_help > ${Csrc}.help    
   Csrc='' Cexe='' Dnam=''
 }
 

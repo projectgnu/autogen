@@ -3,7 +3,7 @@
 #
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2011-02-02 12:07:13 bkorb"
+# Time-stamp:        "2011-08-07 17:34:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -84,7 +84,7 @@ compile "-?"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}-base.help
-cat > ${testname}-base.help <<_EOF_
+clean_help > ${testname}-base.help <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
 USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
@@ -168,7 +168,7 @@ cmp -s ${testname}-base.out ${testname}.out || \
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}-base2.help
-cat > ${testname}-base2.help <<_EOF_
+clean_help > ${testname}-base2.help <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
 USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description

@@ -2,7 +2,7 @@
 #
 # alias.test     ---  test option aliasing
 #
-# Time-stamp:        "2011-01-28 17:46:27 bkorb"
+# Time-stamp:        "2011-08-07 17:37:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -60,7 +60,7 @@ set -x
 # # # # # # # # # # FIRST TEST # # # # # # # # #
 
 echo creating ${testname}-1.help
-cat > ${testname}-1.help <<'_EOF_'
+clean_help > ${testname}-1.help <<'_EOF_'
 test_alias - Test AutoOpts for alias
 USAGE:  alias [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg [...]
   Flg Arg Option-Name    Description

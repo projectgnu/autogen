@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # library.test     ---  test library options
 #
-# Time-stamp:        "2011-02-02 12:06:25 bkorb"
+# Time-stamp:        "2011-08-07 17:29:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -134,9 +134,9 @@ test $? -eq 0 || failure cannot compile ${testname}-main.c
 
 # # # # # # # # # # HELP OUTPUT # # # # # # # # # #
 
-./${testname} -? | clean_pkg > ${testname}.help-sample
+./${testname} -? | clean_help > ${testname}.help-sample
 
-cat > ${testname}.help-base <<- _EOHelp_
+clean_help > ${testname}.help-base <<- _EOHelp_
 test-lib-prog - Test library Program
 USAGE:  library [ -<flag> ]...
   Flg Arg Option-Name    Description

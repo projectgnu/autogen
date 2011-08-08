@@ -51,7 +51,7 @@ compile "-h"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating $testname.hlp
-cat > $testname.hlp <<'_EOF_'
+clean_help > $testname.hlp <<'_EOF_'
 test_vers - Test AutoOpts for vers
 USAGE:  vers [ -<flag> ]...
   Flg Arg Option-Name    Description
@@ -81,7 +81,7 @@ compile "-h"
   failure "$testname '*SHOULD*' accept version option"
 
 echo recreating $testname.hlp
-cat > $testname.hlp <<_EOF_
+clean_help > $testname.hlp <<_EOF_
 test_vers - Test AutoOpts for vers - Ver. ${ver}
 USAGE:  vers [ -<flag> ]...
   Flg Arg Option-Name    Description

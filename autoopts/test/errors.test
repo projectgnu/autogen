@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-02-02 11:56:14 bkorb"
+# Time-stamp:        "2011-08-07 17:37:02 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -60,7 +60,7 @@ compile "--help"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.res-help
-cat > ${testname}.res-help <<'_EOF_'
+clean_help > ${testname}.res-help <<'_EOF_'
 test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
@@ -82,7 +82,7 @@ The following option preset mechanisms are supported:
  - reading file errorsRC/.test_errorsrc
 _EOF_
 
-cat > ${testname}.ignored-expected <<\_EOF_
+clean_help > ${testname}.ignored-expected <<\_EOF_
 errors: The ``ignored'' option has been disabled -- we have dumped this
 test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
@@ -126,7 +126,7 @@ echo "second bumble" > ${testname}RC/.test_errorsrc
 ./${testname} --ignored > ${testname}.ignored 2>&1 && \
   failure "${testname} accepted --ignored"
 
-clean_pkg < ${testname}.ignored > ${testname}.ignored-result
+clean_help < ${testname}.ignored > ${testname}.ignored-result
 cmp -s ${testname}.ignored-* || \
   failure "${testname}.ignored error:  `diff ${testname}.ignored-*`"
 

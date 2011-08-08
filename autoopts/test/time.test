@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # time.test ---  test time duration argument
 #
-# Time-stamp:        "2011-02-02 12:05:38 bkorb"
+# Time-stamp:        "2011-08-07 17:34:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -59,7 +59,7 @@ compile "-?"
 
 basehlp=${testname}.hlp
 echo creating ${basehlp}
-cat > ${basehlp} <<'_EOF_'
+clean_help > ${basehlp} <<'_EOF_'
 test_time - Test AutoOpts for time
 USAGE:  time [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description

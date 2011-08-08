@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2011-04-08 08:24:14 bkorb"
+# Time-stamp:        "2011-08-07 17:37:22 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -64,7 +64,7 @@ ${AG_L} ${testname}.def || \
 compile "-?"
 mv ${testname} ${testname}-1
 echo creating ${testname}-1.help
-cat > ${testname}-1.help <<'_EOF_'
+clean_help > ${testname}-1.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -87,7 +87,7 @@ cmp -s ${testname}-1.help ${testname}.help || \
 INC="${INC} -DCOND=1"
 compile "-?"
 mv ${testname} ${testname}-2
-cat > ${testname}-2.help <<'_EOF_'
+clean_help > ${testname}-2.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -144,7 +144,7 @@ ${AG_L} ${testname}.def5 || \
 
 compile "-?"
 mv ${testname} ${testname}-5
-cat > ${testname}-5.help <<'_EOF_'
+clean_help > ${testname}-5.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
@@ -167,7 +167,7 @@ cmp -s ${testname}-5.help ${testname}.help || \
 INC=`echo ${INC} | sed 's/ -DCOND=1//'`
 compile "-?"
 mv ${testname} ${testname}-6
-cat > ${testname}-6.help <<'_EOF_'
+clean_help > ${testname}-6.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
 USAGE:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description

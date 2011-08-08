@@ -3,7 +3,7 @@
  *
  * @brief Hunt for options in the option descriptor list
  *
- *  Time-stamp:      "2011-07-22 23:07:59 bkorb"
+ *  Time-stamp:      "2011-08-07 13:15:45 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -267,6 +267,67 @@ opt_ambiguous(tOptions * opts, char const * name, int match_ct)
     return FAILURE;
 }
 
+/*=export_func  optionVendorOption
+ * private:
+ *
+ * what:  Process a vendor option
+ * arg:   + tOptions * + pOpts    + program options descriptor +
+ * arg:   + tOptDesc * + pOptDesc + the descriptor for this arg +
+ *
+ * doc:
+ *  For POSIX specified utilities, the options are constrained to the options,
+ *  @xref{config attributes, Program Configuration}.  AutoOpts clients should
+ *  never specify this directly.  It gets referenced when the option
+ *  definitions contain a "vendor-opt" attribute.
+=*/
+void
+optionVendorOption(tOptions * pOpts, tOptDesc * pOD)
+{
+    tOptState     opt_st   = OPTSTATE_INITIALIZER(PRESET);
+    unsigned long st_flags = opt_st.flags;
+    tSuccess      res;
+    char const *  vopt_str = pOD->optArg.argString;
+
+    if ((pOpts->fOptSet & OPTPROC_VENDOR_OPT) == 0)
+        goto illegal;
+
+    if ((pOD->fOptState & OPTPROC_IMMEDIATE) == 0)
+        st_flags = OPTST_DEFINED;
+    res = opt_find_long(pOpts, vopt_str, &opt_st);
+
+    switch (res) {
+    case FAILURE:
+    case PROBLEM:
+    illegal:
+        fprintf(stderr, zIllVendOptStr, vopt_str);
+        (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
+        /* NOTREACHED */
+
+    case SUCCESS:
+        if (! SUCCESSFUL(get_opt_arg(pOpts, &opt_st)))
+            goto illegal;
+
+        /*
+         *  See if we are in immediate handling state.
+         */
+        if (pOpts->fOptSet & OPTPROC_IMMEDIATE) {
+            /*
+             *  See if the enclosed option is okay with that state.
+             */
+            if (DO_IMMEDIATELY(opt_st.flags))
+                (void)handle_opt(pOpts, &opt_st);
+
+        } else {
+            /*
+             *  non-immediate direction.
+             *  See if the enclosed option is okay with that state.
+             */
+            if (DO_NORMALLY(opt_st.flags) || DO_SECOND_TIME(opt_st.flags))
+                (void)handle_opt(pOpts, &opt_st);
+        }
+    }
+}
+
 /**
  *  Find the option descriptor by full name.
  *
@@ -488,7 +549,7 @@ find_opt(tOptions * pOpts, tOptState * pOptState)
          */
         if ((pOpts->fOptSet & OPTPROC_LONGOPT) == 0) {
             fprintf(stderr, zIllOptStr, pOpts->pzProgPath,
-                    zIllegal, pOpts->pzCurOpt-2);
+                    pOpts->pzCurOpt-2);
             return FAILURE;
         }
 

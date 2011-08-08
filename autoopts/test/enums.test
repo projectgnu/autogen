@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-01-28 17:46:20 bkorb"
+# Time-stamp:        "2011-08-07 17:33:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -207,7 +207,7 @@ cat > ${testname}.tpl <<- \__EOF
 	}
 	__EOF
 
-cat >> ${testname}.tpl <<__EOF
+cat >> ${testname}.tpl <<- __EOF
 	int
 	main( int argc, char** argv )
 	{
@@ -249,7 +249,7 @@ compile "-?"
 
 basehlp=${testname}.hlp
 echo creating ${basehlp}
-cat > ${basehlp} <<_EOF_
+clean_help > ${basehlp} <<_EOF_
 ${testname}-test - test complex main procedure
 USAGE:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
   Flg Arg Option-Name   Req?  Description
@@ -273,12 +273,12 @@ hyphen and the flag character.
 
 The valid "print" option keywords are:
   one two three four five six seven eight nine ten
-  or an integer between 0 and 9
+  or an integer from 1 through 10
 The valid "set" option keywords are:
   first      second     third      fourth     fifth      sixth      seventh
   eighth     ninth      tenth      eleventh   twelfth    thirteenth fourteenth
   fifteenth  sixteenth
-  or an integer between 0 and 15
+  or an integer mask with any of the lower 16 bits set
 or you may use a numeric representation.  Preceding these with a '!' will
 clear the bits, specifying 'none' will clear all bits, and 'all' will set them
 all.  Multiple entries may be passed as an option argument list.

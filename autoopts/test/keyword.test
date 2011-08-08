@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-06-03 11:10:43 bkorb"
+# Time-stamp:        "2011-08-07 17:33:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -74,7 +74,7 @@ compile "-X"
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.res-help
-cat > ${testname}.res-help <<\_EOF_
+clean_help > ${testname}.res-help <<\_EOF_
 test_keyword - Test AutoOpts for keyword
 USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
