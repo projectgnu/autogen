@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-07-19 16:38:35 bkorb"
+ *  Time-stamp:      "2011-08-06 09:37:45 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1087,9 +1087,9 @@ intern_file_load(tOptions* pOpts)
  *       always be returned.
 =*/
 int
-optionFileLoad(tOptions* pOpts, char const* pzProgram)
+optionFileLoad(tOptions * pOpts, char const * pzProgram)
 {
-    if (! SUCCESSFUL(validateOptionsStruct(pOpts, pzProgram)))
+    if (! SUCCESSFUL(validate_struct(pOpts, pzProgram)))
         return -1;
 
     {
@@ -1115,7 +1115,7 @@ optionFileLoad(tOptions* pOpts, char const* pzProgram)
  *  pOptDesc->optArg.argString.
 =*/
 void
-optionLoadOpt(tOptions* pOpts, tOptDesc* pOptDesc)
+optionLoadOpt(tOptions * pOpts, tOptDesc * pOptDesc)
 {
     struct stat sb;
 
@@ -1324,13 +1324,19 @@ skip_unkn(char* pzText)
  *  worry about validity.  (Some entry points are free to assume that
  *  the call is not the first to the library and, thus, that this has
  *  already been called.)
+ *
+ *  Upon successful completion, pzProgName and pzProgPath are set.
+ *
+ *  @param pOpts      program options descriptor
+ *  @param pzProgram  name of program, from argv[]
+ *  @returns SUCCESS or FAILURE
  */
 LOCAL tSuccess
-validateOptionsStruct(tOptions* pOpts, char const* pzProgram)
+validate_struct(tOptions * pOpts, char const * pzProgram)
 {
     if (pOpts == NULL) {
         fputs(zAO_Bad, stderr);
-        exit(EX_CONFIG);
+        return FAILURE;
     }
 
     /*

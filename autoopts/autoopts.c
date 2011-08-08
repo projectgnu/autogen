@@ -2,7 +2,7 @@
 /**
  * \file autoopts.c
  *
- *  Time-stamp:      "2011-07-22 23:07:57 bkorb"
+ *  Time-stamp:      "2011-08-07 14:31:49 bkorb"
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -36,7 +36,7 @@
 
 static char const   zNil[] = "";
 static arg_types_t  argTypes             = { NULL };
-static char         zOptFmtLine[16]      = { NUL };
+static char         zOptFmtLine[32]      = { NUL };
 static ag_bool      displayEnum          = AG_FALSE;
 static char const   pkgdatadir_default[] = PKGDATADIR;
 static char const * program_pkgdatadir   = pkgdatadir_default;
@@ -433,10 +433,17 @@ next_opt(tOptions * pOpts, tOptState * pOptState)
 /**
  *  scan the command line for immediate action options.
  *  This is only called the first time through.
+ *  While this procedure is active, the OPTPROC_IMMEDIATE is true.
+ *
+ *  @param pOpts   program options descriptor
+ *  @returns SUCCESS or FAILURE
  */
 LOCAL tSuccess
 immediate_opts(tOptions * pOpts)
 {
+    tSuccess  res;
+
+    pOpts->fOptSet  |= OPTPROC_IMMEDIATE;
     pOpts->curOptIdx = 1;     /* start by skipping program name */
     pOpts->pzCurOpt  = NULL;
 
@@ -447,9 +454,10 @@ immediate_opts(tOptions * pOpts)
     for (;;) {
         tOptState optState = OPTSTATE_INITIALIZER(PRESET);
 
-        switch (next_opt(pOpts, &optState)) {
+        res = next_opt(pOpts, &optState);
+        switch (res) {
         case FAILURE: goto   failed_option;
-        case PROBLEM: return SUCCESS; /* no more args */
+        case PROBLEM: res = SUCCESS; goto leave;
         case SUCCESS: break;
         }
 
@@ -466,7 +474,10 @@ immediate_opts(tOptions * pOpts)
     if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0)
         (*pOpts->pUsageProc)(pOpts, EXIT_FAILURE);
 
-    return FAILURE;
+leave:
+
+    pOpts->fOptSet &= ~OPTPROC_IMMEDIATE;
+    return res;
 }
 
 /**
@@ -474,10 +485,14 @@ immediate_opts(tOptions * pOpts)
  * interspersed options and arguments for the few non-standard programs that
  * require it.)  Thus, do not rewind option indexes because some programs
  * choose to re-invoke after a non-option.
+ *
+ *  @param pOpts   program options descriptor
+ *  @returns SUCCESS or FAILURE
  */
 LOCAL tSuccess
 regular_opts(tOptions * pOpts)
 {
+    /* assert:  pOpts->fOptSet & OPTPROC_IMMEDIATE == 0 */
     for (;;) {
         tOptState optState = OPTSTATE_INITIALIZER(DEFINED);
 
@@ -617,7 +632,7 @@ doPresets(tOptions * pOpts)
 int
 optionProcess(tOptions * pOpts, int argCt, char ** argVect)
 {
-    if (! SUCCESSFUL(validateOptionsStruct(pOpts, argVect[0])))
+    if (! SUCCESSFUL(validate_struct(pOpts, argVect[0])))
         exit(EX_SOFTWARE);
 
     /*
