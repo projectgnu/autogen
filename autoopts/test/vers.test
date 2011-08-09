@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2010-02-24 08:39:51 bkorb"
+# Time-stamp:        "2011-08-07 18:21:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -68,8 +68,8 @@ cmp -s $testname.h*lp || \
 ./$testname -v 2> /dev/null && \
   failure $testname should not accept version option
 
-ver="`echo '$Revision: 4.8 $'|sed 's/.*: *\([0-9.a-z]*\).*/\1/'`"
-echo "version = '$ver';" >> $testname.def
+ver=4.8
+echo "version = '${ver}';" >> $testname.def
 
 echo ${AG_L} $testname.def
 ${AG_L} $testname.def || \
