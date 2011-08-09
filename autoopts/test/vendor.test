@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-08-07 17:36:03 bkorb"
+# Time-stamp:        "2011-08-08 12:53:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,11 +36,12 @@ sedxml='/#ifndef XML/,/^#endif/ {
   /^#else/,/^#endif/d
   /^#/d
 }'
-sedcode='/flag-code =.*_\(EOCode\|EOF\)_/,/_\(EOCode\|EOF\)_;/d'
+sedcode='/flag-code =.*_EOCode_/,/_EOCode_;/d'
+sedeof='/flag-code =.*_EOF_/,/_EOF_;/d'
 
 ${SED} -e 's/long-opts;/vendor-opt;/' \
     -e '/#include "autogen.h"/d' -e '/call-proc  *=/d' \
-    -e "$sedxml" -e "$sedcode" -e '/flag-code *=/d' \
+    -e "$sedxml" -e "$sedcode" -e "$sedeof" -e '/flag-code *=/d' \
     ${top_srcdir}/agen5/opts.def \
     > ${testname}.def
 cat >> ${testname}.def <<- _EOF_
@@ -122,27 +123,26 @@ The next option supports vendor supported extra options:
 
    -W str     vendor supported additional options
 				These additional options are:
-       str     Definitions input file
+      definitions=str  Definitions input file
 				- disabled as --no-definitions
 				- enabled by default
 				- may not be preset
-               set mod times to latest source
+      source-time      set mod times to latest source
 				- disabled as --no-source-time
-       str     characters considered equivalent
-               Allow output files to be writable
+      equate=str       characters considered equivalent
+      writable         Allow output files to be writable
 				- disabled as --not-writable
 				- may not be preset
-       num     Limit on increment loops
+      loop-limit=num   Limit on increment loops
 				- is scalable with a suffix: k/K/m/M/g/G/t/T
 				- It must lie in one of the ranges:
 				  -1 exactly, or
 				  1 to 16777216
-       str     name or path name of shell to use
-       KWd     tracing level of detail
-       str     tracing output file or filter
-               Show the definitions used
+      shell=str        name or path name of shell to use
+      trace=KWd        tracing level of detail
+      trace-out=str    tracing output file or filter
+      used-defines     Show the definitions used
 				- may not be preset
-
 
 
 AutoGen creates text files from templates using external definitions.

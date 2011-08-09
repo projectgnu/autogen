@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-06-25 09:11:49 bkorb"
+ *  Time-stamp:        "2011-08-08 12:53:28 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -526,7 +526,7 @@ flag = {
                   block-macros, expressions, everything;
 
 #ifndef XML2AG
-	doc = <<-  _EOF_
+    doc = <<-  _EOF_
 	This option will cause AutoGen to display a trace of its template
 	processing.  There are six levels, each level including messages from
 	the previous levels:

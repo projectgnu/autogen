@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2011-08-07 15:41:24 bkorb"
+ * Time-stamp:      "2011-08-08 10:25:32 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -49,6 +49,10 @@ print_usage_details(tOptions * opts, int exit_code);
 
 static void
 prt_conflicts(tOptions * pOptions, tOptDesc * pOD);
+
+static void
+prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
+               arg_types_t * pAT, char const * usefmt);
 
 static void
 prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle);
@@ -219,12 +223,10 @@ optionOnlyUsage(tOptions * pOpts, int ex_code)
     /*
      *  Determine which header and which option formatting strings to use
      */
-    if (do_gnu_usage(pOpts)) {
+    if (do_gnu_usage(pOpts))
         (void)setGnuOptFmts(pOpts, &pOptTitle);
-    }
-    else {
+    else
         (void)setStdOptFmts(pOpts, &pOptTitle);
-    }
 
     prt_opt_usage(pOpts, ex_code, pOptTitle);
 
@@ -428,7 +430,67 @@ prt_conflicts(tOptions * pOptions, tOptDesc * pOD)
 }
 
 /**
- * Print the long options processed with "-W".
+ *  Print the usage information for a single vendor option.
+ *
+ * @param pOpts     the program option descriptor
+ * @param pOD       the option descriptor
+ * @param pAT       names of the option argument types
+ */
+static void
+prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
+               arg_types_t * pAT, char const * usefmt)
+{
+    prt_preamble(pOptions, pOD, pAT);
+
+    {
+        char z[ 80 ];
+        char const *  pzArgType;
+
+        /*
+         *  Determine the argument type string first on its usage, then,
+         *  when the option argument is required, base the type string on the
+         *  argument type.
+         */
+        if (pOD->fOptState & OPTST_ARG_OPTIONAL) {
+            pzArgType = pAT->pzOpt;
+
+        } else switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        case OPARG_TYPE_NONE:        pzArgType = pAT->pzNo;   break;
+        case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
+        case OPARG_TYPE_FILE:        pzArgType = pAT->pzFile; break;
+        case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
+        case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
+        case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
+        case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
+        case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
+        case OPARG_TYPE_TIME:        pzArgType = pAT->pzTime; break;
+        default:                     goto bogus_desc;
+        }
+
+        while (IS_WHITESPACE_CHAR(*pzArgType))  pzArgType++;
+        if (*pzArgType == NUL)
+            snprintf(z, sizeof(z), "%s", pOD->pz_Name);
+        else
+            snprintf(z, sizeof(z), "%s=%s", pOD->pz_Name, pzArgType);
+        fprintf(option_usage_fp, usefmt, z, pOD->pzText);
+
+        switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        case OPARG_TYPE_ENUMERATION:
+        case OPARG_TYPE_MEMBERSHIP:
+            displayEnum = (pOD->pOptProc != NULL) ? AG_TRUE : displayEnum;
+        }
+    }
+
+    return;
+
+bogus_desc:
+    fprintf(stderr, zInvalOptDesc, pOD->pz_Name);
+    exit(EX_SOFTWARE);
+}
+
+/**
+ * Print the long options processed with "-W".  These options will be the
+ * ones that do *not* have flag characters.
  *
  * @param pOptions the program option descriptor
  * @param pOD      the option descriptor
@@ -440,26 +502,42 @@ prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle)
     static unsigned int const not_vended_mask =
         OPTST_NO_USAGE_MASK | OPTST_DOCUMENT;
 
+    static char const vfmtfmt[] = "%%-%us %%s\n";
+    char vfmt[sizeof(vfmtfmt)];
+
     /*
      *  Only handle client specified options.  The "vendor option" follows
      *  "presetOptCt", so we won't loop/recurse indefinitely.
      */
     int          ct     = pOpts->presetOptCt;
     tOptDesc *   pOD    = pOpts->pOptDesc;
+    size_t       nmlen  = 0;
 
     fprintf(option_usage_fp, zTabout, zVendOptsAre);
+
+    do  {
+        size_t l;
+        if (  ((pOD->fOptState & not_vended_mask) != 0)
+           || IS_GRAPHIC_CHAR(pOD->optValue))
+            continue;
+
+        l = strlen(pOD->pz_Name);
+        if (l > nmlen)  nmlen = l;
+    } while (pOD++, (--ct > 0));
+
+    sprintf(vfmt, vfmtfmt, (unsigned int)nmlen + 4);
+    ct     = pOpts->presetOptCt;
+    pOD    = pOpts->pOptDesc;
 
     do  {
         if (  ((pOD->fOptState & not_vended_mask) != 0)
            || IS_GRAPHIC_CHAR(pOD->optValue))
             continue;
 
-        prt_one_usage(pOpts, pOD, &argTypes);
+        prt_one_vendor(pOpts, pOD, &argTypes, vfmt);
         prt_extd_usage(pOpts, pOD, &argTypes, pOptTitle);
 
     } while (pOD++, (--ct > 0));
-
-    fputc('\n', option_usage_fp);
 }
 
 /**
@@ -724,7 +802,6 @@ bogus_desc:
     fprintf(stderr, zInvalOptDesc, pOD->pz_Name);
     exit(EX_SOFTWARE);
 }
-
 
 /*
  *  Print out the usage information for just the options.

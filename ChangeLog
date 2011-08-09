@@ -13,6 +13,10 @@
 	* autoopts/usage.c: rework to handle new vendor option
 	* autoopts/usage-txt.def: new strings
 	* autoopts/tpl/*: rework option templates for vendor option
+	* autoopts/usage.c (prt_one_vendor) rewrite of prt_one_usage for
+	vendor option.
+	(prt_vendor_opts): call prt_one_vendor instead of prt_one_usage.
+	Compute a format based on option name lengths.
 
 2011-08-06  Bruce Korb  <bkorb@gnu.org>
 
