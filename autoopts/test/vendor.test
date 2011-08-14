@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-08-08 12:53:10 bkorb"
+# Time-stamp:        "2011-08-13 16:31:50 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -40,8 +40,14 @@ sedcode='/flag-code =.*_EOCode_/,/_EOCode_;/d'
 sedeof='/flag-code =.*_EOF_/,/_EOF_;/d'
 
 ${SED} -e 's/long-opts;/vendor-opt;/' \
-    -e '/#include "autogen.h"/d' -e '/call-proc  *=/d' \
-    -e "$sedxml" -e "$sedcode" -e "$sedeof" -e '/flag-code *=/d' \
+    -e '/#include "autogen.h"/d' \
+    -e "/^prog-name/s/=.*/= ${testname};/" \
+    -e "s/AutoGen/${testname}/g" \
+    -e '/call-proc  *=/d' \
+    -e "$sedxml" \
+    -e "$sedcode" \
+    -e "$sedeof" \
+    -e '/flag-code *=/d' \
     ${top_srcdir}/agen5/opts.def \
     > ${testname}.def
 cat >> ${testname}.def <<- _EOF_
@@ -58,12 +64,12 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-compile "-h"
+HOME=${TMPDIR} compile "-h"
 ${SED} 1d ${testname}.help > ${testname}.$$
 mv -f ${testname}.$$ ${testname}.help
 
-clean_help > ${testname}.hlp <<\_EOF_
-USAGE:  vendor [ -<flag> [<val>] ]... [ <def-file> ]
+clean_help > ${testname}.hlp <<_EOF_
+USAGE:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
 
    -L str     Template search directory list
 				- may appear multiple times
@@ -145,19 +151,20 @@ The next option supports vendor supported extra options:
 				- may not be preset
 
 
-AutoGen creates text files from templates using external definitions.
+${testname} creates text files from templates using external definitions.
 
 The following option preset mechanisms are supported:
- - reading file $HOME/.autogenrc
- - reading file ./.autogenrc
- - examining environment variables named AUTOGEN_*
+ - reading file \$HOME/.${testname}rc
+ - reading file ./.${testname}rc
+ - examining environment variables named `
+    echo ${testname} | tr 'a-z' 'A-Z'`_*
 
 The valid "trace" option keywords are:
   nothing       debug-message server-shell  templates     block-macros
   expressions   everything
   or an integer from 0 through 6
 
-AutoGen is a tool designed for generating program files that contain
+${testname} is a tool designed for generating program files that contain
 repetitive text with varied substitutions.
 _EOF_
 

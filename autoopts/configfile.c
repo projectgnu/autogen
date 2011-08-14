@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-08-06 09:37:45 bkorb"
+ *  Time-stamp:      "2011-08-13 16:17:51 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -288,7 +288,9 @@ optionFindNextValue(const tOptDesc * pOptDesc, const tOptionValue * pPrevVal,
  *  This routine will find an entry in a nested value option or configurable.
  *  If "valueName" is NULL, then the first entry is returned.  Otherwise,
  *  the first entry with a name that exactly matches the argument will be
- *  returned.
+ *  returned.  If there is no matching value, NULL is returned and errno is
+ *  set to ENOENT. If the provided option value is not a hierarchical value,
+ *  NULL is also returned and errno is set to EINVAL.
  *
  * err:
  *  The returned result is NULL and errno is set:
@@ -301,27 +303,26 @@ optionFindNextValue(const tOptDesc * pOptDesc, const tOptionValue * pPrevVal,
  *  @end itemize
 =*/
 const tOptionValue*
-optionGetValue(const tOptionValue* pOld, char const* pzValName)
+optionGetValue(tOptionValue const * pOld, char const * pzValName)
 {
-    tArgList*     pAL;
-    tOptionValue* pRes = NULL;
+    tArgList *     pAL;
+    tOptionValue * pRes = NULL;
 
     if ((pOld == NULL) || (pOld->valType != OPARG_TYPE_HIERARCHY)) {
         errno = EINVAL;
-        return NULL;
+        return pRes;
     }
     pAL = pOld->v.nestVal;
 
     if (pAL->useCt > 0) {
-        int    ct    = pAL->useCt;
-        void** papOV = (void**)(pAL->apzArgs);
+        int     ct    = pAL->useCt;
+        void ** papOV = (void**)(pAL->apzArgs);
 
         if (pzValName == NULL) {
             pRes = (tOptionValue*)*papOV;
-        }
 
-        else do {
-            tOptionValue* pOV = *(papOV++);
+        } else do {
+            tOptionValue * pOV = *(papOV++);
             if (strcmp(pOV->pzName, pzValName) == 0) {
                 pRes = pOV;
                 break;

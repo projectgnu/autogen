@@ -1,3 +1,9 @@
+2011-08-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/string.test (LINENO): fallback for shells that don't
+	support $LINENO
+	* autoopts/test/vendor.test ($SED): cope with BSD brokenness
+
 2011-08-07  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.c (immediate_opts): mark option processing state
