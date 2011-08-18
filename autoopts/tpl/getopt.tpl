@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-06-09 11:34:53 bkorb"
+  Time-stamp:        "2011-08-15 12:05:55 bkorb"
 _EOF_
 \` `            +][+
 
@@ -30,6 +30,8 @@ _EOF_
 
   (if (not (exist? "settable"))
       (error "'settable' must be specified globally for getopt_long\n"))
+  (if (not (exist? "no-libopts"))
+      (error "'no-libopts' must be specified globally to use getopt\n"))
   (define prog-name (string->c-name! (get "prog-name")))
   (define PROG-NAME (string-upcase prog-name))
   (out-move (string-append "getopt-" prog-name "." (suffix)))

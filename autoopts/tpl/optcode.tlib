@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-08-07 14:47:23 bkorb"
+# Time-stamp:      "2011-08-15 12:37:55 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -100,19 +100,6 @@ INCLUDE "optmain.tlib"
 
 =][=
 
-IF (exist? "flag.arg-range")
-
-\=]
-#include <errno.h>[=
-
-ENDIF                     =][=
-
-IF (and (exist? "resettable") (exist? "flag.open-file")) =]
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>[=
-ENDIF                     =][=
-
 IF (or (= "shell-process"  (get "main.main-type"))
        (= "shell-parser"   (get "main.main-type"))
        (exist? "main.code")) =]
@@ -120,8 +107,18 @@ IF (or (= "shell-process"  (get "main.main-type"))
 ENDIF
 =]
 #define OPTION_CODE_COMPILE 1
-#include "[= (define lib-externs "") header-file =]"
+#include "[= (define lib-externs "") header-file =]"[=
 
+ (if (exist? "flag.arg-range")
+     (emit "\n#include <errno.h>"))
+
+ (if (and (exist? "resettable") (exist? "flag.open-file"))
+     (emit "
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>" ))
+
+=]
 #ifdef  __cplusplus
 extern "C" {
 #endif

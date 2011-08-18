@@ -3,6 +3,11 @@
 	* agen5/test/string.test (LINENO): fallback for shells that don't
 	support $LINENO
 	* autoopts/test/vendor.test ($SED): cope with BSD brokenness
+	* autoopts/tpl/getopt.tpl (no-libopts): ensure that this attribute
+	is set when this template is used.
+	* autoopts/tpl/optcode.tlib (#include): do all of these *after*
+	the include of the generated header file.  It might include some
+	important preprocessing stuff (_GNU_SOURCE, for example).
 
 2011-08-07  Bruce Korb  <bkorb@gnu.org>
 
