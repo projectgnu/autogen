@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2011-07-18 09:29:27 bkorb"
+ *  Time-stamp:        "2011-09-20 16:10:34 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -72,6 +72,9 @@ setup_signals(sighandler_proc_t * chldHandler,
 
 /**
  * main routine under Guile guidance
+ * @param  closure Guile closure parameter.  Not used.
+ * @param  argc    argument count
+ * @param  argv    argument vector
  */
 static void
 inner_main(void * closure, int argc, char ** argv)
@@ -107,6 +110,9 @@ inner_main(void * closure, int argc, char ** argv)
 
 /**
  * main() called from _start()
+ * @param  argc    argument count
+ * @param  argv    argument vector
+ * @return nothing -- Guile never returns, but calls exit(2).
  */
 int
 main(int argc, char ** argv)

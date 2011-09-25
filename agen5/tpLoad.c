@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2011-06-03 12:14:53 bkorb"
+ * Time-stamp:        "2011-08-22 15:25:20 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -142,7 +142,7 @@ findFile(char const * pzFName,
 
         /*
          *  Search each directory in our directory search list
-         *  for the file.  We always force one copy of this option.
+         *  for the file.  We always force two copies of this option.
          */
         int  ct = STACKCT_OPT(TEMPL_DIRS);
         char const ** ppzDir = STACKLST_OPT(TEMPL_DIRS) + ct - 1;

@@ -1,7 +1,7 @@
 /**
  * @file expGperf.c
  *
- *  Time-stamp:        "2011-06-03 12:20:16 bkorb"
+ *  Time-stamp:        "2011-08-30 11:46:21 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
@@ -84,14 +84,14 @@ ag_scm_make_gperf(SCM name, SCM hlist)
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        char * pzCmd = aprf(zMakeGperf, zMakeProg, pzName, pzList);
+        char * cmd = aprf(mk_gperf_script, zMakeProg, pzName, pzList);
 
         /*
          *  Run the command and ignore the results.
          *  In theory, the program should be ready.
          */
-        pzList = runShell(pzCmd);
-        AGFREE(pzCmd);
+        pzList = runShell(cmd);
+        AGFREE(cmd);
 
         if (pzList != NULL)
             free((void *)pzList);
@@ -126,24 +126,24 @@ ag_scm_make_gperf(SCM name, SCM hlist)
 SCM
 ag_scm_gperf(SCM name, SCM str)
 {
-    char const * pzCmd;
-    char const * pzStr  = ag_scm2zchars(str,  "key-to-hash");
-    char const * pzName = ag_scm2zchars(name, "gperf name");
+    char const * cmd;
+    char const * key2hash = ag_scm2zchars(str,  "key-to-hash");
+    char const * gp_name  = ag_scm2zchars(name, "gperf name");
 
     /*
      *  Format the gperf command and check the result.  If it fits in
      *  scribble space, use that.
      *  (If it does fit, then the test string fits already).
      */
-    pzCmd = aprf(zRunGperf, pzName, pzStr);
-    pzStr = runShell(pzCmd);
-    if (*pzStr == NUL)
+    cmd = aprf(zRunGperf, gp_name, key2hash);
+    key2hash = runShell(cmd);
+    if (*key2hash == NUL)
         str = SCM_UNDEFINED;
     else
-        str = AG_SCM_STR02SCM(pzStr);
+        str = AG_SCM_STR02SCM(key2hash);
 
-    AGFREE((void *)pzCmd);
-    AGFREE((void *)pzStr);
+    AGFREE((void *)cmd);
+    AGFREE((void *)key2hash);
     return str;
 }
 #endif

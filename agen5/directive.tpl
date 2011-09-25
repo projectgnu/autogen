@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2011-03-02 11:40:21 bkorb"
+# Time-stamp:        "2011-08-30 11:50:23 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -243,7 +243,7 @@ gperf --language=ANSI-C -H %2$s_hash -N %2$s_find \
       -C -E -I -t %2$s.gperf > %2$s-temp.c || \
    die "gperf failed on ${gpdir}/%2$s.gperf
       `cat %2$s.log`"
-egrep -v '^_*inline$' %2$s-temp.c > %2$s.c
+egrep -v '^[^#].*_inline' %2$s-temp.c > %2$s.c
 export CFLAGS=-g
 %1$s %2$s 1>&2
 test $? -eq 0 -a -x ${gperf_%2$s} || \
@@ -252,8 +252,8 @@ test $? -eq 0 -a -x ${gperf_%2$s} || \
 exec 2>&8
 [=
   (set! tmp-txt (out-pop #t))
-  (emit (sprintf "static char const zMakeGperf[%d] =\n"
-                 (+ 1 (string-length tmp-txt)) ))
+  (ag-fprintf 0 "static char const mk_gperf_script[%d] =\n"
+                 (+ 1 (string-length tmp-txt)))
   (kr-string tmp-txt)
 =]; /* ' // " // */
 

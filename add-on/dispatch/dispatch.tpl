@@ -193,8 +193,7 @@ DEFINE Preamble                 =][=
  *  A dispatch routine is generated that will call handler routines[=
   ENDIF =]
  */
-[= (if (exist? "ident")
-       (string-append (get "ident") "\n")) =][=
+[= (stack-join "\n" "ident")        =][=
 
 ENDDEF Preamble
 

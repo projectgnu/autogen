@@ -8,6 +8,9 @@
 	* autoopts/tpl/optcode.tlib (#include): do all of these *after*
 	the include of the generated header file.  It might include some
 	important preprocessing stuff (_GNU_SOURCE, for example).
+	* autoopts/tpl/usage.tlib (config-header): make sure this file can
+	be found by the emit-the-usage-text program.
+	* autoopts/test/shell.test (sedcmd): another variation to remove
 
 2011-08-07  Bruce Korb  <bkorb@gnu.org>
 

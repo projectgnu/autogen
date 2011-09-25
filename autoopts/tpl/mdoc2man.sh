@@ -1,8 +1,8 @@
 #! /bin/sh
 
-## mdoc2mdoc.sh -- script to convert mdoc-isms to mdoc-isms
+## mdoc2man.sh -- script to convert mdoc-isms to man-isms
 ##
-## Time-stamp:      "2011-05-30 14:17:42 bkorb"
+## Time-stamp:      "2011-09-25 10:31:27 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -54,6 +54,9 @@ die() {
     exit 1
 }
 
+had_no_arg() {
+    die "'$1' command had no argument: <$line>"
+}
 
 # One function for each mdoc structure.
 #
@@ -196,16 +199,23 @@ do_optional() {
     local text='['
     while test $# -gt 0
     do
+	m1="$1"
         case "X$1" in
-        XFl )
-            text="${text} \\fB-$2\\fR"
-            shift 2 || die "Fl command had no argument"
+	'X...' | 'X\*' )
+            text=${text}' "\fI'${1}'\fR"'
+            shift
             ;;
-        XAr )
-            text="${text} \"\\fI$2\\fR\""
-            shift 2 || die "Fl command had no argument"
+        XAr | XCm )
+            text=${text}' "\fI'${2}'\fR"'
+            shift 2 || had_no_arg "$m1"
+            ;;
+        XFl )
+            text=${text}' \fB-'${2}'\fR'
+            shift 2 || had_no_arg "$m1"
             ;;
         * ) text="${text} \"$2\""
+	    m1="$1"
+            shift 2 || had_no_arg "$m1"
             ;;
         esac
     done
@@ -225,7 +235,7 @@ do_nest_arg() {
 }
 
 do_arg() {
-    line=`echo ${line} | sed 's/^.Ar *//'`
+    line=`echo ${line#.Ar}`
     echo "\\fI${line}\\fR"
 }
 

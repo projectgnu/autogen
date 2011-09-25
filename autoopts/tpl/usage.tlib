@@ -31,7 +31,7 @@ AutoGen Definitions options.tpl;
 no-libopts;
 [=
 
-FOR var IN  prog-name prog-title argument      config-header
+FOR var IN  prog-name prog-title argument
             environrc export     homerc        include
             long-opts rcfile     version       detail
             explain   package    preserve-case prog-desc
@@ -46,6 +46,10 @@ FOR var IN  prog-name prog-title argument      config-header
   ENDIF have "var"          =][=
 
 ENDFOR var IN ....          =][=
+
+IF (exist? "config-header") =]
+config-header = '[= prog-name =]-config.h';[=
+ENDIF                       =][=
 
 FOR copyright               =]
 copyright = {[=
@@ -107,7 +111,9 @@ ENDFOR flag
 (out-push-new)
 
 \=]
-ldflags=`find ${top_builddir}/autoopts -name libopts.a | head -1`
+test -z "${top_builddir}" && ldflags='' || \
+ldflags=`exec 2>/dev/null
+    find ${top_builddir}/autoopts -name libopts.a | head -1`
 test -f "${ldflags}" || {
     ldflags='[=(. lib-dir)=]/libopts.a'
     test -f "${ldflags}" || die "Cannot locate libopts.a"
@@ -121,7 +127,31 @@ test -d "${top_builddir}" && \
 
 flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
      =]_OPTS=1 ${inc} ${cfg} ${CFLAGS}"
+[= IF (exist? "config-header") \=]
+while :
+do
+    h='[= config-header =]'
+    test -f "$h" && break
+    hdr=$h
+    h=`basename "${hdr}"`
+    test -f "$h" && break
+    g=$h
+    d=`pwd`
 
+    while :
+    do
+        d=`dirname $d`
+        test "X$d" = X/ && die "cannot locate [= config-header =]"
+        h="$d/$g"
+        test -f "$h" && break
+        h="$d/$hdr"
+        test -f "$h" && break
+    done
+    break
+done
+cp "${h}" ${tmp_dir}/[= prog-name =]-config.h
+inc='-I. '${inc}
+[= ENDIF \=]
 cd ${tmp_dir}
 ${AGexe-autogen} [= prog-name=].def || die "Cannot gen [= prog-name =]"
 ${CC:-cc} ${flags} -g -o [= prog-name =] [= prog-name =].c ${ldflags} || \

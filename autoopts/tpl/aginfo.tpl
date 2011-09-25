@@ -4,7 +4,7 @@ texi
 
 ##  Documentation template
 ##
-## Time-stamp:        "2011-05-30 14:25:11 bkorb"
+## Time-stamp:        "2011-08-19 20:59:45 bkorb"
 ## Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,12 +36,12 @@ texi
  (if (not (string? doc-level))
      (set! doc-level "section"))
 
- doc-level =] Invoking [= prog_name =]
-@pindex [= prog-name  =]
-@cindex [= prog-title =][=
+ doc-level =] Invoking [= prog_name  =]
+@pindex [= prog-name                 =]
+@cindex [= prog-title                =][=
 
-FOR concept =]
-@cindex [= concept =][=
+FOR concept                          =]
+@cindex [= concept                   =][=
 ENDFOR
 
 =]
@@ -49,23 +49,21 @@ ENDFOR
 [=
  (out-push-new (string-substitute (out-name) ".texi" ".menu"))
 
- (sprintf "* %-32s Invoking %s\n"
+ (ag-fprintf 0 "* %-32s Invoking %s\n"
   (string-append (get "prog-name") " Invocation::")
   (get "prog-name") )
 
-=][=
-
   (out-pop)
-  (dne "# " "# ")=]
+  (dne "# " "# ")                    =]
 @end ignore
 [= ?% explain %s "This program has no explanation.\n" =]
 [=
-IF (exist? "prog-info-descrip")  =][=
-  FOR prog-info-descrip  "\n\n"  =][=
-    prog-info-descrip            =][=
-  ENDFOR                         =][=
-ELIF (exist? "detail")           =][=
-  detail                         =][=
+IF (exist? "prog-info-descrip")      =][=
+  FOR prog-info-descrip  "\n\n"      =][=
+    prog-info-descrip                =][=
+  ENDFOR                             =][=
+ELIF (exist? "detail")               =][=
+  detail                             =][=
 ENDIF
 =]
 
@@ -74,7 +72,7 @@ the aginfo template and the option descriptions for the @command{[=
 prog-name =]} program.  It documents the @command{[=
 prog-name =]} usage text and option meanings.[=
 
-IF (exist? "copyright") =]
+IF (exist? "copyright")              =]
 
 This software is released under [=
   CASE copyright.type =][=
@@ -82,16 +80,16 @@ This software is released under [=
    = lgpl =]the GNU General Public License with Library Extensions[=
    =  bsd =]the Free BSD License[=
    *      =]a specialized copyright license[=
-  ESAC =].[=
-ENDIF =]
+  ESAC    =].[=
+ENDIF     =]
 
 @menu
 * [=(sprintf "%s %-24s %s" down-prog-name "usage::" (get "prog-name"))
   =] usage help[=
      (if (exist? "flag.value") " (-?)") =]
-[=(out-push-new)=][=
+[= (out-push-new)                    =][=
 
-FOR flag        =][=
+FOR flag                             =][=
 
   IF (not (exist? "documentation"))
 
@@ -113,13 +111,13 @@ ENDFOR flag     =][=
 @end menu
 
 @node [=(. down-prog-name)=] usage
-@[=CASE (. doc-level)=][=
+@[=CASE (. doc-level)                =][=
    = chapter    =][=
    = section    =]sub[=
    = subsection =]subsub[=
    ESAC =]section [=prog-name=] usage help[=
      (if (exist? "flag.value") " (-?)") =]
-@cindex [=(. down-prog-name)=] usage
+@cindex [=(. down-prog-name)=]-usage
 
 This is the automatically generated usage text for [=prog-name=]:
 
@@ -151,8 +149,7 @@ This is the automatically generated usage text for [=prog-name=]:
             -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' \
             -e 's/\t/        /g' "
 
-    (get "prog-name") help-opt
-)  =]
+    (get "prog-name") help-opt)      =]
 @end example
 @exampleindent 4[=
 
@@ -167,39 +164,38 @@ This is the automatically generated usage text for [=prog-name=]:
 
 (if (exist? "preserve-case") (begin
   (define optname-from "_^")
-  (define optname-to   "--") )) =][=
+  (define optname-to   "--") ))      =][=
 
-FOR flag                        =][=
+FOR flag                             =][=
 
-  IF (not (exist? "documentation")) =][=
+  IF (not (exist? "documentation"))  =][=
 
     (set! opt-name (string-tr! (get "name") optname-from optname-to))
     (out-push-new (shellf "echo ${tmp_dir}/opt-text-%s" opt-name)) =][=
-    INVOKE emit-opt-text        =][=
-    (out-pop)                   =][=
+    INVOKE emit-opt-text             =][=
+    (out-pop)                        =][=
 
-  ENDIF documentation exists    =][=
+  ENDIF documentation exists         =][=
 
-ENDFOR flag                     =][=
+ENDFOR flag                          =][=
 
-`cat ${tmp_dir}/opt-text-*`      =][=
+`cat ${tmp_dir}/opt-text-*`          =][=
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE emit-opt-text            =]
+DEFINE emit-opt-text                 =]
 
 @node [= (string-append down-prog-name " " opt-name) =]
-@[=CASE (. doc-level) =][=
+@[=CASE (. doc-level)                =][=
    = chapter    =][=
    = section    =]sub[=
    = subsection =]subsub[=
-   ESAC =]section [=(. opt-name)=] option[=
-          % value " (-%s)" =]
-@cindex [=(. down-prog-name)=]-[=(. opt-name)=]
+   ESAC =]section [=(. opt-name)=] option[= % value " (-%s)" =]
+@cindex [=(string-append down-prog-name "-" opt-name)        =]
 
 This is the ``[=(string-downcase! (get "descrip"))=]'' option.[=
     (set! extra-ct 0)
-    (out-push-new)  =][=
+    (out-push-new)                   =][=
 
     IF (exist? "min") =]@item
 is required to appear on the command line.

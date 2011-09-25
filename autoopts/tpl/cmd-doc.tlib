@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-06-13 08:30:13 bkorb"
+## Time-stamp:      "2011-08-30 14:17:31 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -72,7 +72,7 @@
 ) )
 
 (define name-to-fname (lambda (nm)
-    (string-tr (string-downcase sec-type) " " "-") ))
+    (string-tr (string-downcase nm) " " "-") ))
 
 (define sect-line-fname (lambda () (begin
     (out-push-new file-name)
@@ -157,9 +157,9 @@ FOR doc-section                       :+][+:
                (get "ds-format" "man"))))
     sec-type :+][+:
     == ""    :+][+: (error "unnamed doc-section") :+][+:
-    *==* " " :+].Sh "[+: (. sec-type) :+]"[+:
-    *        :+].Sh [+: (. sec-type)  :+][+:
-    ESAC                              :+]
+    *==* " " :+].Sh "[+: (. sec-type)            :+]"[+:
+    *        :+].Sh [+: (. sec-type)              :+][+:
+    ESAC     :+]
 [+:
     (shell (string-append
       "fn='" cvt-fn "'\n"
@@ -196,30 +196,30 @@ ENDDEF doc-sections
 
 DEFINE ao-sections              :+][+:
 
-INVOKE cond-section  sec = "OPTIONS"       mode = "replace" :+][+:
-INVOKE cond-section  sec = "SYNOPSIS"      mode = "alt"     :+][+:
-INVOKE cond-section  sec = "DESCRIPTION"   mode = "append"  :+][+:
-INVOKE cond-section  sec = "EXIT STATUS"   mode = "insert"  :+][+:
-INVOKE cond-section  sec = "AUTHORS"       mode = "alt"     :+][+:
-INVOKE cond-section  sec = "BUGS"          mode = "append"  :+][+:
-INVOKE cond-section  sec = "NOTES"         mode = "append"  :+][+:
+INVOKE cond-section  sec = "OPTIONS"           mode = "replace"       :+][+:
+INVOKE cond-section  sec = "SYNOPSIS"          mode = "alt"           :+][+:
+INVOKE cond-section  sec = "DESCRIPTION"       mode = "append"        :+][+:
+INVOKE cond-section  sec = "EXIT STATUS"       mode = "insert"        :+][+:
+INVOKE cond-section  sec = "AUTHORS"           mode = "alt"           :+][+:
+INVOKE cond-section  sec = "BUGS"              mode = "append"        :+][+:
+INVOKE cond-section  sec = "NOTES"             mode = "append"        :+][+:
 
-IF (exist? "copyright")                 :+][+:
-  INVOKE cond-section   sec = "COPYRIGHT"      mode = "alt"     :+][+:
-ENDIF                                   :+][+:
+IF (exist? "copyright")                                               :+][+:
+  INVOKE cond-section   sec = "COPYRIGHT"      mode = "alt"           :+][+:
+ENDIF                                                                 :+][+:
 
-IF (or home-rc-files environ-init)      :+][+:
-  INVOKE cond-section   sec = "OPTION PRESETS" mode = "replace" :+][+:
+IF (or home-rc-files environ-init)                                    :+][+:
+  INVOKE cond-section   sec = "OPTION PRESETS" mode = "replace"       :+][+:
 
-  IF (. home-rc-files)                  :+][+:
-    INVOKE cond-section sec = "FILES"          mode = "append"  :+][+:
-  ENDIF                                 :+][+:
+  IF (. home-rc-files)                                                :+][+:
+    INVOKE cond-section sec = "FILES"          mode = "append"        :+][+:
+  ENDIF                                                               :+][+:
 
-  IF (. environ-init)                   :+][+:
-    INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"  :+][+:
-  ENDIF                                 :+][+:
+  IF (. environ-init)                                                 :+][+:
+    INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"        :+][+:
+  ENDIF                                                               :+][+:
 
-ENDIF                                   :+][+:
+ENDIF                                                                 :+][+:
 
 ENDDEF ao-sections
 
@@ -282,22 +282,22 @@ ENDDEF cond-section
 .\"  M K - D E S C R I P T I O N
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
-DEFINE mk-description                 :+][+:
+DEFINE mk-description                   :+][+:
 
   (if (exist? "prog-man-descrip")
       (stack-join "\n.Pp\n" "prog-man-descrip")
       (if (exist? "detail")
           (stack-join "\n.Pp\n" "detail")
           "There is no description for this command."
-  )   )                               :+]
+  )   )                                 :+]
 [+:
-  INVOKE append-description           :+][+:
+  INVOKE append-description             :+][+:
 
 ENDDEF mk-description
 
-.\" = = = = = APPEND TO IT:           :+][+:
+.\" = = = = = APPEND TO IT:             :+][+:
 
-DEFINE append-description             :+][+:
+DEFINE append-description               :+][+:
 
 IF (= (get "main.main-type") "for-each"):+][+:
 

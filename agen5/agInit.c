@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2011-06-03 12:13:40 bkorb"
+ *  Time-stamp:      "2011-08-22 07:59:15 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -63,10 +63,9 @@ initialize(int arg_ct, char** arg_vec)
     pzLastScheme = zSchemeInit;
     ag_scm_c_eval_string_from_file_line(
         zSchemeInit, SCHEME_INIT_FILE, schemeLine);
-#ifndef scm_t_port
+
     SCM_EVAL_CONST("(add-hook! before-error-hook error-source-line)\n"
                    "(use-modules (ice-9 stack-catch))");
-#endif
 
     pzLastScheme = NULL;
     procState = PROC_STATE_OPTIONS;
