@@ -709,7 +709,7 @@ ag_scm_shell(SCM cmd)
     if (! AG_SCM_STRING_P(cmd))
         return SCM_UNDEFINED;
     {
-        char* pz = runShell(ag_scm2zchars(cmd, "command"));
+        char* pz = shell_cmd(ag_scm2zchars(cmd, "command"));
         cmd   = AG_SCM_STR02SCM(pz);
         AGFREE((void*)pz);
         return cmd;
@@ -742,7 +742,7 @@ ag_scm_shellf(SCM fmt, SCM alist)
     pz  = ag_scm2zchars(fmt, "format");
     fmt = run_printf(pz, len, alist);
 
-    pz  = runShell(ag_scm2zchars(fmt, "shell script"));
+    pz  = shell_cmd(ag_scm2zchars(fmt, "shell script"));
     fmt = AG_SCM_STR02SCM(pz);
     AGFREE((void*)pz);
     return fmt;

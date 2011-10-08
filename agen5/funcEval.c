@@ -272,7 +272,7 @@ evalExpression(ag_bool* pMustFree)
 
     case EMIT_SHELL:
     {
-        char* pz = runShell(pzText);
+        char* pz = shell_cmd(pzText);
 
         if (*pMustFree)
             AGFREE((void*)pzText);
@@ -427,7 +427,7 @@ eval(char const* pzExpr)
     case '`':
         AGDUPSTR(pzTemp, pzExpr, "shell script");
         (void)spanQuote(pzTemp);
-        pzExpr = runShell(pzTemp);
+        pzExpr = shell_cmd(pzTemp);
         AGFREE((void*)pzTemp);
         res = AG_SCM_STR02SCM((char*)pzExpr);
         AGFREE((void*)pzExpr);

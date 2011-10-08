@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2011-08-30 11:50:23 bkorb"
+# Time-stamp:        "2011-10-08 10:02:13 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -165,7 +165,7 @@ test -n "${CDPATH}" && {
   CDPATH=''
   unset CDPATH
 }
-( unalias cd ) 1>&2 && unalias cd
+( exec 1>&2 ; unalias cd ) && unalias cd
 die() {
   echo "Killing AutoGen ${AG_pid}:  $*" >&8
   kill -15 ${AG_pid}

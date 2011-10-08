@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-05-26 10:57:44 bkorb"
+ *  Time-stamp:        "2011-10-08 10:46:21 bkorb"
  *
  *  Manage a server shell process
  *
@@ -24,7 +24,7 @@
 #ifndef SHELL_ENABLED
 HIDE_FN(void closeServer(void) {;})
 
-HIDE_FN(char * runShell(char const* pzCmd)) {
+HIDE_FN(char * shell_cmd(char const* pzCmd)) {
      char* pz;
      AGDUPSTR(pz, pzCmd, "dummy shell command");
      return pz;
@@ -484,9 +484,9 @@ load_data(void)
  *  we will shoot it and restart one later.
  */
 LOCAL char*
-runShell(char const*  pzCmd)
+shell_cmd(char const * pzCmd)
 {
-    static char const zCmdFail[] =
+    static char const cmd_fail_fmt[] =
         "CLOSING SHELL SERVER - command failure:\n\t%s\n";
 
     /*
@@ -494,8 +494,8 @@ runShell(char const*  pzCmd)
      *  THEN try to start it.
      */
     if (serv_id == NULLPROCESS) {
-        static char pz4_z[] = "PS4=>${FUNCNAME:-ag}> ";
-        putenv(pz4_z);
+        static char const ps4_z[] = "PS4=>${FUNCNAME:-ag}> ";
+        putenv((char *)ps4_z);
         serv_id = server_fp_open(&serv_pair, serverArgs);
         if (serv_id > 0)
             server_setup();
@@ -529,7 +529,7 @@ runShell(char const*  pzCmd)
         fflush(serv_pair.pfWrite);
 
     if (was_close_err) {
-        fprintf(pfTrace, zCmdFail, pzCmd);
+        fprintf(pfTrace, cmd_fail_fmt, pzCmd);
         return NULL;
     }
 
@@ -540,14 +540,14 @@ runShell(char const*  pzCmd)
     {
         char* pz = load_data();
         if (pz == NULL) {
-            fprintf(pfTrace, zCmdFail, pzCmd);
+            fprintf(pfTrace, cmd_fail_fmt, pzCmd);
             close_server_shell();
             pz = (char*)AGALOC(1, "Text Block");
 
             *pz = NUL;
 
         } else if (was_close_err)
-            fprintf(pfTrace, zCmdFail, pzCmd);
+            fprintf(pfTrace, cmd_fail_fmt, pzCmd);
 
         last_cmd = NULL;
         return pz;

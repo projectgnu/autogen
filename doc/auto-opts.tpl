@@ -65,12 +65,13 @@ as with the following example.
 @example
 [=
 
-(out-push-new (string-append tmp-dir "/checkopt.def" ))
+(out-push-new (string-append tmp-dir "/check.def" ))
 
 =]AutoGen Definitions options;
 prog-name     = check;
 prog-title    = "Checkout Automated Options";
 long-opts;
+gnu-usage;    /* GNU style preferred to default */
 
 main = { main-type = shell-process; };
 
@@ -81,6 +82,7 @@ flag = {
     max       = NOLIMIT;  /* occurrence limit (none)     */
     stack-arg;            /* save opt args in a stack    */
     descrip   = "Checkout directory list";
+    doc       = 'name of each directory that is to be "checked out".';
 };
 
 flag = {
@@ -88,29 +90,33 @@ flag = {
     descrip   = "Show the definition tree";
     disable   = dont;     /* mark as enable/disable type */
                           /* option.  Disable as `dont-' */
+    doc       = 'disable, if you do not want to see the tree.';
 };
 [= (texi-escape-encode (out-pop #t)) \=]
 @end example
 
 @noindent
-Then perform the following steps:[= #
+Then run the following short script:[= #
 
 Developer note:  the following only works when AutoGen has been installed.
 Since this may be being built on a system where it has not been installed,
 the code below ensures we are running out tools out of the build directory =]
 
-@enumerate
-@item
-@code{cflags="-DTEST_CHECK_OPTS `autoopts-config cflags`"}
-@item
-@code{ldflags="`autoopts-config ldflags`"}
-@item
-@code{autogen checkopt.def}
-@item
-@code{cc -o check -g $@{cflags@} checkopt.c $@{ldflags@}}
-@item
-@code{./check --help}
-@end enumerate
+@example
+[=
+
+(out-push-new (string-append tmp-dir "/mk-check.sh" ))
+
+\=]
+base=check
+BASE=`echo $base | tr a-z- A-Z_`
+cflags="-DTEST_${BASE} `autoopts-config cflags`"
+ldflags="`autoopts-config ldflags`"
+autogen ${base}.def
+cc -o ${base} -g ${cflags} ${base}.c ${ldflags}
+./${base} --help
+[= (texi-escape-encode (out-pop #t)) \=]
+@end example
 
 @noindent
 Running those commands yields:
@@ -118,24 +124,36 @@ Running those commands yields:
 @example
 [= (out-push-new) \=]
 cd ${tmp_dir}
+base=check
+exec 4>&2 5>&1 1> ${base}.err 2>&1
 
-test -f checkopt.def || die cannot locate checkopt.def
-test -f check && rm -f check
-cat >> checkopt.def <<- _EOF_
-	include = '#include "compat/compat.h"';
-	_EOF_
-{
-  run_ag checkopt.def
-  opts="-o check -DTEST_CHECK_OPTS ${CFLAGS} ${INCLUDES}"
-  ${CC:-cc} -include ${top_builddir}/config.h ${opts} checkopt.c ${LIBS}
-} > checkopt.err 2>&1
+  case "$-" in
+  *x* ) clear_x=: ;;
+  * ) clear_x='set +x' ;;
+  esac
+  set -x
 
-test -x ./check || {
-  cat checkopt.err >&2
-  die cannot create checkopt program
+  test -f ${base}.def || die "cannot locate ${base}.def"
+  test ! -f ${base} || rm -f ${base}
+  echo "include = '#include \"compat/compat.h\"';" >> ${base}.def
+  f='@="@="'`echo ${INCLUDES} ${CFLAGS}`' @'
+  sed -e "s@^cc @${CC:-cc} -include ${top_builddir}/config.h @" \
+      -e '/^cflags="/s'"${f}" \
+      -e 's@^autogen @run_ag @' \
+          mk-${base}.sh > mk-${base}
+
+  . ./mk-${base}
+
+  $clear_x
+
+exec 1>&5 5>&- 2>&4 4>&-
+
+test -x ./${base} || {
+  cat ${base}.err >&2
+  die cannot create ${base} program
 }
 
-./check --help | sed 's/\t/        /g'
+./${base} --help | sed 's/\t/        /g'
 [=
 
 (texi-escape-encode (shell (out-pop #t)))

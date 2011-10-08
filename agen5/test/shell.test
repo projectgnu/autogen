@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2010-09-07 17:33:15 bkorb"
+# Time-stamp:        "2011-10-08 10:36:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -30,6 +30,9 @@
 exec 9>&2
 
 . ./defs
+
+grep -F '#define SHELL_ENABLED ' ${top_builddir}/config.h > /dev/null 2>&1
+test $? -eq 0 || exit 0
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
 
@@ -104,7 +107,7 @@ cat >${testname}.def <<- \_EOF_
 # this is the output we should expect to see
 cat > ${testname}.sample <<-  \_EOF_
 	SHELL=$SHELL
-	Some mumble text
+	Some "mumble" text
 
 	foo[0]       = ''foo'' 'foo' "foo" `foo` $foo
 	raw-shell-str: \'\''foo'\'\'' '\''foo'\'' "foo" `foo` $foo'
@@ -124,13 +127,8 @@ cat > ${testname}.sample <<-  \_EOF_
 	: This is a final test
 	_EOF_
 
-if ${VERBOSE}
-then trace=''
-else trace="--trace-out=${testname}-trace.log --trace=everything"
-fi
-
-run_ag x ${trace} ${testname}.def || \
-   failure "autogen ${testname}.def"
+run_ag x --shell=$PWD/shell ${testname}.def || \
+    failure "autogen ${testname}.def"
 
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup

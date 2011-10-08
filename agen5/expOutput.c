@@ -573,7 +573,7 @@ ag_scm_make_tmp_dir(void)
             "|| rm -rf %1$s\")";
 
     if (pz_temp_tpl == NULL) {
-        char * tmpdir    = runShell(tmp_dir_cmd);
+        char * tmpdir    = shell_cmd(tmp_dir_cmd);
         char * cmdbf     = ag_scribble(sizeof(set_tmp_dir) + strlen(tmpdir));
 
         pz_temp_tpl      = tmpdir;

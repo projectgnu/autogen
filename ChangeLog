@@ -1,3 +1,9 @@
+2011-10-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/shell.test (SHELL): this environment variable no longer
+	controls the shell used.  Use the --shell= option.
+	* agen5/*.c: replace runShell with shell_cmd.
+
 2011-08-13  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/test/string.test (LINENO): fallback for shells that don't

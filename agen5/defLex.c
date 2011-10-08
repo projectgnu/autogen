@@ -153,7 +153,7 @@ lex_backquote(void)
     pCurCtx->pzScan = pz;
 
     lastToken = DP_EV_STRING;
-    pz = runShell((char const*)pz_token);
+    pz = shell_cmd((char const*)pz_token);
     pCurCtx->lineNo = line_no;
 
     if (pz == NULL)

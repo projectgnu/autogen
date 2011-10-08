@@ -512,7 +512,7 @@ build_defs(int defCt, tDefList* pList)
                 fprintf(pfTrace, "shell eval for arg %d:\n\t`%s'\n",
                         pCurMacro->sibIndex - defCt, pList->pzExpr+1);
             }
-            pList->de.val.pzText = runShell(pList->pzExpr+1);
+            pList->de.val.pzText = shell_cmd(pList->pzExpr+1);
             break;
         }
     } while (pList++, --defCt > 0);

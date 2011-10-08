@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2010-02-24 08:37:15 bkorb"
+# Time-stamp:        "2011-10-07 16:22:48 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -40,7 +40,7 @@ rm -rf ./AGPKG
 mkdir AGPKG
 cd AGPKG
 HOME=`pwd`
-set -x
+
 mkdir -p BUILD SOURCES SPECS RPMS SRPMS
 
 [ -f ../autogen-${AG_VERSION}.tar.gz ] || (

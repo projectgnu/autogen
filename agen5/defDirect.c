@@ -448,7 +448,7 @@ doDir_assert(char* pzArg, char* pzScan)
             break; /* not a valid script */
 
         *pzR = NUL;
-        pzS = runShell((char const*)pzS);
+        pzS = shell_cmd((char const*)pzS);
         check_assert_str(pzS, pzArg);
         free(pzS);
         break;
@@ -981,7 +981,7 @@ doDir_shell(char* pzArg, char* pzScan)
      *  Run the shell command.  The output text becomes the
      *  "file text" that is used for more definitions.
      */
-    pzText = runShell(pzText);
+    pzText = shell_cmd(pzText);
     if (pzText == NULL)
         return pzScan;
 

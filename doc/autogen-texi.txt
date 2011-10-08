@@ -1572,16 +1572,13 @@ Extraction from autogen.texi
 @end ignore
 
 @noindent
-Normally, however, you would compile @file{checkopt.c} as in:
+Normally, however, you would not use the ``main'' clause.  Instead,
+the file would be named something like @file{checkopt.def}, you would
+compile @file{checkopt.c} the usual way, and link the object with the rest
+of your program.
 
-@example
-cc -o checkopt.o $cflags -c checkopt.c
-@end example
-
-@noindent
-and link @file{checkopt.o} with the rest of your program.
-The main program causes the options to be processed
-by calling @code{optionProcess} (@pxref{libopts-optionProcess}):
+The options are processed by calling @code{optionProcess}
+(@pxref{libopts-optionProcess}):
 
 @example
 main( int argc, char** argv )
@@ -1606,6 +1603,20 @@ The options are tested and used as in the following fragment.
       char* dir = *dirs++;
       ...
 @end example
+
+The ``doc'' clauses are used in the flag stanzas for man pages and
+texinfo invoking documentation.  With the above definition file, the
+two following commands will produce the two documentation files
+@file{check.1} and @file{invoke-check.texi}.  The latter file will
+be generated as a chapter, rather than a section or subsection.
+
+@example
+autogen -Tagman-cmd check.def
+autogen -DLEVEL=chapter -Tagtexi-cmd -binvoke-check.texi check.def
+@end example
+
+@noindent
+The result of which is left as an exercise for the reader.
 
 A lot of magic happens to make this happen.
 The rest of this chapter will describe the myriad of option attributes

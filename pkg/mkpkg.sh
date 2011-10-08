@@ -1,7 +1,7 @@
 #! /bin/sh
-set -x
+
 ## mkpkg.sh --      create a native package
-## Time-stamp:      "2011-06-11 11:52:37 bkorb"
+## Time-stamp:      "2011-10-07 16:22:09 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved

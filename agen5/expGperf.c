@@ -90,7 +90,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
          *  Run the command and ignore the results.
          *  In theory, the program should be ready.
          */
-        pzList = runShell(cmd);
+        pzList = shell_cmd(cmd);
         AGFREE(cmd);
 
         if (pzList != NULL)
@@ -136,7 +136,7 @@ ag_scm_gperf(SCM name, SCM str)
      *  (If it does fit, then the test string fits already).
      */
     cmd = aprf(zRunGperf, gp_name, key2hash);
-    key2hash = runShell(cmd);
+    key2hash = shell_cmd(cmd);
     if (*key2hash == NUL)
         str = SCM_UNDEFINED;
     else
