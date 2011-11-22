@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-08-30 14:17:31 bkorb"
+## Time-stamp:      "2011-11-18 08:05:22 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -363,11 +363,15 @@ DEFINE mk-options
 .Bl -tag[+:
 
 FOR flag                              :+][+:
-
-  IF (exist? "documentation")         :+]
-.Ss "[+: (string-substitute (get "descrip") "-" "\\-") :+]"[+:
-  ELSE                                :+][+:
+  IF (not (exist? "documentation"))   :+][+:
     INVOKE emit-flag-text             :+][+:
+
+  ELIF (. man-page)                   :+]
+.PP
+[+: descrip                           :+][+:
+
+  ELSE                                :+]
+.Ss "[+: (string-substitute (get "descrip") "-" "\\-") :+]"[+:
   ENDIF                               :+][+:
 ENDFOR flag
 

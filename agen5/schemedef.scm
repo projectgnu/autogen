@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-05-05 11:05:08 bkorb"
+;;; Time-stamp:        "2011-11-21 14:57:25 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -214,6 +214,7 @@
 )))
 
 ;;; /*=gfunc   string_table_add
+;;;  * general-use:
 ;;;  *
 ;;;  * what:   Add an entry to a string table
 ;;;  *

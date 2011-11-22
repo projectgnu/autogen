@@ -1,6 +1,6 @@
 [= AutoGen5 Template rc
 
-# Time-stamp:      "2011-06-09 12:18:00 bkorb"
+# Time-stamp:      "2011-11-21 04:52:41 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -23,7 +23,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =]
-# [= prog-name =] sample configuration file
+# [= (define prog-name (get "prog-name")) prog-name =] sample configuration file
 #[=
 
 IF (if (not (exist? "homerc"))

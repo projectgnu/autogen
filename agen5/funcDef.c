@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2011-06-05 15:31:33 bkorb"
+ *  Time-stamp:        "2011-10-09 17:33:18 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -735,10 +735,12 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
     return mFunc_Define(pT, pMac);
 }
 
-/* Load Debug
- *
- *  what:   Loads the debug function so you can set breakpoints
- *          at load time, too :-)
+/**
+ * Loads the debug function for load time breakpoints.
+ * @param pT     containing template
+ * @param pMac   the debug macro data
+ * @param ppzSan pointer to scanning pointer
+ * @returns      the next open macro slot
  */
 tMacro *
 mLoad_Debug(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
@@ -747,7 +749,6 @@ mLoad_Debug(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
         return mLoad_Unknown(pT, pMac, ppzScan);
     return mLoad_Comment(pT, pMac, ppzScan);
 }
-
 
 tMacro *
 mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)

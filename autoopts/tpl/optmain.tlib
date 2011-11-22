@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-07-19 11:15:31 bkorb"
+# Time-stamp:      "2011-11-21 15:12:22 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -532,18 +532,17 @@ DEFINE decl-callbacks
   (define undef-proc-names "")
   (define decl-type "")
   (define extern-proc-list (string-append
-
+    (if (exist? "version-proc")
+        (get "version-proc")
+        "optionPrintVersion") "\n"
     "optionBooleanVal\n"
     "optionNestedVal\n"
     "optionNumericVal\n"
-    "optionPagedUsage\n"
-    "optionPrintVersion\n"
     "optionResetOpt\n"
     "optionStackArg\n"
     "optionTimeDate\n"
     "optionTimeVal\n"
     "optionUnstackArg\n"
-    "optionVersionStderr\n"
     "optionVendorOption\n"
 
   ) )
@@ -555,7 +554,7 @@ DEFINE decl-callbacks
 
       (emit (if is-extern "\nextern tOptProc\n" "\nstatic tOptProc\n"))
       (set! txt-var (shellf "
-        (egrep -v '^%s$' | sort -u | \
+        (grep -E -v '^%s$' | sed '/^$/d' | sort -u | \
         sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
             (if is-extern "NULL" "(NULL|optionStackArg|optionUnstackArg)")
             txt-var ))
@@ -638,8 +637,14 @@ DEFINE decl-callbacks
   ENDFOR flag   =][=
 
   IF (. make-test-main)                         =][=
+    (set! extern-proc-list (string-append extern-proc-list
+          "optionVersionStderr\n"))             =][=
     INVOKE emit-testing-defines                 =][=
   ENDIF make-test-main                          =][=
+
+  (if (not (exist? "no-libopts"))
+      (set! extern-proc-list (string-append extern-proc-list
+            "optionPagedUsage\n")) )
 
   (emit-decl-list extern-proc-list #t)
   (emit-decl-list static-proc-list #f)
@@ -786,7 +791,7 @@ DEFINE range-option-code
 (define range-count     (count "arg-range"))
 
 \=]
-    static const struct {long const rmin, rmax;} rng[[=
+    static struct {long rmin, rmax;} const rng[[=
       (. range-count)   =]] = {
 [=(out-push-new)        =][=
   FOR arg-range ",\n"   =]{ [=
@@ -877,27 +882,23 @@ ENDDEF   alias-option-code
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE   keyword-code           =][=
+   (emit (tpl-file-line extract-fmt))
 
-(set! tmp-ct (count "keyword"))
-(if (not (exist? "arg-default"))
-    (begin
-      (set! tmp-ct (+ 1 tmp-ct))
-      (emit "    static char const zDef[2] = { 0x7F, 0 };\n")
-)   )
-
-(emit (tpl-file-line extract-fmt))
-
-(sprintf "    static char const * const azNames[%d] = {" tmp-ct)
-
-=][=
-
-? arg-default "\n" " zDef,\n"   =][=
-
-(shell (string-append
-  "${CLexe} -I8 --spread=2 --sep=',' -f'\"%s\"' <<_EOF_\n"
-   (join "\n" (stack "keyword"))
-  "\n_EOF_\n"  )) =]
-    };
+   (set! tmp-ct (count "keyword"))
+   (if (not (exist? "arg-default"))
+       (begin
+         (set! tmp-ct (+ 1 tmp-ct))
+         (emit "    static char const zDef[2] = { 0x7F, 0 };\n")
+   )   )                        \=]
+    static char const * const azNames[[= (. tmp-ct) =]] = {[=
+        (emit (if (not (exist? "arg-default")) " zDef,\n" "\n"))
+        (out-push-new) =][=
+  FOR keyword =][=
+    (string-table-add-ref opt-strs (get "keyword")) =]
+[=  ENDFOR =][=
+  (shell (string-append
+  "${CLexe} -S, -I8 <<-\\_EOF_\n" (out-pop #t) "_EOF_\nset +x" ))
+=] };
 
     if (pOptions <= OPTPROC_EMIT_LIMIT) {
         (void) optionEnumerationVal(pOptions, pOptDesc, azNames, [=
@@ -1097,5 +1098,80 @@ DEFINE define-option-callbacks      =][=
   ENDFOR flag                       =][=
 
 ENDDEF define-option-callbacks
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-option-callbacks        =]
+/*
+ *  Create the static procedure(s) declared above.
+ */
+static void
+doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
+{[=
+  IF (exist? "resettable") =]
+    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
+        return;
+[=ENDIF=][=
+  IF (exist? "usage-opt") =]
+    int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
+        ? [=(. succ-exit-code)=] : EX_USAGE;
+    (void)pOptions;
+    [= (. UP-prefix) =]USAGE(ex_code);[=
+
+  ELSE   =]
+    (void)pOptions;
+    [= (. UP-prefix) =]USAGE([=(. succ-exit-code)=]);[=
+  ENDIF  =]
+}[=
+
+IF (or (exist? "flag.flag-code")
+       (exist? "flag.extract-code")
+       (exist? "flag.arg-range")
+       (match-value? ~* "flag.arg-type" "key|set|fil")) =][=
+
+  INVOKE define-option-callbacks=][=
+
+ENDIF                           =][=
+
+IF (exist? "main")              =][=
+  INVOKE build-main             =][=
+
+ELIF (. make-test-main)         =][=
+  INVOKE build-test-main        =][=
+
+ELIF (exist? "guile-main")      =][=
+  INVOKE build-guile-main       =][=
+
+ENDIF "test/guile main"
+
+=][=
+(tpl-file-line extract-fmt)
+=][=
+
+IF (exist? "usage-message")     =]
+void
+[=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap)
+{
+    char const * er_fmt = _("%s usage error:\n");
+    fprintf(stderr, er_fmt, [=(. pname)=]Options.pzProgName);
+    vfprintf(stderr, fmt, ap);
+    [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
+    /* NOTREACHED */
+}
+
+void
+[=(. lc-prefix)=]usage_message(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    [=(. lc-prefix)=]vusage_message(fmt, ap);
+    /* NOTREACHED */
+    va_end(ap);
+}
+[=
+ENDIF have usage-message
+=][=
+
+ENDDEF emit-option-callbacks
 
 =]

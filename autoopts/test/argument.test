@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-08-07 17:39:53 bkorb"
+# Time-stamp:        "2011-11-21 12:34:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -39,7 +39,6 @@ export testname test_main argument long_opts
 ${SHELLX} ${stdopts} option:'opt init' second=020 || \
     failure "Could not run stdopts.def"
 
-echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
@@ -88,14 +87,16 @@ exec 3>&-
 
 ${AG_L} ${testname}2.def || \
   failure AutoGen could not process
-( ${SED} '/TEST MAIN PROCEDURE:/,$d;/^#/s/_ARGUMENT_/_ARGUMENT2_/' \
+{
+  ${SED} '/^#if.*TEST MAIN PROCEDURE:/,/#endif.*defined TEST_/d
+         /^#/s/_ARGUMENT_/_ARGUMENT2_/' \
     ${testname}2.c
   cat <<EOF
 int main( int argc, char** argv ) {
   optionProcess( &test_argumentOptions, argc, argv );
   return 0; }
 EOF
-) > XX
+} > XX
 mv ${testname}2.c ${testname}2.c.save
 mv -f XX ${testname}2.c
 
@@ -148,7 +149,9 @@ exec 3>&-
 
 ${AG_L} ${testname}3.def || \
   failure AutoGen could not process
-( ${SED} '/TEST MAIN PROCEDURE:/,$d;/^#/s/_ARGUMENT_/_ARGUMENT3_/' \
+{
+  ${SED} '/^#if.*TEST MAIN PROCEDURE:/,/#endif.*defined TEST_/d
+          /^#/s/_ARGUMENT_/_ARGUMENT3_/' \
     ${testname}3.c
   cat <<EOF
 int main( int argc, char** argv ) {
@@ -158,7 +161,7 @@ int main( int argc, char** argv ) {
     putc(ch, stdout); }
   return fclose(OPT_VALUE_SECOND); }
 EOF
-) > XX
+} > XX
 mv ${testname}3.c ${testname}3.c.save
 mv -f XX ${testname}3.c
 

@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2011-06-03 12:12:25 bkorb"
+## Time-stamp:      "2011-11-18 07:48:17 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -36,6 +36,8 @@
         (sprintf ".TH %s %s \"%s\" \"%s\" \"%s\"\n.\\\"\n"
                 (get "prog-name") man-sect
         (shell "date '+%d %b %Y'") package-text section-name) ))
+
+(define man-page #t)
 
 :+][+:
 

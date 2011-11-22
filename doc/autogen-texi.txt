@@ -2758,7 +2758,21 @@ show the option, and the generated documentation will mark it with:
 @item disable
 @vindex disable
 Prefix for disabling (inverting sense of) the option.  Only useful
-if long option names are being processed.
+if long option names are being processed.  When an option has this
+attribute, the test @code{ENABLED_OPT(OPTNAME)} is false when either
+of the following is true:
+@itemize @bullet
+@item
+The option has not been specified and the @code{enable} attribute has
+not been specified.
+@item
+The option has been specified with this disabling prefix.
+@end itemize
+To detect that the option has been specified with the disabling
+prefix, you must use:
+@example
+HAVE_OPT(OPTNAME) && ! ENABLED_OPT(OPTNAME)
+@end example
 
 @item enable
 @vindex enable
@@ -3693,6 +3707,14 @@ For example, to change the help flag from @code{?} to @code{h}, specify
 only with its long option name, specify
 @vindex save-opts-value
 @code{save-opts-value = "";}.
+
+Additionally, the procedure that prints out the program version may be
+replaced by specifying @code{version-proc}.
+@vindex version-proc
+This procedure must be defined to be of external scope (non-static).
+By default, the AutoOpts library provides @code{optionPrintVersion}
+and it will be the specified callback function in the option
+definition structure.
 
 With the exception of the @code{load-opts} option, none of these automatically
 supported options will be recognized in configuration files or environment

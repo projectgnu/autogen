@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-06-13 08:15:05 bkorb"
+ *  Time-stamp:        "2011-11-21 14:37:16 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -288,26 +288,33 @@ ag_scm_error(SCM res)
  *            copyright information from the description.
  */
 static void
-assemble_full_desc(char * txt)
+assemble_full_desc(char * txt, char const * pfx)
 {
+    char * pd;
+    char * md;
+
+    size_t prefix_len = strlen(pfx) + 1;
+    while (IS_WHITESPACE_CHAR(pfx[prefix_len - 2]))
+        prefix_len--;
+
     /*
      *  Preserve the first newline.  Set the move destination
-     *  out past where we will be inserting the "<PFX>" marker.
+     *  out past where we will be inserting the "<PFX>\n" marker.
      */
-    char * md = ++txt + pfx_len; /* move destination */
-    char * pd = txt; /* prefix destination */
+    pd = txt + 1;          /* prefix destination */
+    md = pd  + prefix_len; /* move destination */
 
-    txt += 2;
     while (*txt == NL) txt++;
     /*
      *  Maybe there were exactly enough NL characters we don't need to move
      */
     if (md != txt)
         memmove(md, txt, strlen(txt) + 1);
-    memmove(pd, pfx_txt, pfx_len);
+    memmove(pd, pfx, --prefix_len);
+    pd[prefix_len] = NL;
 
     /*
-     *  Look for a trailing license name and trim it off.
+     *  Look for a trailing license name and trim it and any newlines off.
      */
     txt = strstr(md, "\n\n");
     if (txt != NULL)
@@ -401,7 +408,8 @@ get_lic_name(char * p)
  * @return pointer to the requested text.
  */
 static char *
-find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
+find_lic_text(
+    lic_segment_e_t segment, SCM lic, size_t * txt_len, char const * pfx)
 {
     static char const * const lic_sfx[] = { "lic", NULL };
 
@@ -453,10 +461,10 @@ find_lic_text(lic_segment_e_t segment, SCM lic, size_t * txt_len)
             AG_ABEND(aprf("invalid license file: %s", fname));
 
         switch (segment) {
-        case LSEG_INFO: p[1]  = NUL;              break;
-        case LSEG_DESC: ftext = trim_lic_name(p); break;
-        case LSEG_NAME: ftext = get_lic_name(p);  break;
-        case LSEG_FULL: assemble_full_desc(p);    break;
+        case LSEG_INFO: p[1]  = NUL;                break;
+        case LSEG_DESC: ftext = trim_lic_name(p);   break;
+        case LSEG_NAME: ftext = get_lic_name(p);    break;
+        case LSEG_FULL: assemble_full_desc(p, pfx); break;
         }
     }
 
@@ -489,6 +497,7 @@ construct_license(
     SCM    vals = SCM_UNDEFINED;
     char * lic_text;
     size_t text_len;
+    char const * pfx_pz = ag_scm2zchars(pfx, "lic-prefix");
 
     if (subs == SCM_UNDEFINED) {
         static char const * const slst[] = {
@@ -504,7 +513,7 @@ construct_license(
     if (! AG_SCM_STRING_P(lic))
         AG_ABEND("license name is not a string");
 
-    lic_text = find_lic_text(seg, lic, &text_len);
+    lic_text = find_lic_text(seg, lic, &text_len, pfx_pz);
     if (lic_text == NULL)
         AG_ABEND(aprf("There is no %s license.", ag_scm2zchars(lic, "lic")));
 
@@ -640,10 +649,11 @@ SCM
 ag_scm_license_name(SCM lic)
 {
     size_t text_len;
-    char * txt = find_lic_text(LSEG_NAME, lic, &text_len);
+    char * txt = find_lic_text(LSEG_NAME, lic, &text_len, "");
     char * e   = txt + strlen(txt);
     while (IS_WHITESPACE_CHAR(e[-1]) && (e > txt))  e--;
     *e  = NUL;
+    while (IS_WHITESPACE_CHAR(*txt))  txt++;
     lic = AG_SCM_STR02SCM(txt);
     return lic;
 }

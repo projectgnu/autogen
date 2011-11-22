@@ -4,7 +4,7 @@
 
 ## agman-cmd.tpl -- Template for command line mdoc pages
 ##
-## Time-stamp:      "2011-06-06 07:45:24 bkorb"
+## Time-stamp:      "2011-11-18 07:48:29 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -36,6 +36,8 @@
    ".Dd "   (shell "date '+%B %e %Y' | sed 's/  */ /g'")
    "\n.Dt " UP-PROG-NAME " " man-sect " " section-name
    "\n.Os " (shell "uname -sr") "\n") ))
+
+(define man-page #f)
 
 :+][+:
 

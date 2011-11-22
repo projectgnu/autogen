@@ -231,16 +231,17 @@ OPTDIR=${TOPDIR}/autoopts
   test -f default-test.c || die 'NO default-test.c PROGRAM'
 
   opts="-o default-test -DTEST_DEFAULT_TEST_OPTS ${INCLUDES}"
-  ${CC:-cc} ${CFLAGS} ${opts} default-test.c ${LIBS}
+  ${CC:-cc} ${CFLAGS} ${opts} default-test.c ${LIBS} || \
+    rm -f ./default-test
 
-  test -x ./default-test || die 'NO default-test EXECUTABLE'
+  test -x ./default-test || {
+    exec 2>&7
+    fail_text=`cat $log_file`$'\n\nprogram:\n'`cat default-test.c`
+    die 'NO default-test EXECUTABLE
+        '"$fail_text"'
+        === END FAIL TEXT'
+  }
 } >&2
-
-test $? -eq 0 || {
-  printf '\n\ncannot build default test\n'
-  cat $log_file
-  die "cannot build AutoOpts doc"
-} 2>&7 1>&7
 
 HOME=${tmp_dir} ${tmp_dir}/default-test --help | \
    sed 's,	,        ,g;s,\([@{}]\),@\1,g'
@@ -258,8 +259,10 @@ INVOKE  get-text tag = autoopts-api
 [=`
 
 f=../autoopts/libopts.texi
-[ ! -f $f ] && f=${top_srcdir}/autoopts/libopts.texi
-test -f $f die "Cannot locate libopts.texi"
+test -f $f || {
+  f=${top_srcdir}/autoopts/libopts.texi
+  test -f $f || die "Cannot locate libopts.texi in $f"
+}
 cat $f
 
 `=]
@@ -415,7 +418,7 @@ and the script parser itself would be very verbose:
 @example
 [= `
 
-log=${tmp_dir}/genshellopt.log
+log=${tmp_dir}/../genshellopt.log
 
 (
   set -x

@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-08-15 12:37:55 bkorb"
+# Time-stamp:      "2011-11-21 14:09:34 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -138,11 +138,11 @@ ELSE  =][=
   (define cright-owner (get "copyright.owner" (get "copyright.author")))
   =][=
   CASE (get "copyright.type") =][=
-    = note  =][=
+    = note       =][=
       (set! tmp-text (get  "copyright.text"))
       (define ext-text tmp-text)            =][=
 
-    ~~* .   =][=
+    ~~* .       =][=
       (define ext-text
          (license-description (get "copyright.type")
             prog-name "" cright-owner ) )
@@ -150,30 +150,30 @@ ELSE  =][=
       (set! tmp-text
          (license-info (get "copyright.type")
             prog-name "" cright-owner (get "copyright.date") ) )
-    =][=
+                =][=
 
-    *       =][=
+    *           =][=
       (set! tmp-text (sprintf
               "Copyright (C) %s %s, all rights reserved"
               (get "copyright.date") cright-owner  ))
       (define ext-text tmp-text)            =][=
 
-  ESAC =][=
+  ESAC          =][=
 
 (set! tmp-text (string-append version-text "\n" tmp-text))
-(ag-fprintf 0 "\nstatic char const zCopyright[%d] =\n%s;\n"
- (+ (string-length tmp-text) 1) (kr-string tmp-text))
+(string-append "\n#define zCopyright      ("
+    (string-table-add-ref opt-strs tmp-text)
+    ")\n#define zLicenseDescrip ("
 
-(if (= tmp-text ext-text)
-    "#define zLicenseDescrip zCopyright\n"
-    (begin
-     (set! ext-text (string-append (shell (string-append
-           "fmt -w 75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
+    (if (= tmp-text ext-text)
+        "zCopyright"
+        (begin
+           (set! ext-text (string-append (shell (string-append
+             "fmt -w 75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
 
-     (sprintf "static char const zLicenseDescrip[%d] =\n%s;\n"
-             (+ (string-length ext-text) 1)
-             (kr-string ext-text)  )
-)   ) =][=
+           (string-table-add-ref opt-strs ext-text)
+    )   )
+    ")\n" )     =][=
 
 ENDIF "copyright"
 
@@ -197,10 +197,14 @@ ENDIF "include exists"
 =]
 #ifndef NULL
 #  define NULL 0
-#endif[=
+#endif
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =]
-[=
+/*
+ *  [= prog-name =] option static const strings
+ */[=
+ (out-resume "home-list") \=][=
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 FOR flag "\n"           =][=
   INVOKE opt-strs       =][=
@@ -220,243 +224,49 @@ ENDFOR flag
 INVOKE help-strs        =][=
 INVOKE decl-callbacks   =][=
 
-IF (and (exist? "version") make-test-main)
+IF (exist? "version")   =][=
 
-=]
+  IF (exist? "version-proc") =]
+#define VER_PROC        [= (get "version-proc") =][=
+  ELIF (. make-test-main) =]
 #ifdef [=(. main-guard) =]
-# define DOVERPROC optionVersionStderr
+# define VER_PROC       optionVersionStderr
 #else
-# define DOVERPROC optionPrintVersion
+# define VER_PROC       optionPrintVersion
 #endif /* [=(. main-guard)=] */[=
+  ELSE                  =]
+#define VER_PROC        optionPrintVersion[=
+  ENDIF  make-test-main =][=
 
-ENDIF
-
-=]
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Define the [=(. pname-cap)=] Option Descriptions.
- */
-static tOptDesc optDesc[[=
-(define default-text   "")
-(define default-cookie "")
-UP-prefix
-=]OPTION_CT] = {[=
-
-FOR flag "\n"           =][=
-
-  INVOKE opt-desc       =][=
-
-ENDFOR flag
-
-=][=
-
-IF (exist? "resettable")
+ENDIF  there is a version
 
 =]
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* resettable */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]RESET_OPTION, [= (. VALUE-pfx) =]RESET_OPTION,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]RESET_OPTION,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-			  | OPTST_NO_INIT, 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ optionResetOpt,
-     /* desc, NAME, name */ zResetText, NULL, zReset_Name,
-     /* disablement strs */ NULL, NULL },[=
-
-ENDIF
-
-=][=
-
-IF (exist? "version")   =]
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* version */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-         INDEX-pfx =]VERSION, [= (. VALUE-pfx) =]VERSION,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VERSION,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_VERSION_FLAGS, 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ [=
-         (if make-test-main "DOVERPROC" "optionPrintVersion")=],
-     /* desc, NAME, name */ zVersionText, NULL, zVersion_Name,
-     /* disablement strs */ NULL, NULL },
-
-[=
-
-ENDIF =]
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* help */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]HELP,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ doUsageOpt,
-     /* desc, NAME, name */ zHelpText, NULL, zHelp_Name,
-     /* disablement strs */ NULL, NULL }[=
-
-IF (not (exist? "no-libopts"))          =],
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* more-help */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]MORE_HELP,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_MORE_HELP_FLAGS, 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ optionPagedUsage,
-     /* desc, NAME, name */ zMore_HelpText, NULL, zMore_Help_Name,
-     /* disablement strs */ NULL, NULL }[=
-
-ENDIF not have no-libopts               =][=
-
-IF (exist? "usage-opt")                 =],
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* usage-opt */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]USAGE, [= (. VALUE-pfx) =]USAGE,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]USAGE,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ doUsageOpt,
-     /* desc, NAME, name */ zUsageText, NULL, zUsage_Name,
-     /* disablement strs */ NULL, NULL }[=
-
-ENDIF have usage-opt                    =][=
-
-IF (exist? "homerc")                    =],
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* save-opts */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]SAVE_OPTS, [=
-           (if (not (exist? "disable-save"))
-               (string-append VALUE-pfx "SAVE_OPTS")
-               "0") =],
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]SAVE_OPTS,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT[=
-    (if (exist? "disable-save") "| OPTST_NO_COMMAND") =], 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ NULL,
-     /* desc, NAME, name */ [=
-    (if (exist? "disable-save") "NULL, NULL, NULL"
-         "zSave_OptsText, NULL, zSave_Opts_Name")=],
-     /* disablement strs */ NULL, NULL },
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* load-opts */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]LOAD_OPTS, [=
-           (if (not (exist? "disable-load"))
-               (string-append VALUE-pfx "LOAD_OPTS")
-               "0") =],
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]LOAD_OPTS,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-			  | OPTST_DISABLE_IMM[=
-    (if (exist? "disable-load") "| OPTST_NO_COMMAND") =], 0,
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL, NULL,
-     /* option proc      */ optionLoadOpt,
-     /* desc, NAME, name */ [=
-    (if (exist? "disable-load") "NULL, NULL, NULL"
-         "zLoad_OptsText, zLoad_Opts_NAME, zLoad_Opts_Name")=],
-     /* disablement strs */ [=
-    (if (exist? "disable-load") "NULL, NULL"
-         "zNotLoad_Opts_Name, zNotLoad_Opts_Pfx")=] }[=
-
-ENDIF have homerc                       =][=
-
-IF (exist? "vendor-opt")                =],
-
-  {  /* entry idx, value */ [=
-        (set! default-text (string-append default-text
-               "\n    { NULL } /* vendor-opt */," ))
-        (set! default-cookie (string-append default-cookie "NULL\n" ))
-        INDEX-pfx =]VENDOR_OPT, [= (. VALUE-pfx) =]VENDOR_OPT,
-     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VENDOR_OPT,
-     /* equivalenced to  */ NO_EQUIVALENT,
-     /* min, max, act ct */ 0, NOLIMIT, 0,
-     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_IMM | OPTST_TWICE, 0, /* both directions */
-     /* last opt argumnt */ { NULL },
-     /* arg list/cookie  */ NULL,
-     /* must/cannot opts */ NULL,  NULL,
-     /* option proc      */ optionVendorOption,
-     /* desc, NAME, name */ zVendorText, NULL, zVendor_Opt_Name,
-     /* disablement strs */ NULL, NULL }[=
-
-ENDIF have vendor-opt                   =]
-};
+[= INVOKE emit-option-desc-table =]
 [= (. lib-externs) =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Define the [= (. pname-cap) =] Option Environment
  */
-static char const zPROGNAME[[=(+ (string-length pname-up) 1)
-=]] = "[= (. pname-up) =]";
-static char const zUsageTitle[[=(+ (string-length usage-text) 1)=]] =
-[= (kr-string usage-text) =];[=
-
-IF (exist? "homerc") =]
-static char const zRcName[[=
-
-  (set! tmp-text (if (not (exist? "rcfile"))
-      (string-append "." pname-down "rc")
+#define zPROGNAME       ([= (string-table-add-ref opt-strs pname-up)   =])
+#define zUsageTitle     ([= (string-table-add-ref opt-strs usage-text) =])
+[=
+IF (exist? "homerc")    \=]
+#define zRcName         ([=
+ (set! tmp-text (if (not (exist? "rcfile"))
+       (string-append "." pname-down "rc")
           (get "rcfile") ))
-  (+ 1 (string-length tmp-text))
-=]] = "[= (. tmp-text) =]";
+ (string-table-add-ref opt-strs tmp-text) =])
 static char const * const apzHomeList[[=(+ (count "homerc") 1)=]] = {[=
   FOR homerc            =]
-    [= (kr-string (get "homerc")) =],[=
+    [= (string-table-add-ref opt-strs (get "homerc")) =],[=
   ENDFOR homerc=]
     NULL };[=
 
-ELSE                    =]
-#define zRcName     NULL
-#define apzHomeList NULL[=
-ENDIF                   =][=
-
+ELSE                    \=]
+#define zRcName         NULL
+#define apzHomeList     NULL[=
+ENDIF                   =]
+#define zBugsAddr       ([=
 (out-push-new)         \=]
 s/@[a-z]*{\([^{@}]*\)}/``\1''/g
 s=@<prog-name>@=[= prog-name =]=g
@@ -469,66 +279,52 @@ s/^@item *$/\
     (raw-shell-str (out-pop #t)) ) )
 
 (define patch-text (lambda (t-name)
-  (set! tmp-text (kr-string (string-append "\n"
+  (set! tmp-text (string-append "\n"
 
   (shell (string-append
     patch-text-sed
     (get t-name)
     "\n_EODetail_" ))
-  "\n" ))) ))
-
-(define bug-text "\n\nstatic char const zBugsAddr[%d]    = %s;")
+  "\n" )) ))
 
 (if (exist? "copyright.eaddr")
-    (begin
-      (set! tmp-text (get "copyright.eaddr"))
-      (sprintf bug-text (+ 1 (string-length tmp-text))
-                        (kr-string tmp-text)) )
-
+    (string-table-add-ref opt-strs (get "copyright.eaddr"))
     (if (exist? "eaddr")
-        (begin
-         (set! tmp-text (get "eaddr"))
-         (sprintf bug-text (+ 1 (string-length tmp-text)) (kr-string tmp-text)))
+        (string-table-add-ref opt-strs (get "eaddr"))
+        "NULL"
+)   )                   =])
+#define zExplain        ([=
 
-        "\n\n#define zBugsAddr NULL" )  )
+(if (or (exist? "explain") (== (get "main.main-type") "for-each"))
+    (begin
+      (if (exist? "explain")
+          (patch-text "explain")
+          (set! tmp-text "")  )
 
-                        =][=
+      (if (== (get "main.main-type") "for-each")
+          (set! tmp-text (string-append tmp-text
+"\nIf no arguments are provided, input arguments are read from stdin,
+one per line; blank and '#'-prefixed lines are comments.
+'stdin' may not be a terminal (tty).\n" ))  )
 
-IF (or (exist? "explain") (== (get "main.main-type") "for-each"))  =]
-static char const zExplain[] = [=
+      (string-table-add-ref opt-strs tmp-text)
+    )
+    "NULL"
+)                       =])
+#define zDetail         ([=
 
- (if (exist? "explain")
-     (patch-text "explain")
-     (set! tmp-text "")  )
+(if (exist? "detail")
+    (begin
+      (patch-text "detail")
+      (string-table-add-ref opt-strs tmp-text)
+    )
+    "NULL"
+)                       =])
+#define zFullVersion    ([=
 
- (if (== (get "main.main-type") "for-each")
-   (set! tmp-text (string-append tmp-text
-
-"\n\"If no arguments are provided, input arguments are read from stdin,\\n\\
-one per line; blank and '#'-prefixed lines are comments.\\n\\
-'stdin' may not be a terminal (tty).\\n\"" ))  )
-
- tmp-text =];[=
-
-ELSE                    =]
-#define zExplain NULL[=
-ENDIF                   =][=
-
-IF (exist? "detail")    =]
-static char const zDetail[[=
-   (patch-text "detail") (+ 1 (string-length tmp-text)) =]] = [=
- (. tmp-text) =];[=
-
-ELSE                    =]
-#define zDetail         NULL[=
-ENDIF                   =][=
-
-IF (exist? "version")   =]
-static char const zFullVersion[] = [=(. pname-up)=]_FULL_VERSION;[=
-
-ELSE                    =]
-#define zFullVersion    NULL[=
-ENDIF                   =][=
+(if (exist? "version")
+    (string-table-add-ref opt-strs version-text)
+    "NULL")             =])[=
 (tpl-file-line extract-fmt)
 =]
 #if defined(ENABLE_NLS)
@@ -546,8 +342,9 @@ ESAC   no-xlate         =]
 #endif /* ENABLE_NLS */
 [= IF (exist? "resettable") =]
 static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
-(. UP-prefix) =]OPTION_CT ] = {[=
-   (substring default-text 0 (- (string-length default-text) 1)) =]
+(. UP-prefix) =]OPTION_CT ] = {
+[= (shell (string-append
+      "sed '$s@},@} @' <<\\_EOF_" default-text "\n_EOF_\n")) =]
 };
 static void * const original[=(. pname-cap)=]Cookies[ [=
 (. UP-prefix) =]OPTION_CT ] = {
@@ -557,7 +354,8 @@ static void * const original[=(. pname-cap)=]Cookies[ [=
 };
 [= ENDIF =]
 [= INVOKE usage-text usage-type = full  \=]
-[= INVOKE usage-text usage-type = short  =]
+[= INVOKE usage-text usage-type = short \=]
+[= INVOKE emit-option-callbacks          =]
 #ifndef  PKGDATADIR
 # define PKGDATADIR ""
 #endif
@@ -577,7 +375,12 @@ static char const [=(. pname)=]_packager_info[] =
 # endif
     "\n";
 #endif
-
+[=
+ (out-suspend  "home-list") =][=
+ (emit-string-table opt-strs) =][=
+ (out-resume   "home-list") =][=
+ (out-pop      #t)
+=]
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
     0, NULL,                    /* original argc + argv    */
@@ -634,80 +437,16 @@ tOptions [=(. pname)=]Options = {
 FOR lib-name
 
 =]
-tOptDesc* [= (string->c-name! (get "lib-name")) =]_optDesc_p = NULL;
-[=
+tOptDesc* [= (string->c-name! (get "lib-name")) =]_optDesc_p = NULL;[=
 
-ENDFOR
+ENDFOR   =][=
 
-=]
-/*
- *  Create the static procedure(s) declared above.
- */
-static void
-doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
-{[=
-  IF (exist? "resettable") =]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;
-[=ENDIF=][=
-  IF (exist? "usage-opt") =]
-    int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
-        ? [=(. succ-exit-code)=] : EX_USAGE;
-    (void)pOptions;
-    [= (. UP-prefix) =]USAGE(ex_code);[=
+INVOKE emit-nls-code         =][= #
 
-  ELSE   =]
-    (void)pOptions;
-    [= (. UP-prefix) =]USAGE([=(. succ-exit-code)=]);[=
-  ENDIF  =]
-}[=
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-IF (or (exist? "flag.flag-code")
-       (exist? "flag.extract-code")
-       (exist? "flag.arg-range")
-       (match-value? ~* "flag.arg-type" "key|set|fil")) =][=
+DEFINE emit-nls-code
 
-  INVOKE define-option-callbacks=][=
-
-ENDIF                           =][=
-
-IF (exist? "main")              =][=
-  INVOKE build-main             =][=
-
-ELIF (. make-test-main)         =][=
-  INVOKE build-test-main        =][=
-
-ELIF (exist? "guile-main")      =][=
-  INVOKE build-guile-main       =][=
-
-ENDIF "test/guile main"
-
-=][=
-(tpl-file-line extract-fmt)
-=][=
-
-IF (exist? "usage-message")     =]
-void
-[=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap)
-{
-    char const * er_fmt = _("%s usage error:\n");
-    fprintf(stderr, er_fmt, [=(. pname)=]Options.pzProgName);
-    vfprintf(stderr, fmt, ap);
-    [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
-    /* NOTREACHED */
-}
-
-void
-[=(. lc-prefix)=]usage_message(char const * fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    [=(. lc-prefix)=]vusage_message(fmt, ap);
-    /* NOTREACHED */
-    va_end(ap);
-}
-[=
-ENDIF have usage-message
 =]
 #if ENABLE_NLS
 #include <stdio.h>
@@ -807,7 +546,212 @@ translate_option_strings(void)
 #ifdef  __cplusplus
 }
 #endif[=
- # /*
+
+ENDDEF emit-nls-code
+
+=][=
+
+DEFINE emit-option-desc-table
+
+=]
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Define the [=(. pname-cap)=] Option Descriptions.
+ */
+static tOptDesc optDesc[[=
+(define default-text   "")
+(define default-cookie "")
+UP-prefix
+=]OPTION_CT] = {[=
+
+FOR flag "\n"           =][=
+
+  INVOKE opt-desc       =][=
+
+ENDFOR flag
+
+=][=
+
+IF (exist? "resettable")
+
+=]
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* resettable */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]RESET_OPTION, [= (. VALUE-pfx) =]RESET_OPTION,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]RESET_OPTION,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ RESET_FLAGS, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ optionResetOpt,
+     /* desc, NAME, name */ RESET_DESC, NULL, RESET_name,
+     /* disablement strs */ NULL, NULL },[=
+
+ENDIF
+
+=][=
+
+IF (exist? "version")   =]
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* version */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+         INDEX-pfx =]VERSION, [= (. VALUE-pfx) =]VERSION,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VERSION,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ VER_FLAGS, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ VER_PROC,
+     /* desc, NAME, name */ VER_DESC, NULL, VER_name,
+     /* disablement strs */ NULL, NULL },
+
+[=
+
+ENDIF =]
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* help */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]HELP, [= (. VALUE-pfx) =]HELP,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]HELP,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ doUsageOpt,
+     /* desc, NAME, name */ HELP_DESC, NULL, HELP_name,
+     /* disablement strs */ NULL, NULL }[=
+
+IF (not (exist? "no-libopts"))          =],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* more-help */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]MORE_HELP, [= (. VALUE-pfx) =]MORE_HELP,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]MORE_HELP,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ MORE_HELP_FLAGS, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ optionPagedUsage,
+     /* desc, NAME, name */ MORE_HELP_DESC, NULL, MORE_HELP_name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF not have no-libopts               =][=
+
+IF (exist? "usage-opt")                 =],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* usage-opt */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]USAGE, [= (. VALUE-pfx) =]USAGE,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]USAGE,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ doUsageOpt,
+     /* desc, NAME, name */ USAGE_DESC, NULL, USAGE_name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF have usage-opt                    =][=
+
+IF (exist? "homerc")                    =],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* save-opts */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]SAVE_OPTS, [=
+           (if (not (exist? "disable-save"))
+               (string-append VALUE-pfx "SAVE_OPTS")
+               "0") =],
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]SAVE_OPTS,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, 1, 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT[=
+    (if (exist? "disable-save") "| OPTST_NO_COMMAND") =], 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ NULL,
+     /* desc, NAME, name */ [=
+    (if (exist? "disable-save") "NULL, NULL, NULL"
+         "SAVE_OPTS_DESC, NULL, SAVE_OPTS_name")=],
+     /* disablement strs */ NULL, NULL },
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* load-opts */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]LOAD_OPTS, [=
+           (if (not (exist? "disable-load"))
+               (string-append VALUE-pfx "LOAD_OPTS")
+               "0") =],
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]LOAD_OPTS,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+			  | OPTST_DISABLE_IMM[=
+    (if (exist? "disable-load") "| OPTST_NO_COMMAND") =], 0,
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL, NULL,
+     /* option proc      */ optionLoadOpt,
+     /* desc, NAME, name */ [=
+    (if (exist? "disable-load") "NULL, NULL, NULL"
+         "LOAD_OPTS_DESC, LOAD_OPTS_NAME, LOAD_OPTS_name")=],
+     /* disablement strs */ [=
+    (if (exist? "disable-load") "NULL, NULL"
+         "NO_LOAD_OPTS_name, LOAD_OPTS_pfx")=] }[=
+
+ENDIF have homerc                       =][=
+
+IF (exist? "vendor-opt")                =],
+
+  {  /* entry idx, value */ [=
+        (set! default-text (string-append default-text
+               "\n    { NULL }, /* vendor-opt */" ))
+        (set! default-cookie (string-append default-cookie "NULL\n" ))
+        INDEX-pfx =]VENDOR_OPT, [= (. VALUE-pfx) =]VENDOR_OPT,
+     /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VENDOR_OPT,
+     /* equivalenced to  */ NO_EQUIVALENT,
+     /* min, max, act ct */ 0, NOLIMIT, 0,
+     /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
+                          | OPTST_IMM | OPTST_TWICE, 0, /* both directions */
+     /* last opt argumnt */ { NULL },
+     /* arg list/cookie  */ NULL,
+     /* must/cannot opts */ NULL,  NULL,
+     /* option proc      */ optionVendorOption,
+     /* desc, NAME, name */ VEND_DESC, NULL, VEND_name,
+     /* disablement strs */ NULL, NULL }[=
+
+ENDIF have vendor-opt                   =]
+};
+[=
+
+ENDDEF emit-option-desc-table
+
+/*
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

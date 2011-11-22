@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-10-02 13:33:31 bkorb"
+# Time-stamp:        "2011-11-20 09:54:11 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -241,18 +241,20 @@ build_agdoc() {
   run_getdefs
 
   env >&2
-  exec 3> ${tmp_dir}/ag.ini
-  cat >&3 <<- _EOF_
+  {
+    cat <<- _EOF_
 	timeout     ${timer}
 	templ-dirs  ${srcdir}
 	templ-dirs  ${top_srcdir}/autoopts/tpl
 	base-name   ${GEN_BASE}
+	trace       every
+	trace-out   >>${tmp_dir}/ag.log
 	_EOF_
-  ${VERBOSE} && {
-    echo 'trace       every'
-    echo "trace-out   >>${tmp_dir}/ag.log"
-  } >&3
-  exec 3>&-
+    ${VERBOSE} && false && {
+      echo 'trace       every'
+      echo "trace-out   >>${tmp_dir}/ag.log"
+    }
+  } > ${tmp_dir}/ag.ini
 
   opts=--load-opts=${tmp_dir}/ag.ini
   cmd=`echo "${cmd}" ${opts} ${tmp_dir}/${GEN_BASE}.def`
