@@ -4,7 +4,7 @@
 
 ## cmd-doc.tlib -- Template for command line man/mdoc pages
 ##
-## Time-stamp:      "2011-11-18 08:05:22 bkorb"
+## Time-stamp:      "2011-11-23 07:46:49 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -53,9 +53,10 @@
    (if (=* man-sect "1") "User Commands"
    (if (=* man-sect "6") "Games"
    (if (=* man-sect "8") "System Management"
+   (if (=* man-sect "5") "File Formats"
    (error
     "the agman-cmd template only produces section 1, 6 and 8 man pages")
-))))
+)))))
 (set! tmp-val (getenv "SECTION_NAME"))
 (if (defined? 'tmp-val) (if (string? tmp-val)
     (set! section-name tmp-val) ))

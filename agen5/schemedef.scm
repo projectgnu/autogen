@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-11-22 19:50:58 bkorb"
+;;; Time-stamp:        "2011-11-23 10:29:21 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -132,9 +132,10 @@
 ;;;  *
 ;;;  * doc:
 ;;;  *   This function will create an array of characters.  The companion
-;;;  *   functions, (@xref{SCM string-table-add}, and @pxref{SCM
-;;;  *   emit-string-table}) will insert text and emit the populated table,
-;;;  *   respectively.
+;;;  *   functions, (@xref{SCM string-table-add},
+;;;  *   @xref{SCM string-table-add-ref}, and
+;;;  *   @pxref{SCM emit-string-table}) will insert text and emit the
+;;;  *   populated table.
 ;;;  *
 ;;;  *   With these functions, it should be much easier to construct
 ;;;  *   structures containing string offsets instead of string pointers.
@@ -146,22 +147,20 @@
 ;;;  *
 ;;;  *   @example
 ;;;  *      [+ (string-table-new "scribble")
-;;;  *    `'   (out-push-new)
-;;;  *    `'   (define ix 0)
+;;;  *    `'   (out-push-new) ;; redirect output to temporary
 ;;;  *    `'   (define ct 1)  +][+
 ;;;  *
 ;;;  *      FOR str IN that was the week that was +][+
 ;;;  *    `'  (set! ct (+ ct 1))
-;;;  *    `'  (set! ix (string-table-add "scribble" (get "str")))
 ;;;  *      +]
-;;;  *    `'    scribble + [+ (. ix) +],[+
+;;;  *    `'    [+ (string-table-add-ref "scribble" (get "str")) +],[+
 ;;;  *      ENDFOR  +]
 ;;;  *    `'    NULL @};
 ;;;  *      [+ (out-suspend "main")
 ;;;  *    `'   (emit-string-table "scribble")
 ;;;  *    `'   (ag-fprintf 0 "\nchar const *ap[%d] = @{" ct)
 ;;;  *    `'   (out-resume "main")
-;;;  *    `'   (out-pop #t) +]
+;;;  *    `'   (out-pop #t) ;; now dump out the redirected output +]
 ;;;  *   @end example
 ;;;  *
 ;;;  *   @noindent
@@ -189,12 +188,12 @@
 ;;;  *    `'    "that\0" "was\0"  "the\0"  "week\0";
 ;;;  *
 ;;;  *      char const *ap[7] = @{
-;;;  *    `'    scribble + 0,
-;;;  *    `'    scribble + 5,
-;;;  *    `'    scribble + 9,
-;;;  *    `'    scribble + 13,
-;;;  *    `'    scribble + 0,
-;;;  *    `'    scribble + 5,
+;;;  *    `'    scribble+0,
+;;;  *    `'    scribble+5,
+;;;  *    `'    scribble+9,
+;;;  *    `'    scribble+13,
+;;;  *    `'    scribble+0,
+;;;  *    `'    scribble+5,
 ;;;  *    `'    NULL @};
 ;;;  *   @end example
 ;;;  *

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2011-11-22 12:01:52 bkorb"
+# Time-stamp:        "2011-11-23 10:29:10 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -33,32 +33,27 @@ cat > ${testname}.tpl <<_EOF_
 [=
 
 (string-table-new "scribble")
-(out-push-new)
-(define ix 0)
-(define ct 0)
+(out-push-new) ;; redirect output to temporary
+(define ct 1)
 
 =][=
 
 FOR str IN that was the week that was
 
-=][=
-
-  (set! ct (+ ct 1))
-  (set! ix (string-table-add "scribble" (get "str")))
-
-=]
-    scribble + [= (. ix) =],[=
+=][= (set! ct (+ ct 1)) =]
+    [= (string-table-add-ref "scribble" (get "str")) =],[=
 
 ENDFOR
 
-=]
-    NULL };
-[= (out-suspend "main")
+=][=
+   (out-suspend "main")
    (emit-string-table "scribble")
-   (emit (sprintf "\n#define STRING_CT %d\n" ct))
-   (ag-fprintf 0 "\nchar const *ap[%d] = {" (+ ct 1))
+   (emit (sprintf "\n#define STRING_CT %d\n" (- ct 1)))
+   (ag-fprintf 0 "\nchar const * const ap[%d] = {" ct)
    (out-resume "main")
-   (out-pop #t) =]
+   (out-pop #t) ;; now dump out the redirected output
+   ;; and finish: =]
+    NULL };
 _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
@@ -75,15 +70,14 @@ static char const scribble[18] =
 
 #define STRING_CT 6
 
-char const *ap[7] = {
-    scribble + 0,
-    scribble + 5,
-    scribble + 9,
-    scribble + 13,
-    scribble + 0,
-    scribble + 5,
+char const * const ap[7] = {
+    scribble+0,
+    scribble+5,
+    scribble+9,
+    scribble+13,
+    scribble+0,
+    scribble+5,
     NULL };
-
 _EOF_
 
 run_ag x -b ${testname} -T ${testname}.tpl --no-defin || \
