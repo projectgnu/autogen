@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # strtable.test --- test string-table functionality
 #
-# Time-stamp:        "2010-06-26 16:04:08 bkorb"
+# Time-stamp:        "2011-11-22 12:01:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -68,7 +68,10 @@ echo creating ${testname}.base
 cat > ${testname}.base <<'_EOF_'
 
 static char const scribble[18] =
-    "that\0" "was\0"  "the\0"  "week\0";
+/*     0 */ "that\0"
+/*     5 */ "was\0"
+/*     9 */ "the\0"
+/*    13 */ "week\0";
 
 #define STRING_CT 6
 

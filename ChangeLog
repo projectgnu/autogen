@@ -9,6 +9,11 @@
 	man pages versus mdoc pages.
 	* autoopts/tpl/opt*.t*: rework to use giant string table.
 	* doc/autogen-texi.txt (version-proc): doc new attribute
+	* agen5/schemedef.scm (emit-string-table): clean up output
+	* agen5/test/Makefile.am: add top_*dir to test environment
+	* agen5/test/snarf.test: adjust test
+	* agen5/test/strtable.test: likewise
+	* autoopts/mk-tpl-config.sh: cleanup
 
 2011-10-08  Bruce Korb  <bkorb@gnu.org>
 

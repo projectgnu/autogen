@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2011-04-20 15:04:32 bkorb"
+# Time-stamp:        "2011-11-22 12:02:18 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -120,8 +120,10 @@ void
 Chosen_init(void)
 {
 static char const g_nm[55] =
-    "test->example!\0"   "guile-syntax-ele\0" "bumble-it\0"
-    "mumble-check\0";
+/*     0 */ "test->example!\0"
+/*    15 */ "guile-syntax-ele\0"
+/*    32 */ "bumble-it\0"
+/*    42 */ "mumble-check\0";
 
     NEW_PROC(g_nm +   0, 0, 0, 1, test_to_example_x);
     scm_make_synt(g_nm+15, scm_makacro, scm_m_undefine);
@@ -237,8 +239,10 @@ void
 Chosen_init(void)
 {
 static char const g_nm[55] =
-    "test->example!\0"   "guile-syntax-ele\0" "bumble-it\0"
-    "mumble-check\0";
+/*     0 */ "test->example!\0"
+/*    15 */ "guile-syntax-ele\0"
+/*    32 */ "bumble-it\0"
+/*    42 */ "mumble-check\0";
 
     NEW_PROC(g_nm +   0, 0, 0, 1, test_to_example_x);
     scm_make_synt(g_nm+15, scm_makacro, scm_m_undefine);

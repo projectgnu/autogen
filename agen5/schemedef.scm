@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-11-21 14:57:25 bkorb"
+;;; Time-stamp:        "2011-11-22 19:50:58 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -241,8 +241,9 @@
    (set! stt-idx     (hash-ref stt-idx-tbl str-val))
    (if (not (number? stt-idx))
        (begin
-          (ag-fprintf st-name "%s \"\\0\"\n" (c-string str-val))
           (set! stt-idx (hash-ref stt-curr "current-index"))
+          (ag-fprintf st-name "/* %5d */ %s \"\\0\"\n"
+                      stt-idx (c-string str-val))
           (hash-create-handle! stt-idx-tbl str-val stt-idx)
           (hash-set! stt-curr "current-index"
                     (+ stt-idx (string-length str-val) 1)  )
@@ -290,10 +291,10 @@
    ;; End the last line with a semi-colon
    ;;
    (emit (shell (string-append
-      "(sed 's/^ *//;s/\" \"\\\\0\"/\\\\0\"/' | \
-      columns -I4 --spread=1
-      ) <<\\_EndStringTable_\n" (out-pop #t) "_EndStringTable_")))
-   (emit ";\n")
+     "sed 's/^ /      /;s/\" \"\\\\0/\\\\0/;$s/$/;/' <<\\_EOF_\n"
+     (out-pop #t)
+     "_EOF_")))
+   (emit "\n")
 )))
 
 ;;; /*=gfunc   string_table_size

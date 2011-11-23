@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2011-08-08 10:25:32 bkorb"
+ * Time-stamp:      "2011-11-22 11:41:18 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -959,6 +959,7 @@ prt_prog_detail(tOptions* pOptions)
 static int
 setGnuOptFmts(tOptions* pOpts, tCC** ppT)
 {
+    static char const zOneSpace[] = " ";
     int  flen = 22;
     *ppT = zNoRq_ShrtTtl;
 

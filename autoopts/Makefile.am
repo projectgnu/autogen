@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-06-06 08:50:00 bkorb"
+## Time-stamp:      "2011-11-22 10:22:32 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -112,10 +112,8 @@ $(GENSCRIPTS)   : tpl-config-stamp
 
 tpl-config-stamp: $(HDRS) $(CSRC) \
 	    $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
-	@touch tmp-$@
 	$(BOOTENV) \
 	    $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
-	@mv tmp-$@ $@
 
 makeshell.lo    : genshell.c
 genshell.c      : $(srcdir)/genshell.def

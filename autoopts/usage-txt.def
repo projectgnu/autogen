@@ -453,10 +453,6 @@ utxt = { ut-name = NumberOpt;
          ut-text = "The '-#<number>' option may omit the hash char\n";
 };
 
-utxt = { ut-name = OneSpace;
-         ut-text = " ";
-};
-
 utxt = { ut-name = OnlyOne;
          ut-text = "one %s%s option allowed\n";
 };

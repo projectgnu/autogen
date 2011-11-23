@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2011-04-20 13:46:56 bkorb"
+# Time-stamp:      "2011-11-22 10:14:23 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -31,7 +31,7 @@
 #  We construct this by pulling down the sources from the
 #  AutoGen source directory.  We will also copy out the same
 #  commands as are used there.  ${top_srcdir} is a full path.
-mkdir ${TMPDIR}
+#
 cp ${top_srcdir}/agen5/snarf.tpl ${top_srcdir}/agen5/exp*.c \
    ${top_srcdir}/agen5/func*.c ${TMPDIR}/.
 f=`fgrep '#ifdef DEBUG_ENABLED' ${top_srcdir}/agen5/expr.ini`

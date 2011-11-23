@@ -1,109 +1,127 @@
 #! /bin/sh
 
-PS4='>mtplc> '
-
-set -e
-pid=$$
-prog=`basename $0`
-
 die() {
     echo "$prog failure:  $*"
-    kill -TERM $pid
+    kill -TERM $progpid
     sleep 1
     exit 1
 }
 
-for d in top_srcdir srcdir top_builddir builddir
-do
-    eval v=\${$d}
-    test -d "$v" || die "$d does not reference a directory"
-    v=`cd $v >/dev/null && pwd`
-    eval ${d}=${v}
-done
+init() {
+    PS4='>tpc-${FUNCNAME}> '
+    set -e
+    progpid=$$
+    prog=`basename $0`
+    progdir=`\cd \`dirname $0\` >/dev/null ; pwd`
+    readonly progpid progdir prog
 
-{
-    cat <<- _EOF_
+    for d in top_srcdir srcdir top_builddir builddir
+    do
+        eval v=\${$d}
+        test -d "$v" || die "$d does not reference a directory"
+        v=`cd $v >/dev/null && pwd`
+        eval ${d}=${v}
+    done
+}
+
+collect_src() {
+    exec 8>&1 1>&2
+    cd ${builddir}
+    sentinel_file=${1} ; shift
+    cat 1>&8 <<- _EOF_
 	#include "autoopts/project.h"
 	#define  AUTOOPTS_INTERNAL 1
 	#include "compat/compat.h"
 	#define  LOCAL static
 	_EOF_
 
-    while test $# -gt 0
-    do  test "X$1" = "Xproject.h" || \
-            printf '#include "%s"\n' $1
-        shift
-    done
-} > libopts.c
-
-cd tpl
-
-test -f tpl-config.tlib || exit 1
-test -f ${top_builddir}/config.h || exit 1
-grep 'extension-defines' tpl-config.tlib >/dev/null || {
-    txt=`sed -n '/POSIX.*SOURCE/,/does not conform to ANSI C/{
-  /^#/p
+    for f in "$@"
+    do  test "X$f" = "Xproject.h" || \
+            printf '#include "%s"\n' $f
+    done 1>&8
 }
-/does not conform to ANSI C/q' ${top_builddir}/config.h`
+
+extension_defines() {
+    cd ${builddir}/tpl
+
+    test -f tpl-config.tlib || die "tpl-config.tlib not configured"
+    test -f ${top_builddir}/config.h || die "config.h missing"
+    grep 'extension-defines' tpl-config.tlib >/dev/null || {
+        txt=`sed -n '/POSIX.*SOURCE/,/does not conform to ANSI C/{
+	    /^#/p
+	}
+	/does not conform to ANSI C/q' ${top_builddir}/config.h`
 
     cat >> tpl-config.tlib <<- _EOF_
 	[= (define extension-defines
 	   "${txt}") \\=]
 	_EOF_
+    }
 }
 
-case `uname -s` in
-SunOS )
-  while : ; do
-    POSIX_SHELL=`which bash`
-    test -x "${POSIX_SHELL}" && break
-    POSIX_SHELL=/usr/xpg4/bin/sh
-    test -x "${POSIX_SHELL}" && break
-    die "You are hosed.  You are on Solaris and have no usable shell."
-  done
-  ;;
-esac
+set_shell_prog() {
+    case `uname -s` in
+    SunOS )
+      while : ; do
+        POSIX_SHELL=`which bash`
+        test -x "${POSIX_SHELL}" && break
+        POSIX_SHELL=/usr/xpg4/bin/sh
+        test -x "${POSIX_SHELL}" && break
+        die "You are hosed.  You are on Solaris and have no usable shell."
+      done
+      ;;
+    esac
 
-for f in ${srcdir}/tpl/*.sh ${srcdir}/tpl/*.pl
-do
-    d=`basename $f | sed 's/\.[sp][hl]$//'`
-    st=`sed 1q $f`
-
-    case "$st" in
-    */perl ) echo '#!' `which perl`
-             sed 1d $f
-             ;;
-
-    */sh )   echo '#!' ${POSIX_SHELL}
-             sed 1d $f
-             ;;
-
-    * )      die "Invalid script type: $st"
-             ;;
-    esac > $d
-    chmod 755 $d
-done
-
-while :
-do
-    \unalias -a
-    unset -f command cat which
-    POSIX_CAT=`which cat`
-    test -x "$POSIX_CAT" && break
-    POSIX_CAT=`
-        PATH=\`command -p getconf CS_PATH\`
-        command -v cat `
-    test -x "${POSIX_CAT}" && break
-    die "cannot locate 'cat' command"
-done
-
-for f in man mdoc texi
-do
-    for g in man mdoc texi
+    for f in ${srcdir}/tpl/*.sh ${srcdir}/tpl/*.pl
     do
-        test -f ${f}2${g} || {
-            echo '#!' ${POSIX_CAT} > ${f}2${g}
-            chmod 755 ${f}2${g}
-        }
+        d=`basename $f | sed 's/\.[sp][hl]$//'`
+        st=`sed 1q $f`
+
+        case "$st" in
+        */perl ) echo '#!' `which perl`
+                 sed 1d $f
+                 ;;
+
+        */sh )   echo '#!' ${POSIX_SHELL}
+                 sed 1d $f
+                 ;;
+
+        * )      die "Invalid script type: $st"
+                 ;;
+        esac > $d
+        chmod 755 $d
     done
-done
+}
+
+set_cat_prog() {
+    while :
+    do
+        \unalias -a
+        unset -f command cat which
+        POSIX_CAT=`which cat`
+        test -x "$POSIX_CAT" && break
+        POSIX_CAT=`
+            PATH=\`command -p getconf CS_PATH\`
+            command -v cat `
+        test -x "${POSIX_CAT}" && break
+        die "cannot locate 'cat' command"
+    done
+
+    for f in man mdoc texi
+    do
+        for g in man mdoc texi
+        do
+            test -f ${f}2${g} || {
+                echo '#!' ${POSIX_CAT} > ${f}2${g}
+                chmod 755 ${f}2${g}
+            }
+        done
+    done
+}
+
+init
+collect_src "$@" > ${builddir}/libopts.c
+extension_defines
+set_shell_prog
+set_cat_prog
+touch ${sentinel_file}
