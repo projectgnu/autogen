@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-08-13 16:31:50 bkorb"
+# Time-stamp:        "2011-11-26 08:10:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -57,6 +57,7 @@ cat >> ${testname}.def <<- _EOF_
 	load-opts-value = P;
 	gnu-usage;
 	main = { main-type = shell-process; };
+	include = '#undef DEBUG_ENABLED';
 	_EOF_
 cp ${top_builddir}/config.h ./${testname}-config.h
 

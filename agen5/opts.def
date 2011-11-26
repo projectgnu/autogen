@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-08-08 12:53:28 bkorb"
+ *  Time-stamp:        "2011-11-25 08:55:38 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -775,6 +775,7 @@ flag = {
 
 #ifndef XML2AG
     call-proc   = config_dep;
+    settable;
     no-preset;
     doc = <<- _EOF_
 	This option behaves fairly closely to the way the @code{-M} series of
@@ -817,6 +818,18 @@ flag = {
 	second before the earliest time stamp of any other output file.
 	Consequently, it is suitable for use as the sentinel file testifying
 	to the fact the program was successfully run.
+
+	All of this may also be specified using the @code{DEPENDENCIES_OUTPUT}
+	or @code{AUTOGEN_MAKE_DEP} environment variables.  If defined,
+	dependency information will be output.  If defined with white space
+	free text that is something other than @code{true}, @code{false},
+	@code{yes}, @code{no}, @code{0} or @code{1}, then the string is taken
+	to be an output file name.  If it contains a string of white space
+	characters, the first token is as above and the second token is taken
+	to be the target (sentinel) file as @code{-MT} in the paragraphs
+	above.  @code{DEPENDENCIES_OUTPUT} will be ignored if there are
+	multiple sequences of white space characters or if its contents are,
+	specifically, @code{false}, @code{no} or @code{0}.
 	_EOF_ ;
 #else
     doc = "Pass-through AutoGen argument";

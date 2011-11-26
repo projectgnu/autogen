@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-11-23 10:29:21 bkorb"
+;;; Time-stamp:        "2011-11-23 10:34:40 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -155,12 +155,12 @@
 ;;;  *      +]
 ;;;  *    `'    [+ (string-table-add-ref "scribble" (get "str")) +],[+
 ;;;  *      ENDFOR  +]
-;;;  *    `'    NULL @};
 ;;;  *      [+ (out-suspend "main")
 ;;;  *    `'   (emit-string-table "scribble")
 ;;;  *    `'   (ag-fprintf 0 "\nchar const *ap[%d] = @{" ct)
 ;;;  *    `'   (out-resume "main")
 ;;;  *    `'   (out-pop #t) ;; now dump out the redirected output +]
+;;;  *    `'    NULL @};
 ;;;  *   @end example
 ;;;  *
 ;;;  *   @noindent

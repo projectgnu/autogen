@@ -14,6 +14,12 @@
 	* agen5/test/snarf.test: adjust test
 	* agen5/test/strtable.test: likewise
 	* autoopts/mk-tpl-config.sh: cleanup
+	* agen5/test/string.test: Adjust test for new Guile that strips off
+	the high-order bit in strings.
+	* agen5/schemedef.scm: string table example cleanup
+	* agen5/agUtils.c (check_make_dep_env): implement AUTOGEN_MAKE_DEP
+	and DEPENDENCIES_OUTPUT environment variables.
+	* agen5/opts.def: doc it
 
 2011-10-08  Bruce Korb  <bkorb@gnu.org>
 

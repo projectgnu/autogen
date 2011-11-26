@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-06-03 12:13:25 bkorb"
+ *  Time-stamp:        "2011-11-25 15:26:20 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -233,6 +233,97 @@ open_trace_file(char ** av, tOptDesc * odsc)
 }
 
 LOCAL void
+check_make_dep_env(void)
+{
+    ag_bool have_opt_string = AG_FALSE;
+    ag_bool set_opt         = AG_FALSE;
+
+    char const * mdep = getenv("AUTOGEN_MAKE_DEP");
+    if (mdep == NULL) {
+        mdep = getenv("DEPENDENCIES_OUTPUT");
+        if (mdep == NULL)
+            return;
+    }
+    switch (*mdep) {
+    case NUL: break;
+    case '1':
+        set_opt = (mdep[0] == '1');
+        /* FALLTHROUGH */
+
+    case '0':
+        if (mdep[1] != NUL)
+            have_opt_string = AG_TRUE;
+        break;
+
+    case 'y':
+    case 'Y':
+        set_opt = AG_TRUE;
+        have_opt_string = (streqvcmp(mdep + 1, "es") != 0);
+        break;
+
+    case 'n':
+    case 'N':
+        set_opt = \
+            have_opt_string = (streqvcmp(mdep + 1, "o") != 0);
+        break;
+
+    case 't':
+    case 'T':
+        set_opt = AG_TRUE;
+        have_opt_string = (streqvcmp(mdep + 1, "es") != 0);
+        break;
+
+    case 'f':
+    case 'F':
+        set_opt = \
+            have_opt_string = (streqvcmp(mdep + 1, "alse") != 0);
+        break;
+
+    default:
+        have_opt_string = \
+            set_opt = AG_TRUE;
+    }
+    if (! set_opt) return;
+    if (! have_opt_string) {
+        SET_OPT_MAKE_DEP("");
+        return;
+    }
+
+    {
+        char * pz = AGALOC(strlen(mdep) + 5, "mdep");
+        char * fp = pz;
+
+        *(pz++) = 'F';
+        for (;;) {
+            int ch = *(unsigned char *)(mdep++);
+            if (IS_END_TOKEN_CHAR(ch))
+                break;
+
+            *(pz++) = ch;
+        }
+        *pz = NUL;
+
+        SET_OPT_SAVE_OPTS(fp);
+
+        while (IS_WHITESPACE_CHAR(*mdep))  mdep++;
+        if (*mdep == NUL) return;
+
+        pz = fp;
+        *(pz++) = 'T';
+        for (;;) {
+            int ch = *(unsigned char *)(mdep++);
+            if (IS_END_TOKEN_CHAR(ch))
+                break;
+
+            *(pz++) = ch;
+        }
+        *pz = NUL;
+        SET_OPT_SAVE_OPTS(fp);
+        AGFREE(fp);
+    }
+}
+
+LOCAL void
 doOptions(int arg_ct, char ** arg_vec)
 {
     /*
@@ -286,6 +377,8 @@ doOptions(int arg_ct, char ** arg_vec)
      */
     if (! HAVE_OPT(BASE_NAME))
         define_base_name();
+
+    check_make_dep_env();
 
     if (HAVE_OPT(MAKE_DEP))
         start_dep_file();
