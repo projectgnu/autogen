@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-04-20 13:26:26 bkorb"
+# Time-stamp:        "2011-12-07 14:03:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -107,7 +107,7 @@ go_init()
   DESTdestdir=${TMPDIR}/autoopts \
   top_builddir=${top_builddir} \
     CONFIG_SHELL="${SHELL}" \
-    ${SHELLX} -x ${top_srcdir}/autoopts/install-options-h
+    ${SHELLX} -x ${top_srcdir}/autoopts/install-hook.sh
   AUTOGEN_TEMPL_DIRS=${TMPDIR}
   export AUTOGEN_TEMPL_DIRS
 }

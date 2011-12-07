@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-11-21 11:57:42 bkorb"
+# Time-stamp:      "2011-12-07 14:01:28 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -42,25 +42,35 @@ DEFINE init-and-validate                =][=
     (error (sprintf "prog-name limited to 16 characters:  %s"
            prog-name)) )
 
-(out-push-new)
-
-=]
+(out-push-new)          \=]
+[= # top_builddir
+  ;; top_builddir  NOTE: all lines referencing the build tree are stripped at
+  ;; top_builddir        install time. Please see install-hook.sh script  \=]
 tried=""
 prefix="[=(. inst-prefix)=]"
 exec_prefix="[=(. exec-prefix)=]"
 bindir="[=(. inst-bin-dir)=]"
+test -z "${top_builddir}" && \
+  top_builddir="[=(. top-build-dir)=]"
+test -d "${top_builddir}" || top_builddir='/dev/null'
 
 test_exe() {
-  tried="${tried} ${1}"
-  test -n "${1}" && test -x ${1} && ${1} -v >/dev/null
-  test $? -ne 0 && return 1
-  CLexe=${1}
-}
-test_exe "${CLexe}" || \
-  test_exe ${top_builddir}/columns/columns || \
-  test_exe "${bindir}/columns" || \
-  test_exe columns || \
-  die "cannot locate columns program:  ${tried}"
+  test -z "$1" && return 1
+  case "$1" in
+  */* ) g=$1 ;;
+  * )   g=`command -v $1` ;;
+  esac
+  tried="${tried} ${g:-$1}"
+  test -x "${g}" && "${g}" -v
+  return $?
+} 1>/dev/null 2>&1
+for f in \
+  "${CLexe}" \
+  "${top_builddir}/columns/columns" \
+  "${bindir}/columns" \
+  columns ''
+do test_exe $f && CLexe=$f && break ; done
+test -x "${CLexe}" || die "cannot locate columns program:  tried:${tried}"
 [=
 (make-tmp-dir)
 (shell (out-pop #t))

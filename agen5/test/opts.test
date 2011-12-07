@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # opts.test --- Verify the handling of options
 #
-# Time-stamp:       "2011-05-28 09:56:13 bkorb"
+# Time-stamp:       "2011-12-04 05:12:42 bkorb"
 # Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -36,6 +36,7 @@ unstamp()
       -e '/static char const zDetail/,/";$/d' \
       -e '/static char const zCopyright/,/";$/d' \
       -e '/static char const zLicenseDescrip/,/";$/d' \
+      -e '/ "autogen is free software: /,/www\.gnu\.org\/licenses/d' \
       $1 > $2 ||
     failure Cannot remove stamps from $1
 }

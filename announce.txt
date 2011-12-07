@@ -1,7 +1,7 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# Time-stamp:        "2010-12-13 12:59:58 bkorb"
+# Time-stamp:        "2011-12-04 07:09:39 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -106,7 +106,7 @@ test ${#alpha_rel} -gt 1 && printf "${alpha_rel}\n\n" >&3
   esac
 ) >&3
 
-printf "\nHere are the 'NEWS' entries since the last release\n\n" >&3
+printf "\nHere are the 'NEWS' entries since the last release\n" >&3
 sed "/^New in ${AG_VERSION} -/d ; /^New in /,\$d" NEWS >&3
 
 cat >&3 <<_EOF_

@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-06-06 08:50:27 bkorb"
+# Time-stamp:      "2011-12-07 14:01:07 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -69,7 +69,7 @@ add_files_to_mf() {
         pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
         edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
         edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
-        edta="${edta}install-options-h${nl}po${nl}tpl/usage-txt.tpl${nl}"
+        edta="${edta}install-hook.sh${nl}po${nl}tpl/usage-txt.tpl${nl}"
 
         for f in tpl/*.*
         do

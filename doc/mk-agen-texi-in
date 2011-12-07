@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2011-11-20 09:54:11 bkorb"
+# Time-stamp:        "2011-12-04 09:06:15 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -46,10 +46,15 @@ build_gnudocs()
     q
 }'
 
+  case "X$-" in
+    *x* ) local dashx=-x ;;
+    *   ) local dashx=   ;;
+  esac
+
   title=`sed -n 's/^@title  *//p' agdoc.texi`
   email=--email' '`sed -n "$sedcmd" agdoc.texi`
   opts="--texi2html ${email}"
-  PS4='>${FUNCNAME:-gd}> ' ${SHELL} -x \
+  PS4='>${FUNCNAME:-gd}> ' ${SHELL} ${dashx} \
     ${srcdir}/gendocs.sh $opts autogen "$title"
 }
 

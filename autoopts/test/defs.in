@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-08-07 17:27:50 bkorb"
+# Time-stamp:     "2011-12-04 05:38:52 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -59,10 +59,12 @@ cfg_vals()
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
   PS4=">${testname}-\${FUNCNAME}> "
   tabch='	'
-
-  srcdir=`cd "@srcdir@" && pwd `
-  top_srcdir=`cd "@top_srcdir@" && pwd`
-  top_builddir=`cd @top_builddir@ && pwd`
+  test -z "$srcdir"       && exit 1
+  srcdir=`cd $srcdir >/dev/null && pwd`
+  test -z "$top_srcdir"   && exit 1
+  top_srcdir=`cd $top_srcdir >/dev/null && pwd`
+  test -z "$top_builddir" && exit 1
+  top_builddir=`cd $top_builddir >/dev/null && pwd`
   GUILE_VERSION="@GUILE_VERSION@"
   LIBGUILE_PATH="@LIBGUILE_PATH@"
   AG_VERSION="@AG_VERSION@"
@@ -88,13 +90,13 @@ cfg_vals()
   nl='
 ' ht='	'
 
-  set +a
-
   stdopts=${top_srcdir}/autoopts/test/stdopts.def
   test_main=yes
   use_flags=true
   sed_omit_license="/-\*- buffer-read-only:/,/^ \*\//d"
   TERM=''
+  set +a
+
   (
     test_local() {
       local local_works=yes

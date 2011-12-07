@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-11-22 10:22:32 bkorb"
+## Time-stamp:      "2011-12-07 14:00:49 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -96,9 +96,9 @@ lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
-BOOTENV         = top_srcdir="$(top_srcdir)" srcdir="$(srcdir)" \
-	top_builddir="$(top_builddir)" builddir="$(builddir)" \
-	AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
+BOOTENV         = AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
+	srcdir="$(srcdir)"     top_srcdir="$(top_srcdir)" \
+	builddir="$(builddir)" top_builddir="$(top_builddir)" \
 	POSIX_SHELL="$(POSIX_SHELL)"
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -158,7 +158,7 @@ install-data-hook:
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
 	POSIX_SHELL='$(POSIX_SHELL)'  \
 	bindir='$(bindir)' \
-	$(POSIX_SHELL) $(srcdir)/install-options-h
+	$(POSIX_SHELL) $(srcdir)/install-hook.sh
 
 .NOTPARALLEL:
 

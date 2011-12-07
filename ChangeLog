@@ -1,3 +1,29 @@
+2011-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def (make-dep): fix up usage information.
+	* autoopts/install-hook.sh: renamed from install-option-h
+	(usage.tlib): remove references to build directories and get
+	install information from autoopts-config.
+	(optlib.tlib): remove references to build directories.
+	* autoopts/tpl/optlib.tlib: make it sedable by install hook.
+	* autoopts/tpl/usage.tlib: likewise
+
+2011-12-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/Makefile.am (TESTS_ENVIRONMENT): clarify list
+	* autoopts/test/Makefile.am (TESTS_ENVIRONMENT): augment with
+	srcdir and builddir values.
+	* autoopts/test/defs.in: ensure that these values are full paths
+	* autoopts/tpl/optlib.tlib: add more care that we can find
+	${top_builddir} when running from installation.
+	* autoopts/tpl/tpl-config-tlib.in: add pre-configured guess for
+	top-build-dir value.
+	* agen5/test/opts.test: remove text that BSD formats differently
+	* agen5/test/snarf.test: find src dirs relative to top_srcdir
+	instead of srcdir.
+	* autoopts/mk-tpl-config.sh: burn top-build-dir and top-src-dir
+	into the installed tpl-config.tlib file.
+
 2011-11-19  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expFormat.c (assemble_full_desc): insert separator correctly

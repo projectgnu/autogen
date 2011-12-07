@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-11-25 08:55:38 bkorb"
+ *  Time-stamp:        "2011-12-07 08:15:43 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -810,14 +810,18 @@ flag = {
 	@end example
 	and then in your @code{Makefile}, make the @file{autogen} rule:
 	@example
-	whatever-you-like.dep:
+	-include whatever-you-like.dep
+	your-sentinel-file:
 	    autogen -MT$@@ -MF$*.d .....
 	@end example
 
 	The modification time on the dependency file is adjusted to be one
 	second before the earliest time stamp of any other output file.
 	Consequently, it is suitable for use as the sentinel file testifying
-	to the fact the program was successfully run.
+	to the fact the program was successfully run.  (@code{-include} is
+	the GNU make way of specifying "include it if it exists".  Your make
+	must support that feature or your bootstrap process must create the
+	file.)
 
 	All of this may also be specified using the @code{DEPENDENCIES_OUTPUT}
 	or @code{AUTOGEN_MAKE_DEP} environment variables.  If defined,

@@ -1,5 +1,16 @@
 New in __CURRENT_VERSION__ June 2011
 
+* Several more changes to keep Guile from "fixing" (breaking) strings.
+
+* AutoOpts now uses string tables instead of individual static char const's.
+
+* AutoOpts now supports vendor-opt attribute to auto-implement the "-W"
+  option for POSIX specified utilities
+
+* fiddle man page generation to facilitate mdoc man pages.
+
+New in 5.12 June 2011
+
 * man page templates have been regularized so it is now easier to
   use doc-section stanzas in the option definition files.
 
@@ -7,15 +18,7 @@ New in __CURRENT_VERSION__ June 2011
   has coelesced around pre-1.7 vs. 1.7-and-later interfaces, yielding
   only two forms for each interface.
 
-* text_mmap() was hardened.
-
 * The new licensing scheme is now used in the distributed templates.
-
-New in 5.11.9 May 2011
-
-* licenses have been moved to separate files.  They are no longer
-  hard coded in autogen.  Consequently, clients may add their own.
-* BASH-ism fix.
 
 New in 5.11.8 March 2011
 
@@ -26,20 +29,9 @@ New in 5.11.8 March 2011
 * AutoOpts argument types of "time and date" have been added
   to the current support for time duration.
 
-* Fixed messup with a data structure.....
-
 New in 5.11.6 February 2011
 
 * Cope with Guile version number 2.0
-
-* XML character encodings are parsed in config files, thus
-  <opt-name>...&lt;...</opt-name> yields "...<..."
-
-* exit codes are enumerated for auto-opts projects
-  They will appear in an enumeration in the header file and
-  in generated documentation.
-
-* program documentation templates have been improved.  See docs.
 
 * packaging information
   The PKGDATADIR and --with-packager... information are now

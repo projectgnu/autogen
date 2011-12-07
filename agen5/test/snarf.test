@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2011-11-22 12:02:18 bkorb"
+# Time-stamp:        "2011-12-03 14:15:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -62,8 +62,8 @@ _EOF_
 
 f=`echo ${AGexe} | ${SED} 's/ .*//'`
 
-agsrc=`cd $srcdir/.. && pwd`
-tplsrc=`dirname $agsrc`/autoopts/tpl
+agsrc=`cd $top_srcdir/agen5 && pwd`
+tplsrc=`cd $top_srcdir/autoopts/tpl && pwd`
 
 cat > ${testname}.cfg <<- _EOF_
 	subblock       exparg=arg_name,arg_desc,arg_optional,arg_list

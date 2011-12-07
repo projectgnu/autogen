@@ -46,17 +46,25 @@ extension_defines() {
 
     test -f tpl-config.tlib || die "tpl-config.tlib not configured"
     test -f ${top_builddir}/config.h || die "config.h missing"
-    grep 'extension-defines' tpl-config.tlib >/dev/null || {
-        txt=`sed -n '/POSIX.*SOURCE/,/does not conform to ANSI C/{
+    grep 'extension-defines' tpl-config.tlib >/dev/null && return
+
+    txt=`sed -n '/POSIX.*SOURCE/,/does not conform to ANSI C/{
 	    /^#/p
 	}
 	/does not conform to ANSI C/q' ${top_builddir}/config.h`
 
-    cat >> tpl-config.tlib <<- _EOF_
-	[= (define extension-defines
+    {
+        sed '/define  *top-build-dir/d;/^;;;/d' tpl-config.tlib
+        cat <<- _EOF_
+	(define top-build-dir   "`cd ${top_builddir} >/dev/null
+		pwd`")
+	(define top-src-dir     "`cd ${top_srcdir} >/dev/null
+		pwd`")
+	(define extension-defines
 	   "${txt}") \\=]
 	_EOF_
-    }
+    } > tpl-config.$$
+    mv -f  tpl-config.$$  tpl-config.tlib
 }
 
 set_shell_prog() {
