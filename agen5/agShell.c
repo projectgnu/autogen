@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-10-08 10:46:21 bkorb"
+ *  Time-stamp:        "2011-12-09 12:30:37 bkorb"
  *
  *  Manage a server shell process
  *
@@ -465,6 +465,7 @@ load_data(void)
      */
     while ((pzScan > pzText) && IS_WHITESPACE_CHAR(pzScan[-1])) pzScan--;
     textSize = (pzScan - pzText) + 1;
+    *pzScan  = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         fprintf(pfTrace, "\n= = = RESULT %d bytes:\n%s%s\n"
@@ -472,7 +473,6 @@ load_data(void)
                 (int)textSize, pzText, zLine);
     }
 
-    *pzScan  = NUL;
     return AGREALOC((void*)pzText, textSize, "resizing text output");
 }
 

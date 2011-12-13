@@ -6,7 +6,17 @@
 	install information from autoopts-config.
 	(optlib.tlib): remove references to build directories.
 	* autoopts/tpl/optlib.tlib: make it sedable by install hook.
-	* autoopts/tpl/usage.tlib: likewise
+	* autoopts/tpl/usage.tlib: likewise, but also redirect stdout to stderr
+	while constructing the emit-help-text program.
+	* agen5/agShell.c (load_data): NUL terminate string before printing
+	* autoopts/autoopts.m4 (min_opts_version): this is a test to verify
+	that the autoopts library is more recent than 2001.  Not important.
+	(changequote): disparaged M4 feature.  Use shell's IFS & set.
+	Clean up code based on these two changes.
+	* autoopts/options_h.tpl (OPTIONS_VER_TO_NUM): new macro to facilitate
+	the m4 code above.
+	* doc/autogen-texi.txt (getopt_long): clarify description of what you
+	need to do to get it working.
 
 2011-12-04  Bruce Korb  <bkorb@gnu.org>
 

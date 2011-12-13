@@ -3,7 +3,7 @@ dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
 dnl
 dnl Author:            Gary V. Vaughan <gvaughan@localhost>
-dnl Time-stamp:        "2011-04-06 09:26:16 bkorb"
+dnl Time-stamp:        "2011-12-13 09:45:03 bkorb"
 dnl
 dnl  This file is part of AutoOpts, a companion to AutoGen.
 dnl  AutoOpts is free software.
@@ -62,28 +62,24 @@ AC_ARG_ENABLE(opts-test,
   else
     AC_PATH_PROG(AUTOOPTS_CONFIG, autoopts-config, no)
   fi
-  min_opts_version="9:0:0"
-  AC_MSG_CHECKING(for autoopts version >= $min_opts_version)
+  AC_MSG_CHECKING(for compatible autoopts version)[
   no_autoopts=""
   if test "$AUTOOPTS_CONFIG" = "no" ; then
     no_autoopts=yes
   else
-    min_cur=9
-    min_rev=0
-    min_age=0
     AUTOGEN=`$AUTOOPTS_CONFIG $aocfg_args --autogen`
     AUTOOPTS_CFLAGS=`$AUTOOPTS_CONFIG $aocfg_args --cflags`
     AUTOGEN_LDFLAGS=`$AUTOOPTS_CONFIG $aocfg_args --pkgdatadir`
     AUTOOPTS_LIBS=`$AUTOOPTS_CONFIG $aocfg_args --libs`
-changequote(,)dnl
     aocfg_version=`$AUTOOPTS_CONFIG $aocfg_args --version`
-    aocfg_current=`echo $aocfg_version | \
-      sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\1/'`
-    aocfg_revision=`echo $aocfg_version | \
-      sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\2/'`
-    aocfg_age=`echo $aocfg_version | \
-      sed 's/\([0-9]*\):\([0-9]*\):\([0-9]*\)/\3/'`
-changequote([,])dnl
+    save_IFS=$IFS
+    IFS=' :'
+    set -- $aocfg_version
+    IFS=$save_IFS
+    aocfg_current=$1
+    aocfg_revision=$2
+    aocfg_age=$3
+    aocfg_currev=$1.$2
     if test "x$enable_opts_test" != "xno" ; then
       AC_LANG_SAVE
       AC_LANG_C
@@ -92,20 +88,26 @@ changequote([,])dnl
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $AUTOOPTS_CFLAGS"
       LDFLAGS="$LDFLAGS $AUTOOPTS $CFLAGS"
-      LIBS="$LIBS $AUTOOPTS_LIBS"
+      LIBS="$LIBS $AUTOOPTS_LIBS"]
       dnl
       dnl Now check if the installed AUTOOPTS is sufficiently new. (Also
       dnl sanity checks the results of autoopts-config to some extent.
       dnl
       rm -f confopts.def conf.optstest
       AC_TRY_RUN([
-#include <autoopts/options.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <autoopts/options.h>
+#ifndef OPTIONS_VER_TO_NUM
+#define  OPTIONS_VER_TO_NUM(_v, _r) (((_v) * 4096) + (_r))
+#endif
 
 static char const zBadVer[] = "\n\\
-*** 'autoopts-config --version' returned $aocfg_current:$aocfg_revision:$aocfg_age,\n\\
-***                but autoopts returned (%d:%d:0)\n\\
+*** 'autoopts-config --version' returned $aocfg_version,\n\\
+***                but autoopts returned %d:%d:0\n\\
+***             and the header file says %s\n\\
+*** These should all be consistent.\n\n\\
 *** If autoopts-config was correct, then it is best to remove the old version\n\\
 *** of autoopts. You may also be able to fix the error by modifying your\n\\
 *** LD_LIBRARY_PATH enviroment variable, or by editing /etc/ld.so.conf.\n\\
@@ -114,59 +116,42 @@ static char const zBadVer[] = "\n\\
 *** the correct copy of autoopts-config, and remove the file config.cache\n\\
 *** before re-running configure.\n";
 
-static char const zOldVer[] = "\n\\
-*** An old version of autoopts (%d:%d:%d) was found.\n\\
-*** You need a version of autoopts newer than $min_cur:$min_rev:$min_age.  \
-The latest version of\n\\
-*** autoopts is always available from http://autogen.sourceforge.net.\n\\
-*** If you have already installed a sufficiently new version, this error\n\\
-*** probably means that the wrong copy of the autoopts-config shell script is\n\\
-*** being found. The easiest way to fix this is to remove the old version\n\\
-*** of autoopts, but you can also set the AUTOOPTS_CONFIG environment to point\n\\
-*** to the correct copy of autoopts-config. (In this case, you will have to\n\\
-*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n\\
-*** so that the correct libraries are found at run-time).\n";
-
-
 int
-main ()
+main (int argc, char ** argv)
 {
-    int current, revision;
+    int current, revision, ct;
     char tmp_version[256];
 
     system ("touch conf.optstest");
 
+    /*
+     *  Test liked library against header file
+     */
     strcpy(tmp_version, optionVersion());
-    if (sscanf(tmp_version, "%d.%d", &current, &revision) != 2) {
-        printf("bad version string: -->>%s<<-- is not -->>%d.%d<<--\n",
-               optionVersion(), current, revision);
-        exit(1);
-    }
-
-    if (  (current  != $aocfg_current)
-       || (revision != $aocfg_revision)) {
-        printf( zBadVer, current, revision);
+    ct = sscanf(tmp_version, "%d.%d", &current, &revision);
+    if (ct != 2) {
+        printf("bad version string: -->>%s<<-- != -->>$aocfg_currev<<--\n",
+               optionVersion());
         return 1;
     }
-#if defined (AO_CURRENT) && defined (AO_REVISION) && defined (AO_AGE)
-    if (  ($aocfg_current  != AO_CURRENT)
-       || ($aocfg_revision != AO_REVISION)
-       || ($aocfg_age      != AO_AGE))  {
-        printf("*** autoopts header files (version %d:%d:%d) do not match\n",
-               AO_CURRENT, AO_REVISION, AO_AGE);
-        printf("*** library (version %d:%d:0)\n", current, revision);
+
+    if (OPTIONS_VER_TO_NUM(current, revision) != OPTIONS_STRUCT_VERSION) {
+        printf(zBadVer, current, revision, OPTIONS_VERSION_STRING);
         return 1;
     }
-#endif
 
-    if (  ($aocfg_current - $aocfg_age > $min_cur)
-       || (  ($aocfg_current - $aocfg_age == $min_cur)
-          && ($aocfg_revision >= $min_rev) ))
-        return 0;
+    /*
+     *  Test autoopts-config against header version
+     */
+    if (   OPTIONS_VER_TO_NUM($aocfg_current, $aocfg_revision)
+        != OPTIONS_STRUCT_VERSION) {
+        printf("*** autoopts header file version "OPTIONS_VERSION_STRING"\n"
+               "*** does not match autoopts-config value $aocfg_version\n"
+               "*** library version is %d:%d\n", current, revision);
+        return 1;
+    }
 
-    printf(zOldVer, $aocfg_current, $aocfg_revision,
-           $aocfg_age);
-    return 1;
+    return 0;
 }
 ],, no_autoopts=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
       CFLAGS="$ac_save_CFLAGS"
@@ -182,12 +167,12 @@ main ()
   else
     AC_MSG_RESULT(no)
     if test "$AUTOOPTS_CONFIG" = "no" ; then
-      cat << _EOF_
-*** The autoopts-config script installed by AutoGen could not be found
-*** If AutoGen was installed in PREFIX, make sure PREFIX/bin is in
-*** your path, or set the AUTOOPTS_CONFIG environment variable to the
-*** full path to autoopts-config.
-_EOF_
+      cat <<- _EOF_
+	*** The autoopts-config script installed by AutoGen could not be found
+	*** If AutoGen was installed in PREFIX, make sure PREFIX/bin is in
+	*** your path, or set the AUTOOPTS_CONFIG environment variable to the
+	*** full path to autoopts-config.
+	_EOF_
      else
        if test -f conf.optstest ; then
          :

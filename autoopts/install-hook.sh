@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-12-07 15:14:13 bkorb"
+# Time-stamp:        "2011-12-09 12:24:19 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -23,7 +23,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 egrep '#undef +AUTOOPTS_ENABLED' ${top_builddir}/config.h >/dev/null && \
- exit 0
+    exit 0
 
 srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
@@ -45,7 +45,7 @@ cfgf=${top_builddir}/config.h
     then echo '#include <limits.h>'
     else echo '#include <sys/limits>' ; fi
 
-    if egrep 'define +HAVE_U_INT' ${cfgf}
+    if egrep 'define +HAVE_U_INT' ${cfgf} >/dev/null
     then :
     else echo 'typedef unsigned int u_int;' ; fi
 
@@ -73,13 +73,13 @@ cfgf=${top_builddir}/config.h
         echo "#endif /* HAVE_UINTPTR_T */"
     fi
 
-    sedcmd='1,/^#endif.*HAVE_SYSEXITS_H/d'
+    sedcmd='1,/END-CONFIGURED-HEADERS/d'
 
     if egrep 'define +HAVE_PATHFIND' ${cfgf} >/dev/null
-    then sedcmd="${sedcmd};/ifndef HAVE_PATHFIND/,/endif.*HAVE_PATHFIND/d"
-    else sedcmd="${sedcmd};/ HAVE_PATHFIND/d" ; fi
+    then nopathfind='/From:.*pathfind\.c/,/#endif.*HAVE_PATHFIND/d'
+    else nopathfind='/HAVE_PATHFIND/d' ; fi
 
-    sed "${sedcmd}" ${opthdrsrc} >&3
+    sed "${sedcmd};${nopathfind}" ${opthdrsrc}
 } > ${DESTdestdir}/options.h
 
 test -d "${DESTpkgdatadir}" && {
@@ -87,17 +87,9 @@ test -d "${DESTpkgdatadir}" && {
 s%(setenv "SHELL" .*%(setenv "SHELL" "'${POSIX_SHELL}'")%
 / test_exe ".*\/columns"/s%"[^"]*"%"'${bindir}'/columns"%'
 
-    sedusage='/# WARNING: *the following code is sedded/,/^}/d
-	/top_builddir/d
-	/^ldflags=/s/="\$ldflags /="/
-
-	/AGexe-autogen/i\
-	ag=`set -- ${AGexe-autogen}\
-	    command -v $1 `\
-	ag=`dirname $ag`\
-	ldflags="${ldflags} `${ag}/autoopts-config ldflags`"\
-	flags="`${ag}/autoopts-config cflags` ${flags}"
-'
+    sedusage='/# *START-BUILDTREE-ISMS/,/# *END-BUILDTREE-ISMS/d
+	/INSTALL-ONLY-CODE/d
+	/^##/d'
 
     cd ${DESTpkgdatadir}
     for f in *

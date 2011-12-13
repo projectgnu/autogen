@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2011-08-07 10:22:27 bkorb"
+# Time-stamp:      "2011-12-13 10:44:52 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -35,7 +35,7 @@ h=options.h
  *
  *  Automated Options Copyright [=`date +'(C) 1992-%Y'`=] by Bruce Korb
  *
-[=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
+ *  [=(lgpl "AutoOpts" "Bruce Korb" " *  ")=]
  */
 [=(make-header-guard "autoopts")=]
 #include <sys/types.h>
@@ -56,9 +56,9 @@ h=options.h
 #if defined(HAVE_SYSEXITS_H)
 #  include <sysexits.h>
 #endif /* HAVE_SYSEXITS_H */
-
-#ifndef EX_USAGE
-#  define EX_USAGE              64
+// END-CONFIGURED-HEADERS
+#ifndef  EX_USAGE
+# define EX_USAGE               64
 #endif
 
 /*
@@ -77,11 +77,12 @@ h=options.h
  *  See the relevant generated header file to determine which and what
  *  values for "opt_name" are available.
  */
-#define  OPTIONS_STRUCT_VERSION  [=  vers-curr    =]
-#define  OPTIONS_VERSION_STRING  "[= vers-sovers  =]"
-#define  OPTIONS_MINIMUM_VERSION [=  vers-min     =]
-#define  OPTIONS_MIN_VER_STRING  "[= vers-min-str =]"
-
+#define OPTIONS_STRUCT_VERSION      [=  vers-curr    =]
+#define OPTIONS_VERSION_STRING      "[= vers-sovers  =]"
+#define OPTIONS_MINIMUM_VERSION     [=  vers-min     =]
+#define OPTIONS_MIN_VER_STRING      "[= vers-min-str =]"
+#define OPTIONS_VER_TO_NUM(_v, _r)  (((_v) * 4096) + (_r))
+	
 typedef enum {
     OPARG_TYPE_NONE             =  0,
     OPARG_TYPE_STRING           =  1,    /* default type/ vanilla string      */

@@ -5419,7 +5419,7 @@ the use of AutoOpts features:
 @enumerate
 @item
 You cannot automatically take advantage of environment variable options or
-rc (ini) files.
+automated parsing of configuration files (``rc'' or ``ini'' files).
 
 @item
 You cannot use set membership, enumerated, range checked or stacked
@@ -5446,17 +5446,29 @@ The usage text is, therefore, statically defined.
 
 @item
 You must supply some compile and link options via environment variables.
+
 @table @samp
 @item srcdir
 In case the option definition file lives in a different directory.
 @item CFLAGS
-Any special flags required to compile.  This should minimally include
-the output from running the @code{autoopts-config cflags} script.
+Any special flags required to compile.  The flags from
+@code{autoopts-config cflags} will be included automatically.  Since
+the creation of the option parsing code includes creating a program
+that prints out help text, if it is necessary to include files from
+various directories to compile that program, you will need to specify
+those directories with ``-Idirpath'' text in the @code{CFLAGS}.
+Some experimentation may be necessary in that case.
+
+@strong{NOTE}: the ``-Idirpath'' text is only needed if your option
+callback functions include code that require additional ``#include''
+directives.
 @item LDFLAGS
-Any special flags required to link.  This should minimally include
-the output from running the @code{autoopts-config ldflags} script.
+Any special flags required to link.  The flags from
+@code{autoopts-config ldflags} will be included automatically.  This
+is required only if additional link flags for the help text emission
+program might be needed.
 @item CC
-Set this only if ``@code{cc}'' cannot be found in @code{$PATH}
+This is needed only if ``@code{cc}'' cannot be found in @code{$PATH}
 (or it is not the one you want).
 @end table
 @end enumerate
@@ -5477,6 +5489,19 @@ the global @code{prog-name} attribute in the option definition file.  You must
 compile and link both @file{.c} files into your program.  If there are link
 failures, then you are using AutoOpts features that require the @file{libopts}
 library.  You must remove these features.
+
+@emph{Also please note}: though the compile/build of a project that utilizes
+the @file{getopt-progname.c} output does *not* require AutoOpts to be installed,
+the header file @strong{is} required.  In preparing your sources, you must
+pick a directory that the compiler uses for including with a ``-I'' option and:
+@example
+destdir=$top_srcdir/path/to/includes
+mkdir $destdir/autoopts
+cp `autoopts-config includedir`/autoopts/options.h \
+   $destdir/autoopts/.
+@end example
+
+A better solution will be worked out, but is not currently available.
 
 @c === SECTION MARKER
 
