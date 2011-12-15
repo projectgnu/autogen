@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2011-03-04 09:29:20 bkorb"
+ *  Time-stamp:        "2011-12-15 12:21:13 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -308,39 +308,6 @@ ag_scm_version_compare(SCM op, SCM v1, SCM v2)
     v2 = SCM_FROM(val2);
     return scm_apply(op, v1, scm_cons(v2, AG_SCM_LISTOFNULL()));
 }
-
-
-/*=gfunc chdir
- *
- * what:   Change current directory
- *
- * exparg: dir, new directory name
- *
- * doc:  Sets the current directory for AutoGen.  Shell commands will run
- *       from this directory as well.  This is a wrapper around the Guile
- *       native function.  It returns its directory name argument and
- *       fails the program on failure.
-=*/
-SCM
-ag_scm_chdir(SCM dir)
-{
-    static char const zChdirDir[] = "chdir directory";
-
-    scm_chdir(dir);
-
-    /*
-     *  We're still here, so we have a valid argument.
-     */
-    if (pCurDir != NULL)
-        free(pCurDir);
-    {
-        char const * pz = ag_scm2zchars(dir, zChdirDir);
-        pCurDir = malloc(AG_SCM_STRLEN(dir) + 1);
-        strcpy((char*)pCurDir, pz);
-    }
-    return dir;
-}
-
 
 /*=gfunc count
  *

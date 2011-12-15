@@ -2,7 +2,7 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2011-06-03 12:20:50 bkorb"
+ *  Time-stamp:        "2011-12-15 12:22:12 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -453,8 +453,6 @@ MODE int            stackSize        VALUE( 16 );
 MODE tDefEntry *    parseStack[16]   VALUE( { 0 } );
 MODE tDefEntry **   ppParseStack     VALUE( parseStack );
 MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
-
-MODE tpChar         pCurDir          VALUE( NULL );
 
 MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
 

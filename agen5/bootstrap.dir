@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-03-06 16:15:30 bkorb"
+# Time-stamp:        "2011-12-15 12:35:27 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -198,7 +198,7 @@ make_exprini()
     test ${#DEBUG_ENABLED} -gt 0 && \
         printf '%-15s %s\n' assign 'debug-enabled = true' >&3
 
-    for f in func*.c exp*.c
+    for f in func*.c exp*.c agShell.c
     do echo input ${f} ; done >&3
     exec 3>&-
 

@@ -4,7 +4,22 @@
 	opt-def.c and opt-def.h files, then extract out the option
 	definitions and structures from options.h into the getopt-prog.h
 	header.  Edit the opt-def.h header to include this header
-	instead of autoopts/options.h.
+	instead of autoopts/options.h.  Make sure the autogen and
+	autoopts-config programs used come from the same distribution.
+
+	* agen5/expState.c (ag_scm_chdir): move function
+	* agen5/agShell.c (ag_scm_chdir): to here and make pCurDir static
+	(server_setup): too large.  Break it up.  Emit AGexe=... to init
+	* agen5/Makefile.am (agShell.c): now part of EXPRLIST
+	* agen5/bootstrap.dir (agShell.c): likewise
+	* agen5/test/expr.test (agShell.c): likewise
+	* agen5/test/shell.test: strip AGexe= from test output text
+	* autoopts/test/getopt.test: Change primary template to getopt.
+	* agen5/autogen.h (pCurDir): removed
+	* agen5/schemedef.scm (emit-string-table): trim last NUL byte
+	'cuz some compilers insist upon supplying their own.
+	* agen5/test/strtable.test: adjust for changed last lines
+	* agen5/test/snarf.test: likewise
 
 2011-12-10  Bruce Korb  <bkorb@gnu.org>
 

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2011-10-08 10:36:41 bkorb"
+# Time-stamp:        "2011-12-15 13:26:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -130,6 +130,8 @@ cat > ${testname}.sample <<-  \_EOF_
 run_ag x --shell=$PWD/shell ${testname}.def || \
     failure "autogen ${testname}.def"
 
+grep -v '^AGexe=' ${testname}.test > ${testname}.XX
+mv -f ${testname}.XX ${testname}.test
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup
      exit 0

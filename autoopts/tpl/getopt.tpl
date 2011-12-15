@@ -3,8 +3,8 @@
    h=%s-temp.h
    c=%s-temp.c  +][+
 
-`stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-12-15 05:28:55 bkorb"
+`stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
+  Time-stamp:        "2011-12-15 14:06:47 bkorb"
 _EOF_
 \` `            +][+
 
@@ -53,20 +53,37 @@ _EOF_
  *  Last template edit: [+ `echo $stamp` +]
  */[+
 CASE (suffix) +][+
-== h        +][+ (define header-file (out-name)) +][+ (out-push-new) \+]
+== h          +][+
+ (define header-file (out-name))
+ (out-push-new) \+]
 {
     def_file=[+ (def-file) +]
-    autogen $def_file
+    ${AGexe} -b[+ (base-name) +] -Toptions.tpl $def_file
     def_hdr=${def_file%.def}.h
-    sed '/#include/s@<autoopts/options.h>@"[+ (. header-file)
-        +]"@' $def_hdr > ${def_hdr}-$$
-    mv -f ${def_hdr}-$$ $def_hdr
-    tarfile=`autoopts-config libsrc`
+    sed 's@<autoopts/options.h>@"[+ (. header-file)
+        +]"@' $def_hdr > XXX-$$
+    mv -f XXX-$$ $def_hdr
+    aocfg=`echo ${AGexe} | sed 's@/[^/]*$@@'`
+
+    if ! test -x ${aocfg}/autoopts-config
+    then
+        # Check for AGexe in build directory and a subdirectory of build
+        #
+        aocfg=`echo ${aocfg} | sed 's@/[^/]*$@@'`/autoopts
+        test -x ${aocfg}/autoopts-config || {
+            aocfg=`echo ${aocfg} | sed 's@/[^/]*/autoopts$@@'`/autoopts
+            test -x ${aocfg}/autoopts-config || \
+                die 'cannot locate autoopts-config'
+        }
+    fi
+
+    tarfile=`${aocfg}/autoopts-config libsrc`
     hdrfile=`gunzip -c $tarfile | tar tf - | fgrep /autoopts/options.h`
     gunzip -c $tarfile | tar xf - $hdrfile
     exec 3< $hdrfile
     untardir=`echo $hdrfile | sed 's@/.*@@'`
 } >&2
+
 while :
 do
     IFS= read -r -u3 line || die "no header guard in $hdrfile"
@@ -75,6 +92,7 @@ do
     esac
 done
 echo
+
 while :
 do
     echo "$line"
@@ -96,6 +114,8 @@ cat <<- _EOF_
 	#endif
 
 	extern int process_[+(. prog-name)+]_opts(int argc, char** argv);
+	extern tUsageProc optionUsage;
+	extern void optionPrintVersion(tOptions* pOptions, tOptDesc* pOptDesc);
 
 	CPLUSPLUS_CLOSER
 	_EOF_

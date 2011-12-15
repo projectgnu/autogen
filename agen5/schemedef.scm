@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-11-23 10:34:40 bkorb"
+;;; Time-stamp:        "2011-12-15 14:17:36 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -290,7 +290,10 @@
    ;; End the last line with a semi-colon
    ;;
    (emit (shell (string-append
-     "sed 's/^ /      /;s/\" \"\\\\0/\\\\0/;$s/$/;/' <<\\_EOF_\n"
+     "sed 's/^ /      /
+	$s/\" \"\\\\0\"/\";/
+	s/\" \"\\\\0/\\\\0/
+	' <<\\_EOF_\n"
      (out-pop #t)
      "_EOF_")))
    (emit "\n")

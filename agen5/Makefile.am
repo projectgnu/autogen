@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-04-20 16:09:40 bkorb"
+## Time-stamp:      "2011-12-15 12:37:22 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -37,17 +37,22 @@ MAINTAINERCLEANFILES = $(GEN_CSRC)
 
 bin_PROGRAMS    = autogen
 
+# The list of source files with AutoGen functions
+#
 FUNCLIST        = \
 	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
 
+# The list of source files with Guile expression functions defined
+#
 EXPRLIST        = \
 	expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
-	expOutput.c  expPrint.c  expState.c expString.c $(FUNCLIST)
+	expOutput.c  expPrint.c  expState.c expString.c agShell.c \
+	$(FUNCLIST)
 
 FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
     autogen.c    $(FSMLIST)   $(EXPRLIST) \
-    agCgi.c      agInit.c     agShell.c  agUtils.c    \
+    agCgi.c      agInit.c     agUtils.c    \
     defDirect.c  defFind.c    defLex.c   defLoad.c    \
     fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
     tpLoad.c     tpParse.c    tpProcess.c

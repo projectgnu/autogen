@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-12-09 12:30:37 bkorb"
+ *  Time-stamp:        "2011-12-15 12:51:04 bkorb"
  *
  *  Manage a server shell process
  *
@@ -21,6 +21,39 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+static char * cur_dir = NULL;
+
+/*=gfunc chdir
+ *
+ * what:   Change current directory
+ *
+ * exparg: dir, new directory name
+ *
+ * doc:  Sets the current directory for AutoGen.  Shell commands will run
+ *       from this directory as well.  This is a wrapper around the Guile
+ *       native function.  It returns its directory name argument and
+ *       fails the program on failure.
+=*/
+SCM
+ag_scm_chdir(SCM dir)
+{
+    static char const zChdirDir[] = "chdir directory";
+
+    scm_chdir(dir);
+
+    /*
+     *  We're still here, so we have a valid argument.
+     */
+    if (cur_dir != NULL)
+        free(cur_dir);
+    {
+        char const * pz = ag_scm2zchars(dir, zChdirDir);
+        cur_dir = malloc(AG_SCM_STRLEN(dir) + 1);
+        strcpy((char*)cur_dir, pz);
+    }
+    return dir;
+}
+
 #ifndef SHELL_ENABLED
 HIDE_FN(void closeServer(void) {;})
 
@@ -122,33 +155,108 @@ handle_signal(int signo)
     {
         char const* pz = (last_cmd == NULL)
             ? "?? unknown ??\n" : last_cmd;
-        fprintf(pfTrace, cmd_fmt, pCurDir, pz, zShDone, log_ct);
+        fprintf(pfTrace, cmd_fmt, cur_dir, pz, zShDone, log_ct);
     }
     last_cmd = NULL;
     close_server_shell();
 }
 
+/**
+ * first time starting a server shell, we get our current directory.
+ * That value is kept, but may be changed via a (chdir "...") scheme call.
+ */
+static void
+set_orig_dir(void)
+{
+    char * p = malloc(AG_PATH_MAX);
+    if (p == NULL)
+        AG_ABEND("cannot allocate path name");
 
+    cur_dir = getcwd(p, AG_PATH_MAX);
+
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+        fputs("\nServer First Start\n", pfTrace);
+}
+
+/**
+ * Tracing level is TRACE_EVERYTHING, so send the server shell
+ * various commands to start "set -x" tracing and display the
+ * trap actions.
+ */
+static void
+start_server_cmd_trace(void)
+{
+    static char const set_xtrace[] =
+        "set -x\n"
+        "trap\n"
+        "echo server setup done\n";
+    char * pz;
+
+    fputs("Server traps set\n", pfTrace);
+    last_cmd = set_xtrace;
+    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
+            zShDone, ++log_ct);
+    if (pfTrace != stderr) {
+        fprintf(pfTrace, log_sep_fmt, log_ct);
+        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd, zShDone, log_ct);
+    }
+
+    (void)fflush(serv_pair.pfWrite);
+    pz = load_data();
+    fputs("(result discarded)\n", pfTrace);
+    fprintf(pfTrace, "Trap state:\n%s\n", pz);
+    AGFREE((void*)pz);
+}
+
+/**
+ * Send down the initialization string with our PID in it, as well
+ * as the full path name of the autogen executable.
+ */
+static void
+send_server_init_cmds(void)
+{
+    was_close_err = AG_FALSE;
+
+    {
+        char * pz = AGALOC(AG_PATH_MAX, "AGexe");
+        if (optionMakePath(pz, AG_PATH_MAX, autogenOptions.pzProgPath, NULL))
+            fprintf(serv_pair.pfWrite, "\nAGexe='%s'\n", pz);
+        AGFREE((void*)pz);
+    }
+
+    last_cmd = shell_init_str;
+    sprintf(shell_init_str + shell_init_len, "%u\n", (unsigned int)getpid());
+    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
+            zShDone, ++log_ct);
+
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+        fprintf(pfTrace, log_sep_fmt, log_ct);
+        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd, zShDone, log_ct);
+    }
+
+    (void)fflush(serv_pair.pfWrite);
+    {
+        char * pz = load_data();
+        AGFREE((void*)pz);
+    }
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+        fputs("(result discarded)\n", pfTrace);
+
+    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
+        start_server_cmd_trace();
+}
+
+/**
+ * Perform various initializations required when starting
+ * a new server shell process.
+ */
 static void
 server_setup(void)
 {
-    {
-        static int do_once = 0;
-        if (do_once == 0) {
-            char* p = malloc(AG_PATH_MAX);
-            if (p == NULL)
-                AG_ABEND("cannot allocate path name");
-
-            pCurDir = (tpChar)getcwd(p, AG_PATH_MAX);
-
-            if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-                fputs("\nServer First Start\n", pfTrace);
-
-            do_once = 1;
-        }
-        else if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fputs("\nServer Restart\n", pfTrace);
-    }
+    if (cur_dir == NULL)
+        set_orig_dir();
+    else if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+        fputs("\nServer Restart\n", pfTrace);
 
     {
         struct sigaction new_sa;
@@ -159,54 +267,10 @@ server_setup(void)
         (void)sigaction(SIGALRM, &new_sa, NULL);
     }
 
-    was_close_err = AG_FALSE;
+    send_server_init_cmds();
 
-    {
-        char* pz;
-        last_cmd = shell_init_str;
-        sprintf(shell_init_str + shell_init_len, "%u\n",
-                (unsigned int)getpid());
-        fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, last_cmd,
-                zShDone, ++log_ct);
-
-        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-            fprintf(pfTrace, log_sep_fmt, log_ct);
-            fprintf(pfTrace, cmd_fmt, pCurDir, last_cmd, zShDone, log_ct);
-        }
-
-        (void)fflush(serv_pair.pfWrite);
-        pz = load_data();
-        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fputs("(result discarded)\n", pfTrace);
-        AGFREE((void*)pz);
-    }
-
-    if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        static char const zSetup[] =
-            "set -x\n"
-            "trap\n"
-            "echo server setup done\n";
-        char* pz;
-
-        fputs("Server traps set\n", pfTrace);
-        last_cmd = zSetup;
-        fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, last_cmd,
-                zShDone, ++log_ct);
-        if (pfTrace != stderr) {
-            fprintf(pfTrace, log_sep_fmt, log_ct);
-            fprintf(pfTrace, cmd_fmt, pCurDir, last_cmd, zShDone, log_ct);
-        }
-
-        (void)fflush(serv_pair.pfWrite);
-        pz = load_data();
-        if (pfTrace != stderr)
-            fputs("(result discarded)\n", pfTrace);
-        fprintf(pfTrace, "Trap state:\n%s\n", pz);
-        AGFREE((void*)pz);
-    }
     last_cmd = NULL;
 }
-
 
 /**
  *  Given an FD for an inferior process to use as stdin,
@@ -214,6 +278,12 @@ server_setup(void)
  *  will use for its stdout.  Requires the argument vector
  *  for the new process and, optionally, a pointer to a place
  *  to store the child's process id.
+ *
+ * @param stdinFd the file descriptor for the process' stdin
+ * @param ppArgs  The program and argument vector
+ * @param pChild  where to stash the child process PID
+ *
+ * @returns the read end of a pipe the child process uses for stdout
  */
 static int
 chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
@@ -518,11 +588,11 @@ shell_cmd(char const * pzCmd)
      *  have it output a special marker that we can find.
      */
     last_cmd = pzCmd;
-    fprintf(serv_pair.pfWrite, cmd_fmt, pCurDir, pzCmd, zShDone, ++log_ct);
+    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, pzCmd, zShDone, ++log_ct);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
         fprintf(pfTrace, log_sep_fmt, log_ct);
-        fprintf(pfTrace, cmd_fmt, pCurDir, pzCmd, zShDone, log_ct);
+        fprintf(pfTrace, cmd_fmt, cur_dir, pzCmd, zShDone, log_ct);
     }
 
     if (serv_pair.pfWrite != NULL)
