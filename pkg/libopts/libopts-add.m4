@@ -1,7 +1,7 @@
 
 dnl @synopsis  LIBOPTS_CHECK
 dnl
-dnl Time-stamp:        "2010-11-29 15:45:54 bkorb"
+dnl Time-stamp:        "2011-12-13 21:26:37 bkorb"
 dnl
 dnl If autoopts-config works, add the linking information to LIBS.
 dnl Otherwise, add ``libopts-${ao_rev}'' to SUBDIRS and run all
@@ -33,12 +33,12 @@ AC_DEFUN([LIBOPTS_CHECK_COMMON],[
 	    [ifelse($1, , [libopts], [$1])])
   AC_ARG_ENABLE([local-libopts],
     AC_HELP_STRING([--enable-local-libopts],
-       [Force using the supplied libopts tearoff code]),[
+       [Use the supplied libopts tearoff code]),[
     if test x$enableval = xyes ; then
        AC_MSG_NOTICE([Using supplied libopts tearoff])
-       LIBOPTS_LDADD='$(top_builddir)/AO_Libopts_Dir/libopts.la'
        LIBOPTS_CFLAGS='-I$(top_srcdir)/AO_Libopts_Dir'
        NEED_LIBOPTS_DIR=true
+       LIBOPTS_LDADD='$(top_builddir)/AO_Libopts_Dir/libopts.la'
     fi])
 
   AC_ARG_ENABLE([libopts-install],

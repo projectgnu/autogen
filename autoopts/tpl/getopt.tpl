@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp:,,' <<\_EOF_
-  Time-stamp:        "2011-08-15 12:05:55 bkorb"
+  Time-stamp:        "2011-12-15 05:28:55 bkorb"
 _EOF_
 \` `            +][+
 
@@ -53,12 +53,57 @@ _EOF_
  *  Last template edit: [+ `echo $stamp` +]
  */[+
 CASE (suffix) +][+
-== h +]
-[+   (make-header-guard "autoopts") +]
+== h        +][+ (define header-file (out-name)) +][+ (out-push-new) \+]
+{
+    def_file=[+ (def-file) +]
+    autogen $def_file
+    def_hdr=${def_file%.def}.h
+    sed '/#include/s@<autoopts/options.h>@"[+ (. header-file)
+        +]"@' $def_hdr > ${def_hdr}-$$
+    mv -f ${def_hdr}-$$ $def_hdr
+    tarfile=`autoopts-config libsrc`
+    hdrfile=`gunzip -c $tarfile | tar tf - | fgrep /autoopts/options.h`
+    gunzip -c $tarfile | tar xf - $hdrfile
+    exec 3< $hdrfile
+    untardir=`echo $hdrfile | sed 's@/.*@@'`
+} >&2
+while :
+do
+    IFS= read -r -u3 line || die "no header guard in $hdrfile"
+    case "$line" in
+    *AUTOOPTS_OPTIONS_H_GUARD ) break ;;
+    esac
+done
+echo
+while :
+do
+    echo "$line"
+    IFS= read -r -u3 line || die "no CPLUSPLUS_CLOSER in $hdrfile"
+    case "$line" in
+    *'Versions where in various fields first appear'* ) break ;;
+    esac
+done
 
-extern int process_[+(. prog-name)+]_opts (int argc, char** argv);
+cat <<- _EOF_
+	 * option loop function
+	 */
+	#ifdef  __cplusplus
+	#define CPLUSPLUS_OPENER extern "C" {
+	CPLUSPLUS_OPENER
+	#define CPLUSPLUS_CLOSER }
+	#else
+	#define CPLUSPLUS_CLOSER
+	#endif
 
-#endif /* [+ (. header-guard) +] */
+	extern int process_[+(. prog-name)+]_opts(int argc, char** argv);
+
+	CPLUSPLUS_CLOSER
+	_EOF_
+
+sed '1,/^CPLUSPLUS_CLOSER/d' <&3
+exec 3<&-
+rm -rf $untardir
+[+ (shell (out-pop #t)) +]
 [+ == c +]
 #include <sys/types.h>
 #include <stdlib.h>

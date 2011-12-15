@@ -1,3 +1,11 @@
+2011-12-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/getopt.tpl (== h): Build option handling code
+	opt-def.c and opt-def.h files, then extract out the option
+	definitions and structures from options.h into the getopt-prog.h
+	header.  Edit the opt-def.h header to include this header
+	instead of autoopts/options.h.
+
 2011-12-10  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/opts.def (make-dep): fix up usage information.
