@@ -30,10 +30,10 @@ maintenance of programs that contain large amounts of repetitious text.
 This is especially valuable if there are several blocks of such text
 that must be kept synchronized in parallel tables.
 
-One common example is the problem of maintaining the code required for
-processing program options.  Processing options requires a minimum of
-four different constructs be kept in proper order in different places in
-your program.  You need at least:
+An obvious example is the problem of maintaining the code required for
+processing program options and configuration settings.  Processing options
+requires a minimum of four different constructs be kept in proper order in
+different places in your program.  You need at least:
 
 @enumerate
 @item
@@ -47,13 +47,14 @@ a line in the usage text.
 @end enumerate
 
 @noindent
-You will need more things besides this if you choose to implement long
-option names, rc/ini/config file processing, environment variables and so on.
-All of this can be done mechanically; with the proper templates and this
-program.  In fact, it has already been done and AutoGen itself uses it@:
-@xref{AutoOpts}.  For a simple example of Automated Option processing,
-@xref{Quick Start}.  For a full list of the Automated Option features,
-@xref{Features}.
+You will need more things besides this if you choose to implement long option
+names, configuration (rc/ini) file processing, environment variables and keep
+all the documentation for these up to date.  This can be done mechanically;
+with the proper templates and this program.  In fact, it has already been done
+and AutoGen itself uses it@: @xref{AutoOpts}.  For a simple example of
+Automated Option processing, @xref{Quick Start}.  For a full list of the
+Automated Option features, @xref{Features}.  Be forewarned, though, the
+feature list is ridiculously extensive.
 
 @menu
 * Generalities::         The Purpose of AutoGen
@@ -280,10 +281,9 @@ requirements:
 
 @enumerate
 @item
-It handles @code{trap $sig ":"} without output to standard out.
-This is done when the server shell is first started.
-If your shell does not handle this, then it may be able to by
-loading functions from its start up files.
+It handles @code{trap ":" $sig} without output to standard out.  This is done
+when the server shell is first started.  If your shell does not handle this,
+then it may be able to by loading functions from its start up files.
 @item
 At the beginning of each scriptlet, the command @code{\\cd $PWD}
 is inserted.  This ensures that @code{cd} is not aliased to something

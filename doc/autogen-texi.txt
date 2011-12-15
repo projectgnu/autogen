@@ -5459,9 +5459,8 @@ various directories to compile that program, you will need to specify
 those directories with ``-Idirpath'' text in the @code{CFLAGS}.
 Some experimentation may be necessary in that case.
 
-@strong{NOTE}: the ``-Idirpath'' text is only needed if your option
-callback functions include code that require additional ``#include''
-directives.
+@strong{NOTE}: the ``-Idirpath'' text is only needed if your option callback
+functions include code that require additional ``#include'' directives.
 @item LDFLAGS
 Any special flags required to link.  The flags from
 @code{autoopts-config ldflags} will be included automatically.  This
@@ -5474,35 +5473,22 @@ This is needed only if ``@code{cc}'' cannot be found in @code{$PATH}
 @end enumerate
 
 @noindent
-To use this, set the exported environment variables and then invoke
-autogen twice, in the following order:
+To use this, set the exported environment variables and specify ``getopt'' as
+the default template in your option definitions file (@pxref{Identification}).
+You will have @i{four} new files.  Assuming your definitions were in a file
+named @file{myprog-opts.def} and your program name was specified as
+@file{progname}, the resulting files would be: @file{myprog-opts.h},
+@file{myprog-opts.c}, @file{getopt-progname.h} and @file{getopt-progname.c}.
+You must compile and link both @file{.c} files into your program.  If there
+are link failures, then you are using AutoOpts features that require the
+@file{libopts} library.  You must remove these features.
 
-@example
-autogen myprog-opts.def
-autogen -T getopt.tpl myprog-opts.def
-@end example
-
-@noindent
-and you will have three new files: @file{myprog-opts.h}, @file{myprog-opts.c},
-and @file{getopt-progname.c}, where ``progname'' is the name specified with
-the global @code{prog-name} attribute in the option definition file.  You must
-compile and link both @file{.c} files into your program.  If there are link
-failures, then you are using AutoOpts features that require the @file{libopts}
-library.  You must remove these features.
-
-@emph{Also please note}: though the compile/build of a project that utilizes
-the @file{getopt-progname.c} output does *not* require AutoOpts to be installed,
-the header file @strong{is} required.  In preparing your sources, you must
-pick a directory that the compiler uses for including with a ``-I'' option and:
-@example
-destdir=$top_srcdir/path/to/includes
-mkdir $destdir/autoopts
-cp `autoopts-config includedir`/autoopts/options.h \
-   $destdir/autoopts/.
-@end example
-
-A better solution will be worked out, but is not currently available.
-
+These generated files depend upon configure defines to work correctly.
+Therefore, you should specify a @code{config-header} attribute
+(@pxref{programming attributes}) and ensure it has @code{#defines} for
+either @code{HAVE_STDINT_H} or @code{HAVE_INTTYPES_H}; either
+@code{HAVE_SYS_LIMITS_H} or @code{HAVE_LIMITS_H}; and
+@code{HAVE_SYSEXITS_H}, if the @file{sysexits.h} header is available.
 @c === SECTION MARKER
 
 @node i18n

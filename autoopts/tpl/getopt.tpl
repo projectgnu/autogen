@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2011-12-15 14:06:47 bkorb"
+  Time-stamp:        "2011-12-15 15:42:17 bkorb"
 _EOF_
 \` `            +][+
 
@@ -56,18 +56,13 @@ CASE (suffix) +][+
 == h          +][+
  (define header-file (out-name))
  (out-push-new) \+]
-{
-    def_file=[+ (def-file) +]
-    ${AGexe} -b[+ (base-name) +] -Toptions.tpl $def_file
-    def_hdr=${def_file%.def}.h
-    sed 's@<autoopts/options.h>@"[+ (. header-file)
-        +]"@' $def_hdr > XXX-$$
-    mv -f XXX-$$ $def_hdr
+
+find_aocfg() {
     aocfg=`echo ${AGexe} | sed 's@/[^/]*$@@'`
 
     if ! test -x ${aocfg}/autoopts-config
     then
-        # Check for AGexe in build directory and a subdirectory of build
+        # Check for autoopts-config in build directory layout
         #
         aocfg=`echo ${aocfg} | sed 's@/[^/]*$@@'`/autoopts
         test -x ${aocfg}/autoopts-config || {
@@ -77,7 +72,17 @@ CASE (suffix) +][+
         }
     fi
 
-    tarfile=`${aocfg}/autoopts-config libsrc`
+    aocfg=${aocfg}/autoopts-config
+}
+{
+    def_file=[+ (def-file) +]
+    ${AGexe} -b[+ (base-name) +] -Toptions.tpl $def_file
+    def_hdr=${def_file%.def}.h
+    sed 's@<autoopts/options.h>@"[+ (. header-file)
+        +]"@' $def_hdr > XXX-$$
+    mv -f XXX-$$ $def_hdr
+
+    tarfile=`${aocfg} libsrc`
     hdrfile=`gunzip -c $tarfile | tar tf - | fgrep /autoopts/options.h`
     gunzip -c $tarfile | tar xf - $hdrfile
     exec 3< $hdrfile
