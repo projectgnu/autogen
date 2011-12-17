@@ -5406,16 +5406,28 @@ are global definitions that apply to all the documented functions.
 @section Using getopt(3C)
 @cindex getopt_long
 
-There is a template named, ``@code{getopt.tpl}'' that is distributed with
-AutoOpts.  With it, you will have another source file generated for you that
+There is a template named, @code{getopt.tpl} that is distributed with
+AutoOpts.  Using that template instead of @code{options.tpl} will produce
+completely independent source code that will parse command line options.  It
 will utilize either the standard @code{getopt(3C)} or the GNU
-@code{getopt_long(3GNU)} function for parsing the command line arguments.
-Which is used is selected by the presence or absence of the @code{long-opts}
-program attribute.  It will save you from being dependent upon the
-@code{libopts} library @i{and} it produces code ready for
-internationalization.  However, it also carries with it some limitations on
-the use of AutoOpts features:
+@code{getopt_long(3GNU)} function to drive the parsing.  Which is used is
+selected by the presence or absence of the @code{long-opts} program attribute.
+It will save you from being dependent upon the @code{libopts} library @i{and}
+it produces code ready for internationalization.  However, it also carries
+with it some limitations on the use of AutoOpts features and some requirements
+on the build environment.
 
+
+@menu
+* getopt limitations::  getopt feature limitations
+* getopt building::     getopt build requirements
+@end menu
+
+@node getopt limitations
+@subsection getopt feature limitations
+
+This list of limitations is relative to the full list of AutoOpts
+supported features, @xref{Features}.
 @enumerate
 @item
 You cannot automatically take advantage of environment variable options or
@@ -5443,8 +5455,11 @@ emitted @b{before} the @file{getopt.tpl} template gets expanded.
 
 @item
 The usage text is, therefore, statically defined.
+@end enumerate
 
-@item
+@node getopt building
+@subsection getopt build requirements
+
 You must supply some compile and link options via environment variables.
 
 @table @samp
@@ -5470,25 +5485,43 @@ program might be needed.
 This is needed only if ``@code{cc}'' cannot be found in @code{$PATH}
 (or it is not the one you want).
 @end table
-@end enumerate
 
-@noindent
 To use this, set the exported environment variables and specify ``getopt'' as
 the default template in your option definitions file (@pxref{Identification}).
 You will have @i{four} new files.  Assuming your definitions were in a file
 named @file{myprog-opts.def} and your program name was specified as
-@file{progname}, the resulting files would be: @file{myprog-opts.h},
+@file{progname}, the resulting files would be created: @file{myprog-opts.h},
 @file{myprog-opts.c}, @file{getopt-progname.h} and @file{getopt-progname.c}.
 You must compile and link both @file{.c} files into your program.  If there
 are link failures, then you are using AutoOpts features that require the
-@file{libopts} library.  You must remove these features.
+@file{libopts} library.  You must remove these features,
+@xref{getopt limitations}.
 
 These generated files depend upon configure defines to work correctly.
-Therefore, you should specify a @code{config-header} attribute
+Therefore, you must specify a @code{config-header} attribute
 (@pxref{programming attributes}) and ensure it has @code{#defines} for
 either @code{HAVE_STDINT_H} or @code{HAVE_INTTYPES_H}; either
 @code{HAVE_SYS_LIMITS_H} or @code{HAVE_LIMITS_H}; and
 @code{HAVE_SYSEXITS_H}, if the @file{sysexits.h} header is available.
+The required header files for these defines are, respectively,
+the @file{/usr/include} files named:
+@itemize @bullet
+@item stdint.h
+@item inttypes.h
+@item sys/limits.h
+@item limits.h
+@item sysexits.h
+@end itemize
+
+@noindent
+The following header files must also exist on the build platform:
+@itemize @bullet
+@item sys/types.h
+@item stdio.h
+@item string.h
+@item unistd.h -- or, for getopt_long:
+@item getopt.h
+@end itemize
 @c === SECTION MARKER
 
 @node i18n

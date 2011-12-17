@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-12-15 12:51:04 bkorb"
+ *  Time-stamp:        "2011-12-17 11:50:38 bkorb"
  *
  *  Manage a server shell process
  *
@@ -22,6 +22,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 static char * cur_dir = NULL;
+static char const cmd_fail_fmt[] =
+    "CLOSING SHELL SERVER - command failure:\n\t%s\n";
 
 /*=gfunc chdir
  *
@@ -78,6 +80,18 @@ static char const * last_cmd      = NULL;
 /* = = = START-STATIC-FORWARD = = = */
 static void
 handle_signal(int signo);
+
+static void
+set_orig_dir(void);
+
+static ag_bool
+send_cmd_ok(char const * cmd);
+
+static void
+start_server_cmd_trace(void);
+
+static void
+send_server_init_cmds(void);
 
 static void
 server_setup(void);
@@ -179,6 +193,28 @@ set_orig_dir(void)
 }
 
 /**
+ * Send a command string down to the server shell
+ */
+static ag_bool
+send_cmd_ok(char const * cmd)
+{
+    last_cmd = cmd;
+    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
+            zShDone, ++log_ct);
+
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+        fprintf(pfTrace, log_sep_fmt, log_ct);
+        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd,
+                zShDone, log_ct);
+    }
+
+    (void)fflush(serv_pair.pfWrite);
+    if (was_close_err)
+        fprintf(pfTrace, cmd_fail_fmt, cmd);
+    return ! was_close_err;
+}
+
+/**
  * Tracing level is TRACE_EVERYTHING, so send the server shell
  * various commands to start "set -x" tracing and display the
  * trap actions.
@@ -190,22 +226,14 @@ start_server_cmd_trace(void)
         "set -x\n"
         "trap\n"
         "echo server setup done\n";
-    char * pz;
 
     fputs("Server traps set\n", pfTrace);
-    last_cmd = set_xtrace;
-    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
-            zShDone, ++log_ct);
-    if (pfTrace != stderr) {
-        fprintf(pfTrace, log_sep_fmt, log_ct);
-        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd, zShDone, log_ct);
+    if (send_cmd_ok(set_xtrace)) {
+        char * pz = load_data();
+        fputs("(result discarded)\n", pfTrace);
+        fprintf(pfTrace, "Trap state:\n%s\n", pz);
+        AGFREE((void*)pz);
     }
-
-    (void)fflush(serv_pair.pfWrite);
-    pz = load_data();
-    fputs("(result discarded)\n", pfTrace);
-    fprintf(pfTrace, "Trap state:\n%s\n", pz);
-    AGFREE((void*)pz);
 }
 
 /**
@@ -218,27 +246,19 @@ send_server_init_cmds(void)
     was_close_err = AG_FALSE;
 
     {
-        char * pz = AGALOC(AG_PATH_MAX, "AGexe");
-        if (optionMakePath(pz, AG_PATH_MAX, autogenOptions.pzProgPath, NULL))
-            fprintf(serv_pair.pfWrite, "\nAGexe='%s'\n", pz);
-        AGFREE((void*)pz);
+        char * pzc = AGALOC(sizeof(shell_init_str)
+                            + 11 // log10(1 << 32) + 1
+                            + strlen(autogenOptions.pzProgPath),
+                            "server init");
+        sprintf(pzc, shell_init_str, (unsigned int)getpid(),
+                autogenOptions.pzProgPath,
+                (pfDepends == NULL) ? "" : pzDepFile);
+
+        if (send_cmd_ok(pzc))
+            AGFREE((void*)load_data());
+        AGFREE(pzc);
     }
 
-    last_cmd = shell_init_str;
-    sprintf(shell_init_str + shell_init_len, "%u\n", (unsigned int)getpid());
-    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
-            zShDone, ++log_ct);
-
-    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, log_sep_fmt, log_ct);
-        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd, zShDone, log_ct);
-    }
-
-    (void)fflush(serv_pair.pfWrite);
-    {
-        char * pz = load_data();
-        AGFREE((void*)pz);
-    }
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
         fputs("(result discarded)\n", pfTrace);
 
@@ -556,9 +576,6 @@ load_data(void)
 LOCAL char*
 shell_cmd(char const * pzCmd)
 {
-    static char const cmd_fail_fmt[] =
-        "CLOSING SHELL SERVER - command failure:\n\t%s\n";
-
     /*
      *  IF the shell server process is not running yet,
      *  THEN try to start it.
@@ -587,21 +604,8 @@ shell_cmd(char const * pzCmd)
      *  send the supplied command, and then
      *  have it output a special marker that we can find.
      */
-    last_cmd = pzCmd;
-    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, pzCmd, zShDone, ++log_ct);
-
-    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, log_sep_fmt, log_ct);
-        fprintf(pfTrace, cmd_fmt, cur_dir, pzCmd, zShDone, log_ct);
-    }
-
-    if (serv_pair.pfWrite != NULL)
-        fflush(serv_pair.pfWrite);
-
-    if (was_close_err) {
-        fprintf(pfTrace, cmd_fail_fmt, pzCmd);
+    if (! send_cmd_ok(pzCmd))
         return NULL;
-    }
 
     /*
      *  Now try to read back all the data.  If we fail due to either

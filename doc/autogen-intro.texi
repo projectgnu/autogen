@@ -48,12 +48,12 @@ a line in the usage text.
 
 @noindent
 You will need more things besides this if you choose to implement long option
-names, configuration (rc/ini) file processing, environment variables and keep
-all the documentation for these up to date.  This can be done mechanically;
-with the proper templates and this program.  In fact, it has already been done
-and AutoGen itself uses it@: @xref{AutoOpts}.  For a simple example of
-Automated Option processing, @xref{Quick Start}.  For a full list of the
-Automated Option features, @xref{Features}.  Be forewarned, though, the
+names, configuration (rc/ini) file processing, environment variable settings
+and keep all the documentation for these up to date.  This can be done
+mechanically; with the proper templates and this program.  In fact, it has
+already been done and AutoGen itself uses it@: @xref{AutoOpts}.  For a simple
+example of Automated Option processing, @xref{Quick Start}.  For a full list
+of the Automated Option features, @xref{Features}.  Be forewarned, though, the
 feature list is ridiculously extensive.
 
 @menu

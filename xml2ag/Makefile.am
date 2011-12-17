@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-03-06 14:06:59 bkorb"
+## Time-stamp:      "2011-12-17 15:05:58 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -39,9 +39,14 @@ INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
 
 BOOTENV     = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
 	PATH=`cd ../columns;pwd`:"$$PATH" CLexe="$(CLexe)"
-
-RUNAG       = $(BOOTENV) $(AGexe) -MF$@ -L$(top_srcdir)/autoopts/tpl \
-	-L$(top_builddir)/autoopts/tpl --definition=$(srcdir)/xmlopts.def
+if AMDEP
+AGDEPS      = -MF$(DEPDIR)/$@ -MT$@
+else
+AGDEPS      =
+endif
+RUNAG       = $(BOOTENV) $(AGexe) $(AGDEPS) \
+	-L$(top_srcdir)/autoopts/tpl -L$(top_builddir)/autoopts/tpl \
+	--definition=$(srcdir)/xmlopts.def
 
 all 	    : gen
 gen 	    : $(gsrcs) $(DOCFILES)
@@ -58,18 +63,22 @@ x.c 	    : $(gsrcs) $(csrcs)
 $(getdefs_OBJECTS) xmlopts.c xmlopts.h : stamp-opts
 stamp-opts  : xmlopts.def $(CLexe)
 	$(RUNAG)
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-opts@am__quote@
 
 fork.c      : stamp-fork
 stamp-fork  : fork.tpl xmlopts.def $(CLexe)
 	$(RUNAG) -L$(srcdir) -Tfork.tpl
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-fork@am__quote@
 
 $(TARG).texi $(TARG).menu : stamp-texi
 stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(RUNAG) -Tagtexi-cmd -DLEVEL=section
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-texi@am__quote@
 
 $(TARG).1   : stamp-man
 stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
 	$(RUNAG) -Tagman-cmd -b$(TARG)
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-man@am__quote@
 
 $(CLexe)    :
 	cd ../columns ; $(MAKE) $(CLnam)

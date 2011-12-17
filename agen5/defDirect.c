@@ -1,7 +1,7 @@
 /**
  * @file defDirect.c
  *
- *  Time-stamp:        "2011-04-20 14:19:01 bkorb"
+ *  Time-stamp:        "2011-12-17 13:45:32 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -798,7 +798,7 @@ doDir_include(char* pzArg, char* pzScan)
             AG_CANT("open file", zFullName);
 
         if (pfDepends != NULL)
-            append_source_name(zFullName);
+            add_source_file(zFullName);
 
         do  {
             size_t rdct = fread((void*)pz, (size_t)1, inclSize, fp);

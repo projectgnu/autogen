@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-11-21 14:37:16 bkorb"
+ *  Time-stamp:        "2011-12-17 14:31:00 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -454,6 +454,9 @@ find_lic_text(
         fclose(fp);
     }
 
+    if (pfDepends != NULL)
+        add_source_file(fname);
+
     {
         char * p = strstr(ftext, "\n\n");
 
@@ -810,7 +813,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
                 AG_ABEND(aprf("Could not open license file '%s'", pzLicense));
 
             if (pfDepends != NULL)
-                append_source_name(pzLicense);
+                add_source_file(pzLicense);
 
             AGDUPSTR(lic.pzFN, zRealFile, "license file name");
         }

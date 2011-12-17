@@ -2,7 +2,7 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2011-06-03 11:46:31 bkorb"
+ *  Time-stamp:        "2011-12-17 14:24:43 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -202,11 +202,8 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     /*
      * Avoid printing temporary file names in the dependency file
      */
-    if (  (pfDepends != NULL)
-       && ((flags & FPF_TEMPFILE) == 0)
-       && (  (pz_temp_tpl == NULL)
-          || (strncmp(fname, pz_temp_tpl, temp_tpl_dir_len) != 0)) )
-        fprintf(pfDepends, " \\\n\t%s", fname);
+    if ((pfDepends != NULL) && ((flags & FPF_TEMPFILE) == 0))
+        add_target_file(fname);
 }
 
 /*=gfunc out_delete
@@ -228,6 +225,7 @@ ag_scm_out_delete(void)
      */
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(pfTrace, zSkipMsg, pCurFp->pzOutName);
+    rm_target_file(pCurFp->pzOutName);
     outputDepth = 1;
     longjmp(fileAbort, PROBLEM);
     /* NOTREACHED */
@@ -262,13 +260,10 @@ ag_scm_out_move(SCM new_file)
                 pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
 
-    /*
-     * Avoid printing temporary file names in the dependency file
-     */
-    if (  (pfDepends != NULL)
-       && (  (pz_temp_tpl == NULL)
-          || (strncmp(pz, pz_temp_tpl, temp_tpl_dir_len) != 0)) )
-        fprintf(pfDepends, " \\\n\t%s", pz);
+    if (pfDepends != NULL) {
+        rm_target_file(pCurFp->pzOutName);
+        add_target_file(pz);
+    }
 
     if ((pCurFp->flags & FPF_STATIC_NM) == 0)
         AGFREE((void*)pCurFp->pzOutName);
@@ -314,7 +309,8 @@ ag_scm_out_pop(SCM ret_contents)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "%s%s\n", __func__, (res == SCM_UNDEFINED) ? "" : " #t");
+        fprintf(pfTrace, "%s%s\n", __func__,
+                (res == SCM_UNDEFINED) ? "" : " #t");
 
     outputDepth--;
     out_close(AG_FALSE);

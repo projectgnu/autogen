@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-12-15 12:37:22 bkorb"
+## Time-stamp:      "2011-12-17 13:49:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -52,7 +52,7 @@ EXPRLIST        = \
 FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
     autogen.c    $(FSMLIST)   $(EXPRLIST) \
-    agCgi.c      agInit.c     agUtils.c    \
+    agCgi.c      agDep.c      agInit.c   agUtils.c    \
     defDirect.c  defFind.c    defLex.c   defLoad.c    \
     fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
     tpLoad.c     tpParse.c    tpProcess.c

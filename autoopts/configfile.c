@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2011-08-13 16:17:51 bkorb"
+ *  Time-stamp:      "2011-12-17 12:51:30 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1387,9 +1387,15 @@ validate_struct(tOptions * pOpts, char const * pzProgram)
         char const *  pz = strrchr(pzProgram, DIRCH);
         char const ** pp =
             (char const **)(void **)&(pOpts->pzProgName);
-        if (pz == NULL)
-             *pp = pzProgram;
-        else *pp = pz+1;
+
+        if (pz != NULL) {
+            *pp = pz+1;
+        } else {
+            *pp = pzProgram;
+            pz = pathfind(getenv("PATH"), (char *)pzProgram, "rx");
+            if (pz != NULL)
+                pzProgram = (void *)pz;
+        }
 
         pp  = (char const **)(void **)&(pOpts->pzProgPath);
         *pp = pzProgram;

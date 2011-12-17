@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2011-08-22 15:25:20 bkorb"
+ * Time-stamp:        "2011-12-17 13:51:20 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -336,37 +336,6 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
 #endif
 }
 
-LOCAL void
-append_source_name(char const * pz)
-{
-    static char const fmt[] = " \\\n\t%s\n";
-    size_t ln = strlen(pz) + sizeof(fmt) - 2 /* one for '%' and one for 's' */;
-    char * insert_pt;
-
-    if (source_used + ln >= source_size) {
-        pzSourceList =
-            AGREALOC(pzSourceList, source_size + ln + 2048, "srclist");
-        source_size += ln + 2048;
-    }
-
-    insert_pt = (char *)pzSourceList + source_used;
-    ln = sprintf(insert_pt, fmt, pz);
-
-    /*
-     *  See if we've done this file before.
-     */
-    {
-        char * p = strstr(pzSourceList, insert_pt);
-        if (p == insert_pt) {
-            source_used += ln - 1;
-            p += ln - 1;
-        } else
-            p = insert_pt;
-
-        *p = NUL;
-    }
-}
-
 /**
  * Process the stuff in the pseudo macro.
  */
@@ -459,7 +428,7 @@ loadTemplate(char const * pzFileName, char const * referrer)
         AG_ABEND(aprf("Could not open template '%s'", zRealFile));
 
     if (pfDepends != NULL)
-        append_source_name(zRealFile);
+        add_source_file(zRealFile);
 
     /*
      *  Process the leading pseudo-macro.  The template proper
@@ -508,67 +477,6 @@ unloadTemplate(tTemplate* pT)
 
     AGFREE((void*)(pT->pzTplFile));
     AGFREE(pT);
-}
-
-/**
- *  Finish off the dependency file
- */
-static void
-wrap_up_depends(void)
-{
-    static mode_t const fil_mode =
-        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-
-    static char const fmt[] =
-        "\n\n%1$s_SList =%2$s\n"
-        "\n%3$s : $(%1$s_SList)\n"
-        "\n$(%1$s_TList) : %3$s\n"
-        "\t@:\n";
-
-    fprintf(pfDepends, fmt, pz_targ_base, pzSourceList, pzDepTarget);
-    fclose(pfDepends);
-    pfDepends = NULL;
-
-    /*
-     * "startTime" is engineered to be 1 second earlier than the mod time
-     * of any of the output files.
-     */
-    {
-        struct utimbuf tbuf = {
-            .actime  = time(NULL),
-            .modtime = startTime
-        };
-
-        utime(pzDepFile, &tbuf);
-
-        /*
-         * If the target is not the dependency file, then ensure that the
-         * file exists and set its time to the same time.  Ignore all errors.
-         */
-        if (strcmp(pzDepFile, pzDepTarget) != 0) {
-            if (access(pzDepTarget, R_OK) != 0)
-                close( open(pzDepTarget, O_CREAT, fil_mode));
-
-            utime(pzDepTarget, &tbuf);
-        }
-    }
-
-    chmod(pzDepFile, fil_mode);
-
-    /*
-     * Trim off the temporary suffix and rename the dependency file into
-     * place.  We used a mkstemp name in case autogen failed.
-     */
-    {
-        char * pze = strrchr(pzDepFile, '-');
-        char * pzn;
-
-        *pze = NUL;
-        AGDUPSTR(pzn, pzDepFile, "dep file");
-        *pze = '-';
-        rename(pzDepFile, pzn);
-        AGFREE(pzn);
-    }
 }
 
 /**

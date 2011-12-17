@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2011-12-15 15:42:17 bkorb"
+  Time-stamp:        "2011-12-17 13:15:11 bkorb"
 _EOF_
 \` `            +][+
 
@@ -56,33 +56,58 @@ CASE (suffix) +][+
 == h          +][+
  (define header-file (out-name))
  (out-push-new) \+]
+{
+    test -x "${AGexe}" || die "AGexe not properly set:  ${AGexe}"
+[+ # START-BUILDTREE-ISMS:
 
-find_aocfg() {
-    aocfg=`echo ${AGexe} | sed 's@/[^/]*$@@'`
+#  The following code is sedded away in install-hook.sh.
+#  The goal is to ensure we use build tree templates in testing mode, and
+#  remove them when installing this file.
 
-    if ! test -x ${aocfg}/autoopts-config
+\+]
+    aobdir=`echo ${AGexe} | sed 's@/[^/]*$@@'`
+
+    if ! test -x ${aobdir}/autoopts-config
     then
         # Check for autoopts-config in build directory layout
         #
-        aocfg=`echo ${aocfg} | sed 's@/[^/]*$@@'`/autoopts
-        test -x ${aocfg}/autoopts-config || {
-            aocfg=`echo ${aocfg} | sed 's@/[^/]*/autoopts$@@'`/autoopts
-            test -x ${aocfg}/autoopts-config || \
+        aobdir=`echo ${aobdir} | sed 's@/[^/]*$@@'`/autoopts
+        test -x ${aobdir}/autoopts-config || {
+            aobdir=`echo ${aobdir} | sed 's@/[^/]*/autoopts$@@'`/autoopts
+            test -x ${aobdir}/autoopts-config || \
                 die 'cannot locate autoopts-config'
         }
     fi
 
-    aocfg=${aocfg}/autoopts-config
-}
-{
-    def_file=[+ (def-file) +]
-    ${AGexe} -b[+ (base-name) +] -Toptions.tpl $def_file
-    def_hdr=${def_file%.def}.h
+    agopts=`dirname [+ (tpl-file #t) +]`
+    agopts="-L${aobdir}/tpl -L$agopts "
+    tarfile=`set -- ${aobdir}/libopts*.tar.*
+        test -f $1 || {
+            cd ${aobdir}
+            ${MAKE:-make} libsrc
+            cd -
+            set -- ${aobdir}/libopts*.tar.*
+            test -f $1 || die 'libopts tarball not built'
+        } >&2
+        echo $1`[+
+
+# END-BUILDTREE-ISMS the following code is for installed version:
+    agopts=
+    aocfg=`echo ${AGexe} | sed 's@/[^/]*$@@'`/autoopts-config
+    tarfile=`${aocfg} libsrc`
+
+# END-INSTALL-ONLY-CODE +]
+    if test -n "${AG_Tracing}"
+    then
+        AG_Dep_File=`dirname "${AG_Tracing}"`/ao-[+ (base-name) +].dep
+        agopts="${agopts}-MF${AG_Dep_File} -MT${AG_Dep_File%.dep}.targ"
+    fi
+
+    ${AGexe} -b[+ (base-name) +] ${agopts} -Toptions.tpl [+ (def-file) +]
+    def_hdr=[+ (base-name) +].h
     sed 's@<autoopts/options.h>@"[+ (. header-file)
         +]"@' $def_hdr > XXX-$$
     mv -f XXX-$$ $def_hdr
-
-    tarfile=`${aocfg} libsrc`
     hdrfile=`gunzip -c $tarfile | tar tf - | fgrep /autoopts/options.h`
     gunzip -c $tarfile | tar xf - $hdrfile
     exec 3< $hdrfile
@@ -98,13 +123,26 @@ do
 done
 echo
 
+echo "$line"
+IFS= read -r -u3 line || die "short $hdrfile"
+case "$line" in
+'#define AUTOOPTS_OPTIONS_H_GUARD'* ) : ;;
+*) die "invalid header guard in $hdrfile" ;;
+esac
+echo "$line"
+echo '#include "[+
+(if (exist? "config-header")
+    (get "config-header")
+    (error "getopt template requires a \"config-header\" attribute")
+)   +]"'
+
 while :
 do
-    echo "$line"
     IFS= read -r -u3 line || die "no CPLUSPLUS_CLOSER in $hdrfile"
     case "$line" in
     *'Versions where in various fields first appear'* ) break ;;
     esac
+    echo "$line"
 done
 
 cat <<- _EOF_
@@ -130,13 +168,15 @@ exec 3<&-
 rm -rf $untardir
 [+ (shell (out-pop #t)) +]
 [+ == c +]
+#include "[+ (. header-file) +]"
+
 #include <sys/types.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <[+ (if (exist? "long-opts") "getopt" "unistd") +].h>
 #include "[+ (base-name) +].h"
-#include "[+ (. header-file) +]"
 
 #ifndef DIRCH
 #  if defined(_WIN32) && !defined(__CYGWIN__)

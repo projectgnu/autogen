@@ -1,7 +1,7 @@
 /**
  * @file expExtract.c
  *
- *  Time-stamp:        "2011-01-28 10:22:33 bkorb"
+ *  Time-stamp:        "2011-12-17 14:29:05 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -118,6 +118,9 @@ load_extract_file(char const* pzNewFile)
 
         *pzIn = NUL;
         fclose(fp);
+
+        if (pfDepends != NULL)
+            add_source_file(pzNewFile);
     }
 
     return pzText;

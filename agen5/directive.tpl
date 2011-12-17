@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-# Time-stamp:        "2011-10-08 10:02:13 bkorb"
+# Time-stamp:        "2011-12-17 13:03:03 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -190,10 +190,8 @@ mk_tmp_dir() {
 }
 exec 2>&8
 export AG_pid
-AG_pid=[=
- (define init-str (out-pop #t))
- (kr-string init-str)=] "\000........."; /* ' // " // */
-static int const shell_init_len = [= (string-length init-str) =];
+AG_pid="%u"
+AGexe='%s'[= (kr-string (out-pop #t))=];
 
 /*
  *  "gperf" functionality only works if the subshell is enabled.

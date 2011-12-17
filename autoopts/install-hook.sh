@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-12-09 12:24:19 bkorb"
+# Time-stamp:        "2011-12-17 11:31:24 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -95,24 +95,24 @@ s%(setenv "SHELL" .*%(setenv "SHELL" "'${POSIX_SHELL}'")%
     for f in *
     do  case "$f" in
         ag*.tpl | options.tpl )
-           sed "${sedtpl}" $f > $f.tmp
-           mv -f $f.tmp $f
-           ;;
+            sed "${sedtpl}" $f > $f.tmp
+            mv -f $f.tmp $f
+            ;;
 
-        usage.tlib )
-           sed "${sedusage}" $f > $f.tmp
-           mv -f $f.tmp $f
-           ;;
+        getopt.tpl | usage.tlib )
+            sed "${sedusage}" $f > $f.tmp
+            mv -f $f.tmp $f
+            ;;
 
         optlib.tlib )
-           sed '/top_builddir/d' $f > $f.tmp
-           mv -f $f.tmp $f
-           ;;
+            sed '/builddir/d' $f > $f.tmp
+            mv -f $f.tmp $f
+            ;;
 
         *.* ) : ;;
         * )
-           chmod a+x $f
-           ;;
+            chmod a+x $f
+            ;;
         esac
     done
 }

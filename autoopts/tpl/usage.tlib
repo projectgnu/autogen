@@ -42,9 +42,7 @@ FOR var IN  prog-name  prog-title  argument
             version-value   help-value  more-help-value
             save-opts-value usage-value load-opts-value
   =][=
-
   (emit-def (get "var"))    =][=
-
 ENDFOR var IN ....          =][=
 
 IF (exist? "config-header") =]
@@ -56,9 +54,7 @@ copyright = {[=
 
   FOR var IN  date owner type text author eaddr
     =][=
-
     (emit-def (get "var"))  =][=
-
   ENDFOR var IN ....        =]
 };[=
 ENDFOR copyright            =]
@@ -77,23 +73,19 @@ flag = {[=
              arg-type arg-optional arg-default default arg-range
              stack-arg unstack-arg
     =][=
-
-    IF (exist? (get "var")) =]
-    [= var =] = [= (kr-string (get (get "var"))) =];[=
-    ENDIF have "var"        =][=
-
+    (emit-def (get "var"))  =][=
   ENDFOR var IN ....        =][=
 
   IF (exist? "keyword")     =]
-    keyword = [= (join "," (stack "keyword")) =];[=
+    keyword = '[=    (join "', '" (stack "keyword")) =]';[=
   ENDIF  keyword exists     =][=
 
   IF (exist? "flags-must")  =]
-    flags-must = [= (join "," (stack "flags-must")) =];[=
+    flags-must = '[= (join "', '" (stack "flags-must")) =]';[=
   ENDIF  flags-must exists  =][=
 
   IF (exist? "flags-cant")  =]
-    flags-cant = [= (join "," (stack "flags-cant")) =];[=
+    flags-cant = '[= (join "', '" (stack "flags-cant")) =]';[=
   ENDIF  flags-cant exists  =]
 };[=
 
@@ -123,18 +115,17 @@ ENDFOR flag                 =][=
     }
     ldflags="$ldflags ${cfg_ldflags}"
     test -d "${top_builddir}" && \
-        inc_list="${inc_list} -I${top_builddir} -I${top_builddir}/autoopts"
+        inc_list="-I${top_builddir} -I${top_builddir}/autoopts ${inc_list}"
     test -d "${top_srcdir}" && \
-        inc_list="${inc_list} -I${top_srcdir}/autoopts"
+        inc_list="-I${top_srcdir}/autoopts ${inc_list}"
 
 [= # END-BUILDTREE-ISMS the following code is for installed version:
 
-    ag=`set -- ${AGexe-autogen} ; command -v $1`
-    test -z "$ag" && die "cannot locate autogen${AGexe+ ($AGexe)}"
-    ag=`dirname $ag`/autoopts-config
-    test -x "$ag" || die "missing $ag"
-    ldflags="${cfg_ldflags} `${ag} ldflags`"
-    cfg_cflags="${cfg_cflags} `${ag} cflags`"
+    test -x "${AGexe}" || die "AGexe is invalid:  ${AGexe}"
+    aocfg=`dirname ${AGexe}`/autoopts-config
+    test -x "$aocfg" || die "missing $ag"
+    ldflags="${cfg_ldflags} `${aocfg} ldflags`"
+    cfg_cflags="${cfg_cflags} `${aocfg} cflags`"
 
 # END-INSTALL-ONLY-CODE \=]
 [= IF (exist? "config-header") \=]
@@ -165,7 +156,8 @@ ENDFOR flag                 =][=
     flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
         =]_OPTS=1 ${inc_list} ${cfg_cflags}"
     cd ${tmp_dir}
-    ${AGexe-autogen} [= prog-name =].def || die "Cannot gen [= prog-name =]"
+    ${AGexe} -Toptions.tpl [= prog-name =].def || \
+        die "Cannot gen [= prog-name =]"
     cd -
     ${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \
         die cannot compile ${exe}.c

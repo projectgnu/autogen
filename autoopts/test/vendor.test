@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-11-26 08:10:39 bkorb"
+# Time-stamp:        "2011-12-17 16:35:37 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -139,7 +139,6 @@ The next option supports vendor supported extra options:
       equate=str       characters considered equivalent
       writable         Allow output files to be writable
 				- disabled as --not-writable
-				- may not be preset
       loop-limit=num   Limit on increment loops
 				- is scalable with a suffix: k/K/m/M/g/G/t/T
 				- It must lie in one of the ranges:

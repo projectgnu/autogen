@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-12-07 08:15:43 bkorb"
+ *  Time-stamp:        "2011-12-17 16:48:14 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -431,7 +431,6 @@ flag = {
     disable    = not;
 #ifndef XML2AG
     settable;
-    no-preset;
     doc = <<-  _EODoc_
 	This option will leave output files writable.
 	Normally, output files are read-only.
@@ -778,31 +777,32 @@ flag = {
     settable;
     no-preset;
     doc = <<- _EOF_
+
 	This option behaves fairly closely to the way the @code{-M} series of
-	options work with the gcc compiler, except that instead of emitting the
-	predecessor dependencies, this emits both the predecessor and the
-	successor dependencies (output files).  By default, the output
-	dependency information will be placed in @code{<base-name>.d}, but may
-	also be specified with @code{-MF<file>}.  The time stamp on this file
-	will be manipulated so that it will be one second older than the oldest
+	options work with the gcc compiler, except that instead of just
+	emitting the predecessor dependencies, this also emits the successor
+	dependencies (output target files).  By default, the output dependency
+	information will be placed in @code{<base-name>.d}, but may also be
+	specified with @code{-MF<file>}.  The time stamp on this file will be
+	manipulated so that it will be one second older than the oldest
 	primary output file.
 
 	The target in this dependency file will normally be the dependency
 	file name, but may also be overridden with @code{-MT<targ-name>}.
 	AutoGen will not alter the contents of that file, but it may create
-	it and it will adjust the modification time to match the dependency
-	file.
+	it and it will adjust the modification time to match the start time.
 
 	@strong{NB:} these second letters are part of the option argument, so
 	@code{-MF <file>} must have the space character quoted or omitted, and
 	@code{-M "F <file>"} is acceptable because the @code{F} is part of the
 	option argument.
 
-	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or G.
-	They are not all meaningful and one has a somewhat different meaning:
-	@code{-MT<name>} This is interpreted as meaning @code{<name>} is a
-	sentinel file that will depend on all inputs (templates and definition
-	files) and all the output files will depend on this sentinel file.
+	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or
+	G.  However, only F and T are meaningful and the latter has a somewhat
+	different meaning: @code{-MT<name>} is interpreted as meaning
+	@code{<name>} is a sentinel file that will depend on all inputs
+	(templates and definition files) and all the output files will depend
+	on this sentinel file.  It is suitable for use as a real make target.
 
 	This is the recommended usage:
 	@example

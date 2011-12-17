@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-11-25 15:26:20 bkorb"
+ *  Time-stamp:        "2011-12-17 13:51:55 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -122,74 +122,6 @@ put_defines_into_env(void)
     } while (--ct > 0);
 }
 
-static void
-start_dep_file(void)
-{
-    static char const mkdep_fmt[] =
-        "# Makefile dependency file created by %s\n"
-        "# with the following command:\n";
-
-    char * pz;
-
-    if (pzDepFile == NULL)
-        pzDepFile = aprf("%s.d-XXXXXX", OPT_ARG(BASE_NAME));
-    mkstemp((char *)pzDepFile);
-    pfDepends = fopen(pzDepFile, "w");
-
-    if (pfDepends == NULL)
-        AG_CANT("fopen for write", pzDepFile);
-
-    fprintf(pfDepends, mkdep_fmt, autogenOptions.pzProgName);
-
-    {
-        int     ac = autogenOptions.origArgCt;
-        char ** av = autogenOptions.origArgVect;
-
-        while (ac-- > 0) {
-            char * arg = *(av++);
-            fprintf(pfDepends, "#   %s\n", arg);
-        }
-    }
-
-    if (pzDepTarget == NULL) {
-        char * p;
-        AGDUPSTR(pzDepTarget, pzDepFile, "targ name");
-        p  = (char *)pzDepTarget + strlen(pzDepTarget) - 7;
-        *p = NUL;
-    }
-
-    {
-        static char const tfmt[] = "%s_%s";
-        char const * pnm = autogenOptions.pzPROGNAME;
-        char const * bnm = strchr(pzDepTarget, '/');
-
-        if (bnm != NULL)
-            bnm++;
-        else
-            bnm = pzDepTarget;
-
-        {
-            size_t sz = strlen(pnm) + strlen(bnm) + sizeof(tfmt) - 4;
-
-            pz_targ_base = pz = AGALOC(sz, "mk targ list");
-            sprintf(pz, tfmt, pnm, bnm);
-        }
-    }
-
-    /*
-     * Now scan over the characters in "pz_targ_base".  Anything that
-     * is not a legal name character gets replaced with an underscore.
-     */
-    for (;;) {
-        unsigned int ch = (unsigned int)*(pz++);
-        if (ch == NUL)
-            break;
-        if (! IS_ALPHANUMERIC_CHAR(ch))
-            pz[-1] = '_';
-    }
-    fprintf(pfDepends, "%s_TList =", pz_targ_base);
-}
-
 /**
  *  Open trace output file.
  *
@@ -226,7 +158,7 @@ open_trace_file(char ** av, tOptDesc * odsc)
     setvbuf(pfTrace, NULL, _IONBF, 0);
 #endif
 
-    fprintf(pfTrace, "\nAutoGen starts:  %s", *av);
+    fprintf(pfTrace, "\nAutoGen %u starts:  %s", (unsigned int)getpid(), *av);
     while (*(++av) != NULL)
         fprintf(pfTrace, " '%s'", *av);
     putc(NL, pfTrace);

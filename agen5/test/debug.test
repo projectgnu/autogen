@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2011-06-03 11:29:45 bkorb"
+# Time-stamp:        "2011-12-17 11:41:21 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -149,7 +149,7 @@ fi
 run_ag x1 ${trace_args} ${testname}.def || failure AutoGen failed
 ${SED} -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
     -e '/Called ag_scm_for_index/d' \
-    -e '/^AutoGen starts:/d' \
+    -e '/^AutoGen [0-9]* starts:/d' \
     ${traceout} > ${testname}.trace1
 cmp -s ${testname}.base1 ${testname}.trace1 || \
   failure "`diff -c ${testname}.base1 ${testname}.trace1`"

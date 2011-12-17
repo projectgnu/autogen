@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2011-09-20 16:10:34 bkorb"
+ *  Time-stamp:        "2011-12-17 10:24:48 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -177,8 +177,10 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
     close_server_shell();
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        fprintf(pfTrace, "exit_cleanup %s done\n",
-                (cl_wait == EXIT_PCLOSE_WAIT) ? "waited" : "no waiting");
+        fprintf(pfTrace, "exit_cleanup %s done\n"
+                "AutoGen %u exits\n",
+                (cl_wait == EXIT_PCLOSE_WAIT) ? "waited" : "no waiting",
+                (unsigned int)getpid());
 
     do  {
         if (pfTrace == stderr)

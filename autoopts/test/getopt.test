@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2011-12-15 13:32:01 bkorb"
+# Time-stamp:        "2011-12-17 11:31:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -187,13 +187,15 @@ _EOF_
 echo creating ${testname}1-base.c
 
 cat > ${testname}1-base.c <<\_EndOfSample_
+#include "getopt-test_getopt.h"
+
 #include <sys/types.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "getopt-bn.h"
-#include "getopt-test_getopt.h"
 
 #ifndef DIRCH
 #  if defined(_WIN32) && !defined(__CYGWIN__)
@@ -404,13 +406,15 @@ _EndOfSample_
 echo creating ${testname}2-base.c
 
 cat > ${testname}2-base.c <<\_EndOfSample_
+#include "getopt-test_getopt.h"
+
 #include <sys/types.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
 #include "getopt-bn.h"
-#include "getopt-test_getopt.h"
 
 #ifndef DIRCH
 #  if defined(_WIN32) && !defined(__CYGWIN__)

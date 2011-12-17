@@ -2,7 +2,7 @@
 /**
  * @file defLoad.c
  *
- *  Time-stamp:        "2011-01-20 16:25:52 bkorb"
+ *  Time-stamp:        "2011-12-17 13:45:49 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -425,7 +425,7 @@ readDefines(void)
             AG_CANT("open", pzDefFile);
 
         if (pfDepends != NULL)
-            append_source_name(pzDefFile);
+            add_source_file(pzDefFile);
     }
 
     /*
