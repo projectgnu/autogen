@@ -11,6 +11,14 @@ New in __CURRENT_VERSION__ December 2011
   if it was not supplied in argv[0].  "pathfind(3GEN)" is now used
   in that case.
 
+* makefile-script function will now honor the "then", "else" and "in"
+  keywords appearing at the end of a line.  "makefile-script" splices
+  lines together with a semi-colon and a backslash, add a leading tab
+  to each line and double dollar sign characters, basically turning
+  semi-ordinary shell scripts into scripts suitable for use inside make.
+  In the case of these keywords and certain operators, the semi-colon
+  is now omitted.
+
 New in 5.13 December 2011
 
 * AutoOpts now uses string tables instead of individual static char const's.

@@ -1428,11 +1428,6 @@ an AutoOpt-ed program.  This is done by providing an option definition file
 that client programs @code{#include} into their own option definitions.
 See ``AutoOpt-ed Library for AutoOpt-ed Program'' (@pxref{lib and program})
 for more details.
-
-@item
-Insert the option processing state into Scheme-defined variables.
-Thus, Guile based applications that are linked with private
-@code{main()} routines can take advantage of all of AutoOpts' functionality.
 @end enumerate
 
 @c === SECTION MARKER
@@ -5428,6 +5423,7 @@ on the build environment.
 
 This list of limitations is relative to the full list of AutoOpts
 supported features, @xref{Features}.
+
 @enumerate
 @item
 You cannot automatically take advantage of environment variable options or
@@ -5441,8 +5437,9 @@ take ``@code{string}'' arguments, though you may handle the option
 argument with a callback procedure.
 
 @item
-You must specify every option as ``settable'' because the emitted code
+Every option must be ``settable'' because the emitted code
 depends upon the @code{SET_OPT_XXX} macros having been defined.
+Specify this as a global (program) attribute.
 
 @item
 You must specify a main procedure of type ``main''.  The

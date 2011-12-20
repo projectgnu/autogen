@@ -2,7 +2,7 @@
  *
  *    getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2011-03-06 12:23:11 bkorb"
+ *  Time-stamp:        "2011-12-17 21:21:06 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -86,7 +86,6 @@ DEF_STRING( zDne,
  *  The patterns we accept for output may specify a particular group,
  *  certain members within certain groups or all members of all groups
  */
-char const *    pzDefPat   = NULL;
 regex_t         define_re;
 regex_t         attrib_re;
 

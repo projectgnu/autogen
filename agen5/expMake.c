@@ -2,7 +2,7 @@
 /**
  * @file expMake.c
  *
- *  Time-stamp:        "2011-06-03 12:19:50 bkorb"
+ *  Time-stamp:        "2011-12-18 12:12:59 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -22,6 +22,119 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+static char const zNl[]  = " ; \\\n";
+
+static ag_bool
+handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
+{
+    char * pzScn = *ppzi;
+    char * pzOut = *ppzo;
+    int    l_len = pzOut - bol;
+
+    /*
+     *  Backup past trailing white space (other than newline).
+     */
+    while (IS_WHITESPACE_CHAR(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
+        pzOut--;
+
+    /*
+     *  Skip over empty lines, but leave leading white space
+     *  on the next non-empty line.
+     */
+    {
+        char* pz = pzScn;
+        while (IS_WHITESPACE_CHAR(*pz)) {
+            if (*(pz++) == NL)
+                pzScn = pz;
+        }
+    }
+
+    /*
+     *  The final newline is dropped.
+     */
+    if (*pzScn == NUL)
+        return AG_FALSE;
+
+    switch (pzOut[-1]) {
+    case '\\':
+        /*
+         *  The newline is already escaped, so don't
+         *  insert our extra command termination.
+         */
+        *(pzOut++) = NL;
+        break;
+
+    case '&':
+        /*
+         *  A single ampersand is a backgrounded command.
+         *  We must terminate those statements, but not
+         *  statements conjoined with '&&'.
+         */
+        if ('&' != pzOut[-2])
+            goto append_statement_end;
+        /* FALLTHROUGH */
+
+    case '|':
+    case ';':
+    skip_semi_colon:
+        /*
+         *  Whatever the reason for a final '|' or ';' we will not
+         *  add a semi-colon after it.
+         */
+        strcpy(pzOut, zNl + 2);
+        pzOut += sizeof(zNl) - 3;
+        break;
+
+    case 'n': // "then" or "in"
+        if (l_len < 3)
+            goto append_statement_end;
+
+        if (pzOut[-2] == 'i') {
+            if ((l_len == 3) || IS_WHITESPACE_CHAR(pzOut[-3]))
+                goto skip_semi_colon;
+            goto append_statement_end;
+        }
+
+        if (  (l_len < 5)
+           || (  (l_len > 5)
+              && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
+            goto append_statement_end;
+        if (strncmp(pzOut-4, "the", 3) == 0)
+            goto skip_semi_colon;
+        goto append_statement_end;
+
+    case 'e': // "else"
+        if (  (l_len < 5)
+           || (  (l_len > 5)
+              && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
+            goto append_statement_end;
+        if (strncmp(pzOut-4, "els", 3) == 0)
+            goto skip_semi_colon;
+        goto append_statement_end;
+
+    default:
+    append_statement_end:
+        /*
+         *  Terminate the current command and escape the newline.
+         */
+        strcpy(pzOut, zNl);
+        pzOut += sizeof(zNl) - 1;
+    }
+
+    /*
+     *  We have now started our next output line and there are
+     *  still data.  Indent with a tab, if called for.  If we do
+     *  insert a tab, then skip leading tabs on the line.
+     */
+    if (tabch) {
+        *(pzOut++) = tabch;
+        while (*pzScn == tabch)  pzScn++;
+    }
+
+    *ppzi = pzScn;
+    *ppzo = pzOut;
+    return AG_TRUE;
+}
 
 /*=gfunc makefile_script
  *
@@ -44,17 +157,17 @@
  *
  *  @item
  *  Except for the last line, the string, " ; \\" is appended to the end of
- *  every line that does not end with a backslash, semi-colon,
- *  conjunction operator or pipe.  Note that this will mutilate multi-line
- *  quoted strings, but @command{make} renders it impossible to use multi-line
- *  constructs anyway.
+ *  every line that does not end with certain special characters or keywords.
+ *  Note that this will mutilate multi-line quoted strings, but @command{make}
+ *  renders it impossible to use multi-line constructs anyway.
  *
  *  @item
  *  If the line ends with a backslash, it is left alone.
  *
  *  @item
- *  If the line ends with one of the excepted operators, then a space and
- *  backslash is added.
+ *  If the line ends with a semi-colon, conjunction operator,
+ *  pipe (vertical bar) or one of the keywords "then", "else" or "in", then
+ *  a space and a backslash is added, but no semi-colon.
  *
  *  @item
  *  The dollar sign character is doubled, unless it immediately precedes an
@@ -95,8 +208,6 @@
 SCM
 ag_scm_makefile_script(SCM text)
 {
-    static char const zNl[]  = " ; \\\n";
-
     SCM    res;
     char*  pzText = ag_scm2zchars(text, "GPL line prefix");
     char   tabch;
@@ -133,90 +244,22 @@ ag_scm_makefile_script(SCM text)
     }
 
     {
-        char* pzRes = AGALOC(sz, "makefile text");
-        char* pzOut = pzRes;
-        char* pzScn = pzText;
-
+        char * res_str    = AGALOC(sz, "makefile text");
+        char * out_scan   = res_str;
+        char * src_scan   = pzText;
+        char * start_line = out_scan;
         /*
          *  Force the initial line to start with a tab.
          */
-        *(pzOut++) = TAB;
+        *(out_scan++) = TAB;
 
         for (;;) {
-            char ch = *(pzScn++);
+            char ch = *(src_scan++);
             switch (ch) {
             case NL:
-                /*
-                 *  Backup past trailing white space (other than newline).
-                 */
-                while (IS_WHITESPACE_CHAR(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
-                    pzOut--;
-
-                /*
-                 *  Skip over empty lines, but leave leading white space
-                 *  on the next non-empty line.
-                 */
-                {
-                    char* pz = pzScn;
-                    while (IS_WHITESPACE_CHAR(*pz)) {
-                        if (*(pz++) == NL)
-                            pzScn = pz;
-                    }
-                }
-
-                /*
-                 *  The final newline is dropped.
-                 */
-                if (*pzScn == NUL)
+                if (! handle_eol(&src_scan, &out_scan, tabch, start_line))
                     goto copy_done;
-
-                switch (pzOut[-1]) {
-                case '\\':
-                    /*
-                     *  The newline is already escaped, so don't
-                     *  insert our extra command termination.
-                     */
-                    *(pzOut++) = NL;
-                    break;
-
-                case '&':
-                    /*
-                     *  A single ampersand is a backgrounded command.
-                     *  We must terminate those statements, but not
-                     *  statements conjoined with '&&'.
-                     */
-                    if ('&' != pzOut[-2])
-                        goto append_statement_end;
-                    /* FALLTHROUGH */
-
-                case '|':
-                case ';':
-                    /*
-                     *  Whatever the reason for a final '|' or ';' we will not
-                     *  add a semi-colon after it.
-                     */
-                    strcpy(pzOut, zNl + 2);
-                    pzOut += sizeof(zNl) - 3;
-                    break;
-
-                default:
-                append_statement_end:
-                    /*
-                     *  Terminate the current command and escape the newline.
-                     */
-                    strcpy(pzOut, zNl);
-                    pzOut += sizeof(zNl) - 1;
-                }
-
-                /*
-                 *  We have now started our next output line and there are
-                 *  still data.  Indent with a tab, if called for.  If we do
-                 *  insert a tab, then skip leading tabs on the line.
-                 */
-                if (tabch) {
-                    *(pzOut++) = tabch;
-                    while (*pzScn == tabch)  pzScn++;
-                }
+                start_line = out_scan;
                 break;
 
             case NUL:
@@ -226,7 +269,7 @@ ag_scm_makefile_script(SCM text)
                 /*
                  *  Double the dollar -- IFF it is not a makefile macro
                  */
-                switch (*pzScn) {
+                switch (*src_scan) {
                 case '(': case '*': case '@': case '<': case '%': case '?':
                     break;
 
@@ -236,24 +279,24 @@ ag_scm_makefile_script(SCM text)
                      *  Avoid having to do a backward scan on the second '$'
                      *  by handling the next '$' now.  We get FOUR '$' chars.
                      */
-                    pzScn++;
-                    *(pzOut++) = '$';
-                    *(pzOut++) = '$';  /* two down, two to go */
+                    src_scan++;
+                    *(out_scan++) = '$';
+                    *(out_scan++) = '$';  /* two down, two to go */
                     /* FALLTHROUGH */
 
                 default:
-                    *(pzOut++) = '$';
+                    *(out_scan++) = '$';
                 }
                 /* FALLTHROUGH */
 
             default:
-                *(pzOut++) = ch;
+                *(out_scan++) = ch;
             }
         } copy_done:;
 
-        sz    = (pzOut - pzRes);
-        res   = AG_SCM_STR2SCM(pzRes, sz);
-        AGFREE(pzRes);
+        sz    = (out_scan - res_str);
+        res   = AG_SCM_STR2SCM(res_str, sz);
+        AGFREE(res_str);
     }
 
     return res;

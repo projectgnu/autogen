@@ -1,3 +1,9 @@
+2011-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c (handle_eol): break out as separate function.
+	exempt lines ending with "then", "else" and "in" from semi-colon
+	statement separations.
+
 2011-12-17  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am (agDep.c): new module
@@ -52,8 +58,8 @@
 	install information from autoopts-config.
 	(optlib.tlib): remove references to build directories.
 	* autoopts/tpl/optlib.tlib: make it sedable by install hook.
-	* autoopts/tpl/usage.tlib: likewise, but also redirect stdout to stderr
-	while constructing the emit-help-text program.
+	* autoopts/tpl/usage.tlib: likewise, but also redirect stdout to
+	stderr while constructing the emit-help-text program.
 	* agen5/agShell.c (load_data): NUL terminate string before printing
 	* autoopts/autoopts.m4 (min_opts_version): this is a test to verify
 	that the autoopts library is more recent than 2001.  Not important.

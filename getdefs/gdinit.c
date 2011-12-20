@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-01-31 11:51:45 bkorb"
+ *  Time-stamp:        "2011-12-18 11:57:54 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -27,13 +27,13 @@ static char const zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static char*
-compressOptionText( char* pzS, char* pzE );
+compressOptionText(char* pzS, char* pzE);
 
 static char*
 fixupSubblockString(char const * pzSrc);
 
 static void
-loadStdin( void );
+loadStdin(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void
@@ -63,7 +63,7 @@ fserr_die(char const * fmt, ...)
  *  compressOptionText
  */
 static char*
-compressOptionText( char* pzS, char* pzE )
+compressOptionText(char* pzS, char* pzE)
 {
     char* pzR = pzS;  /* result      */
     char* pzD = pzS;  /* destination */
@@ -90,11 +90,11 @@ compressOptionText( char* pzS, char* pzE )
 
     {
         size_t len = (pzD - pzR);
-        pzD = malloc( len + 1 );
+        pzD = malloc(len + 1);
         if (pzD == NULL)
             die("cannot dup %d byte string\n", (int)(pzD - pzR));
 
-        memcpy( pzD, pzR, len );
+        memcpy(pzD, pzR, len);
         pzD[ len ] = NUL;
     }
 
@@ -147,11 +147,11 @@ fixupSubblockString(char const * pzSrc)
         /*
          *  Attribute names must start with an alpha
          */
-        if (! IS_ALPHABETIC_CHAR( *pzCopy )) {
+        if (! IS_ALPHABETIC_CHAR(*pzCopy)) {
             fprintf(stderr, "ERROR:  attribute names must start "
                     "with an alphabetic character:\n\t%s\n",
                     pzString);
-            USAGE( EXIT_FAILURE );
+            USAGE(EXIT_FAILURE);
         }
 
         /*
@@ -196,39 +196,39 @@ fixupSubblockString(char const * pzSrc)
  *  problems, we just choke on it.
  */
 static void
-loadStdin( void )
+loadStdin(void)
 {
     char z[ 4096 ];
     int    ct  = 0;
-    tCC**  ppz = STACKLST_OPT( INPUT );
+    tCC**  ppz = STACKLST_OPT(INPUT);
 
-    if (isatty( STDIN_FILENO )) {
-        fputs( "getdefs error:  no inputs were specified and stdin is a tty\n",
-               stderr );
-        USAGE( EXIT_FAILURE );
+    if (isatty(STDIN_FILENO)) {
+        fputs("getdefs error:  no inputs were specified and stdin is a tty\n",
+              stderr);
+        USAGE(EXIT_FAILURE);
     }
 
     while (fgets(z, (int)sizeof(z), stdin) != NULL) {
-        char* pz = z + strlen( z );
+        char* pz = z + strlen(z);
 
         if (pz[-1] != '\n') {
             tSCC zErr[] =
                 "getdefs error: input line not newline terminated\n";
-            fputs( zErr, stderr );
-            exit( EXIT_FAILURE );
+            fputs(zErr, stderr);
+            exit(EXIT_FAILURE);
         }
 
-        while ((pz > z) && isspace( pz[-1] ))  pz--;
+        while ((pz > z) && isspace(pz[-1]))  pz--;
         *pz = '\0';
         pz = z;
-        while (isspace( *pz ))  pz++;
+        while (isspace(*pz))  pz++;
         if ((*pz == '\0') || (*pz == '#'))  continue;
-        if (access( pz, R_OK ) != 0)  continue;
+        if (access(pz, R_OK) != 0)  continue;
 
         if (ct++ == 0)
-            *ppz = strdup( z );  /* replace the "-" */
+            *ppz = strdup(z);  /* replace the "-" */
         else
-            SET_OPT_INPUT( strdup( z )); /* if 'strdup' fails, we die later */
+            SET_OPT_INPUT(strdup(z)); /* if 'strdup' fails, we die later */
     }
 }
 
@@ -241,40 +241,144 @@ loadStdin( void )
  *  option, it will need to be massaged for use.
  */
 LOCAL void
-processEmbeddedOptions( char* pzText )
+processEmbeddedOptions(char* pzText)
 {
     tSCC zStStr[] = "/*=--";
     tSCC zEndSt[] = "=*/";
 
     for (;;) {
-        char* pzStart = strstr( pzText, zStStr );
+        char* pzStart = strstr(pzText, zStStr);
         char* pzEnd;
         int   sblct = 0;
 
         if (pzStart == NULL)
             return;
 
-        if (HAVE_OPT( SUBBLOCK ))
-            sblct = STACKCT_OPT(  SUBBLOCK );
+        if (HAVE_OPT(SUBBLOCK))
+            sblct = STACKCT_OPT(SUBBLOCK);
 
-        pzEnd = strstr( pzStart, zEndSt );
+        pzEnd = strstr(pzStart, zEndSt);
         if (pzEnd == NULL)
             return;
 
-        pzStart = compressOptionText( pzStart + sizeof( zStStr )-1, pzEnd );
+        pzStart = compressOptionText(pzStart + sizeof(zStStr)-1, pzEnd);
 
-        optionLoadLine( &getdefsOptions, pzStart );
+        optionLoadLine(&getdefsOptions, pzStart);
 
-        if (HAVE_OPT( SUBBLOCK ) && (sblct != STACKCT_OPT( SUBBLOCK ))) {
-            tCC** ppz = STACKLST_OPT( SUBBLOCK );
-            ppz[ sblct ] = fixupSubblockString( ppz[ sblct ] );
+        if (HAVE_OPT(SUBBLOCK) && (sblct != STACKCT_OPT(SUBBLOCK))) {
+            tCC** ppz = STACKLST_OPT(SUBBLOCK);
+            ppz[ sblct ] = fixupSubblockString(ppz[sblct]);
         }
-        pzText = pzEnd + sizeof( zEndSt );
+        pzText = pzEnd + sizeof(zEndSt);
     }
 }
 
+/**
+ * set up the regular expression we search for
+ */
+static void
+set_define_re(void)
+{
+    static char const default_pat[] =
+        "/\\*=(\\*|"
+        "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
+    static char const pat_wrapper[] = "/\\*=(%s)";
 
-/*
+    char const * def_pat;
+    ag_bool      free_pat = AG_FALSE;
+
+    /*
+     *  Our default pattern is to accept all names following
+     *  the '/' '*' '=' character sequence.  We ignore case.
+     */
+    if ((! HAVE_OPT(DEFS_TO_GET)) || (*OPT_ARG(DEFS_TO_GET) == NUL)) {
+        def_pat = default_pat;
+
+    } else if (strncmp(OPT_ARG(DEFS_TO_GET), default_pat, 4) == 0) {
+        def_pat = OPT_ARG(DEFS_TO_GET);
+
+    } else {
+        char const * pz  = OPT_ARG(DEFS_TO_GET);
+        size_t       len = strlen((char *)pz) + 16;
+        char *       bf  = malloc(len);
+
+        if (bf == NULL)
+            die(zMallocErr, (int)len, "definition pattern");
+
+        /*
+         *  IF a pattern has been supplied, enclose it with
+         *  the '/' '*' '=' part of the pattern.
+         */
+        snprintf(bf, len, pat_wrapper, pz);
+        def_pat  = bf;
+        free_pat = AG_TRUE;
+    }
+
+    /*
+     *  Compile the regular expression that we are to search for
+     *  to find each new definition in the source files.
+     */
+    {
+        char zRER[MAXNAMELEN];
+        static char const zReErr[] =
+            "Regex error %d (%s):  Cannot compile reg expr:\n\t%s\n";
+
+        int rerr = regcomp(&define_re, def_pat, REG_EXTENDED | REG_ICASE);
+        if (rerr != 0) {
+            regerror(rerr, &define_re, zRER, sizeof(zRER));
+            die(zReErr, rerr, zRER, def_pat);
+        }
+
+        if (free_pat)
+            free((void *)def_pat);
+
+        rerr = regcomp(&attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE);
+        if (rerr != 0) {
+            regerror(rerr, &attrib_re, zRER, sizeof(zRER));
+            die(zReErr, rerr, zRER, zAttribRe);
+        }
+    }
+}
+
+/**
+ *  Make sure each of the input files is findable.
+ *  Also, while we are at it, compute the output file mod time
+ *  based on the mod time of the most recent file.
+ */
+static void
+set_modtime(void)
+{
+    int ct = STACKCT_OPT(INPUT);
+    char const ** ppz = STACKLST_OPT(INPUT);
+    struct stat stb;
+
+    if ((ct == 1) && (strcmp(*ppz, "-") == 0)) {
+        /*
+         *  Read the list of input files from stdin.
+         */
+        loadStdin();
+        ct  = STACKCT_OPT( INPUT);
+        ppz = STACKLST_OPT(INPUT);
+    }
+
+    do  {
+        if (stat(*ppz++, &stb) != 0)
+            break;
+
+        if (! S_ISREG(stb.st_mode)) {
+            errno = EINVAL;
+            break;
+        }
+
+        if (++(stb.st_mtime) > modtime)
+            modtime = stb.st_mtime;
+    } while (--ct > 0);
+
+    if (ct > 0)
+        fserr_die("stat-ing %s for text file\n", ppz[-1]);
+}
+
+/**
  *  validateOptions
  *
  *  -  Sanity check the options
@@ -288,73 +392,16 @@ processEmbeddedOptions( char* pzText )
  *  -  Initialize the user name characters array.
  */
 LOCAL void
-validateOptions( void )
+validateOptions(void)
 {
-    static char const default_pat[] =
-        "/\\*=(\\*|"
-        "([a-z][a-z0-9_]*(\\[[0-9]+\\]){0,1}|\\*)[ \t]+[a-z])";
-    static char const pat_wrapper[] = "/\\*=(%s)";
-    ag_bool free_pat = AG_FALSE;
-
-    /*
-     *  Our default pattern is to accept all names following
-     *  the '/' '*' '=' character sequence.  We ignore case.
-     */
-    if ((! HAVE_OPT(DEFS_TO_GET)) || (*OPT_ARG(DEFS_TO_GET) == NUL)) {
-        pzDefPat = default_pat;
-
-    } else if (strncmp(OPT_ARG(DEFS_TO_GET), default_pat, 4) == 0) {
-        pzDefPat = OPT_ARG(DEFS_TO_GET);
-
-    } else {
-        tCC*   pz  = OPT_ARG(DEFS_TO_GET);
-        size_t len = strlen( pz ) + 16;
-        char*  bf  = malloc( len );
-
-        if (bf == NULL)
-            die(zMallocErr, (int)len, "definition pattern");
-
-        /*
-         *  IF a pattern has been supplied, enclose it with
-         *  the '/' '*' '=' part of the pattern.
-         */
-        snprintf(bf, len, pat_wrapper, pz);
-        pzDefPat = bf;
-        free_pat = AG_TRUE;
-    }
-
-    /*
-     *  Compile the regular expression that we are to search for
-     *  to find each new definition in the source files.
-     */
-    {
-        char zRER[ MAXNAMELEN ];
-        static char const zReErr[] =
-            "Regex error %d (%s):  Cannot compile reg expr:\n\t%s\n";
-
-        int rerr = regcomp( &define_re, pzDefPat, REG_EXTENDED | REG_ICASE );
-        if (rerr != 0) {
-            regerror( rerr, &define_re, zRER, sizeof( zRER ));
-            die(zReErr, rerr, zRER, pzDefPat);
-        }
-
-        if (free_pat)
-            free((void *)pzDefPat);
-        pzDefPat = NULL;
-
-        rerr = regcomp( &attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE );
-        if (rerr != 0) {
-            regerror( rerr, &attrib_re, zRER, sizeof( zRER ));
-            die(zReErr, rerr, zRER, zAttribRe);
-        }
-    }
+    set_define_re();
 
     /*
      *  Prepare each sub-block entry so we can parse easily later.
      */
-    if (HAVE_OPT( SUBBLOCK )) {
-        int     ct  = STACKCT_OPT(  SUBBLOCK );
-        tCC**   ppz = STACKLST_OPT( SUBBLOCK );
+    if (HAVE_OPT(SUBBLOCK)) {
+        int     ct  = STACKCT_OPT( SUBBLOCK);
+        tCC**   ppz = STACKLST_OPT(SUBBLOCK);
 
         /*
          *  FOR each SUBBLOCK argument,
@@ -362,48 +409,15 @@ validateOptions( void )
          *      separated by a single space and NUL terminated.
          */
         do  {
-            *ppz = fixupSubblockString( *ppz );
+            *ppz = fixupSubblockString(*ppz);
             ppz++;
         } while (--ct > 0);
     }
 
-    if (! HAVE_OPT( INPUT ))
-        SET_OPT_INPUT( "-" );
+    if (! HAVE_OPT(INPUT))
+        SET_OPT_INPUT("-");
 
-    /*
-     *  Make sure each of the input files is findable.
-     *  Also, while we are at it, compute the output file mod time
-     *  based on the mod time of the most recent file.
-     */
-    {
-        int    ct  = STACKCT_OPT(  INPUT );
-        tCC**  ppz = STACKLST_OPT( INPUT );
-        struct stat stb;
-
-        if ((ct == 1) && (strcmp( *ppz, "-" ) == 0)) {
-            /*
-             *  Read the list of input files from stdin.
-             */
-            loadStdin();
-            ct  = STACKCT_OPT(  INPUT );
-            ppz = STACKLST_OPT( INPUT );
-        }
-
-        do  {
-            if (stat( *ppz++, &stb ) != 0)
-                break;
-            if (! S_ISREG( stb.st_mode )) {
-                errno = EINVAL;
-                break;
-            }
-
-            if (++(stb.st_mtime) > modtime)
-                modtime = stb.st_mtime;
-        } while (--ct > 0);
-
-        if (ct > 0)
-            fserr_die("stat-ing %s for text file\n", ppz[-1]);
-    }
+    set_modtime();
 
     /*
      *  IF the output is to have order AND it is to be based on a file,
@@ -411,19 +425,19 @@ validateOptions( void )
      *       IF we cannot load the file,
      *       THEN it must be new or empty.  Allocate several K to start.
      */
-    if (  HAVE_OPT( ORDERING )
-       && (OPT_ARG( ORDERING ) != NULL)) {
+    if (  HAVE_OPT(ORDERING)
+       && (OPT_ARG(ORDERING) != NULL)) {
         tSCC zIndexPreamble[] =
             "# -*- buffer-read-only: t -*- vi: set ro:\n"
             "#\n# DO NOT EDIT THIS FILE - it is auto-edited by getdefs\n";
 
-        pzIndexText = loadFile( OPT_ARG( ORDERING ));
+        pzIndexText = loadFile(OPT_ARG(ORDERING));
         if (pzIndexText == NULL) {
-            pzIndexText = pzEndIndex = pzIndexEOF = malloc( (size_t)0x4000 );
+            pzIndexText = pzEndIndex = pzIndexEOF = malloc((size_t)0x4000);
             indexAlloc = 0x4000;
-            pzEndIndex += sprintf( pzEndIndex, "%s", zIndexPreamble );
+            pzEndIndex += sprintf(pzEndIndex, "%s", zIndexPreamble);
         } else {
-            pzEndIndex  = pzIndexEOF = pzIndexText + strlen( pzIndexText );
+            pzEndIndex  = pzIndexEOF = pzIndexText + strlen(pzIndexText);
             indexAlloc = (pzEndIndex - pzIndexText) + 1;
         }
 
@@ -432,17 +446,17 @@ validateOptions( void )
          *  By default, everything is mapped to lower case already.
          *  This call will map these three characters to '_'.
          */
-        strequate( "_-^" );
+        strequate("_-^");
     }
 
     {
-        char const * pz = OPT_ARG( SRCFILE );
+        char const * pz = OPT_ARG(SRCFILE);
         if ((pz == NULL) || (*pz == NUL))
-            OPT_ARG( SRCFILE ) = "srcfile";
+            OPT_ARG(SRCFILE) = "srcfile";
 
-        pz = OPT_ARG( LINENUM );
+        pz = OPT_ARG(LINENUM);
         if ((pz == NULL) || (*pz == NUL))
-            OPT_ARG( LINENUM ) = "linenum";
+            OPT_ARG(LINENUM) = "linenum";
     }
 
     {
