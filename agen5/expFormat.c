@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2011-12-17 14:31:00 bkorb"
+ *  Time-stamp:        "2011-12-28 09:48:52 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -294,7 +294,7 @@ assemble_full_desc(char * txt, char const * pfx)
     char * md;
 
     size_t prefix_len = strlen(pfx) + 1;
-    while (IS_WHITESPACE_CHAR(pfx[prefix_len - 2]))
+    while ((prefix_len > 0) && IS_WHITESPACE_CHAR(pfx[prefix_len - 2]))
         prefix_len--;
 
     /*
@@ -314,16 +314,14 @@ assemble_full_desc(char * txt, char const * pfx)
     pd[prefix_len] = NL;
 
     /*
-     *  Look for a trailing license name and trim it and any newlines off.
+     *  Look for a trailing license name and trim it and trailing white space
      */
     txt = strstr(md, "\n\n");
-    if (txt != NULL)
-        *txt = NUL;
-    else {
-        txt += strlen(txt);
-        if (txt[-1] == NL)
-            txt[-1] = NUL;
-    }
+    if (txt == NULL)
+        txt = md + strlen(md);
+
+    while ((txt > md) && IS_WHITESPACE_CHAR(txt[-1]))  txt--;
+    *txt = NUL;
 }
 
 /**
@@ -340,10 +338,6 @@ trim_lic_name(char * p)
     char * res;
     /* skip the leading white space.  It starts with NL. */
     while (IS_WHITESPACE_CHAR(*(++p))) ;
-    if (strncmp(p, pfx_txt, pfx_len - 1) == 0) {
-        p += pfx_len - 1;
-        while (IS_WHITESPACE_CHAR(*p))  p++;
-    }
 
     if (*p == NUL)
         return p;
@@ -355,18 +349,10 @@ trim_lic_name(char * p)
      *  All trailing newlines are trimmed (not all white space).
      */
     p = strstr(p, "\n\n");
-    if (p != NULL)
-        *p = NUL;
-    else {
+    if (p == NULL)
         p = res + strlen(res);
-
-        /*
-         * We have skipped at least two bytes:  the two leading NL chars.
-         * Therefore, we know that "p[-1]" refers to a valid byte.
-         */
-        if (p[-1] == NL)
-            *p = NUL;
-    }
+    while ((p > res) && IS_WHITESPACE_CHAR(p[-1]))  p--;
+    *p = NUL;
 
     return res;
 }
@@ -382,19 +368,20 @@ trim_lic_name(char * p)
 static char *
 get_lic_name(char * p)
 {
-    while (*(++p) == NL) ; /* skip the leading NL's.  It starts with NL. */
+    char * scan = p;
+    while (*(++scan) == NL)   ; /* skip the leading NL's. */
 
     /*
      * Find the third stanza.  If there.  If not, we supply some static
      * text:  "an unknown license"
      */
-    p = strstr(p, "\n\n");
-    if (p == NULL) {
+    scan = strstr(scan, "\n\n");
+    if (scan == NULL) {
         strcpy(p, bad_lic);
         return p;
     }
-    while (*p == NL) p++;
-    return p;
+    while (*scan == NL) scan++;
+    return scan;
 }
 
 /**
@@ -409,7 +396,7 @@ get_lic_name(char * p)
  */
 static char *
 find_lic_text(
-    lic_segment_e_t segment, SCM lic, size_t * txt_len, char const * pfx)
+    lic_segment_e_t segment, SCM lic, ssize_t * txt_len, char const * pfx)
 {
     static char const * const lic_sfx[] = { "lic", NULL };
 
@@ -497,9 +484,9 @@ construct_license(
     static SCM subs  = SCM_UNDEFINED;
     static SCM empty = SCM_UNDEFINED;
 
-    SCM    vals = SCM_UNDEFINED;
-    char * lic_text;
-    size_t text_len;
+    SCM     vals = SCM_UNDEFINED;
+    char *  lic_text;
+    ssize_t text_len;
     char const * pfx_pz = ag_scm2zchars(pfx, "lic-prefix");
 
     if (subs == SCM_UNDEFINED) {
@@ -651,12 +638,13 @@ ag_scm_license_info(SCM lic, SCM prog, SCM pfx, SCM owner, SCM years)
 SCM
 ag_scm_license_name(SCM lic)
 {
-    size_t text_len;
+    ssize_t text_len;
     char * txt = find_lic_text(LSEG_NAME, lic, &text_len, "");
-    char * e   = txt + strlen(txt);
+    char * e;
+    while (IS_WHITESPACE_CHAR(*txt))  txt++;
+    e   = txt + strlen(txt);
     while (IS_WHITESPACE_CHAR(e[-1]) && (e > txt))  e--;
     *e  = NUL;
-    while (IS_WHITESPACE_CHAR(*txt))  txt++;
     lic = AG_SCM_STR02SCM(txt);
     return lic;
 }

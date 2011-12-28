@@ -2,7 +2,7 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2011-12-17 13:25:51 bkorb"
+# Time-stamp:        "2011-12-28 09:59:12 bkorb"
 
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
@@ -25,7 +25,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=14
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL="pre14"
+AG_PATCHLEVEL=""
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

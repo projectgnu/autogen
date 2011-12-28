@@ -2,29 +2,29 @@
 
   AutoGen5 template man
 
-## cmd-doc.tlib -- Template for command line man/mdoc pages
-##
-## Time-stamp:      "2011-11-23 07:46:49 bkorb"
-##
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
+# cmd-doc.tlib -- Template for command line man/mdoc pages
+#
+# Time-stamp:      "2011-12-21 10:35:02 bkorb"
+#
+#  This file is part of AutoOpts, a companion to AutoGen.
+#  AutoOpts is free software.
+#  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+#
+#  AutoOpts is available under any one of two licenses.  The license
+#  in use must be one of these two and the choice is under the control
+#  of the user of the license.
+#
+#   The GNU Lesser General Public License, version 3 or later
+#      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+#
+#   The Modified Berkeley Software Distribution License
+#      See the file "COPYING.mbsd"
+#
+#  These files have the following md5sums:
+#
+#  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+#  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+#  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 # Produce a man page for section 1, 6 or 8 commands.  Which is
 # selected via: -DMAN_SECTION=n.  "n" may have a suffix, if desired.
@@ -32,6 +32,20 @@
 # with -DSECTIN_NAME=XX, also passed to the autogen invocation.
 #
 :+][+:
+
+   ;;# START-BUILDTREE-ISMS
+   ;;
+   (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+:+][+: # END-BUILDTREE-ISMS
+
+   (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE :+][+:
 
 (define down-prog-name (string-downcase! (get "prog-name")))
 (define UP-PROG-NAME   (get-up-name "prog-name"))
@@ -848,7 +862,7 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: (shellf "${CLexe:-columns} --indent='' --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: (shellf "${CLexe} --indent='' --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  )   :+]
 .fi
 or their numeric equivalent.

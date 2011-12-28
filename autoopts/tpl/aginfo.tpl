@@ -2,34 +2,49 @@
 
 texi
 
-##  Documentation template
-##
-## Time-stamp:        "2011-08-19 20:59:45 bkorb"
-## Author:            Bruce Korb <bkorb@gnu.org>
-##
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
+#  Documentation template
+#
+# Time-stamp:        "2011-12-21 10:36:00 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+#
+#  This file is part of AutoOpts, a companion to AutoGen.
+#  AutoOpts is free software.
+#  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#
+#  AutoOpts is available under any one of two licenses.  The license
+#  in use must be one of these two and the choice is under the control
+#  of the user of the license.
+#
+#   The GNU Lesser General Public License, version 3 or later
+#      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+#
+#   The Modified Berkeley Software Distribution License
+#      See the file "COPYING.mbsd"
+#
+#  These files have the following md5sums:
+#
+#  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+#  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+#  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =]
 @node [= prog-name =] Invocation
 @[=
+
+  ;;# START-BUILDTREE-ISMS
+  ;;
+  (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+=][= # END-BUILDTREE-ISMS
+
+  (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE =][=
+
  (make-tmp-dir)
  (define down-prog-name (string-downcase! (get "prog-name")))
  (define doc-level (getenv "LEVEL"))
@@ -270,7 +285,7 @@ with bit tests against[=
 "OPT_VALUE_" (get "name")  )) =]).
 The available keywords are:
 @example
-[= (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[= (shellf "${CLexe} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  ) =]
 @end example
 [=

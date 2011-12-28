@@ -2,36 +2,36 @@
 
 AutoGen5 template man=%s.1
 
-## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##
-## NOTICE:  this template is DEPRECATED.  Please convert to agman-cmd.
-##
-## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# NOTICE:  this template is DEPRECATED.  Please convert to agman-cmd.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-## agman1.tpl -- Template for command line man pages
-##
-## Time-stamp:      "2011-01-19 10:58:13 bkorb"
-## Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
-##
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
+# agman1.tpl -- Template for command line man pages
+#
+# Time-stamp:      "2011-01-19 10:58:13 bkorb"
+# Author:          Jim Van Zandt <jrv@vanzandt.mv.com>
+#
+#  This file is part of AutoOpts, a companion to AutoGen.
+#  AutoOpts is free software.
+#  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#
+#  AutoOpts is available under any one of two licenses.  The license
+#  in use must be one of these two and the choice is under the control
+#  of the user of the license.
+#
+#   The GNU Lesser General Public License, version 3 or later
+#      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+#
+#   The Modified Berkeley Software Distribution License
+#      See the file "COPYING.mbsd"
+#
+#  These files have the following md5sums:
+#
+#  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+#  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+#  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 :+]
 .TH [+: % prog-name (string-upcase! "%s") :+] 1 [+:
@@ -52,6 +52,21 @@ AutoGen5 template man=%s.1
 [+: (define prog-name (string-downcase! (get "prog-name")))
     (define PROG_NAME (string-tr! (get "prog-name") "a-z^-" "A-Z__"))
     (define prog_name (string-tr! (get "prog-name") "A-Z^-" "a-z__"))
+
+  ;;# START-BUILDTREE-ISMS
+  ;;
+  (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+:+][+: # END-BUILDTREE-ISMS
+
+  (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE :+][+:
+
     prog-name :+] \- [+: prog-title :+]
 .SH SYNOPSIS
 .B [+:
@@ -361,7 +376,7 @@ The available keywords are:
 .in +4
 .nf
 .na
-[+: (shellf "${CLexe:-columns} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
+[+: (shellf "${CLexe} --spread=1 -W50 <<_EOF_\n%s\n_EOF_"
             (join "\n" (stack "keyword"))  )   :+]
 .fi
 or their numeric equivalent.

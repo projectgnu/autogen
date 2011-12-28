@@ -2,7 +2,7 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2011-08-02 12:21:12 bkorb"
+ *  Time-stamp:        "2011-12-21 10:56:11 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -42,12 +42,12 @@ sub_count(char const * haystack, char const * needle);
 
 static void
 do_substitution(
-    char const * pzStr,
-    size_t       strLen,
+    char const * src_str,
+    ssize_t      str_len,
     SCM          match,
     SCM          repl,
-    char **      ppzRes,
-    size_t *     pResLen);
+    char **      ppz_res,
+    ssize_t *    res_len);
 /* = = = END-STATIC-FORWARD = = = */
 
 static size_t
@@ -329,58 +329,64 @@ sub_count(char const * haystack, char const * needle)
     return repCt;
 }
 
-/* * * * *
+/**
+ *  Replace marker text.
  *
- *  Substitution routines.  These routines implement a sed-like
- *  experience, except that we don't use regex-es.  It is straight
- *  text substitution.
+ *  Replace all occurrances of the marker text with the substitution text.
+ *  The result is stored in an automatically freed temporary buffer.
+ *
+ *  @param src_str  The source string
+ *  @param str_len  The length of the string
+ *  @param match    the SCM-ized marker string
+ *  @param repl     the SCM-ized replacement string
+ *  @param ppz_res  pointer to the result pointer
+ *  @param res_len  pointer to result length
  */
 static void
 do_substitution(
-    char const * pzStr,
-    size_t       strLen,
+    char const * src_str,
+    ssize_t      str_len,
     SCM          match,
     SCM          repl,
-    char **      ppzRes,
-    size_t *     pResLen)
+    char **      ppz_res,
+    ssize_t *    res_len)
 {
-    char* pzMatch = ag_scm2zchars(match, "match text");
-    char* pzRepl  = ag_scm2zchars(repl,  "repl text");
-    int   matchL  = AG_SCM_STRLEN(match);
-    int   replL   = AG_SCM_STRLEN(repl);
-    int   endL    = strLen;
+    char* pzMatch  = ag_scm2zchars(match, "match text");
+    char* rep_str  = ag_scm2zchars(repl,  "repl text");
+    int   mark_len = AG_SCM_STRLEN(match);
+    int   repl_len = AG_SCM_STRLEN(repl);
 
-    int   repCt   = sub_count(pzStr, pzMatch);
-    char const * pz = pzStr;
-    char * pzRes;
-    char * pzScan;
+    {
+        int ct = sub_count(src_str, pzMatch);
+        if (ct == 0)
+            return; /* No substitutions -- no work. */
 
-    /*
-     *  No substitutions -- no work.  The caller will have to track
-     *  whether or not to deallocate the result.
-     */
-    if (repCt == 0)
-        return;
-
-    endL   = endL + (replL * repCt) - (matchL * repCt);
-    pzScan = pzRes = ag_scribble(endL + 1);
-    pz     = pzStr;
-
-    for (;;) {
-        char const * pzNxt = strstr(pz, pzMatch);
-        if (pzNxt == NULL)
-            break;
-        if (pz != pzNxt) {
-            memcpy(pzScan, pz, (size_t)(pzNxt - pz));
-            pzScan += (pzNxt - pz);
-        }
-        memcpy(pzScan, pzRepl, (size_t)replL);
-        pzScan += replL;
-        pz = pzNxt + matchL;
+        str_len += (repl_len - mark_len) * ct;
     }
-    strcpy(pzScan, pz);
-    *ppzRes = pzRes;
-    *pResLen = (pzScan - pzRes) + strlen(pz);
+
+    {
+        char * dest = ag_scribble(str_len + 1);
+        *ppz_res = dest;
+        *res_len = str_len;
+
+        for (;;) {
+            char const * next = strstr(src_str, pzMatch);
+            size_t len;
+
+            if (next == NULL)
+                break;
+            len = next - src_str;
+            if (len != 0) {
+                memcpy(dest, src_str, len);
+                dest += len;
+            }
+            memcpy(dest, rep_str, (size_t)repl_len);
+            dest   += repl_len;
+            src_str = next + mark_len;
+        }
+
+        strcpy(dest, src_str);
+    }
 }
 
 
@@ -391,7 +397,7 @@ do_substitution(
  *  The "match" and "repl" trees *must* be identical in structure.
  */
 LOCAL void
-do_multi_subs(char ** ppzStr, size_t * pStrLen, SCM match, SCM repl)
+do_multi_subs(char ** ppzStr, ssize_t * pStrLen, SCM match, SCM repl)
 {
     char* pzStr = *ppzStr;
     char* pzNxt = pzStr;
@@ -680,74 +686,6 @@ ag_scm_prefix(SCM prefix, SCM text)
         }
     }
 }
-
-
-/*=gfunc shell
- *
- * what:  invoke a shell script
- * general_use:
- *
- * exparg: command, shell command - the result value is stdout
- *
- * doc:
- *  Generate a string by writing the value to
- *  a server shell and reading the output back in.  The template
- *  programmer is responsible for ensuring that it completes
- *  within 10 seconds.  If it does not, the server will be killed,
- *  the output tossed and a new server started.
- *
- *  NB:  This is the same server process used by the '#shell'
- *  definitions directive and backquoted @code{`} definitions.
- *  There may be left over state from previous shell expressions
- *  and the @code{`} processing in the declarations.  However, a
- *  @code{cd} to the original directory is always issued before
- *  the new command is issued.
-=*/
-SCM
-ag_scm_shell(SCM cmd)
-{
-    if (! AG_SCM_STRING_P(cmd))
-        return SCM_UNDEFINED;
-    {
-        char* pz = shell_cmd(ag_scm2zchars(cmd, "command"));
-        cmd   = AG_SCM_STR02SCM(pz);
-        AGFREE((void*)pz);
-        return cmd;
-    }
-}
-
-
-/*=gfunc shellf
- *
- * what:  format a string, run shell
- * general_use:
- *
- * exparg: format, formatting string
- * exparg: format-arg, list of arguments to formatting string, opt, list
- *
- * doc:  Format a string using arguments from the alist,
- *       then send the result to the shell for interpretation.
-=*/
-SCM
-ag_scm_shellf(SCM fmt, SCM alist)
-{
-    int   len = scm_ilength(alist);
-    char* pz;
-
-#ifdef DEBUG_ENABLED
-    if (len < 0)
-        AG_ABEND("invalid alist to shellf");
-#endif
-
-    pz  = ag_scm2zchars(fmt, "format");
-    fmt = run_printf(pz, len, alist);
-
-    pz  = shell_cmd(ag_scm2zchars(fmt, "shell script"));
-    fmt = AG_SCM_STR02SCM(pz);
-    AGFREE((void*)pz);
-    return fmt;
-}
-
 
 /*=gfunc raw_shell_str
  *
@@ -1101,7 +1039,6 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
     return str;
 }
 
-
 /*=gfunc string_tr
  *
  * what:  convert characters with new result
@@ -1121,7 +1058,6 @@ ag_scm_string_tr(SCM Str, SCM From, SCM To)
     SCM    res   = AG_SCM_STR2SCM(AG_SCM_CHARS(Str), lenz);
     return ag_scm_string_tr_x(res, From, To);
 }
-
 
 /*=gfunc string_substitute
  *
@@ -1147,8 +1083,8 @@ SCM
 ag_scm_string_substitute(SCM Str, SCM Match, SCM Repl)
 {
     char const *  pzStr;
-    size_t len;
-    SCM    res;
+    ssize_t len;
+    SCM     res;
 
     if (! AG_SCM_STRING_P(Str))
         return SCM_UNDEFINED;
@@ -1164,7 +1100,6 @@ ag_scm_string_substitute(SCM Str, SCM Match, SCM Repl)
     res = AG_SCM_STR2SCM(pzStr, len);
     return res;
 }
-
 
 /*=gfunc time_string_to_number
  *

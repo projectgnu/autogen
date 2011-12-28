@@ -96,7 +96,9 @@ flag = {
 @end example
 
 @noindent
-Then run the following short script:[= #
+This program will produce a program that digests its options and
+writes the values as shell script code to stdout.
+Run the following short script to produce this program:[= #
 
 Developer note:  the following only works when AutoGen has been installed.
 Since this may be being built on a system where it has not been installed,

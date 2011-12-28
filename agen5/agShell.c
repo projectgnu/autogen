@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-12-17 11:50:38 bkorb"
+ *  Time-stamp:        "2011-12-21 10:58:06 bkorb"
  *
  *  Manage a server shell process
  *
@@ -54,6 +54,78 @@ ag_scm_chdir(SCM dir)
         strcpy((char*)cur_dir, pz);
     }
     return dir;
+}
+
+/*=gfunc shell
+ *
+ * what:  invoke a shell script
+ * general_use:
+ *
+ * exparg: command, shell command - the result value is the stdout output.
+ *
+ * doc:
+ *  Generate a string by writing the value to a server shell and reading the
+ *  output back in.  The template programmer is responsible for ensuring that
+ *  it completes within 10 seconds.  If it does not, the server will be
+ *  killed, the output tossed and a new server started.
+ *
+ *  Please note: This is the same server process used by the '#shell'
+ *  definitions directive and backquoted @code{`} definitions.  There may be
+ *  left over state from previous shell expressions and the @code{`}
+ *  processing in the declarations.  However, a @code{cd} to the original
+ *  directory is always issued before the new command is issued.
+ *
+ *  Also note:  When initializing, autogen will set the environment
+ *  variable "AGexe" to the full path of the autogen executable.
+=*/
+SCM
+ag_scm_shell(SCM cmd)
+{
+#ifndef SHELL_ENABLED
+    return cmd;
+#else
+    if (! AG_SCM_STRING_P(cmd))
+        return SCM_UNDEFINED;
+    {
+        char* pz = shell_cmd(ag_scm2zchars(cmd, "command"));
+        cmd   = AG_SCM_STR02SCM(pz);
+        AGFREE((void*)pz);
+        return cmd;
+    }
+#endif
+}
+
+/*=gfunc shellf
+ *
+ * what:  format a string, run shell
+ * general_use:
+ *
+ * exparg: format, formatting string
+ * exparg: format-arg, list of arguments to formatting string, opt, list
+ *
+ * doc:  Format a string using arguments from the alist,
+ *       then send the result to the shell for interpretation.
+=*/
+SCM
+ag_scm_shellf(SCM fmt, SCM alist)
+{
+    int   len = scm_ilength(alist);
+    char* pz;
+
+#ifdef DEBUG_ENABLED
+    if (len < 0)
+        AG_ABEND("invalid alist to shellf");
+#endif
+
+    pz  = ag_scm2zchars(fmt, "format");
+    fmt = run_printf(pz, len, alist);
+
+#ifdef SHELL_ENABLED
+    pz  = shell_cmd(ag_scm2zchars(fmt, "shell script"));
+    fmt = AG_SCM_STR02SCM(pz);
+    AGFREE((void*)pz);
+#endif
+    return fmt;
 }
 
 #ifndef SHELL_ENABLED

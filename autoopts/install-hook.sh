@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-12-17 11:31:24 bkorb"
+# Time-stamp:        "2011-12-21 10:08:43 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -83,29 +83,16 @@ cfgf=${top_builddir}/config.h
 } > ${DESTdestdir}/options.h
 
 test -d "${DESTpkgdatadir}" && {
-    sedtpl='/^#!\//s@.*@#!'${POSIX_SHELL}'@
-s%(setenv "SHELL" .*%(setenv "SHELL" "'${POSIX_SHELL}'")%
-/ test_exe ".*\/columns"/s%"[^"]*"%"'${bindir}'/columns"%'
-
-    sedusage='/# *START-BUILDTREE-ISMS/,/# *END-BUILDTREE-ISMS/d
-	/INSTALL-ONLY-CODE/d
+    rmbuild='/# *START-BUILDTREE-ISMS/,/# *END-BUILDTREE-ISMS/d
+	/# *END-INSTALL-ONLY-CODE/d
 	/^##/d'
 
     cd ${DESTpkgdatadir}
     for f in *
     do  case "$f" in
-        ag*.tpl | options.tpl )
-            sed "${sedtpl}" $f > $f.tmp
-            mv -f $f.tmp $f
-            ;;
-
-        getopt.tpl | usage.tlib )
-            sed "${sedusage}" $f > $f.tmp
-            mv -f $f.tmp $f
-            ;;
-
-        optlib.tlib )
-            sed '/builddir/d' $f > $f.tmp
+        optlib.tlib    | getopt.tpl | usage.tlib | cmd-doc.tlib | \
+        agtexi-cmd.tpl | agman1.tpl | aginfo.tpl )
+            sed "${rmbuild}" $f > $f.tmp
             mv -f $f.tmp $f
             ;;
 

@@ -3,6 +3,21 @@
 	* agen5/expMake.c (handle_eol): break out as separate function.
 	exempt lines ending with "then", "else" and "in" from semi-colon
 	statement separations.
+	* agen5/expFormat.c: fix licensing code (missing prefix)
+	* agen5/expString.c (do_substitution): length needs to be signed,
+	ripples through rest of file.
+	(ag_scm_shell): move to agShell.c module
+	(ag_scm_shellf): likewise
+	* autoopts/install-hook.sh (rmbuild): remove build-isms from various
+	installed templates.
+	* autoopts/tpl/aginfo.tpl (CLexe): setting depends on build or install
+	* autoopts/tpl/agman1.tpl (CLexe): likewise
+	* autoopts/tpl/agtexi-cmd.tpl (CLexe): likewise
+	* autoopts/tpl/cmd-doc.tlib (CLexe): likewise
+	* autoopts/tpl/optlib.tlib (CLexe): likewise
+	* autoopts/tpl/usage-txt.tpl (CLexe): likewise
+	* agen5/agShell.c (ag_scm_shell): moved from expString.c
+	(ag_scm_shellf): likewise
 
 2011-12-17  Bruce Korb  <bkorb@gnu.org>
 

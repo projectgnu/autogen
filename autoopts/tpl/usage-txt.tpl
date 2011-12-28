@@ -2,7 +2,7 @@
 
   h  pot
 
-(define time-stamp "2011-06-09 13:28:06")
+(define time-stamp "2011-12-21 10:13:57")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -128,11 +128,15 @@ ENDFOR  utxt        =][=
   usage_text_t option_usage_text = {
     [= (count "utxt") =],
 [= (shell (string-append
-  "${CLexe:-columns} -W84 -I4 --spread=1 -f'eng_z%s,' <<_EOF_" typed-list
-  "\n_EOF_" )) =]
-    {
-[= (shell (string-append
-  "${CLexe:-columns} -W84 -I6 --spread=1 -S, <<_EOF_\n" const-list
+  "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }
+  ${CLexe} -W84 -I4 --spread=1 -f'eng_z%s,' <<_EOF_" typed-list
+  "\n_EOF_
+  echo '    {'
+  ${CLexe} -W84 -I6 --spread=1 -S, <<_EOF_\n" const-list
   "_EOF_" )) =]
     }
   };

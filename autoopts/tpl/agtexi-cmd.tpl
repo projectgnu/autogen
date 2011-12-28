@@ -2,30 +2,30 @@
 
 texi
 
-##  Documentation template
-##
-## Time-stamp:        "2011-05-29 13:57:55 bkorb"
-## Author:            Bruce Korb <bkorb@gnu.org>
-##
-##  This file is part of AutoOpts, a companion to AutoGen.
-##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
-##
-##  AutoOpts is available under any one of two licenses.  The license
-##  in use must be one of these two and the choice is under the control
-##  of the user of the license.
-##
-##   The GNU Lesser General Public License, version 3 or later
-##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
-##
-##   The Modified Berkeley Software Distribution License
-##      See the file "COPYING.mbsd"
-##
-##  These files have the following md5sums:
-##
-##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
+#  Documentation template
+#
+# Time-stamp:        "2011-12-21 10:35:21 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+#
+#  This file is part of AutoOpts, a companion to AutoGen.
+#  AutoOpts is free software.
+#  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#
+#  AutoOpts is available under any one of two licenses.  The license
+#  in use must be one of these two and the choice is under the control
+#  of the user of the license.
+#
+#   The GNU Lesser General Public License, version 3 or later
+#      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+#
+#   The Modified Berkeley Software Distribution License
+#      See the file "COPYING.mbsd"
+#
+#  These files have the following md5sums:
+#
+#  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
+#  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
+#  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =][=
 
@@ -588,6 +588,21 @@ ENDDEF header
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE initialization                   =][=
+
+  ;;# START-BUILDTREE-ISMS
+  ;;
+  (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+=][= # END-BUILDTREE-ISMS
+
+  (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE =][=
+
   (make-tmp-dir)
   (define program-name   (get "prog-name"))
   (define down-prog-name (string-downcase program-name))

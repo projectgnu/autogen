@@ -5428,6 +5428,8 @@ supported features, @xref{Features}.
 @item
 You cannot automatically take advantage of environment variable options or
 automated parsing of configuration files (``rc'' or ``ini'' files).
+Consequently, the resulting code does not support @file{--load-opts} or
+@file{--save-opts} options automatically.
 
 @item
 You cannot use set membership, enumerated, range checked or stacked
@@ -5435,6 +5437,15 @@ argument type options.  In fact, you cannot use anything that depends
 upon the @code{libopts} library.  You are constrained to options that
 take ``@code{string}'' arguments, though you may handle the option
 argument with a callback procedure.
+
+@item
+Special disablement and/or enablement prefixes are not recognized.
+
+@item
+Generated @code{main()} procedures will not work.
+
+@item
+Option coordination with external libraries will not work.
 
 @item
 Every option must be ``settable'' because the emitted code
