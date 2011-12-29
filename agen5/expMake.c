@@ -2,7 +2,7 @@
 /**
  * @file expMake.c
  *
- *  Time-stamp:        "2011-12-18 12:12:59 bkorb"
+ *  Time-stamp:        "2011-12-28 16:51:31 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -24,6 +24,23 @@
  */
 static char const zNl[]  = " ; \\\n";
 
+/**
+ * Figure out how to handle the line continuation.
+ * If the line we just finished ends with a backslash, we're done.
+ * Just add the newline character.  If it ends with a semi-colon or a
+ * doubled amphersand or doubled or-bar, then escape the newline with a
+ * backslash.  If the line ends with one of the keywords "then", "in" or
+ * "else", also only add the escaped newline.  Otherwise, add a
+ * semi-colon, backslash and newline.
+ *
+ * @param  ppzi  pointer to pointer to input text
+ * @param  ppzo  pointer to pointer to output text
+ * @param  tabch line prefix (tab) character
+ * @param  bol   pointer to start of currently-being-output line
+ *
+ * @returns AG_FALSE to say the newline is dropped becase we're done
+ *          AG_TRUE  to say the line was appended with the newline.
+ */
 static ag_bool
 handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
 {
@@ -136,6 +153,101 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
     return AG_TRUE;
 }
 
+/**
+ * Pass through untreated sedable lines.  Sometimes it is just very useful
+ * to post-process Makefile files with sed(1) to clean it up.
+ *
+ * @param txt   pointer to text.  We skip initial white space.
+ * @param tab   pointer to where we stash the tab character to use
+ * @returns     AG_TRUE to say this was a sed line and was emitted,
+ *              AG_FALSE to say it was not and needs to be copied out.
+ */
+static ag_bool
+handle_sed_expr(char ** src_p, char ** out_p)
+{
+    char * src = *src_p;
+    char * out = *out_p;
+
+    switch (src[1]) {
+    case 'i':
+        if (strncmp(src+2, "fndef ", 6) == 0)
+            break;
+        if (strncmp(src+2, "fdef ", 5) == 0)
+            break;
+        return AG_FALSE;
+
+    case 'e':
+        if (strncmp(src+2, "lse ", 4) == 0)
+            break;
+        if (strncmp(src+2, "ndif ", 5) == 0)
+            break;
+        /* FALLTHROUGH */
+    default:
+        return AG_FALSE;
+    }
+
+    for (;;) {
+        char ch = *(src);
+        *(out++) = ch;
+        if (ch == NL)
+            break;
+    }
+    *out_p = out;
+    *src_p = src;
+    return AG_TRUE;
+}
+
+/**
+ * Compute a maximal size for the output script.
+ * Leading and trailing white space are trimmed.
+ *
+ * @param txt   pointer to text.  We skip initial white space.
+ * @param tab   pointer to where we stash the tab character to use
+ * @returns     the maximum number of bytes required to store result.
+ */
+static size_t
+script_size(char ** txt_p, char * tab)
+{
+    char * txt = *txt_p;
+    char * ptxte;
+    size_t sz = 0;
+
+    /*
+     *  skip all blank lines and other initial white space
+     *  in the source string.
+     */
+    if (! IS_WHITESPACE_CHAR(*txt))
+        *tab = TAB;
+    else {
+        while (IS_WHITESPACE_CHAR(*++txt))  ;
+        *tab  = (txt[-1] == TAB) ? NUL : TAB;
+    }
+
+    /*
+     *  Do nothing with empty input.
+     */
+    if (*txt == NUL)
+        return 0;
+
+    /*
+     *  "txt" is now our starting point.  Do not modify it any more.
+     */
+    *txt_p = ptxte = txt;
+
+    for (;;)  {
+        char * p = strpbrk(ptxte+1, "\n$");
+        if (p == NULL)
+            break;
+        sz += (*p == NL) ? sizeof(zNl) : 1;
+        ptxte = p;
+    }
+
+    ptxte += strlen(ptxte);
+    while (IS_WHITESPACE_CHAR(ptxte[-1]))  ptxte--;
+    *ptxte = NUL;
+    return (ptxte - txt) + sz;
+}
+
 /*=gfunc makefile_script
  *
  * what:  create makefile script
@@ -193,6 +305,17 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
  *
  *  @item
  *  Blank lines are stripped.
+ *
+ *  @item
+ *  Lines starting with "@@ifdef", "@@ifndef", "@@else" and "@@endif" are
+ *  presumed to be autoconf "sed" expression tags.  These lines will be
+ *  emitted as-is, with no tab prefix and no line splicing backslash.
+ *  These lines can then be processed at configure time with
+ *  @code{AC_CONFIG_FILES} sed expressions, similar to:
+ *
+ *  @example
+ *  sed "/^@@ifdef foo/d;/^@@endif foo/d;/^@@ifndef foo/,/^@@endif foo/d"
+ *  @end example
  *  @end enumerate
  *
  *  @noindent
@@ -211,40 +334,13 @@ ag_scm_makefile_script(SCM text)
     SCM    res;
     char*  pzText = ag_scm2zchars(text, "GPL line prefix");
     char   tabch;
-    size_t sz     = strlen(pzText) + 2;
+    size_t sz     = script_size(&pzText, &tabch);
 
-    /*
-     *  skip all blank lines and other initial white space
-     *  in the source string.
-     */
-    if (! IS_WHITESPACE_CHAR(*pzText))
-        tabch = TAB;
-    else {
-        while (IS_WHITESPACE_CHAR(*++pzText))  ;
-        tabch  = (pzText[-1] == TAB) ? NUL : TAB;
-    }
-
-    if (*pzText == NUL)
+    if (sz == 0)
         return AG_SCM_STR02SCM(zNil);
 
     {
-        char*  pz  = strchr(pzText, NL);
-        size_t inc = ((*pzText == TAB) ? 0 : 1) + sizeof(zNl) - 1;
-
-        while (pz != NULL) {
-            sz += inc;
-            pz = strchr(pz+1, NL);
-        }
-
-        pz = strchr(pzText, '$');
-        while (pz != NULL) {
-            sz++;
-            pz = strchr(pz + 1, '$');
-        }
-    }
-
-    {
-        char * res_str    = AGALOC(sz, "makefile text");
+        char * res_str    = ag_scribble(sz);
         char * out_scan   = res_str;
         char * src_scan   = pzText;
         char * start_line = out_scan;
@@ -281,12 +377,22 @@ ag_scm_makefile_script(SCM text)
                      */
                     src_scan++;
                     *(out_scan++) = '$';
-                    *(out_scan++) = '$';  /* two down, two to go */
-                    /* FALLTHROUGH */
+                    *(out_scan++) = '$';
+                    *(out_scan++) = '$';
+                    break;
 
                 default:
-                    *(out_scan++) = '$';
+                    *(out_scan++) = '$'; /* double, not quadruple */
                 }
+                *(out_scan++) = ch;
+                break;
+
+            case '@':
+                if (start_line == out_scan)
+                    if (handle_sed_expr(&src_scan, &out_scan)) {
+                        start_line = out_scan;
+                        break;
+                    }
                 /* FALLTHROUGH */
 
             default:
@@ -294,9 +400,7 @@ ag_scm_makefile_script(SCM text)
             }
         } copy_done:;
 
-        sz    = (out_scan - res_str);
-        res   = AG_SCM_STR2SCM(res_str, sz);
-        AGFREE(res_str);
+        res = AG_SCM_STR2SCM(res_str, out_scan - res_str);
     }
 
     return res;

@@ -19,6 +19,11 @@ New in __CURRENT_VERSION__ December 2011
   In the case of these keywords and certain operators, the semi-colon
   is now omitted.
 
+  Additionally, it produces text that can be post-processed at
+  configure time in that it will leave alone any lines starting with
+  "@ifdef", "@ifndef", "@else" and "@endif".  See the second argument
+  to the AC_CONFIG_FILES() autoconf macro for details.
+
 New in 5.13 December 2011
 
 * AutoOpts now uses string tables instead of individual static char const's.
