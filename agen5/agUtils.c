@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-12-17 13:51:55 bkorb"
+ *  Time-stamp:        "2011-12-29 10:04:30 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -28,9 +28,6 @@ define_base_name(void);
 
 static void
 put_defines_into_env(void);
-
-static void
-start_dep_file(void);
 
 static char const *
 skipQuote(char const * pzQte);

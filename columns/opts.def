@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-03-24 23:18:58 bkorb"
+ *  Time-stamp:        "2011-12-29 10:35:31 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
  *
@@ -47,7 +47,8 @@ export = <<- EOExport
 	#include <string.h>
 	EOExport;
 
-include = "#include <errno.h>\n";
+include = "[= AutoGen5 Template =]";
+include = "#include <errno.h>";
 
 flag = {
     name        = width;
@@ -260,6 +261,11 @@ flag = {
 };
 #endif
 
+include =
+  '#define OPEN_ERROR_FMT      ([=
+  (string-table-add-ref opt-strs
+  "Error %d (%s) opening %s\n")=])';
+
 flag = {
     name        = input;
     value       = i;
@@ -271,8 +277,8 @@ flag = {
 	        pOptDesc->optArg.argString, "r" FOPEN_BINARY_FLAG, stdin);
 
 	    if (fp == (FILE*)NULL) {
-	        fprintf(stderr, "Error %d (%s) opening %s\n",
-	                errno, strerror(errno), pOptDesc->optArg.argString);
+	        fprintf(stderr, OPEN_ERROR_FMT, errno, strerror(errno),
+	                pOptDesc->optArg.argString);
 	        USAGE(EXIT_FAILURE);
 	    }
 	_EODoc_;

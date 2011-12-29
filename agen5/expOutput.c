@@ -2,7 +2,7 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2011-12-17 14:24:43 bkorb"
+ *  Time-stamp:        "2011-12-29 10:06:18 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -569,10 +569,10 @@ ag_scm_make_tmp_dir(void)
             "|| rm -rf %1$s\")";
 
     if (pz_temp_tpl == NULL) {
-        char * tmpdir    = shell_cmd(tmp_dir_cmd);
-        char * cmdbf     = ag_scribble(sizeof(set_tmp_dir) + strlen(tmpdir));
+        char * tmpdir = shell_cmd(tmp_dir_cmd);
+        char * cmdbf  = ag_scribble(sizeof(set_tmp_dir) + 2 * strlen(tmpdir));
 
-        pz_temp_tpl      = tmpdir;
+        pz_temp_tpl = tmpdir;
         temp_tpl_dir_len = strlen(pz_temp_tpl) - 9;
 
         tmpdir[temp_tpl_dir_len - 1] = NUL;

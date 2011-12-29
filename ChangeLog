@@ -1,3 +1,18 @@
+2011-12-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agDep.c (wrap_up_depends): make really sure we don't specify
+	temporary files in dependencies.
+	* agen5/expOutput.c (ag_scm_make_tmp_dir): make really sure there is
+	lots of space for our make-a-temp-directory command
+	* agen5/opts.def (include): Use the option string tables for our
+	message strings
+	* columns/opts.def: likewise
+	* autoopts/tpl/opthead.tlib: put the "join export" code into a
+	join-or-expand macro.  Use expand-a-template logic if the first
+	line of the text contains a template pseudo macro.
+	* autoopts/tpl/optcode.tlib: use join-or-expand for "join include"
+	* configure.ac (CFLAGS): add -Wno-format-contains-nul for GCC
+
 2011-12-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expMake.c (handle_eol): break out as separate function.

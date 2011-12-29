@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2011-12-17 13:51:20 bkorb"
+ * Time-stamp:        "2011-12-29 10:04:47 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -38,9 +38,6 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
 
 static tTemplate *
 digest_pseudo_macro(tmap_info_t * minfo, char * real_file);
-
-static void
-wrap_up_depends(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**

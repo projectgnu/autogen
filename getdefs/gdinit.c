@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-12-18 11:57:54 bkorb"
+ *  Time-stamp:        "2011-12-29 10:02:47 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -34,6 +34,12 @@ fixupSubblockString(char const * pzSrc);
 
 static void
 loadStdin(void);
+
+static void
+set_define_re(void);
+
+static void
+set_modtime(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void

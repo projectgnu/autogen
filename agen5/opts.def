@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-12-17 16:48:14 bkorb"
+ *  Time-stamp:        "2011-12-29 09:44:44 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
@@ -62,6 +62,7 @@ version = `
     eval \`egrep '^AG_[A-Z_]*='  ${top_srcdir}/VERSION\` 2> /dev/null
     echo $AG_VERSION `;
 
+include = "[= AutoGen5 Template =]";
 #ifndef XML2AG
 include = <<-  _END_INCLUDE
 	#include "autogen.h"
@@ -234,6 +235,15 @@ flag = {
 #endif
 };
 
+include =
+  '#define CANNOT_LOCATE_FMT   ([=
+  (string-table-add-ref opt-strs
+  "Cannot locate scheme file \'%s\'\n")=])' "\n"
+
+  '#define LOAD_GUILE_FILE_FMT ([=
+  (string-table-add-ref opt-strs
+  "(load \"%s\")")=])';
+
 flag = {
     name      = load-scheme;
     value     = S;
@@ -260,12 +270,12 @@ flag = {
 	    if (! SUCCESSFUL(
 	        findFile(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {
 
-	        usage_message("Cannot locate scheme file `%s'\n",
+	        usage_message(CANNOT_LOCATE_FMT,
 	                      pOptDesc->optArg.argString);
 	        /* NOTREACHED */
 	    }
 
-	    pz = aprf("(load \"%s\")", zPath);
+	    pz = aprf(LOAD_GUILE_FILE_FMT, zPath);
 	    procState = PROC_STATE_GUILE_PRELOAD;
 	    (void)ag_scm_c_eval_string_from_file_line(
 	                   pz, __FILE__, __LINE__);
@@ -276,6 +286,16 @@ flag = {
     doc = "Pass-through AutoGen argument";
 #endif
 };
+
+include =
+  '#define DLOPEN_ERROR_FMT    ([=
+  (string-table-add-ref opt-strs
+  "dlopen(%s) error %d\n%s\n")=])' "\n"
+
+  '#define SYM_NOT_FOUND_FMT   ([=
+  (string-table-add-ref opt-strs (string-append
+  "dlsym(scm_init) not found in %s\n"
+  "\tyou must initialize the library yourself\n")) =])';
 
 flag = {
     name      = load-functions;
@@ -298,14 +318,13 @@ flag = {
 
 	    if (hdl == NULL) {
 	        char const* pzErr = dlerror();
-	        fprintf(stderr, "dlopen(%s) error %d\n%s\n",
+	        fprintf(stderr, DLOPEN_ERROR_FMT,
 	                pOptDesc->optArg.argString, errno, pzErr);
 	        exit(EXIT_FAILURE);
 	    }
 	    proc = (init_proc_t*)dlsym(hdl, "scm_init");
 	    if (proc == NULL) {
-	        fprintf(stderr, "dlsym(scm_init) not found in %s\n"
-	                "\tyou must initialize the library yourself\n",
+	        fprintf(stderr, SYM_NOT_FOUND_FMT,
 	                pOptDesc->optArg.argString);
 	    }
 	    else (*proc)();

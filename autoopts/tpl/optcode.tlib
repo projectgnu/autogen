@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-11-21 14:09:34 bkorb"
+# Time-stamp:      "2011-12-29 09:21:23 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -181,20 +181,7 @@ ENDIF "copyright"
 extern tUsageProc [=
   (define usage-proc (get "usage" "optionUsage"))
   usage-proc =];
-[=
-
-IF (exist? "include")
-
-=]
-/*
- *  global included definitions
- */
-[=(join "\n" (stack "include"))  =]
-[=
-
-ENDIF "include exists"
-
-=]
+[= INVOKE join-or-expand   join-type = "include" =]
 #ifndef NULL
 #  define NULL 0
 #endif

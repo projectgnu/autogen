@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2011-12-15 14:17:36 bkorb"
+;;; Time-stamp:        "2011-12-29 11:33:35 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
@@ -199,6 +199,10 @@
 ;;;  *
 ;;;  *   These functions use the global name space @code{stt-*} in addition to
 ;;;  *   the function names.
+;;;  *
+;;;  *   If you utilize this in your programming, it is recommended that you
+;;;  *   prevent printf format usage warnings with the GCC option
+;;;  *   @code{-Wno-format-contains-nul}
 ;;; =*/
 ;;;
 (define string-table-new (lambda (st-name) (begin

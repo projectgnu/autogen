@@ -2,7 +2,7 @@
 /**
  * @file tpDep.c
  *
- * Time-stamp:        "2011-12-17 12:04:53 bkorb"
+ * Time-stamp:        "2011-12-29 10:06:17 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -307,10 +307,16 @@ wrap_up_depends(void)
 
     flist_t * flist = targ_flist; //!< list scanning pointer
 
+    if (temp_tpl_dir_len == 0) {
+        temp_tpl_dir_len = 1;
+        pz_temp_tpl = fmt;
+    }
+
     fprintf(pfDepends, "%s_TList =", pz_targ_base);
     while (flist != NULL) {
         flist_t * p = flist;
-        fprintf(pfDepends, " \\\n\t%s", p->fname);
+        if (strncmp(pz_temp_tpl, p->fname, temp_tpl_dir_len) != 0)
+            fprintf(pfDepends, " \\\n\t%s", p->fname);
         flist = p->next;
         AGFREE(p);
     }
@@ -319,10 +325,12 @@ wrap_up_depends(void)
     flist = src_flist;
     while (flist != NULL) {
         flist_t * p = flist;
-        fprintf(pfDepends, " \\\n\t%s", p->fname);
+        if (strncmp(pz_temp_tpl, p->fname, temp_tpl_dir_len) != 0)
+            fprintf(pfDepends, " \\\n\t%s", p->fname);
         flist = p->next;
         AGFREE(p);
     }
+    temp_tpl_dir_len--;
 
     targ_flist = src_flist = NULL;
     fprintf(pfDepends, fmt, pz_targ_base, pzSourceList, pzDepTarget);

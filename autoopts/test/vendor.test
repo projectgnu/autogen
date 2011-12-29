@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-12-17 16:35:37 bkorb"
+# Time-stamp:        "2011-12-29 10:17:44 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -43,6 +43,7 @@ ${SED} -e 's/long-opts;/vendor-opt;/' \
     -e '/#include "autogen.h"/d' \
     -e "/^prog-name/s/=.*/= ${testname};/" \
     -e "s/AutoGen/${testname}/g" \
+    -e "/^include /s/= ${testname}5 Temp/= AutoGen5 Temp/" \
     -e '/call-proc  *=/d' \
     -e "$sedxml" \
     -e "$sedcode" \

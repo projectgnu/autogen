@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-08-07 16:42:09 bkorb"
+# Time-stamp:      "2011-12-29 09:21:47 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -474,16 +474,8 @@ IF (not (exist? "library"))
 =]
 #ifdef  __cplusplus
 extern "C" {
-#endif[=
-
-  IF (exist? "export")                =]
-
-/* * * * * *
- *
- *  Globals exported from the [=prog_title=] option definitions
- */
-[=  (join "\n\n" (stack "export"))    =][=
-  ENDIF  export? =][=
+#endif
+[=INVOKE join-or-expand  join-type = "export" =][=
 
   IF (exist? "usage-message")         =]
 extern void [=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap);
@@ -542,7 +534,31 @@ static inline char* aoGetsText(char const* pz) {
 ENDIF this is not a lib
 
 =]
-#endif /* [=(. header-guard)=] */[= # /*
+#endif /* [=(. header-guard)=] */[=
+DEFINE join-or-expand                   =][=
+  IF (define join-type (get "join-type"))
+     (exist? join-type)                \=]
+/*
+ *  global [=(string-append join-type (if (==* join-type "inc") "d" "ed"))
+           =] definitions
+ */[=
+    IF
+      (set! tmp-text (join "\n\n" (stack join-type)))
+      (~* (get join-type) "^[^a-z0-9_]{2,}[ \t]+autogen5[ \t]+template")
+      =][=
+      INCLUDE (begin
+               (set! tmp-val (string-append tmp-dir "/" join-type "-text"))
+               (out-push-new tmp-val)
+               (emit tmp-text)
+               (out-pop)
+               tmp-val
+          )                             =][=
+    ELSE   text is not template         =][=
+      (. tmp-text)                      =][=
+    ENDIF  text is template             =]
+[=ENDIF  join-type                      =][=
+ENDDEF join-or-expand
+/*
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

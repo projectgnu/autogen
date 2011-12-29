@@ -1390,6 +1390,14 @@ set to the string @code{autoopts}, it will force AutoOpts standard
 format; otherwise, it will have no effect.
 
 @item
+The usage text and many other strings are stored in a single character array
+(@pxref{SCM string-table-new,string table functions}).  This reduces fixup
+costs when loading the program or library.  The downside is that if GCC
+detects that any of these strings are used in a printf format, you may get
+the warning, @code{embedded '\0' in format}.  To eliminate the warning, you
+must provide GCC with the @code{-Wno-format-contains-nul} option.
+
+@item
 If you compile with @code{ENABLE_NLS} defined and @code{_()} defined to
 a localization function such as @code{gettext(3GNU)}, then the option
 processing code will be localizable (@pxref{i18n}).
