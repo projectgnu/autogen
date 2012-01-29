@@ -2,8 +2,8 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2010-12-07 09:07:10 bkorb"
-## Copyright (c):   1997-2010 by Bruce Korb
+## Time-stamp:      "2012-01-29 13:14:52 bkorb"
+## Copyright (c)    1997-2012 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

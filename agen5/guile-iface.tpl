@@ -1,7 +1,22 @@
 [= AutoGen5 Template h =]
 [=
+(emit (make-header-guard "mutating"))
+(shell "guile_range() {
+  local lo=${1%%-*}
+  local hi=${1##*-}
+  echo \"(GUILE_VERSION >= $lo) && (GUILE_VERSION <= $hi)\"
+}")
+=][=
 
-(out-push-new)  =]
+FOR invalid     =]
+
+#if [= (shell (string-append "guile_range " (get "invalid"))) =]
+# error AutoGen does not work with this version of Guile
+  choke me.
+#endif
+[=
+ENDFOR invalid  =]
+[= (out-push-new)  =]
 set -- $(sort -n -u <<_EOF_
 [=  (join "\n" (stack "iface.i-impl.i-end")) =]
 _EOF_
@@ -85,8 +100,11 @@ FOR iface       =][=
 ENDFOR iface    =][=
 
 `prt_tbl`
-
 =]
+
 #else
-#error unknown GUILE_VERSION
+# error unknown GUILE_VERSION
+  choke me.
 #endif
+
+#endif /* [= (. header-guard) =] */

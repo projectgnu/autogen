@@ -1,9 +1,9 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2011-12-07 14:01:07 bkorb"
+# Time-stamp:      "2012-01-29 16:06:25 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -125,6 +125,7 @@ make_funcs_def()
         s2enum="bash ${top_srcdir}/add-on/char-mapper/mk-str2enum.sh"
 
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
+    ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
 
     ${s2enum} --base-name=xat-attribute -n \
         type words members cooked uncooked keep || \

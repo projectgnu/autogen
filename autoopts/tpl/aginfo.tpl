@@ -4,12 +4,12 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2011-12-21 10:36:00 bkorb"
+# Time-stamp:        "2012-01-29 16:38:57 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
-#  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 #
 #  AutoOpts is available under any one of two licenses.  The license
 #  in use must be one of these two and the choice is under the control
@@ -178,8 +178,8 @@ This is the automatically generated usage text for [=prog-name=]:
 (make-tmp-dir)
 
 (if (exist? "preserve-case") (begin
-  (define optname-from "_^")
-  (define optname-to   "--") ))      =][=
+  (set! optname-from "_^")
+  (set! optname-to   "--") ))        =][=
 
 FOR flag                             =][=
 

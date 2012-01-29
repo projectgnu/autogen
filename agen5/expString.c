@@ -2,13 +2,13 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2011-12-21 10:56:11 bkorb"
+ *  Time-stamp:        "2011-12-30 18:11:23 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -56,7 +56,7 @@ string_size(char const * pzScn, size_t newLineSize)
     /*
      *  Start by counting the start and end quotes, plus the NUL.
      */
-    size_t dtaSize = sizeof("\"\"");
+    size_t dtaSize = 3;
 
     for (;;) {
         char ch = *(pzScn++);
@@ -188,15 +188,12 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
             break;
 
         default:
-        {
-            static char const zFmt[] = "\\%03o";
             /*
              *  sprintf is safe here, because we already computed
              *  the amount of space we will be using.
              */
-            sprintf(pzDta, zFmt, ch);
+            sprintf(pzDta, MK_STR_OCT_FMT, ch);
             pzDta += 4;
-        }
         }
 
         pzScn++;
@@ -638,9 +635,9 @@ ag_scm_prefix(SCM prefix, SCM text)
     size_t   pfx_size;
     char*    pzRes;
 
-    pzPfx   = ag_scm2zchars(prefix, "prefix");
-    pzDta   = \
-    pzText  = ag_scm2zchars(text, "text");
+    pzPfx    = ag_scm2zchars(prefix, "prefix");
+    pzDta    = \
+    pzText   = ag_scm2zchars(text, "text");
     pfx_size = strlen(pzPfx);
     out_size = pfx_size;
 
@@ -668,7 +665,7 @@ ag_scm_prefix(SCM prefix, SCM text)
         switch (ch) {
         case NUL:
             if (rem_size != 0)
-                AG_ABEND("(prefix ...) failed");
+                AG_ABEND(PREFIX_FAIL);
 
             return AG_SCM_STR2SCM(pzRes, out_size);
 
@@ -932,10 +929,8 @@ ag_scm_stack(SCM obj)
 SCM
 ag_scm_kr_string(SCM str)
 {
-    static char const zNewLine[] = "\\n\\\n";
-
-    return makeString(ag_scm2zchars(str, "string"),
-                      zNewLine, sizeof(zNewLine)-1);
+    return makeString(ag_scm2zchars(str, "str"),
+                      KR_STRING_NEWLINE, KR_STRING_NEWLINE_LEN);
 }
 
 
@@ -961,10 +956,8 @@ ag_scm_kr_string(SCM str)
 SCM
 ag_scm_c_string(SCM str)
 {
-    static char const zNewLine[] = "\\n\"\n       \"";
-
-    return makeString(ag_scm2zchars(str, "string"),
-                      zNewLine, sizeof(zNewLine)-1);
+    return makeString(ag_scm2zchars(str, "str"),
+                      C_STRING_NEWLINE, C_STRING_NEWLINE_LEN);
 }
 
 
@@ -990,8 +983,8 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
 {
     unsigned char ch_map[ 1 << 8 /* bits-per-byte */ ];
     int   i      = sizeof(ch_map) - 1;
-    char* pzFrom = ag_scm2zchars(from_xform, "string");
-    char* pzTo   = ag_scm2zchars(to_xform, "string");
+    char* pzFrom = ag_scm2zchars(from_xform, "str");
+    char* pzTo   = ag_scm2zchars(to_xform, "str");
 
     do  {
         ch_map[i] = i;

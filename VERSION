@@ -2,12 +2,12 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2011-12-28 09:59:12 bkorb"
+# Time-stamp:        "2012-01-29 08:08:04 bkorb"
 
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -23,9 +23,9 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AG_MAJOR_VERSION=5
-AG_MINOR_VERSION=14
+AG_MINOR_VERSION=15
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=""
+AG_PATCHLEVEL="pre6"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -42,7 +42,7 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #
 AO_LIBRARY=libopts.la
 AO_CURRENT=36
-AO_REVISION=1
+AO_REVISION=2
 AO_AGE=11
 
 # For automake

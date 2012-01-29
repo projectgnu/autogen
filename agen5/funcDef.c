@@ -4,10 +4,10 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2011-10-09 17:33:18 bkorb"
+ *  Time-stamp:        "2012-01-29 20:49:18 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -30,9 +30,6 @@ struct def_list {
     tDefEntry  de;
     char*      pzExpr;
 };
-
-static char const zNoResolution[] = "Could not resolve macro name: ``%s''";
-static char const zTplInvoked[] = "Template macro %s invoked with %d args\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
@@ -72,7 +69,6 @@ order_def_list(const void* p1, const void* p2)
         cmp = (int)(pDL1->pzDefName - pDL2->pzDefName);
     return cmp;
 }
-
 
 static tDefList *
 link_twins(tDefList* pDL, tDefList* pNext, int* pCt)
@@ -118,17 +114,17 @@ count_named_values(tTemplate* pT, tMacro* pMac)
     while (*pzScan != NUL) {
         ct++;
         if (! IS_VAR_FIRST_CHAR(*pzScan)) {
-            fprintf(stderr, "On macro argument # %d:\n%s\n", ct, pzScan);
-            AG_ABEND_IN(pT, pMac, "no macro arg name");
+            fprintf(stderr, NAMED_VALUES_WHERE, ct, pzScan);
+            AG_ABEND_IN(pT, pMac, NAMED_VALUES_NO_NAME);
         }
 
-        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
-        while (IS_WHITESPACE_CHAR(*pzScan))  pzScan++;
+        pzScan = SPN_VALUE_NAME_CHARS(pzScan);
+        pzScan = SPN_WHITESPACE_CHARS(pzScan);
         if (*pzScan != '=')
             continue;
-        while (IS_WHITESPACE_CHAR(*++pzScan))   ;
+        pzScan = SPN_WHITESPACE_CHARS(pzScan+1);
         pzScan = (char*)skipExpression(pzScan, strlen(pzScan));
-        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
+        pzScan = SPN_WHITESPACE_CHARS(pzScan);
     }
 
     return ct;
@@ -138,7 +134,7 @@ count_named_values(tTemplate* pT, tMacro* pMac)
 static char *
 gather_assigned_value(char * pzScan, tDefList * pDL)
 {
-    while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
+    pzScan = SPN_WHITESPACE_CHARS(pzScan);
     strtransform(pDL->de.pzDefName, pDL->de.pzDefName);
     pDL->pzExpr = pzScan;
     pDL->de.valType = VALTYP_TEXT;
@@ -198,7 +194,7 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
 {
     for (;; pDL++ ) {
         pDL->de.pzDefName = pzScan;
-        while (IS_VALUE_NAME_CHAR(*pzScan))  pzScan++;
+        pzScan = SPN_VALUE_NAME_CHARS(pzScan);
 
         switch (*pzScan) {
         case NUL:
@@ -206,11 +202,11 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
             return;
 
         default:
-            AG_ABEND_IN(pT, pMac, "name not followed by '='");
+            AG_ABEND_IN(pT, pMac, FILL_IN_VAL_NO_ASSIGN);
 
         case ' ': case TAB: case NL: case '\f':
             *(pzScan++) = NUL;
-            while (IS_WHITESPACE_CHAR(*pzScan)) pzScan++;
+            pzScan = SPN_WHITESPACE_CHARS(pzScan);
 
             /*
              *  The name was separated by space, but has no value
@@ -241,13 +237,13 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
             break;
 
         if (! IS_WHITESPACE_CHAR(*pzScan))
-            AG_ABEND_IN(pT, pMac, "no space separating entries");
+            AG_ABEND_IN(pT, pMac, FILL_IN_VAL_NO_SEP);
 
         /*
          *  Terminate the string value and skip over any additional space
          */
         *(pzScan++) = NUL;
-        while (IS_WHITESPACE_CHAR(*pzScan))     pzScan++;
+        pzScan = SPN_WHITESPACE_CHARS(pzScan);
     }
 }
 
@@ -344,7 +340,7 @@ prep_invoke_args(tMacro * pMac)
     tTemplate * pT = pCurTemplate;
 
     if (pMac->ozText == 0)
-        AG_ABEND_IN(pT, pMac, "The INVOKE macro requires a name");
+        AG_ABEND_IN(pT, pMac, PREP_INVOKE_NO_NAME);
     pMac->ozName = pMac->ozText;
     pzText = pT->pzTemplText + pMac->ozText;
     pzText = (char*)skipExpression(pzText, strlen(pzText));
@@ -364,9 +360,9 @@ prep_invoke_args(tMacro * pMac)
      */
     else {
         if (! IS_WHITESPACE_CHAR(*pzText))
-            AG_ABEND_IN(pT, pMac, "The INVOKE macro name not space separated");
+            AG_ABEND_IN(pT, pMac, PREP_INVOKE_NO_SEP);
         *pzText = NUL;
-        while (IS_WHITESPACE_CHAR(*++pzText))  ;
+        pzText = SPN_WHITESPACE_CHARS(pzText + 1);
         pMac->ozText = pzText - pT->pzTemplText;
         parseMacroArgs(pT, pMac);
         pCurTemplate = pT;
@@ -404,7 +400,7 @@ mFunc_Debug(tTemplate* pT, tMacro* pMac)
         ? -1
         : forInfo.fi_data[ forInfo.fi_depth - 1].for_index;
 
-    fprintf(pfTrace, "  --  DEBUG %s -- FOR index %d", pz, for_index);
+    fprintf(pfTrace, FN_DEBUG, pz, for_index);
 
     /*
      *  The case element values were chosen to thwart most
@@ -437,7 +433,7 @@ mFunc_Debug(tTemplate* pT, tMacro* pMac)
     default:   dummy++;
     }
     if (IS_GRAPHIC_CHAR(dummy))
-        fprintf(pfTrace, " (%c)", dummy);
+        fprintf(pfTrace, FN_DEBUG_GRAPHIC, dummy);
     putc(NL, pfTrace);
     return pMac+1;
 }
@@ -468,7 +464,7 @@ build_defs(int defCt, tDefList* pList)
         {
             char* pz = strchr(pList->pzExpr, NL);
             if (pz != NULL) {
-                while (IS_WHITESPACE_CHAR(*++pz))  ;
+                pz = SPN_WHITESPACE_CHARS(pz + 1);
                 pList->pzExpr = pz;
                 goto retryExpression;
             }
@@ -488,7 +484,7 @@ build_defs(int defCt, tDefList* pList)
              *  and number results.
              */
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                fprintf(pfTrace, "Scheme eval for arg %d:\n\t`%s'\n",
+                fprintf(pfTrace, TRACE_BUILD_DEFS,
                         pCurMacro->sibIndex - defCt, pList->pzExpr);
             }
 
@@ -499,17 +495,17 @@ build_defs(int defCt, tDefList* pList)
             }
             else if (AG_SCM_NUM_P(res)) {
                 pList->de.val.pzText = AGALOC(16, "number buf");
-                snprintf(pList->de.val.pzText, (size_t)16, "%ld",
+                snprintf(pList->de.val.pzText, (size_t)16, BUILD_DEFS_LONG_FMT,
                          AG_SCM_TO_ULONG(res));
             }
             else
-                AGDUPSTR(pList->de.val.pzText, zNil, "empty string");
+                AGDUPSTR(pList->de.val.pzText, zNil, "empty str");
             break;
         }
 
         case '`':
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                fprintf(pfTrace, "shell eval for arg %d:\n\t`%s'\n",
+                fprintf(pfTrace, TRACE_BUILD_DEFS,
                         pCurMacro->sibIndex - defCt, pList->pzExpr+1);
             }
             pList->de.val.pzText = shell_cmd(pList->pzExpr+1);
@@ -607,10 +603,10 @@ mFunc_Define(tTemplate* pT, tMacro* pMac)
     pT = (tTemplate*)pMac->funcPrivate;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        fprintf(pfTrace, zTplInvoked, pT->pzTplName, defCt);
+        fprintf(pfTrace, TPL_INVOKED, pT->pzTplName, defCt);
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                    pMac->lineNo);
+            fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                    pCurTemplate->pzTplFile, pMac->lineNo);
     }
 
     /*
@@ -707,7 +703,7 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
                 pT->pzTemplText + pMac->ozName );
 
             if (pMac->funcPrivate == NULL) {
-                pzText = aprf(zNoResolution, pT->pzTemplText + pMac->ozName);
+                pzText = aprf(BAD_MAC_NM_FMT, pT->pzTemplText + pMac->ozName);
                 AG_ABEND_IN(pT, pMac, pzText);
                 /* NOTREACHED */
             }
@@ -725,7 +721,7 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
     pzText = ag_scm2zchars(macName, "macro name");
     pInv = findTemplate(pzText);
     if (pInv == NULL) {
-        pzText = aprf(zNoResolution, pzText);
+        pzText = aprf(BAD_MAC_NM_FMT, pzText);
         AG_ABEND_IN(pT, pMac, pzText);
         /* NOTREACHED */
     }
@@ -753,8 +749,6 @@ mLoad_Debug(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 tMacro *
 mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 {
-    static char const zNameNeeded[] = "DEFINE requires a name";
-
     char *       pzCopy;             /* next text dest   */
     tTemplate *  pNewT;
 
@@ -765,7 +759,7 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
     static tpLoadProc apDefineLoad[ FUNC_CT ] = { NULL };
 
     if (pMac->ozText == 0)
-        AG_ABEND_IN(pT, pMac, zNameNeeded);
+        AG_ABEND_IN(pT, pMac, LD_DEF_NEED_NAME);
 
     /*
      *  IF this is the first time here,
@@ -793,7 +787,7 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
         /*
          *  Allocate a new template block that is much larger than needed.
          */
-        pNewT = (tTemplate*)AGALOC(alocSize, "AG macro definition");
+        pNewT = (tTemplate*)AGALOC(alocSize, "AG macro def");
         memset((void*)pNewT, 0, alocSize);
         pNewT->magic      = pT->magic;
         pNewT->descSize   = alocSize;
@@ -802,13 +796,14 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 
         pzCopy = pNewT->pzTplName = (void*)(pNewT->aMacros + macCt);
         if (! IS_VAR_FIRST_CHAR(*pzSrc))
-            AG_ABEND_IN(pT, pMac, zNameNeeded);
+            AG_ABEND_IN(pT, pMac, LD_DEF_NEED_NAME);
 
-        while (IS_VALUE_NAME_CHAR(*pzSrc))  *(pzCopy++) = *(pzSrc++);
+        while (IS_VALUE_NAME_CHAR(*pzSrc))
+            *(pzCopy++) = *(pzSrc++);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, "Defining macro %s from %s\n",
+        fprintf(pfTrace, TRACE_MACRO_DEF,
                 pNewT->pzTplName, pNewT->pzTplFile);
 
     *(pzCopy++) = NUL;
@@ -826,7 +821,7 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
          *  Make sure all of the input string was *NOT* scanned.
          */
         if (*ppzScan == NULL)
-            AG_ABEND_IN(pNewT, pNewT->aMacros, "parse ended unexpectedly");
+            AG_ABEND_IN(pNewT, pNewT->aMacros, LD_DEF_WOOPS);
 
         ct = pMacEnd - pNewT->aMacros;
 
@@ -858,11 +853,7 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
             pNewT->descSize     = sz;
             pNewT->pzTplName   -= (long)pNewT;
             pNewT->pzTemplText -= (long)pNewT;
-            pNewT = AGREALOC((void*)pNewT, pNewT->descSize,
-                             "resize AG mac def");
-            if (pNewT == NULL)
-                AG_ABEND("failed to resize AG macro");
-
+            pNewT = AGREALOC((void*)pNewT, pNewT->descSize, "resize AG mac");
             pNewT->pzTplName   += (long)pNewT;
             pNewT->pzTemplText += (long)pNewT;
         }

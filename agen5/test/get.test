@@ -2,11 +2,11 @@
 #  -*- Mode: Shell-script -*-
 # get.test --- test get functionality
 #
-# Time-stamp:        "2010-06-26 16:05:34 bkorb"
+# Time-stamp:        "2011-03-06 15:26:30 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the

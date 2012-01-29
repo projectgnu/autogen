@@ -1,12 +1,12 @@
 /**
  * @file expExtract.c
  *
- *  Time-stamp:        "2011-12-17 14:29:05 bkorb"
+ *  Time-stamp:        "2011-12-30 15:19:39 bkorb"
  *
  *  This module implements a file extraction function.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -79,8 +79,8 @@ load_extract_file(char const* pzNewFile)
         pzFile = pzText = NULL;
     }
 
-    AGDUPSTR(pzFile, pzNewFile, "extract file name");
-    pzIn = (char*)AGALOC(sbuf.st_size + 1, "Extraction File Text");
+    AGDUPSTR(pzFile, pzNewFile, "extract file");
+    pzIn = (char*)AGALOC(sbuf.st_size + 1, "Extract Text");
 
     if (! HAVE_OPT(WRITABLE))
         SET_OPT_WRITABLE;
@@ -107,9 +107,9 @@ load_extract_file(char const* pzNewFile)
         do  {
             size_t sz = fread(pzIn, (size_t)1, (size_t)sbuf.st_size, fp);
             if (sz == 0) {
-                fprintf(stderr, "Error %d (%s) reading %d bytes of %s\n",
-                        errno, strerror(errno), (int)sbuf.st_size, pzFile);
-                AG_ABEND("read failure");
+                fprintf(stderr, LD_EXTRACT_BAD_READ, errno, strerror(errno),
+                        (int)sbuf.st_size, pzFile);
+                AG_ABEND(LD_EXTRACT_READ_FAIL);
             }
 
             pzIn += sz;
@@ -148,13 +148,13 @@ mk_empty_text(char const* pzStart, char const* pzEnd, SCM def)
 
     if (! AG_SCM_STRING_P(def)) {
         pzOut = ag_scribble(mlen);
-        sprintf(pzOut, "%s\n%s", pzStart, pzEnd);
+        sprintf(pzOut, LINE_CONCAT3_FMT+3, pzStart, pzEnd);
 
     } else {
-        char const * pzDef = ag_scm2zchars(def, "default extract string");
+        char const * pzDef = ag_scm2zchars(def, "dft extr str");
         mlen += AG_SCM_STRLEN(def) + 1;
         pzOut = ag_scribble(mlen);
-        sprintf(pzOut, "%s\n%s\n%s", pzStart, pzDef, pzEnd);
+        sprintf(pzOut, LINE_CONCAT3_FMT, pzStart, pzDef, pzEnd);
     }
 
     return AG_SCM_STR02SCM(pzOut);
@@ -283,17 +283,17 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
     if (! AG_SCM_STRING_P(file) || ! AG_SCM_STRING_P(marker))
         return SCM_UNDEFINED;
 
-    pzText = load_extract_file(ag_scm2zchars(file, "extract file"));
+    pzText = load_extract_file(ag_scm2zchars(file, "extr file"));
 
     {
         char const * pzMarker = ag_scm2zchars(marker, "marker");
-        char const * pzCaveat = "DO NOT CHANGE THIS COMMENT";
+        char const * pzCaveat = EXTRACT_CAVEAT;
 
         if (AG_SCM_STRING_P(caveat) && (AG_SCM_STRLEN(caveat) > 0))
-            pzCaveat = ag_scm2zchars(caveat, "extract caveat");
+            pzCaveat = ag_scm2zchars(caveat, "caveat");
 
-        pzStart = aprf(pzMarker, "START", pzCaveat);
-        pzEnd   = aprf(pzMarker, "END  ", pzCaveat);
+        pzStart = aprf(pzMarker, EXTRACT_START, pzCaveat);
+        pzEnd   = aprf(pzMarker, EXTRACT_END,   pzCaveat);
     }
 
     {
@@ -325,11 +325,10 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
 SCM
 ag_scm_find_file(SCM file, SCM suffix)
 {
-    static char const zFun[] = "find-file";
     SCM res = SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P(file))
-        scm_wrong_type_arg(zFun, 1, file);
+        scm_wrong_type_arg(FIND_FILE_NAME, 1, file);
 
     {
         char z[ AG_PATH_MAX+1 ];

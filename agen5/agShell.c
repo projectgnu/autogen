@@ -1,12 +1,12 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2011-12-21 10:58:06 bkorb"
+ *  Time-stamp:        "2012-01-29 20:36:21 bkorb"
  *
  *  Manage a server shell process
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,8 +22,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 static char * cur_dir = NULL;
-static char const cmd_fail_fmt[] =
-    "CLOSING SHELL SERVER - command failure:\n\t%s\n";
 
 /*=gfunc chdir
  *
@@ -114,7 +112,7 @@ ag_scm_shellf(SCM fmt, SCM alist)
 
 #ifdef DEBUG_ENABLED
     if (len < 0)
-        AG_ABEND("invalid alist to shellf");
+        AG_ABEND(SHELLF_BAD_ALIST_MSG);
 #endif
 
     pz  = ag_scm2zchars(fmt, "format");
@@ -145,8 +143,6 @@ static tpfPair      serv_pair     = { NULL, NULL };
 static pid_t        serv_id       = NULLPROCESS;
 static ag_bool      was_close_err = AG_FALSE;
 static int          log_ct        = 0;
-static char const   log_sep_fmt[] = "\n\n* * * * LOG ENTRY %d * * * *\n";
-static char const   cmd_fmt[]     = "cd %s\n%s\n\necho\necho %s - %d\n";
 static char const * last_cmd      = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
@@ -177,7 +173,7 @@ server_open(tFdPair* pPair, char const ** ppArgs);
 static pid_t
 server_fp_open(tpfPair* pfPair, char const ** ppArgs);
 
-static void
+static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len);
 
 static char*
@@ -231,17 +227,16 @@ handle_signal(int signo)
 {
     static int timeout_limit = 5;
     if ((signo == SIGALRM) && (--timeout_limit <= 0))
-        AG_ABEND("Server shell timed out 5 times");
+        AG_ABEND(TOO_MANY_TIMEOUTS_MSG);
 
-    fprintf(pfTrace, "Closing server:  %s signal (%d) received\n",
-            strsignal(signo), signo);
+    fprintf(pfTrace, SHELL_DIE_ON_SIGNAL_FMT, strsignal(signo), signo);
     was_close_err = AG_TRUE;
 
-    (void)fputs("\nLast command issued:\n", pfTrace);
+    (void)fputs(SHELL_LAST_CMD_MSG, pfTrace);
     {
         char const* pz = (last_cmd == NULL)
-            ? "?? unknown ??\n" : last_cmd;
-        fprintf(pfTrace, cmd_fmt, cur_dir, pz, zShDone, log_ct);
+            ? SHELL_UNK_LAST_CMD_MSG : last_cmd;
+        fprintf(pfTrace, SHELL_CMD_FMT, cur_dir, pz, SH_DONE_MARK, log_ct);
     }
     last_cmd = NULL;
     close_server_shell();
@@ -256,12 +251,12 @@ set_orig_dir(void)
 {
     char * p = malloc(AG_PATH_MAX);
     if (p == NULL)
-        AG_ABEND("cannot allocate path name");
+        AG_ABEND(SET_ORIG_DIR_NO_MEM_MSG);
 
     cur_dir = getcwd(p, AG_PATH_MAX);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs("\nServer First Start\n", pfTrace);
+        fputs(TRACE_SHELL_FIRST_START, pfTrace);
 }
 
 /**
@@ -271,18 +266,18 @@ static ag_bool
 send_cmd_ok(char const * cmd)
 {
     last_cmd = cmd;
-    fprintf(serv_pair.pfWrite, cmd_fmt, cur_dir, last_cmd,
-            zShDone, ++log_ct);
+    fprintf(serv_pair.pfWrite, SHELL_CMD_FMT, cur_dir, last_cmd,
+            SH_DONE_MARK, ++log_ct);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, log_sep_fmt, log_ct);
-        fprintf(pfTrace, cmd_fmt, cur_dir, last_cmd,
-                zShDone, log_ct);
+        fprintf(pfTrace, LOG_SEP_FMT, log_ct);
+        fprintf(pfTrace, SHELL_CMD_FMT, cur_dir, last_cmd,
+                SH_DONE_MARK, log_ct);
     }
 
     (void)fflush(serv_pair.pfWrite);
     if (was_close_err)
-        fprintf(pfTrace, cmd_fail_fmt, cmd);
+        fprintf(pfTrace, CMD_FAIL_FMT, cmd);
     return ! was_close_err;
 }
 
@@ -294,16 +289,11 @@ send_cmd_ok(char const * cmd)
 static void
 start_server_cmd_trace(void)
 {
-    static char const set_xtrace[] =
-        "set -x\n"
-        "trap\n"
-        "echo server setup done\n";
-
-    fputs("Server traps set\n", pfTrace);
-    if (send_cmd_ok(set_xtrace)) {
+    fputs(TRACE_XTRACE_MSG, pfTrace);
+    if (send_cmd_ok(SHELL_XTRACE_CMDS)) {
         char * pz = load_data();
-        fputs("(result discarded)\n", pfTrace);
-        fprintf(pfTrace, "Trap state:\n%s\n", pz);
+        fputs(SHELL_RES_DISCARD_MSG, pfTrace);
+        fprintf(pfTrace, TRACE_TRAP_STATE_FMT, pz);
         AGFREE((void*)pz);
     }
 }
@@ -318,11 +308,11 @@ send_server_init_cmds(void)
     was_close_err = AG_FALSE;
 
     {
-        char * pzc = AGALOC(sizeof(shell_init_str)
+        char * pzc = AGALOC(SHELL_INIT_STR_LEN
                             + 11 // log10(1 << 32) + 1
                             + strlen(autogenOptions.pzProgPath),
                             "server init");
-        sprintf(pzc, shell_init_str, (unsigned int)getpid(),
+        sprintf(pzc, SHELL_INIT_STR, (unsigned int)getpid(),
                 autogenOptions.pzProgPath,
                 (pfDepends == NULL) ? "" : pzDepFile);
 
@@ -332,7 +322,7 @@ send_server_init_cmds(void)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs("(result discarded)\n", pfTrace);
+        fputs(SHELL_RES_DISCARD_MSG, pfTrace);
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
         start_server_cmd_trace();
@@ -348,7 +338,7 @@ server_setup(void)
     if (cur_dir == NULL)
         set_orig_dir();
     else if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs("\nServer Restart\n", pfTrace);
+        fputs(SHELL_RESTART_MSG, pfTrace);
 
     {
         struct sigaction new_sa;
@@ -436,7 +426,7 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
         close(stdinFd);
         close(stdoutPair.writeFd);
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, "Server shell is pid %u\n", (unsigned int)chId);
+            fprintf(pfTrace, TRACE_SHELL_PID_FMT, (unsigned int)chId);
 
         fflush(pfTrace);
         return stdoutPair.readFd;
@@ -474,7 +464,7 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
     setvbuf(stdout, NULL, _IONBF, (size_t)0);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, "Server shell %s starts\n", pzShell);
+        fprintf(pfTrace, TRACE_SHELL_STARTS_FMT, pzShell);
 
         fflush(pfTrace);
     }
@@ -484,7 +474,6 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
     /* NOTREACHED */
     return -1;
 }
-
 
 /**
  *  Given a pointer to an argument vector, start a process and
@@ -533,16 +522,11 @@ server_fp_open(tpfPair* pfPair, char const ** ppArgs)
     return chId;
 }
 
-static void
+static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
 {
-    size_t sz = (*p_sz + need_len + 0xFFF) & ~0xFFF;
-    void * p = AGREALOC((void*)*p_txt, sz, "expanding text");
-    if (p == NULL)
-        AG_ABEND(aprf(zAllocWhat, sz, "Realloc Text Block"));
-
-    *p_txt = p;
-    *p_sz  = sz;
+    *p_sz  = (*p_sz + need_len + 0xFFF) & ~0xFFF;
+    *p_txt = AGREALOC((void*)*p_txt, *p_sz, "expand text");
 }
 
 /**
@@ -585,8 +569,7 @@ load_data(void)
                 break;
 
             if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retryCt++ > 0))
-                fprintf(pfTrace, "fs err %d (%s) reading from server shell\n",
-                         errno, strerror(errno));
+                fprintf(pfTrace, SHELL_READ_ERR_FMT, errno, strerror(errno));
 
             if (feof(serv_pair.pfRead) || (retryCt > 32))
                 break;
@@ -597,7 +580,7 @@ load_data(void)
         /*
          *  Check for magic character sequence indicating 'DONE'
          */
-        if (strncmp(zLine, zShDone, STRSIZE(zShDone)) == 0)
+        if (strncmp(zLine, SH_DONE_MARK, SH_DONE_MARK_LEN) == 0)
             break;
 
         {
@@ -616,7 +599,7 @@ load_data(void)
          *  Stop now if server timed out or if we are at EOF
          */
         if ((serv_id == NULLPROCESS) || feof(serv_pair.pfRead)) {
-            fputs("feof on data load\n", pfTrace);
+            fputs(SHELL_NO_END_MARK_MSG, pfTrace);
             break;
         }
     }
@@ -625,17 +608,16 @@ load_data(void)
      *  Trim off all trailing white space and shorten the buffer
      *  to the size actually used.
      */
-    while ((pzScan > pzText) && IS_WHITESPACE_CHAR(pzScan[-1])) pzScan--;
+    while (  (pzScan > pzText)
+          && IS_WHITESPACE_CHAR(pzScan[-1]))
+        pzScan--;
     textSize = (pzScan - pzText) + 1;
     *pzScan  = NUL;
 
-    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, "\n= = = RESULT %d bytes:\n%s%s\n"
-                "= = = = = = = = = = = = = = =\n",
-                (int)textSize, pzText, zLine);
-    }
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+        fprintf(pfTrace, TRACE_SHELL_RESULT_MSG, (int)textSize, pzText, zLine);
 
-    return AGREALOC((void*)pzText, textSize, "resizing text output");
+    return AGREALOC((void*)pzText, textSize, "resize output");
 }
 
 
@@ -653,8 +635,7 @@ shell_cmd(char const * pzCmd)
      *  THEN try to start it.
      */
     if (serv_id == NULLPROCESS) {
-        static char const ps4_z[] = "PS4=>${FUNCNAME:-ag}> ";
-        putenv((char *)ps4_z);
+        putenv((char *)SHELL_SET_PS4_FMT);
         serv_id = server_fp_open(&serv_pair, serverArgs);
         if (serv_id > 0)
             server_setup();
@@ -686,14 +667,14 @@ shell_cmd(char const * pzCmd)
     {
         char* pz = load_data();
         if (pz == NULL) {
-            fprintf(pfTrace, cmd_fail_fmt, pzCmd);
+            fprintf(pfTrace, CMD_FAIL_FMT, pzCmd);
             close_server_shell();
             pz = (char*)AGALOC(1, "Text Block");
 
             *pz = NUL;
 
         } else if (was_close_err)
-            fprintf(pfTrace, cmd_fail_fmt, pzCmd);
+            fprintf(pfTrace, CMD_FAIL_FMT, pzCmd);
 
         last_cmd = NULL;
         return pz;

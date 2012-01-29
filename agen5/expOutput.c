@@ -2,12 +2,12 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2011-12-29 10:06:18 bkorb"
+ *  Time-stamp:        "2012-01-29 11:58:30 bkorb"
  *
  *  This module implements the output file manipulation function
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -93,7 +93,7 @@ do_output_file_line(int line_delta, char const * fmt)
     char const * fname = pCurFp->pzOutName;
 
     if (pCurFp->flags & FPF_TEMPFILE) {
-        fname = "* temp file *";
+        fname = OUTPUT_TEMP_FILE;
         line_delta = 0;
 
     } else if (fseek(pCurFp->pFile, 0, SEEK_SET) == 0) {
@@ -109,9 +109,10 @@ do_output_file_line(int line_delta, char const * fmt)
     }
 
     {
-        void * args[2];
-        args[0] = (void *)fname;
-        args[1] = (void *)(uintptr_t)line_delta;
+        void * args[2] = {
+            (void *)fname,
+            (void *)(uintptr_t)line_delta
+        };
         sprintfv(buf, fmt, (snv_constpointer *)args);
     }
 
@@ -171,7 +172,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
      */
     if ((*mode == 'w') && ((flags & FPF_NOUNLINK) == 0)) {
         if ((unlink(pz) != 0) && (errno != ENOENT))
-            AG_CANT("unlink", pz);
+            AG_CANT(OUTPUT_NO_UNLINK, pz);
     }
 
     {
@@ -187,7 +188,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 
     p->pFile = fopen(pz, mode);
     if (p->pFile == NULL)
-        AG_CANT("open for output", pz);
+        AG_CANT(OUTPUT_NO_OPEN, pz);
 
     p->pPrev = pCurFp;
     pCurFp   = p;
@@ -197,7 +198,7 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     make_writable(pz);
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s '%s' mode %s\n", __func__, fname, mode);
+        fprintf(pfTrace, TRACE_OPEN_OUT, __func__, fname, mode);
 
     /*
      * Avoid printing temporary file names in the dependency file
@@ -218,13 +219,11 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 SCM
 ag_scm_out_delete(void)
 {
-    static char const zSkipMsg[] = "NOTE:  skipping file '%s'\n";
-
     /*
      *  Delete the current output file
      */
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, zSkipMsg, pCurFp->pzOutName);
+        fprintf(pfTrace, TRACE_OUT_DELETE, pCurFp->pzOutName);
     rm_target_file(pCurFp->pzOutName);
     outputDepth = 1;
     longjmp(fileAbort, PROBLEM);
@@ -256,8 +255,7 @@ ag_scm_out_move(SCM new_file)
     pz[ sz ] = NUL;
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s %s to %s\n", __func__,
-                pCurFp->pzOutName, pz);
+        fprintf(pfTrace, TRACE_MOVE_FMT, __func__, pCurFp->pzOutName, pz);
     rename(pCurFp->pzOutName, pz);
 
     if (pfDepends != NULL) {
@@ -293,24 +291,29 @@ ag_scm_out_pop(SCM ret_contents)
     SCM res = SCM_UNDEFINED;
 
     if (pCurFp->pPrev == NULL)
-        AG_ABEND("ERROR:  Cannot pop output with no output pushed\n");
+        AG_ABEND(SCM_OUT_POP_EMPTY);
+
+    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+        fprintf(pfTrace, TRACE_POP_FMT, __func__, pCurFp->pzOutName,
+                (ret_contents == SCM_UNDEFINED) ? "" : " #t");
 
     if (AG_SCM_BOOL_P(ret_contents) && AG_SCM_NFALSEP(ret_contents)) {
-        unsigned long pos = ftell(pCurFp->pFile);
-        char * pz = ag_scribble((size_t)pos + 1);
+        long  pos = ftell(pCurFp->pFile);
+        char * pz;
 
-        if (pos > 0) {
+        if (pos <= 0) {
+            pz  = (void*)zNil; // const-ness not important
+            pos = 0;
+
+        } else {
+            pz = ag_scribble((size_t)pos + 1);
             rewind(pCurFp->pFile);
             if (fread(pz, (size_t)pos, (size_t)1, pCurFp->pFile) != 1)
-                AG_CANT("re-read output", pCurFp->pzOutName);
+                AG_CANT(SCM_OUT_POP_NO_REREAD, pCurFp->pzOutName);
         }
 
         res = AG_SCM_STR2SCM(pz, pos);
     }
-
-    if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "%s%s\n", __func__,
-                (res == SCM_UNDEFINED) ? "" : " #t");
 
     outputDepth--;
     out_close(AG_FALSE);
@@ -338,7 +341,7 @@ ag_scm_out_pop(SCM ret_contents)
 SCM
 ag_scm_output_file_next_line(SCM num_or_str, SCM str)
 {
-    char const * pzFmt = "# %2$d \"%1$s\"";
+    char const * pzFmt = FILE_LINE_FMT;
     int  line_off = 1;
 
     if (AG_SCM_NUM_P(num_or_str))
@@ -370,25 +373,23 @@ SCM
 ag_scm_out_suspend(SCM susp_nm)
 {
     if (pCurFp->pPrev == NULL)
-        AG_ABEND("ERROR:  Cannot pop output with no output pushed");
+        AG_ABEND(OUT_SUSPEND_CANNOT);
 
     if (++suspendCt > suspAllocCt) {
         suspAllocCt += 8;
         if (pSuspended == NULL)
             pSuspended = (tSuspendName*)
-                AGALOC(suspAllocCt * sizeof(tSuspendName),
-                        "suspended file list");
+                AGALOC(suspAllocCt * sizeof(tSuspendName), "susp file list");
         else
             pSuspended = (tSuspendName*)
                 AGREALOC((void*)pSuspended,
-                         suspAllocCt * sizeof(tSuspendName),
-                         "augmenting suspended file list");
+                         suspAllocCt * sizeof(tSuspendName), "add to susp f");
     }
 
     pSuspended[ suspendCt-1 ].pzSuspendName = AG_SCM_TO_NEWSTR(susp_nm);
     pSuspended[ suspendCt-1 ].pOutDesc      = pCurFp;
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "%s '%s'\n", __func__,
+        fprintf(pfTrace, TRACE_SUSPEND, __func__, pCurFp->pzOutName,
                 pSuspended[ suspendCt-1 ].pzSuspendName);
 
     pCurFp = pCurFp->pPrev;
@@ -422,13 +423,13 @@ ag_scm_out_resume(SCM susp_nm)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-                fprintf(pfTrace, "%s '%s'\n", __func__, pzName);
+                fprintf(pfTrace, TRACE_RESUME, __func__,
+                        pCurFp->pzOutName, pzName);
             return SCM_UNDEFINED;
         }
     }
 
-    AG_ABEND(aprf("ERROR: no output file was suspended as ``%s''\n",
-                  pzName));
+    AG_ABEND(aprf(OUT_RESUME_CANNOT, pzName));
     /* NOTREACHED */
     return SCM_UNDEFINED;
 }
@@ -470,9 +471,8 @@ ag_scm_out_emit_suspended(SCM susp_nm)
 SCM
 ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
 {
-    static char const invalid_z[] = "ag-fprintf: 'port' is invalid";
     int   list_len = scm_ilength(alist);
-    char const * pzFmt = ag_scm2zchars(fmt, zFormat);
+    char const * pzFmt = ag_scm2zchars(fmt, WORD_FORMAT);
     SCM   res      = run_printf(pzFmt, list_len, alist);
 
     /*
@@ -522,7 +522,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      */
     fprintf_woops:
 
-    AG_ABEND(invalid_z);
+    AG_ABEND(AG_FPRINTF_BAD_PORT);
     /* NOTREACHED */
     return SCM_UNDEFINED;
 }
@@ -542,7 +542,7 @@ ag_scm_out_push_add(SCM new_file)
     static char const append_mode[] = "a" FOPEN_BINARY_FLAG "+";
 
     if (! AG_SCM_STRING_P(new_file))
-        AG_ABEND("No output file specified to add to");
+        AG_ABEND(OUT_ADD_INVALID);
 
     open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
                      append_mode, 0);
@@ -561,26 +561,19 @@ ag_scm_out_push_add(SCM new_file)
 SCM
 ag_scm_make_tmp_dir(void)
 {
-    static char const tmp_dir_cmd[] =
-        "mk_tmp_dir ; echo ${tmp_dir}/ag-XXXXXX";
-    static char const set_tmp_dir[] =
-        "(set! tmp-dir \"%1$s\")"
-        "(add-cleanup \"test \\\"${VERBOSE:-false}\\\" = true "
-            "|| rm -rf %1$s\")";
-
     if (pz_temp_tpl == NULL) {
-        char * tmpdir = shell_cmd(tmp_dir_cmd);
-        char * cmdbf  = ag_scribble(sizeof(set_tmp_dir) + 2 * strlen(tmpdir));
+        char * tmpdir = shell_cmd(MK_TMP_DIR_CMD);
+        char * cmdbf  =
+            ag_scribble(SET_TMP_DIR_CMD_LEN + 2 * MK_TMP_DIR_CMD_LEN);
 
         pz_temp_tpl = tmpdir;
-        temp_tpl_dir_len = strlen(pz_temp_tpl) - 9;
+        temp_tpl_dir_len = strlen(tmpdir) - 9;    // "ag-XXXXXX"
 
-        tmpdir[temp_tpl_dir_len - 1] = NUL;
-        sprintf(cmdbf, set_tmp_dir, tmpdir);
-        tmpdir[temp_tpl_dir_len - 1] = DIRCH;
+        tmpdir[temp_tpl_dir_len - 1] = NUL;       // trim dir char
+        sprintf(cmdbf, SET_TMP_DIR_CMD, tmpdir);
+        tmpdir[temp_tpl_dir_len - 1] = DIRCH;     // restore dir char
 
-        ag_scm_c_eval_string_from_file_line(
-            cmdbf, __FILE__, __LINE__);
+        ag_scm_c_eval_string_from_file_line(cmdbf, __FILE__, __LINE__);
     }
 
     return SCM_UNDEFINED;
@@ -628,19 +621,19 @@ ag_scm_out_push_new(SCM new_file)
         p = (tFpStack*)AGALOC(sizeof(tFpStack), "out file stack");
         p->pPrev  = pCurFp;
         p->flags  = FPF_FREE;
-        p->pFile  = ag_fmemopen(NULL, (ssize_t)0, "wb+");
-        pzNewFile = (char*)zMemFile;
+        p->pFile  = ag_fmemopen(NULL, (ssize_t)0, "w" FOPEN_BINARY_FLAG "+");
+        pzNewFile = (char*)MEM_FILE_STR;
         p->flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
 
         if (p->pFile == NULL)
-            AG_CANT("open 'wb+'", pzNewFile);
+            AG_CANT(OUT_PUSH_NEW_FAIL, pzNewFile);
 
         p->pzOutName = pzNewFile;
         outputDepth++;
         pCurFp    = p;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "%s -- temp file %s\n", __func__, pzNewFile);
+            fprintf(pfTrace, TRACE_OUT_PUSH_NEW, __func__, pzNewFile);
         return SCM_UNDEFINED;
     }
 #endif
@@ -662,7 +655,7 @@ ag_scm_out_push_new(SCM new_file)
         tmpfd   = mkstemp(tmp_fnm);
 
         if (tmpfd < 0)
-            AG_ABEND(aprf("failed to create temp file from %s", pz_temp_tpl));
+            AG_ABEND(aprf(OUT_PUSH_NEW_FAILED, pz_temp_tpl));
 
         open_output_file(tmp_fnm, tmplen, write_mode, FPF_TEMPFILE);
         close(tmpfd);
@@ -716,7 +709,7 @@ ag_scm_out_switch(SCM new_file)
     if (  freopen(pzNewFile, "w" FOPEN_BINARY_FLAG "+", pCurFp->pFile)
        != pCurFp->pFile)
 
-        AG_CANT("freopen", pzNewFile);
+        AG_CANT(OUT_SWITCH_FAIL, pzNewFile);
 
     /*
      *  Set the mod time on the old file.
@@ -725,7 +718,7 @@ ag_scm_out_switch(SCM new_file)
     tbuf.modtime = outTime;
     utime(pCurFp->pzOutName, &tbuf);
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s from %s to '%s'\n",
+        fprintf(pfTrace, TRACE_OUT_SWITCH,
                 __func__, pCurFp->pzOutName, pzNewFile);
     pCurFp->pzOutName = pzNewFile;  /* memory leak */
 
@@ -879,33 +872,32 @@ ag_scm_make_header_guard(SCM name)
      *  and the trailer (always "_GUARD") and the output file name in between.
      */
     {
-        static char const hdr[] = "HEADER";
-        static char const grd[] = "_GUARD";
-
         /*
          *  Leader string and its length.  Usually passed, but defaults
          *  to "HEADER"
          */
-        char const * lpz = AG_SCM_STRING_P(name) ? AG_SCM_CHARS(name) : hdr;
-        size_t lsz = (lpz == hdr) ? (sizeof(hdr) - 1) : AG_SCM_STRLEN(name);
+        char const * lpz =
+            AG_SCM_STRING_P(name) ? AG_SCM_CHARS(name) : HEADER_STR;
+        size_t lsz = (lpz == HEADER_STR)
+            ? HEADER_STR_LEN : AG_SCM_STRLEN(name);
 
         /*
          *  Full, maximal length of output
          */
-        size_t hsz = lsz + osz + sizeof(grd) + 1;
+        size_t hsz = lsz + osz + GUARD_SFX_LEN + 2;
         char * scan_p;
 
         /*
          * Sanity:
          */
         if (*lpz == NUL) {
-            lpz = hdr;
-            lsz = sizeof(hdr) - 1;
+            lpz = HEADER_STR;
+            lsz = HEADER_STR_LEN;
             hsz += lsz;
         }
         scan_p = AGALOC(hsz, "header guard string");
 
-        gpz = scan_p;
+        gpz = scan_p;  // gpz must be freed
         do  {
             *(scan_p++) = toupper(*(lpz++));
         } while (--lsz > 0);
@@ -918,43 +910,25 @@ ag_scm_make_header_guard(SCM name)
         lpz = opz;
         do  {
             *(scan_p++) = '_';
-            while ((! IS_ALPHANUMERIC_CHAR(*lpz)) && (*lpz != NUL))  lpz++;
+            lpz = BRK_ALPHANUMERIC_CHARS(lpz);
             while (IS_ALPHANUMERIC_CHAR(*lpz))
                 *(scan_p++) = toupper(*(lpz++));
         } while (*lpz != NUL);
 
-        memcpy(scan_p, grd, sizeof(grd));
-        gsz = (scan_p - gpz) + sizeof(grd) - 1;
+        memcpy(scan_p, GUARD_SFX, GUARD_SFX_LEN + 1);
+        gsz = (scan_p - gpz) + GUARD_SFX_LEN;
     }
 
     {
-        static int  const line_no = __LINE__ + 2;
-        static char const setvar[] =
-            "(set! header-file \"%s\") "
-            "(set! header-guard \"%s\")";
-        char z[sizeof(setvar) + SCRIBBLE_SIZE];
-        char * p = z;
-        size_t cmdsz = sizeof(setvar) + gsz + osz;
-        if (cmdsz > sizeof(z))
-            p = AGALOC(cmdsz, "Guile set cmd");
-        snprintf(p, cmdsz, setvar, opz, gpz);
-        (void)ag_scm_c_eval_string_from_file_line(
-            p, __FILE__, line_no);
-        if (p != z)
-            AGFREE(p);
-    }
+        size_t sz1 = MK_HEAD_GUARD_SCM_LEN + gsz + osz;
+        size_t sz2 = MK_HEAD_GUARD_GUARD_LEN + 2 * gsz;
+        size_t sz  = (sz1 < sz2) ? sz2 : sz1;
+        char * p = ag_scribble(sz);
+        sprintf(p, MK_HEAD_GUARD_SCM, opz, gpz);
+        (void)ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
 
-    {
-        static char const ifndef[] = "#ifndef %1$s\n#define %1$s 1";
-        char z[sizeof(ifndef) + SCRIBBLE_SIZE];
-        char * p = z;
-        size_t strsz = sizeof(ifndef) + (2 * gsz);
-        if (strsz > sizeof(z))
-            p = AGALOC(strsz, "ifndef guard");
-        snprintf(p, strsz, ifndef, gpz);
+        sprintf(p, MK_HEAD_GUARD_GUARD, gpz);
         name = AG_SCM_STR02SCM(p);
-        if (p != z)
-            AGFREE(p);
     }
 
     AGFREE(gpz);

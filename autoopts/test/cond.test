@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2011-08-07 17:37:22 bkorb"
+# Time-stamp:        "2012-01-14 11:24:40 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -109,8 +109,9 @@ echo guard-option-names\; >> ${testname}.def
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || failure AutoGen could not process
 
-( eval `echo ${cc_cmd} | \
-  ${SED} 's/-Werror//;s/-DTEST_TEST/-DSECOND -DTEST_TEST/' ` 2>&1 ) \
+( cc_cmd=`echo ${cc_cmd} | \
+  ${SED} 's/-Werror//;s/-DTEST_TEST/-DSECOND -DTEST_TEST/' `
+  eval "$cc_cmd" 2>&1 ) \
   | ${SED} -n '/undefining SECOND due to option name conflict/p' \
     > ${testname}-cc.log
 

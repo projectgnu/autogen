@@ -7,7 +7,7 @@
  *
  *  Automated Finite State Machine
  *
- *  Copyright (c) 2001-2011 by Bruce Korb - all rights reserved
+ *  Copyright (c) 2001-2012 by Bruce Korb - all rights reserved
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
  *  
@@ -169,7 +169,7 @@ cgi_invalid_transition( te_cgi_state st, te_cgi_event evt )
     char* pz = aprf( zCgiStrings + CgiFsmErr_off, st, CGI_STATE_NAME( st ),
                      evt, CGI_EVT_NAME( evt ));
 
-    AG_ABEND( aprf( "CGI parsing error:  %s", pz ));
+    AG_ABEND( aprf(CGI_PARSE_ERR_FMT, pz ));
     /* END   == INVALID TRANS MSG == DO NOT CHANGE THIS COMMENT */
 
     return EXIT_FAILURE;
@@ -209,8 +209,7 @@ cgi_run_fsm(
 
         } else {
             if (outlen < 4) {
-                static char const exhaustion[] =
-                    "output space exhausted\n";
+                static char const exhaustion[] = "output space exhausted\n";
                 if (saved_outlen > sizeof(exhaustion))
                     memcpy(saved_pzOut, exhaustion, sizeof(exhaustion));
 

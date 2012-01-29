@@ -1,13 +1,13 @@
 /**
  * \file gdinit.c
  *
- *  getdefs Copyright (c) 1999-2011 by Bruce Korb - all rights reserved
+ *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *  Time-stamp:        "2011-12-29 10:02:47 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

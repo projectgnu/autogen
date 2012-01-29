@@ -1,5 +1,7 @@
 #! /bin/sh
 
+prog=`basename $0 .sh`
+
 die() {
     echo "$prog failure:  $*"
     kill -TERM $progpid
@@ -33,6 +35,7 @@ collect_src() {
 	#define  AUTOOPTS_INTERNAL 1
 	#include "compat/compat.h"
 	#define  LOCAL static
+	#include "ao-strs.h"
 	_EOF_
 
     for f in "$@"

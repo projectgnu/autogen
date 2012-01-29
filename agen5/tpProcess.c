@@ -4,10 +4,10 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2011-06-03 11:25:10 bkorb"
+ * Time-stamp:        "2012-01-14 10:55:04 bkorb"
  *
  * This file is part of AutoGen.
- * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -71,13 +71,11 @@ generateBlock(tTemplate * pT, tMacro * pMac, tMacro * pEnd)
 static void
 trace_macro(tTemplate * pT, tMacro * pMac)
 {
-    static char const zFmt[] = "%-10s (%2X) in %s at line %d\n";
-
     teFuncType fc = pMac->funcCode;
     if (fc >= FUNC_CT)
         fc = FTYP_BOGUS;
 
-    fprintf(pfTrace, zFmt, apzFuncNames[fc], pMac->funcCode,
+    fprintf(pfTrace, TRACE_MACRO_FMT, apzFuncNames[fc], pMac->funcCode,
             pT->pzTplFile, pMac->lineNo);
 
     if (pMac->ozText > 0) {
@@ -104,8 +102,6 @@ trace_macro(tTemplate * pT, tMacro * pMac)
 static void
 do_stdout_tpl(tTemplate * pTF)
 {
-    static char const zNoSfx[] = "* NONE *";
-    static char const zBadR[]  = "%sBogus return from setjmp\n";
     char   const *    pzRes;
     SCM    res;
 
@@ -117,27 +113,27 @@ do_stdout_tpl(tTemplate * pTF)
 
     case PROBLEM:
         if (*pzOopsPrefix != NUL) {
-            fprintf(stdout, "%soutput was abandoned\n", pzOopsPrefix);
+            fprintf(stdout, DO_STDOUT_TPL_ABANDONED, pzOopsPrefix);
             pzOopsPrefix = zNil;
         }
         fclose(stdout);
         return;
 
     default:
-        fprintf(stdout, zBadR, pzOopsPrefix);
+        fprintf(stdout, DO_STDOUT_TPL_BADR, pzOopsPrefix);
 
     case FAILURE:
         exit(EXIT_FAILURE);
     }
 
-    pzCurSfx      = zNoSfx;
+    pzCurSfx      = DO_STDOUT_TPL_NOSFX;
     currDefCtx    = rootDefCtx;
     pCurFp        = &fpRoot;
     fpRoot.pFile  = stdout;
-    fpRoot.pzOutName = "stdout";
+    fpRoot.pzOutName = DO_STDOUT_TPL_STDOUT;
     fpRoot.flags  = FPF_NOUNLINK | FPF_STATIC_NM;
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-        fputs("Starting stdout template\n", pfTrace);
+        fputs(DO_STDOUT_TPL_START_STD, pfTrace);
 
     /*
      *  IF there is a CGI prefix for error messages,
@@ -148,7 +144,6 @@ do_stdout_tpl(tTemplate * pTF)
         generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
 
     else {
-        static char const zCont[]  = "content-type:";
         (void)ag_scm_out_push_new(SCM_UNDEFINED);
 
         generateBlock(pTF, pTF->aMacros, pTF->aMacros + pTF->macroCt);
@@ -160,8 +155,9 @@ do_stdout_tpl(tTemplate * pTF)
         res   = ag_scm_out_pop(SCM_BOOL_T);
         pzRes = AG_SCM_CHARS(res);
 
-        if (strneqvcmp(pzRes, zCont, (int)sizeof(zCont) - 1) != 0)
-            fputs("Content-Type: text/html\n\n", stdout);
+        /* 13:  "content-type:" */
+        if (strneqvcmp(pzRes, DO_STDOUT_TPL_CONTENT, 13) != 0)
+            fputs(DO_STDOUT_TPL_CONTENT, stdout);
 
         fwrite(pzRes, AG_SCM_STRLEN(res), (size_t)1, stdout);
     }
@@ -218,7 +214,7 @@ processTemplate(tTemplate* pTF)
         switch (setjmp(fileAbort)) {
         case SUCCESS:
             if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-                fprintf(pfTrace, "Starting %s template\n", pOS->zSuffix);
+                fprintf(pfTrace, PROC_TPL_START, pOS->zSuffix);
                 fflush(pfTrace);
             }
             /*
@@ -251,7 +247,7 @@ processTemplate(tTemplate* pTF)
             break;
 
         default:
-            fprintf(pfTrace, "%sBogus return from setjmp\n", pzOopsPrefix);
+            fprintf(pfTrace, PROC_TPL_BOGUS_RET, pzOopsPrefix);
             pzOopsPrefix = zNil;
             /* FALLTHROUGH */
 
@@ -284,7 +280,7 @@ out_close(ag_bool purge)
         make_readonly(fileno(pCurFp->pFile));
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-        fprintf(pfTrace, "%s '%s'\n", __func__, pCurFp->pzOutName);
+        fprintf(pfTrace, OUT_CLOSE_TRACE_WRAP, __func__, pCurFp->pzOutName);
 
     fclose(pCurFp->pFile);
 
@@ -345,10 +341,10 @@ open_output(tOutSpec * spec)
 
     char const * out_file = NULL;
 
-    if (strcmp(spec->zSuffix, "null") == 0) {
+    if (strcmp(spec->zSuffix, OPEN_OUTPUT_NULL) == 0) {
         static int const flags = FPF_NOUNLINK | FPF_NOCHMOD | FPF_TEMPFILE;
     null_open:
-        open_output_file(zDevNull, sizeof(zDevNull)-1, write_mode, flags);
+        open_output_file(DEV_NULL, DEV_NULL_LEN, write_mode, flags);
         return;
     }
 
@@ -371,9 +367,6 @@ open_output(tOutSpec * spec)
      *  Remove any suffixes in the last file name
      */
     {
-        static char const bad_fmt[] =
-            "Cannot format file name:  \"%s\", %s, %s";
-
         char const * def_file = OPT_ARG(BASE_NAME);
         char   z[AG_PATH_MAX];
         const char * pst = strrchr(def_file, '/');
@@ -402,7 +395,8 @@ open_output(tOutSpec * spec)
          */
         out_file = aprf(spec->pzFileFmt, pst, spec->zSuffix);
         if (out_file == NULL)
-            AG_ABEND(aprf(bad_fmt, spec->pzFileFmt, pst, spec->zSuffix));
+            AG_ABEND(aprf(OPEN_OUTPUT_BAD_FMT, spec->pzFileFmt, pst,
+                          spec->zSuffix));
     }
 
     open_output_file(out_file, strlen(out_file), write_mode, 0);

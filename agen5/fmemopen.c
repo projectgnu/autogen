@@ -25,7 +25,7 @@ typedef struct {
 /**
  * @file /old-home/bkorb/tools/mine/lib/fmemopen/fmemopen.c
  *
- * Copyright (c) 2004-2011 by Bruce Korb.  All rights reserved.
+ * Copyright (c) 2004-2012 by Bruce Korb.  All rights reserved.
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de

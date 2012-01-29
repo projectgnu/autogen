@@ -1,5 +1,5 @@
 %%comments:
-Copyright (c) 2001-2011 by Bruce Korb - all rights reserved
+Copyright (c) 2001-2012 by Bruce Korb - all rights reserved
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or

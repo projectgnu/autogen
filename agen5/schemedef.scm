@@ -1,8 +1,8 @@
 
-;;; Time-stamp:        "2011-12-29 11:33:35 bkorb"
+;;; Time-stamp:        "2012-01-07 09:25:09 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
-;;; AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+;;; AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ;;;
 ;;; AutoGen is free software: you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by the
@@ -20,6 +20,11 @@
 ;;; This module defines all the scheme initialization for AutoGen.
 ;;; It gets sucked up into directives.h as a single ANSI-C string.
 ;;; Comments, blank lines and leading white space are omitted.
+;;;
+;;; The contents of this file get converted to a C language static string
+;;; and is then fed to the guile library at start up time.
+;;; Blank lines, commends, leading and trailing white space and spaces
+;;; before closing parentheses are all stripped.
 ;;;
 (use-modules (ice-9 common-list))
 

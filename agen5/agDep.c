@@ -2,12 +2,12 @@
 /**
  * @file tpDep.c
  *
- * Time-stamp:        "2011-12-29 10:06:17 bkorb"
+ * Time-stamp:        "2011-12-30 17:38:15 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
- * Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ * Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -69,7 +69,7 @@ add_source_file(char const * pz)
         p->next = NULL;
         strcpy(p->fname, pz);
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, "add source dep:  %s\n", p->fname);
+            fprintf(pfTrace, TRACE_ADD_SRC_FILE_FMT, p->fname);
     }
 }
 
@@ -96,7 +96,7 @@ rm_source_file(char const * pz)
         flist_t * p = *lp;
         *pp = p->next;
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, "remove source dep:  %s\n", p->fname);
+            fprintf(pfTrace, TRACE_RM_SRC_FILE_FMT, p->fname);
         AGFREE(p);
     }
 }
@@ -140,7 +140,7 @@ add_target_file(char const * pz)
         p->next = NULL;
         strcpy(p->fname, pz);
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, "add target dep:  %s\n", p->fname);
+            fprintf(pfTrace, TRACE_ADD_TARG_FILE_FMT, p->fname);
     }
 }
 
@@ -165,7 +165,7 @@ rm_target_file(char const * pz)
         flist_t * p = *lp;
         *lp = p->next;
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, "remove target dep:  %s\n", p->fname);
+            fprintf(pfTrace, TRACE_RM_TARG_FILE_FMT, p->fname);
         AGFREE(p);
     }
 }
@@ -176,21 +176,17 @@ rm_target_file(char const * pz)
 LOCAL void
 start_dep_file(void)
 {
-    static char const mkdep_fmt[] =
-        "# Makefile dependency file created by\n# %s\n"
-        "# with the following command:\n";
-
     char * pz;
 
     if (pzDepFile == NULL)
-        pzDepFile = aprf("%s.d-XXXXXX", OPT_ARG(BASE_NAME));
+        pzDepFile = aprf(START_DEP_TEMP_FMT, OPT_ARG(BASE_NAME));
     mkstemp((char *)pzDepFile);
     pfDepends = fopen(pzDepFile, "w");
 
     if (pfDepends == NULL)
-        AG_CANT("fopen for write", pzDepFile);
+        AG_CANT(START_DEP_FOPEN_MSG, pzDepFile);
 
-    fprintf(pfDepends, mkdep_fmt, autogenOptions.pzProgPath);
+    fprintf(pfDepends, START_DEP_FILE_FMT, autogenOptions.pzProgPath);
 
     {
         int     ac = autogenOptions.origArgCt;
@@ -198,9 +194,9 @@ start_dep_file(void)
 
         for (;;) {
             char * arg = *(av++);
-            fprintf(pfDepends, "#   %s", arg);
+            fprintf(pfDepends, START_DEP_ARG_FMT, arg);
             if (--ac == 0) break;
-            fputs(" \\\n", pfDepends);
+            fputs(DEP_FILE_SPLICE_STR, pfDepends);
         }
         fputs("\n", pfDepends);
     }
@@ -213,7 +209,6 @@ start_dep_file(void)
     }
 
     {
-        static char const tfmt[] = "%s_%s";
         char const * pnm = autogenOptions.pzPROGNAME;
         char const * bnm = strchr(pzDepTarget, '/');
 
@@ -223,10 +218,10 @@ start_dep_file(void)
             bnm = pzDepTarget;
 
         {
-            size_t sz = strlen(pnm) + strlen(bnm) + sizeof(tfmt) - 4;
+            size_t sz = strlen(pnm) + strlen(bnm) + 2; // underscore + NUL
 
-            pz_targ_base = pz = AGALOC(sz, "mk targ list");
-            sprintf(pz, tfmt, pnm, bnm);
+            pz_targ_base = pz = AGALOC(sz, "targ list");
+            sprintf(pz, DEP_FILE_TARG_FMT, pnm, bnm);
         }
     }
 
@@ -300,16 +295,11 @@ tidy_dep_file(void)
 LOCAL void
 wrap_up_depends(void)
 {
-    static char const fmt[] = "\n"
-        "\n%3$s : $(%1$s_SList)\n"
-        "\n$(%1$s_TList) : %3$s\n"
-        "\t@:\n";
-
     flist_t * flist = targ_flist; //!< list scanning pointer
 
     if (temp_tpl_dir_len == 0) {
         temp_tpl_dir_len = 1;
-        pz_temp_tpl = fmt;
+        pz_temp_tpl = DEP_FILE_WRAP_FMT;
     }
 
     fprintf(pfDepends, "%s_TList =", pz_targ_base);
@@ -333,7 +323,8 @@ wrap_up_depends(void)
     temp_tpl_dir_len--;
 
     targ_flist = src_flist = NULL;
-    fprintf(pfDepends, fmt, pz_targ_base, pzSourceList, pzDepTarget);
+    fprintf(pfDepends, DEP_FILE_WRAP_FMT, pz_targ_base,
+            pzSourceList, pzDepTarget);
 #if 0
     if (serv_id != NULLPROCESS) {
         char * pz = shell_cmd("echo ${AG_Dep_File}");

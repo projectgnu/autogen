@@ -2,11 +2,11 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2011-04-06 11:12:16 bkorb"
+## Time-stamp:        "2012-01-06 15:04:43 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
-##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -206,7 +206,8 @@ ENDDEF  end-feat-test
 
 DEFINE  collect-act   =][=
 
-  CASE (set! tmp-text (get "act-text"))
+  CASE
+       (set! tmp-text (get "act-text"))
        (set! TMP-text (string-upcase tmp-text))
        (string-append
          (if (exist? "no") "no-" "yes-")

@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------
 # immediate.test      ---  test immediate option handling
 #
-# Time-stamp:        "2011-08-07 17:32:58 bkorb"
+# Time-stamp:        "2012-01-29 13:33:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -43,7 +43,7 @@ include    = "#include <stdio.h>\nint invocation_ct = 0;";
 config-header = 'config.h';
 version    = '1.0';
 copyright = {
-    date  = "1992-2009";
+    date  = "1992-2012";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
     type  = gpl;

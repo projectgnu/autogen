@@ -4,10 +4,10 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2011-05-05 11:02:50 bkorb"
+ *  Time-stamp:        "2012-01-29 09:49:11 bkorb"
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -54,20 +54,20 @@ resolveSCM(SCM s)
         z[0] = AG_SCM_CHAR(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
-        pzRes = "** Vector **"; break;
+        pzRes = RESOLVE_SCM_VECTOR; break;
 
     case GH_TYPE_PAIR:
-        pzRes = "** Pair **"; break;
+        pzRes = RESOLVE_SCM_PAIR; break;
 
     case GH_TYPE_NUMBER:
-        snprintf(z, sizeof(z), "%ld", AG_SCM_TO_ULONG(s)); break;
+        snprintf(z, sizeof(z), RESOLVE_SCM_NUMBER, AG_SCM_TO_ULONG(s)); break;
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY
     {
-        void* x = &SCM_SUBR_ENTRY(s);
+        void * x = &SCM_SUBR_ENTRY(s);
 
-        snprintf(z, sizeof(z), "** Procedure 0x%08lX **",
+        snprintf(z, sizeof(z), RESOLVE_SCM_PROC,
                  (unsigned long)x);
         break;
     }
@@ -77,19 +77,19 @@ resolveSCM(SCM s)
 #endif
 
     case GH_TYPE_LIST:
-        pzRes = "** LIST **"; break;
+        pzRes = RESOLVE_SCM_LIST; break;
 
     case GH_TYPE_INEXACT:
-        pzRes = "** INEXACT **"; break;
+        pzRes = RESOLVE_SCM_INEXACT; break;
 
     case GH_TYPE_EXACT:
-        pzRes = "** EXACT **"; break;
+        pzRes = RESOLVE_SCM_EXACT; break;
 
     case GH_TYPE_UNDEFINED:
         pzRes = (char*)zNil; break;
 
     default:
-        pzRes = "** UNKNOWN **"; break;
+        pzRes = RESOLVE_SCM_UNKNOWN; break;
     }
 
     return pzRes;
@@ -110,7 +110,7 @@ tpl_text(tTemplate * tpl, tMacro * mac)
 static void
 tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg)
 {
-    fprintf(pfTrace, zTplWarn, tpl->pzTplFile, mac->lineNo, msg);
+    fprintf(pfTrace, TPL_WARN_FMT, tpl->pzTplFile, mac->lineNo, msg);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -173,13 +173,13 @@ evalExpression(ag_bool* pMustFree)
                 /*
                  *  Emit only if found
                  */
-                return (char*)zNil;
+                return zNotDefined;
 
             case (EMIT_IF_ABSENT | EMIT_ALWAYS):
                 /*
                  *  Emit inconsistently :-}
                  */
-                AG_ABEND_IN(pT, pMac, "PROGRAM ERROR:  ambiguous expr code");
+                AG_ABEND_IN(pT, pMac, EVAL_EXPR_PROG_ERR);
                 /* NOTREACHED */
             }
         }
@@ -188,15 +188,12 @@ evalExpression(ag_bool* pMustFree)
          *  OTHERWISE, we found an entry.  Make sure we were supposed to.
          */
         else {
-            static char const zBlock[] =
-                "attempted to use block macro in eval expression";
-
             if ((code & EMIT_IF_ABSENT) != 0)
                 return (char*)zNil;
 
             if (  (pDef->valType != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
-                tpl_warning(pT, pMac, zBlock);
+                tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
                 return (char*)zNil;
             }
 
@@ -216,7 +213,7 @@ evalExpression(ag_bool* pMustFree)
                  *  And make sure what we found is a text value
                  */
                 if (pDef->valType != VALTYP_TEXT) {
-                    tpl_warning(pT, pMac, zBlock);
+                    tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
                     return (char*)zNil;
                 }
 
@@ -232,7 +229,7 @@ evalExpression(ag_bool* pMustFree)
                  *  And make sure what we found is a text value
                  */
                 if (pDef->valType != VALTYP_TEXT) {
-                    tpl_warning(pT, pMac, zBlock);
+                    tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
                     return (char*)zNil;
                 }
 
@@ -308,10 +305,7 @@ evalExpression(ag_bool* pMustFree)
 SCM
 ag_scm_error_source_line(void)
 {
-    static char const zErr[] =
-        "\nGuile/Scheme evaluation error in %s line %d:  %s\n";
-
-    fprintf(stderr, zErr, pCurTemplate->pzTplName, pCurMacro->lineNo,
+    fprintf(stderr, SCM_ERROR_FMT, pCurTemplate->pzTplName, pCurMacro->lineNo,
             pCurTemplate->pzTemplText + pCurMacro->ozText);
     fflush(stderr);
     guileFailure = 1;
@@ -352,8 +346,7 @@ ag_scm_emit(SCM val)
         for (; pnum > 0; pnum--) {
             pSaveFp = pSaveFp->pPrev;
             if (pSaveFp == NULL)
-                AG_ABEND(aprf("invalid emission port: %d",
-                              AG_SCM_TO_ULONG(val)));
+                AG_ABEND(aprf(EMIT_INVAL_PORT, AG_SCM_TO_ULONG(val)));
         }
 
         fp = pSaveFp->pFile;
@@ -567,7 +560,7 @@ mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     {
         size_t remLen = canonicalizeName(pzCopy, pzSrc, (int)srcLen);
         if (remLen > srcLen)
-            AG_ABEND_IN(pT, pMac, "Invalid definition name");
+            AG_ABEND_IN(pT, pMac, LD_EXPR_BAD_NAME);
         pzSrc  += srcLen - remLen;
         srcLen  = remLen;
         pzCopy += strlen(pzCopy) + 1;
@@ -575,7 +568,7 @@ mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 
     if (pzSrc >= pzSrcEnd) {
         if (pMac->res != EMIT_VALUE)
-            AG_ABEND_IN(pT, pMac, "No text for unfound value");
+            AG_ABEND_IN(pT, pMac, LD_EXPR_NO_TEXT);
 
         pMac->ozText = 0;
 
@@ -601,10 +594,10 @@ mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
              *  The next expression must be within bounds and space separated
              */
             if (pzNextExpr >= pz + srcLen)
-                AG_ABEND_IN(pT, pMac, "`?' needs two expressions");
+                AG_ABEND_IN(pT, pMac, LD_EXPR_NEED_TWO);
 
             if (! IS_WHITESPACE_CHAR(*pzNextExpr))
-                AG_ABEND_IN(pT, pMac, "No space between expressions");
+                AG_ABEND_IN(pT, pMac, LD_EXPR_NO_SPACE);
 
             /*
              *  NUL terminate the first expression, skip intervening
@@ -612,7 +605,7 @@ mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
              *  into the macro type code as the "secondary type".
              */
             *(pzNextExpr++) = NUL;
-            while (IS_WHITESPACE_CHAR(*pzNextExpr))  pzNextExpr++;
+            pzNextExpr = SPN_WHITESPACE_CHARS(pzNextExpr);
             pMac->res |= (exprType(pzNextExpr) << EMIT_SECONDARY_SHIFT);
             pMac->endIndex = pzNextExpr - pT->pzTemplText;
         }

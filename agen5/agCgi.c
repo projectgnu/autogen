@@ -2,14 +2,14 @@
 /**
  * @file agCgi.c
  *
- *  Time-stamp:        "2011-01-20 16:24:54 bkorb"
+ *  Time-stamp:        "2011-12-30 17:51:56 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
  *  AutoGen process.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -70,10 +70,6 @@ typedef enum {
 #define pzCgiQuery  nameValueMap[ QUERY_STRING_IDX   ].pzValue
 #define pzCgiLength nameValueMap[ CONTENT_LENGTH_IDX ].pzValue
 
-static char const zOops[] =
-"Content-type: text/plain\n\n"
-"AutoGen form processing error:\n";
-
 /* = = = START-STATIC-FORWARD = = = */
 static char*
 parseInput(char* pzSrc, int len);
@@ -90,13 +86,13 @@ loadCgi(void)
      */
     dup2(STDOUT_FILENO, STDERR_FILENO);
     (void)fdopen(STDERR_FILENO, "w" FOPEN_BINARY_FLAG);
-    pzOopsPrefix = zOops;
+    pzOopsPrefix = CGI_ERR_MSG_FMT;
     {
         int tmpfd;
-        AGDUPSTR(cgi_stderr, "/tmp/cgi-stderr-XXXXXX", "stderr file");
+        AGDUPSTR(cgi_stderr, CGI_TEMP_ERR_FILE_STR, "stderr file");
         tmpfd = mkstemp(cgi_stderr);
         if (tmpfd < 0)
-            AG_ABEND(aprf("mkstemp failed on `%s'", cgi_stderr));
+            AG_ABEND(aprf(MKSTEMP_FAIL_FMT, cgi_stderr));
         dup2(tmpfd, STDERR_FILENO);
         close(tmpfd);
     }
@@ -116,7 +112,7 @@ loadCgi(void)
         } while (pNM++, ++ix < NAME_CT);
     }
 
-    pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "CGI context");
+    pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "CGI ctx");
     memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
 
     {
@@ -125,24 +121,24 @@ loadCgi(void)
 
         if (strcasecmp(pzCgiMethod, "POST") == 0) {
             if (textLen == 0)
-                AG_ABEND("No CGI data were received");
+                AG_ABEND(LOAD_CGI_NO_DATA_MSG);
 
-            pzText  = AGALOC(textLen + 1, "CGI POST text");
+            pzText  = AGALOC(textLen + 1, "CGI POST");
             if (fread(pzText, (size_t)1, textLen, stdin) != textLen)
-                AG_CANT("read", "CGI text");
+                AG_CANT(LOAD_CGI_READ_NAME, LOAD_CGI_READ_WHAT);
 
             pzText[ textLen ] = NUL;
 
             pBaseCtx->pzData = parseInput(pzText, (int)textLen);
             AGFREE(pzText);
 
-        } else if (strcasecmp(pzCgiMethod, "GET") == 0) {
+        } else if (strcasecmp(pzCgiMethod, LOAD_CGI_GET_NAME) == 0) {
             if (textLen == 0)
                 textLen = strlen(pzCgiQuery);
             pBaseCtx->pzData = parseInput(pzCgiQuery, (int)textLen);
 
         } else {
-            AG_ABEND(aprf("invalid CGI request method: ``%s''", pzCgiMethod));
+            AG_ABEND(aprf(LOAD_CGI_INVAL_REQ_FMT, pzCgiMethod));
             /* NOTREACHED */
 #ifdef  WARNING_WATCH
             pzText = NULL;
@@ -151,7 +147,7 @@ loadCgi(void)
     }
 
     pBaseCtx->lineNo     = 1;
-    pBaseCtx->pzCtxFname = "@@ CGI Definitions @@";
+    pBaseCtx->pzCtxFname = LOAD_CGI_DEFS_MARKER;
     pBaseCtx->pzScan     = pBaseCtx->pzData;
 }
 
@@ -159,12 +155,10 @@ loadCgi(void)
 static char*
 parseInput(char* pzSrc, int len)
 {
-    static char const zDef[] = "Autogen Definitions cgi;\n";
-
-#   define defLen   (sizeof(zDef) - 1)
+#   define defLen   (sizeof("Autogen Definitions cgi;\n") - 1)
     char*  pzRes  = AGALOC((len * 2) + defLen + 1, "CGI Definitions");
 
-    memcpy(pzRes, zDef, defLen);
+    memcpy(pzRes, PARSE_INPUT_AG_DEF_STR, defLen);
     (void)cgi_run_fsm(pzSrc, len, pzRes + defLen, len*2);
     return AGREALOC(pzRes, strlen(pzRes)+1, "CGI input");
 }

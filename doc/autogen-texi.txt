@@ -11,7 +11,7 @@ This file serves two purposes:
 
 
   This file is part of AutoGen.
-  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 
   AutoGen is free software: you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -2222,14 +2222,17 @@ values.  If @code{copyright} is used, then the first three are required.
 @item
 @vindex type
 @file{type} - specifies the type of distribution license.
-AutoOpts/AutoGen will automatically support the text of the GNU Public
-License (@file{GPL}), the GNU General Public License with Library extensions
-(@file{LGPL}), the Free BSD license (@file{BSD}), and a
-write-it-yourself copyright notice (@file{NOTE}).  Only these values are
-recognized.
+AutoOpts/AutoGen supports the text of the GNU Public License (@file{gpl}),
+the GNU ``Lesser'' General Public License with Library extensions
+(@file{lgpl}), the Modified Free BSD license (@file{mbsd}) and a few others.
+Other licenses may be specified, but you must provide your own license file.
+The list of license files provided by AutoOpts may be seen by typing:
+@example
+ls $(autoopts-config pkgdatadir)/*.lic
+@end example
 @item
 @vindex text
-@file{text} - the text of the copyright notice.  It is only needed
+@file{text} - the text of the copyright notice.  This must be provided
 if @file{type} is set to @file{NOTE}.
 @item
 @vindex author
@@ -2244,7 +2247,7 @@ Typically that of the author or copyright holder.
 An example of this might be:
 @example
 copyright = @{
-    date  = "1992-2008";
+    date  = "1992-2012";
     owner = "Bruce Korb";
     eaddr = 'bkorb@@gnu.org';
     type  = GPL;
@@ -2268,11 +2271,11 @@ e.g.:  @code{autogen @i{(GNU autogen)} - The Automated Program Generator}.
 
 @item preserve-case
 @vindex preserve-case
-This attribute will not change anything except appearance.
-Normally, the option names are all documented in lower case.
-However, if you specify this attribute, then they will display
-in the case used in their specification.  Command line options
-will still be matched without case sensitivity.
+This attribute will not change anything except appearance.  Normally, the
+option names are all documented in lower case.  However, if you specify this
+attribute, then they will display in the case used in their specification.
+Command line options will still be matched without case sensitivity.
+This is useful for specifying option names in camel-case.
 
 @item prog-desc @strong{and}
 @itemx opts-ptr
@@ -3301,9 +3304,6 @@ expressions.
 
 @table @samp
 @item [[HH:]MM:]SS
-where the hyphens (@code{-}) are really colons(@code{:}), but the
-texi doc system won't allow colons there.
-
 @code{HH} is multiplied by @code{3600} and @code{MM} multiplied by @code{60}
 before they are added to @code{SS}.  This time specification may not be
 followed by any other time specs.  @code{HH} and @code{MM} are both optional,

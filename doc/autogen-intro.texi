@@ -451,10 +451,18 @@ it prints an error message and exits.
 @section Named Definitions
 @cindex definitions
 
-Any name may have multiple values associated with it in the definition
-file.  If there is more than one instance, the @strong{only} way to
-expand all of the copies of it is by using the FOR (@pxref{FOR}) text
-function on it, as described in the next chapter.
+A name is a sequence of characters beginning with an alphabetic character
+(@code{a} through @code{z}) followed by zero or more alpha-numeric
+characters and/or separator characters: hyphen (@code{-}), underscore
+(@code{_}) or carat (@code{^}).  Names are case insensitive.
+
+Any name may have multiple values associated with it.  Every name may be
+considered a sparse array of one or more elements.  If there is more than
+one value, the values my be accessed by indexing the value with
+@code{[index]} or by iterating over them using the FOR (@pxref{FOR}) AutoGen
+macro on it, as described in the next chapter.  Sparse arrays are specified
+by specifying an index when defining an entry
+(@pxref{Index Assignments,, Assigning an Index to a Definition}).
 
 There are two kinds of definitions, @samp{simple} and @samp{compound}.
 They are defined thus (@pxref{Full Syntax}):
@@ -462,13 +470,14 @@ They are defined thus (@pxref{Full Syntax}):
 @example
 compound_name '=' '@{' definition-list '@}' ';'
 
-simple_name '=' string ';'
+simple-name[2] '=' string ';'
 
-no_text_name ';'
+no^text^name ';'
 @end example
 
 @noindent
-@code{No_text_name} is a simple definition with a shorthand empty string
+@code{simple-name} has the third index (index number 2) defined here.
+@code{No^text^name} is a simple definition with a shorthand empty string
 value.  The string values for definitions may be specified in any of
 several formation rules.
 
@@ -513,9 +522,16 @@ list = @{ list_element = omega;  last;
 @subsection Double Quote String
 
 @cindex string, double quote
-The string follows the C-style escaping (@code{\}, @code{\n}, @code{\f},
-@code{\v}, etc.), plus octal character numbers specified as @code{\ooo}.
-The difference from "C" is that the string may span multiple lines.
+The string follows the C-style escaping, using the backslash to quote
+(escape) the following character(s).  Certain letters are translated to
+various control codes (e.g. @code{\n}, @code{\f}, @code{\t}, etc.).
+@code{x} introduces a two character hex code.  @code{0} (the digit zero)
+introduces a one to three character octal code (note: an octal byte followed
+by a digit must be represented with three octal digits, thus: @code{"\0001"}
+yielding a NUL byte followed by the ASCII digit 1).  Any other character
+following the backslash escape is simply inserted, without error, into the
+string being formed.
+
 Like ANSI "C", a series of these strings, possibly intermixed with
 single quote strings, will be concatenated together.
 

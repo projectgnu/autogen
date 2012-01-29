@@ -15,7 +15,7 @@ New in __CURRENT_VERSION__ December 2011
   keywords appearing at the end of a line.  "makefile-script" splices
   lines together with a semi-colon and a backslash, add a leading tab
   to each line and double dollar sign characters, basically turning
-  semi-ordinary shell scripts into scripts suitable for use inside make.
+  semi-ordinary shell scripts into scripts suitable for use with make.
   In the case of these keywords and certain operators, the semi-colon
   is now omitted.
 

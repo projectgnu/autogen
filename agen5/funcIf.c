@@ -2,12 +2,12 @@
 /**
  * @file funcIf.c
  *
- *  Time-stamp:        "2011-01-27 12:39:51 bkorb"
+ *  Time-stamp:        "2012-01-29 20:47:38 bkorb"
  *
  *  This module implements the _IF text function.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,10 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-static char const zNoIfEnd[]  = "%s ERROR:  cannot find ENDIF\n\t'%s'\n";
-static char const zNoIfExpr[] = "expressionless IF";
-
 
 typedef struct if_stack tIfStack;
 struct if_stack {
@@ -84,7 +80,7 @@ eval_true(void)
         int len = strlen(pz);
         if (len > 5)
             len = 5;
-        if (strneqvcmp("false", pz, len) == 0)
+        if (strneqvcmp(EVAL_TRUE_FALSE_STR, pz, len) == 0)
             res = AG_FALSE;
         break;
     }
@@ -145,9 +141,6 @@ eval_true(void)
 tMacro*
 mFunc_If(tTemplate* pT, tMacro* pMac)
 {
-    static char const zIfFmt[] =
-        "IF expression `%s' on line %d yielded true\n";
-
     tMacro* pRet = pT->aMacros + pMac->endIndex;
     tMacro* pIf  = pMac;
 
@@ -164,13 +157,13 @@ mFunc_If(tTemplate* pT, tMacro* pMac)
            || eval_true()) {
 
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, zIfFmt, (pMac->funcCode == FTYP_ELSE)
-                        ? "ELSE clause" : pT->pzTemplText + pMac->ozText,
+                fprintf(pfTrace, TRACE_FN_IF, (pMac->funcCode == FTYP_ELSE)
+                        ? FN_IF_ELSE : pT->pzTemplText + pMac->ozText,
                         pMac->lineNo);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                            pIf->lineNo);
+                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                            pCurTemplate->pzTplFile, pIf->lineNo);
             }
 
             generateBlock(pT, pMac+1, pT->aMacros + pMac->sibIndex);
@@ -180,11 +173,12 @@ mFunc_If(tTemplate* pT, tMacro* pMac)
     } while (pMac < pRet);
 
     if ((OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) && (pMac >= pRet)) {
-        fprintf(pfTrace, "IF `%s' macro selected no clause\n",
+        fprintf(pfTrace, TRACE_FN_IF_NOTHING,
                 pCurTemplate->pzTemplText + pCurMacro->ozText);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile, pIf->lineNo);
+            fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                    pCurTemplate->pzTplFile, pIf->lineNo);
     }
 
     return pRet;
@@ -234,7 +228,7 @@ mFunc_While(tTemplate* pT, tMacro* pMac)
     int     ct   = 0;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, "WHILE `%s' loop in %s on line %d begins:\n",
+        fprintf(pfTrace, TRACE_FN_WHILE_START,
                 pCurTemplate->pzTemplText + pCurMacro->ozText,
                 pT->pzTplFile, pMac->lineNo);
 
@@ -249,10 +243,10 @@ mFunc_While(tTemplate* pT, tMacro* pMac)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(pfTrace, "WHILE macro repeated %d times\n", ct);
+        fprintf(pfTrace, TRACE_FN_WHILE_END, ct);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
+            fprintf(pfTrace, TAB_FILE_LINE_FMT, pT->pzTplFile, pMac->lineNo);
     }
 
     return pRet;
@@ -275,7 +269,7 @@ static tMacro*
 mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     if ((int)pMac->res == 0)
-        AG_ABEND_IN(pT, pMac, zNoIfExpr);
+        AG_ABEND_IN(pT, pMac, NO_IF_EXPR);
     /*
      *  Load the expression
      */
@@ -354,7 +348,7 @@ mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, zNoIfExpr);
+        AG_ABEND_IN(pT, pMac, NO_IF_EXPR);
 
     if (apIfLoad[0] == NULL) {
         memcpy((void*)apIfLoad, apLoadProc, sizeof(apLoadProc));
@@ -385,7 +379,7 @@ mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      */
     pEndifMac = parseTemplate(pMac+1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN(pT, pMac, "ENDIF not found");
+        AG_ABEND_IN(pT, pMac, LD_IF_NO_ENDIF);
 
     current_if.pIf->endIndex   = \
     current_if.pElse->sibIndex = pEndifMac - pT->aMacros;
@@ -418,7 +412,7 @@ mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, "expressionless WHILE");
+        AG_ABEND_IN(pT, pMac, LD_WHILE_NO_EXPR);
 
     if (apWhileLoad[0] == NULL) {
         memcpy((void*)apWhileLoad, apLoadProc, sizeof(apLoadProc));
@@ -440,7 +434,7 @@ mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      */
     pEndMac = parseTemplate(pMac+1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN(pT, pMac, "ENDWHILE not found");
+        AG_ABEND_IN(pT, pMac, LD_WHILE_NO_ENDWHILE);
 
     pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;
 
@@ -466,14 +460,11 @@ mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 SCM
 ag_scm_set_writable(SCM set)
 {
-    static char const zWarn[] =
-        "Warning: (set-writable) function in %s on line %d:\n"
-        "\toverridden by invocation option\n";
-
     switch (STATE_OPT(WRITABLE)) {
     case OPTST_DEFINED:
     case OPTST_PRESET:
-        fprintf(pfTrace, zWarn, pCurTemplate->pzTplFile, pCurMacro->lineNo);
+        fprintf(pfTrace, SET_WRITE_WARN, pCurTemplate->pzTplFile,
+                pCurMacro->lineNo);
         break;
 
     default:

@@ -2,14 +2,14 @@
 /**
  * @file defLoad.c
  *
- *  Time-stamp:        "2011-12-17 13:45:49 bkorb"
+ *  Time-stamp:        "2011-12-30 15:33:37 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -88,7 +88,7 @@ getEntry(void)
 
     } else {
         int   ct = ENTRY_ALLOC_CT-1;
-        void* p  = AGALOC(ENTRY_ALLOC_SIZE, "definition headers");
+        void* p  = AGALOC(ENTRY_ALLOC_SIZE, "def headers");
 
         manageAllocatedData(p);
 
@@ -129,23 +129,19 @@ getEntry(void)
 LOCAL void
 print_def(tDefEntry * pDef)
 {
-    static char const show_fmt[] = "%s%s[%u] (%s) from %s/%d\n";
-    static char const blanks[] = "                                ";
-    char const * space = (blanks + sizeof(blanks) - 1) - (2 * stackDepth);
+    int ix = 32 - (2 * stackDepth);
+    char const * space = PRINT_DEF_SPACES + ((ix < 0) ? 0 : ix);
 
     char const * vtyp;
 
-    if (space < blanks)
-        space = blanks;
-
     switch (pDef->valType) {
-    case VALTYP_UNKNOWN: vtyp = "unknown"; break;
-    case VALTYP_TEXT:    vtyp = "text";    break;
-    case VALTYP_BLOCK:   vtyp = "block";   break;
-    default:             vtyp = "INVALID"; break;
+    case VALTYP_UNKNOWN: vtyp = DEF_TYPE_UNKNOWN; break;
+    case VALTYP_TEXT:    vtyp = DEF_TYPE_TEXT;    break;
+    case VALTYP_BLOCK:   vtyp = DEF_TYPE_BLOCK;   break;
+    default:             vtyp = DEF_TYPE_INVALID; break;
     }
 
-    fprintf(pfTrace, show_fmt,
+    fprintf(pfTrace, PRINT_DEF_SHOW_FMT,
             space,
             pDef->pzDefName, (unsigned int)pDef->index,
             vtyp,
@@ -313,7 +309,7 @@ ready_input(char const ** ppzfile, size_t * psz)
         pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "scan context");
         memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
         pBaseCtx->lineNo     = 1;
-        pBaseCtx->pzCtxFname = "@@ No-Definitions @@";
+        pBaseCtx->pzCtxFname = READY_INPUT_NODEF;
         manageAllocatedData(pBaseCtx);
 
         if (! ENABLED_OPT(SOURCE_TIME))
@@ -324,7 +320,7 @@ ready_input(char const ** ppzfile, size_t * psz)
     *ppzfile = OPT_ARG(DEFINITIONS);
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "Definition Load:\n");
+        fprintf(pfTrace, TRACE_DEF_LOAD);
 
     /*
      *  Check for stdin as the input file.  We use the current time
@@ -334,7 +330,7 @@ ready_input(char const ** ppzfile, size_t * psz)
      */
     if (strcmp(*ppzfile, "-") == 0) {
         *ppzfile = OPT_ARG(DEFINITIONS) = "stdin";
-        if (getenv("REQUEST_METHOD") != NULL) {
+        if (getenv(REQUEST_METHOD) != NULL) {
             loadCgi();
             pCurCtx = pBaseCtx;
             dp_run_fsm();
@@ -352,14 +348,14 @@ ready_input(char const ** ppzfile, size_t * psz)
      *  find out how big it was and when it was last modified.
      */
     if (stat(*ppzfile, &stbf) != 0)
-        AG_CANT("stat", *ppzfile);
+        AG_CANT(READY_INPUT_STAT, *ppzfile);
 
     if (! S_ISREG(stbf.st_mode)) {
         if (S_ISFIFO(stbf.st_mode))
             goto accept_fifo;
 
         errno = EINVAL;
-        AG_CANT("open non-regular file", *ppzfile);
+        AG_CANT(READY_INPUT_NOT_REG, *ppzfile);
     }
 
     /*
@@ -397,7 +393,7 @@ readDefines(void)
      *  Allocate the space we need for our definitions.
      */
     sizeLeft = dataSize+4+sizeof(*pBaseCtx);
-    pBaseCtx = (tScanCtx*)AGALOC(sizeLeft, "file buffer");
+    pBaseCtx = (tScanCtx*)AGALOC(sizeLeft, "file buf");
     memset((void*)pBaseCtx, 0, sizeLeft);
     pBaseCtx->lineNo = 1;
     sizeLeft = dataSize;
@@ -422,7 +418,7 @@ readDefines(void)
     else {
         fp = fopen(pzDefFile, "r" FOPEN_TEXT_FLAG);
         if (fp == NULL)
-            AG_CANT("open", pzDefFile);
+            AG_CANT(READ_DEF_OPEN, pzDefFile);
 
         if (pfDepends != NULL)
             add_source_file(pzDefFile);
@@ -445,7 +441,7 @@ readDefines(void)
             if (feof(fp) || (in_mode == INPUT_STDIN))
                 break;
 
-            AG_CANT("read", pzDefFile);
+            AG_CANT(READ_DEF_READ, pzDefFile);
         }
 
         /*
@@ -474,7 +470,7 @@ readDefines(void)
             dataSize += (sizeLeft = 0x1000);
             dataOff = pzData - pBaseCtx->pzData;
             p = AGREALOC((void*)pBaseCtx, dataSize+4+sizeof(*pBaseCtx),
-                         "expanded file buffer");
+                         "expand f buf");
 
             /*
              *  The buffer may have moved.  Set the data pointer at an
@@ -491,7 +487,7 @@ readDefines(void)
     }
 
     if (pzData == pBaseCtx->pzData)
-        AG_ABEND("No definition data were read");
+        AG_ABEND(READ_DEF_NO_DEFS);
 
     *pzData = NUL;
     AGDUPSTR(pBaseCtx->pzCtxFname, pzDefFile, "def file name");

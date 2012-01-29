@@ -1,11 +1,11 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2011-12-29 10:51:20 bkorb"
+dnl Time-stamp:      "2012-01-29 13:50:29 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+dnl  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 dnl
 dnl AutoGen is free software: you can redistribute it and/or modify it
 dnl under the terms of the GNU General Public License as published by the
@@ -210,7 +210,7 @@ test ${GUILE_VERSION} -ge 108000 \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
        -Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-       -Wno-format-contains-nul -fno-strict-aliasing`
+       -Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
 

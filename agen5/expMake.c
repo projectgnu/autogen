@@ -2,12 +2,12 @@
 /**
  * @file expMake.c
  *
- *  Time-stamp:        "2011-12-28 16:51:31 bkorb"
+ *  Time-stamp:        "2012-01-29 20:15:59 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -116,7 +116,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
            || (  (l_len > 5)
               && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
             goto append_statement_end;
-        if (strncmp(pzOut-4, "the", 3) == 0)
+        if (strncmp(pzOut-4, HANDLE_EOL__THE, 3) == 0)
             goto skip_semi_colon;
         goto append_statement_end;
 
@@ -125,7 +125,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
            || (  (l_len > 5)
               && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
             goto append_statement_end;
-        if (strncmp(pzOut-4, "els", 3) == 0)
+        if (strncmp(pzOut-4, HANDLE_EOL__ELS, 3) == 0)
             goto skip_semi_colon;
         goto append_statement_end;
 
@@ -170,16 +170,16 @@ handle_sed_expr(char ** src_p, char ** out_p)
 
     switch (src[1]) {
     case 'i':
-        if (strncmp(src+2, "fndef ", 6) == 0)
+        if (strncmp(src+2, HANDLE_SED_IFNDEF, 6) == 0)
             break;
-        if (strncmp(src+2, "fdef ", 5) == 0)
+        if (strncmp(src+2, HANDLE_SED_IFDEF, 5) == 0)
             break;
         return AG_FALSE;
 
     case 'e':
-        if (strncmp(src+2, "lse ", 4) == 0)
+        if (strncmp(src+2, HANDLE_SED_ELSE, 4) == 0)
             break;
-        if (strncmp(src+2, "ndif ", 5) == 0)
+        if (strncmp(src+2, HANDLE_SED_ENDIF, 5) == 0)
             break;
         /* FALLTHROUGH */
     default:
@@ -219,7 +219,7 @@ script_size(char ** txt_p, char * tab)
     if (! IS_WHITESPACE_CHAR(*txt))
         *tab = TAB;
     else {
-        while (IS_WHITESPACE_CHAR(*++txt))  ;
+        txt = SPN_WHITESPACE_CHARS(txt + 1);
         *tab  = (txt[-1] == TAB) ? NUL : TAB;
     }
 
@@ -235,7 +235,7 @@ script_size(char ** txt_p, char * tab)
     *txt_p = ptxte = txt;
 
     for (;;)  {
-        char * p = strpbrk(ptxte+1, "\n$");
+        char * p = strpbrk(ptxte+1, SCRIPT_SIZE_SCAN_END);
         if (p == NULL)
             break;
         sz += (*p == NL) ? sizeof(zNl) : 1;
@@ -243,7 +243,8 @@ script_size(char ** txt_p, char * tab)
     }
 
     ptxte += strlen(ptxte);
-    while (IS_WHITESPACE_CHAR(ptxte[-1]))  ptxte--;
+    while (IS_WHITESPACE_CHAR(ptxte[-1]))
+        ptxte--;
     *ptxte = NUL;
     return (ptxte - txt) + sz;
 }

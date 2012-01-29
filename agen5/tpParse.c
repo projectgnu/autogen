@@ -2,12 +2,12 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2011-06-03 12:14:32 bkorb"
+ * Time-stamp:        "2012-01-29 20:14:38 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
- * Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ * Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -139,7 +139,6 @@ func_code(char const ** ppzScan)
     return FTYP_UNKNOWN;
 }
 
-
 static char const *
 find_mac_end(char const ** ppzMark)
 {
@@ -167,11 +166,11 @@ find_mac_end(char const ** ppzMark)
      */
     pzEndMark = strstr(pzMark, zEndMac);
     if (pzEndMark == NULL)
-        AG_ABEND("macro has no end");
+        AG_ABEND(FIND_MAC_END_NOPE);
 
     if (pzEndMark == pzFunc) {
         pCurMacro->funcCode = FTYP_COMMENT;
-        fprintf(pfTrace, "WARNING: empty macro in %s line %d\n",
+        fprintf(pfTrace, FIND_MAC_END_EMPTY,
                 pCurTemplate->pzTplFile, templLineNo);
         return pzEndMark;
     }
@@ -188,19 +187,18 @@ find_mac_end(char const ** ppzMark)
         return pzEndMark;
 
     if (pzEndMark > pzNextMark)
-        AG_ABEND("macros cannot nest");
+        AG_ABEND(FIND_MAC_END_NESTED);
 
     return pzEndMark;
 }
 
-
 static char const *
 find_mac_start(char const * pz, tMacro** ppM, tTemplate* pTpl)
 {
-    char*   pzCopy;
-    char const *    pzEnd;
-    char const *    res = strstr(pz, zStartMac);
-    tMacro* pM = *ppM;
+    char *       pzCopy;
+    char const * pzEnd;
+    char const * res = strstr(pz, zStartMac);
+    tMacro *     pM  = *ppM;
 
     if (res == pz)
         return res;
@@ -275,9 +273,9 @@ find_macro(tTemplate * pTpl, tMacro ** ppM, char const ** ppzScan)
         /*
          *  Strip white space from the macro
          */
-        while ((pzMark < pzMacEnd) && IS_WHITESPACE_CHAR(*pzMark))
-            pzMark++;
-        while ((pzMacEnd > pzMark) && IS_WHITESPACE_CHAR(pzMacEnd[-1]))
+        pzMark = SPN_WHITESPACE_CHARS(pzMark);
+        while (  (pzMacEnd > pzMark)
+              && IS_WHITESPACE_CHAR(pzMacEnd[-1]))
             pzMacEnd--;
 
         if (pzMark != pzMacEnd) {

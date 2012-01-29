@@ -2,12 +2,12 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2011-06-03 11:54:40 bkorb"
+ *  Time-stamp:        "2012-01-29 20:21:28 bkorb"
  *
  *  This module implements text functions.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,9 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-static char const zCantInc[] = "cannot include file";
-static char const zTrcFmt[] = "%-10s (%2X) in %s at line %d\n";
 
 /*=macfunc INCLUDE
  *
@@ -72,11 +69,9 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
         }
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE) {
-            static char const zTplFmt[] = "Template %s included\n";
-            static char const zLinFmt[] = "\tfrom %s line %d\n";
-            fprintf(pfTrace, zTplFmt, pNewTpl->pzTplFile);
+            fprintf(pfTrace, TRACE_FN_INC_TPL, pNewTpl->pzTplFile);
             if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                fprintf(pfTrace, zLinFmt, pCurTemplate->pzTplFile,
+                fprintf(pfTrace, TRACE_FN_INC_LINE, pCurTemplate->pzTplFile,
                         pMac->lineNo);
         }
 
@@ -103,7 +98,7 @@ tMacro*
 mLoad_Include(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
     if ((int)pMac->res == 0)
-        AG_ABEND_IN(pT, pMac, "The INCLUDE macro requires a file name");
+        AG_ABEND_IN(pT, pMac, LD_INC_NO_FNAME);
     return mLoad_Expr(pT, pMac, ppzScan);
 }
 
@@ -130,8 +125,8 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
     tTemplate * pInv = findTemplate(pT->pzTemplText + pMac->ozName);
     if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf(pfTrace, zTrcFmt, "remapped to 'Invoke'", pMac->funcCode,
-                    pT->pzTplFile, pMac->lineNo);
+            fprintf(pfTrace, TRACE_FN_REMAPPED, TRACE_FN_REMAP_INVOKE,
+                    pMac->funcCode, pT->pzTplFile, pMac->lineNo);
         pMac->funcCode    = FTYP_DEFINE;
         pMac->funcPrivate = (void*)pInv;
         parseMacroArgs(pT, pMac);
@@ -139,9 +134,9 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        fprintf(pfTrace, zTrcFmt, "remapped to Expr", pMac->funcCode,
-                pT->pzTplFile, pMac->lineNo);
-        fprintf(pfTrace, "\tbased on %s\n", pT->pzTemplText + pMac->ozName);
+        fprintf(pfTrace, TRACE_FN_REMAPPED, TRACE_FN_REMAP_EXPR,
+                pMac->funcCode, pT->pzTplFile, pMac->lineNo);
+        fprintf(pfTrace, TRACE_FN_REMAP_BASE, pT->pzTemplText + pMac->ozName);
     }
 
     pMac->funcCode = FTYP_EXPR;
@@ -171,7 +166,7 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
         }
 
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf(pfTrace, "\tcode %lX -- %s\n", pMac->res, pzExpr);
+            fprintf(pfTrace, TRACE_UNKNOWN_FMT, pMac->res, pzExpr);
     }
 
     return mFunc_Expr(pT, pMac);
@@ -188,11 +183,10 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
 tMacro*
 mFunc_Bogus(tTemplate* pT, tMacro* pMac)
 {
-    static char const z[] =
-        "%d (%s) is an unknown macro function, or has no handler";
-
-    char* pz = aprf(z, pMac->funcCode, (pMac->funcCode < FUNC_CT)
-                    ? apzFuncNames[ pMac->funcCode ] : "??");
+    char * pz = aprf(FN_BOGUS_FMT, pMac->funcCode,
+                     (pMac->funcCode < FUNC_CT)
+                     ? apzFuncNames[ pMac->funcCode ]
+                     : FN_BOGUS_HUH);
 
     AG_ABEND_IN(pT, pMac, pz);
     /* NOTREACHED */
@@ -293,7 +287,8 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
          *  Move back the source pointer.  We may have skipped blanks,
          *  so skip over however many first, then back up over the name.
          */
-        while (IS_WHITESPACE_CHAR(pzSrc[-1])) pzSrc--, srcLen++;
+        while (IS_WHITESPACE_CHAR(pzSrc[-1]))
+            pzSrc--, srcLen++;
         remLen  = strlen(pzCopy);
         pzSrc  -= remLen;
         srcLen += remLen;
@@ -303,7 +298,7 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
          */
         remLen = canonicalizeName(pzCopy, pzSrc, (int)srcLen);
         if (remLen > srcLen)
-            AG_ABEND_IN(pT, pMac, "Invalid definition name");
+            AG_ABEND_IN(pT, pMac, LD_UNKNOWN_INVAL_DEF);
 
         pzSrc  += srcLen - remLen;
         srcLen  = remLen;
@@ -345,9 +340,6 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 tMacro*
 mLoad_Bogus(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 {
-    static char const zUnk[] =
-        "Unknown macro or invalid context in %s line %d:\n\t%s%s";
-
     char const * pzSrc = (char const*)pMac->ozText; /* macro text */
     char const * pzMac;
 
@@ -371,7 +363,7 @@ mLoad_Bogus(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
         pzMac = apzFuncNames[ ix ];
     }
 
-    pzSrc = aprf(zUnk, pT->pzTplFile, pMac->lineNo, pzMac, pzSrc);
+    pzSrc = aprf(LD_BOGUS_UNKNOWN, pT->pzTplFile, pMac->lineNo, pzMac, pzSrc);
 
     AG_ABEND_IN(pT, pMac, pzSrc);
     /* NOTREACHED */

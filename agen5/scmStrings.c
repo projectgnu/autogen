@@ -4,10 +4,10 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2011-07-18 16:07:07 bkorb"
+ * Time-stamp:        "2012-01-29 09:48:03 bkorb"
  *
  * This file is part of AutoGen.
- * AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -160,22 +160,15 @@ LOCAL char *
 ag_scm2zchars(SCM s, const char * type)
 {
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
-
-    if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(zNotStr, type));
-
-    if (SCM_SUBSTRP(s))
-        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
-    return SCM_CHARS(s);
+#   error Your Guile is too old.
+    choke me.
 
 #else
-    static char const bad_val[] =
-        "scm_string_length returned wrong value: %d != %d\n";
     size_t len;
     char * buf;
 
     if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(zNotStr, type));
+        AG_ABEND(aprf(NOT_STR_FMT, type));
 
     len = scm_c_string_length(s);
     if (len == 0) {
@@ -188,7 +181,7 @@ ag_scm2zchars(SCM s, const char * type)
     {
         size_t buflen = scm_to_locale_stringbuf(s, buf, len);
         if (buflen != len)
-            AG_ABEND(aprf(bad_val, buflen, len));
+            AG_ABEND(aprf(SCM2ZCHARS_BAD_VAL, buflen, len));
     }
 
     buf[len] = NUL;

@@ -2,3 +2,4 @@
 /cm-opt.stamp
 /char-mapper.o
 /char-mapper
+/cm-usage.c

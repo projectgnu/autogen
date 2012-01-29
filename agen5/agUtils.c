@@ -3,10 +3,10 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2011-12-29 10:04:30 bkorb"
+ *  Time-stamp:        "2012-01-29 20:18:27 bkorb"
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,10 +43,8 @@ aprf(char const * pzFmt, ...)
     va_end(ap);
 
     if (pz == NULL) {
-        static char const zMsg[] =
-            "could not allocate for or formatting failed on:\n%s";
-        char z[ sizeof (zMsg) + SCRIBBLE_SIZE ];
-        snprintf(z, sizeof(z), zMsg, pzFmt);
+        char z[ 2 * SCRIBBLE_SIZE ];
+        snprintf(z, sizeof(z), APRF_ALLOCATE_FAIL, pzFmt);
         AG_ABEND(z);
     }
     return pz;
@@ -59,7 +57,7 @@ define_base_name(void)
     char* pzD;
 
     if (! ENABLED_OPT(DEFINITIONS)) {
-        OPT_ARG(BASE_NAME) = "baseless";
+        OPT_ARG(BASE_NAME) = DFT_BASE_NAME;
         return;
     }
 
@@ -74,7 +72,7 @@ define_base_name(void)
      *  IF input is from stdin, then use "stdin"
      */
     if ((pz[0] == '-') && (pz[1] == NUL)) {
-        OPT_ARG(BASE_NAME) = "stdin";
+        OPT_ARG(BASE_NAME) = STDIN_FILE_NAME;
         return;
     }
 
@@ -82,7 +80,7 @@ define_base_name(void)
      *  Otherwise, use the basename of the definitions file
      */
     OPT_ARG(BASE_NAME) = \
-        pzD = AGALOC(strlen(pz)+1, "derived base name");
+        pzD = AGALOC(strlen(pz)+1, "derived base");
 
     while ((*pz != NUL) && (*pz != '.'))  *(pzD++) = *(pz++);
     *pzD = NUL;
@@ -108,7 +106,7 @@ put_defines_into_env(void)
             char*  p   = AGALOC(siz, "env define");
 
             strcpy(p, pz);
-            strcpy(p+siz-3, "=1");
+            strcpy(p+siz-3, DFT_ENV_VAL);
             pz = p;
         }
 
@@ -139,8 +137,7 @@ open_trace_file(char ** av, tOptDesc * odsc)
         pfTrace = popen(++fname, "w");
 
     else if ((fname[0] == '>') && (fname[1] == '>')) {
-        fname += 2;
-        while (IS_WHITESPACE_CHAR((int)(*fname)))  fname++;
+        fname = SPN_WHITESPACE_CHARS(fname + 2);
         pfTrace = fopen(fname, "a");
     }
 
@@ -148,16 +145,15 @@ open_trace_file(char ** av, tOptDesc * odsc)
         pfTrace = fopen(fname, "w");
 
     if (pfTrace == NULL)
-        AG_ABEND(aprf("Error %d (%s) opening `%s' for output",
-                      errno, strerror(errno), fname));
+        AG_ABEND(aprf(OPEN_ERROR_FMT, errno, strerror(errno), fname));
 
 #ifdef _IONBF
     setvbuf(pfTrace, NULL, _IONBF, 0);
 #endif
 
-    fprintf(pfTrace, "\nAutoGen %u starts:  %s", (unsigned int)getpid(), *av);
+    fprintf(pfTrace, TRACE_START_FMT, (unsigned int)getpid(), *av);
     while (*(++av) != NULL)
-        fprintf(pfTrace, " '%s'", *av);
+        fprintf(pfTrace, TRACE_AG_ARG_FMT, *av);
     putc(NL, pfTrace);
 }
 
@@ -167,9 +163,9 @@ check_make_dep_env(void)
     ag_bool have_opt_string = AG_FALSE;
     ag_bool set_opt         = AG_FALSE;
 
-    char const * mdep = getenv("AUTOGEN_MAKE_DEP");
+    char const * mdep = getenv(AG_MAKE_DEP_NAME);
     if (mdep == NULL) {
-        mdep = getenv("DEPENDENCIES_OUTPUT");
+        mdep = getenv(DEP_OUT_NAME);
         if (mdep == NULL)
             return;
     }
@@ -187,25 +183,25 @@ check_make_dep_env(void)
     case 'y':
     case 'Y':
         set_opt = AG_TRUE;
-        have_opt_string = (streqvcmp(mdep + 1, "es") != 0);
+        have_opt_string = (streqvcmp(mdep + 1, YES_NAME_STR+1) != 0);
         break;
 
     case 'n':
     case 'N':
         set_opt = \
-            have_opt_string = (streqvcmp(mdep + 1, "o") != 0);
+            have_opt_string = (streqvcmp(mdep + 1, NO_NAME_STR+1) != 0);
         break;
 
     case 't':
     case 'T':
         set_opt = AG_TRUE;
-        have_opt_string = (streqvcmp(mdep + 1, "es") != 0);
+        have_opt_string = (streqvcmp(mdep + 1, TRUE_NAME_STR+1) != 0);
         break;
 
     case 'f':
     case 'F':
         set_opt = \
-            have_opt_string = (streqvcmp(mdep + 1, "alse") != 0);
+            have_opt_string = (streqvcmp(mdep + 1, FALSE_NAME_STR+1) != 0);
         break;
 
     default:
@@ -233,9 +229,9 @@ check_make_dep_env(void)
         *pz = NUL;
 
         SET_OPT_SAVE_OPTS(fp);
-
-        while (IS_WHITESPACE_CHAR(*mdep))  mdep++;
-        if (*mdep == NUL) return;
+        mdep = SPN_WHITESPACE_CHARS(mdep);
+        if (*mdep == NUL)
+            return;
 
         pz = fp;
         *(pz++) = 'T';
@@ -260,7 +256,6 @@ doOptions(int arg_ct, char ** arg_vec)
      *  command line options
      */
     {
-        static char const one_src[] = "%s ERROR:  Too many definition files\n";
         int  optCt = optionProcess(&autogenOptions, arg_ct, arg_vec);
 
         /*
@@ -275,12 +270,12 @@ doOptions(int arg_ct, char ** arg_vec)
             /* FALLTHROUGH */
 
         default:
-            usage_message(one_src, pzProg);
+            usage_message(DOOPT_TOO_MANY_DEFS, pzProg);
             /* NOTREACHED */
 
         case 0:
             if (! HAVE_OPT(DEFINITIONS))
-                OPT_ARG(DEFINITIONS) = "-";
+                OPT_ARG(DEFINITIONS) = DFT_DEF_INPUT_STR;
             break;
         }
     }
@@ -299,7 +294,7 @@ doOptions(int arg_ct, char ** arg_vec)
      */
     if (  (! ENABLED_OPT(DEFINITIONS))
        && (! HAVE_OPT(OVERRIDE_TPL)) )
-        AG_ABEND("no template was specified");
+        AG_ABEND(NO_TEMPLATE_ERR_MSG);
 
     /*
      *  IF we do not have a base-name option, then we compute some value
@@ -481,7 +476,7 @@ skipExpression(char const * pzSrc, size_t len)
 
  guess_again:
 
-    while (IS_WHITESPACE_CHAR(*pzSrc)) pzSrc++;
+    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
     if (pzSrc >= pzEnd)
         return pzEnd;
     switch (*pzSrc) {
@@ -504,7 +499,7 @@ skipExpression(char const * pzSrc, size_t len)
         break;
     }
 
-    while (! IS_WHITESPACE_CHAR(*pzSrc))  pzSrc++;
+    pzSrc = BRK_WHITESPACE_CHARS(pzSrc);
     return (pzSrc > pzEnd) ? pzEnd : pzSrc;
 }
 /*

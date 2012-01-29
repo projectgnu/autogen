@@ -1,14 +1,14 @@
 /**
  * @file expGperf.c
  *
- *  Time-stamp:        "2011-08-30 11:46:21 bkorb"
+ *  Time-stamp:        "2012-01-15 08:38:23 bkorb"
  *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -69,7 +69,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
 
     char const * pzName  = ag_scm2zchars(name, "gperf name");
     char const * pzList;
-    SCM          newline = AG_SCM_STR2SCM("\n", (size_t)1);
+    SCM          newline = AG_SCM_STR2SCM(NEWLINE, (size_t)1);
 
     if (! AG_SCM_STRING_P(name))
         return SCM_UNDEFINED;
@@ -84,7 +84,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        char * cmd = aprf(mk_gperf_script, zMakeProg, pzName, pzList);
+        char * cmd = aprf(MK_GPERF_SCRIPT, zMakeProg, pzName, pzList);
 
         /*
          *  Run the command and ignore the results.
@@ -98,7 +98,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
     }
 
     if (do_cleanup) {
-        SCM_EVAL_CONST("(add-cleanup \"rm -rf ${gpdir}\")");
+        SCM_EVAL_CONST(MAKE_GPERF_CLEANUP);
         do_cleanup = AG_FALSE;
     }
 
@@ -135,7 +135,7 @@ ag_scm_gperf(SCM name, SCM str)
      *  scribble space, use that.
      *  (If it does fit, then the test string fits already).
      */
-    cmd = aprf(zRunGperf, gp_name, key2hash);
+    cmd = aprf(RUN_GPERF_CMD, gp_name, key2hash);
     key2hash = shell_cmd(cmd);
     if (*key2hash == NUL)
         str = SCM_UNDEFINED;

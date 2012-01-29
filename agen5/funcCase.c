@@ -4,11 +4,11 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2011-06-03 11:54:20 bkorb"
+ *  Time-stamp:        "2012-01-29 08:10:09 bkorb"
  */
 /*
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,8 +36,6 @@
 #endif
 
 #define PTRUP(p) STMTS(if(IS_LOW(*(p))) *(p)=_toupper(*(p));(p)++)
-
-static char const zBadRe[] = "Invalid regular expression:  error %d (%s):\n%s";
 
 typedef tSuccess (tSelectProc)(char const * sample, char const * pattern);
 static tSelectProc
@@ -67,8 +65,8 @@ struct case_stack {
     tMacro*  pSelect;
 };
 
-static tCaseStack  current_case;
-static tLoadProc mLoad_Select;
+static tCaseStack current_case;
+static tLoadProc  mLoad_Select;
 
 static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
 static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
@@ -77,8 +75,8 @@ static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
 static void
 compile_re(regex_t* pRe, char const * pzPat, int flags);
 
-static void
-upString(char* pz);
+static inline void
+up_case(char* pz);
 
 static tSuccess
 Select_Compare(char const * sample, char const * pattern);
@@ -139,14 +137,14 @@ compile_re(regex_t* pRe, char const * pzPat, int flags)
     if (rerr != 0) {
         char zEr[ SCRIBBLE_SIZE ];
         regerror(rerr, pRe, zEr, sizeof(zEr));
-        fprintf(stderr, zBadRe, rerr, zEr, pzPat);
-        AG_ABEND("Bad regular expression");
+        fprintf(stderr, BAD_RE_FMT, rerr, zEr, pzPat);
+        AG_ABEND(COMPILE_RE_BAD);
     }
 }
 
 
-static void
-upString(char* pz)
+static inline void
+up_case(char* pz)
 {
     while (*pz != NUL) PTRUP(pz);
 }
@@ -308,7 +306,7 @@ Select_Equivalent(char const * sample, char const * pattern)
     char*    pz;
     tSuccess res = SUCCESS;
     AGDUPSTR(pz, sample, "equiv chars");
-    upString(pz);
+    up_case(pz);
     if (strstr(pz, pattern) == NULL)
         res = FAILURE;
     AGFREE((void*)pz);
@@ -319,14 +317,13 @@ Select_Equivalent(char const * sample, char const * pattern)
 SCM
 ag_scm_string_contains_eqv_p(SCM text, SCM substr)
 {
-    static char const zSrch[] = "search string";
-    char* pzSubstr;
-    SCM   res;
+    char * pzSubstr;
+    SCM    res;
 
-    AGDUPSTR(pzSubstr, ag_scm2zchars( substr, zSrch ), "substring");
+    AGDUPSTR(pzSubstr, ag_scm2zchars(substr, "search"), "substr");
 
-    upString(pzSubstr);
-    if (SUCCESSFUL(Select_Equivalent(ag_scm2zchars(text, "sample text"),
+    up_case(pzSubstr);
+    if (SUCCESSFUL(Select_Equivalent(ag_scm2zchars(text, "sample"),
                                      pzSubstr)))
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
@@ -762,7 +759,7 @@ Select_Match_Full(char const * sample, char const * pattern)
         regex_t*  pRe = AGALOC(sizeof(*pRe), "select match full re");
 
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
-            fprintf(pfTrace, "Compiling ``%s'' with bits 0x%lX\n",
+            fprintf(pfTrace, TRACE_SEL_MATCH_FULL,
                      pattern, pCurMacro->res);
         }
         compile_re(pRe, mat, (int)pCurMacro->res);
@@ -844,7 +841,7 @@ Select_Match_Always(char const * sample, char const * pattern)
 static tSuccess
 Select_Match_Existence(char const * sample, char const * pattern)
 {
-    return (sample != zNil) ? SUCCESS : FAILURE;
+    return (sample != zNotDefined) ? SUCCESS : FAILURE;
 }
 
 /**
@@ -855,7 +852,7 @@ Select_Match_Existence(char const * sample, char const * pattern)
 static tSuccess
 Select_Match_NonExistence(char const * sample, char const * pattern)
 {
-    return (sample == zNil) ? SUCCESS : FAILURE;
+    return (sample == zNotDefined) ? SUCCESS : FAILURE;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1000,12 +997,11 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
         pMac = pT->aMacros + pMac->sibIndex;
         if (pMac >= pEnd) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, "CASE string `%s' did not match\n",
-                        pzSampleText);
+                fprintf(pfTrace, TRACE_CASE_FAIL, pzSampleText);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                            pMac->lineNo);
+                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                            pCurTemplate->pzTplFile, pMac->lineNo);
             }
 
             break;
@@ -1023,21 +1019,21 @@ mFunc_Case(tTemplate* pT, tMacro* pMac)
          */
         if (SUCCEEDED(mRes)) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, "CASE string `%s' %s matched `%s'\n",
+                fprintf(pfTrace, TRACE_CASE_MATCHED,
                         pzSampleText,
                         match_names[pMac->funcCode & 0x0F],
                         pT->pzTemplText + pMac->ozText);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, zFileLine, pCurTemplate->pzTplFile,
-                            pMac->lineNo);
+                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                            pCurTemplate->pzTplFile, pMac->lineNo);
             }
 
             generateBlock(pT, pMac + 1, pT->aMacros + pMac->sibIndex);
             break;
         }
         else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
-            fprintf(pfTrace, "CASE no match: `%s' %s vs. `%s'\n",
+            fprintf(pfTrace, TRACE_CASE_NOMATCH,
                     pzSampleText,
                     match_names[pMac->funcCode & 0x0F],
                     pT->pzTemplText + pMac->ozText);
@@ -1073,7 +1069,7 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      *  THEN woops!  what are we to case on?
      */
     if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, "expressionless CASE");
+        AG_ABEND_IN(pT, pMac, LD_CASE_NO_EXPR);
 
     /*
      *  Load the expression
@@ -1120,7 +1116,7 @@ mLoad_Case(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      */
     pEsacMac = parseTemplate(pMac+1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN(pT, pMac, "ESAC not found");
+        AG_ABEND_IN(pT, pMac, LD_CASE_NO_ESAC);
 
     /*
      *  Tell the last select macro where its end is.
@@ -1172,9 +1168,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
     char*         pzCopy = pT->pNext; /* next text dest   */
     char const *  pzSrc  = (char*)pMac->ozText; /* macro text */
     long          srcLen = pMac->res;           /* macro len  */
-
-    static char const zInvSel[] = "Invalid selection clause";
-    int  typ       = (int)FTYP_SELECT_COMPARE_FULL;
+    int typ = (int)FTYP_SELECT_COMPARE_FULL;
 
     /*
      *  Set the global macro loading mode
@@ -1182,7 +1176,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
     papLoadProc = apCaseLoad;
     pMac->res   = 0;
     if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, "Empty macro text");
+        AG_ABEND_IN(pT, pMac, LD_SEL_EMPTY);
 
     /*
      *  IF the first character is an asterisk,
@@ -1246,7 +1240,7 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
 
     default:
     bad_sel:
-        AG_ABEND_IN(pT, pMac, zInvSel);
+        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
     }
 
     /*
@@ -1260,12 +1254,12 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
     }
 
     if (! IS_WHITESPACE_CHAR(*pzSrc))
-        AG_ABEND_IN(pT, pMac, zInvSel);
+        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
 
-    while (IS_WHITESPACE_CHAR(*pzSrc)) pzSrc++;
+    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
     srcLen -= pzSrc - (char const *)pMac->ozText;
     if (srcLen <= 0)
-        AG_ABEND_IN(pT, pMac, zInvSel);
+        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
 
     /*
      *  See if we are doing case insensitive regular expressions
@@ -1302,10 +1296,12 @@ mLoad_Select(tTemplate * pT, tMacro* pMac, char const ** ppzScan)
     *(pzCopy++) = NUL;
     pT->pNext = pzCopy;
 
-    if ((*pzScan == '"') || (*pzScan == '\'')) {
-        void * ptr = (void *)pzScan;
-        spanQuote(ptr);
-    }
+    /*
+     * If the value is a quoted string, strip the quotes and
+     * process the string (backslash fixup).
+     */
+    if ((*pzScan == '"') || (*pzScan == '\''))
+        spanQuote((void *)pzScan);
 
  selection_done:
     pMac->funcCode = (teFuncType)typ;

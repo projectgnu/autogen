@@ -2,11 +2,11 @@
 
 h=options.h
 
-# Time-stamp:      "2011-12-13 10:44:52 bkorb"
+# Time-stamp:      "2012-01-29 13:01:21 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -311,7 +311,7 @@ typedef void (tOptionXlateProc)(void);
  */
 struct options {
     int const           structVersion;
-    int                 origArgCt;
+    unsigned int        origArgCt;
     char**              origArgVect;
     unsigned int        fOptSet;
     unsigned int        curOptIdx;

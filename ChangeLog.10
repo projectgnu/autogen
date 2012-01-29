@@ -1,0 +1,678 @@
+
+2011-12-04  Bruce Korb  <bkorb@gnu.org>
+
+	5.13 released
+
+	* agen5/test/Makefile.am (TESTS_ENVIRONMENT): clarify list
+	* autoopts/test/Makefile.am (TESTS_ENVIRONMENT): augment with
+	srcdir and builddir values.
+	* autoopts/test/defs.in: ensure that these values are full paths
+	* autoopts/tpl/optlib.tlib: add more care that we can find
+	${top_builddir} when running from installation.
+	* autoopts/tpl/tpl-config-tlib.in: add pre-configured guess for
+	top-build-dir value.
+	* agen5/test/opts.test: remove text that BSD formats differently
+	* agen5/test/snarf.test: find src dirs relative to top_srcdir
+	instead of srcdir.
+	* autoopts/mk-tpl-config.sh: burn top-build-dir and top-src-dir
+	into the installed tpl-config.tlib file.
+
+2011-11-19  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c (assemble_full_desc): insert separator correctly
+	* autoopts/test/argument.test: adjust
+	* autoopts/test/handler.test: likewise
+	* autoopts/tpl/agman-cmd.tpl (man-page): mark as true
+	* autoopts/tpl/agmdoc-cmd.tpl (man-page): mark as false
+	* autoopts/tpl/cmd-doc.tlib (documentation): emit differently for
+	man pages versus mdoc pages.
+	* autoopts/tpl/opt*.t*: rework to use giant string table.
+	* doc/autogen-texi.txt (version-proc): doc new attribute
+	* agen5/schemedef.scm (emit-string-table): clean up output
+	* agen5/test/Makefile.am: add top_*dir to test environment
+	* agen5/test/snarf.test: adjust test
+	* agen5/test/strtable.test: likewise
+	* autoopts/mk-tpl-config.sh: cleanup
+	* agen5/test/string.test: Adjust test for new Guile that strips off
+	the high-order bit in strings.
+	* agen5/schemedef.scm: string table example cleanup
+	* agen5/agUtils.c (check_make_dep_env): implement AUTOGEN_MAKE_DEP
+	and DEPENDENCIES_OUTPUT environment variables.
+	* agen5/opts.def: doc it
+
+2011-10-08  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/shell.test (SHELL): this environment variable no longer
+	controls the shell used.  Use the --shell= option.
+	* agen5/*.c: replace runShell with shell_cmd.
+
+2011-08-13  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/string.test (LINENO): fallback for shells that don't
+	support $LINENO
+	* autoopts/test/vendor.test ($SED): cope with BSD brokenness
+	* autoopts/tpl/getopt.tpl (no-libopts): ensure that this attribute
+	is set when this template is used.
+	* autoopts/tpl/optcode.tlib (#include): do all of these *after*
+	the include of the generated header file.  It might include some
+	important preprocessing stuff (_GNU_SOURCE, for example).
+	* autoopts/tpl/usage.tlib (config-header): make sure this file can
+	be found by the emit-the-usage-text program.
+	* autoopts/test/shell.test (sedcmd): another variation to remove
+
+2011-08-07  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c (immediate_opts): mark option processing state
+	as being "immediate action".
+	* autoopts/configfile.c (validateOptionsStruct) rename to validate_struct
+	* autoopts/find.c (optionVendorOption): new function for -W option.
+	* autoopts/options_h.tpl (VENDOR_OPTION_VALUE) #define for that option
+	* autoopts/proc-state.def (immediate): define the immediate proc flag
+	(vendor-opt): define flag saying -W is supported
+	* autoopts/test/Makefile.am (vendor.test): new test
+	* autoopts/test/vendor.test: new test
+	* autoopts/test/*.test: consistently make help text consistent
+	* autoopts/usage.c: rework to handle new vendor option
+	* autoopts/usage-txt.def: new strings
+	* autoopts/tpl/*: rework option templates for vendor option
+	* autoopts/usage.c (prt_one_vendor) rewrite of prt_one_usage for
+	vendor option.
+	(prt_vendor_opts): call prt_one_vendor instead of prt_one_usage.
+	Compute a format based on option name lengths.
+
+2011-08-06  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c: clarify doc for (string-tr ...)
+	* autoopts/autoopts.c (next_opt): extract arg processing to find.c
+	* autoopts/file.c (check_existence): new function, modified
+	functionality -- when checking for the containing directory of
+	a "file" arg type, skip test when name has no directory component
+	[thanks to Dave Hart].
+	(open_file_fd): extract of optionFileCheck()
+	(fopen_file_fp): extract of optionFileCheck()
+	* autoopts/find.c (get_opt_arg): new -- extracted from autoopts.c
+
+2011-07-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.c (main): add "LC_ALL=C" into the enviornment.
+	This should prevent Guile from mutilating strings.
+	* agen5/test/string.test: correct source line number reference
+
+2011-06-25  Bruce Korb  <bkorb@gnu.org>
+
+	5.12 released
+
+	* agen5/expFormat.c: remove some unused globals, make global some
+	const variables needed in multiple functions, localize some globals
+	used only in one function.
+	* agen5/fmemopen.c (_IOWR): static code analysis cleanup
+	* autoopts/text_mmap.c: properly use MAP_ANONYMOUS. simplify code.
+	* agen5/opts.def (skip-suffix): make conflict with select-suffix
+	* autoopts/aoconf.tpl (libdir): do not include any of the directories:
+	    /lib /lib64 /usr/lib /usr/lib64
+	in the value.  Just assume these are always searched.
+	* autoopts/tpl/cmd-doc.tlib (BUGS): if this section exists, it should
+	be appended to instead of replaced.
+	* config/misc.def (--with-guile): clarify that an installation prefix
+	is called for with this option.
+
+2011-06-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/*.lic: add license names
+	* autoopts/tpl/getopt.tpl: use the new (license-description...)
+	* autoopts/tpl/cmd-doc.tlib: likewise
+	* autoopts/tpl/optlib.tlib: likewise
+	* autoopts/tpl/rc-sample.tpl: likewise
+	* autoopts/tpl/usage-txt.tpl: likewise
+	* config/bootstrap.local: skip debian stuff
+	* pkg/Makefile.am: likewise
+	* pkg/mkpkg.sh: likewise
+	* pkg/mkpkg.debian: obsolete, removed.
+	* doc/autogen-texi.txt: document this new licensing stuff better.
+
+2011-06-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/autogen.h (__func__): #define a replacement when needed
+	* agen5/expOutput.c : use it throughout
+	* agen5/tpProcess.c (out_close): new name for closeOutput()
+	* agen5/test/debug.test: adjust for new name
+	* agen5/expOutput.c: likewise
+	* agen5/autogen.c: likewise
+	* autoopts/tpl/agman-cmd.tpl (cond-section): new macro.  Utilize it
+	throughout to "regularize" the creation of AutoOpts defined sections.
+	* autoopts/test/keyword.test: adjust for new templates
+	* agen5/*.c: change Doxygen file tag to @file
+	* doc/auto-opts.tpl (HOME): set it to our temp directory, instead
+	of emptying it.  Debian has a problem when it is empty.
+	* agen5/fmemopen.c (ag_fmemioctl): do not compile.  GNU Hurd
+	chokes on _IOWR('m', 1, fmemc_get_buf_addr_t) by token pasting
+	weird stuff and not being able to compile.  It isn't used anyway.
+	* autoopts/bootstrap.dir (GENSCRIPTS): new list of files.
+	These must be "maintainerclean" and depend upon the mk-tpl-config.sh
+	script running.
+	* autoopts/Makefile.am (MAINTAINERCLEANFILES): use GENSCRIPTS.
+	* agen5/expFormat.c (assemble_full_desc): new extract of find_lic_text
+	(get_lic_name): procedure to return the license name from lic file
+	(find_lic_text): call that procedure when segment is "LSEG_NAME".
+	(ag_scm_license_name): implement new scheme functioon "license-name".
+	* autoopts/Makefile.am (GENSCRIPTS): new macro listing all the
+	scripts that convert one doc format to another.  They are all
+	derives from either a source file or thin air.
+	* autoopts/bootstrap.dir (GENSCRIPTS): derive this list
+
+2011-05-30  Harlan Stenn  <stenn@ntp.org>
+
+	* autoopts/tpl/mdoc2man.sh (do_NmName): handle the .Nm mdoc macro
+
+2011-05-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/agtexi-cmd.tpl (exit status): include any "doc-section"
+	documentation pertaining to exit status.
+	* autoopts/tpl/cmd-doc.tlib (exit status): likewise
+
+2011-05-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/opts.test: adjust for changes in string names
+	* autoopts/Makefile.am (SHELL): replace with $(POSIX_SHELL)
+	* doc/Makefile.am: likewise
+	* pkg/Makefile.am: likewise
+
+2011-05-27  Bruce Korb  <bkorb@gnu.org>
+
+	Thanks to Harlen Stenn:
+	* autoopts/tpl/cmd-doc.tlib (bugs): separate bugs section from
+	"authors" section and make it last.
+	* doc/autogen-texi.txt (prog-*-descrip): make it clearer that these
+	are *deprecated*.
+	(detail): describe how it defaults for the DESCRIPTION section in man
+	* autoopts/test/keyword.test: adjust test.  ".Sh FILES" precedes
+	the exit status section.
+
+2011-05-26  Bruce Korb  <bkorb@gnu.org>
+
+	Thanks to Ivo Shopov <ivoshopov@users.sourceforge.net>
+	* autoopts/bootstrap.dir (edta): remove tpl/usage.tlib and
+	add to pdta instead.  (It needs to be installed.)
+
+	* autoopts/find.c (parse_opt): new function, extracted from opt_find_long
+	(opt_ambiguities): likewise
+	(opt_match_ct): likewise
+	(opt_set): likewise
+	(opt_unknown): likewise
+	(opt_ambiguous): likewise, also add code to print 2 - 4 matching
+	options.  Beyond that, use --help option.
+	(opt_find_long): make it smaller. Much smaller.
+	* autoopts/usage-txt.def: two new messages
+	* agen5/guile-iface.tpl (ag_scm2zchars): remove pre-Guile 1.7 version
+	* agen5/scmStrings.c (ag_scm2zchars): add pre-1.7 code to function
+
+2011-05-24  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.c: make it smaller
+	* autoopts/check.c: new
+	* autoopts/find.c: new
+	* autoopts/enum.c: renamed from enumeration.c
+	* autoopts/env.c:  renamed from environment.c
+
+2011-05-02  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.9 released
+
+	* autoopts/usage.c (set_usage_flags): make "local" instead of "static"
+	* autoopts/version.c (print_ver): use "set_usage_flags" to decide if
+	we should, by default, include licensing information with version.
+	* doc/autogen-texi.txt (<?auto-options>): discuss how this works in
+	config files
+	* autoopts/mk-tpl-config.sh (POSIX_CAT): make really, really sure
+	we have the full path of the POSIX program "cat".
+	* install several gnulib programs and sources
+	* pkg/mkgnudoc.sh: remove -- gotten from gnulib now
+	* pkg/Makefile.am (gnudoc): removed to doc directory
+	* doc/Makefile.am (gnudocs): new target -- uses gendocs.sh from gnulib
+	* Makefile.am (docs): new phony target
+
+	Thanks to Dave Hart:
+	* autoopts/tpl/optcode.tlib (zCopyrightNotice): newline needed
+	before closing here-doc marker.
+
+2011-04-29  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expString.c (sub_count): new function
+	(do_multi_subs): now used by expFormat.c
+	(ag_scm_string_substitute): use scribble space.  do not allocate
+	* agen5/expFormat.c (zGpl): remove
+	(zAgpl): remove
+	(zLgpl): remove
+	(zBsd): remove
+	(find_lic_text): new function for obtaining license text
+	(construct_license): use that function for constructing results
+	(ag_scm_license_full, ag_scm_license_info, ag_scm_license_description):
+	new scheme functions for selecting the flavor of text derivable
+	from the license text files.
+	(ag_scm_gpl, ag_scm_agpl, ag_scm_lgpl, ag_scm_bsd):
+	modified to use the above functions.
+	* agen5/test/*.test: trim licensing text from all comparisons.
+	It is too variable now for validation.
+
+	* agen5/opts.def (trace-out): defer opening the file.  Do not
+	leave trace file around when only options are processed.
+	* agen5/agUtils.c (open_trace_file): new function
+	(doOptions): use it when --trace-out is specified
+
+	* add-on/char-mapper/char-mapper.c: we handle 64 bits in a word now.
+	* add-on/cright-update/opts.def: correct license name to mbsd.
+
+	* agen5/autogen.h (NL): new #define
+	(TAB): also
+	* agen5/agInit.c: use them
+	* agen5/autogen.c: likewise
+	* agen5/defDirect.c: likewise
+	* agen5/defLex.c: likewise
+	* agen5/expMake.c: likewise
+	* agen5/expOutput.c: likewise
+	* agen5/funcDef.c: likewise
+	* agen5/funcFor.c: likewise
+	* agen5/functions.c: likewise
+	* agen5/loadPseudo.c: likewise
+	* agen5/expString.c: likewise
+
+2011-04-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c (textToVariable): clean up some nits
+	(emit_var_text): new procedure with some old textToVariable code.
+	* autoopts/tpl/agtexi-cmd.tpl (homerc): include the list in the
+	generated doc.
+
+2011-04-07  Bruce Korb  <bkorb@gnu.org>
+
+	thanks to Ryan Hill <dirtyepic@gentoo.org>
+	* autoopts/test/cond.test (undefining SECOND): adapt to new GCC.
+
+2011-04-06  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/configfile.c (program_directive): replace "strcpy" with
+	"memcpy".
+	(internalFileLoad): likewise
+	* autoopts/enumeration.c (set_memb_names): likewise
+	* autoopts/environment.c (doEnvPresets): likewise
+	* autoopts/save.c (findDirName): likewise
+	(findFileName): likewise
+	* config/confmacs.tlib (link): wrap "AC_LINK_IFELSE" source code
+	in a "AC_LANG_SOURCE" macro.  Not needed, but it partially shuts up
+	autoconf.
+	* agen5/agUtils.c (strlcpy): remove
+	* agen5/tpLoad.c (findFile): use memcpy, not strlcpy.
+	* agen5/cgi-fsm.c (cgi_run_fsm): buffer sanity check added
+	* agen5/fsm-trans.tlib (looping-machine): preserve cookie args
+
+2011-03-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optcode.tlib: use the program specific exit codes
+	instead of EXIT_SUCCESS/FAILURE.
+	* autoopts/tpl/opthead.tlib: likewise
+	* autoopts/tpl/optmain.tlib: likewise
+	* autoopts/tpl/optcode.tlib: adjust test
+	* autoopts/test/handler.test: likewise
+	* autoopts/test/argument.test: likewise
+
+	thanks to Jonathan Nieder <jrnieder@gmail.com>
+	* autoopts/test/defs.in (local): bash is not the only shell with local
+
+2011-03-25  Bruce Korb  <bkorb@gnu.org>
+
+	* add-on/char-mapper/char-mapper.c (table_name): add option to make
+	the table be "static".  Ought to have been so already....
+	* autoopts/autogen.map (static-table): specify that the character
+	classification table is to be static scope.
+	* agen5/Makefile.am (ag-char-map.h): libopts no longer exports the
+	table, so define it in autogen, too.
+	* getdefs/Makefile.am: likewise
+	* autoopts/tpl/optcode.tlib (usage_message): emit new function if
+	"usage-message" has been defined.
+	* autoopts/tpl/opthead.tlib: declare these new functions
+	* doc/autogen-texi.txt: doc the new attribute
+	* agen5/agInit.c (dep_usage): use usage_message() function
+	* agen5/agUtils.c (doOptions): likewise
+	* agen5/opts.def (load-scheme): likewise
+	* autoopts/numeric.c (optionShowRange): remove unnecessary nesting.
+	* autoopts/test/cond.test: adjust and enhance conditional option tests
+
+2011-03-06  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.8 released
+
+	* autoopts/project.h: new header for common defines that are not to be
+	installed with autoopts/options.h.
+	* */Makefile.am: use it
+	* */*.h: remove the common stuff
+	* autoopts/bootstrap.dir: copy it to the libopts header staging directory
+	* autoopts/configfile.c (validateOptionsStruct): use the common
+	stringifier macro
+	* autoopts/numeric.c (optionNumericVal): if the value string is not
+	a valid number, then set errno to EINVAL.
+	* autoopts/tpl/optmain.tlib: do not generate code that duplicates
+	functionality in the libopts library.
+	Allow time duration arguments to have range limits.
+	* config/libopts.def (POSIX_SHELL): look for one and emit it into
+	both config.h and make it available to the Makefile-s.
+	* everywhere: replace SHELL and CONFIG_SHELL with POSIX_SHELL,
+	where it makes sense.
+
+2011-03-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expState.c (ag_scm_get_c_name): use ag_scm_get() instead of
+	duplicating its text.
+	* agen5/tpProcess.c (closeOutput): add tracing output.
+	* autoopts/mk-tpl-config.sh: make certain our shell scripts never,
+	ever, *EVER* use the Solaris /bin/sh.  "read -r" is totally broken.
+	* autoopts/test/keyword.test: test the mdoc output, too.
+	* autoopts/time.c: do not directly include parse-duration.c.
+	It gets pulled from gnulib and listed as a first-class source file.
+	* columns/columns.c (pad_indentation): zero needs to be an acceptable
+	indentation.
+	* autoopts/install-options-h: make sure pathfind() is only declared
+	if we supply the function.
+	* autoopts/tpl/optmain.tlib: support date/time arguments
+	* autoopts/usage-txt.def: likewise
+	* doc/autogen-texi.txt: doc this stuff
+
+2011-03-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/mk-tpl-config.sh: new script to insert a definition of
+	"extension-defines" in tpl-config.tlib after config.h is built.
+	* autoopts/Makefile.am: invoke it before constructing libopts.c
+	and distribute this script.
+	* autoopts/tpl/optmain.tlib: use this string instead of hard wired
+	#defines that do not work for all platforms.
+	* agen5/expOutput.c (open_output_file): appending to a file closed
+	and set to read-only needs to be re-open read/write.
+	* autoopts/tpl/mdoc2man.sh: fix for BSD and Solaris "sed" program.
+
+2011-02-25  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/fsm-macro.tpl: rename to fsm-macro.tlib.  Fix it so that
+	events and fsm state names my be hyphenated.
+	* agen5/fsm-trans.tpl: likewise
+	* agen5/Makefile.am: adjust
+	* agen5/expGuile.c (ag_scm_c_eval_string_from_file_line):
+	remove code used only for Guile 1.4.  Condense a bit of dup code.
+	* agen5/expState.c (ag_scm_version_compare): scm_listofnull was
+	removed from the interface in Guile 2.0.  By accident.
+	* agen5/guile-iface.def (listofnull): new interface macro.
+	(i-end = 106;): obsolete
+	* autoopts/tpl/agman-cmd.tpl: reworked
+	* autoopts/tpl/agmdoc-cmd.tpl: also
+	* autoopts/tpl/cmd-doc.tlib: also
+	* autoopts/tpl/mdoc2man.sh: new patches added
+	* autoopts/tpl/texi2mdoc.sh: convert the "@*" lines correctly (".br")
+	* config/misc.def: do not try to include gh.h in feature test
+
+	Throughout: fix nested Guile "define" invocations:
+	* agen5/test/endmac.test: fixed.
+	* agen5/test/html.test: fixed
+	* autoopts/tpl/aginfo.tpl: fixed
+	* autoopts/tpl/agman1.tpl: fixed
+	* autoopts/tpl/agman3.tpl: fixed
+	* autoopts/tpl/agtexi-cmd.tpl: fixed
+	* autoopts/tpl/optlib.tlib: fixed
+	* autoopts/tpl/usage-txt.tpl: fixed
+
+2011-02-22  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optmain.tlib (#include): put 'em all at the top.
+	(validate_fname): allow for translation of fs error message
+
+2011-02-17  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.6 release
+
+	* agen5/expState.c (do_tpl_file_line): trim the path name in the
+	tpl-file-line/def-file-line functions.
+	* autoopts/test/defs.in (ulimit): if you cannot do it, be quiet about it
+	* autoopts/tpl/optmain.tlib (file-fail-code): now that we're emitting
+	an exit code enumeration, return the enum value and allow it to be
+	specified with:  file-fail-code = name;
+	* autoopts/tpl/texi2mdoc.sh: Fix some BASH-isms.
+	* config/misc.def (SCM_*_VERSION): 2.0 is okay.
+
+2011-01-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/getopt.tpl (3GNU): not always -- if "long-opts" is not
+	specified, then getopt(3posix) is used in preference to
+	getopt_long(3GNU)
+	* autoopts/test/getopt.test: adjust
+	* autoopts/tpl/agman-cmd.tpl: remove common code
+	* autoopts/tpl/agmdoc-cmd.tpl: likewise
+	* autoopts/tpl/cmd-doc.tlib: common command code
+	* autoopts/tpl/mdoc2man.pl: remove it - it was broken
+	* autoopts/tpl/mdoc2man.sh: simple sed command
+	* autoopts/test/keyword.test: adjust
+	* autoopts/install-options-h: make sure installed scripts are executable
+	* autoopts/test/rc.test: Solaris "tr" doesn't work
+	* autoopts/tpl/usage.tlib: if libgen exists on the system, then
+	link with "-lgen", too.
+	* autoopts/bootstrap.dir: adjust the handling lists for templates
+	* autoopts/tpl/options.tpl.in: rename to autoopts/tpl/options-tpl.in and
+	move all the validation code to optlib.tlib.
+	* agen5/*: constify immutable tables and adjust references.
+	* autoopts/test/shell.test: FreeBSD's sed cannot cope with a two line
+	search expression.  Use a shell loop.
+	* autoopts/usage.c (print_usage_details): now includes packager info
+	* autoopts/version.c (printVersion): likewise
+	* config/confmacs.tlib (try-with-group): add "with-group" macro that
+	adds a series of ``--with-whatever...'' options.
+	* config/misc.def: use with-group to add packager options
+	* autoopts/tpl/optcode.tlib (pzPackager): add packager info to options
+
+2011-01-24  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/error.test (TEST 3): remove it.  Too many variations
+	on the output.
+	* autoopts/tpl/usage.tlib: try a little harder to get data from
+	the build tree before using the installed files.
+	* config/misc.def (scm_c_make_string): not available in Guile 1.6
+	and the previous version is not available in Guile 1.9.
+	* doc/mk-agen-texi-in: do a "find" for the libraries we're interested in
+
+2011-01-19  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl: rename non-base templates from *.tpl to *.tlib
+	and adjust the INCLUDEs.
+
+2011-01-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/guile-iface.tpl: template for producing versioned Guile
+	interface glue
+	* agen5/guile-iface.def: define the interfaces that migrate.
+	* agen5/bootstrap.dir: generate the new guile-iface.h file
+	* agen5/autogen.h: remove Guile interface glue and include
+	generated guile-iface.h.
+	* agen5/Makefile.am:
+	* agen5/autogen.c: Adjust to new Guile interface macros
+	* agen5/expFormat.c: likewise
+	* agen5/expGuile.c: likewise
+	* agen5/expOutput.c: likewise
+	* agen5/expPrint.c: likewise
+	* agen5/expState.c: likewise
+	* agen5/expString.c: likewise
+	* agen5/funcDef.c: likewise
+	* agen5/funcEval.c: likewise
+	* agen5/funcFor.c: likewise
+	* agen5/snarf.tpl: likewise
+	* agen5/test/snarf.test: likewise
+
+2011-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expExtract.c (load_extract_file): do not include extraction
+	files in dependencies.  They are not required to exist.
+	* .cright-opts: config file for updating copyright dates in options
+	* autoopts/configfile.c (parse_xml_encoding): new function for parsing
+	XML-ish encodings in config files.
+
+2010-12-21  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (SED): define to working sed program
+	* agen5/test/error.test: use it
+	* autoopts/tpl/usage.tpl (autoopts-config): try to find it in
+	$top_builddir/autoopts instead of via PATH first.
+	* pkg/libopts/libopts-add.m4: adopt Dave Hart's NTP patch
+	* agen5/autogen.h (pz_temp_tpl): temp file template added
+	(temp_tpl_dir_len): portion of template that is a temp dir.
+	* agen5/expOutput.c (open_output_file): do not print files from the
+	temp directory in the dependency output
+	(ag_scm_out_move): also
+	(ag_scm_make_tmp_dir): rewritten as C code
+	(ag_scm_out_push_new): use the new function
+	* agen5/schemedef.scm (make-tmp-dir): removed
+	* autoopts/tpl/aginfo.tpl.in: use (make-tmp-dir) function so that
+	temporary files do not show up in dependencies
+	* getdefs/Makefile.am: remove getdefs executable from dependencies
+	of the man page output.
+	* pkg/libopts/README: clean up and adapt to new LIBOPTS_CHECK
+	macros.  Thank you, Dave Hart.
+	* agen5/funcEval.c (mFunc_Expr): do not fputs() empty strings.
+	* doc/auto-opts.tpl (hello example): use ${CC} when available
+	for compiling the hello example.
+
+2010-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am (ag.c): define PKGDATADIR
+	* columns/Makefile.am (cols.c): ditto
+	* getdefs/Makefile.am (gd.c): ditto
+	* xml2ag/Makefile.am (x.c): ditto
+	* agen5/autogen.c (ignore_vars): new -- ignore static variables
+	declared in ../autoopts/autoopts.h. Move some more into here
+	* agen5/autogen.h (DIRCH): move to here
+	* agen5/expFormat.c (ag_scm_dne): only print the file name,
+	not all the directories leading up to a file name.
+	* autoopts/autogen.map (option-char-category) replacement for
+	opt-char-cat which is too short for a global used in a library.
+	* autoopts/autoopts.c: collect global definitions and make more
+	of them be "static" scope.
+	* autoopts/load.c (optionMakePath): use longer global name
+	for pkgdatadir. It is also set from the tOptions structure.
+	* autoopts/usage.c: remove static variables
+	(prt_ini_list): do not print environment variable expansions in the
+	usage information.  Print the variable used.
+	* autoopts/options_h.tpl (pzPkgDataDir): new options structure field
+	(HAS_pzPkgDataDir_STRUCT_VERSION): add a test to see if the field is
+	in an input structure.
+	* autoopts/tpl/optcode.tpl (PKGDATADIR): if defined, then initialize
+	pzPkgData to that string, otherwise use the empty string.
+	* autoopts/usage-txt.def (AO_Alloc): new translatable string
+	(AO_Realloc): also
+	(AO_Strdup): also
+	* doc/autogen-texi.txt: document the $@ expansion in rc/ini/config
+	file names
+
+2010-12-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/opthead.tpl.in (exit_code_t): new exit code enumeration
+	* doc/autogen-texi.txt: doc exit code handling
+	* agen5/opts.def (exit-name): new exit codes
+	(exit-desc): ditto
+	* agen5/autogen.h (autogen_exit_code_t): use newly generated enum
+	* agen5/agInit.c (initialize): use the enum
+	* agen5/autogen.c (inner_main): ditto
+	(catch_sig_and_bail): ditto
+	(done_check): ditto
+
+	* autoopts/options_h.tpl (pzProgPath): make pointer const
+	(pzProgName): ditto
+	* autoopts/makeshell.c (emitUsage): adjust code for const-ness
+	(genshelloptUsage): ditto
+	* autoopts/configfile.c (optionFileLoad): ditto
+	(validateOptionsStruct): ditto
+	* autoopts/tpl/getopt.tpl: adjust template to accommodate const-ness
+	* autoopts/test/getopt.test: adjust for new template
+
+	* autoopts/tpl/agman-cmd.tpl: tweak -- ensure all hyphens are escaped
+	and document the newly generated exit code enumeration
+	* columns/Makefile.am (agman): use new template for man page
+	* agen5/bootstrap.dir: ditto
+	* getdefs/Makefile.am: ditto
+	* xml2ag/Makefile.am: ditto
+	* autoopts/test/keyword.test: adjust for new man page template
+
+	* autoopts/test/defs.in (TERM): make sure it is empty
+	* autoopts/test/Makefile.am (TERM): make really sure
+	* agen5/test/Makefile.am: ditto
+
+2010-12-12  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.5 release
+
+	* agen5/loadPseudo.c (handle_hash_line): add file name argument for
+	error display.
+	* agen5/test/error.test (test 2): ensure VERBOSE is off
+	* agen5/test/opts.test (-L ${top_srcdir}/autoopts): this is supplied
+	by the "defs" test setup script.
+	* autoopts/tpl/optmain.tpl (O_CLOEXEC): set on opened files, unless
+	client overrides the default mode.
+	* agen5/Makefile.am (stamp-texi): remove "columns" and "getdefs" from
+	dependencies and ensure they have been made in the rule instead.
+	(stamp-man): ditto
+	* getdefs/Makefile.am (stamp-opts): ditto, but "columns" and "autogen".
+	(stamp-doc): ditto
+
+2010-12-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (trap): organize the code into functions and
+	set up a timer trap that limits most tests to 30 seconds.
+	Remove the trap in cleanup() and failure().
+	* columns/columns.c (construct_first_pfx): extract from main() and
+	insert line separation, new line and indentation if it is longer
+	than the indentation.
+	* agen5/tpLoad.c (wrap_up_depends): make dependency files readable
+	by everyone.
+
+2010-12-07  Bruce Korb  <bkorb@gnu.org>
+
+	* Makefile.am (aclocal_DATA): not needed.  Removed.
+	* config/liboptschk.m4 (CFLAGS): builder domain, (LIBS): also
+	(ao_CFLAGS): proper naming, (ao_LIBS): ditto
+	* config/misc.def (connld): not used any more.
+	* doc/auto_gen-tpl.in (setfilename): move to mk-agen-texi-in
+	* doc/mk-agen-texi-in (setfilename): insert into autogen.texi
+	* agen5/agShell.c (load_data): fix allocation fence post issue.
+
+2010-12-06  Bruce Korb  <bkorb@gnu.org>
+
+	5.11.4 release
+
+	* agen5/Makefile.am (ag.c): gperf code needs the "make" program,
+	so define the make program name in the generated "ag.c" file.
+	* agen5/autogen.h (pCurDir): used in multiple modules --> global
+	* agen5/directive.tpl (zMakeGperf): add parameter for make program
+	* agen5/expGperf.c (ag_scm_make_gperf): supply that parameter
+	* autoopts/environment.c (do_env_opt): ignore empty value strings
+
+2010-12-05  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/directive.tpl (zShellInit): compute the pid offset
+	* agen5/agShell.c (server_setup): print pid at compiled offset
+	(die): use signal numbers instead of names
+	* agen5/test/error.test: handle pid number in Killing AutoGen msg
+	* autoopts/test/defs.in (tabch): define for global use
+	(SunOS): avoid /bin/sh at all costs.
+	* autoopts/test/cfg-edit.test: use ${tabch}, not $'\t'
+	* utoopts/test/nested.test: ditto
+	* autoopts/test/errors.test (conflicting flag): skip test on
+	Solaris when not using BASH.  shell quits on program coring.
+
+2010-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in (local): eval the args, do not discard
+	(compile): The Solaris /usr/xpg4/bin/tr is junk.  Do not use.
+	* autoopts/test/nested.test (sed): '-i' is a GNU-ism
+	* doc/mk-agen-texi-in (setup_exports): libopts.a must be found
+	in order to build docs.
+
+	Dave Hart  <hart@ntp.org>
+	* agen5/expOutput.c (ag_scm_out_push_new): fix #ifdef-ed "else"
+
+	Elias Pipping  <pipping@users.sourceforge.net>
+	* agen5/expFormat.c (mk_license): pass owner string to aprf().
+	* autoopts/bootstrap.dir (make_funcs_def): locate mk-str2enum
+	if it is not in the current PATH.
+	* config/bootstrap (config_tools): "set -e" is unnecessary

@@ -1,10 +1,10 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2011-12-29 09:21:47 bkorb"
+# Time-stamp:      "2012-01-15 08:11:22 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -230,7 +230,7 @@ typedef enum {[=
        =] = [= (for-index)            =][=
   ENDFOR                              =]
 } [= (. pname-down) =]_exit_code_t;[=
-
+DEBUG =][=
 CASE guard-option-names               =][=
 !E                                    =][=
 =  full-enum                          =][=
@@ -241,7 +241,7 @@ CASE guard-option-names               =][=
  *  Make sure there are no #define name conflicts with the option names
  */[=
     FOR  flag                         =]
-#undef [= (get-up-name "name")          =][=
+#undef [= (get-up-name "name")        =][=
     ENDFOR flag                       =][=
 
 *                                     =][=

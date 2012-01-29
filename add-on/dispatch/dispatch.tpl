@@ -2,6 +2,10 @@
 
 c
 
+# This dispatch template is
+# copyright (c) 2005-2012 Bruce Korb
+# all rights reserved.
+
 =]
 [= INVOKE Initialize                \=][=# /*
 

@@ -2,12 +2,12 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2011-12-15 12:22:12 bkorb"
+ *  Time-stamp:        "2012-01-29 07:43:06 bkorb"
  *
  *  Global header file for AutoGen
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,6 +36,7 @@
 # include <libguile.h>
 #endif
 
+#include "ag-text.h"
 #include "opts.h"
 #include "expr.h"
 #include "autoopts/autoopts.h"
@@ -332,6 +333,12 @@ typedef struct {
 MODE teProcState    procState        VALUE( PROC_STATE_INIT );
 MODE tTemplate*     pNamedTplList    VALUE( NULL );
 MODE char const *   pzOopsPrefix     VALUE( "" );
+/*
+ *  "evalExpression" must be able to return a distinct empty string so that
+ *  the "CASE" function can distinguish an empty string due to it being a
+ *  value from an empty string due to an absent definition.
+ */
+MODE char const     zNotDefined[1]   VALUE( "" );
 
 /*
  *  Template Processing Globals
@@ -439,7 +446,7 @@ MODE char           zEndMac[   8 ]   VALUE( "" );
 MODE size_t         startMacLen      VALUE( 0  );
 MODE char           zStartMac[  8 ]  VALUE( "" );
 MODE int            guileFailure     VALUE( 0 );
-MODE char           name_sep_ch      VALUE( '.' );
+#define name_sep_ch '.'
 
 /*
  *  Definition Parsing Globals
@@ -455,29 +462,6 @@ MODE tDefEntry **   ppParseStack     VALUE( parseStack );
 MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
 
 MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  GLOBAL STRINGS
- */
-#define MKSTRING(_n, _v) \
-        MODE char const _n[sizeof(_v)] VALUE(_v)
-
-MKSTRING(zAllocErr,   "Allocation Failure");
-MKSTRING(zAllocWhat,  "Could not allocate a %d byte %s\n");
-MKSTRING(zCannot,     "fserr %d: cannot %s %s:  %s\n");
-MKSTRING(zDevNull,    "/dev/null");
-MKSTRING(zEmpty,      "");
-MKSTRING(zFileFormat, "%s%s\0%s.%s");
-MKSTRING(zFileLine,   "\tfrom %s line %d\n");
-MKSTRING(zFormat,     "format");
-MKSTRING(zMemFile,    "in-mem file");
-MKSTRING(zNil,        "");
-MKSTRING(zNotStr,     "ERROR: %s is not a string\n");
-MKSTRING(zShDone,     "ShElL-OuTpUt-HaS-bEeN-cOmPlEtEd");
-MKSTRING(zTplWarn,    "Warning in template %s, line %d\n\t%s\n");
-
-#undef MKSTRING
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -500,7 +484,7 @@ MODE v2c_t p2p VALUE( { NULL } );
 # define AG_ABEND(s)  ag_abend_at(s)
 #endif
 #define  AG_CANT(_op, _wh) \
-    AG_ABEND(aprf(zCannot, errno, _op, _wh, strerror(errno)))
+    AG_ABEND(aprf(CANNOT_FMT, errno, _op, _wh, strerror(errno)))
 
 #ifdef DEBUG_FSM
 # define DEBUG

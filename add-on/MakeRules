@@ -2,6 +2,8 @@
 
 AO_LIBS         := $(shell autoopts-config ldflags)
 AO_CFLAGS       := $(shell autoopts-config cflags)
+CFLAGS          =  -std=c99
+
 CLOBBER_LIST    =  $(TARGET)
 HEADER_LIST     =  $(LCLHDR)
 CLEAN_LIST      =  $(LCL_CLEAN)
@@ -73,7 +75,7 @@ endif
 #
 ifdef SRC
 .c.o: $(HEADER_LIST)
-	$(CC) -g $(CFLAGS) $(AO_FLAGS) -c $*.c
+	$(CC) -g $(CFLAGS) $(AO_CFLAGS) -c $*.c
 endif
 
 # How to build an executable

@@ -1,12 +1,12 @@
 /**
  * @file defFind.c
  *
- *  Time-stamp:        "2011-01-20 16:23:20 bkorb"
+ *  Time-stamp:        "2012-01-29 07:42:06 bkorb"
  *
  *  This module locates definitions.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -30,8 +30,6 @@ struct defEntryList {
 };
 typedef struct defEntryList tDefEntryList;
 
-static char const zNameRef[] = "Ill formed name ``%s'' in %s line %d\n";
-
 typedef struct hash_name_s hash_name_t;
 struct hash_name_s {
     hash_name_t *   next;
@@ -39,25 +37,22 @@ struct hash_name_s {
 };
 
 static hash_name_t ** hash_table = NULL;
-static int hash_table_ct = 0;
-
+static int  hash_table_ct = 0;
 static char zDefinitionName[ AG_PATH_MAX ];
 
-static tDefEntry* findEntryByIndex(tDefEntry* pE, char* pzScan);
-
 #define ILLFORMEDNAME() \
-    AG_ABEND(aprf(zNameRef, zDefinitionName, \
+    AG_ABEND(aprf(BAD_NAME_FMT, zDefinitionName, \
               pCurTemplate->pzTplFile, pCurMacro->lineNo));
 
 /* = = = START-STATIC-FORWARD = = = */
-static tDefEntry*
-findEntryByIndex(tDefEntry* pE, char* pzScan);
+static tDefEntry *
+find_by_index(tDefEntry * pE, char * pzScan);
 
 static void
-addResult(tDefEntry* pDE, tDefEntryList* pDEL);
+add_to_def_list(tDefEntry* pDE, tDefEntryList* pDEL);
 
 static size_t
-badName(char* pzD, char const* pzS, size_t srcLen);
+bad_def_name(char * pzD, char const * pzS, size_t srcLen);
 
 static tDefEntry*
 find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed);
@@ -69,11 +64,11 @@ static void
 stringAdd(char const * pz);
 
 static tDefEntry **
-get_def_list(char* pzName, tDefCtx* pDefCtx);
+get_def_list(char * pzName, tDefCtx * pDefCtx);
 /* = = = END-STATIC-FORWARD = = = */
 
-static tDefEntry*
-findEntryByIndex(tDefEntry* pE, char* pzScan)
+static tDefEntry *
+find_by_index(tDefEntry * pE, char * pzScan)
 {
     int  idx;
 
@@ -87,7 +82,7 @@ findEntryByIndex(tDefEntry* pE, char* pzScan)
      *  '[$]' means the last entry of whatever index number
      */
     if (*pzScan == '$') {
-        while (IS_WHITESPACE_CHAR(*++pzScan )) ;
+        pzScan = SPN_WHITESPACE_CHARS(pzScan + 1);
         if (*pzScan != ']')
             return NULL;
 
@@ -107,7 +102,7 @@ findEntryByIndex(tDefEntry* pE, char* pzScan)
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (IS_WHITESPACE_CHAR(*pz )) pz++;
+        pz = SPN_WHITESPACE_CHARS(pz);
         if (*pz != ']')
             return NULL;
     }
@@ -122,7 +117,7 @@ findEntryByIndex(tDefEntry* pE, char* pzScan)
         if (! IS_VAR_FIRST_CHAR(*pzScan))
             return NULL;
 
-        while (IS_VALUE_NAME_CHAR(*pzScan)) pzScan++;
+        pzScan = SPN_VALUE_NAME_CHARS(pzScan);
 
         /*
          *  Temporarily remove the character under *pzScan and
@@ -138,7 +133,7 @@ findEntryByIndex(tDefEntry* pE, char* pzScan)
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        while (IS_WHITESPACE_CHAR(*pzScan )) pzScan++;
+        pzScan = SPN_WHITESPACE_CHARS(pzScan);
         if (*pzScan != ']')
             return NULL;
 
@@ -175,30 +170,29 @@ findEntryByIndex(tDefEntry* pE, char* pzScan)
 /*
  *  find entry support routines:
  *
- *  addResult:  place a new definition entry on the end of the
+ *  add_to_def_list:  place a new definition entry on the end of the
  *              list of found definitions (reallocating list size as needed).
  */
 static void
-addResult(tDefEntry* pDE, tDefEntryList* pDEL)
+add_to_def_list(tDefEntry* pDE, tDefEntryList* pDEL)
 {
     if (++(pDEL->usedCt) > pDEL->allocCt) {
         pDEL->allocCt += pDEL->allocCt + 8; /* 8, 24, 56, ... */
         pDEL->papDefEntry = (tDefEntry**)
             AGREALOC((void*)pDEL->papDefEntry, pDEL->allocCt * sizeof(void*),
-                     "added find result");
+                     "add find");
     }
 
     pDEL->papDefEntry[ pDEL->usedCt-1 ] = pDE;
 }
 
-
 static size_t
-badName(char* pzD, char const* pzS, size_t srcLen)
+bad_def_name(char * pzD, char const * pzS, size_t srcLen)
 {
     memcpy((void*)pzD, (void*)pzS, srcLen);
     pzD[srcLen] = NUL;
-    fprintf(pfTrace, zNameRef, pzD,
-             pCurTemplate->pzTplFile, pCurMacro->lineNo);
+    fprintf(pfTrace, BAD_NAME_FMT, pzD,
+            pCurTemplate->pzTplFile, pCurMacro->lineNo);
     return srcLen + 1;
 }
 
@@ -234,37 +228,41 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
      *  Before anything, skip a leading name_sep_ch as a special hack
      *  to force a current context lookup.
      */
-    while (IS_WHITESPACE_CHAR(*pzS )) {
-        if (--srcLen <= 0) {
+    pzS = SPN_WHITESPACE_CHARS(pzS);
+    if (pzOri != pzS) {
+        srcLen -= pzS - pzOri;
+        if (srcLen <= 0)
             pzS = zNil;
-            break;
-        }
-        pzS++;
     }
 
     if (*pzS == name_sep_ch) {
         *(pzD++) = name_sep_ch;
         pzS++;
+        if (--srcLen <= 0)
+            pzS = zNil;
     }
 
  nextSegment:
+
     /*
      *  The next segment may always start with an alpha character,
      *  but an index may also start with a number.  The full number
-     *  validation will happen in findEntryByIndex().
+     *  validation will happen in find_by_index().
      */
-    while (IS_WHITESPACE_CHAR(*pzS )) {
-        if (--srcLen <= 0) {
-            pzS = zNil;
-            break;
+    {
+        char * p = SPN_WHITESPACE_CHARS(pzS);
+        if (p != pzS) {
+            srcLen -= p - pzS;
+            if (srcLen <= 0)
+                pzS = zNil;
+            pzS = p;
         }
-        pzS++;
     }
 
     switch (state) {
     case CN_START_NAME:
         if (! IS_VAR_FIRST_CHAR(*pzS))
-            return badName(pzDst, pzOri, stLen);
+            return bad_def_name(pzDst, pzOri, stLen);
         state = CN_NAME_ENDED;  /* we found the start of our first name */
         break;  /* fall through to name/number consumption code */
 
@@ -289,7 +287,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
         }
 
         if (--srcLen <= 0)
-            return badName(pzDst, pzOri, stLen);
+            return bad_def_name(pzDst, pzOri, stLen);
         goto nextSegment;
 
     case CN_INDEX:
@@ -320,7 +318,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
          */
         if (*pzS == '$') {
             if (--srcLen < 0)
-                return badName(pzDst, pzOri, stLen);
+                return bad_def_name(pzDst, pzOri, stLen);
 
             *(pzD++) = *(pzS++);
             goto nextSegment;
@@ -332,7 +330,7 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
          *  Nothing else is okay.
          */
         if ((*(pzD++) = *(pzS++)) != ']')
-            return badName(pzDst, pzOri, stLen);
+            return bad_def_name(pzDst, pzOri, stLen);
 
         if (--srcLen <= 0) {
             *pzD = NUL;
@@ -428,7 +426,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
         }
     }
 
-    brace  = pzName + strcspn(pzName, "[.");
+    brace  = BRK_NAME_SEP_CHARS(pzName);
     br_ch  = *brace;
     *brace = NUL;
 
@@ -484,9 +482,9 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
         /*
          *  We have to find a specific entry in a list.
          */
-        while (IS_WHITESPACE_CHAR(*++brace )) ;
+        brace = SPN_WHITESPACE_CHARS(brace + 1);
 
-        ent = findEntryByIndex(ent, brace);
+        ent = find_by_index(ent, brace);
         if (ent == NULL)
             return ent;
 
@@ -685,29 +683,24 @@ findDefEntry(char * pzName, ag_bool* pIsIndexed)
 LOCAL void
 print_used_defines(void)
 {
-    static char const cmd[] =
-        "echo 'definition names looked up'\n"
-        "sed 's/[-^]/-/g'|sort -u -f\n"
-        "echo 'end of looked up definitions'";
-
-    int ix = 0;
-        
-    FILE * fp;
-
     if (hash_table_ct == 0)
         return;
 
-    fp = popen(cmd, "w");
-    if (fp == NULL) return;
+    {
+        int ix = 0;
+        
+        FILE * fp = popen(USED_DEFINES_FMT, "w");
+        if (fp == NULL) return;
 
-    while (ix < hash_table_ct) {
-        hash_name_t * hn = hash_table[ix++];
-        while (hn != NULL) {
-            fprintf(fp, "%s\n", hn->str);
-            hn = hn->next;
+        while (ix < hash_table_ct) {
+            hash_name_t * hn = hash_table[ix++];
+            while (hn != NULL) {
+                fprintf(fp, USED_DEFINES_LINE_FMT, hn->str);
+                hn = hn->next;
+            }
         }
+        pclose(fp);
     }
-    pclose(fp);
 }
 
 
@@ -719,7 +712,7 @@ print_used_defines(void)
  *  not try to traverse the list of twins).
  */
 static tDefEntry **
-get_def_list(char* pzName, tDefCtx* pDefCtx)
+get_def_list(char * pzName, tDefCtx * pDefCtx)
 {
     static tDefEntryList defList = { 0, 0, NULL, 0 };
 
@@ -737,7 +730,7 @@ get_def_list(char* pzName, tDefCtx* pDefCtx)
     if (defList.nestLevel == 0) {
         if (*pzName == name_sep_ch) {
             noNesting = AG_TRUE;
-            while (IS_WHITESPACE_CHAR(*++pzName)) ;
+            pzName = SPN_WHITESPACE_CHARS(pzName + 1);
         }
 
         if (! IS_VAR_FIRST_CHAR(*pzName)) {
@@ -751,10 +744,7 @@ get_def_list(char* pzName, tDefCtx* pDefCtx)
         defList.usedCt = 0;
     }
 
-    {
-        char sep_buf[3] = { '[', name_sep_ch, NUL };
-        pcBrace = pzName + strcspn(pzName, sep_buf);
-    }
+    pcBrace  = BRK_NAME_SEP_CHARS(pzName);
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
@@ -815,7 +805,7 @@ get_def_list(char* pzName, tDefCtx* pDefCtx)
     switch (breakCh) {
     case NUL:
         do  {
-            addResult(pE, &defList);
+            add_to_def_list(pE, &defList);
             pE = pE->pTwin;
         } while (pE != NULL);
         goto returnResult;
@@ -824,9 +814,9 @@ get_def_list(char* pzName, tDefCtx* pDefCtx)
         /*
          *  We have to find a specific entry in a list.
          */
-        while (IS_WHITESPACE_CHAR(*++pcBrace)) ;
+        pcBrace = SPN_WHITESPACE_CHARS(pcBrace + 1);
 
-        pE = findEntryByIndex(pE, pcBrace);
+        pE = find_by_index(pE, pcBrace);
         if (pE == NULL)
             goto returnResult;
 
@@ -900,7 +890,7 @@ get_def_list(char* pzName, tDefCtx* pDefCtx)
 
  returnResult:
     if (defList.nestLevel == 0)
-        addResult(NULL, &defList);
+        add_to_def_list(NULL, &defList);
 
     return defList.papDefEntry;
 }

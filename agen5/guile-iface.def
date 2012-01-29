@@ -9,6 +9,8 @@ iface = {
 };
 #endif
 
+invalid = '200000-200003';
+
 iface = {
   i-name    = bool_p;
   i-args    = '_b';
@@ -110,14 +112,16 @@ iface = {
   i-name    = str02scm;
   i-args    = '_s';
   i-impl    = { i-end = '107'; i-code = 'scm_makfrom0str(_s)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_from_locale_string(_s)'; };
+  i-impl    = { i-end = '200'; i-code = 'scm_from_locale_string(_s)'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_from_utf8_string(_s)'; };
 };
 
 iface = {
   i-name    = str2scm;
   i-args    = '_st,_sz';
   i-impl    = { i-end = '107'; i-code = 'scm_mem2string(_st,_sz)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_from_locale_stringn(_st,_sz)'; };
+  i-impl    = { i-end = '200'; i-code = 'scm_from_locale_stringn(_st,_sz)'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_from_utf8_stringn(_st,_sz)'; };
 };
 
 iface = {

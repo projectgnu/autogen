@@ -5,12 +5,12 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2011-06-25 09:11:38 bkorb"
+ *  Time-stamp:        "2012-01-29 07:34:52 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,9 +28,6 @@
 
 #define DEFINE_FSM
 #include "pseudo-fsm.h"
-
-static char const zAgName[] = "autogen5";
-static char const zTpName[] = "template";
 
 /* = = = START-STATIC-FORWARD = = = */
 static char const *
@@ -95,19 +92,16 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    static char const zEmptySpec[] = "Empty suffix format";
-
-    tOutSpec*  pOS;
+    tOutSpec   *       pOS;
     char const *       pzSfxFmt;
     char const *       pzResult;
-    size_t     spn;
-    static tOutSpec**  ppOSList = &pOutSpecList;
+    size_t             spn;
+    static tOutSpec ** ppOSList = &pOutSpecList;
 
     /*
      *  Skip over the suffix construct
      */
-    pzSfxFmt = pzData;
-    while (IS_SUFFIX_CHAR(*pzSfxFmt))  pzSfxFmt++;
+    pzSfxFmt = SPN_SUFFIX_CHARS(pzData);
 
     if (*pzSfxFmt != '=') {
         pzResult = pzSfxFmt;
@@ -121,11 +115,10 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
             pzResult = skipScheme(pzSfxFmt, pe);
 
         } else {
-            pzResult = pzSfxFmt;
-            while (IS_SUFFIX_FMT_CHAR(*pzResult)) pzResult++;
+            pzResult = SPN_SUFFIX_FMT_CHARS(pzSfxFmt);
 
             if (pzSfxFmt == pzResult)
-                AG_ABEND(zEmptySpec);
+                AG_ABEND(DO_SUFFIX_EMPTY);
         }
     }
 
@@ -150,9 +143,9 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
         pOS = AGALOC(sz, "Output Specification");
         memset(pOS, NUL, sz);
     }
+
     *ppOSList  = pOS;
-    ppOSList   = &pOS->pNext;
-    pOS->pNext = NULL;
+    ppOSList   = &pOS->pNext; /* NULL, from memset */
     memcpy(pOS->zSuffix, pzData, spn);
     pOS->zSuffix[spn] = NUL;
 
@@ -177,11 +170,11 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
             str_length = strlen(pzSfxFmt);
 
             if (str_length == 0)
-                AG_ABEND(zEmptySpec);
-            while (IS_SUFFIX_FMT_CHAR(*pz))  pz++;
+                AG_ABEND(DO_SUFFIX_EMPTY);
+            pz = SPN_SUFFIX_FMT_CHARS(pz);
 
             if ((pz - pzSfxFmt) != str_length)
-                AG_ABEND(aprf("invalid chars in suffix format:  %s", pz));
+                AG_ABEND(aprf(DO_SUFFIX_BAD_CHARS, pz));
 
             /*
              *  IF the scheme replacement text fits in the space, don't
@@ -200,9 +193,8 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
          *  IF the suffix does not start with punctuation,
          *  THEN we will insert a '.' of our own.
          */
-        if (IS_VAR_FIRST_CHAR(pOS->zSuffix[0]))
-             pOS->pzFileFmt = zFileFormat + 5;
-        else pOS->pzFileFmt = zFileFormat;
+        pOS->pzFileFmt = IS_VAR_FIRST_CHAR(pOS->zSuffix[0])
+            ? DOT_SFX_FMT : SFX_FMT;
     }
 
     return pzResult;
@@ -213,7 +205,7 @@ handle_hash_line(char const * pz)
 {
     char const * res = strchr(pz, NL);
     if (res == NULL)
-        AG_ABEND("Invalid template file");
+        AG_ABEND(HANDLE_HASH_BAD_TPL);
 
     /*
      *  If the comment starts with "#!/", then see if it names
@@ -224,7 +216,7 @@ handle_hash_line(char const * pz)
         char * nmbuf;
         size_t len;
 
-        while (IS_FILE_NAME_CHAR(*pzScn))   pzScn++;
+        pzScn = SPN_FILE_NAME_CHARS(pzScn);
 
         len   = pzScn - (pz + 2);
         nmbuf = ag_scribble(len);
@@ -236,11 +228,10 @@ handle_hash_line(char const * pz)
          *  the SHELL environment variable to this executable.
          */
         if (access(nmbuf, X_OK) == 0) {
-            static char const sh_nm[] = "SHELL";
-            char * sp = malloc(sizeof(sh_nm) + 1 + len);
-            sprintf(sp, "%s=%s", sh_nm, nmbuf);
+            char * sp = malloc(len + 7); // len + "SHELL=" + NUL byte
+            sprintf(sp, HANDLE_HASH_ENV_FMT, HANDLE_HASH_SHELL, nmbuf);
             putenv(sp);
-            AGDUPSTR(pzShellProgram, nmbuf, "shell name");
+            AGDUPSTR(pzShellProgram, nmbuf, "prog shell");
             AGDUPSTR(serverArgs[0],  nmbuf, "shell name");
         }
     }
@@ -304,18 +295,18 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
     if (IS_VAR_FIRST_CHAR(*pzData)) {
-        if (strneqvcmp(pzData, zAgName, (int)sizeof(zAgName) - 1) == 0) {
-            if (IS_WHITESPACE_CHAR(pzData[ sizeof(zAgName) - 1 ])) {
-                *ppzData = pzData + sizeof(zAgName);
+        if (strneqvcmp(pzData, AG_MARK, AG_MARK_LEN) == 0) {
+            if (IS_WHITESPACE_CHAR(pzData[ AG_MARK_LEN ])) {
+                *ppzData = pzData + AG_MARK_LEN + 1;
                 return PM_EV_AUTOGEN;
             }
 
             return PM_EV_SUFFIX;
         }
 
-        if (  (strneqvcmp(pzData, zTpName, (int)sizeof(zTpName)-1) == 0)
-           && (IS_WHITESPACE_CHAR(pzData[ sizeof(zTpName)-1 ])) ) {
-            *ppzData = pzData + sizeof(zTpName)-1;
+        if (  (strneqvcmp(pzData, TPL_MARK, TPL_MARK_LEN) == 0)
+           && (IS_WHITESPACE_CHAR(pzData[ TPL_MARK_LEN ])) ) {
+            *ppzData = pzData + TPL_MARK_LEN;
             return PM_EV_TEMPLATE;
         }
 
@@ -354,7 +345,7 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
     /*
      *  Otherwise, it is just junk.
      */
-    AG_ABEND(aprf("Invalid template file: %s", fnm));
+    AG_ABEND(aprf(NEXT_PM_TOKEN_INVALID, fnm));
     /* NOTREACHED */
     return PM_EV_INVALID;
 }
@@ -385,7 +376,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
     *pzMark = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, "marker ``%s'' loaded\n", pzMark - ct);
+        fprintf(pfTrace, TRACE_COPY_MARK, pzMark - ct);
 
     return pzData;
 }
@@ -399,11 +390,6 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
 LOCAL char const *
 loadPseudoMacro(char const * pzData, char const * pzFileName)
 {
-    static char const zMarkErr[] =
-        "start/end macro mark too long";
-    static char const zBadMark[] =
-        "bad template marker in %s on line %d:\n\t%s";
-
     char const * pzBadness;
 #   define BAD_MARKER(t) { pzBadness = t; goto abort_load; }
 
@@ -427,10 +413,10 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         switch (trans) {
         case PM_TR_SKIP_ED_MODE:
         {
-            char* pzEnd = strstr(pzData + 3, "-*-");
+            char* pzEnd = strstr(pzData + 3, PSEUDO_MAC_MODE_MARK);
             char* pzNL  = strchr(pzData + 3, NL);
             if ((pzEnd == NULL) || (pzNL < pzEnd))
-                BAD_MARKER("invalid edit mode marker");
+                BAD_MARKER(PSEUDO_MAC_BAD_MODE);
 
             pzData = pzEnd + 3;
             break;
@@ -439,14 +425,14 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         case PM_TR_INIT_MARKER:
             pzData = copy_mark(pzData, zStartMac, &startMacLen);
             if (pzData == NULL)
-                BAD_MARKER(zMarkErr);
+                BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
             pzData = copy_mark(pzData, zEndMac, &endMacLen);
             if (pzData == NULL)
-                BAD_MARKER(zMarkErr);
+                BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             /*
              *  IF the end macro seems to end with the start macro and
@@ -461,9 +447,9 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
             }
 
             if (strstr(zEndMac, zStartMac) != NULL)
-                BAD_MARKER("start marker contained in end marker");
+                BAD_MARKER(PSEUDO_MAC_BAD_ENDER);
             if (strstr(zStartMac, zEndMac) != NULL)
-                BAD_MARKER("end marker contained in start marker");
+                BAD_MARKER(PSEUDO_MAC_BAD_STARTER);
             break;
 
         case PM_TR_TEMPL_SUFFIX:
@@ -477,19 +463,19 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         case PM_TR_INVALID:
             pm_invalid_transition(fsm_state, fsm_tkn);
             switch (fsm_state) {
-            case PM_ST_INIT:     BAD_MARKER("need start marker");
-            case PM_ST_ST_MARK:  BAD_MARKER("need autogen5 marker");
-            case PM_ST_AGEN:     BAD_MARKER("need template marker");
-            case PM_ST_TEMPL:    BAD_MARKER("need end marker");
-            case PM_ST_END_MARK: BAD_MARKER("need end of line");
-            default:             BAD_MARKER("BROKEN FSM STATE");
+            case PM_ST_INIT:     BAD_MARKER(PSEUDO_MAC_BAD_NOSTART);
+            case PM_ST_ST_MARK:  BAD_MARKER(PSEUDO_MAC_BAD_NOAG5);
+            case PM_ST_AGEN:     BAD_MARKER(PSEUDO_MAC_BAD_NOTPL);
+            case PM_ST_TEMPL:    BAD_MARKER(PSEUDO_MAC_BAD_NOEND);
+            case PM_ST_END_MARK: BAD_MARKER(PSEUDO_MAC_BAD_NOEOL);
+            default:             BAD_MARKER(PSEUDO_MAC_BAD_FSM);
             }
 
         case PM_TR_NOOP:
             break;
 
         default:
-            BAD_MARKER("broken pseudo-macro FSM");
+            BAD_MARKER(PSEUDO_MAC_BAD_PSEUDO);
         }
 
         fsm_state = nxt_state;
@@ -498,7 +484,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
     return pzData;
 
  abort_load:
-    AG_ABEND(aprf(zBadMark, pzFileName, templLineNo, pzBadness));
+    AG_ABEND(aprf(PSEUDO_MAC_ERR_FMT, pzFileName, templLineNo, pzBadness));
 #   undef BAD_MARKER
     return NULL;
 }

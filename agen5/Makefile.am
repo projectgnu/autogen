@@ -2,10 +2,10 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-12-17 13:49:21 bkorb"
+## Time-stamp:      "2011-12-30 11:40:17 bkorb"
 ##
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -51,13 +51,13 @@ EXPRLIST        = \
 
 FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
-    autogen.c    $(FSMLIST)   $(EXPRLIST) \
+    autogen.c    ag-text.c    $(FSMLIST) $(EXPRLIST)  \
     agCgi.c      agDep.c      agInit.c   agUtils.c    \
     defDirect.c  defFind.c    defLex.c   defLoad.c    \
     fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
     tpLoad.c     tpParse.c    tpProcess.c
 
-hsrc = autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
+hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
              defParse.x bootstrap.dir schemedef.scm \
@@ -112,6 +112,10 @@ stamp-fsm : pseudo.def $(FSMTPL)
 
 ## stamp-parse GEN-RULE
 stamp-parse : defParse.def $(FSMTPL)
+	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+
+## stamp-ag-text GEN-RULE
+stamp-ag-text : ag-text.def
 	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## proto.h GEN-RULE

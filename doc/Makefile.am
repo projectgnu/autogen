@@ -2,11 +2,11 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-10-08 10:48:20 bkorb"
+## Time-stamp:      "2012-01-29 15:04:34 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -34,9 +34,12 @@ all : $(INFO_DEPS)
 
 BUILT_SOURCES   = autogen.texi
 info_TEXINFOS   = $(BUILT_SOURCES)
-EXTRA_DIST	= snprintfv.texi snprintfv.menu autogen-texi.txt \
-		auto-opts.tpl autogen-intro.texi \
-		gendocs_template gendocs.sh
+EXTRA_DIST	= autogen-texi.txt auto-opts.tpl autogen-intro.texi \
+    gendocs_template      gendocs.sh \
+    agdoc.texi            autogen-intro.texi    \
+    fdl.texi              invoke-autogen.texi   invoke-columns.texi \
+    invoke-getdefs.texi   invoke-snprintfv.texi invoke-xml2ag.texi \
+    libopts.texi          snprintfv.texi
 
 # MAINTAINERCLEANFILES  = MakeDep.inc
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'

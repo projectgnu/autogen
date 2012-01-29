@@ -3,7 +3,7 @@
 #  Time-stamp:        "2010-07-17 09:59:33 bkorb"
 #
 #  This file is part of char-mapper.
-#  char-mapper Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+#  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 #
 # char-mapper is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the

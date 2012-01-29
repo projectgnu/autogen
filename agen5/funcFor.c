@@ -2,12 +2,12 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2011-06-03 12:19:38 bkorb"
+ *  Time-stamp:        "2012-01-29 20:13:07 bkorb"
  *
  *  This module implements the FOR text macro.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -68,7 +68,7 @@ ag_scm_first_for_p(SCM which)
 
     {
         tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars(which, "which for");
+        char *     pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
@@ -351,10 +351,9 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
         ag_bool gotNewDef = nextDefinition(invert, &pFoundDef);
 
         if (loopLimit-- < 0) {
-            fprintf(pfTrace, "too many FOR iterations in %s line %d\n",
+            fprintf(pfTrace, TRACE_FOR_STEP_TOO_FAR,
                     pT->pzTplName, pMac->lineNo);
-            fprintf(pfTrace, "\texiting FOR %s from %d to %d by %d:\n"
-                    "\tmore than %d iterations\n",
+            fprintf(pfTrace, TRACE_FOR_BY_STEP,
                     pT->pzTemplText + pMac->ozText,
                     pFS->for_from, pFS->for_to, pFS->for_by,
                     (int)OPT_VALUE_LOOP_LIMIT);
@@ -495,16 +494,16 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
     /*
      *  Find the first text value
      */
-    pzSrc  += 2;
-    srcLen -= 3;
-    while (IS_WHITESPACE_CHAR(*++pzSrc))  srcLen--;
-    if (*pzSrc == NUL)
-        AG_ABEND_IN(pT, pMac, "FOR x IN ... has no list");
+    pz = SPN_WHITESPACE_CHARS(pzSrc + 3);
+    if (*pz == NUL)
+        AG_ABEND_IN(pT, pMac, FOR_IN_LISTLESS);
+    srcLen -= pz - pzSrc;
+    pzSrc = pz;
 
     {
         size_t nmlen = strlen(pzName);
 
-        pz = AGALOC(srcLen + 2 + nmlen, "copy of FOR x IN ... text");
+        pz = AGALOC(srcLen + 2 + nmlen, "copy FOR text");
         strcpy(pz, pzName);
         pzName = pz;
         manageAllocatedData(pz);
@@ -529,7 +528,7 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
             /*
              *  Clean up trailing commas
              */
-            while (IS_WHITESPACE_CHAR(*pz))  pz++;
+            pz = SPN_WHITESPACE_CHARS(pz);
             if (*pz == ',')
                 pz++;
             break;
@@ -564,7 +563,7 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
         /*
          *  Clean up trailing white space
          */
-        while (IS_WHITESPACE_CHAR(*pz))  pz++;
+        pz = SPN_WHITESPACE_CHARS(pz);
 
         /*
          *  IF there is a previous entry, link its twin to this one.
@@ -693,11 +692,12 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
         pDef = findDefEntry(pT->pzTemplText + pMac->ozName, &isIndexed);
         if (pDef == NULL) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, "FOR loop skipped - no definition for `%s'\n",
+                fprintf(pfTrace, TRACE_FN_FOR_SKIP,
                         pT->pzTemplText + pMac->ozName);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
+                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
+                            pT->pzTplFile, pMac->lineNo);
             }
 
             return pMRet;
@@ -711,11 +711,10 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
         forInfo.fi_alloc += 5;
         if (forInfo.fi_data == NULL)
              forInfo.fi_data = (tForState*)
-                 AGALOC(5 * sizeof(tForState), "Initial FOR sate");
+                 AGALOC(5 * sizeof(tForState), "Init FOR sate");
         else forInfo.fi_data = (tForState*)
                  AGREALOC((void*)forInfo.fi_data,
-                          forInfo.fi_alloc * sizeof(tForState),
-                          "Expansion of FOR state");
+                          forInfo.fi_alloc * sizeof(tForState), "FOR state");
     }
 
     pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
@@ -724,9 +723,8 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
     pFS->for_pzName   = pT->pzTemplText + pMac->ozName;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, "FOR %s loop in %s on line %d begins:\n",
-                pT->pzTemplText + pMac->ozName, pT->pzTplFile,
-                pMac->lineNo);
+        fprintf(pfTrace, TRACE_FN_FOR, pT->pzTemplText + pMac->ozName,
+                pT->pzTplFile, pMac->lineNo);
 
     /*
      *  Check for a FOR iterating based on scheme macros
@@ -751,11 +749,11 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
     forInfo.fi_depth--;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(pfTrace, "FOR %s repeated %d times\n",
-                pT->pzTemplText + pMac->ozName, loopCt);
+        fprintf(pfTrace, TRACE_FN_FOR_REPEAT, pT->pzTemplText + pMac->ozName,
+                loopCt);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, zFileLine, pT->pzTplFile, pMac->lineNo);
+            fprintf(pfTrace, TAB_FILE_LINE_FMT, pT->pzTplFile, pMac->lineNo);
     }
 
     return pMRet;
@@ -779,7 +777,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 
     papLoadProc = apForLoad;
     if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, "FOR macro requires iterator name");
+        AG_ABEND_IN(pT, pMac, LD_FOR_NAMELESS);
 
     /*
      *  IF this is the first time here,
@@ -809,12 +807,12 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     *(pzCopy++) = NUL;
 
     if (pT->pzTemplText[ pMac->ozName ] == NUL)
-        AG_ABEND_IN(pT, pMac, "invalid FOR loop variable");
+        AG_ABEND_IN(pT, pMac, LD_FOR_INVALID_VAR);
 
     /*
      *  Skip space to the start of the text following the iterator name
      */
-    while (IS_WHITESPACE_CHAR(*pzSrc)) pzSrc++;
+    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
     srcLen -= pzSrc - (char*)pMac->ozText;
 
     /* * * * *
@@ -829,7 +827,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      *
      *  FOR foo IN ...  -> no text, but we create an array of text values
      */
-    else if (  (strneqvcmp(pzSrc, "in", 2) == 0)
+    else if (  (strneqvcmp(pzSrc, LD_FOR_IN, 2) == 0)
             && IS_WHITESPACE_CHAR(pzSrc[2])) {
         load_ForIn(pzSrc, srcLen, pT, pMac);
     }
@@ -856,7 +854,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 
     pEndMac = parseTemplate(pMac + 1, ppzScan);
     if (*ppzScan == NULL)
-        AG_ABEND_IN(pT, pMac, "ENDFOR not found");
+        AG_ABEND_IN(pT, pMac, LD_FOR_NO_ENDFOR);
 
     pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;
 

@@ -2,11 +2,11 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2011-12-17 11:41:21 bkorb"
+# Time-stamp:        "2011-12-30 12:34:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ DEBUG      ( 3) in debug.tpl at line 3
 Text       (12) in debug.tpl at line 3
   
 Unknown    (13) in debug.tpl at line 4
-remapped to Expr (13) in debug.tpl at line 4
+remapped to 'Expr' (13) in debug.tpl at line 4
 	based on val[$]
 Text       (12) in debug.tpl at line 4
   
@@ -91,7 +91,7 @@ eval from file debug.tpl line 7:
 Text       (12) in debug.tpl at line 7
   ]=
 Unknown    (13) in debug.tpl at line 7
-remapped to Expr (13) in debug.tpl at line 7
+remapped to 'Expr' (13) in debug.tpl at line 7
 	based on val
 DEBUG      ( 3) in debug.tpl at line 7
   bucket 128

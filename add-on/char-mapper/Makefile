@@ -1,18 +1,21 @@
 
 # char-mapper Makefile
 #
-
-           TOP = ..
-           SRC = char-mapper.c cm-opt.c
-           OBJ = $(SRC:.c=.o)
-           EXE = char-mapper
-        TARGET = $(EXE)
-   LOCAL_CLEAN = lcl-clean
- LOCAL_CLOBBER = lcl-clobber
+            TOP = ..
+            SRC = char-mapper.c cm-opt.c
+            OBJ = $(SRC:.c=.o)
+            EXE = char-mapper
+         TARGET = $(EXE)
+    LOCAL_CLEAN = lcl-clean
+  LOCAL_CLOBBER = lcl-clobber
+    HEADER_LIST = cm-opt.h
 
 include $(TOP)/MakeRules
 
-$(SRC)      : cm-opt.stamp
+cm-opt.c        : cm-opt.stamp
+$(OBJ)          : $(HEADER_LIST) cm-usage.c
+$(HEADER_LIST)  : cm-opt.stamp
+
 cm-opt.stamp: mk-str2enum.sh mk-opt-table.sh
 	bash ./mk-opt-table.sh $@
 	@touch $@

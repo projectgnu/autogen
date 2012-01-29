@@ -7,7 +7,7 @@ c=%s-fsm.c
 #  Time-stamp:      "2011-06-03 12:10:58 bkorb"
 
 ## This file is part of AutoGen.
-## Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+## Copyright (c) 1992-2012 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the

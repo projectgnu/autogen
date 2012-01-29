@@ -2,13 +2,13 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2011-06-03 12:20:36 bkorb"
+ *  Time-stamp:        "2012-01-29 09:39:37 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,8 +23,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-static char const zErrMsg[] = "%s Error:  %s in %s on line %d\n";
-
 /*
  *  This keyword table must match those found in agParse.y.
  *  You will find them in a %token statement that follows
@@ -79,7 +77,7 @@ static void
 alist_to_autogen_def(void);
 
 static char*
-assembleName(char * pzScan, te_dp_event * pRetVal);
+gather_name(char * pzScan, te_dp_event * pRetVal);
 
 static char*
 assembleHereString(char* pzScan);
@@ -100,27 +98,32 @@ pop_context(void)
 static void
 trim_whitespace(void)
 {
-    char* pz = pCurCtx->pzScan;
-    if (*pz == NL)
-        pCurCtx->lineNo++;
-    *(pz++) = NUL;
+    char * pz = pCurCtx->pzScan;
 
     /*
      *  This ensures that any names found previously
      *  are NUL terminated.
      */
-    while (IS_WHITESPACE_CHAR(*pz)) {
-        if (*pz == NL)
-            pCurCtx->lineNo++;
-        pz++;
+    if (*pz == NL)
+        pCurCtx->lineNo++;
+    *pz = NUL;
+
+    for (;;) {
+        pz = SPN_HORIZ_WHITE_CHARS(pz+1);
+        if (*pz != NL)
+            break;
+        pCurCtx->lineNo++;
     }
+
     pCurCtx->pzScan = pz;
 }
 
 static void
 lex_escaped_char(void)
 {
-    char* pz = strchr(pCurCtx->pzScan, ';');
+    static int const semi_colon = ';';
+
+    char* pz = strchr(pCurCtx->pzScan, semi_colon);
 
     for (;;) {
         if (pz == NULL) {
@@ -129,10 +132,10 @@ lex_escaped_char(void)
         }
         if (IS_WHITESPACE_CHAR(pz[1])) {
             *pz = NUL;
-            pz[1] = ';';
+            pz[1] = semi_colon;
             break;
         }
-        pz = strchr(pz+1, ';');
+        pz = strchr(pz+1, semi_colon);
     }
 
     lastToken = DP_EV_STRING;
@@ -158,7 +161,7 @@ lex_backquote(void)
 
     if (pz == NULL)
         return PROBLEM;
-    TAGMEM(pz, "shell definition string");
+    TAGMEM(pz, "shell def str");
     pz_token = pz;
     manageAllocatedData(pz);
     return SUCCESS;
@@ -173,7 +176,7 @@ lex_comment(void)
     switch (pCurCtx->pzScan[1]) {
     case '*':
     {
-        char* pz = strstr(pCurCtx->pzScan+2, "*/");
+        char* pz = strstr(pCurCtx->pzScan+2, END_C_COMMENT);
         if (pz != NULL) {
             char* p = pCurCtx->pzScan+1;
             for (;;) {
@@ -297,7 +300,7 @@ scanAgain:
         break;
 
     case '\\':
-        if (strncmp(pCurCtx->pzScan+1, "'(", (size_t)2) == 0) {
+        if (strncmp(pCurCtx->pzScan+1, START_SCHEME_LIST, (size_t)2) == 0) {
             alist_to_autogen_def();
             goto scanAgain;
         }
@@ -321,7 +324,7 @@ scanAgain:
 
     default:
     BrokenToken:
-        pCurCtx->pzScan = assembleName(pCurCtx->pzScan, &lastToken);
+        pCurCtx->pzScan = gather_name(pCurCtx->pzScan, &lastToken);
         break;
     }   /* switch (*pCurCtx->pzScan) */
 
@@ -329,7 +332,7 @@ scanAgain:
 
 NUL_error:
 
-    AG_ABEND(aprf(zErrMsg, pzProg, "unterminated quote in definition",
+    AG_ABEND(aprf(DEF_ERR_FMT, pzProg, YYLEX_UNENDING_QUOTE,
                   pCurCtx->pzCtxFname, pCurCtx->lineNo));
     return DP_EV_INVALID;
 
@@ -353,17 +356,7 @@ lex_done:
 LOCAL void
 yyerror(char* s)
 {
-    static char const yyerr_fmt[] =
-        "%s:  in %s on line %d\n"
-        "\ttoken in error:  %s\n"
-        "\t[[...<error-text>]] %s\n\n"
-        "Likely causes:  a mismatched quote, a value that needs "
-        "quoting,\n\t\tor a missing semi-colon\n";
-
-    static char const zErrTkn[] = "%s:  ``%s''\n";
-    static char const zDf[] = "`%s'\n";
-
-    char* pz;
+    char * pz;
 
     if (strlen(pCurCtx->pzScan) > 64 )
         pCurCtx->pzScan[64] = NUL;
@@ -376,14 +369,14 @@ yyerror(char* s)
         if (strlen(pz_token) > 64 )
             pz_token[64] = NUL;
 
-        pz = aprf(zErrTkn, DP_EVT_NAME(lastToken), pz_token);
+        pz = aprf(YYLEX_TOKEN_STR, DP_EVT_NAME(lastToken), pz_token);
         break;
 
     default:
-        pz = aprf(zDf, DP_EVT_NAME(lastToken));
+        pz = aprf(YYLEX_DF_STR, DP_EVT_NAME(lastToken));
     }
-    AG_ABEND(aprf(yyerr_fmt, s, pCurCtx->pzCtxFname, pCurCtx->lineNo, pz,
-                  pCurCtx->pzScan));
+    AG_ABEND(aprf(YYLEX_ERR_FMT, s, pCurCtx->pzCtxFname, pCurCtx->lineNo,
+                  pz, pCurCtx->pzScan));
 }
 
 
@@ -402,8 +395,7 @@ loadScheme(void)
      *  the NUL-ed character.
      */
     if (*pzEnd == NUL)
-        AG_ABEND(aprf(zErrMsg, pzProg,
-                      "end of Guile/scheme expression not found",
+        AG_ABEND(aprf(DEF_ERR_FMT, pzProg, LOAD_SCM_ENDLESS,
                       pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
     *pzEnd  = NUL;
@@ -444,9 +436,6 @@ loadScheme(void)
 static void
 alist_to_autogen_def(void)
 {
-    static char const zSchemeText[] = "Scheme Computed Definitions";
-    static char const zWrap[] = "(alist->autogen-def %s)";
-
     char*  pzText  = ++(pCurCtx->pzScan);
     char*  pzEnd   = (char*)skipScheme(pzText, pzText + strlen(pzText));
 
@@ -460,7 +449,7 @@ alist_to_autogen_def(void)
     {
         char endCh = *pzEnd;
         *pzEnd = NUL;
-        pzText = aprf(zWrap, pzText);
+        pzText = aprf(ALIST_TO_AG_WRAP, pzText);
         *pzEnd = endCh;
     }
 
@@ -474,11 +463,8 @@ alist_to_autogen_def(void)
     /*
      *  The result *must* be a string, or we choke.
      */
-    if (! AG_SCM_STRING_P(res)) {
-        static char const zEr[] =
-            "Scheme definition expression does not yield string:\n";
-        AG_ABEND(zEr);
-    }
+    if (! AG_SCM_STRING_P(res))
+        AG_ABEND(ALIST_TO_AG_ERR);
 
     res_len   = AG_SCM_STRLEN(res);
     procState = PROC_STATE_LOAD_DEFS;
@@ -489,14 +475,14 @@ alist_to_autogen_def(void)
      *  Now, push the resulting string onto the input stack
      *  and link the new scan data into the context stack
      */
-    pCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx) + 4 + res_len, "lex scan ctx");
+    pCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx) + 4 + res_len, "lex ctx");
     pCtx->pCtx  = pCurCtx;
     pCurCtx     = pCtx;
 
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR(pCtx->pzCtxFname, zSchemeText, "scheme text");
+    AGDUPSTR(pCtx->pzCtxFname, ALIST_TO_AG_TEXT, "scheme text");
     pCtx->pzScan = \
     pCtx->pzData = (char*)(pCtx+1);
     pCtx->lineNo = 0;
@@ -518,7 +504,7 @@ alist_to_autogen_def(void)
  *  Figure out which.
  */
 static char*
-assembleName(char * pzScan, te_dp_event * pRetVal)
+gather_name(char * pzScan, te_dp_event * pRetVal)
 {
     /*
      *  Check for a number.
@@ -539,13 +525,12 @@ assembleName(char * pzScan, te_dp_event * pRetVal)
                       pzProg, *pzScan, pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
     {
-        unsigned char* pz = (unsigned char*)pzScan;
-
-        while (IS_VALUE_NAME_CHAR(*pz))          pz++;
+        char* pz = SPN_VALUE_NAME_CHARS(pzScan);
 
         if (IS_UNQUOTABLE_CHAR(*pz)) {
             *pRetVal = DP_EV_OTHER_NAME;
-            while (IS_UNQUOTABLE_CHAR(*++pz))    ;
+            pz = SPN_UNQUOTABLE_CHARS(pz+1);
+
         } else
             *pRetVal = DP_EV_VAR_NAME;
 
@@ -591,7 +576,6 @@ assembleName(char * pzScan, te_dp_event * pRetVal)
 static char*
 assembleHereString(char* pzScan)
 {
-    static char const endless[] = "Unterminated HereString";
     ag_bool  trimTabs = AG_FALSE;
     char     zMark[ MAX_HEREMARK_LEN ];
     size_t   markLen = 0;
@@ -611,7 +595,7 @@ assembleHereString(char* pzScan)
      */
     while (IS_WHITESPACE_CHAR(*pzScan)) {
         if (*pzScan++ == NL)
-            AG_ABEND(aprf(zErrMsg, pzProg, "HereString missing the mark",
+            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, "HereString missing the mark",
                           pCurCtx->pzCtxFname, pCurCtx->lineNo));
     }
 
@@ -619,22 +603,22 @@ assembleHereString(char* pzScan)
      *  Copy the marker, noting its length
      */
     {
-        char* pz = zMark;
-        while (IS_VARIABLE_NAME_CHAR(*pzScan)) {
-            if (++markLen >= sizeof(zMark))
-                AG_ABEND(aprf(zErrMsg, pzProg, "HereString mark "
-                              STR(MAX_HEREMARK_LEN) " or more chars",
-                              pCurCtx->pzCtxFname, pCurCtx->lineNo));
+        char * pz = SPN_VARIABLE_NAME_CHARS(pzScan);
+        markLen = pz - pzScan;
 
-            *(pz++) = *(pzScan++);
-        }
         if (markLen == 0)
-            AG_ABEND(aprf(zErrMsg, pzProg, "HereString missing the mark",
+            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_MISS_MARK_STR,
                           pCurCtx->pzCtxFname, pCurCtx->lineNo));
-        *pz = NUL;
+
+        if (markLen >= sizeof(zMark))
+            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_MARK_TOO_LONG,
+                          pCurCtx->pzCtxFname, pCurCtx->lineNo));
+
+        memcpy(zMark, pzScan, markLen);
+        zMark[markLen] = NUL;
     }
 
-    pzDest = pzScan;
+    pzDest   = pzScan;
     pz_token = pzDest;
 
     /*
@@ -642,8 +626,8 @@ assembleHereString(char* pzScan)
      */
     pzScan = strchr(pzScan, NL);
     if (pzScan == NULL)
-        AG_ABEND(aprf(zErrMsg, pzProg, endless, pCurCtx->pzCtxFname,
-                      pCurCtx->lineNo));
+        AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_ENDLESS_STR,
+                      pCurCtx->pzCtxFname, pCurCtx->lineNo));
 
     /*
      *  And skip the first new line + conditionally skip tabs
@@ -669,8 +653,8 @@ assembleHereString(char* pzScan)
                 goto lineDone;
 
             case NUL:
-                AG_ABEND(aprf(zErrMsg, pzProg, endless, pCurCtx->pzCtxFname,
-                              here_string_line_no));
+                AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_ENDLESS_STR,
+                              pCurCtx->pzCtxFname, here_string_line_no));
             }
         } lineDone:;
 

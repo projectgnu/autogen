@@ -3,10 +3,10 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2011-12-29 09:44:44 bkorb"
+ *  Time-stamp:        "2012-01-29 13:33:10 bkorb"
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -23,7 +23,7 @@ autogen definitions options;
  */
 
 copyright = {
-    date  = "1992-2011";
+    date  = "1992-2012";
     owner = "Bruce Korb";
     eaddr = 'autogen-users@lists.sourceforge.net';
     type  = gpl;
@@ -112,10 +112,13 @@ exit-desc[3]  = 'The definitions could not be deciphered.';
 exit-name[4]  = load-error;
 exit-desc[4]  = 'An error was encountered during the load phase.';
 exit-name[5]  = signal;
-exit-desc[5]  = 'Program exited due to catching a signal.
-If your template includes string formatting, a number argument
-to a "%s" formatting element will trigger a segmentation fault.
-Autogen will catch the seg fault signal and exit with code 5.';
+exit-desc[5]  = <<- _EndDesc_
+	Program exited due to catching a signal.  If your template includes
+	string formatting, a number argument to a "%s" formatting element will
+	trigger a segmentation fault.  Autogen will catch the seg fault signal
+	and exit with @code{AUTOGEN_EXIT_SIGNAL(5)}.  Alternatively, AutoGen
+	may have been interrupted with a @code{kill(2)} signal.
+	_EndDesc_;
 
 flag = {
     name      = templ-dirs;

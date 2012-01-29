@@ -5,10 +5,10 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2011-08-22 07:59:15 bkorb"
+ *  Time-stamp:      "2012-01-29 20:21:59 bkorb"
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -60,12 +60,11 @@ initialize(int arg_ct, char** arg_vec)
      *  Initialize all the Scheme functions.
      */
     ag_init();
-    pzLastScheme = zSchemeInit;
+    pzLastScheme = SCHEME_INIT_TEXT;
     ag_scm_c_eval_string_from_file_line(
-        zSchemeInit, SCHEME_INIT_FILE, schemeLine);
+        SCHEME_INIT_TEXT, AG_TEXT_STRTABLE_FILE, SCHEME_INIT_TEXT_LINENO);
 
-    SCM_EVAL_CONST("(add-hook! before-error-hook error-source-line)\n"
-                   "(use-modules (ice-9 stack-catch))");
+    SCM_EVAL_CONST(INIT_SCM_ERRS_FMT);
 
     pzLastScheme = NULL;
     procState = PROC_STATE_OPTIONS;
@@ -75,7 +74,7 @@ initialize(int arg_ct, char** arg_vec)
     exit_code = AUTOGEN_EXIT_LOAD_ERROR;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        SCM_EVAL_CONST("(debug-enable 'backtrace)");
+        SCM_EVAL_CONST(INIT_SCM_DEBUG_FMT);
 
 #ifdef DAEMON_ENABLED
 
@@ -88,7 +87,7 @@ initialize(int arg_ct, char** arg_vec)
         daemonize("/", logf, logf, logf);
     }
 #else
-    daemonize("/", zDevNull, zDevNull, zDevNull);
+    daemonize("/", DEV_NULL, DEV_NULL, DEV_NULL);
 #endif /* DEBUG_ENABLED */
 
     {
@@ -121,7 +120,7 @@ make_quote_str(char const * str)
         scan = scan + 1;
     }
 
-    res  = AGALOC(sz, "make target name");
+    res  = AGALOC(sz, "t name");
     scan = res;
 
     for (;;) {
@@ -155,7 +154,7 @@ dep_usage(char const * fmt, ...)
         va_end(ap);
     }
 
-    usage_message("invalid make dependency option:  %s", msg);
+    usage_message(USAGE_INVAL_DEP_OPT_FMT, msg);
     /* NOTREACHED */
 }
 
@@ -165,8 +164,6 @@ dep_usage(char const * fmt, ...)
 LOCAL void
 config_dep(tOptions * pOptions, tOptDesc * pOptDesc)
 {
-    static char const dup_targ[] = "duplicate make target";
-
     char const * popt = pOptDesc->optArg.argString;
 
     /*
@@ -181,23 +178,23 @@ retry:
 
     switch (*popt) {
     case ' ': case TAB: case '\r': case NL:
-        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
+        popt = SPN_WHITESPACE_CHARS(popt + 1);
         goto retry;
 
     case 'Q':
         if (pzDepTarget != NULL)
-            dep_usage(dup_targ);
+            dep_usage(CFGDEP_DUP_TARGET_MSG);
 
-        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
+        popt = SPN_WHITESPACE_CHARS(popt + 1);
         pzDepTarget = make_quote_str(popt);
         break;
 
     case 'T':
         if (pzDepTarget != NULL)
-            dep_usage(dup_targ);
+            dep_usage(CFGDEP_DUP_TARGET_MSG);
 
-        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
-        AGDUPSTR(pzDepTarget, popt, "make target name");
+        popt = SPN_WHITESPACE_CHARS(popt + 1);
+        AGDUPSTR(pzDepTarget, popt, "t name");
         break;
 
     case 'D':
@@ -211,10 +208,10 @@ retry:
 
     case 'F':
         if (pzDepFile != NULL)
-            dep_usage(dup_targ);
+            dep_usage(CFGDEP_DUP_TARGET_MSG);
 
-        while (IS_WHITESPACE_CHAR((int)*(++popt)))  ;
-        pzDepFile = aprf("%s-XXXXXX", popt);
+        popt = SPN_WHITESPACE_CHARS(popt + 1);
+        pzDepFile = aprf(CFGDEP_TARGET_TMP_FMT, popt);
         break;
 
     case 'P':
@@ -222,14 +219,13 @@ retry:
         break;
 
     default:
-        dep_usage("unknown dependency type:  %s", popt);
+        dep_usage(CFGDEP_UNKNOWN_DEP_FMT, popt);
     }
 }
 
 static void
 add_sys_env(char* pzEnvName)
 {
-    static char const zFmt[] = "%s=1";
     int i = 2;
 
     for (;;) {
@@ -250,9 +246,9 @@ add_sys_env(char* pzEnvName)
         char* pz;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, "Adding ``%s'' to environment\n", pzEnvName);
-        pz = aprf(zFmt, pzEnvName);
-        TAGMEM(pz, "Added environment var");
+            fprintf(pfTrace, TRACE_ADD_TO_ENV_FMT, pzEnvName);
+        pz = aprf(ADD_SYS_ENV_VAL_FMT, pzEnvName);
+        TAGMEM(pz, ADD_TO_ENV_MSG);
         putenv(pz);
     }
 }
@@ -265,8 +261,8 @@ add_env_vars(void)
      *  The lowest of the low is the config time install data dir.
      *  Next is the *current* directory of this executable.
      */
-    SET_OPT_TEMPL_DIRS("$@");
-    SET_OPT_TEMPL_DIRS("$$/../share/autogen");
+    SET_OPT_TEMPL_DIRS(DFT_TPL_DIR_DATA);
+    SET_OPT_TEMPL_DIRS(DFT_TPL_DIR_RELATIVE);
 
     {
         char z[ SCRIBBLE_SIZE ] = "__autogen__";
@@ -286,7 +282,7 @@ add_env_vars(void)
             if (sz > 0) {
                 sz += 2;
                 while (z[sz-1] == NUL)  sz--;
-                strcpy(z + sz, "__");
+                strcpy(z + sz, ADD_ENV_VARS_SUFFIX_FMT+2);
                 add_sys_env(z);
             }
         }
@@ -296,15 +292,15 @@ add_env_vars(void)
 
         add_sys_env(z);
         if (uname(&unm) != 0)
-            AG_CANT("uname(2)", "syscall");
+            AG_CANT(UNAME_CALL_NAME, SYSCALL_NAME);
 
-        sprintf(z+2, "%s__", unm.sysname);
+        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.sysname);
         add_sys_env(z);
 
-        sprintf(z+2, "%s__", unm.machine);
+        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.machine);
         add_sys_env(z);
 
-        sprintf(z+2, "%s__", unm.nodename);
+        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.nodename);
         add_sys_env(z);
 #else
 
@@ -341,7 +337,6 @@ evalProto(char const ** ppzS, uint16_t* pProto)
     return IS_DEC_DIGIT_CHAR(*pzS);
 }
 
-
   LOCAL void
 handleSighup(int sig)
 {
@@ -359,23 +354,22 @@ spawnPipe(char const * pzFile)
 
     {
         size_t len = 2 * (strlen(pzFile) + 5);
-        pzIn = AGALOC(len + 5, "fifo file name");
-        pzOut = pzIn + sprintf(pzIn, "%s-in", pzFile) + 1;
+        pzIn = AGALOC(len + 5, "fifo name");
+        pzOut = pzIn + sprintf(pzIn, PIPE_FIFO_IN_NAME_FMT, pzFile) + 1;
     }
 
     unlink(pzIn);
     if ((mkfifo(pzIn, S_IRW_ALL) != 0) && (errno != EEXIST))
-        AG_CANT("mkfifo",    pzIn);
+        AG_CANT(PIPE_MKFIFO_NAME,    pzIn);
 
-    (void)sprintf(pzOut, "%s-out", pzFile);
+    (void)sprintf(pzOut, PIPE_FIFO_OUT_NAME_FMT, pzFile);
     unlink(pzOut);
     if ((mkfifo(pzOut, S_IRW_ALL) != 0) && (errno != EEXIST))
-        AG_CANT("mkfifo",    pzOut);
+        AG_CANT(PIPE_MKFIFO_NAME,    pzOut);
 
     fdpair.readFd = open(pzIn, O_RDONLY);
     if (fdpair.readFd < 0)
-        AG_CANT("open fifo", pzIn);
-
+        AG_CANT(PIPE_FIFO_OPEN, pzIn);
 
     {
         struct pollfd polls[1];
@@ -395,7 +389,7 @@ spawnPipe(char const * pzFile)
                 optionRestore(&autogenOptions);
                 doOptions(autogenOptions.origArgCt,
                           autogenOptions.origArgVect);
-                SET_OPT_DEFINITIONS("-");
+                SET_OPT_DEFINITIONS(PIPE_DEFS_STDIN_STR);
                 break;
 
             case 1:
@@ -409,25 +403,25 @@ spawnPipe(char const * pzFile)
                     continue;
 
                 case -1:
-                    AG_CANT("fork", zNil);
+                    AG_CANT(PIPE_FORK_NAME, zNil);
 
                 case 0:
                 }
 
                 if (dup2(fdpair.readFd, STDIN_FILENO) != STDIN_FILENO)
-                    AG_CANT("dup2", "stdin");
+                    AG_CANT(PIPE_DUP2_NAME_STR, PIPE_DEFS_STDIN_NAME);
 
                 fdpair.writeFd = open(pzOut, O_WRONLY);
                 if (fdpair.writeFd < 0)
-                    AG_CANT("open fifo", pzOut);
+                    AG_CANT(PIPE_FIFO_OPEN, pzOut);
 
                 polls[0].fd = fdpair.writeFd;
                 polls[0].events = POLLOUT;
                 if (poll(polls, 1, -1) != 1)
-                    AG_CANT("poll", "write pipe");
+                    AG_CANT(PIPE_POLL_NAME_STR, PIPE_WRITE_NAME_STR);
 
                 if (dup2(fdpair.writeFd, STDOUT_FILENO) != STDOUT_FILENO)
-                    AG_CANT("dup2", pzOut);
+                    AG_CANT(PIPE_DUP2_NAME_STR, pzOut);
 
                 return;
             }
@@ -448,7 +442,6 @@ spawnPipe(char const * pzFile)
   static void
 spawnListens(char const * pzPort, sa_family_t addr_family)
 {
-    static char const zPortFmt[] = "to port %s with %d type address";
     int socket_fd = socket(addr_family, SOCK_STREAM, 0);
     union {
         struct sockaddr     addr;
@@ -502,7 +495,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
     }
 
     if (bind(socket_fd, &sa.addr, addr_len) < 0) {
-        char* pz = aprf(zPortFmt, pzPort, addr_family);
+        char* pz = aprf(LISTEN_PORT_FMT, pzPort, addr_family);
         AG_CANT("bind", pz);
     }
 
@@ -510,7 +503,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
         AG_CANT("socket-fcntl", "FNDELAY");
 
     if (listen(socket_fd, 5) < 0)
-        AG_CANT("listen", aprf(zPortFmt, pzPort));
+        AG_CANT("listen", aprf(LISTEN_PORT_FMT, pzPort));
 
     for (;;) {
         fd_set fds;

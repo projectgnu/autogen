@@ -5,12 +5,12 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-08-19 19:58:45 bkorb"
+# Time-stamp:        "2012-01-29 18:34:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -172,6 +172,7 @@ echo creating ${testname}.sht
 exec 3> ${testname}.sht
 echo "#! ${SHELL}" >&3
 cat >&3 <<'_EOF_'
+#
 TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
 USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		reg-arg [ ... ]
@@ -197,17 +198,16 @@ Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.'
 
 
-TEST_SHELL_OPTION="${TEST_SHELL_OPTION}"
+TEST_SHELL_OPTION=${TEST_SHELL_OPTION}
 TEST_SHELL_OPTION_set=false
 export TEST_SHELL_OPTION
 
-TEST_SHELL_SECOND="${TEST_SHELL_SECOND}"
+TEST_SHELL_SECOND=${TEST_SHELL_SECOND}
 TEST_SHELL_SECOND_set=false
 export TEST_SHELL_SECOND
 
 OPT_PROCESS=true
-OPT_ARG="$1"
-
+OPT_ARG=$1
 while ${OPT_PROCESS} && [ $# -gt 0 ]
 do
     OPT_ELEMENT=''
@@ -218,16 +218,13 @@ do
         OPT_PROCESS=false
         shift
         ;;
-
     --* )
         OPT_CODE=`echo "X${OPT_ARG}"|sed 's/^X-*//'`
         shift
-        OPT_ARG="$1"
-
+        OPT_ARG=$1
         case "${OPT_CODE}" in *=* )
             OPT_ARG_VAL=`echo "${OPT_CODE}"|sed 's/^[^=]*=//'`
             OPT_CODE=`echo "${OPT_CODE}"|sed 's/=.*$//'` ;; esac
-
         case "${OPT_CODE}" in
         'op' | \
         'opt' | \
@@ -289,7 +286,6 @@ do
         NO )
             OPT_ARG_VAL=''
             ;;
-
         YES )
             if [ -z "${OPT_ARG_VAL}" ]
             then
@@ -299,20 +295,18 @@ do
                     echo "$TEST_SHELL_USAGE_TEXT"
                     exit 1
                 fi
-
-                OPT_ARG_VAL="${OPT_ARG}"
+                OPT_ARG_VAL=${OPT_ARG}
                 shift
-                OPT_ARG="$1"
+                OPT_ARG=$1
             fi
             ;;
-
         OK )
             if [ -z "${OPT_ARG_VAL}" ] && [ $# -gt 0 ]
             then
                 case "${OPT_ARG}" in -* ) ;; * )
-                    OPT_ARG_VAL="${OPT_ARG}"
+                    OPT_ARG_VAL=${OPT_ARG}
                     shift
-                    OPT_ARG="$1" ;; esac
+                    OPT_ARG=$1 ;; esac
             fi
             ;;
         esac
@@ -321,7 +315,6 @@ do
     -* )
         OPT_CODE=`echo "X${OPT_ARG}" | sed 's/X-\(.\).*/\1/'`
         OPT_ARG=` echo "X${OPT_ARG}" | sed 's/X-.//'`
-
         case "${OPT_CODE}" in
         'o' )
             if [ -n "${TEST_SHELL_OPTION}" ] && ${TEST_SHELL_OPTION_set} ; then
@@ -366,18 +359,16 @@ do
         NO )
             if [ -n "${OPT_ARG}" ]
             then
-                OPT_ARG=-"${OPT_ARG}"
+                OPT_ARG=-${OPT_ARG}
             else
                 shift
-                OPT_ARG="$1"
+                OPT_ARG=$1
             fi
             ;;
-
         YES )
             if [ -n "${OPT_ARG}" ]
             then
-                OPT_ARG_VAL="${OPT_ARG}"
-
+                OPT_ARG_VAL=${OPT_ARG}
             else
                 if [ $# -eq 0 ]
                 then
@@ -386,28 +377,25 @@ do
                     exit 1
                 fi
                 shift
-                OPT_ARG_VAL="$1"
+                OPT_ARG_VAL=$1
             fi
-
             shift
-            OPT_ARG="$1"
+            OPT_ARG=$1
             ;;
-
         OK )
             if [ -n "${OPT_ARG}" ]
             then
-                OPT_ARG_VAL="${OPT_ARG}"
+                OPT_ARG_VAL=${OPT_ARG}
                 shift
-                OPT_ARG="$1"
-
+                OPT_ARG=$1
             else
                 shift
                 if [ $# -gt 0 ]
                 then
                     case "$1" in -* ) ;; * )
-                        OPT_ARG_VAL="$1"
+                        OPT_ARG_VAL=$1
                         shift ;; esac
-                    OPT_ARG="$1"
+                    OPT_ARG=$1
                 fi
             fi
             ;;
@@ -418,20 +406,18 @@ do
          OPT_PROCESS=false
          ;;
     esac
-
     if [ -n "${OPT_ARG_VAL}" ]
     then
         eval TEST_SHELL_${OPT_NAME}${OPT_ELEMENT}="'${OPT_ARG_VAL}'"
         export TEST_SHELL_${OPT_NAME}${OPT_ELEMENT}
     fi
 done
-
 unset OPT_PROCESS || :
 unset OPT_ELEMENT || :
-unset OPT_ARG || :
+unset OPT_ARG     || :
 unset OPT_ARG_NEEDED || :
-unset OPT_NAME || :
-unset OPT_CODE || :
+unset OPT_NAME    || :
+unset OPT_CODE    || :
 unset OPT_ARG_VAL || :
 
 # # # # # # # # # #

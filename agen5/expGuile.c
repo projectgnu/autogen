@@ -2,13 +2,13 @@
 /**
  * @file expGuile.c
  *
- *  Time-stamp:        "2011-06-03 12:13:11 bkorb"
+ *  Time-stamp:        "2012-01-29 07:06:37 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -48,8 +48,7 @@ ag_scm_c_eval_string_from_file_line(
     SCM port = scm_open_input_string(AG_SCM_STR02SCM(pzExpr));
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-        fprintf(pfTrace, "eval from file %s line %d:\n%s\n", pzFile, line,
-                pzExpr);
+        fprintf(pfTrace, TRACE_EVAL_STRING, pzFile, line, pzExpr);
 
     {
         static SCM    file      = SCM_UNDEFINED;
@@ -66,6 +65,7 @@ ag_scm_c_eval_string_from_file_line(
             SCM ln = AG_SCM_INT2SCM(line);
             scm_set_port_filename_x(port, file);
             scm_set_port_line_x(port, ln);
+            scm_set_port_column_x(port, SCM_INUM0);
         }
     }
 
@@ -259,30 +259,26 @@ ag_scm_sum(SCM list)
 SCM
 ag_scm_string_to_c_name_x(SCM str)
 {
-    static char const zFun[] = "ag_scm_string_to_c_name_x";
-    static char const zMap[] = "cannot map unprintable chars to C name chars";
     int   len;
     char* pz;
 
     if (! AG_SCM_STRING_P(str))
-        scm_wrong_type_arg(zFun, 1, str);
+        scm_wrong_type_arg(STR_TO_C_NAME, 1, str);
 
-    len = AG_SCM_STRLEN(str);
-    pz  = (char*)(void*)AG_SCM_CHARS(str);
-    while (--len >= 0) {
+    
+    
+    for (pz = (char*)(void*)AG_SCM_CHARS(str), len = AG_SCM_STRLEN(str);
+         --len >= 0;
+         pz++) {
+
         char ch = *pz;
-        if (! IS_ALPHANUMERIC_CHAR(ch)) {
+        if (IS_ALPHANUMERIC_CHAR(ch) || IS_WHITESPACE_CHAR(ch))
+            continue;
 
-            if (IS_WHITESPACE_CHAR(ch))
-                ;
+        if (! IS_GRAPHIC_CHAR(ch))
+            scm_misc_error(STR_TO_C_NAME, STR_TO_C_MAP_FAIL, str);
 
-            else if (IS_GRAPHIC_CHAR(ch))
-                *pz = '_';
-
-            else
-                scm_misc_error(zFun, zMap, str);
-        }
-        pz++;
+        *pz = '_';
     }
 
     return str;

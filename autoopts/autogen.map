@@ -1,14 +1,14 @@
 
-%guard          autoopts_internal
+%guard
 %file           ag-char-map.h
-%static-table   option-char-category
 
 %comment
   This file contains the character classifications
   used by AutoGen and AutoOpts for identifying tokens.
+  The table is static scope, so %guard is empty.
 
   This file is part of AutoGen.
-  Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
 
   AutoGen is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,8 @@ variable-name   +var-first    +dec-digit
 option-name     "^-"          +variable-name
 value-name      ":"           +option-name
 horiz-white     "\t "
-compound-name   "[.]"         +value-name   +horiz-white
+name-sep        "[.]"
+compound-name   +value-name   +name-sep +horiz-white
 whitespace      "\v\f\r\n\b"  +horiz-white
 unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
 end-xml-token   "/>"          +whitespace
@@ -48,3 +49,4 @@ false-type      "nNfF0\x00"
 file-name       "/"           +suffix
 end-token       "\x00"        +whitespace
 end-list-entry  ","           +end-token
+set-separator   "|+"          +end-list-entry

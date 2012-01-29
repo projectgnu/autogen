@@ -4,7 +4,7 @@
 
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -96,7 +96,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (out-push-new (string-append (base-name) ".h"))
 (dne " *  " "/* ")=]
  *
- *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -147,7 +147,7 @@ ENDFOR symbol   =]
 
 =]
  *
- *  copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
 [=
 (string-table-new "g_nm")

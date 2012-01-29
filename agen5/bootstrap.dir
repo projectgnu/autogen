@@ -4,10 +4,10 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-12-15 12:35:27 bkorb"
+# Time-stamp:        "2012-01-07 07:44:08 bkorb"
 ##
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -246,6 +246,16 @@ make_texi()
 
 # # # # # # # # # # # # # # # # # # #
 #
+# Construct the ag-text strings
+#
+make_ag_text()
+{
+    export srcdir AG_VERSION
+    run_ag ag-text ${srcdir}/ag-text.def
+}
+
+# # # # # # # # # # # # # # # # # # #
+#
 # Construct the man page
 #
 make_man()
@@ -293,6 +303,8 @@ do
     opts.[ch]       )           make_opts ;;
 
   (stamp-fsm        )           make_fsm ;;
+
+  (stamp-ag-text    )           make_ag_text ;;
 
   ( stamp-exprini   | \
     expr.h          | \

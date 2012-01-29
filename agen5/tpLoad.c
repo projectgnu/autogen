@@ -2,12 +2,12 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2011-12-29 10:04:47 bkorb"
+ * Time-stamp:        "2012-01-29 09:24:26 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
- * Copyright (c) 1992-2011 Bruce Korb - all rights reserved
+ * Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -134,16 +134,13 @@ findFile(char const * pzFName,
      *  then we will use the TEMPL_DIR search list to keep hunting.
      */
     {
-        static char const curdir[]  = ".";
-        static char const zDirFmt[] = "%s/%s";
-
         /*
-         *  Search each directory in our directory search list
-         *  for the file.  We always force two copies of this option.
+         *  Search each directory in our directory search list for the file.
+         *  We always force two copies of this option, so we know it exists.
          */
         int  ct = STACKCT_OPT(TEMPL_DIRS);
         char const ** ppzDir = STACKLST_OPT(TEMPL_DIRS) + ct - 1;
-        char const *  pzDir  = curdir;
+        char const *  pzDir  = FIND_FILE_CURDIR;
 
         if (*pzFName == '/')
             ct = 0;
@@ -159,7 +156,7 @@ findFile(char const * pzFName,
                 if (! optionMakePath(pzFullName, (int)AG_PATH_MAX, pzDir,
                                      autogenOptions.pzProgPath)) {
                     coerce = (void *)pzDir;
-                    strcpy(coerce, curdir);
+                    strcpy(coerce, FIND_FILE_CURDIR);
 
                 } else {
                     AGDUPSTR(pzDir, pzFullName, "find directory name");
@@ -169,7 +166,7 @@ findFile(char const * pzFName,
                 }
             }
 
-            if ((*pzFName == '/') || (pzDir == curdir)) {
+            if ((*pzFName == '/') || (pzDir == FIND_FILE_CURDIR)) {
                 size_t nln = strlen(pzFName);
                 if (nln >= AG_PATH_MAX - MAX_SUFFIX_LEN)
                     break;
@@ -181,7 +178,7 @@ findFile(char const * pzFName,
             else {
                 pzEnd = pzFullName
                     + snprintf(pzFullName, AG_PATH_MAX - MAX_SUFFIX_LEN,
-                               zDirFmt, pzDir, pzFName);
+                               FIND_FILE_DIR_FMT, pzDir, pzFName);
             }
 
             if (read_okay(pzFullName))
@@ -214,7 +211,7 @@ findFile(char const * pzFName,
              *  never again when ct is STACKCT_OPT(TEMPL_DIRS)
              */
             if (  (pzReferrer != NULL)
-               && (pzDir == curdir)
+               && (pzDir == FIND_FILE_CURDIR)
                && (ct == STACKCT_OPT(TEMPL_DIRS))) {
 
                 pzDir = pzReferrer;
@@ -293,7 +290,7 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
          *  Make sure all of the input string was scanned.
          */
         if (pzData != NULL)
-            AG_ABEND("Template parse ended unexpectedly");
+            AG_ABEND(LOAD_MACS_BAD_PARSE);
 
         ct = pMacEnd - pMac;
 
@@ -368,7 +365,7 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
 
     strcpy(pRes->zStartMac, zStartMac); /* must fit */
     strcpy(pRes->zEndMac, zEndMac);     /* must fit */
-    load_macs(pRes, real_file, "*template file*", pzData);
+    load_macs(pRes, real_file, PSEUDO_MAC_TPL_FILE, pzData);
 
     pRes->pzTplName   -= (long)pRes;
     pRes->pzTemplText -= (long)pRes;
@@ -389,16 +386,17 @@ LOCAL tTemplate *
 loadTemplate(char const * pzFileName, char const * referrer)
 {
     static tmap_info_t mapInfo;
-    static char        zRealFile[ AG_PATH_MAX ];
+    static char        tpl_file[ AG_PATH_MAX ];
 
     /*
      *  Find the template file somewhere
      */
     {
-        static char const * const apzSfx[] = { "tpl", "agl", NULL };
-        if (! SUCCESSFUL(findFile(pzFileName, zRealFile, apzSfx, referrer))) {
+        static char const * const apzSfx[] = {
+            LOAD_TPL_SFX_TPL, LOAD_TPL_SFX_AGL, NULL };
+        if (! SUCCESSFUL(findFile(pzFileName, tpl_file, apzSfx, referrer))) {
             errno = ENOENT;
-            AG_CANT("map data file", pzFileName);
+            AG_CANT(LOAD_TPL_CANNOT_MAP, pzFileName);
         }
     }
 
@@ -408,24 +406,24 @@ loadTemplate(char const * pzFileName, char const * referrer)
      */
     {
         struct stat stbf;
-        if (stat(zRealFile, &stbf) != 0)
-            AG_CANT("stat file", pzFileName);
+        if (stat(tpl_file, &stbf) != 0)
+            AG_CANT(LOAD_TPL_CANNOT_STAT, pzFileName);
 
         if (! S_ISREG(stbf.st_mode)) {
             errno = EINVAL;
-            AG_CANT("not regular file", pzFileName);
+            AG_CANT(LOAD_TPL_IRREGULAR, pzFileName);
         }
 
         if (outTime <= stbf.st_mtime)
             outTime = stbf.st_mtime + 1;
     }
 
-    text_mmap(zRealFile, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo);
+    text_mmap(tpl_file, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo);
     if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
-        AG_ABEND(aprf("Could not open template '%s'", zRealFile));
+        AG_ABEND(aprf(LOAD_TPL_CANNOT_OPEN, tpl_file));
 
     if (pfDepends != NULL)
-        add_source_file(zRealFile);
+        add_source_file(tpl_file);
 
     /*
      *  Process the leading pseudo-macro.  The template proper
@@ -436,7 +434,7 @@ loadTemplate(char const * pzFileName, char const * referrer)
         tTemplate * pRes;
         pCurMacro = NULL;
 
-        pRes = digest_pseudo_macro(&mapInfo, zRealFile);
+        pRes = digest_pseudo_macro(&mapInfo, tpl_file);
         pCurMacro = pSaveMac;
         text_munmap(&mapInfo);
 

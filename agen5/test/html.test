@@ -3,11 +3,11 @@
 # ----------------------------------------------------------------------
 # html.test --- test html generation
 #
-# Time-stamp:      "2011-02-24 10:53:02 bkorb"
+# Time-stamp:      "2011-12-30 12:17:28 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -68,7 +68,7 @@ _EOF_
 echo creating ${testname}.out in `pwd`
 # this is the output we should expect to see
 cat > ${testname}.samp <<'_EOF_'
-Content-Type: text/html
+content-type: text/html
 
 <head>Mumble:  fumble bumble</head>
 <body>Foolish: bar</body>

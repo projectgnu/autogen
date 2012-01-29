@@ -4,10 +4,10 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-01-24 15:02:12 bkorb"
+# Time-stamp:        "2011-12-30 16:40:11 bkorb"
 #
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -152,7 +152,7 @@ echo creating ${testname}.base4
 cat > ${testname}.base4 <<'_EOF_'
 FSM Error:  in state 5 (have_name), event 3 (var_name) is invalid
 invalid transition:  in error2.def on line 2
-	token in error:  var_name:  ``is broken;
+	token in error:  var_name:  ''is broken;
 ''
 
 	[[...<error-text>]]  broken;

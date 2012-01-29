@@ -2,12 +2,12 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2011-04-20 10:13:05 bkorb"
+ *  Time-stamp:        "2012-01-29 08:28:04 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
  *  This file is part of char-mapper.
- *  char-mapper Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * char-mapper is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#define  _GNU_SOURCE 1
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -42,51 +42,12 @@
 #  define NBBY 8
 #endif
 
-static char const usage_txt[] =
-    "USAGE:  char-mapper [ -h | --help | <input-file> ]\n"
-    "If the '<input-file>' is not specified, it is read from standard input.\n"
-    "Input may not be from a TTY device.  Various directives affecting the\n"
-    "output are embedded in the input text.  These are:\n\n"
-
-    "  %guard\n"
-    "\tspecifies the name of a '#ifdef' guard protecting the compilation of\n"
-    "\tthe bit mask table.  One compilation unit must '#define' this name.\n"
-    "\tThe default is:  CHAR_MAPPER_DEFINE\n\n"
-
-    "  %file\n"
-    "\tspecifies the output file name.  The multi-inclusion guard is\n"
-    "\tderived from this name.  That guard defaults to CHAR_MAPPER_H_GUARD.\n"
-    "\tThe default output is to stdout.\n\n"
-
-    "  %comment\n"
-    "\tspecifies the text to insert in a comment block at the head of the\n"
-    "\toutput file.  The comment text starts on the next line and ends with\n"
-    "\tthe first input line with a percent ('%') in the first column.\n"
-    "\tThe default is:  char-mapper Character Classifications\n\n"
-
-    "  %table\n"
-    "\tspecifies the name of the output table.  Normally, it is a global,\n"
-    "\tbut may be made static scope with %static-table.\n"
-    "\tThe default is:  char_type_table\n\n"
-
-    "Otherwise, input lines that are blank or start with a hash ('#') are\n"
-    "ignored.  The lines that are not ignored must begin with a name and be\n"
-    "followed by space separated character membership specifications.\n"
-    "A quoted string is \"cooked\" and the characters found added to the\n"
-    "set of member characters for the given name.  If the string is preceded\n"
-    "by a hyphen ('-'), then the characters are removed from the set.  Ranges\n"
-    "of characters are specified by a hyphen between two characters.  If you\n"
-    "want a hyphen in the set, use it at the start or end of the string.\n"
-    "You may also add or remove members of previously defined sets by name,\n"
-    "preceded with a plus ('+') or hyphen ('-'), respectively.\n\n"
-
-    "If the input file can be rewound and re-read, then the input text will\n"
-    "also be inserted into the output as a comment.\n";
-
-#define BUF_SIZE 1024
+#define BUF_SIZE         0x1000
 #define CLASS_NAME_LIMIT 31
 
 static char const bad_directive[] = "invalid directive: %s\n";
+static char const typedef_mask[]  = "typedef %s %s;\n\n";
+static char const declare_tbl[]   = "extern %s const %s[%d];\n";
 
 static char const leader_z[] = "/*\n\
  *   Character mapping generated %1$s\n *\n\
@@ -95,77 +56,82 @@ static char const leader_z[] = "/*\n\
 #define %3$s 1\n\n\
 #ifdef HAVE_CONFIG_H\n\
 # if defined(HAVE_INTTYPES_H)\n\
-#  include <inttypes.h>\n\
+#   include <inttypes.h>\n\
 # elif defined(HAVE_STDINT_H)\n\
-#  include <stdint.h>\n\n\
+#   include <stdint.h>\n\n\
 # else\n\
-#   ifndef HAVE_INT8_T\n\
-        typedef signed char     int8_t;\n\
-#   endif\n\
 #   ifndef HAVE_UINT8_T\n\
         typedef unsigned char   uint8_t;\n\
 #   endif\n\
-#   ifndef HAVE_INT16_T\n\
-        typedef signed short    int16_t;\n\
-#   endif\n\
 #   ifndef HAVE_UINT16_T\n\
         typedef unsigned short  uint16_t;\n\
-#   endif\n\
-#   ifndef HAVE_UINT_T\n\
-        typedef unsigned int    uint_t;\n\
-#   endif\n\n\
-#   ifndef HAVE_INT32_T\n\
-#    if SIZEOF_INT == 4\n\
-        typedef signed int      int32_t;\n\
-#    elif SIZEOF_LONG == 4\n\
-        typedef signed long     int32_t;\n\
-#    endif\n\
 #   endif\n\n\
 #   ifndef HAVE_UINT32_T\n\
-#    if SIZEOF_INT == 4\n\
+#     if SIZEOF_INT == 4\n\
         typedef unsigned int    uint32_t;\n\
-#    elif SIZEOF_LONG == 4\n\
+#     elif SIZEOF_LONG == 4\n\
         typedef unsigned long   uint32_t;\n\
-#    endif\n\
+#     endif\n\
+#   endif\n\n\
+#   ifndef HAVE_UINT64_T\n\
+#     if SIZEOF_LONG == 8\n\
+        typedef unsigned long       uint64_t;\n\
+#     elif SIZEOF_LONG_LONG == 8\n\
+        typedef unsigned long long  uint64_t;\n\
+#     endif\n\
 #   endif\n\
 # endif /* HAVE_*INT*_H header */\n\n\
 #else /* not HAVE_CONFIG_H -- */\n\
 # ifdef __sun\n\
-#  include <inttypes.h>\n\
+#   include <inttypes.h>\n\
 # else\n\
-#  include <stdint.h>\n\
+#   include <stdint.h>\n\
 # endif\n\
 #endif /* HAVE_CONFIG_H */\n";
 
-static char const check_class_inline[] =
-"typedef %3$s %1$s_mask_t;\n"
-"%4$s %1$s_mask_t const %1$s[%5$d];\n\n"
-"static inline int is_%1$s_char(char ch, %1$s_mask_t mask) {\n"
+static char const inline_functions[] = "\n"
+"static inline int\n"
+"is_%1$s_char(char ch, %2$s mask)\n"
+"{\n"
 "    unsigned int ix = (unsigned char)ch;\n"
-"    return ((ix < %5$d) && ((%1$s[ix] & mask) != 0)); }\n\n";
+"    return ((ix < %3$d) && ((%4$s[ix] & mask) != 0));\n"
+"}\n\n"
 
-static char const start_static_table_fmt[] = "\
-#if 1 /* def %1$s */\n\
-static %2$s_mask_t const %2$s[%3$d] = {";
+"static inline char *\n"
+"spn_%1$s_chars(char * p, %2$s mask)\n"
+"{\n"
+"    while ((*p != '\\0') && is_%1$s_char(*p, mask))  p++;\n"
+"    return p;\n"
+"}\n\n"
+
+"static inline char *\n"
+"brk_%1$s_chars(char * p, %2$s mask)\n"
+"{\n"
+"    while ((*p != '\\0') && (! is_%1$s_char(*p, mask)))  p++;\n"
+"    return p;\n"
+"}\n\n";
+
+static char const start_static_table_fmt[] =
+"static %s const %s[%d] = {";
 
 static char const start_table_fmt[] = "\
-#ifdef %1$s\n\
-%2$s_mask_t const %2$s[%3$d] = {";
+#ifdef %s\n%s const %s[%d] = {";
 
-static char const endif_fmt[] = "#endif /* %s */\n";
-static char const mask_fmt_fmt[] = "0x%%0%dX";
+static char const mask_fmt_fmt[]= "0x%%0%dX";
 static char mask_fmt[sizeof(mask_fmt_fmt) + 9];
-
-static char const * data_guard = "CHAR_MAPPER_DEFINE";
-static char const * file_guard = "CHAR_MAPPER_H_GUARD";
-static char const * commentary = " *  char-mapper Character Classifications\n";
-static char const * table_name = "char_type_table";
+static char const char_map_gd[] = "CHAR_MAPPER_H_GUARD";
+static char const end_table[]   ="\n};\n";
+static char const endif_fmt[]   = "#endif /* %s */\n";
+static char const * data_guard  = NULL;
+static char const * mask_name   = NULL;
+static char const * base_fn_nm  = NULL;
+static char const * file_guard  = char_map_gd;
+static char const * commentary  = " *  char-mapper Character Classifications\n";
+static char const   tname_fmt[] = "%s_table";
+static char const * table_name  = NULL;
 static int          table_is_static = 0;
 #define TABLE_SIZE  (1 << (NBBY - 1))
 static int const    table_size = TABLE_SIZE;
-
-char in_macro_name[CLASS_NAME_LIMIT+7] = "IN_CHAR_TYPE_TABLE";
-
 static char buffer[BUF_SIZE];
 
 typedef unsigned int value_bits_t;
@@ -198,13 +164,23 @@ value_map_t * new_map(char * name);
 int read_data(void);
 void emit_macros(int bit_count);
 void emit_table(int bit_count);
+void emit_functions(void);
 void parse_help(char const * pz);
+
+static void
+make_define_name(char * ptr);
+
+static void
+init_names(void);
+
+#define write_const(_c, _fp)  fwrite(_c, sizeof(_c)-1, 1, _fp)
 
 int
 main(int argc, char ** argv)
 {
-    int need_comma = 0;
-    int bit_count = 0;
+    int need_comma   = 0;
+    int bit_count    = 0;
+    int skip_comment = 0;
 
     if (argc > 1) {
         char * pz = argv[1];
@@ -237,10 +213,22 @@ main(int argc, char ** argv)
         static char const src_z[] =
             "\n#if 0 /* mapping specification source (from %s) */\n";
         printf(src_z, argv[1]);
-        while (fgets(buffer, BUF_SIZE, stdin) != NULL)
+        while (fgets(buffer, BUF_SIZE, stdin) != NULL) {
+            if (strstr(buffer, "%comment") != NULL) {
+                skip_comment = 1;
+                fputs("// %comment -- see above\n", stdout);
+                continue;
+            }
+            if (skip_comment) {
+                int bfix = 0;
+                while (isspace(buffer[bfix]))  bfix++;
+                if (buffer[bfix] != '%') continue;
+                skip_comment = 0;
+            }
             printf("// %s", buffer);
+        }
 
-        fwrite(end_src, sizeof(end_src)-1, 1, stdout);
+        write_const(end_src, stdout);
     }
 
     {
@@ -251,9 +239,10 @@ main(int argc, char ** argv)
             strcat(mask_fmt, "ULL");
     }
 
+    init_names();
     emit_macros(bit_count);
     emit_table(bit_count);
-    printf(endif_fmt, file_guard);
+    emit_functions();
     return 0;
 }
 
@@ -268,27 +257,84 @@ die(char const * fmt, ...)
     exit(EXIT_FAILURE);
 }
 
+static void
+init_names(void)
+{
+    static char const tbl[] = "_table";
+
+    if (table_name == NULL) {
+
+        if (file_guard == char_map_gd)
+            table_name = "char_type_table";
+
+        else {
+            static char const grd[] = "_GUARD";
+            char * p = NULL;
+            char const * e = file_guard + strlen(file_guard)
+                - (sizeof(grd) - 1);
+
+            if (strcmp(e, grd) != 0)
+                e += sizeof(grd) - 1;
+            else if ((e[-2] == '_') && (e[-1] == 'H'))
+                e -= 2;
+
+            size_t copy_len = e - file_guard;
+            table_name = p = malloc(copy_len + sizeof(tbl));
+            memcpy(p, file_guard, copy_len);
+            memcpy(p + copy_len, tbl, sizeof(tbl));
+            for (; p < table_name + copy_len; p++)
+                *p = tolower((int)*p);
+        }
+    }
+
+    if (data_guard == NULL) {
+        static char const guard_fmt[] = "DEFINE_%s_TABLE";
+        char * p = malloc(strlen(table_name) + sizeof(guard_fmt));
+        sprintf(p, guard_fmt, table_name);
+        make_define_name(p);
+        data_guard = p;
+    }
+
+    {
+        static char const msk[] = "_mask_t";
+        size_t tn_len = strlen(table_name);
+        if (strcmp(table_name + tn_len - (sizeof(tbl) - 1), tbl) == 0)
+            tn_len -= sizeof(tbl) - 1;
+        char * p = malloc(tn_len + sizeof(tbl));
+        memcpy(p, table_name, tn_len);
+        memcpy(p + tn_len, msk, sizeof(msk));
+        mask_name = p;
+
+        p = malloc(tn_len + 1);
+        memcpy(p, table_name, tn_len);
+        p[tn_len]  = NUL;
+        base_fn_nm = p;
+    }
+}
+
 void
 parse_help(char const * opt_pz)
 {
+#   include "cm-usage.c"
+
     static char const opterrmsg[] = "char-mapper error:  %s:  %s\n";
     int exit_code = EXIT_SUCCESS;
     FILE * fp = stdout;
     char const * pz = opt_pz;
 
     if (opt_pz == NULL) {
+        fp = stderr;
         fprintf(stderr, opterrmsg, "input is from a TTY device",
                 "must be file or pipe\n");
-        fwrite(usage_txt, sizeof(usage_txt)-1, 1, fp);
+        write_const(usage_txt, fp);
         exit_code = EXIT_FAILURE;
     } else
 
     switch (pz[1]) {
     case '-':
-    {
+        pz += 2;
         static char const help[] = "help";
         char const * p = help;
-        pz += 2;
         for (;;) {
             if (*pz != *p)
                 goto bad_opt;
@@ -297,9 +343,10 @@ parse_help(char const * opt_pz)
             if (*++pz == NUL)
                 break;
         }
-    }
+        /* FALLTHROUGH */
+
     case 'h':
-        fwrite(usage_txt, sizeof(usage_txt)-1, 1, fp);
+        write_const(usage_txt, fp);
         break;
 
     default:
@@ -318,52 +365,20 @@ parse_help(char const * opt_pz)
 void
 emit_macros(int bit_count)
 {
-    static char const macro_fmt[] =
-        "#define IS_%s_CHAR(_c)%s is_%s_char((_c), ";
     char fill[CLASS_NAME_LIMIT+3];
 
-    
-    value_map_t * map;
-
     {
-        char * pzD = in_macro_name + 3;
-        char const * pzS = table_name;
-        for (;;) {
-            char ch = *(pzS++);
-            switch (ch) {
-            case NUL:
-                *pzD = NUL;
-                goto print_class_mask;
-
-            case 'a' ... 'z':
-                *(pzD++) = toupper((unsigned int)ch);
-                break;
-
-            case 'A' ... 'Z': case '_':
-                *(pzD++) = ch;
-                break;
-
-            default:
-                *(pzD++) = '_';
-            }
-        }
-    } print_class_mask:;
-
-    {
-        char const * type_pz;
+        char const * mask_type;
         switch (bit_count) {
-        case  1 ...  8: type_pz = "uint8_t";  break;
-        case  9 ... 16: type_pz = "uint16_t"; break;
-        case 17 ... 32: type_pz = "uint32_t"; break;
-        case 33 ... 64: type_pz = "uint64_t"; break;
+        case  1 ...  8: mask_type = "uint8_t";  break;
+        case  9 ... 16: mask_type = "uint16_t"; break;
+        case 17 ... 32: mask_type = "uint32_t"; break;
+        case 33 ... 64: mask_type = "uint64_t"; break;
 
-        default: die("too many char types (63 max)\n");
+        default:
+            die("too many char types (%u max)\n", sizeof(long long) * NBBY);
         }
-
-        printf(check_class_inline,
-               table_name, in_macro_name, type_pz,
-               table_is_static ? "static" : "extern",
-               table_size);
+        printf(typedef_mask, mask_type, mask_name);
     }
 
     if (max_name_len < CLASS_NAME_LIMIT-2)
@@ -371,17 +386,33 @@ emit_macros(int bit_count)
     memset(fill, ' ', max_name_len);
     fill[max_name_len - 1] = NUL;
 
-    for (map = all_map.next; map != NULL; map = map->next) {
+    for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
+        static char const mac_fmt[] =
+            "#define  IS_%1$s_CHAR( _c)%2$s  is_%3$s_char((char)( _c), %4$s)\n"
+            "#define SPN_%1$s_CHARS(_s)%2$s spn_%3$s_chars((char *)_s, %4$s)\n"
+            "#define BRK_%1$s_CHARS(_s)%2$s brk_%3$s_chars((char *)_s, %4$s)\n";
+
         char * pz = fill + strlen(map->vname);
-        printf(macro_fmt, map->vname, pz, table_name);
-        printf(mask_fmt, map->mask);
-        putc(')', stdout);
-        putc('\n', stdout);
+        char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
+        snprintf(z, sizeof(z), mask_fmt, map->mask);
+
+        printf(mac_fmt, map->vname, pz, base_fn_nm, z);
     }
 
     putc('\n', stdout);
 }
 
+void
+emit_functions(void)
+{
+    if (! table_is_static)
+        printf(declare_tbl, mask_name, table_name, table_size);
+
+    printf(inline_functions,
+           base_fn_nm, mask_name, table_size, table_name);
+
+    printf(endif_fmt, file_guard);
+}
 
 void
 emit_table(int bit_count)
@@ -394,8 +425,10 @@ emit_table(int bit_count)
     int entry_ct = 0;
     int init_ct  = (bit_count > 32) ? 2 : 4;
 
-    printf(table_is_static ? start_static_table_fmt : start_table_fmt,
-           data_guard, table_name, table_size);
+    if (table_is_static)
+        printf(start_static_table_fmt, mask_name, table_name, table_size);
+    else
+        printf(start_table_fmt, data_guard, mask_name, table_name, table_size);
 
     while (ix < TABLE_SIZE) {
 
@@ -423,11 +456,10 @@ emit_table(int bit_count)
 
         printf(mask_fmt, all_map.values[ix++]);
     }
-    fputs("\n};\n", stdout);
-
-    printf(endif_fmt, data_guard);
+    fputs(end_table, stdout);
+    if (! table_is_static)
+        printf(endif_fmt, data_guard);
 }
-
 
 int
 read_data(void)
@@ -515,14 +547,14 @@ scan_quoted_value(char * scan, value_map_t * map, quoted_val_action_t act)
                     char octbuf[4];
                     octbuf[0] = *(scan++);
                     if ((*scan < '0') || (*scan > '7'))
-                        octbuf[1] = '\0';
+                        octbuf[1] = NUL;
                     else {
                         octbuf[1] = *(scan++);
                         if ((*scan < '0') || (*scan > '7'))
-                            octbuf[2] = '\0';
+                            octbuf[2] = NUL;
                         else {
                             octbuf[2] = *(scan++);
-                            octbuf[3] = '\0';
+                            octbuf[3] = NUL;
                         }
                     }
                     lo_ix = (int)strtoul(octbuf, NULL, 8);
@@ -539,10 +571,10 @@ scan_quoted_value(char * scan, value_map_t * map, quoted_val_action_t act)
                 if (! isxdigit(*++scan)) goto invalid_escape;
                 hexbuf[0] = *(scan++);
                 if (! isxdigit(*scan))
-                    hexbuf[1] = '\0';
+                    hexbuf[1] = NUL;
                 else {
                     hexbuf[1] = *(scan++);
-                    hexbuf[2] = '\0';
+                    hexbuf[2] = NUL;
                 }
                 lo_ix = (int)strtoul(hexbuf, NULL, 16);
                 break;
@@ -580,10 +612,14 @@ scan_quoted_value(char * scan, value_map_t * map, quoted_val_action_t act)
 char *
 trim(char * buf)
 {
-    char * pe = buf + strlen(buf);
-    while ((pe > buf) && isspace(pe[-1]))  pe--;
-    *pe = NUL;
     while (isspace(*buf))  buf++;
+
+    {
+        char * pe = buf + strlen(buf);
+        while ((pe > buf) && isspace(pe[-1]))  pe--;
+        *pe = NUL;
+    }
+
     switch (*buf) {
     case NUL:
     case '#':
@@ -684,7 +720,7 @@ copy_another_value(char * scan, value_map_t * map)
     return scan;
 }
 
-void
+static void
 make_define_name(char * ptr)
 {
     while (*ptr) {
@@ -695,121 +731,6 @@ make_define_name(char * ptr)
 
         ptr++;
     }
-}
-
-char *
-handle_guard(char * scan)
-{
-    char * pz;
-
-    if (! isspace(*scan)) die(bad_directive, scan-5);
-
-    while (isspace(*scan))   scan++;
-    data_guard = pz = strdup(scan);
-    make_define_name(pz);
-    return scan + strlen(scan);
-}
-
-char *
-handle_file(char * scan)
-{
-    char * pz;
-
-    if (! isspace(*scan)) die(bad_directive, scan-4);
-
-    while (isspace(*scan))   scan++;
-
-    if (freopen(scan, "w", stdout) != stdout)
-        die("fs error %d (%s) reopening %s as stdout\n", errno,
-            strerror(errno), scan);
-
-    file_guard = pz = malloc(strlen(scan) + 7);
-    sprintf(pz, "%s_GUARD", scan);
-    make_define_name(pz);
-    return scan + strlen(scan);
-}
-
-char *
-handle_comment(char * scan)
-{
-    char * com_buf = malloc(0x1000);
-    char * com_scan = com_buf;
-    size_t com_buf_size = 0x1000;
-
-    for (;;) {
-        size_t line_len;
-
-        if (fgets(buffer, BUF_SIZE, stdin) == NULL)
-            die("incomplete comment section");
-
-        scan = trim(buffer);
-        /*
-         *  if scan is NULL, we've got a comment
-         */
-        if (scan == NULL)
-            continue;
-
-        if (*scan == '%')
-            break;
-        if ((*scan == NUL) && (com_scan + 3 < com_buf + com_buf_size)) {
-            memcpy(com_scan, " *\n", 3);
-            com_scan += 3;
-        } else {
-            line_len = strlen(scan);
-            if (com_scan + line_len + 6 >= com_buf + com_buf_size) {
-                com_buf_size += 0x1000;
-                com_buf = realloc(com_buf, com_buf_size);
-            }
-            memcpy(com_scan, " *  ", 4);
-            memcpy(com_scan + 4, scan, line_len);
-            com_scan += line_len + 4;
-            *(com_scan++) = '\n';
-        }
-        *com_scan = NUL;
-    }
-    commentary = com_buf;
-    return scan + strlen(scan);
-}
-
-char *
-handle_table(char * scan)
-{
-    char * pz;
-
-    if (! isspace(*scan)) die(bad_directive, scan-5);
-
-    while (isspace(*scan))   scan++;
-    table_name = pz = strdup(scan);
-    for (;*pz; pz++) {
-        if (! isalnum((int)*pz))
-            *pz = '_';
-    }
-
-    return scan + strlen(scan);
-}
-
-char *
-handle_static_table(char * scan)
-{
-    char * pz;
-
-    if (! isspace(*scan)) die(bad_directive, scan-5);
-
-    while (isspace(*scan))   scan++;
-    table_name = pz = strdup(scan);
-    for (;*pz; pz++) {
-        if (! isalnum((int)*pz))
-            *pz = '_';
-    }
-
-    table_is_static = 1;
-    return scan + strlen(scan);
-}
-
-char *
-handle_invalid(char * scan)
-{
-    die(bad_directive, scan);
 }
 
 char *
@@ -835,4 +756,192 @@ parse_directive(char * scan)
     } have_name:;
 
     return disp_cm_opt(scan, len, scan + len);
+}
+
+/* * * * * * * * * * * * * * * *
+
+   The following handler functions document and define the embedded
+   directives.  The first line of the comment must be exactly
+   "handle" + one space + directive name + one space + "directive".
+   Dispatch tables and documentation is derived from this.
+
+ * * * * * * * * * * * * * * * */
+
+/**
+ * handle file directive.
+ *
+ * specifies the output file name.  The multi-inclusion guard is derived
+ * from this name.  If %file is not specified, that guard defaults to
+ * CHAR_MAPPER_H_GUARD.  The default output is to stdout.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_file(char * scan)
+{
+    char * pz;
+
+    if (! isspace(*scan)) die(bad_directive, scan-4);
+
+    while (isspace(*scan))   scan++;
+
+    if (freopen(scan, "w", stdout) != stdout)
+        die("fs error %d (%s) reopening %s as stdout\n", errno,
+            strerror(errno), scan);
+
+    file_guard = pz = malloc(strlen(scan) + 7);
+    sprintf(pz, "%s_GUARD", scan);
+    make_define_name(pz);
+    return scan + strlen(scan);
+}
+
+static char *
+add_text(char ** buff, size_t * sz, char * curr, char * add)
+{
+    size_t len = (add == NULL) ? 0 : strlen(add);
+    char * e = *buff + *sz - 4;
+
+    if (*buff + len >= e) {
+        size_t o = curr - *buff;
+        *sz += BUF_SIZE;
+        *buff = realloc(*buff, *sz);
+        curr  = *buff + o;
+    }
+
+    *(curr++) = ' ';
+    *(curr++) = '*';
+    if (len > 0) {
+        *(curr++) = ' ';
+        *(curr++) = ' ';
+        memcpy(curr, add, len);
+        curr += len;
+    }
+    *(curr++) = '\n';
+
+    return curr;
+}
+
+/**
+ * handle comment directive.
+ *
+ * specifies the text to insert in a comment block at the head of the output
+ * file.  The comment text starts on the next line and ends with the first
+ * input line with a percent ('%') in the first column.  The default is:
+ * char-mapper Character Classifications
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_comment(char * scan_in)
+{
+    char * com_buf      = malloc(BUF_SIZE);
+    char * scan_out     = com_buf;
+    size_t com_buf_size = BUF_SIZE;
+    int    line_ct      = 0;
+    int    blank_ct     = 0;
+
+    for (;;) {
+        if (fgets(buffer, BUF_SIZE, stdin) == NULL)
+            die("incomplete comment section");
+
+        scan_in = trim(buffer);
+
+        /*
+         *  if scan is NULL, we've got a comment
+         */
+        if (scan_in == NULL) {
+            blank_ct++;
+            continue;
+        }
+
+        if (*scan_in == '%')
+            break;
+
+        if (line_ct++ == 0) {
+            blank_ct = 0;
+
+        } else while (blank_ct > 0) {
+                scan_out = add_text(&com_buf, &com_buf_size, scan_out, NULL);
+                blank_ct--;
+                line_ct++;
+            }
+
+        scan_out = add_text(&com_buf, &com_buf_size, scan_out, scan_in);
+    }
+
+    *scan_out  = NUL;
+    commentary = com_buf;
+    buffer[0]  = NUL;
+    return buffer;
+}
+
+/**
+ * handle table directive.
+ *
+ * specifies the name of the output table.  If not specified, it defaults to
+ * the base file name, suffixed with "_table" and "char_type_table" if %file
+ * is not specified.  Normally, this table is "extern" in scope, but may be
+ * made static by specifying an empty %guard.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_table(char * scan)
+{
+    char * pz;
+
+    if (! isspace(*scan)) die(bad_directive, scan-5);
+
+    while (isspace(*scan))   scan++;
+    table_name = pz = strdup(scan);
+    for (;*pz; pz++) {
+        if (! isalnum((int)*pz))
+            *pz = '_';
+    }
+
+    return scan + strlen(scan);
+}
+
+/**
+ * handle guard directive.
+ *
+ * specifies the name of a '#ifdef' guard protecting the compilation of
+ * the bit mask table.  One compilation unit must '#define' this name.
+ * The default is the table name surrounded by "DEFINE_" and "_TABLE".
+ * If empty, the output table is unguarded and made static in scope.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_guard(char * scan)
+{
+    char * pz;
+
+    if (! isspace(*scan)) {
+        table_is_static = 1;
+        return scan;
+    }
+
+    while (isspace(*scan))   scan++;
+    data_guard = pz = strdup(scan);
+    make_define_name(pz);
+    return scan + strlen(scan);
+}
+
+/**
+ * handle invalid directive.
+ *
+ * This function does not return.
+ *
+ * @param scan current scan point
+ * @returns    not
+ */
+char *
+handle_invalid(char * scan)
+{
+    die(bad_directive, scan);
 }

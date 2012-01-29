@@ -2,12 +2,12 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2011-12-07 14:00:49 bkorb"
+## Time-stamp:      "2012-01-29 17:10:56 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -43,9 +43,9 @@ GENTEXI         = libopts.texi libopts.menu
 TEXI_STAMP      = texi-stamp
 
 GENHDRS         = autoopts/options.h autoopts/usage-txt.h genshell.h \
-	xat-attribute.h value-type.h ag-char-map.h
-HDRS            = $(GENHDRS) autoopts.h proto.h parse-duration.h project.h
-GEN_SRC         = value-type.c xat-attribute.c
+	xat-attribute.h value-type.h ao-strs.h ag-char-map.h
+HDRS            = $(GENHDRS) autoopts.h parse-duration.h project.h proto.h
+GEN_SRC         = ao-strs.c value-type.c xat-attribute.c
 
 ## The primary source (autoopts.c) must be listed first and on a separate
 ## line.  'sed' does some magic here to get the list of source files for the
@@ -60,7 +60,7 @@ CSRC            = parse-duration.c $(GEN_SRC) \
     usage.c   version.c
 
 SRC             = $(HDRS) $(CSRC) $(GENSRC)
-DEF_FILES       = genshell.def $(srcdir)/funcs.def
+DEF_FILES       = genshell.def $(srcdir)/funcs.def ao-strs.def
 pkgconfigdir    =$(libdir)/pkgconfig
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

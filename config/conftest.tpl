@@ -2,11 +2,11 @@
 
 null
 
-##  Time-stamp:        "2011-02-01 12:33:54 bkorb"
+##  Time-stamp:        "2012-01-02 20:00:21 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
-##  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -45,17 +45,19 @@ INCLUDE "confmacs.tlib"  =][=
     (string->c-name! group-id)  )
 (define group-pfx   (string-append    group-id "_"))
 
+(define ofile "")
+(define separate-macros #t)
+
 (if (exist? "output-file")
     (begin
-      (define ofile (get "output-file"))
-      (define separate-macros #f)
+      (set! ofile (get "output-file"))
+      (set! separate-macros #f)
       (shellf "echo sending output to %s >&2" ofile)
     )
 
     (begin
-      (define ofile
+      (set! ofile
          (string-append (string-downcase! (get "group")) "_macros.m4") )
-      (define separate-macros #t)
 )   )
 (out-switch ofile)
 (define ofile-list ofile)
