@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#  Time-stamp:        "2010-07-17 09:59:33 bkorb"
+#  Time-stamp:        "2012-02-12 09:05:16 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -78,8 +78,7 @@ init() {
     make_id2name=true
     dispatch_fmt=''
     make_id2name=true
-    nl='
-'
+    nl=$'\n'
 
     while :
     do

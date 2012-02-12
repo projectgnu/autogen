@@ -2,7 +2,7 @@
 /**
  * \file putshell.c
  *
- * Time-stamp:      "2012-01-29 18:50:19 bkorb"
+ * Time-stamp:      "2012-02-12 09:14:49 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -226,7 +226,7 @@ optionPutShell(tOptions* pOpts)
     do  {
         tOptDesc* pOD = pOpts->pOptDesc + optIx;
 
-        if (SKIP_OPT(pOD))
+        if ((pOD->fOptState & OPTST_NO_OUTPUT_MASK) != 0)
             continue;
 
         /*
@@ -269,9 +269,8 @@ optionPutShell(tOptions* pOpts)
          *  The idea is that if someone defines an option to initialize
          *  enabled, we should tell our shell script that it is enabled.
          */
-        if (UNUSED_OPT(pOD) && DISABLED_OPT(pOD)) {
+        if (UNUSED_OPT(pOD) && DISABLED_OPT(pOD))
             continue;
-        }
 
         /*
          *  Handle stacked arguments

@@ -3000,7 +3000,7 @@ flag = @{
 @end example
 Do not provide anything else.  The usage text for such an option will be:
 @example
-   alais for @i{aliased-to-option} option
+   This is an alais for @i{aliased-to-option}
 @end example
 
 @node opt-attr default option

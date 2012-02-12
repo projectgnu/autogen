@@ -2,7 +2,7 @@
 /**
  * \file alias.c
  *
- * Time-stamp:      "2010-07-17 10:37:22 bkorb"
+ * Time-stamp:      "2012-02-12 09:41:42 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -29,23 +29,28 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
-/*=export_func  optionBooleanVal
+/*=export_func  optionAlias
  * private:
  *
  * what:  relay an option to its alias
- * arg:   + tOptions* + pOpts    + program options descriptor  +
- * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
- * arg:   + uint_t    + alias    + the aliased-to option index +
+ * arg:   + tOptions*    + pOpts    + program options descriptor  +
+ * arg:   + tOptDesc*    + pOptDesc + the descriptor for this arg +
+ * arg:   + unsigned int + alias    + the aliased-to option index +
+ * ret-type: int
  *
  * doc:
- *  Decipher a true or false value for a boolean valued option argument.
- *  The value is true, unless it starts with 'n' or 'f' or "#f" or
- *  it is an empty string or it is a number that evaluates to zero.
+ *  Handle one option as if it had been specified as another.  Exactly.
+ *  Returns "-1" if the aliased-to option has appeared too many times.
 =*/
-void
-optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
+int
+optionAlias(tOptions * pOpts, tOptDesc * pOldOD, unsigned int alias)
 {
-    tOptDesc * pOD = pOpts->pOptDesc + alias;
+    tOptDesc * pOD;
+
+    if (pOpts == OPTPROC_EMIT_USAGE)
+        return 0;
+
+    pOD = pOpts->pOptDesc + alias;
     if ((unsigned)pOpts->optCt <= alias) {
         fwrite(zAliasRange, strlen (zAliasRange), 1, stderr);
         exit(EXIT_FAILURE);
@@ -56,6 +61,7 @@ optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
      */
     pOD->fOptState &= OPTST_PERSISTENT_MASK;
     pOD->fOptState |= (pOldOD->fOptState & ~OPTST_PERSISTENT_MASK);
+    pOD->optArg.argString = pOldOD->optArg.argString;
 
     /*
      *  Keep track of count only for DEFINED (command line) options.
@@ -76,7 +82,7 @@ optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
                 fprintf(stderr, zOnlyOne, pOD->pz_Name, pzEqv);
         }
 
-        return FAILURE;
+        return -1;
     }
 
     /*
@@ -90,6 +96,7 @@ optionAlias(tOptions* pOpts, tOptDesc* pOldOD, uint_t alias)
      */
     if (pOD->pOptProc != NULL)
         (*pOD->pOptProc)(pOpts, pOD);
+    return 0;
 }
 
 /*

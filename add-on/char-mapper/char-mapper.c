@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-01-29 08:28:04 bkorb"
+ *  Time-stamp:        "2012-02-12 09:55:29 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -22,166 +22,11 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#define  _GNU_SOURCE 1
-#include <ctype.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-
-#include "cm-opt.h"
-
-#ifndef NUL
-#  define NUL '\0'
-#endif
-
-#ifndef NBBY
-#  define NBBY 8
-#endif
-
-#define BUF_SIZE         0x1000
-#define CLASS_NAME_LIMIT 31
-
-static char const bad_directive[] = "invalid directive: %s\n";
-static char const typedef_mask[]  = "typedef %s %s;\n\n";
-static char const declare_tbl[]   = "extern %s const %s[%d];\n";
-
-static char const leader_z[] = "/*\n\
- *   Character mapping generated %1$s\n *\n\
-%2$s */\n\
-#ifndef %3$s\n\
-#define %3$s 1\n\n\
-#ifdef HAVE_CONFIG_H\n\
-# if defined(HAVE_INTTYPES_H)\n\
-#   include <inttypes.h>\n\
-# elif defined(HAVE_STDINT_H)\n\
-#   include <stdint.h>\n\n\
-# else\n\
-#   ifndef HAVE_UINT8_T\n\
-        typedef unsigned char   uint8_t;\n\
-#   endif\n\
-#   ifndef HAVE_UINT16_T\n\
-        typedef unsigned short  uint16_t;\n\
-#   endif\n\n\
-#   ifndef HAVE_UINT32_T\n\
-#     if SIZEOF_INT == 4\n\
-        typedef unsigned int    uint32_t;\n\
-#     elif SIZEOF_LONG == 4\n\
-        typedef unsigned long   uint32_t;\n\
-#     endif\n\
-#   endif\n\n\
-#   ifndef HAVE_UINT64_T\n\
-#     if SIZEOF_LONG == 8\n\
-        typedef unsigned long       uint64_t;\n\
-#     elif SIZEOF_LONG_LONG == 8\n\
-        typedef unsigned long long  uint64_t;\n\
-#     endif\n\
-#   endif\n\
-# endif /* HAVE_*INT*_H header */\n\n\
-#else /* not HAVE_CONFIG_H -- */\n\
-# ifdef __sun\n\
-#   include <inttypes.h>\n\
-# else\n\
-#   include <stdint.h>\n\
-# endif\n\
-#endif /* HAVE_CONFIG_H */\n";
-
-static char const inline_functions[] = "\n"
-"static inline int\n"
-"is_%1$s_char(char ch, %2$s mask)\n"
-"{\n"
-"    unsigned int ix = (unsigned char)ch;\n"
-"    return ((ix < %3$d) && ((%4$s[ix] & mask) != 0));\n"
-"}\n\n"
-
-"static inline char *\n"
-"spn_%1$s_chars(char * p, %2$s mask)\n"
-"{\n"
-"    while ((*p != '\\0') && is_%1$s_char(*p, mask))  p++;\n"
-"    return p;\n"
-"}\n\n"
-
-"static inline char *\n"
-"brk_%1$s_chars(char * p, %2$s mask)\n"
-"{\n"
-"    while ((*p != '\\0') && (! is_%1$s_char(*p, mask)))  p++;\n"
-"    return p;\n"
-"}\n\n";
-
-static char const start_static_table_fmt[] =
-"static %s const %s[%d] = {";
-
-static char const start_table_fmt[] = "\
-#ifdef %s\n%s const %s[%d] = {";
-
-static char const mask_fmt_fmt[]= "0x%%0%dX";
-static char mask_fmt[sizeof(mask_fmt_fmt) + 9];
-static char const char_map_gd[] = "CHAR_MAPPER_H_GUARD";
-static char const end_table[]   ="\n};\n";
-static char const endif_fmt[]   = "#endif /* %s */\n";
-static char const * data_guard  = NULL;
-static char const * mask_name   = NULL;
-static char const * base_fn_nm  = NULL;
-static char const * file_guard  = char_map_gd;
-static char const * commentary  = " *  char-mapper Character Classifications\n";
-static char const   tname_fmt[] = "%s_table";
-static char const * table_name  = NULL;
-static int          table_is_static = 0;
-#define TABLE_SIZE  (1 << (NBBY - 1))
-static int const    table_size = TABLE_SIZE;
-static char buffer[BUF_SIZE];
-
-typedef unsigned int value_bits_t;
-typedef struct value_map_s value_map_t;
-
-struct value_map_s {
-    value_map_t *   next;
-    char            vname[CLASS_NAME_LIMIT+1];
-    int             bit_no;
-    value_bits_t    mask;
-    value_bits_t    values[TABLE_SIZE];
-};
-
-value_map_t all_map = { NULL, "total", 0, 0, { 0 }};
-value_map_t ** end_map = &(all_map.next);
-size_t max_name_len = 0;
-size_t curr_name_len;
-
-typedef enum {
-    VAL_ADD, VAL_REMOVE
-} quoted_val_action_t;
-
-void   die(char const *, ...);
-char * trim(char * buf);
-char * get_name(char * scan, char * nm_buf, size_t buf_size);
-char * scan_quoted_value(char * scan, value_map_t *, quoted_val_action_t);
-char * copy_another_value(char * scan, value_map_t * map);
-char * parse_directive(char * scan);
-value_map_t * new_map(char * name);
-int read_data(void);
-void emit_macros(int bit_count);
-void emit_table(int bit_count);
-void emit_functions(void);
-void parse_help(char const * pz);
-
-static void
-make_define_name(char * ptr);
-
-static void
-init_names(void);
-
-#define write_const(_c, _fp)  fwrite(_c, sizeof(_c)-1, 1, _fp)
+#include "char-mapper.h"
 
 int
 main(int argc, char ** argv)
 {
-    int need_comma   = 0;
-    int bit_count    = 0;
-    int skip_comment = 0;
-
     if (argc > 1) {
         char * pz = argv[1];
         if (*pz == '-')
@@ -207,29 +52,8 @@ main(int argc, char ** argv)
         printf(leader_z, buffer, commentary, file_guard);
     }
 
-    if (fseek(stdin, 0, SEEK_SET) == 0) {
-        static char const end_src[] =
-            "//\n#endif /* 0 -- mapping spec. source */\n\n";
-        static char const src_z[] =
-            "\n#if 0 /* mapping specification source (from %s) */\n";
-        printf(src_z, argv[1]);
-        while (fgets(buffer, BUF_SIZE, stdin) != NULL) {
-            if (strstr(buffer, "%comment") != NULL) {
-                skip_comment = 1;
-                fputs("// %comment -- see above\n", stdout);
-                continue;
-            }
-            if (skip_comment) {
-                int bfix = 0;
-                while (isspace(buffer[bfix]))  bfix++;
-                if (buffer[bfix] != '%') continue;
-                skip_comment = 0;
-            }
-            printf("// %s", buffer);
-        }
-
-        write_const(end_src, stdout);
-    }
+    if (fseek(stdin, 0, SEEK_SET) == 0)
+        copy_input_text(argv[1]);
 
     {
         int width = (bit_count+3)/4;
@@ -288,7 +112,7 @@ init_names(void)
     }
 
     if (data_guard == NULL) {
-        static char const guard_fmt[] = "DEFINE_%s_TABLE";
+        static char const guard_fmt[] = "DEFINE_%s";
         char * p = malloc(strlen(table_name) + sizeof(guard_fmt));
         sprintf(p, guard_fmt, table_name);
         make_define_name(p);
@@ -309,7 +133,40 @@ init_names(void)
         memcpy(p, table_name, tn_len);
         p[tn_len]  = NUL;
         base_fn_nm = p;
+
+        p = malloc(tn_len + 1);
+        memcpy(p, table_name, tn_len);
+        p[tn_len]  = NUL;
+        make_define_name(p);
+        base_ucase = p;
     }
+}
+
+static void
+copy_input_text(char const * name)
+{
+    printf(copy_input_start, name);
+    while (fgets(buffer, BUF_SIZE, stdin) != NULL) {
+        if (strstr(buffer, "%comment") != NULL) {
+            skip_comment = 1;
+            fputs("// %comment -- see above\n", stdout);
+            continue;
+        }
+        if (strstr(buffer, "%emit") != NULL) {
+            skip_comment = 1;
+            fputs("// %emit code -- see below\n", stdout);
+            continue;
+        }
+        if (skip_comment) {
+            int bfix = 0;
+            while (isspace(buffer[bfix]))  bfix++;
+            if (buffer[bfix] != '%') continue;
+            skip_comment = 0;
+        }
+        printf("// %s", buffer);
+    }
+
+    write_const(copy_input_end, stdout);
 }
 
 void
@@ -387,19 +244,43 @@ emit_macros(int bit_count)
     fill[max_name_len - 1] = NUL;
 
     for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
-        static char const mac_fmt[] =
-            "#define  IS_%1$s_CHAR( _c)%2$s  is_%3$s_char((char)( _c), %4$s)\n"
-            "#define SPN_%1$s_CHARS(_s)%2$s spn_%3$s_chars((char *)_s, %4$s)\n"
-            "#define BRK_%1$s_CHARS(_s)%2$s brk_%3$s_chars((char *)_s, %4$s)\n";
 
         char * pz = fill + strlen(map->vname);
         char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
         snprintf(z, sizeof(z), mask_fmt, map->mask);
 
-        printf(mac_fmt, map->vname, pz, base_fn_nm, z);
+        printf(macro_def_fmt, map->vname, pz, base_fn_nm, z);
     }
 
     putc('\n', stdout);
+}
+
+static void
+emit_test_code(void)
+{
+    int ix = 0;
+    value_map_t * map;
+    printf(testit_fmt, base_ucase);
+    for (map = all_map.next; map != NULL; map = map->next) {
+        printf(testit_class_names, ix++, map->vname);
+    }
+    fputs(testit_class_hdrs, stdout);
+    for (map = all_map.next, ix=0;
+         map != NULL;
+         map = map->next) {
+        printf(" %02X", ix++);
+    }
+    fputs(test_loop, stdout);
+    for (map = all_map.next, ix=0;
+         map != NULL;
+         map = map->next) {
+        char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
+        snprintf(z, sizeof(z), mask_fmt, map->mask);
+        printf(each_test, base_fn_nm, z);
+        ix++;
+    }
+    fputs("        putchar('\\n');\n", stdout);
+    printf(endtest_fmt, base_ucase);
 }
 
 void
@@ -410,6 +291,12 @@ emit_functions(void)
 
     printf(inline_functions,
            base_fn_nm, mask_name, table_size, table_name);
+
+    if (add_on_text != NULL)
+        printf(emit_text_fmt, add_on_text);
+
+    if (add_test_code)
+        emit_test_code();
 
     printf(endif_fmt, file_guard);
 }
@@ -444,14 +331,16 @@ emit_table(int bit_count)
         if (isprint(ix))
             printf(" /* %c */ ", (char)ix);
         else switch (ix) {
-            case '\a': fputs(" /*\\a */ ", stdout); break;
-            case '\b': fputs(" /*\\b */ ", stdout); break;
-            case '\t': fputs(" /*\\t */ ", stdout); break;
-            case '\n': fputs(" /*\\n */ ", stdout); break;
-            case '\v': fputs(" /*\\v */ ", stdout); break;
-            case '\f': fputs(" /*\\f */ ", stdout); break;
-            case '\r': fputs(" /*\\r */ ", stdout); break;
-            default:   printf(" /*x%02X*/ ", ix); break;
+            case NUL:  fputs(" /*NUL*/ ", stdout); break;
+            case '\a': fputs(" /*BEL*/ ", stdout); break;
+            case '\b': fputs(" /* BS*/ ", stdout); break;
+            case '\t': fputs(" /* HT*/ ", stdout); break;
+            case '\n': fputs(" /* NL*/ ", stdout); break;
+            case '\v': fputs(" /* VT*/ ", stdout); break;
+            case '\f': fputs(" /* FF*/ ", stdout); break;
+            case '\r': fputs(" /* CR*/ ", stdout); break;
+            case 0x1B: fputs(" /*ESC*/ ", stdout); break;
+            default:  printf(" /*x%02X*/ ", ix);    break;
             }
 
         printf(mask_fmt, all_map.values[ix++]);
@@ -517,6 +406,76 @@ read_data(void)
 }
 
 char *
+eat_a_byte(char * scan, int * byte_val)
+{
+    if (*scan != '\\') {
+        *byte_val = (unsigned char)*(scan++);
+
+    } else {
+        int chval = '\\';
+
+        switch (*++scan) {
+        case NUL: break;
+        case '\\':               scan++; break;
+        case 'a':  chval = '\a'; scan++; break;
+        case 'b':  chval = '\b'; scan++; break;
+        case 't':  chval = '\t'; scan++; break;
+        case 'n':  chval = '\n'; scan++; break;
+        case 'v':  chval = '\v'; scan++; break;
+        case 'f':  chval = '\f'; scan++; break;
+        case 'r':  chval = '\r'; scan++; break;
+        case '"':  chval = '"';  scan++; break;
+        case '0' ... '7':
+            {
+                char octbuf[4];
+                octbuf[0] = *(scan++);
+                if ((*scan < '0') || (*scan > '7'))
+                    octbuf[1] = NUL;
+                else {
+                    octbuf[1] = *(scan++);
+                    if ((*scan < '0') || (*scan > '7'))
+                        octbuf[2] = NUL;
+                    else {
+                        octbuf[2] = *(scan++);
+                        octbuf[3] = NUL;
+                    }
+                }
+                chval = (int)strtoul(octbuf, NULL, 8);
+                if (chval > 0xFF) {
+                    scan -= 2;
+                    goto invalid_escape;
+                }
+                break;
+            }
+
+        case 'x': case 'X':
+        {
+            char hexbuf[4];
+            if (! isxdigit(*++scan)) goto invalid_escape;
+            hexbuf[0] = *(scan++);
+            if (! isxdigit(*scan))
+                hexbuf[1] = NUL;
+            else {
+                hexbuf[1] = *(scan++);
+                hexbuf[2] = NUL;
+            }
+            chval = (int)strtoul(hexbuf, NULL, 16);
+            break;
+        }
+
+        default:
+        invalid_escape:
+            die("invalid escape sequence:  %s\n", scan-1);
+        }
+
+        *byte_val = chval;
+    }
+
+    return scan;
+}
+
+
+char *
 scan_quoted_value(char * scan, value_map_t * map, quoted_val_action_t act)
 {
     value_bits_t mask = 1 << map->bit_no;
@@ -524,74 +483,19 @@ scan_quoted_value(char * scan, value_map_t * map, quoted_val_action_t act)
         mask = ~mask;
 
     for (;;) {
-        int lo_ix = (unsigned)*(scan++);
-        int hi_ix;
+        int lo_ix, hi_ix;
 
-        if ((lo_ix == '"') || (lo_ix == NUL))
-            return scan;
-
-        if (lo_ix == '\\') {
-            switch (*scan) {
-            case NUL: break;
-            case '\\':               scan++; break;
-            case 'a':  lo_ix = '\a'; scan++; break;
-            case 'b':  lo_ix = '\b'; scan++; break;
-            case 't':  lo_ix = '\t'; scan++; break;
-            case 'n':  lo_ix = '\n'; scan++; break;
-            case 'v':  lo_ix = '\v'; scan++; break;
-            case 'f':  lo_ix = '\f'; scan++; break;
-            case 'r':  lo_ix = '\r'; scan++; break;
-            case '"':  lo_ix = '"';  scan++; break;
-            case '0' ... '7':
-                {
-                    char octbuf[4];
-                    octbuf[0] = *(scan++);
-                    if ((*scan < '0') || (*scan > '7'))
-                        octbuf[1] = NUL;
-                    else {
-                        octbuf[1] = *(scan++);
-                        if ((*scan < '0') || (*scan > '7'))
-                            octbuf[2] = NUL;
-                        else {
-                            octbuf[2] = *(scan++);
-                            octbuf[3] = NUL;
-                        }
-                    }
-                    lo_ix = (int)strtoul(octbuf, NULL, 8);
-                    if (lo_ix > 0xFF) {
-                        scan -= 2;
-                        goto invalid_escape;
-                    }
-                    break;
-                }
-
-            case 'x': case 'X':
-            {
-                char hexbuf[4];
-                if (! isxdigit(*++scan)) goto invalid_escape;
-                hexbuf[0] = *(scan++);
-                if (! isxdigit(*scan))
-                    hexbuf[1] = NUL;
-                else {
-                    hexbuf[1] = *(scan++);
-                    hexbuf[2] = NUL;
-                }
-                lo_ix = (int)strtoul(hexbuf, NULL, 16);
-                break;
-            }
-
-            default:
-            invalid_escape:
-                die("invalid escape sequence:  %s\n", scan-1);
-            }
+        switch (*scan) {
+            case NUL: return scan;
+            case '"': return scan + 1;
+            default:  break;
+        }
+        scan = eat_a_byte(scan, &lo_ix);
+        if ((*scan == '-') && (scan[1] != NUL) && (scan[1] != '"')) {
+            scan = eat_a_byte(scan + 1, &hi_ix);
+        } else {
             hi_ix = lo_ix;
         }
-        else if ((*scan == '-') && (scan[1] != NUL) && (scan[1] != '"')) {
-            hi_ix = (unsigned)(scan[1]);
-            scan += 2;
-
-        } else
-            hi_ix = lo_ix;
 
         switch (act) {
         case VAL_ADD:
@@ -758,6 +662,81 @@ parse_directive(char * scan)
     return disp_cm_opt(scan, len, scan + len);
 }
 
+static char *
+add_text(char ** buff, size_t * sz, char * curr, char * add, int pfx)
+{
+    size_t len = (add == NULL) ? 0 : strlen(add);
+    char * e = *buff + *sz - 4;
+
+    if (*buff + len >= e) {
+        size_t o = curr - *buff;
+        *sz += BUF_SIZE;
+        *buff = realloc(*buff, *sz);
+        curr  = *buff + o;
+    }
+
+    if (pfx)
+        *(curr++) = ' ', *(curr++) = '*';
+
+    if (len == 0) {
+        *(curr++) = '\n';
+
+    } else {
+        if (pfx)
+            *(curr++) = ' ', *(curr++) = ' ';
+
+        memcpy(curr, add, len);
+        curr += len;
+    }
+
+    return curr;
+}
+
+static char *
+load_text(int pfx)
+{
+    char * scan_in;
+    char * com_buf      = malloc(BUF_SIZE);
+    char * scan_out     = com_buf;
+    size_t com_buf_size = BUF_SIZE;
+    int    line_ct      = 0;
+    int    blank_ct     = 0;
+
+    for (;;) {
+        if (fgets(buffer, BUF_SIZE, stdin) == NULL)
+            die("incomplete comment section");
+
+        scan_in = buffer;
+        while (isspace(*scan_in)) scan_in++;
+
+        /*
+         *  if scan is NULL, we've got a comment
+         */
+        if (*scan_in == NUL) {
+            blank_ct++;
+            continue;
+        }
+
+        if (*scan_in == '%')
+            break;
+
+        if (line_ct++ == 0) {
+            blank_ct = 0;
+
+        } else while (blank_ct > 0) {
+                scan_out =
+                    add_text(&com_buf, &com_buf_size, scan_out, NULL, pfx);
+                blank_ct--;
+                line_ct++;
+            }
+
+        scan_out = add_text(&com_buf, &com_buf_size, scan_out, scan_in, pfx);
+    }
+
+    *scan_out  = NUL;
+    return com_buf;
+}
+
 /* * * * * * * * * * * * * * * *
 
    The following handler functions document and define the embedded
@@ -793,33 +772,8 @@ handle_file(char * scan)
     file_guard = pz = malloc(strlen(scan) + 7);
     sprintf(pz, "%s_GUARD", scan);
     make_define_name(pz);
-    return scan + strlen(scan);
-}
-
-static char *
-add_text(char ** buff, size_t * sz, char * curr, char * add)
-{
-    size_t len = (add == NULL) ? 0 : strlen(add);
-    char * e = *buff + *sz - 4;
-
-    if (*buff + len >= e) {
-        size_t o = curr - *buff;
-        *sz += BUF_SIZE;
-        *buff = realloc(*buff, *sz);
-        curr  = *buff + o;
-    }
-
-    *(curr++) = ' ';
-    *(curr++) = '*';
-    if (len > 0) {
-        *(curr++) = ' ';
-        *(curr++) = ' ';
-        memcpy(curr, add, len);
-        curr += len;
-    }
-    *(curr++) = '\n';
-
-    return curr;
+    *scan = NUL;
+    return scan;
 }
 
 /**
@@ -834,47 +788,58 @@ add_text(char ** buff, size_t * sz, char * curr, char * add)
  * @returns    end of guard scan
  */
 char *
-handle_comment(char * scan_in)
+handle_comment(char * scan)
 {
-    char * com_buf      = malloc(BUF_SIZE);
-    char * scan_out     = com_buf;
-    size_t com_buf_size = BUF_SIZE;
-    int    line_ct      = 0;
-    int    blank_ct     = 0;
+    commentary = load_text(1);
+    *scan = NUL;
+    return scan;
+}
 
-    for (;;) {
-        if (fgets(buffer, BUF_SIZE, stdin) == NULL)
-            die("incomplete comment section");
+/**
+ * handle emit directive.
+ *
+ * collect text to be emitted at the end of the header
+ *
+ * @param scan current scan point
+ * @returns    The '%' starting the next directive.
+ */
+char *
+handle_emit(char * scan)
+{
+    add_on_text = load_text(0);
+    *scan = NUL;
+    return scan;
+}
 
-        scan_in = trim(buffer);
-
-        /*
-         *  if scan is NULL, we've got a comment
-         */
-        if (scan_in == NULL) {
-            blank_ct++;
-            continue;
-        }
-
-        if (*scan_in == '%')
-            break;
-
-        if (line_ct++ == 0) {
-            blank_ct = 0;
-
-        } else while (blank_ct > 0) {
-                scan_out = add_text(&com_buf, &com_buf_size, scan_out, NULL);
-                blank_ct--;
-                line_ct++;
-            }
-
-        scan_out = add_text(&com_buf, &com_buf_size, scan_out, scan_in);
-    }
-
-    *scan_out  = NUL;
-    commentary = com_buf;
-    buffer[0]  = NUL;
-    return buffer;
+/**
+ * handle map directive.
+ *
+ * Map a set of characters into another set.
+ * There are three arguments to this directive:
+ *
+ * * the mapping name (e.g. "lower")
+ * * the map-from list.  Specify a character class name.
+ * * the map-to list. This may be a literal, a class name, or a mix.
+ *
+ * These three elements are separated by two commas (",").
+ * If the "map-to" list is shorter than the map-from list, then the
+ * last character is repeated until there are the same number of characters.
+ * It is an error for it to be longer.  This will produce CPP macros
+ * named TO_XXX_CHARS(), using the name above.  The input argument is also
+ * the output argument.  It is an in-place replacement.
+ *
+ * @param scan current scan point
+ * @returns    The '%' starting the next directive.
+ */
+char *
+handle_map(char * scan)
+{
+    while (isspace(*scan))   scan++;
+    if (*scan == NUL) die("%map requires a mapping specification");
+    // mapping_text = strdup(scan);
+    fprintf(stderr, "%map is not actually implemented yet.\n");
+    *scan = NUL;
+    return scan;
 }
 
 /**
@@ -933,6 +898,21 @@ handle_guard(char * scan)
 }
 
 /**
+ * handle test directive.
+ *
+ * specifies that a main procedure is to be emitted under an ifdef guard.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_test(char * scan)
+{
+    add_test_code = 1;
+    return scan + strlen(scan);
+}
+
+/**
  * handle invalid directive.
  *
  * This function does not return.
@@ -945,3 +925,10 @@ handle_invalid(char * scan)
 {
     die(bad_directive, scan);
 }
+/*
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * end of char-mapper.c */

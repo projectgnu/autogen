@@ -139,10 +139,13 @@ exec 4>&2 5>&1 1> ${base}.err 2>&1
   test ! -f ${base} || rm -f ${base}
   echo "include = '#include \"compat/compat.h\"';" >> ${base}.def
   f='@="@="'`echo ${INCLUDES} ${CFLAGS}`' @'
-  sed -e "s@^cc @${CC:-cc} -include ${top_builddir}/config.h @" \
-      -e '/^cflags="/s'"${f}" \
-      -e 's@^autogen @run_ag @' \
-          mk-${base}.sh > mk-${base}
+  {
+    echo set -x
+    sed -e "s@^cc @${CC:-cc} -include ${top_builddir}/config.h @" \
+        -e '/^cflags="/s'"${f}" \
+        -e 's@^autogen @run_ag @' \
+            mk-${base}.sh
+  } > mk-${base}
 
   . ./mk-${base}
 
@@ -151,9 +154,11 @@ exec 4>&2 5>&1 1> ${base}.err 2>&1
 exec 1>&5 5>&- 2>&4 4>&-
 
 test -x ./${base} || {
-  cat ${base}.err >&2
+  cat mk-${base}
+  printf '\n\nFAILURE LOG:\n\n'
+  cat ${base}.err
   die cannot create ${base} program
-}
+} >&2
 
 ./${base} --help | sed 's/\t/        /g'
 [=

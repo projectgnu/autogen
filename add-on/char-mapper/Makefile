@@ -13,6 +13,8 @@
 include $(TOP)/MakeRules
 
 cm-opt.c        : cm-opt.stamp
+cm-usage.c      : cm-opt.stamp
+
 $(OBJ)          : $(HEADER_LIST) cm-usage.c
 $(HEADER_LIST)  : cm-opt.stamp
 
@@ -36,3 +38,7 @@ lcl-clean   :
 	bash ./test.sh --clean
 	bash ./mk-opt-table.sh --clean cm-opt
 	bash ./test.sh --clean
+
+check : lcl-check
+lcl-check : $(EXE)
+	bash ./test.sh

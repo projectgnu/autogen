@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2011-12-21 10:08:43 bkorb"
+# Time-stamp:        "2012-02-12 09:00:21 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -44,10 +44,6 @@ cfgf=${top_builddir}/config.h
     if egrep 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
     then echo '#include <limits.h>'
     else echo '#include <sys/limits>' ; fi
-
-    if egrep 'define +HAVE_U_INT' ${cfgf} >/dev/null
-    then :
-    else echo 'typedef unsigned int u_int;' ; fi
 
     if egrep 'define +HAVE_SYSEXITS_H' ${cfgf} >/dev/null
     then echo '#include <sysexits.h>' ; fi

@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2012-01-29 17:10:56 bkorb"
+## Time-stamp:      "2012-02-12 09:54:28 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -43,7 +43,7 @@ GENTEXI         = libopts.texi libopts.menu
 TEXI_STAMP      = texi-stamp
 
 GENHDRS         = autoopts/options.h autoopts/usage-txt.h genshell.h \
-	xat-attribute.h value-type.h ao-strs.h ag-char-map.h
+		xat-attribute.h value-type.h ao-strs.h ag-char-map.h
 HDRS            = $(GENHDRS) autoopts.h parse-duration.h project.h proto.h
 GEN_SRC         = ao-strs.c value-type.c xat-attribute.c
 
@@ -52,12 +52,14 @@ GEN_SRC         = ao-strs.c value-type.c xat-attribute.c
 ## documentation.  Files without documentation are on the CSRC = line.
 ##
 CSRC            = parse-duration.c $(GEN_SRC) \
-    autoopts.c  \
-    boolean.c configfile.c cook.c      check.c     enum.c      env.c     \
-    file.c    find.c       genshell.c  load.c      makeshell.c nested.c  \
-    numeric.c pgusage.c    putshell.c  reset.c     restore.c   save.c    \
-    sort.c    stack.c      streqvcmp.c text_mmap.c tokenize.c  time.c    \
-    usage.c   version.c
+    autoopts.c \
+    alias.c    boolean.c   check.c     configfile.c cook.c \
+    enum.c     env.c       file.c      find.c       genshell.c \
+    load.c     makeshell.c nested.c    numeric.c    pgusage.c \
+    putshell.c reset.c     restore.c   save.c       sort.c \
+    stack.c    streqvcmp.c text_mmap.c time.c       tokenize.c \
+    usage.c    version.c
+
 
 SRC             = $(HDRS) $(CSRC) $(GENSRC)
 DEF_FILES       = genshell.def $(srcdir)/funcs.def ao-strs.def

@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2012-01-29 13:01:21 bkorb"
+# Time-stamp:      "2012-02-12 09:20:29 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -231,7 +231,7 @@ typedef tOptProc*  tpOptProc;
  */
 // coverity[+kill]
 typedef void (tUsageProc)(tOptions* pOpts, int exitCode);
-typedef tUsageProc* tpUsageProc;
+typedef tUsageProc * tpUsageProc;
 
 /*
  *  Special definitions.  "NOLIMIT" is the 'max' value to use when
@@ -424,7 +424,7 @@ CPLUSPLUS_OPENER
  (out-push-new)
  (out-suspend "priv")   =][=
 
-FOR export_func         =][=
+FOR export-func         =][=
 
   IF
 

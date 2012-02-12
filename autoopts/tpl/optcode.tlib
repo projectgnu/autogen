@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2011-12-29 09:21:23 bkorb"
+# Time-stamp:      "2012-02-12 09:10:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -124,7 +124,7 @@ extern "C" {
 #endif
 extern FILE * option_usage_fp;
 [= IF (exist? "flag.aliases") =]
-extern void optionAlias(tOptions* pOpts, tOptDesc* pOD, unsigned int alias);
+extern int optionAlias(tOptions * o, tOptDesc* od, unsigned int alias);
 [= ENDIF =]
 /* TRANSLATORS: choose the translation for option names wisely because you
                 cannot ever change your mind. */[=

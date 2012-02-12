@@ -1,3 +1,12 @@
+2012-02-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/agtexi-cmd.tpl: cleanups
+	* autoopts/tpl/man2texi.sh: convert \fI to @i and \fB to @var
+	* compat/compat.h: sys/wait.h may not exist.  likewise u_int.
+	* config/libopts.def: test for u_int type
+	* doc/auto-opts.tpl: improve debuggability
+	* everywhere: remove all residual "u_int" types.
+
 2012-01-28  Bruce Korb  <bkorb@gnu.org>
 
 	* everywhere: redate copyrights

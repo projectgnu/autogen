@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2011-04-22 12:47:57 bkorb"
+ *  Time-stamp:        "2012-02-12 09:59:30 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -43,7 +43,7 @@ static char*
 emit_subblock(char const * pzDefList, char * pzText, char * pzOut);
 
 static char*
-subblock_str(char ** ppzText, u_int sepChar, char * pzOut);
+subblock_str(char ** ppzText, uint_t sepChar, char * pzOut);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -289,8 +289,8 @@ list_attrib(char * pzText, char * pzOut)
 {
     static char const  zStart[]  = " = ";
 
-    u_int sepChar   = ',';
-    int   FirstAttr = 1;
+    uint_t sepChar   = ',';
+    int    FirstAttr = 1;
 
     strcpy(pzOut, zStart);
     pzOut += sizeof(zStart) - 1;
@@ -301,7 +301,7 @@ list_attrib(char * pzText, char * pzOut)
      *  a quote character.
      */
     if (ispunct(*pzText) && (*pzText != '"') && (*pzText != '\''))
-        sepChar = (u_int)*(pzText++);
+        sepChar = (uint_t)*(pzText++);
     while (isspace(*pzText)) pzText++;
 
     /*
@@ -318,7 +318,7 @@ list_attrib(char * pzText, char * pzOut)
          *  If the first thing we find is the separator char,
          *  then emit the empty string.
          */
-        if ((u_int)*pzText == sepChar) {
+        if ((uint_t)*pzText == sepChar) {
             *(pzOut++) = '\''; *(pzOut++) = '\'';
             pzText++;
             continue;
@@ -432,8 +432,8 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
     static char const zStart[]  = " = {";
     static char const zEnd[]    = "\n    };\n";
 
-    u_int sepChar   = ',';
-    int   FirstAttr = 1;
+    uint_t sepChar   = ',';
+    int    FirstAttr = 1;
 
     /*
      *  Advance past subblock name to the entry name list
@@ -448,7 +448,7 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
      *  a quote character.
      */
     if (ispunct(*pzText) && (*pzText != '"') && (*pzText != '\''))
-        sepChar = (u_int)*(pzText++);
+        sepChar = (uint_t)*(pzText++);
 
     /*
      *  Loop for as long as we have text entries and subblock
@@ -459,7 +459,7 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
          *  IF the first character is the separator,
          *  THEN this entry is skipped.
          */
-        if ((u_int)*pzText == sepChar) {
+        if ((uint_t)*pzText == sepChar) {
             next_def_entry(&pzText, &pzDefList);
             continue;
         }
@@ -488,7 +488,7 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
          *  IF there are no data for this attribute,
          *  THEN we leave the definition empty.
          */
-        if ((u_int)*pzText == sepChar) {
+        if ((uint_t)*pzText == sepChar) {
             pzText++;
             continue;
         }
@@ -512,7 +512,7 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
  *  correctly reconstruct it.
  */
 static char*
-subblock_str(char ** ppzText, u_int sepChar, char * pzOut)
+subblock_str(char ** ppzText, uint_t sepChar, char * pzOut)
 {
     char * pzText  = *ppzText;
     char * pcComma;

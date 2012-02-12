@@ -2,7 +2,7 @@
 /*
  *  \file autoopts.h
  *
- *  Time-stamp:      "2012-01-29 18:57:41 bkorb"
+ *  Time-stamp:      "2012-02-12 09:04:40 bkorb"
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -79,7 +79,7 @@
 #define NAMED_OPTS(po) \
         (((po)->fOptSet & (OPTPROC_SHORTOPT | OPTPROC_LONGOPT)) == 0)
 
-#define SKIP_OPT(p)  (((p)->fOptState & (OPTST_DOCUMENT|OPTST_OMITTED)) != 0)
+#define SKIP_OPT(p)  (((p)->fOptState & OPTST_IMMUTABLE_MASK) != 0)
 
 typedef int tDirection;
 #define DIRECTION_PRESET        -1

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2011-12-21 10:34:25 bkorb"
+# Time-stamp:      "2012-02-12 09:07:34 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -354,12 +354,14 @@ DEFINE save-name-morphs
 
   ELIF (or (exist? "extract-code")
            (exist? "flag-code")
+           (exist? "aliases")
            (exist? "arg-range"))
     =][=
 
     (set! have-proc #t)
     (set! is-extern #f)
-    (set! test-name (if (exist? "arg-range") proc-name
+    (set! test-name (if (or (exist? "arg-range") (exist? "aliases"))
+                        proc-name
                         (if need-stacking "optionStackArg" "NULL")  ))
     =][=
 
@@ -799,7 +801,8 @@ DEFINE   emit-alias-option
 #define [= (. UP-name) =]_NAME    NULL
 #define [= (. UP-name) =]_name    ([=
     (string-table-add-ref opt-strs (get "name")) =])
-#define [=(. UP-name)=]_FLAGS     [= (get-up-name "aliases") =]_FLAGS[=
+#define [=(. UP-name)=]_FLAGS     ([=
+    (get-up-name "aliases") =]_FLAGS | OPTST_ALIAS)[=
 
 ENDDEF   emit-alias-option
 

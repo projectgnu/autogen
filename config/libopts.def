@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2011-12-07 15:12:07 bkorb"
+ *  Time-stamp:        "2012-02-12 09:59:59 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -315,16 +315,16 @@ do-first = <<-_EOF_
 	# ----------------------------------------------------------------------
 	AC_CHECK_TYPES(wchar_t)
 	AC_CHECK_TYPES(wint_t, [], [], [
-	AC_INCLUDES_DEFAULT
-	#if HAVE_RUNETYPE_H
-	# include <runetype.h>
-	#endif
-	#if HAVE_WCHAR_H
-	# include <wchar.h>
-	#endif
+	  AC_INCLUDES_DEFAULT
+	  #if HAVE_RUNETYPE_H
+	  # include <runetype.h>
+	  #endif
+	  #if HAVE_WCHAR_H
+	  # include <wchar.h>
+	  #endif
 	])
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
-	   intptr_t, uintptr_t, uint_t, pid_t, size_t])
+			intptr_t, uintptr_t, uint_t, pid_t, size_t])
 
 	# =====
 	# sizes

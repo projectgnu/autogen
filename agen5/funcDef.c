@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2012-01-29 20:49:18 bkorb"
+ *  Time-stamp:        "2012-02-12 09:01:11 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -38,7 +38,7 @@ order_def_list(const void* p1, const void* p2);
 static tDefList *
 link_twins(tDefList* pDL, tDefList* pNext, int* pCt);
 
-static u_int
+static uint_t
 count_named_values(tTemplate* pT, tMacro* pMac);
 
 static char *
@@ -105,11 +105,11 @@ link_twins(tDefList* pDL, tDefList* pNext, int* pCt)
 }
 
 
-static u_int
+static uint_t
 count_named_values(tTemplate* pT, tMacro* pMac)
 {
     char * pzScan = pT->pzTemplText + pMac->ozText;
-    u_int  ct = 0;
+    uint_t ct = 0;
 
     while (*pzScan != NUL) {
         ct++;
@@ -259,7 +259,7 @@ LOCAL void
 parseMacroArgs(tTemplate* pT, tMacro* pMac)
 {
     char *      pzScan = pT->pzTemplText + pMac->ozText;
-    u_int       ct;
+    uint_t      ct;
     tDefList *  pDL;
     tDefList *  pN;
 

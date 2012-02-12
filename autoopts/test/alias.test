@@ -2,7 +2,7 @@
 #
 # alias.test     ---  test option aliasing
 #
-# Time-stamp:        "2011-08-07 17:37:58 bkorb"
+# Time-stamp:        "2012-02-12 09:13:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -26,7 +26,7 @@
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
 . ./defs
-
+failure() { exit 1 ; }
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
 echo "creating ${testname}.def in `pwd`"
@@ -55,7 +55,6 @@ ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
-set -x
 
 # # # # # # # # # # FIRST TEST # # # # # # # # #
 
@@ -78,6 +77,19 @@ _EOF_
 cmp -s ${testname}-1.help ${testname}.help || \
   failure "`diff ${testname}-1.help ${testname}.help`"
 
+./${testname} -o foo -a bar && \
+    failure "both -o and -a were accepted"
+
+./${testname} -a bar fumble > ${testname}.out
+cat > ${testname}.base <<- \_EOF_
+	OPTION_CT=2
+	export OPTION_CT
+	TEST_ALIAS_OPTION='bar'
+	export TEST_ALIAS_OPTION
+	_EOF_
+
+cmp -s ${testname}.out ${testname}.base || \
+    failure "`diff ${testname}.out ${testname}.base`"
 cleanup
 
 ## Local Variables:

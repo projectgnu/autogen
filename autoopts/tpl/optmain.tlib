@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2011-11-21 15:12:22 bkorb"
+# Time-stamp:      "2012-02-12 09:27:28 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -672,20 +672,10 @@ DEFINE decl-callbacks
 
 =][=
 
-  IF (. make-test-main)                         =][=
+  (if make-test-main
+      (ag-fprintf 0 "\n#endif /* defined(%s) */" main-guard) )
 
-    FOR     flag                                =][=
-      IF (set! flg-name (get "name"))
-         (not (= (hash-ref cb-proc-name   flg-name)
-                 (hash-ref test-proc-name flg-name))) =]
-#define [=(get-up-name "name")=]_OPT_PROC [=(hash-ref cb-proc-name flg-name)=][=
-      ENDIF                                     =][=
-    ENDFOR  flag                                =]
-#endif /* defined([=(. main-guard)=]) */[=
-
-  ENDIF (. make-test-main)                      =][=
-
-(. undef-proc-names)                            =][=
+  undef-proc-names                              =][=
 
 ENDDEF decl-callbacks                           =][=
 
@@ -873,8 +863,10 @@ ENDDEF   range-option-code
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE alias-option-code       \=]
-    optionAlias(pOptions, pOptDesc, [=
+    int res = optionAlias(pOptions, pOptDesc, [=
         (string-append INDEX-pfx (get-up-name "aliases")) =]);
+    if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
+        [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
 [=
 
 ENDDEF   alias-option-code
@@ -1025,7 +1017,7 @@ ENDDEF   file-name-code
 
 DEFINE define-option-callbacks      =][=
 
-  FOR  flag  =][=
+  FOR flag                          =][=
 
     (set-flag-names)
     (define endif-test-main "")     =][=
@@ -1124,14 +1116,7 @@ doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
   ENDIF  =]
 }[=
 
-IF (or (exist? "flag.flag-code")
-       (exist? "flag.extract-code")
-       (exist? "flag.arg-range")
-       (match-value? ~* "flag.arg-type" "key|set|fil")) =][=
-
-  INVOKE define-option-callbacks=][=
-
-ENDIF                           =][=
+INVOKE define-option-callbacks  =][=
 
 IF (exist? "main")              =][=
   INVOKE build-main             =][=

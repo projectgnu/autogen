@@ -30,7 +30,7 @@ omit-test-n-set;
 /*
  *  If any of these bit assignments change, the minimum version number of
  *  the autoopts interface will also have to be changed.  The result is
- *  incompatible.
+ *  incompatible.  The first 8 bits are mutable, tho 7 are used.
  */
 bit[ 0] = { b-name = set;           b-what = 'Set via the "SET_OPT()" macro'; };
 bit[ 1] = { b-name = preset;        b-what = 'Set via an RC/INI file'; };
@@ -41,6 +41,9 @@ bit[ 4] = { b-name = equivalence;   b-what = 'selected by equiv\'ed option'; };
 bit[ 5] = { b-name = disabled;      b-what = 'option is in disabled state'; };
 bit[ 6] = { b-name = alloc-arg;     b-what = 'pzOptArg was allocated'; };
 
+/*
+ * The remaining bits must not change
+ */
 bit[ 8] = { b-name = no-init;       b-what = 'option cannot be preset'; };
 bit[ 9] = { b-name = number-opt;    b-what = 'opt value (flag) is any digit'; };
 bit[10] = { b-name = stacked;       b-what = 'opt uses optionStackArg proc'; };
@@ -64,6 +67,7 @@ bit[23] = { b-name = disable-twice; b-what = 'process disabled option twice'; };
 bit[24] = { b-name = scaled-num;    b-what = 'scaled integer value'; };
 bit[25] = { b-name = no-command;    b-what = 'disable from cmd line'; };
 bit[26] = { b-name = deprecated;    b-what = 'support is being removed'; };
+bit[27] = { b-name = alias;         b-what = 'alias for other option'; };
 
 mask = {
   m-name  = set;
@@ -86,11 +90,21 @@ mask = {
 };
 
 mask = {
-  m-name  = do-not-save;
-  b-name  = no-init, document, omitted;
+  m-name  = no-usage;
+  b-name  = omitted, no-command, deprecated;
 };
 
 mask = {
-  m-name  = no-usage;
-  b-name  = omitted, no-command, deprecated;
+  m-name  = immutable;
+  b-name  = document, omitted;
+};
+
+mask = {
+  m-name  = do-not-save;
+  b-name  = document, omitted, no-init;
+};
+
+mask = {
+  m-name  = no-output;
+  b-name  = document, omitted, alias;
 };

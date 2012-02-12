@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2012-01-29 13:50:29 bkorb"
+dnl Time-stamp:      "2012-02-12 09:59:48 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -105,7 +105,7 @@ else
 fi]
 AC_DEFINE_UNQUOTED([SNV_LONG_DOUBLE],$snv_long_double,
                    [Define this to the long+double type])
-AC_CHECK_TYPES([u_int, long long, uintmax_t, size_t, wchar_t])
+AC_CHECK_TYPES([long long, uintmax_t, size_t, wchar_t])
 AC_CHECK_SIZEOF(char*, 4)
 AC_CHECK_SIZEOF(int,   4)
 AC_CHECK_SIZEOF(long,  4)
