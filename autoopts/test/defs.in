@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2011-12-04 05:38:52 bkorb"
+# Time-stamp:     "2012-02-12 09:18:48 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -152,7 +152,7 @@ init_tests()
   PATH=${f}:${PATH}
 
   set_exe AGexe
-  AGexe=${AGexe}
+  AGexe=${AGexe:-`command -v autogen`}
   set_exe GDexe
   set_exe CLexe
 
@@ -163,8 +163,8 @@ init_tests()
 
   export PATH
   echo PATH is ${PATH} >&2
-  which columns >&2
-  which autogen >&2
+  command -v columns >&2
+  command -v autogen >&2
 
   lo_dir=${top_builddir}/autoopts
   test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs

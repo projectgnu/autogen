@@ -3,7 +3,7 @@
 #
 # equiv.test ---  test option equivivalence classes
 #
-# Time-stamp:        "2011-08-07 17:34:21 bkorb"
+# Time-stamp:        "2012-02-12 09:28:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -77,7 +77,7 @@ flag = {
 _EOF_
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+  failure "AutoGen could not process - exited $?"
 
 compile "-?"
 

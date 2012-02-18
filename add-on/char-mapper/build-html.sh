@@ -15,7 +15,7 @@ case "${1}" in
     ;;
 
 ( files )
-    primary_source=$(echo char-mapper.c mk-str2enum.sh mk-opt-table.sh)
+    primary_source=$(echo *.c *.h mk*.sh)
     example_source=test.sh
     make >&4 2>&4
     example_output=$(echo test-cmap.map test-cmap.h)

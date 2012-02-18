@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-01-29 20:21:59 bkorb"
+ *  Time-stamp:      "2012-02-12 12:14:50 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -384,7 +384,7 @@ spawnPipe(char const * pzFile)
             switch (ct) {
             case -1:
                 if ((errno != EINTR) || (! redoOptions))
-                    goto no_fattach_finish;
+                    goto spawnpipe_finish;
 
                 optionRestore(&autogenOptions);
                 doOptions(autogenOptions.origArgCt,
@@ -428,7 +428,7 @@ spawnPipe(char const * pzFile)
         }
     }
 
- no_fattach_finish:
+ spawnpipe_finish:
     unlink(pzIn);
     unlink(pzOut);
     AGFREE(pzIn);

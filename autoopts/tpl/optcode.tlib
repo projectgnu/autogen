@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-02-12 09:10:14 bkorb"
+# Time-stamp:      "2012-02-18 09:04:43 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -235,19 +235,26 @@ ENDIF  there is a version
  *  Define the [= (. pname-cap) =] Option Environment
  */
 #define zPROGNAME       ([= (string-table-add-ref opt-strs pname-up)   =])
-#define zUsageTitle     ([= (string-table-add-ref opt-strs usage-text) =])
+#define zUsageTitle     ([=
+ (define homerc-ct   0)
+ (define homerc-txt "")
+ (string-table-add-ref opt-strs usage-text) =])
 [=
-IF (exist? "homerc")    \=]
+FOR homerc              =][=
+  (set! tmp-text (get "homerc"))
+  (if (> (string-length tmp-text)) (begin
+      (set! homerc-ct  (+ 1 homerc-ct))
+      (set! homerc-txt (string-append homerc-txt
+            "\n    " (string-table-add-ref opt-strs tmp-text) "," ))
+  )   )                 =][=
+ENDFOR homerc           =][=
+IF (> homerc-ct 0)     \=]
 #define zRcName         ([=
- (set! tmp-text (if (not (exist? "rcfile"))
-       (string-append "." pname-down "rc")
-          (get "rcfile") ))
+ (set! tmp-text (if (exist? "rcfile") (get "rcfile")
+       (string-append "." pname-down "rc") ))
  (string-table-add-ref opt-strs tmp-text) =])
-static char const * const apzHomeList[[=(+ (count "homerc") 1)=]] = {[=
-  FOR homerc            =]
-    [= (string-table-add-ref opt-strs (get "homerc")) =],[=
-  ENDFOR homerc=]
-    NULL };[=
+static char const * const apzHomeList[=
+  (sprintf "[%u] = {%s\n    NULL };" (+ 1 homerc-ct) homerc-txt) =][=
 
 ELSE                    \=]
 #define zRcName         NULL
@@ -400,7 +407,7 @@ tOptions [=(. pname)=]Options = {
     { [= (if (exist? "no-libopts") "NO_EQUIVALENT"
              (string-append INDEX-pfx "MORE_HELP"))
        =], /* more-help option index */
-      [=IF (exist? "homerc")
+      [=IF (and (exist? "homerc") (not (exist? "disable-save")))
              =][= (. INDEX-pfx) =]SAVE_OPTS[=
         ELSE =]NO_EQUIVALENT[=
         ENDIF=], /* save option index */
@@ -661,7 +668,8 @@ IF (exist? "usage-opt")                 =],
 
 ENDIF have usage-opt                    =][=
 
-IF (exist? "homerc")                    =],
+IF (exist? "homerc")                    =][=
+   IF (not (exist? "disable-save"))     =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text
@@ -675,16 +683,15 @@ IF (exist? "homerc")                    =],
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT[=
-    (if (exist? "disable-save") "| OPTST_NO_COMMAND") =], 0,
+                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, 0,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
      /* option proc      */ NULL,
-     /* desc, NAME, name */ [=
-    (if (exist? "disable-save") "NULL, NULL, NULL"
-         "SAVE_OPTS_DESC, NULL, SAVE_OPTS_name")=],
-     /* disablement strs */ NULL, NULL },
+     /* desc, NAME, name */ SAVE_OPTS_DESC, NULL, SAVE_OPTS_name,
+     /* disablement strs */ NULL, NULL }[=
+
+   ENDIF disable-save does not exist     =],
 
   {  /* entry idx, value */ [=
         (set! default-text (string-append default-text

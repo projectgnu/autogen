@@ -1314,17 +1314,18 @@ the option definition file.  ``@code{xxx}'' is the name of the option below:
 @table @samp
 @item --help
 @itemx --more-help
-These are always available.  ``@code{more-help}'' will pass the full usage
+These are always available.  @samp{--more-help} will pass the full usage
 text through a pager.
 @item --usage
 @vindex usage-opt
-This is added to the option list if ``@code{usage-opt}'' is specified.
+This is added to the option list if @code{usage-opt} is specified.
 It yields the abbreviated usage to @file{stdout}.
 @item --version
-This is added to the option list if ``@code{version = xxx;}'' is specified.
+This is added to the option list if @code{version = xxx;} is specified.
 @item --load-opts
 @itemx --save-opts
-These are added to the option list if ``@code{homerc}'' is specified.
+These are added to the option list if @code{homerc} is specified.  Mostly.
+If, @code{disable-save} is specified, then @samp{--save-opts} is disabled.
 @end table
 
 @item
@@ -1821,14 +1822,19 @@ as the option argument to the option nameed @code{optname}.
 
 @item homerc
 @vindex homerc
-Specifies either a directory or a file using a specific path, a path based
-on an environment variable or a path relative to installation directories.
-The method used depends on the first two characters of the name.  If the
-first character is not the dollar character (@code{$}), then it is
-presumed to be a path name based on the current directory.
+Specifies that option settings may be loaded from and stored into
+configuration files.  Each instance of this attribute is either a directory or
+a file using a specific path, a path based on an environment variable or a
+path relative to installation directories.  The method used depends on the name.
+If the one entry is empty, it enables the loading and storing of settings,
+but no specific files are searched for.  Otherwise, a series of configuration
+files are hunted down and, if found, loaded.
 
-Otherwise, the method depends on the second character:
-@table @samp
+If the first character of the @samp{homerc} value is not the dollar
+character (@code{$}), then it is presumed to be a path name based on the
+current directory.  Otherwise, the method depends on the second character:
+
+@table @code
 @item $
 The path is relative to the directory where the executable was found.
 @item @@
@@ -1840,8 +1846,9 @@ The path is derived from the named environment variable.
 
 Use as many as you like.  The presence of this attribute
 activates the @code{--save-opts} and @code{--load-opts} options.
-See the @code{optionMakePath(3AGEN)} man page for excruciating details.
+However, saving into a file may be disabled with the @samp{disable-save}.
 @xref{loading rcfile}.
+See the @code{optionMakePath(3AGEN)} man page for excruciating details.
 
 @item rcfile
 @vindex rcfile
@@ -3000,30 +3007,30 @@ flag = @{
 @end example
 Do not provide anything else.  The usage text for such an option will be:
 @example
-   This is an alais for @i{aliased-to-option}
+   This is an alias for @i{aliased-to-option}
 @end example
 
 @node opt-attr default option
 @subsubsection Default Option
 @vindex default
 If your program processes its arguments in named option mode (See
-``long-opts'' in @ref{program attributes}), then you may select @strong{one}
-of your options to be the default option.  Do so by using attribute
-``@code{default}'' with one of the options.  The option so specified must have
-an @code{arg-type} (@pxref{Option Arguments}) specified, but not the
+@code{long-opts} in @ref{program attributes}), then you may select
+@strong{one} of your options to be the default option.  Do so by using
+attribute @code{default} with one of the options.  The option so specified
+must have an @code{arg-type} (@pxref{Option Arguments}) specified, but not the
 @code{arg-optional} (@pxref{arg-optional}) attribute.  That is to say, the
 option argument must be required.
 
-If you have done this, then any arguments that do not match an option
-name and do not contain an equal sign (@code{=}) will be interpreted as
-an option argument to the default option.
+If you have done this, then any arguments that do not match an option name and
+do not contain an equal sign (@code{=}) will be interpreted as an option
+argument to the default option.
 
 @node opt-attr documentation
 @subsubsection Option Sectioning Comment
-This attribute means the option exists for the purpose of separating
-option description text in the usage output.  Libraries may choose
-to make it settable so that the library can determine which command
-line option is the first one that pertains to the library.
+This attribute means the option exists for the purpose of separating option
+description text in the usage output.  Libraries may choose to make it
+settable so that the library can determine which command line option is the
+first one that pertains to the library.
 
 @vindex documentation
 If the ``@code{documentation}'' attribute is present, then all other
@@ -3035,8 +3042,11 @@ When present, the @code{descrip} attribute will be displayed only when the
 left hand margin and may consist of one or more lines of text.  The name of
 the option will not be printed.
 
-Documentation options are for clarifying the usage text and will not
-appear in generated man pages or in the generated invoking texinfo doc.
+Documentation options are for clarifying the usage text and will not usually
+appear in generated man pages or in the generated invoking texinfo doc.  They
+may be gotten to appear in texinfo documents if the @code{USAGE_NODES}
+environment variable is set to ``doc''.  In that case, the invoking menu will
+have entries for these documentation flags, but not the individual options.
 
 @node opt-attr translators
 @subsubsection Translator Notes

@@ -4,7 +4,7 @@
 
 # cmd-doc.tlib -- Template for command line man/mdoc pages
 #
-# Time-stamp:      "2011-12-21 10:35:02 bkorb"
+# Time-stamp:      "2012-02-12 08:41:48 bkorb"
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
@@ -379,7 +379,11 @@ DEFINE mk-options
 
 FOR flag                              :+][+:
   IF (not (exist? "documentation"))   :+][+:
-    INVOKE emit-flag-text             :+][+:
+    IF (exist? "aliases")             :+][+:
+      INVOKE emit-alias-opt           :+][+:
+    ELSE                              :+][+:
+      INVOKE emit-flag-text           :+][+:
+    ENDIF                             :+][+:
 
   ELIF (. man-page)                   :+]
 .PP
@@ -683,6 +687,30 @@ DEFINE append-files                   :+][+:
 ENDDEF append-files
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  E M I T   A L I A S   O P T
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE emit-alias-opt                   :+]
+.It [+:
+  IF (exist? "value")                   :+][+:
+    IF (exist? "long-opts")            \:+]
+ \-[+:value:+] ", " -\-[+: name         :+][+:
+    ELSE                               \:+]
+ \-[+:value:+][+:
+    ENDIF  (exist? "long-opts")         :+][+:
+
+  ELSE  value does not exist -- named option only  :+][+:
+
+    IF (not (exist? "long-opts"))      \:+]
+ [+: name :+][+:
+    ELSE                               \:+]
+ \-\-[+: (. opt-name)                   :+][+:
+    ENDIF                               :+][+:
+  ENDIF                                 :+]
+This is an alias for the [+: aliases :+] option.[+:
+ENDDEF emit-alias-opt
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  E M I T   F L A G   T E X T
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
@@ -710,8 +738,8 @@ DEFINE emit-flag-text                 :+][+:
 
 :+]
 .It [+:
-  IF (exist? "value")                 :+][+:
-    IF (exist? "long-opts")           :+][+:
+  IF (exist? "value")                   :+][+:
+    IF (exist? "long-opts")             :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -720,18 +748,18 @@ DEFINE emit-flag-text                 :+][+:
           *
           \:+]
  \-[+:value:+][+:
-      IF (not (exist? "arg-type"))    :+] ", " -\-[+:
+      IF (not (exist? "arg-type"))      :+] ", " -\-[+:
       ELSE  :+] " [+:(. opt-arg):+], " \-\-[+:
-      ENDIF :+][+: (. opt-name)       :+][+:
-      IF (exist? "arg-type")          :+][+:
+      ENDIF :+][+: (. opt-name)         :+][+:
+      IF (exist? "arg-type")            :+][+:
               ? arg-optional " [ =" ' "=" '
-              :+][+:  (. opt-arg)     :+][+:
-              arg-optional " ]"       :+][+:
-      ENDIF :+][+:
+              :+][+:  (. opt-arg)       :+][+:
+              arg-optional " ]"         :+][+:
+      ENDIF                             :+][+:
       IF (exist? "disable") :+], " \fB\-\-[+:(. dis-name):+]\fP"[+:
-      ENDIF :+][+:
+      ENDIF                             :+][+:
 
-    ELSE   :+][+:
+    ELSE                                :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -740,16 +768,16 @@ DEFINE emit-flag-text                 :+][+:
           *
           \:+]
  \-[+:value:+][+:
-      IF (exist? "arg-type") :+][+:
+      IF (exist? "arg-type")            :+][+:
             arg-optional "["     :+] "[+:(. opt-arg):+][+:
-            arg-optional '"]"'   :+][+:
-      ENDIF " :+][+:
-    ENDIF     :+][+:
+            arg-optional '"]"'          :+][+:
+      ENDIF "                           :+][+:
+    ENDIF  (exist? "long-opts")         :+][+:
 
 
   ELSE  value does not exist -- named option only  :+][+:
 
-    IF (not (exist? "long-opts"))     :+][+:
+    IF (not (exist? "long-opts"))       :+][+:
 
           # * * * * * * * * * * * * * * * * * * * *
           *
@@ -759,16 +787,16 @@ DEFINE emit-flag-text                 :+][+:
           *
           \:+]
  [+: (. opt-name) :+][+:
-      IF (exist? "arg-type")          :+] [+:
+      IF (exist? "arg-type")            :+] [+:
          ? arg-optional " [ =" ' "=" '
-         :+][+:(. opt-arg):+][+:
-         arg-optional "]" :+][+:
+         :+][+:(. opt-arg)              :+][+:
+         arg-optional "]"               :+][+:
       ENDIF:+][+:
       IF (exist? "disable") :+], " \fB[+:(. dis-name):+]\fP"[+:
-      ENDIF                           :+][+:
+      ENDIF                             :+][+:
 
 
-    ELSE                              :+][+:
+    ELSE                                :+][+:
           # * * * * * * * * * * * * * * * * * * * *
           *
           *  The option does not have a flag value (character).
@@ -780,18 +808,18 @@ DEFINE emit-flag-text                 :+][+:
       IF (exist? "arg-type") :+] "[+: #" :+][+:
             arg-optional "[" :+]=[+:(. opt-arg):+][+:
             arg-optional "]" :+]"[+: #" :+][+:
-      ENDIF                           :+][+:
+      ENDIF                             :+][+:
 
       IF (exist? "disable")
         :+], " \fB\-\-[+:(. dis-name):+]\fP"[+:
-      ENDIF                           :+][+:
-    ENDIF                             :+][+:
-  ENDIF                               :+]
+      ENDIF                             :+][+:
+    ENDIF                               :+][+:
+  ENDIF                                 :+]
 [+: (string-substitute (get "descrip") "\\" "\\\\") :+].[+:
 
-  IF (exist? "min")                   :+]
+  IF (exist? "min")                     :+]
 This option is required to appear.[+:
-  ENDIF                               :+][+:
+  ENDIF                                 :+][+:
 
   IF (exist? "max") :+]
 This option may appear [+:

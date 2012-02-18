@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-01-29 13:33:10 bkorb"
+ *  Time-stamp:        "2012-02-12 12:16:12 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -664,7 +664,7 @@ flag = {
     value       = d;
     arg-type    = string;
     arg-name    = connect-type;
-    descrip     = "TCP port or fattach file name";
+    descrip     = "TCP port or pipe file name";
     woops       = (error "Daemon-ization is not ready for prime time");
 #ifndef XML2AG
     ifdef       = DAEMON_ENABLED;
@@ -689,12 +689,11 @@ flag = {
 	file name.  "inet:" and "inet6" should be followed by a port number.
 
 	@item some other string
-	The string represents a named pipe.  If your system supports
-	@code{fattach} and @code{connld}, then that will be the name of the
-	bi-directional pipe that any number of processes can open and
-	communicate over.  If your system does @strong{not} support such things,
-	then the input pipe will be suffixed with "-in" and the output pipe
-	suffixed with "-out" and only one client may connect at a time.
+	The string represents a named pipe.  The name of the bi-directional
+	pipe that any number of processes can open and communicate over.  If
+	your system does @strong{not} support such things, then the input pipe
+	will be suffixed with "-in" and the output pipe suffixed with "-out"
+	and only one client may connect at a time.
 	@end table
 	_EODoc_;
 #else
@@ -748,6 +747,9 @@ flag = {
 	While processing a template, you may specify an index to retrieve
 	a specific value.  That index may also be a define-d value.
 	@end enumerate
+
+	It is entirely equivalent to place this name in the exported environment.
+	Internally, that is what AutoGen actually does with this option.
 	_EODoc_;
 #else
     doc = "Pass-through AutoGen argument";

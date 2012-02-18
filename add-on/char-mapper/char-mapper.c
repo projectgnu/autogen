@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-02-12 09:55:29 bkorb"
+ *  Time-stamp:        "2012-02-18 09:32:07 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -43,27 +43,9 @@ main(int argc, char ** argv)
     else argv[1] = "stdin";
 
     bit_count = read_data();
-
-    {
-        time_t tm = time(NULL);
-        struct tm * tmp = localtime(&tm);
-
-        strftime(buffer, BUF_SIZE, "%x %X", tmp);
-        printf(leader_z, buffer, commentary, file_guard);
-    }
-
-    if (fseek(stdin, 0, SEEK_SET) == 0)
-        copy_input_text(argv[1]);
-
-    {
-        int width = (bit_count+3)/4;
-        if (width < 2) width = 2;
-        sprintf(mask_fmt, mask_fmt_fmt, width);
-        if (width > 8)
-            strcat(mask_fmt, "ULL");
-    }
-
     init_names();
+
+    emit_leader(argv[1]);
     emit_macros(bit_count);
     emit_table(bit_count);
     emit_functions();
@@ -79,6 +61,34 @@ die(char const * fmt, ...)
     vfprintf(stderr, fmt, ap);
     va_end(ap);
     exit(EXIT_FAILURE);
+}
+
+static void
+emit_leader(char * input)
+{
+    if (add_test_code) {
+        if (out_file_nm != NULL)
+            printf(test_script, base_fn_nm, base_ucase, out_file_nm);
+    }
+
+    {
+        time_t tm = time(NULL);
+        struct tm * tmp = localtime(&tm);
+
+        strftime(buffer, BUF_SIZE, "%x %X", tmp);
+        printf(leader_z, buffer, commentary, file_guard);
+    }
+
+    if (fseek(stdin, 0, SEEK_SET) == 0)
+        copy_input_text(input);
+
+    {
+        int width = (bit_count+3)/4;
+        if (width < 2) width = 2;
+        sprintf(mask_fmt, mask_fmt_fmt, width);
+        if (width > 8)
+            strcat(mask_fmt, "ULL");
+    }
 }
 
 static void
@@ -112,9 +122,8 @@ init_names(void)
     }
 
     if (data_guard == NULL) {
-        static char const guard_fmt[] = "DEFINE_%s";
-        char * p = malloc(strlen(table_name) + sizeof(guard_fmt));
-        sprintf(p, guard_fmt, table_name);
+        char * p = malloc(strlen(table_name) + define_fmt_LEN);
+        sprintf(p, define_fmt, table_name);
         make_define_name(p);
         data_guard = p;
     }
@@ -142,6 +151,12 @@ init_names(void)
     }
 }
 
+/**
+ * Copy out the input to the output as a comment.
+ * The input file was successfully rewound, so we simply re-read it.
+ *
+ * @param name the name of the input file.
+ */
 static void
 copy_input_text(char const * name)
 {
@@ -166,24 +181,26 @@ copy_input_text(char const * name)
         printf("// %s", buffer);
     }
 
-    write_const(copy_input_end, stdout);
+    fwrite(copy_input_end, copy_input_end_LEN, 1, stdout);
 }
 
+/**
+ * See of the command argument matches a help request.
+ * We accept "-h" and "--h[e[l[p]]]".
+ *
+ * @param name the name of the input file.
+ */
 void
 parse_help(char const * opt_pz)
 {
-#   include "cm-usage.c"
-
-    static char const opterrmsg[] = "char-mapper error:  %s:  %s\n";
     int exit_code = EXIT_SUCCESS;
     FILE * fp = stdout;
     char const * pz = opt_pz;
 
     if (opt_pz == NULL) {
         fp = stderr;
-        fprintf(stderr, opterrmsg, "input is from a TTY device",
-                "must be file or pipe\n");
-        write_const(usage_txt, fp);
+        fprintf(stderr, opterrmsg, input_is_tty, must_be_file);
+        fwrite(usage_text, usage_text_LEN, 1, fp);
         exit_code = EXIT_FAILURE;
     } else
 
@@ -203,7 +220,7 @@ parse_help(char const * opt_pz)
         /* FALLTHROUGH */
 
     case 'h':
-        write_const(usage_txt, fp);
+        fwrite(usage_text, usage_text_LEN, 1, fp);
         break;
 
     default:
@@ -211,7 +228,7 @@ parse_help(char const * opt_pz)
         exit_code = EXIT_FAILURE;
         fp = stderr;
         fprintf(stderr, opterrmsg, "unknown option", opt_pz);
-        pz = usage_txt;
+        pz = usage_text;
         do putc(*pz, stderr);
         while (*(pz++) != '\n');
     }
@@ -219,11 +236,21 @@ parse_help(char const * opt_pz)
     exit(exit_code);
 }
 
+/**
+ * Emit all the macros for doing the char classification tests.
+ * "NBBY" is "Number of Bits per BYte".
+ *
+ * @param bit_count  the number of bits in use
+ */
 void
 emit_macros(int bit_count)
 {
     char fill[CLASS_NAME_LIMIT+3];
 
+    /*
+     * The type to use for the mask depends on the number of bits
+     * in the output.  Make the selection and emit the mask typedef.
+     */
     {
         char const * mask_type;
         switch (bit_count) {
@@ -238,6 +265,9 @@ emit_macros(int bit_count)
         printf(typedef_mask, mask_type, mask_name);
     }
 
+    /*
+     *  Make a padding string so our output looks pretty.
+     */
     if (max_name_len < CLASS_NAME_LIMIT-2)
         max_name_len += 2;
     memset(fill, ' ', max_name_len);
@@ -245,7 +275,7 @@ emit_macros(int bit_count)
 
     for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
 
-        char * pz = fill + strlen(map->vname);
+        char * pz = fill + strlen(map->vname); // padding pointer
         char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
         snprintf(z, sizeof(z), mask_fmt, map->mask);
 
@@ -255,6 +285,10 @@ emit_macros(int bit_count)
     putc('\n', stdout);
 }
 
+/**
+ * produce a test main procedure that shows the classsifications.
+ * Iterate character values from 0 through 0x7F.
+ */
 static void
 emit_test_code(void)
 {
@@ -760,6 +794,7 @@ char *
 handle_file(char * scan)
 {
     char * pz;
+    size_t fname_len;
 
     if (! isspace(*scan)) die(bad_directive, scan-4);
 
@@ -769,9 +804,14 @@ handle_file(char * scan)
         die("fs error %d (%s) reopening %s as stdout\n", errno,
             strerror(errno), scan);
 
-    file_guard = pz = malloc(strlen(scan) + 7);
-    sprintf(pz, "%s_GUARD", scan);
+    fname_len = strlen(scan);
+    file_guard = pz = malloc(fname_len + guard_fmt_LEN);
+    sprintf(pz, guard_fmt, scan);
     make_define_name(pz);
+
+    out_file_nm = pz = malloc(fname_len + 1);
+    strcpy(out_file_nm, scan);
+
     *scan = NUL;
     return scan;
 }
@@ -798,7 +838,8 @@ handle_comment(char * scan)
 /**
  * handle emit directive.
  *
- * collect text to be emitted at the end of the header
+ * Collect text to be emitted at the end of the header.  Like "%comment",
+ * the block of text also ends with a line with a '%' character in column 1.
  *
  * @param scan current scan point
  * @returns    The '%' starting the next directive.
@@ -810,7 +851,7 @@ handle_emit(char * scan)
     *scan = NUL;
     return scan;
 }
-
+#if 0
 /**
  * handle map directive.
  *
@@ -832,7 +873,7 @@ handle_emit(char * scan)
  * @returns    The '%' starting the next directive.
  */
 char *
-handle_map(char * scan)
+NO_handle_map(char * scan)
 {
     while (isspace(*scan))   scan++;
     if (*scan == NUL) die("%map requires a mapping specification");
@@ -841,7 +882,7 @@ handle_map(char * scan)
     *scan = NUL;
     return scan;
 }
-
+#endif
 /**
  * handle table directive.
  *
@@ -901,6 +942,9 @@ handle_guard(char * scan)
  * handle test directive.
  *
  * specifies that a main procedure is to be emitted under an ifdef guard.
+ * The first few lines of the output can also be processed by a Bourne
+ * shell to compile and test that main procedure.  That shell script is
+ * invisible to the C compiler.  It is under a "#if 0" guard.
  *
  * @param scan current scan point
  * @returns    end of guard scan

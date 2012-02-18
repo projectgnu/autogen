@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-11-21 13:53:43 bkorb"
+# Time-stamp:        "2012-02-18 09:15:12 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -114,6 +114,12 @@ ${SED} -e '1,/Create the static procedure(s) declared above/d' \
 echo creating ${testname}.sample
 cat > ${testname}.sample <<\_EOF_
  */
+/**
+ * The callout function that invokes the USAGE() macro.
+ *
+ * @param pOptions the AutoOpts option description structure
+ * @param pOptDesc the descriptor for the "help" (usage) option.
+ */
 static void
 doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 {
@@ -121,9 +127,12 @@ doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
     USAGE(HANDLER_EXIT_SUCCESS);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the first option.
  *
- *   For the first option.
+ * @param pOptions the handler options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 static void
 doOptFirst(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -133,9 +142,12 @@ SampleCode();
 /*  END   =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the second option.
  *
- *   For the second option.
+ * @param pOptions the handler options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 static void
 doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -156,9 +168,12 @@ doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
 
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the third option.
  *
- *   For the third option.
+ * @param pOptions the handler options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 static void
 doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -167,9 +182,12 @@ doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
     SomeCodeOrOther();
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the fourth option.
  *
- *   For the fourth option.
+ * @param pOptions the handler options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 static void
 doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -192,9 +210,12 @@ doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
 
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Code to handle the sixth option.
  *
- *   For the sixth option.
+ * @param pOptions the handler options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 static void
 doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -208,7 +229,7 @@ doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
 
 _EOF_
 
-cmp -s ${testname}.test ${testname}.sample || { set +x ; \
+cmp -s ${testname}.test ${testname}.sample || {
   failure "`diff -c ${testname}.test ${testname}.sample`" ; }
 
 cleanup

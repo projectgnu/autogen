@@ -13,12 +13,10 @@ case "${1}" in
     ;;
 esac
 
+rm -f test[-_]*
 set -e
 
-tbl_name=`echo ${base_name} | sed 's/[^a-zA-Z0-9_]/_/g'`
-
-{
-    cat <<- _EOF_
+cat > ${base_name}.map <<- _EOF_
 	%file ${base_name}.h
 	%test
 	%comment
@@ -122,24 +120,7 @@ tbl_name=`echo ${base_name} | sed 's/[^a-zA-Z0-9_]/_/g'`
 	#define IS_SPACE_OR_NUL(_c)	IS_CPPSP_CHAR(_c)
 	%
 	_EOF_
-} > ${base_name}.map
 
 ./char-mapper ${base_name}.map
-test -f ${base_name}.h
-
-cat >${base_name}.c <<- _EOF_
-	#include <stdio.h>
-	#include "${base_name}.h"
-	_EOF_
-
-guard=$(echo ${base_name} | tr a-z- A-Z_)
-defs="-DDEFINE_${guard}_TABLE -DTEST_${guard}"
-cmd=$(echo ${CC:-cc} -o ${base_name} $defs ${base_name}.c)
-echo $cmd
-$cmd
-case "$-" in
-*x* ) ./${base_name}
-      ls -l ${base_name}* ;;
-*   ) ./${base_name} >/dev/null
-      rm -f ${base_name}* ;;
-esac
+bash ./${base_name}.h
+rm -f ${base_name}*

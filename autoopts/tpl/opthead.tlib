@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-01-15 08:11:22 bkorb"
+# Time-stamp:      "2012-02-18 09:47:00 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -88,7 +88,7 @@ ELSE not exists library                 =][=
   (if (exist? "vendor-opt")       (add-opt-index "VENDOR_OPT"))
 
   (if (exist? "homerc") (begin
-      (add-opt-index "SAVE_OPTS")
+      (if (not (exist? "disable-save")) (add-opt-index "SAVE_OPTS"))
       (add-opt-index "LOAD_OPTS")
   )   )                                 =][=
 ENDIF  not exist library                =]
@@ -541,7 +541,8 @@ DEFINE join-or-expand                   =][=
 /*
  *  global [=(string-append join-type (if (==* join-type "inc") "d" "ed"))
            =] definitions
- */[=
+ */
+[=
     IF
       (set! tmp-text (join "\n\n" (stack join-type)))
       (~* (get join-type) "^[^a-z0-9_]{2,}[ \t]+autogen5[ \t]+template")

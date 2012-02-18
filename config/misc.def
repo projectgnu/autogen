@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2011-07-19 11:56:39 bkorb"
+/*  Time-stamp:        "2012-02-12 12:28:06 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -25,7 +25,6 @@ autogen definitions conftest.tpl;
  */
 
 group       = ag;
-version     = "$Revision: 4.29 $";
 output-file = ag_macros.m4;
 
 test = {
@@ -146,10 +145,8 @@ test   = {
 	  SCM bumble = SCM_UNDEFINED;
 	  SCM stumble= SCM_UNDEFINED;
 	  long lstumble;
-	  stumble = scm_cons( fumble, bumble );
 	  stumble = scm_display( fumble, bumble );
 	  lstumble = scm_ilength( fumble );
-	  /* stumble = scm_c_make_string( 1, SCM_UNDEFINED); */
 	  stumble = scm_c_eval_string( "stumble" );
 	  scm_misc_error( "oops", "bad", bumble );
 	  stumble = scm_num_eq_p( fumble, bumble );
@@ -162,12 +159,12 @@ test   = {
   action = { yes; act-type = script;
              act-text = '  CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
                         '  LIBS="${ag_save_LIBS}"';
-           };
+  };
 
   action = { no; act-type = script; asis;
       act-text = '  AC_MSG_ERROR([Cannot find libguile.  libguile is required.'
                  '  Perhaps you need to install guile-devel?])';
-    };
+  };
 
   doc = <<- _END_OF_DOC_
 	AutoGen won't work without Guile, so either the methods for finding the
@@ -222,30 +219,6 @@ test   = {
 };
 
 test   = {
-  name      = "eval_string";
-  type      = link;
-  check     = "scm_primitive_eval_x links";
-  cflags    = "${ag_cv_with_libguile_cflags}";
-  libs      = "${ag_cv_with_libguile_libs}";
-  code      = "#include <libguile.h>\n"
-              "SCM res = scm_primitive_eval_x( SCM_UNDEFINED );";
-
-  action    = { no; asis;
-    act-type  = script;
-    act-text  = <<- _END_OF_SCRIPT_
-	AC_DEFINE([scm_primitive_eval_x], [scm_eval_x],
-	        [Define this if no scm_primitive_eval_x])
-	AC_DEFINE([scm_t_port], [scm_port], [Define this if no scm_t_port])
-	_END_OF_SCRIPT_; };
-
-  doc = <<- _END_OF_DOC_
-	Guile 1.4 does not have scm_primitive_eval_x,
-	but scm_eval_x will work as well.  If this is necessary, then the port
-	type structure will be named "scm_port" instead of "scm_t_port", too.
-	_END_OF_DOC_;
-};
-
-test   = {
   name     = xml2;
   type     = withlib;
   check    = "a working libxml2 can be found";
@@ -273,23 +246,6 @@ test   = {
 	_END_OF_DOC_; // '
 };
 
-test   = {
-  name     = fattach;
-  type     = run;
-  check    = "fattach runs";
-  code     = <<- _END_OF_CODE_
-	int fds[2];
-	pipe(fds);
-	return fattach(fds[0],__FILE__);
-	_END_OF_CODE_;
-  run-mode      =  null;
-  code-mode     =  body;
-
-  action   = { yes; act-type=define; act-text = "1"; };
-
-  doc = "fattach(3) is available but non-functional on some systems.";
-};
-
 test = {
     name   = solaris_sysinfo;
     type   = run;
@@ -298,7 +254,7 @@ test = {
     code   = <<- _EOF_
 	#include <sys/systeminfo.h>
 	int main() { char z[ 256 ];
-	long sz = sysinfo( SI_SYSNAME, z, sizeof( z ));
+	long sz = sysinfo(SI_SYSNAME, z, sizeof(z));
 	return (sz > 0) ? 0 : 1; }
 	_EOF_;
     doc =
@@ -338,24 +294,6 @@ test = {
 };
 
 test = {
-    name   = sys_siglist;
-    type   = run;
-    check  = "there is a global text array sys_siglist";
-    action = { act-type = define; };
-
-    code   = <<-  _EOF_
-	#include <signal.h>
-	int main() {
-	  char const* pz = sys_siglist[1];
-	  return (pz != 0) ? 0 : 1; }
-	_EOF_;
-
-    doc =
-    "Check that the POSIX compliant regular expression compiler\n"
-    "is available in the POSIX specified manner, and it works.";
-};
-
-test = {
     name   = uname_syscall;
     type   = run;
     check  = "uname(2) is POSIX";
@@ -367,16 +305,6 @@ test = {
 	_EOF_;
     doc =
     "Check that the POSIX compliant uname(2) call works properly.";
-};
-
-test = {
-    name   = long_long;
-    type   = compile;
-    check  = "long long ints";
-    action = { act-type = define; };
-    code   = "long long i;";
-    doc =
-    "See if long long works";
 };
 
 test   = {
@@ -460,6 +388,7 @@ do-always = <<- _END_ALWAYS_
 	AC_CHECK_HEADERS([libio.h ctype.h assert.h sys/resource.h])
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
+	AC_DECL_SYS_SIGLIST
 	AC_CHECK_FUNCS([putenv getdate_r])
 	AC_CHECK_FUNCS([fopencookie funopen], [break])
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
@@ -468,6 +397,7 @@ do-always = <<- _END_ALWAYS_
 	   ;;
 	esac
 	AC_C_INLINE
+	AC_TYPE_LONG_LONG_INT
 
 	# Note that BSD does not typedef these in its headers, but instead
 	# calls for them to be identical in signature to read(2), write(2),

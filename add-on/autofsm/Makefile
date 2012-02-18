@@ -14,6 +14,11 @@ example : example-fsm.c
 install-local : all
 	@:
 
+$(TPL)  : tpl-stamp
+
+tpl-stamp :
+	@rm -f $(TPL) ; ln $(SRCDIR)/fsm*.t* .
+
 check-stamp : sample.shar
 	@DEF=$(DEF) sh run.sh testing && \
 	touch $@ && \
@@ -33,6 +38,3 @@ sample.shar : $(TPL) $(DEF) run.sh
 
 example-fsm.c : example.def $(TPL)
 	autogen -L. example.def
-
-%.tpl : $(SRCDIR)/%.tpl
-	cp $(SRCDIR)/$@ .

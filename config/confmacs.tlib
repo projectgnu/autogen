@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2012-01-06 15:04:43 bkorb"
+## Time-stamp:        "2012-02-12 11:26:06 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -479,7 +479,7 @@ DEFINE  try-withlib             =][=
   ) # end of AC_ARG_WITH [=(. lib-name)=]
 
   if test "${with_[=(. lib-name)=]+set}" = set && \
-     test "${withval}" = no
+     test "X${withval}" = Xno
   then ## disabled by request
     [=(. cv-name)=]_root=no
     [=(. cv-name)=]_cflags=no
@@ -489,8 +489,7 @@ DEFINE  try-withlib             =][=
   AC_ARG_WITH([[=(. lib-name)=]-cflags],
     AS_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
         =]-cflags], [[=(. lib-name)=] compile flags]),
-    [[=(. cv-name)=]_cflags=${with_[=(string-tr test-name "-A-Z" "_a-z")
-                                   =]_cflags}],
+    [[=(. cv-name)=]_cflags=${with_[=(. lib-name)=]_cflags}],
     AC_CACHE_CHECK([whether with-[=(. lib-name)=]-cflags was specified], [=
         (. cv-name)=]_cflags,
       [=(. cv-name)=]_cflags=no)
@@ -499,8 +498,7 @@ DEFINE  try-withlib             =][=
   AC_ARG_WITH([[=(. lib-name)=]-libs],
     AS_HELP_STRING([--with-lib[=(string-tr down-name "_A-Z" "-a-z")
         =]-libs], [[=(. lib-name)=] link command arguments]),
-    [[=(. cv-name)=]_libs=${with_[=(string-tr test-name "-A-Z" "_a-z")
-                                   =]_libs}],
+    [[=(. cv-name)=]_libs=${with_[=(. lib-name)=]_libs}],
     AC_CACHE_CHECK([whether with-[=(. lib-name)=]-libs was specified], [=
         (. cv-name)=]_libs,
       [=(. cv-name)=]_libs=no)

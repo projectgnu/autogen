@@ -1,4 +1,10 @@
-New in __CURRENT_VERSION__ December 2011
+New in __CURRENT_VERSION__ February 2012
+
+* aliasing options was only partially implemented.  Finished now.
+
+* Generated texi documentation missed the new doc-section stanzas.
+
+New in 5.14 January 2011
 
 * getopt support has been improved.  Developers using generated code
   that called that function had to arrange for the autoopts/option.h
@@ -31,27 +37,8 @@ New in 5.13 December 2011
 * AutoOpts now supports vendor-opt attribute to auto-implement the "-W"
   option for POSIX specified utilities
 
-New in 5.12 June 2011
-
-* The Guile interface glue layer has dropped Guile version 1.4 and
-  has coelesced around pre-1.7 vs. 1.7-and-later interfaces, yielding
-  only two forms for each interface.
-
-* The new licensing scheme is now used in the distributed templates.
-
-New in 5.11.8 March 2011
-
-* AutoOpts argument types of "time and date" have been added
-  to the current support for time duration.
-
 New in 5.11.6 February 2011
 
 * packaging information
   The PKGDATADIR and --with-packager... information are now
-  compiled into the option structure.  This makes it possible for
-  config file searches to look in ${PKGDATADIR} by using "$@/"
-  as the lead part of a "homerc" name.  e.g.
-     homerc = "$@/config";
-  will look for a file named "config" in that directory.
-  "help" and "version" information will now include any
-  --with-packager stuff.
+  compiled into the option structure.

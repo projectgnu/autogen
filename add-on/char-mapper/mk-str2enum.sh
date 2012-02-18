@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#  Time-stamp:        "2012-02-12 09:05:16 bkorb"
+#  Time-stamp:        "2012-02-12 16:21:21 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -248,9 +248,9 @@ mk_header() {
         word=$(echo ${dispatch_args} | \
             sed "s/^(/(char * str, unsigned int len, /;s/,  *void *)$/)/")
         dispatch_proto=$(cat <<- _EOF_
-	${dispatch_ret}
-	${dispatch_proc}${word}
-	_EOF_
+		${dispatch_ret}
+		${dispatch_proc}${word}
+		_EOF_
         )
         cat >&5 <<- _EOF_
 
@@ -372,13 +372,13 @@ mk_dispatch_proc() {
     for word in ${namelist}
     do
         printf "${dispatch_fmt}\\n" ${word}
-    done | columns --spread=1 -I8 -S, | sed '$s/$/;/' >&4
+    done | columns --spread=1 -I8 -S, --end=';' >&4
     echo "${nl}    static ${base_name}_handler_t * const dispatch[] = {" >&4
 
     for word in ${namelist}
     do
         printf "${dispatch_fmt}\\n" ${word}
-    done | columns --spread=1 -I8 -S, | sed '$s/$/ };/' >&4
+    done | columns --spread=1 -I8 -S, --end=' };' >&4
 
     if test -n "$(echo ${dispatch_args} | egrep '^\( *void *\)$')"
     then arglist='()'

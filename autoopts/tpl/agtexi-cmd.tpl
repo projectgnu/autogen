@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-02-12 09:28:49 bkorb"
+# Time-stamp:        "2012-02-18 09:30:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -119,7 +119,11 @@ FOR flag                        =][=
 
     (set! opt-name (string-tr! (get "name") optname-from optname-to))
     (out-push-new (shellf "echo ${tmp_dir}/opt-text-%s" opt-name)) =][=
-    INVOKE emit-opt-text        =][=
+    IF (exist? "aliases")       =][=
+      INVOKE emit-aliases       =][=
+    ELSE                        =][=
+      INVOKE emit-opt-text      =][=
+    ENDIF                       =][=
     (out-pop)                   =][=
 
   ENDIF documentation exists    =][=
@@ -230,6 +234,22 @@ ENDIF                                 =][=
 [=
 
 ENDDEF emit-top-menu
+
+@c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+
+DEFINE emit-aliases             =][=
+
+(set! tmp-str (string-append opt-name " option"))
+   (if (exist? "value")
+       (set! tmp-str (string-append tmp-str " (-" (get "value") ")")) )
+   (print-node opt-name tmp-str) =]
+@cindex [=(. down-prog-name)=]-[=(. opt-name)=]
+
+This is an alias for the [= aliases =] option,
+[= (sprintf "@pxref{%1$s %2$s, the %2$s documentation}.\n"
+      down-prog-name (get "aliases")) =][=
+
+ENDDEF emit-aliases
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
@@ -377,9 +397,15 @@ DEFINE set-home-rc-vars          =][=
              ", " ))
        =][=
 
+  == "" =][= (set! cfg-file-name "") =][=
+
   *                              =][=
        (set! cfg-file-name (get "homerc"))  =][=
   ESAC                           =][=
+
+  (if (> (string-length cfg-file-name) 0)
+      (sprintf "\nitem\n%s\n" cfg-file-name) )
+  =][=
 
 ENDDEF set-home-rc-vars
 
@@ -392,9 +418,7 @@ DEFINE emit-multiple-rc         \=]
   rc-count =] places for configuration files:
 @itemize @bullet[=
 FOR homerc                       =][=
-  INVOKE set-home-rc-vars        =]
-@item
-[= (. cfg-file-name)             =][=
+  INVOKE set-home-rc-vars        =][=
 ENDFOR homerc                    =]
 @end itemize[=
  (if explain-pkgdatadir (ag-fprintf 0

@@ -364,10 +364,6 @@ utxt = { ut-name = NoArg;
          ut-text = "%s: option `%s' cannot have an argument\n";
 };
 
-utxt = { ut-name = NoArgv;
-         ut-text = "%s: cannot allocate new argument vector\n";
-};
-
 utxt = { ut-name = NoArgs;
          ut-text = "%s: Command line arguments not allowed\n";
 };

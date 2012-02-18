@@ -2,29 +2,28 @@
 # char-mapper Makefile
 #
             TOP = ..
-            SRC = char-mapper.c cm-opt.c
+         GENSRC = cm-opt.c map-text.c
+         GENHDR = map-text.h cm-opt.h
+            SRC = char-mapper.c $(GENSRC)
             OBJ = $(SRC:.c=.o)
             EXE = char-mapper
          TARGET = $(EXE)
     LOCAL_CLEAN = lcl-clean
   LOCAL_CLOBBER = lcl-clobber
-    HEADER_LIST = cm-opt.h
+         LCLHDR = $(GENHDR) char-mapper.h
 
 include $(TOP)/MakeRules
 
-cm-opt.c        : cm-opt.stamp
-cm-usage.c      : cm-opt.stamp
-
-$(OBJ)          : $(HEADER_LIST) cm-usage.c
+$(GENSRC)       : cm-opt.stamp
+char-mapper.o   : cm-opt.stamp
+$(OBJ)          : $(HEADER_LIST)
 $(HEADER_LIST)  : cm-opt.stamp
 
-cm-opt.stamp: mk-str2enum.sh mk-opt-table.sh
+cm-opt.stamp    : mk-str2enum.sh mk-opt-table.sh map-text.def
 	bash ./mk-opt-table.sh $@
-	@touch $@
 
-lcl-clobber : clean
-	rm -f char-mapper ag-char-map*
-	bash ./mk-opt-table.sh --clobber cm-opt
+lcl-clobber     : clean
+	rm -rf $(EXE) $(GENHDR) $(GENSRC)
 	bash ./test.sh --clobber
 
 source-list :
@@ -36,9 +35,17 @@ source-list :
 
 lcl-clean   :
 	bash ./test.sh --clean
-	bash ./mk-opt-table.sh --clean cm-opt
-	bash ./test.sh --clean
+	rm -f *~ $(OBJ) *.stamp $(EXE).txz
 
 check : lcl-check
 lcl-check : $(EXE)
 	bash ./test.sh
+
+tarball : $(GENSRC)
+	@-test -f $(EXE) && mv $(EXE) $(EXE).exe
+	@-rm -f $(EXE).txz ; mkdir $(EXE)
+	ln $(SRC) $(HEADER_LIST) map-text.def $(TOP)/MakeRules *.sh $(EXE)/.
+	sed '/^ *TOP =/s/=.*/= ./' Makefile > $(EXE)/Makefile
+	tar cJvf $(EXE).txz $(EXE)
+	cd $(EXE) ; $(MAKE)
+	@-rm -rf $(EXE) ; test -f $(EXE).exe && mv $(EXE).exe $(EXE)

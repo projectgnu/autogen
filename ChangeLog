@@ -1,4 +1,14 @@
-2012-02-11  Bruce Korb  <bkorb@gnu.org>
+2012-02-18  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/alias.test: fully test "aliases" attribute.
+	* autoopts/tpl/opt*.t*: allow empty homerc value to enable
+	command line options witout automatically looking up config files.
+	Also, add Doxygen comments to much of the generated code.
+	* autoopts/tpl/strings.tpl: allow the specification of leader and
+	trailer code for the emitted header.
+	* config/misc.def: remove some antiquated testing
+
+2012-02-12  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/agtexi-cmd.tpl: cleanups
 	* autoopts/tpl/man2texi.sh: convert \fI to @i and \fB to @var

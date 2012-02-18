@@ -1,6 +1,6 @@
 [= AutoGen5 Template c -*- Mode: scheme -*-
 
-## Time-stamp:      "2012-01-07 09:22:11 bkorb"
+## Time-stamp:      "2012-02-12 15:50:33 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 
 ## Copyright (C) 2011-2012 Bruce Korb, all rights reserved.
@@ -125,7 +125,9 @@ done <<\_EOF_
 [= (. find-ln) =]_EOF_[=
 
 (shell (out-pop #t))            =][=
-ENDIF find-ln not empty        \=]
+ENDIF find-ln not empty         =][=
+(if (exist? "header-trailer")
+    (emit (join "\n\n" "header-trailer")) ) \=]
 
 
 #endif /* [= (. header-guard)   =] */
@@ -137,8 +139,17 @@ DEFINE leader \=][=
  (emit (license-full "mbsd" "strings" " *  " "Bruce Korb" copy-years))
  (emit "\n */\n")
  (if (= (get "guard") "true")
-     (make-header-guard "strings"))
+     (emit (string-append
+        (make-header-guard "strings")
+        (if (exist? "header-leader") (string-append "\n\n"
+            (join "\n\n" "header-leader") ) "" ) ))
+     (if (exist? "code-leader")
+         (emit (string-append "\n\n" (join "\n\n" "code-leader"))) )
+ )
 =][=
-ENDDEF leader =]
+
+ENDDEF leader =][=
+(if (exist? "code-trailer")
+    (emit (join "\n\n" "code-trailer")) ) =]
 
 /* end of [= (out-name) =] */

@@ -2,7 +2,7 @@
 
   h  pot
 
-(define time-stamp "2011-12-21 10:13:57")
+(define time-stamp "2012-02-18 10:10:47")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -172,7 +172,7 @@ msgstr ""
 FOR utxt
   =][=
   (set! ref-list (shellf
-     "list=`grep -n -E -w z%s *.c [agpo]*.h tpl/opt*.t* | \\
+     "list=`grep -n -w z%s *.c [agpo]*.h tpl/opt*.t* | \\
          sed -n 's/\\([^:]*:[^:]*\\):.*/\\1/p'`
      echo ${list}" (get "ut-name")))
 

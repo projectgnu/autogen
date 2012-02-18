@@ -1,7 +1,7 @@
 #! /bin/bash
 #  mk-opt-table.sh
 #
-#  Time-stamp:        "2012-01-29 11:30:50 bkorb"
+#  Time-stamp:        "2012-02-18 09:53:25 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -19,60 +19,59 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+declare -r progdir=$(\cd $(dirname $0) && pwd -P)
+declare -r prognam=$(basename $0)
+declare -r program=${progdir}/${prognam}
+
 die() {
     echo "mk-opt-table error:  $*"
     exit 1
 } >&2
 
-usage_file=cm-usage.c
-test "X${1}" = X--clean -o "X${1}" = X--clobber && {
-    shift
-    base_name=${1%%.*}
-    echo "rm -f ${base_name}* $usage_file"
-    rm -f ${base_name}* $usage_file
-    exit 0
+init() {
+    declare -g base_name=${1%%.*}
+    declare -g exe_name=char-mapper
+    set -e
+
+    declare -g hdl_list=$(
+        egrep '^handle_[a-z_]+\(' ${exe_name}.c | \
+            sed '/^handle_invalid(/d;s/^handle_//;s/(.*//' | \
+            sort)
 }
-base_name=${1%%.*}
-base_name=--base-name=${base_name}
 
-set -e
-progdir=$(\cd $(dirname $0) && pwd -P)
-prognam=$(basename $0)
-program=${progdir}/${prognam}
+mk_enum() {
+    test -f ${base_name}.c \
+        -a ${base_name}.c -nt ${exe_name}.c \
+        -a -f ${base_name}.h \
+        -a ${base_name}.h -nt ${exe_name}.c \
+        -a ${base_name}.h -nt ${progdir}/mk-str2enum.sh && {
+        echo "${base_name}.[ch] are up to date"
+        return 0
+    }
 
-list=$(
-    egrep '^handle_[a-z_]+\(' char-mapper.c | \
-        sed '/^handle_invalid(/d;s/^handle_//;s/(.*//')
+    declare opts=--base-name=${base_name}
+    declare dashx=
+    [[ X$- =~ .*x.* ]] && dashx=-x
+    declare dispfmt=--dispatch="char * handle_%s(char * scan)"
+    declare BOILERPLATE=$'/*\n'$(
+        sed '1d;/^$/,$d;s/^#/ */' $program)$'\n */\n'
 
-case "$-" in ( *x* ) dashx=-x ;; ( * ) dashx='' ;; esac
-dispfmt=--dispatch="char * handle_%s(char * scan)"
-BOILERPLATE=$'/*\n'$(sed '1d;/^$/,$d;s/^#/ */' $0)$'\n */\n'
+    echo "${base_name}.[ch]" >&5
+    PS4='>mt> ' bash ${dashx} -e \
+        ${progdir}/mk-str2enum.sh "${dispfmt}" ${opts} ${hdl_list}
+}
 
-export BOILERPLATE
-
-PS4='>mt> ' bash ${dashx} -e \
-    ${progdir}/mk-str2enum.sh "${dispfmt}" ${base_name} ${list}
-
-tmp_text=$(mktemp ./cm-usage-XXXXXX)
-test -f "$tmp_text" || die "cannot mktemp"
-{
-    echo "[= AutoGen5 Template c=$usage_file =]"
-
-    for d in $list
-    do
-        printf '' "$d"
-    done
-
+assemble_usage() {
     cat <<- _EOF_
-	[= (out-push-new) \=]
-	USAGE:  char-mapper [ -h | --help | <input-file> ]
+	str = <<_EOUsage_
+	USAGE:  ${exe_name} [ -h | --help | <input-file> ]
 	If the '<input-file>' is not specified, it is read from standard input.
 	Input may not be from a TTY device.  Various directives affecting the
 	output are embedded in the input text.  These are:
 
 	_EOF_
 
-    for d in $list
+    for d in $hdl_list
     do
         printf '  %s' "%$d"
         x="\\* *handle $d directive"
@@ -82,7 +81,7 @@ test -f "$tmp_text" || die "cannot mktemp"
 		s/^ *\* *//
 		s/^/\t/
 		p
-	}' char-mapper.c | \
+	}' ${exe_name}.c | \
             fmt
     done
 
@@ -102,12 +101,44 @@ test -f "$tmp_text" || die "cannot mktemp"
 
 	If the input file can be rewound and re-read, then the input text will
 	also be inserted into the output as a comment.
-	[= (define usage-text (out-pop #t))
-	(sprintf "static char const usage_txt[%d] =\n       %s;"
-	         (+ 1 (string-length usage-text)) (c-string usage-text) ) =]
+
+	_EOUsage_;
 	_EOF_
+}
 
-} > $tmp_text
+mk_text_def() {
+    declare ag=$(command -v autogen)
+    test -x "$ag" || {
+        test -f map-text.c -a -f map-text.h || \
+            die "map-text.c and .h are missing and cannot be recreated"
+        echo "warning: map-text.c and .h are out of date and cannot be rebuilt"
+        return 0
+    } 1>&2
 
-autogen --no-def -T ./$tmp_text || die "autogen failed"
-rm -f $tmp_text
+    test -f map-text.c -a -f map-text.h && {
+        test map-text.c -nt ${exe_name}.c \
+            -a map-text.h -nt ${exe_name}.c \
+            -a map-text.h -nt ${program} && {
+            echo 'map-text.[ch] are up to date'
+            return 0
+        }
+    }
+
+    declare tmp_text=$(awk '/^#include/{print $2}' map-text.def)
+    assemble_usage > $tmp_text
+    autogen map-text.def
+    echo 'map-text.[ch]' >&5
+    rm -f $tmp_text
+}
+
+trap "die failure" EXIT
+exec 5> ${1}-temp
+date >&5
+
+init "$1"
+mk_enum
+mk_text_def
+
+exec 5>&-
+mv -f $1-temp $1
+trap '' EXIT
