@@ -2726,12 +2726,14 @@ guard-option-names;
 
 @item descrip
 @vindex descrip
-Except for documentation options, a @strong{very} brief description of
-the option.  About 40 characters on one line, maximum.  It appears on
-the @code{usage()} output next to the option name.  If, however, the
-option is a documentation option, it will appear on one or more lines by
-itself.  It is thus used to visually separate and comment upon groups of
-options in the usage text.
+Except for documentation options, a @strong{very} brief description of the
+option.  About 40 characters on one line, maximum, not counting any texinfo
+markups.  Texinfo markups are stripped before printing in the usage text.  It
+appears on the @code{usage()} output next to the option name.
+
+If, however, the option is a documentation option, it will appear on one or
+more lines by itself.  It is thus used to visually separate and comment upon
+groups of options in the usage text.
 @end table
 
 @node Common Attributes

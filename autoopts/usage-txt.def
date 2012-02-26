@@ -512,7 +512,7 @@ utxt = { ut-name = RangeOr;
 };
 
 utxt = { ut-name = RangeErr;
-         ut-text = "%s error:  %s option value ``%s'' is out of range.\n";
+         ut-text = "%s error:  %s option value %ld is out of range.\n";
 };
 
 utxt = { ut-name = RangeExact;

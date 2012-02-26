@@ -1,3 +1,19 @@
+2012-02-25  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optcode.tlib: make sure config header is included
+	before any system headers.
+	* autoopts/tpl/optmain.tlib: remove system header includes
+	* autoopts/tpl/optlib.tlib: remove texi-isms from any "descrip"
+	attributes.
+	* autoopts/tpl/texi2man.sh (command, option): add to bolded text
+	* autoopts/tpl/texi2mdoc.sh: likewise
+	* config/confmacs.tlib (affirmed): new conditional that defaults
+	to disabled instead of enabled.
+	* pkg/libopts/libopts-add.m4: default to *not* installing the
+	external-project-built libopts library
+	* autoopts/numeric.c (optionShowRange): value is long int, not str.
+	* autoopts/usage-txt.def (rangeerr): fix format, too
+
 2012-02-18  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/test/alias.test: fully test "aliases" attribute.

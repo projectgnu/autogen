@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-02-18 09:32:07 bkorb"
+ *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -66,17 +66,23 @@ die(char const * fmt, ...)
 static void
 emit_leader(char * input)
 {
+
     if (add_test_code) {
         if (out_file_nm != NULL)
-            printf(test_script, base_fn_nm, base_ucase, out_file_nm);
+            printf(test_script_fmt, base_fn_nm, base_ucase, out_file_nm);
     }
 
     {
         time_t tm = time(NULL);
         struct tm * tmp = localtime(&tm);
+        char const * mask_type =
+            (bit_count <= 8) ? type_8bits
+            : ((bit_count <= 16) ? type_16bits
+               : ((bit_count <= 32) ? type_32bits
+                  : type_64bits ));
 
         strftime(buffer, BUF_SIZE, "%x %X", tmp);
-        printf(leader_z, buffer, commentary, file_guard);
+        printf(leader_fmt, buffer, commentary, file_guard, mask_type);
     }
 
     if (fseek(stdin, 0, SEEK_SET) == 0)

@@ -1292,7 +1292,7 @@ string = { nm = SHELL_INIT_STR;
 
 string = { nm = MK_GPERF_SCRIPT;
    str = <<- _GP_Script_
-	gperf --version > /dev/null 2>&1 || die "no gperf program"
+	gperf --version > /dev/null 2>&1 || die 'no gperf program'
 	test -z ${gpdir} && {
 	  gpdir=`mktemp -d ./.gperf.XXXXXX` 2>/dev/null
 	  test -z "${gpdir}" && gpdir=.gperf.$$
@@ -1302,7 +1302,8 @@ string = { nm = MK_GPERF_SCRIPT;
 	gpdir=`pwd`
 	gperf_%2$s=${gpdir}/%2$s
 
-	( cat << '_EOF_'
+	{
+	  cat << \_EOF_
 		%%{
 		#include <stdio.h>
 		%%}
@@ -1314,7 +1315,7 @@ string = { nm = MK_GPERF_SCRIPT;
 	  while read f
 	  do echo "${f}, ${idx}"
 	     idx=`expr ${idx} + 1`
-	  done << _EOLIST_
+	  done << \_EOLIST_
 		%3$s
 		_EOLIST_
 
@@ -1329,7 +1330,7 @@ string = { nm = MK_GPERF_SCRIPT;
 		    return 0;
 		}
 		_EOF_
-	) > %2$s.gperf
+	} > %2$s.gperf
 
 	exec 2> %2$s.log
 	gperf --language=ANSI-C -H %2$s_hash -N %2$s_find \

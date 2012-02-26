@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-02-18 09:04:43 bkorb"
+# Time-stamp:      "2012-02-25 12:54:32 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -107,7 +107,31 @@ IF (or (= "shell-process"  (get "main.main-type"))
 ENDIF
 =]
 #define OPTION_CODE_COMPILE 1
-#include "[= (define lib-externs "") header-file =]"[=
+#include "[= (define lib-externs "") header-file=]"[=
+
+IF (== (get "main.main-type" "") "for-each")
+
+=]
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>[=
+
+ELSE
+
+=]
+#include <sys/types.h>
+
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>[=
 
  (if (exist? "flag.arg-range")
      (emit "\n#include <errno.h>"))
@@ -116,15 +140,18 @@ ENDIF
      (emit "
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>" ))
+#include <unistd.h>" )) =][=
+
+ENDIF
 
 =]
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
 extern FILE * option_usage_fp;
-[= IF (exist? "flag.aliases") =]
-extern int optionAlias(tOptions * o, tOptDesc* od, unsigned int alias);
+[= IF (exist? "flag.aliases") \=]
+extern int    optionAlias(tOptions * o, tOptDesc* od, unsigned int alias);
 [= ENDIF =]
 /* TRANSLATORS: choose the translation for option names wisely because you
                 cannot ever change your mind. */[=

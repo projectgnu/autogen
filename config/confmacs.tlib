@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2012-02-12 11:26:06 bkorb"
+## Time-stamp:        "2012-02-25 12:54:32 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -325,7 +325,11 @@ DEFINE  emit-results   =][=
 
   FOR conditional =]
   AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" != Xno])[=
-  ENDFOR cond..   =][=
+  ENDFOR          =][=
+
+  FOR affirmed    =]
+  AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" = Xyes])[=
+  ENDFOR          =][=
 
 ENDDEF  emit-results
 

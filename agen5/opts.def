@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-02-12 12:16:12 bkorb"
+ *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -42,6 +42,7 @@ environrc;
 usage-opt;
 usage-message;
 resettable;
+config-header  = config.h;
 
 #else
 prog-name      = xml2ag;

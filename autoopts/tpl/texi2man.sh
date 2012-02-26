@@ -2,7 +2,7 @@
 
 ## texi2man.sh -- script to convert texi-isms to man page isms
 ##
-## Time-stamp:      "2012-02-12 09:20:38 bkorb"
+## Time-stamp:      "2012-02-25 12:54:32 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,14 +33,14 @@
 ##
 ## And run the entire output through "sed" to convert texi-isms
 
+bold='\(code\|command\|var\|samp\|option\|strong\)'
+ital='\(i\|file\|emph\)'
+
 sed \
- -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
- -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
- -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
- -e      's;@i{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@file{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@emph{\([^}]*\)};\\fI\1\\fP;g' \
- -e 's;@strong{\([^}]*\)};\\fB\1\\fP;g' \
+ -e "s;@${bold}{"'\([^}]*\)};\\fB\2\\fP;g' \
+ -e "s;@${ital}{"'\([^}]*\)};\\fI\2\\fP;g' \
+ -e 's;@pxref{\([^}]*\)};see: \1;g' \
+ -e 's;@xref{\([^}]*\)};see: \1;g' \
  -e 's/@\([{}]\)/\1/g' \
  -e 's,^\$\*$,.br,' \
  -e '/@ *example/,/@ *end *example/s/^/    /' \

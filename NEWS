@@ -4,6 +4,10 @@ New in __CURRENT_VERSION__ February 2012
 
 * Generated texi documentation missed the new doc-section stanzas.
 
+* compile issue on non-mmap platforms was fixed
+
+* but in usage error display was fixed
+
 New in 5.14 January 2011
 
 * getopt support has been improved.  Developers using generated code

@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2012-02-12 09:59:59 bkorb"
+ *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -325,10 +325,6 @@ do-first = <<-_EOF_
 	])
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
 			intptr_t, uintptr_t, uint_t, pid_t, size_t])
-
-	# =====
-	# sizes
-	# =====
 	AC_CHECK_SIZEOF(char*, 8)
 	AC_CHECK_SIZEOF(int,   4)
 	AC_CHECK_SIZEOF(long,  8)

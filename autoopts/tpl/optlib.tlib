@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-02-12 09:07:34 bkorb"
+# Time-stamp:      "2012-02-25 12:54:32 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -817,7 +817,10 @@ DEFINE   emit-nondoc-option     =][=
 %s
 _EOF_" (get "translators")  ) " */" )  ) =]
 #define [= (. UP-name) =]_DESC      ([=
-    (string-table-add-ref opt-strs (get "descrip")) =])
+    (set! tmp-val (shell (string-append
+          "sed 's/@{\\([^}]*\\)}/\\1/g' <<\\_EODesc_\n"
+          (get "descrip") "\n_EODesc_" )))
+    (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_NAME      ([=
     (string-table-add-ref opt-strs UP-name) =])[=
 

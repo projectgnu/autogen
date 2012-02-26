@@ -32,7 +32,7 @@ string = { nm = must_be_file;
   str  = "device must be file or pipe";
 };
 
-string = { nm = leader_z;
+string = { nm = leader_fmt;
   str = <<- _EOString_
 	/*
 	 *   Character mapping generated %1$s
@@ -48,39 +48,49 @@ string = { nm = leader_z;
 	# elif defined(HAVE_STDINT_H)
 	#   include <stdint.h>
 
-	# else
-	#   ifndef HAVE_UINT8_T
-	        typedef unsigned char   uint8_t;
-	#   endif
-	#   ifndef HAVE_UINT16_T
-	        typedef unsigned short  uint16_t;
-	#   endif
-
-	#   ifndef HAVE_UINT32_T
-	#     if SIZEOF_INT == 4
-	        typedef unsigned int    uint32_t;
-	#     elif SIZEOF_LONG == 4
-	        typedef unsigned long   uint32_t;
-	#     endif
-	#   endif
-
-	#   ifndef HAVE_UINT64_T
-	#     if SIZEOF_LONG == 8
-	        typedef unsigned long       uint64_t;
-	#     elif SIZEOF_LONG_LONG == 8
-	        typedef unsigned long long  uint64_t;
-	#     endif
-	#   endif
+	%4$s
 	# endif /* HAVE_*INT*_H header */
 
 	#else /* not HAVE_CONFIG_H -- */
-	# ifdef __sun
-	#   include <inttypes.h>
-	# else
-	#   include <stdint.h>
-	# endif
+	# include <inttypes.h>
 	#endif /* HAVE_CONFIG_H */
-	
+
+	_EOString_;
+};
+
+string = { nm = type_8bits;
+  str  = <<- _EOString_
+	#   elif !defined(HAVE_UINT8_T)
+	        typedef unsigned char   uint8_t;
+	_EOString_;
+};
+
+string = { nm = type_16bits;
+  str  = <<- _EOString_
+	# elif !defined(HAVE_UINT16_T)
+	    typedef unsigned short  uint16_t;
+	_EOString_;
+};
+
+string = { nm = type_32bits;
+  str  = <<- _EOString_
+	# elif !defined(HAVE_UINT32_T)
+	#   if SIZEOF_INT == 4
+	      typedef unsigned int    uint32_t;
+	#   elif SIZEOF_LONG == 4
+	      typedef unsigned long   uint32_t;
+	#   endif
+	_EOString_;
+};
+
+string = { nm = type_64bits;
+  str  = <<- _EOString_
+	# elif !defined(HAVE_UINT64_T)
+	#   if SIZEOF_LONG == 8
+	      typedef unsigned long       uint64_t;
+	#   elif SIZEOF_LONG_LONG == 8
+	      typedef unsigned long long  uint64_t;
+	#   endif
 	_EOString_;
 };
 
@@ -205,20 +215,21 @@ string = { nm = endtest_fmt;
 	    }
 	    return 0;
 	}
-        #endif /* TEST_%s */
+	#endif /* TEST_%s */
 
 	_EOString_;
 };
 
-string = { nm = test_script;
+string = { nm = test_script_fmt;
   str = <<- _EOString_
 	#if 0
 	##  process this file with bash to test the classification result
+	##  /usr/include/inttypes.h must exist
 	base=%1$s-$$
 	cfil=${base}.c
 	set -e
 	trap "rm -f ${base}*" EXIT
-	cat > ${cfil} <<_EOCode_
+	cat > ${cfil} <<\_EOCode_
 		#define TEST_%2$s         1
 		#define DEFINE_%2$s_TABLE 1
 		#define _GNU_SOURCE 1
@@ -231,6 +242,7 @@ string = { nm = test_script;
 	rm -f ${base}*
 	exit 0
 	#endif
+
 	_EOString_;
 };
 

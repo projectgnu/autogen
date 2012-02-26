@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-02-18 10:38:38 bkorb"
+# Time-stamp:      "2012-02-25 12:54:32 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -23,29 +23,6 @@
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =][=
-
-IF (== (get "main.main-type" "") "for-each") 
-
-=][= (. extension-defines) =]
-
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-[= ELSE =]
-#include <sys/types.h>
-
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-[= ENDIF =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

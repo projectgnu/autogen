@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2011-03-30 15:13:15 bkorb"
+## Time-stamp:      "2012-02-25 12:54:32 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -151,25 +151,27 @@ do_line() {
     return 0
 }
 
-fixfont='
-s;@code{\([^}]*\)};\\fB\1\\fP;g
-s;@var{\([^}]*\)};\\fB\1\\fP;g
-s;@samp{\([^}]*\)};\\fB\1\\fP;g
-s;@i{\([^}]*\)};\\fI\1\\fP;g
-s;@file{\([^}]*\)};\\fI\1\\fP;g
-s;@emph{\([^}]*\)};\\fI\1\\fP;g
-s;@strong{\([^}]*\)};\\fB\1\\fP;g
-s;@pxref{\([^}]*\)};see: \1;g
-s;@xref{\([^}]*\)};see: \1;g
-s/@\([{@}]\)/\1/g
-s,^[@$]\*$,.br,
-s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
-s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
-s/\([^\\]\)-/\1\\-/g
-s/\([^\\]\)-/\1\\-/g
-/^\.\(Bl\|Bd\|in\) /s/ \\-/ -/g'"
-s/^'/\\'/
-/^$/d"
+
+bold='\(code\|command\|var\|samp\|option\|strong\)'
+bold="s;@${bold}"'{\([^}]*\)};\\fB\2\\fP;g'
+
+ital='\(i\|file\|emph\)'
+ital="s;@${ital}"'{\([^}]*\)};\\fI\2\\fP;g'
+nl='
+'
+
+fixfont="${bold}${nl}${ital}"'
+	s;@pxref{\([^}]*\)};see: \1;g
+	s;@xref{\([^}]*\)};see: \1;g
+	s/@\([{@}]\)/\1/g
+	s,^[@$]\*$,.br,
+	s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
+	s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
+	s/\([^\\]\)-/\1\\-/g
+	s/\([^\\]\)-/\1\\-/g
+	/^\.\(Bl\|Bd\|in\) /s/ \\-/ -/g'"
+	s/^'/\\\\'/
+	/^\$/d"
 readonly fixfont
 
 {

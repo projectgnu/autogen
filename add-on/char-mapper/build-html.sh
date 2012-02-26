@@ -15,11 +15,15 @@ case "${1}" in
     ;;
 
 ( files )
-    primary_source=$(echo *.c *.h mk*.sh)
+    primary_source=$(git ls-files . | \
+        grep -E -v '^(.gitignore|test.sh|README|build-html.sh)$')
     example_source=test.sh
-    make >&4 2>&4
+    {
+        make
+        KEEP_TEST_RESULTS=true make check
+    } >/dev/null 2>&1
+
     example_output=$(echo test-cmap.map test-cmap.h)
-    build_example=Makefile
     text=$(sed '1,/^PURPOSE:/d;/^[A-Z ]\+:/Q' README)
     ;;
 esac
