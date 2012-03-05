@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-02-25 12:54:32 bkorb"
+# Time-stamp:      "2012-02-28 19:43:49 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -1069,7 +1069,7 @@ doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 [=ENDIF=][=
   IF (exist? "usage-opt") =]
     int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
-        ? [=(. succ-exit-code)=] : EX_USAGE;
+        ? [=(. succ-exit-code)=] : AO_EXIT_REQ_USAGE;
     (void)pOptions;
     [= (. UP-prefix) =]USAGE(ex_code);[=
 

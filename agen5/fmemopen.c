@@ -113,7 +113,7 @@ typedef struct {
  * invent our own boolean rather than try to work around all the ways
  * different systems spell it.
  */
-typedef enum { AG_FALSE = 0, AG_TRUE = 1 } ag_bool;
+typedef enum { false = 0, true = 1 } bool;
 #endif
 
 static cookie_fp_map_t const * map    = NULL;
@@ -139,10 +139,10 @@ fmem_seek(void * cookie, seek_off_t offset, int dir);
 static int
 fmem_close(void * cookie);
 
-static ag_bool
+static bool
 fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len);
 
-static ag_bool
+static bool
 fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len);
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -415,7 +415,7 @@ fmem_close(void * cookie)
 /**
  * Configure the user supplied buffer.
  */
-static ag_bool
+static bool
 fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
 {
     /*
@@ -424,7 +424,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
     if (len == 0) {
         free(pFMC);
         errno = EINVAL;
-        return AG_FALSE;
+        return false;
     }
 
     pFMC->buffer = (buf_bytes_t*)buf;
@@ -466,13 +466,13 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
     }
 
     pFMC->buf_size = len;
-    return AG_TRUE;
+    return true;
 }
 
 /**
  * Allocate an initial buffer for fmem.
  */
-static ag_bool
+static bool
 fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
 {
     /*
@@ -489,7 +489,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
     if (pFMC->buffer == NULL) {
         errno = ENOMEM;
         free(pFMC);
-        return AG_FALSE;
+        return false;
     }
 
     /*
@@ -499,7 +499,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
     pFMC->next_ix  = 0;
     pFMC->eof      = 0;
     pFMC->buf_size = len;
-    return AG_TRUE;
+    return true;
 }
 
 /*=export_func ag_fmemopen

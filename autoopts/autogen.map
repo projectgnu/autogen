@@ -1,6 +1,7 @@
 
 %guard
 %file           ag-char-map.h
+%backup
 
 %comment
   This file contains the character classifications
@@ -23,30 +24,47 @@
   with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-lower-case      "a-z"
-upper-case      "A-Z"
-alphabetic      +lower-case   +upper-case
+newline         "\n"
+nul-byte        "\x00"
+dir-sep         "/\\"
+percent         "%"
+comma           ","
+colon           ":"
+underscore      "_"
+plus            "+"
+dollar          "$"
+
+horiz-white     "\t "
+alt-white       "\v\f\r\b"
+whitespace      +horiz-white  +newline +alt-white
+non-nl-white    +horiz-white  +alt-white
+
+graphic         "!-~"
+inversion       "~-"
 oct-digit       "0-7"
 dec-digit       "89"          +oct-digit
 hex-digit       "a-fA-F"      +dec-digit
+lower-case      "a-z"
+upper-case      "A-Z"
+alphabetic      +lower-case   +upper-case
 alphanumeric    +alphabetic   +dec-digit
-var-first       "_"           +alphabetic
+var-first       +underscore   +alphabetic
 variable-name   +var-first    +dec-digit
 option-name     "^-"          +variable-name
-value-name      ":"           +option-name
-horiz-white     "\t "
+value-name      +colon        +option-name
 name-sep        "[.]"
 compound-name   +value-name   +name-sep +horiz-white
-whitespace      "\v\f\r\n\b"  +horiz-white
+
 unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
 end-xml-token   "/>"          +whitespace
-graphic         "!-~"
-plus-n-space    "+"           +whitespace
+plus-n-space    +plus         +whitespace
 punctuation     "!-~"         -alphanumeric -"_"
 suffix          "-._"         +alphanumeric
-suffix-fmt      "%/"          +suffix     
-false-type      "nNfF0\x00"
-file-name       "/"           +suffix
-end-token       "\x00"        +whitespace
-end-list-entry  ","           +end-token
+suffix-fmt      +percent      +suffix +dir-sep
+false-type      "nNfF0"       +nul-byte
+file-name       +dir-sep      +suffix
+end-token       +nul-byte     +whitespace
+end-list-entry  +comma        +end-token
 set-separator   "|+"          +end-list-entry
+signed-number   +inversion    +dec-digit
+make-script     +dollar       +newline

@@ -74,9 +74,6 @@ string = { nm = CANNOT_FMT;
 string = { nm = CFGDEP_DUP_TARGET_MSG;
    str = "duplicate make target"; };
 
-string = { nm = CFGDEP_TARGET_TMP_FMT;
-   str = "%s-XXXXXX"; };
-
 string = { nm = CFGDEP_UNKNOWN_DEP_FMT;
    str = "unknown dependency type:  %s"; };
 
@@ -126,11 +123,35 @@ string = { nm = DEP_FILE_SPLICE_STR;
 string = { nm = DEP_FILE_TARG_FMT;
    str = "%s_%s"; };
 
+string = { nm = DEP_FILE_CLEAN_FMT;
+   str = <<_EOF_
+
+.PHONY : clean-%3$s
+
+clean-%3$s :
+	rm -f %1$s $(%2$s_TList)
+	touch -t 199912312359 %3$s
+
+_EOF_; };
+
 string = { nm = DEP_FILE_WRAP_FMT;
-   str = "\n"
-         "\n%3$s : $(%1$s_SList)\n"
-         "\n$(%1$s_TList) : %3$s\n"
-         "\t@:\n"; };
+   str = <<- _EOStr_
+
+	%2$s : $(%1$s_SList)
+
+	$(%1$s_TList) : %2$s
+	\	@:
+
+	_EOStr_; };
+
+string = { nm = DEP_List;
+   str = " \\\n\t%s"; };
+
+string = { nm = DEP_SList;
+   str = "\n\n%s_SList ="; };
+
+string = { nm = DEP_TList;
+   str = "%s_TList ="; };
 
 string = { nm = DEP_OUT_NAME;
    str = "DEPENDENCIES_OUTPUT"; };
@@ -432,10 +453,10 @@ string = { nm = HANDLE_HASH_SHELL;
    str = "SHELL"; };
 
 string = { nm = HANDLE_SED_ELSE;
-   str = "lse "; };
+   str = "lse"; };
 
 string = { nm = HANDLE_SED_ENDIF;
-   str = "ndif "; };
+   str = "ndif"; };
 
 string = { nm = HANDLE_SED_IFDEF;
    str = "fdef "; };
@@ -603,6 +624,9 @@ string = { nm = LOG_SEP_FMT;
 
 string = { nm = MAKE_GPERF_CLEANUP;
    str = "(add-cleanup \"rm -rf ${gpdir}\")"; };
+
+string = { nm = MAKE_SCRIPT_NL;
+   str = " ; \\\n"; };
 
 string = { nm = MALLOC_FAIL_FMT;
    str = "malloc of %zd bytes failed\n"; };
@@ -911,9 +935,6 @@ string = { nm = SCM_PROC_CAST;
 string = { nm = SCM_TRUE_STR;
    str = "#t"; };
 
-string = { nm = SCRIPT_SIZE_SCAN_END;
-   str = "\n$"; };
-
 string = { nm = SET_ORIG_DIR_NO_MEM_MSG;
    str = "cannot allocate path name"; };
 
@@ -971,14 +992,12 @@ string = { nm = START_DEP_ARG_FMT;
    str = "#   %s"; };
 
 string = { nm = START_DEP_FILE_FMT;
-   str = "# Makefile dependency file created by\n# %s\n"
-         "# with the following command:\n"; };
+   str = "# Makefile dependency file created by:\t\t-*- Mode: Makefile -*-\n"
+         "# %s\n"
+         "# with the following command line arguments:\n"; };
 
 string = { nm = START_DEP_FOPEN_MSG;
    str = "fopen for write"; };
-
-string = { nm = START_DEP_TEMP_FMT;
-   str = "%s.d-XXXXXX"; };
 
 string = { nm = START_SCHEME_LIST;
    str = "'("; };
@@ -1000,6 +1019,9 @@ string = { nm = SYSCALL_NAME;
 
 string = { nm = TAB_FILE_LINE_FMT;
    str = "\tfrom %s line %d\n"; };
+
+string = { nm = TEMP_SUFFIX;
+   str = ".d-XXXXXX"; };
 
 string = { nm = TOO_MANY_TIMEOUTS_MSG;
    str = "Server shell timed out 5 times"; };

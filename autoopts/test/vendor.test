@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2011-12-29 10:17:44 bkorb"
+# Time-stamp:        "2012-02-28 19:49:11 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -32,26 +32,25 @@
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-sedxml='/#ifndef XML/,/^#endif/ {
+sedcmd='
+s/long-opts;/vendor-opt;/
+/#include "autogen.h"/d
+/^prog-name/s/=.*/= '${testname}';/
+s/AutoGen/'${testname}'/g
+/^include /s/= '${testname}'5 Temp/= AutoGen5 Temp/
+/^config-header/s/=.*/= '${testname}'-config.h;/
+/call-proc  *=/d
+/#ifndef XML/,/^#endif/ {
   /^#else/,/^#endif/d
   /^#/d
-}'
-sedcode='/flag-code =.*_EOCode_/,/_EOCode_;/d'
-sedeof='/flag-code =.*_EOF_/,/_EOF_;/d'
+}
+/flag-code =.*_EOCode_/,/_EOCode_;/d
+/flag-code *=/d
+'
 
-${SED} -e 's/long-opts;/vendor-opt;/' \
-    -e '/#include "autogen.h"/d' \
-    -e "/^prog-name/s/=.*/= ${testname};/" \
-    -e "s/AutoGen/${testname}/g" \
-    -e "/^include /s/= ${testname}5 Temp/= AutoGen5 Temp/" \
-    -e '/call-proc  *=/d' \
-    -e "$sedxml" \
-    -e "$sedcode" \
-    -e "$sedeof" \
-    -e '/flag-code *=/d' \
-    ${top_srcdir}/agen5/opts.def \
-    > ${testname}.def
-cat >> ${testname}.def <<- _EOF_
+{
+    ${SED} "$sedcmd" ${top_srcdir}/agen5/opts.def
+    cat <<- _EOF_
 	config-header = ${testname}-config.h;
 	help-value = h;
 	save-opts-value = S;
@@ -60,7 +59,16 @@ cat >> ${testname}.def <<- _EOF_
 	main = { main-type = shell-process; };
 	include = '#undef DEBUG_ENABLED';
 	_EOF_
-cp ${top_builddir}/config.h ./${testname}-config.h
+} > ${testname}.def
+
+{
+    sed '/^#endif.*_CONFIG_H/d' ${top_builddir}/config.h
+    sed '1,/#define  *COMPAT_H_GUARD/d
+        /^#endif .* COMPAT_H_GUARD/{
+           s/COMPAT_H_GUARD/AUTOGEN_CONFIG_H/
+           q
+        }' ${top_srcdir}/compat/compat.h
+} > ./${testname}-config.h
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \

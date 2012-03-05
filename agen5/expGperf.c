@@ -65,7 +65,7 @@ HIDE_FN(SCM ag_scm_gperf(SCM name, SCM str))
 SCM
 ag_scm_make_gperf(SCM name, SCM hlist)
 {
-    static ag_bool do_cleanup = AG_TRUE;
+    static bool do_cleanup = true;
 
     char const * pzName  = ag_scm2zchars(name, "gperf name");
     char const * pzList;
@@ -99,7 +99,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
 
     if (do_cleanup) {
         SCM_EVAL_CONST(MAKE_GPERF_CLEANUP);
-        do_cleanup = AG_FALSE;
+        do_cleanup = false;
     }
 
     return SCM_BOOL_T;

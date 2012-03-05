@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2012-02-12 09:01:11 bkorb"
+ *  Time-stamp:        "2012-03-04 19:40:45 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -27,7 +27,7 @@ typedef int (tCmpProc)(const void*, const void*);
 
 typedef struct def_list tDefList;
 struct def_list {
-    tDefEntry  de;
+    def_ent_t  de;
     char*      pzExpr;
 };
 
@@ -39,16 +39,16 @@ static tDefList *
 link_twins(tDefList* pDL, tDefList* pNext, int* pCt);
 
 static uint_t
-count_named_values(tTemplate* pT, tMacro* pMac);
+count_named_values(templ_t* pT, macro_t* pMac);
 
 static char *
 gather_assigned_value(char * pzScan, tDefList * pDL);
 
 static void
-fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac);
+fill_in_values(tDefList * pDL, char * pzScan, templ_t* pT, macro_t* pMac);
 
 static void
-prep_invoke_args(tMacro * pMac);
+prep_invoke_args(macro_t * pMac);
 
 static void
 build_defs(int defCt, tDefList* pList);
@@ -57,16 +57,16 @@ build_defs(int defCt, tDefList* pList);
 static int
 order_def_list(const void* p1, const void* p2)
 {
-    tDefEntry * pDL1 = (tDefEntry*)p1;
-    tDefEntry * pDL2 = (tDefEntry*)p2;
-    int cmp = streqvcmp(pDL1->pzDefName, pDL2->pzDefName);
+    def_ent_t * pDL1 = (def_ent_t*)p1;
+    def_ent_t * pDL2 = (def_ent_t*)p2;
+    int cmp = streqvcmp(pDL1->de_name, pDL2->de_name);
 
     /*
      *  IF the names are the same, then we order them based on which name
      *  appears first.  Do not reorder entries with the same name.
      */
     if (cmp == 0)
-        cmp = (int)(pDL1->pzDefName - pDL2->pzDefName);
+        cmp = (int)(pDL1->de_name - pDL2->de_name);
     return cmp;
 }
 
@@ -77,38 +77,38 @@ link_twins(tDefList* pDL, tDefList* pNext, int* pCt)
     int  ct  = *pCt;
     int  idx = 1;
 
-    pDL->de.pTwin = &(pNext->de);
-    pNext->de.pPrevTwin = &(pDL->de);
+    pDL->de.de_twin = &(pNext->de);
+    pNext->de.de_ptwin = &(pDL->de);
 
     for (;;) {
-        pNext->de.index = idx++;
+        pNext->de.de_index = idx++;
         pN = pNext + 1; /* We return this, valid or not */
         if (--ct <= 0)  /* count each successive twin   */
             break;
-        if (streqvcmp(pNext->de.pzDefName, pN->de.pzDefName) != 0)
+        if (streqvcmp(pNext->de.de_name, pN->de.de_name) != 0)
             break;
 
         /*
          *  We have found another twin.  Link it in and advance
          */
-        pNext->de.pTwin  = &(pN->de);
-        pN->de.pPrevTwin = &(pNext->de);
+        pNext->de.de_twin  = &(pN->de);
+        pN->de.de_ptwin = &(pNext->de);
         pNext = pN;
     }
 
-    pDL->de.pEndTwin  = &(pNext->de);
-    pNext->de.pTwin   = NULL; /* NULL terminated list */
-    pDL->de.pPrevTwin = NULL; /* NULL terminated list */
+    pDL->de.de_etwin  = &(pNext->de);
+    pNext->de.de_twin = NULL; /* NULL terminated list */
+    pDL->de.de_ptwin  = NULL; /* NULL terminated list */
     *pCt = ct;
-    pDL->de.pNext = NULL;     /* in case ct == 0      */
+    pDL->de.de_next   = NULL; /* in case ct == 0      */
     return pN; /* If ct is zero, then this is invalid */
 }
 
 
 static uint_t
-count_named_values(tTemplate* pT, tMacro* pMac)
+count_named_values(templ_t* pT, macro_t* pMac)
 {
-    char * pzScan = pT->pzTemplText + pMac->ozText;
+    char * pzScan = pT->td_text + pMac->md_txt_off;
     uint_t ct = 0;
 
     while (*pzScan != NUL) {
@@ -135,9 +135,9 @@ static char *
 gather_assigned_value(char * pzScan, tDefList * pDL)
 {
     pzScan = SPN_WHITESPACE_CHARS(pzScan);
-    strtransform(pDL->de.pzDefName, pDL->de.pzDefName);
+    strtransform(pDL->de.de_name, pDL->de.de_name);
     pDL->pzExpr = pzScan;
-    pDL->de.valType = VALTYP_TEXT;
+    pDL->de.de_type = VALTYP_TEXT;
     pzScan = (char*)skipExpression(pzScan, strlen(pzScan));
 
     /*
@@ -172,7 +172,6 @@ gather_assigned_value(char * pzScan, tDefList * pDL)
             char* pz = (char*)AGALOC(24, "quoted string");
             memcpy((void*)pz, pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
             pDL->pzExpr = pz;
-            manageAllocatedData(pz);
         }
         spanQuote(pDL->pzExpr);
         /* FALLTHROUGH */
@@ -181,7 +180,7 @@ gather_assigned_value(char * pzScan, tDefList * pDL)
         /*
          *  Default:  the raw sequence of characters is the value
          */
-        pDL->de.val.pzText = pDL->pzExpr;
+        pDL->de.de_val.dvu_text = pDL->pzExpr;
         pDL->pzExpr        = NULL;
     }
 
@@ -190,15 +189,15 @@ gather_assigned_value(char * pzScan, tDefList * pDL)
 
 
 static void
-fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
+fill_in_values(tDefList * pDL, char * pzScan, templ_t* pT, macro_t* pMac)
 {
     for (;; pDL++ ) {
-        pDL->de.pzDefName = pzScan;
+        pDL->de.de_name = pzScan;
         pzScan = SPN_VALUE_NAME_CHARS(pzScan);
 
         switch (*pzScan) {
         case NUL:
-            pDL->de.val.pzText = (char*)zNil;
+            pDL->de.de_val.dvu_text = (char*)zNil;
             return;
 
         default:
@@ -212,7 +211,7 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
              *  The name was separated by space, but has no value
              */
             if (*pzScan != '=') {
-                pDL->de.val.pzText = (char*)zNil;
+                pDL->de.de_val.dvu_text = (char*)zNil;
                 if (*pzScan == NUL)
                     return;
                 continue;
@@ -256,9 +255,9 @@ fill_in_values(tDefList * pDL, char * pzScan, tTemplate* pT, tMacro* pMac)
  *  of the processing of the user defined macro.
  */
 LOCAL void
-parseMacroArgs(tTemplate* pT, tMacro* pMac)
+parseMacroArgs(templ_t* pT, macro_t* pMac)
 {
-    char *      pzScan = pT->pzTemplText + pMac->ozText;
+    char *      pzScan = pT->td_text + pMac->md_txt_off;
     uint_t      ct;
     tDefList *  pDL;
     tDefList *  pN;
@@ -266,8 +265,8 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
     /*
      *  If there is no argument text, then the arg count is zero.
      */
-    if (pMac->ozText == 0) {
-        pMac->res = 0;
+    if (pMac->md_txt_off == 0) {
+        pMac->md_res = 0;
         return;
     }
 
@@ -276,20 +275,20 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
     /*
      *  The result is zero if we don't have any
      */
-    pMac->sibIndex = ct;
+    pMac->md_sib_idx = ct;
     if (ct == 0) {
-        pMac->ozText = 0;
-        pMac->res = 0;
+        pMac->md_txt_off = 0;
+        pMac->md_res = 0;
         return;
     }
 
     /*
      *  Allocate the array of definition descriptors
      */
-    pzScan = pT->pzTemplText + pMac->ozText;
+    pzScan = pT->td_text + pMac->md_txt_off;
     pDL = (tDefList*)AGALOC(ct * sizeof(tDefList), "array of def desc");
     memset((void*)pDL, 0, ct * sizeof(tDefList));
-    pMac->res = (uintptr_t)pDL;
+    pMac->md_res = (uintptr_t)pDL;
 
     /*
      *  Fill in the array of value assignments
@@ -303,7 +302,7 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
          *  Order is preserved by comparing string addresses,
          *  if the strings compare equal.
          */
-        pDL = (tDefList*)pMac->res;
+        pDL = (tDefList*)pMac->md_res;
         qsort((void*)pDL, (size_t)ct, sizeof(tDefList), order_def_list);
 
         /*
@@ -311,7 +310,7 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
          */
         for (;;) {
             if (--ct == 0) {
-                pDL->de.pNext = NULL;
+                pDL->de.de_next = NULL;
                 break;
             }
 
@@ -321,28 +320,28 @@ parseMacroArgs(tTemplate* pT, tMacro* pMac)
              *  IF the next entry has the same name,
              *  THEN it is a "twin".  Link twins on the twin list.
              */
-            if (streqvcmp(pDL->de.pzDefName, pN->de.pzDefName) == 0) {
+            if (streqvcmp(pDL->de.de_name, pN->de.de_name) == 0) {
                 pN = link_twins(pDL, pN, (int*)&ct);
                 if (ct <= 0)
                     break;  /* pN is now invalid */
             }
 
-            pDL->de.pNext = &(pN->de);
+            pDL->de.de_next = &(pN->de);
             pDL = pN;
         }
     }
 }
 
 static void
-prep_invoke_args(tMacro * pMac)
+prep_invoke_args(macro_t * pMac)
 {
     char * pzText;
-    tTemplate * pT = pCurTemplate;
+    templ_t * pT = current_tpl;
 
-    if (pMac->ozText == 0)
+    if (pMac->md_txt_off == 0)
         AG_ABEND_IN(pT, pMac, PREP_INVOKE_NO_NAME);
-    pMac->ozName = pMac->ozText;
-    pzText = pT->pzTemplText + pMac->ozText;
+    pMac->md_name_off = pMac->md_txt_off;
+    pzText = pT->td_text + pMac->md_txt_off;
     pzText = (char*)skipExpression(pzText, strlen(pzText));
 
     /*
@@ -350,8 +349,8 @@ prep_invoke_args(tMacro * pMac)
      *  THEN there are no arguments
      */
     if (*pzText == NUL) {
-        pMac->ozText = 0;
-        pMac->res = 0;
+        pMac->md_txt_off = 0;
+        pMac->md_res = 0;
     }
 
     /*
@@ -363,9 +362,9 @@ prep_invoke_args(tMacro * pMac)
             AG_ABEND_IN(pT, pMac, PREP_INVOKE_NO_SEP);
         *pzText = NUL;
         pzText = SPN_WHITESPACE_CHARS(pzText + 1);
-        pMac->ozText = pzText - pT->pzTemplText;
+        pMac->md_txt_off = pzText - pT->td_text;
         parseMacroArgs(pT, pMac);
-        pCurTemplate = pT;
+        current_tpl = pT;
     }
 }
 
@@ -391,16 +390,16 @@ prep_invoke_args(tMacro * pMac)
  *      helpful, but not crucial.  Please contact the author if you think you
  *      might actually want to use this.
 =*/
-tMacro *
-mFunc_Debug(tTemplate* pT, tMacro* pMac)
+macro_t *
+mFunc_Debug(templ_t* pT, macro_t* pMac)
 {
     static int dummy = 0;
-    char const * pz  = pT->pzTemplText + pMac->ozText;
+    char const * pz  = pT->td_text + pMac->md_txt_off;
     int  for_index = (forInfo.fi_depth <= 0)
         ? -1
         : forInfo.fi_data[ forInfo.fi_depth - 1].for_index;
 
-    fprintf(pfTrace, FN_DEBUG, pz, for_index);
+    fprintf(trace_fp, FN_DEBUG, pz, for_index);
 
     /*
      *  The case element values were chosen to thwart most
@@ -433,8 +432,8 @@ mFunc_Debug(tTemplate* pT, tMacro* pMac)
     default:   dummy++;
     }
     if (IS_GRAPHIC_CHAR(dummy))
-        fprintf(pfTrace, FN_DEBUG_GRAPHIC, dummy);
-    putc(NL, pfTrace);
+        fprintf(trace_fp, FN_DEBUG_GRAPHIC, dummy);
+    putc(NL, trace_fp);
     return pMac+1;
 }
 
@@ -447,8 +446,7 @@ mFunc_Debug(tTemplate* pT, tMacro* pMac)
 static void
 build_defs(int defCt, tDefList* pList)
 {
-    tDefEntry* pDefs = &(pList->de);
-    currDefCtx.pDefs = pDefs;
+    curr_def_ctx.dcx_defent = &(pList->de);
 
     /*
      *  FOR each definition, evaluate the associated expression
@@ -472,7 +470,7 @@ build_defs(int defCt, tDefList* pList)
         }
         case NUL:
             pList->pzExpr = NULL;
-            pList->de.val.pzText = (char*)zNil;
+            pList->de.de_val.dvu_text = (char*)zNil;
             break;
 
         case '(':
@@ -484,31 +482,31 @@ build_defs(int defCt, tDefList* pList)
              *  and number results.
              */
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                fprintf(pfTrace, TRACE_BUILD_DEFS,
-                        pCurMacro->sibIndex - defCt, pList->pzExpr);
+                fprintf(trace_fp, TRACE_BUILD_DEFS,
+                        cur_macro->md_sib_idx - defCt, pList->pzExpr);
             }
 
             res = ag_eval(pList->pzExpr);
             if (AG_SCM_STRING_P(res)) {
-                AGDUPSTR(pList->de.val.pzText, ag_scm2zchars(res, "eval res"),
-                         "dup eval res");
+                AGDUPSTR(pList->de.de_val.dvu_text,
+                         ag_scm2zchars(res, "res"), "ev res");
             }
             else if (AG_SCM_NUM_P(res)) {
-                pList->de.val.pzText = AGALOC(16, "number buf");
-                snprintf(pList->de.val.pzText, (size_t)16, BUILD_DEFS_LONG_FMT,
-                         AG_SCM_TO_ULONG(res));
+                pList->de.de_val.dvu_text = AGALOC(16, "number buf");
+                snprintf(pList->de.de_val.dvu_text, (size_t)16,
+                         BUILD_DEFS_LONG_FMT, AG_SCM_TO_ULONG(res));
             }
             else
-                AGDUPSTR(pList->de.val.pzText, zNil, "empty str");
+                AGDUPSTR(pList->de.de_val.dvu_text, zNil, "empty str");
             break;
         }
 
         case '`':
             if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS) {
-                fprintf(pfTrace, TRACE_BUILD_DEFS,
-                        pCurMacro->sibIndex - defCt, pList->pzExpr+1);
+                fprintf(trace_fp, TRACE_BUILD_DEFS,
+                        cur_macro->md_sib_idx - defCt, pList->pzExpr+1);
             }
-            pList->de.val.pzText = shell_cmd(pList->pzExpr+1);
+            pList->de.de_val.dvu_text = shell_cmd(pList->pzExpr+1);
             break;
         }
     } while (pList++, --defCt > 0);
@@ -593,48 +591,48 @@ build_defs(int defCt, tDefList* pList)
  *
  *  This routine runs the invocation.
  */
-tMacro*
-mFunc_Define(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Define(templ_t* pT, macro_t* pMac)
 {
-    tDefList*   pList  = (tDefList*)pMac->res;
-    int         defCt  = pMac->sibIndex;
-    tDefCtx     ctx;
+    tDefList*   pList  = (tDefList*)pMac->md_res;
+    int         defCt  = pMac->md_sib_idx;
+    def_ctx_t     ctx;
 
-    pT = (tTemplate*)pMac->funcPrivate;
+    pT = (templ_t*)pMac->md_pvt;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        fprintf(pfTrace, TPL_INVOKED, pT->pzTplName, defCt);
+        fprintf(trace_fp, TPL_INVOKED, pT->td_name, defCt);
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, TAB_FILE_LINE_FMT,
-                    pCurTemplate->pzTplFile, pMac->lineNo);
+            fprintf(trace_fp, TAB_FILE_LINE_FMT,
+                    current_tpl->td_file, pMac->md_line);
     }
 
     /*
      *  IF we have no special definitions, then do not nest definitions
      */
     if (defCt != 0) {
-        ctx  = currDefCtx;
-        currDefCtx.pPrev = &ctx;
+        ctx  = curr_def_ctx;
+        curr_def_ctx.dcx_prev = &ctx;
         build_defs(defCt, pList);
     }
 
     {
-        tTemplate*  pOldTpl = pCurTemplate;
-        pCurTemplate = pT;
+        templ_t*  pOldTpl = current_tpl;
+        current_tpl = pT;
 
-        generateBlock(pT, pT->aMacros, pT->aMacros + pT->macroCt);
-        pCurTemplate = pOldTpl;
+        generateBlock(pT, pT->td_macros, pT->td_macros + pT->td_mac_ct);
+        current_tpl = pOldTpl;
     }
 
     if (defCt != 0)
-        currDefCtx = ctx;
+        curr_def_ctx = ctx;
 
-    if ((defCt = pMac->sibIndex) > 0) {
-        pList = (tDefList*)pMac->res;
+    if ((defCt = pMac->md_sib_idx) > 0) {
+        pList = (tDefList*)pMac->md_res;
         while (defCt-- > 0) {
             if (pList->pzExpr != NULL) {
-                AGFREE((void*)pList->de.val.pzText);
-                pList->de.val.pzText = NULL;
+                AGFREE((void*)pList->de.de_val.dvu_text);
+                pList->de.de_val.dvu_text = NULL;
             }
             pList++;
         }
@@ -645,9 +643,9 @@ mFunc_Define(tTemplate* pT, tMacro* pMac)
 
 
 void
-mUnload_Define(tMacro* pMac)
+mUnload_Define(macro_t* pMac)
 {
-    void* p = (void*)(pMac->res);
+    void* p = (void*)(pMac->md_res);
     if (p != NULL)
         AGFREE(p);
 }
@@ -678,18 +676,18 @@ mUnload_Define(tMacro* pMac)
  *  the first time the macro is processed and evaluated again every
  *  time the macro is evaluated.
 =*/
-tMacro *
-mFunc_Invoke(tTemplate * pT, tMacro * pMac)
+macro_t *
+mFunc_Invoke(templ_t * pT, macro_t * pMac)
 {
     char* pzText;
     SCM   macName;
-    tTemplate* pInv;
+    templ_t* pInv;
 
     /*
      *  IF this is the first time through,
      *  THEN separate the name from the rest of the arguments.
      */
-    if (pMac->ozName == 0) {
+    if (pMac->md_name_off == 0) {
         prep_invoke_args(pMac);
 
         /*
@@ -697,13 +695,13 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
          *  THEN go find the template now and bind the macro call
          *       to a particular template macro
          */
-        if (IS_VAR_FIRST_CHAR(pT->pzTemplText[ pMac->ozName ])) {
-            pMac->funcCode    = FTYP_DEFINE;
-            pMac->funcPrivate = (void*)findTemplate(
-                pT->pzTemplText + pMac->ozName );
+        if (IS_VAR_FIRST_CHAR(pT->td_text[ pMac->md_name_off ])) {
+            pMac->md_code    = FTYP_DEFINE;
+            pMac->md_pvt = (void*)findTemplate(
+                pT->td_text + pMac->md_name_off );
 
-            if (pMac->funcPrivate == NULL) {
-                pzText = aprf(BAD_MAC_NM_FMT, pT->pzTemplText + pMac->ozName);
+            if (pMac->md_pvt == NULL) {
+                pzText = aprf(BAD_MAC_NM_FMT, pT->td_text + pMac->md_name_off);
                 AG_ABEND_IN(pT, pMac, pzText);
                 /* NOTREACHED */
             }
@@ -716,7 +714,7 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
      *  Call `eval' to determine the macro name.  Every invocation
      *  may be different!!
      */
-    macName = eval(pT->pzTemplText + pMac->ozName);
+    macName = eval(pT->td_text + pMac->md_name_off);
 
     pzText = ag_scm2zchars(macName, "macro name");
     pInv = findTemplate(pzText);
@@ -726,7 +724,7 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
         /* NOTREACHED */
     }
 
-    pMac->funcPrivate = (void*)pInv;
+    pMac->md_pvt = (void*)pInv;
 
     return mFunc_Define(pT, pMac);
 }
@@ -738,19 +736,19 @@ mFunc_Invoke(tTemplate * pT, tMacro * pMac)
  * @param ppzSan pointer to scanning pointer
  * @returns      the next open macro slot
  */
-tMacro *
-mLoad_Debug(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
+macro_t *
+mLoad_Debug(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     if (OPT_VALUE_TRACE >= TRACE_DEBUG_MESSAGE)
         return mLoad_Unknown(pT, pMac, ppzScan);
     return mLoad_Comment(pT, pMac, ppzScan);
 }
 
-tMacro *
-mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
+macro_t *
+mLoad_Define(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     char *       pzCopy;             /* next text dest   */
-    tTemplate *  pNewT;
+    templ_t *  pNewT;
 
     /*
      *  Save the global macro loading mode
@@ -758,7 +756,7 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
     tpLoadProc const * papLP = papLoadProc;
     static tpLoadProc apDefineLoad[ FUNC_CT ] = { NULL };
 
-    if (pMac->ozText == 0)
+    if (pMac->md_txt_off == 0)
         AG_ABEND_IN(pT, pMac, LD_DEF_NEED_NAME);
 
     /*
@@ -777,24 +775,24 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
 
     {
         char const*    pzScan = *ppzScan;  /* text after macro */
-        char const*    pzSrc  = (char const*)pMac->ozText; /* macro text */
-        int            macCt  = pT->macroCt - (pMac - pT->aMacros);
+        char const*    pzSrc  = (char const*)pMac->md_txt_off; /* macro text */
+        int            macCt  = pT->td_mac_ct - (pMac - pT->td_macros);
 
         size_t alocSize = sizeof(*pNewT)
-            + (macCt * sizeof(tMacro)) + strlen(pzScan) + 0x100;
+            + (macCt * sizeof(macro_t)) + strlen(pzScan) + 0x100;
         alocSize &= ~0x0F;
 
         /*
          *  Allocate a new template block that is much larger than needed.
          */
-        pNewT = (tTemplate*)AGALOC(alocSize, "AG macro def");
+        pNewT = (templ_t*)AGALOC(alocSize, "AG macro def");
         memset((void*)pNewT, 0, alocSize);
-        pNewT->magic      = pT->magic;
-        pNewT->descSize   = alocSize;
-        pNewT->macroCt    = macCt;
-        pNewT->pzTplFile  = strdup(pT->pzTplFile);
+        pNewT->td_magic  = pT->td_magic;
+        pNewT->td_size  = alocSize;
+        pNewT->td_mac_ct = macCt;
+        pNewT->td_file   = strdup(pT->td_file);
 
-        pzCopy = pNewT->pzTplName = (void*)(pNewT->aMacros + macCt);
+        pzCopy = pNewT->td_name = (void*)(pNewT->td_macros + macCt);
         if (! IS_VAR_FIRST_CHAR(*pzSrc))
             AG_ABEND_IN(pT, pMac, LD_DEF_NEED_NAME);
 
@@ -803,43 +801,43 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, TRACE_MACRO_DEF,
-                pNewT->pzTplName, pNewT->pzTplFile);
+        fprintf(trace_fp, TRACE_MACRO_DEF,
+                pNewT->td_name, pNewT->td_file);
 
     *(pzCopy++) = NUL;
-    pNewT->pzTemplText = pzCopy;
-    pNewT->pNext = pzCopy+1;
-    strcpy(pNewT->zStartMac, pT->zStartMac);
-    strcpy(pNewT->zEndMac, pT->zEndMac);
-    pCurTemplate = pNewT;
+    pNewT->td_text = pzCopy;
+    pNewT->td_scan = pzCopy+1;
+    strcpy(pNewT->td_start_mac, pT->td_start_mac);
+    strcpy(pNewT->td_end_mac,   pT->td_end_mac);
+    current_tpl = pNewT;
 
     {
-        tMacro* pMacEnd = parseTemplate(pNewT->aMacros, ppzScan);
+        macro_t* pMacEnd = parseTemplate(pNewT->td_macros, ppzScan);
         int     ct;
 
         /*
          *  Make sure all of the input string was *NOT* scanned.
          */
         if (*ppzScan == NULL)
-            AG_ABEND_IN(pNewT, pNewT->aMacros, LD_DEF_WOOPS);
+            AG_ABEND_IN(pNewT, pNewT->td_macros, LD_DEF_WOOPS);
 
-        ct = pMacEnd - pNewT->aMacros;
+        ct = pMacEnd - pNewT->td_macros;
 
         /*
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
-        if (ct < pNewT->macroCt) {
-            int   delta = sizeof(tMacro) * (pNewT->macroCt - ct);
-            void* data  = (pNewT->pzTplName == NULL) ?
-                pNewT->pzTemplText : pNewT->pzTplName;
-            size_t size = pNewT->pNext - (char*)data;
+        if (ct < pNewT->td_mac_ct) {
+            int   delta = sizeof(macro_t) * (pNewT->td_mac_ct - ct);
+            void* data  = (pNewT->td_name == NULL) ?
+                pNewT->td_text : pNewT->td_name;
+            size_t size = pNewT->td_scan - (char*)data;
             memmove((void*)pMacEnd, data, size);
 
-            pNewT->pzTemplText -= delta;
-            pNewT->pNext       -= delta;
-            pNewT->pzTplName   -= delta;
-            pNewT->macroCt      = ct;
+            pNewT->td_text  -= delta;
+            pNewT->td_scan  -= delta;
+            pNewT->td_name  -= delta;
+            pNewT->td_mac_ct = ct;
         }
     }
 
@@ -848,14 +846,14 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
      *  size.  Restore the offsets to pointer values.
      */
     {
-        size_t sz = pNewT->pNext - (char*)pNewT;
-        if (sz < pNewT->descSize) {
-            pNewT->descSize     = sz;
-            pNewT->pzTplName   -= (long)pNewT;
-            pNewT->pzTemplText -= (long)pNewT;
-            pNewT = AGREALOC((void*)pNewT, pNewT->descSize, "resize AG mac");
-            pNewT->pzTplName   += (long)pNewT;
-            pNewT->pzTemplText += (long)pNewT;
+        size_t sz = pNewT->td_scan - (char*)pNewT;
+        if (sz < pNewT->td_size) {
+            pNewT->td_size = sz;
+            pNewT->td_name -= (long)pNewT;
+            pNewT->td_text -= (long)pNewT;
+            pNewT = AGREALOC((void*)pNewT, pNewT->td_size, "resize AG mac");
+            pNewT->td_name += (long)pNewT;
+            pNewT->td_text += (long)pNewT;
         }
     }
 
@@ -863,16 +861,16 @@ mLoad_Define(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
     if (HAVE_OPT(SHOW_DEFS)) {
         static char const zSum[] = "loaded %d macros from %s\n"
             "\tBinary template size:  0x%X\n\n";
-        fprintf(pfTrace, zSum, pNewT->macroCt, pNewT->pzTplFile,
-                (unsigned int)pNewT->descSize);
+        fprintf(trace_fp, zSum, pNewT->td_mac_ct, pNewT->td_file,
+                (unsigned int)pNewT->td_size);
     }
 #endif
 
-    pNewT->pNext  = (char*)pNamedTplList;
-    pNamedTplList = pNewT;
-    papLoadProc   = papLP;
+    pNewT->td_scan = (char*)named_tpls;
+    named_tpls     = pNewT;
+    papLoadProc    = papLP;
     memset((void*)pMac, 0, sizeof(*pMac));
-    pCurTemplate  = pT;
+    current_tpl    = pT;
     return pMac;
 }
 /*

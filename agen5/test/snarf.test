@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # snarf.test --- test the extraction of scm-type definitions
 #
-# Time-stamp:        "2011-12-15 14:39:04 bkorb"
+# Time-stamp:        "2012-03-04 19:48:23 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -205,7 +205,7 @@ agrelay_scm_test_to_example_x(SCM scm0)
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
         static char const proc_z[] =
             "Called ag_scm_test_to_example_x()\n";
-        fwrite(proc_z, sizeof(proc_z) - 1, 1, pfTrace);
+        fwrite(proc_z, sizeof(proc_z) - 1, 1, trace_fp);
     }
     return ag_scm_test_to_example_x(scm0);
 }

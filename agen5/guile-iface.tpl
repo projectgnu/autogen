@@ -1,19 +1,25 @@
 [= AutoGen5 Template h =]
 [=
 (emit (make-header-guard "mutating"))
-(shell "guile_range() {
+(shell "ranged='#if'
+guile_range() {
   local lo=${1%%-*}
   local hi=${1##*-}
-  echo \"(GUILE_VERSION >= $lo) && (GUILE_VERSION <= $hi)\"
-}")
-=][=
+  if test ${#lo} -eq 0
+  then echo \"${ranged} (GUILE_VERSION <= $hi)\"
+  elif test ${#hi} -eq 0
+  then echo \"${ranged} (GUILE_VERSION >= $lo)\"
+  else echo \"${ranged} (GUILE_VERSION >= $lo) && (GUILE_VERSION <= $hi)\"
+  fi
+  ranged='#elif'
+}") =]
+[=
 
-FOR invalid     =]
+FOR invalid     \=]
 
-#if [= (shell (string-append "guile_range " (get "invalid"))) =]
+[= (shell (string-append "guile_range " (get "invalid"))) =]
 # error AutoGen does not work with this version of Guile
   choke me.
-#endif
 [=
 ENDFOR invalid  =]
 [= (out-push-new)  =]
@@ -55,7 +61,7 @@ emit_iface_type() {
 }
 
 prt_tbl() {
-  if='#if  '
+  if='#[= (if (exist? "invalid") "elif" "if  ") =]'
   for v in $v_list
   do
     printf '%s GUILE_VERSION < %s000\n' "$if" "$v"

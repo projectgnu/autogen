@@ -207,7 +207,7 @@ agrelay_scm_[= (get "name")     =]([=
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
         static char const proc_z[] =
             "Called ag_scm_[= name =]()\n";
-        fwrite(proc_z, sizeof(proc_z) - 1, 1, pfTrace);
+        fwrite(proc_z, sizeof(proc_z) - 1, 1, trace_fp);
     }
     return ag_scm_[= name =]([= (. pass-list) =]);
 }

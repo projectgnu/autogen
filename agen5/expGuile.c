@@ -2,7 +2,7 @@
 /**
  * @file expGuile.c
  *
- *  Time-stamp:        "2012-01-29 07:06:37 bkorb"
+ *  Time-stamp:        "2012-03-04 19:06:37 bkorb"
  *
  *  This module implements the expression functions that should
  *  be part of Guile.
@@ -48,7 +48,7 @@ ag_scm_c_eval_string_from_file_line(
     SCM port = scm_open_input_string(AG_SCM_STR02SCM(pzExpr));
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-        fprintf(pfTrace, TRACE_EVAL_STRING, pzFile, line, pzExpr);
+        fprintf(trace_fp, TRACE_EVAL_STRING, pzFile, line, pzExpr);
 
     {
         static SCM    file      = SCM_UNDEFINED;
@@ -353,7 +353,7 @@ ag_scm_string_capitalize_x(SCM str)
 {
     int     len;
     char*   pz;
-    ag_bool word_start = AG_TRUE;
+    bool word_start = true;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
@@ -365,10 +365,10 @@ ag_scm_string_capitalize_x(SCM str)
         char ch = *pz;
 
         if (! IS_ALPHANUMERIC_CHAR(ch)) {
-            word_start = AG_TRUE;
+            word_start = true;
 
         } else if (word_start) {
-            word_start = AG_FALSE;
+            word_start = false;
             if (IS_LOWER_CASE_CHAR(ch))
                 *pz = toupper(ch);
 
@@ -477,7 +477,7 @@ ag_scm_string_to_camelcase(SCM str)
     int   len;
     char* pzd, * res;
     char* pzs;
-    ag_bool cap_done = AG_FALSE;
+    bool cap_done = false;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
@@ -491,20 +491,20 @@ ag_scm_string_to_camelcase(SCM str)
         if (IS_LOWER_CASE_CHAR(ch)) {
             if (! cap_done) {
                 ch = toupper(ch);
-                cap_done = AG_TRUE;
+                cap_done = true;
             }
 
         } else if (IS_UPPER_CASE_CHAR(ch)) {
             if (cap_done)
                 ch = tolower(ch);
             else
-                cap_done = AG_TRUE;
+                cap_done = true;
 
         } else if (IS_DEC_DIGIT_CHAR(ch)) {
-            cap_done = AG_FALSE;
+            cap_done = false;
 
         } else {
-            cap_done = AG_FALSE;
+            cap_done = false;
             continue;
         }
 

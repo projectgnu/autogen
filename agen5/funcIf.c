@@ -2,7 +2,7 @@
 /**
  * @file funcIf.c
  *
- *  Time-stamp:        "2012-01-29 20:47:38 bkorb"
+ *  Time-stamp:        "2012-03-04 19:17:20 bkorb"
  *
  *  This module implements the _IF text function.
  *
@@ -25,22 +25,22 @@
 
 typedef struct if_stack tIfStack;
 struct if_stack {
-    tMacro*  pIf;
-    tMacro*  pElse;
+    macro_t*  pIf;
+    macro_t*  pElse;
 };
 
 static tIfStack  current_if;
 static tLoadProc mLoad_Elif, mLoad_Else;
 
 /* = = = START-STATIC-FORWARD = = = */
-static ag_bool
+static bool
 eval_true(void);
 
-static tMacro*
-mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
+static macro_t*
+mLoad_Elif(templ_t* pT, macro_t* pMac, char const ** ppzScan);
 
-static tMacro*
-mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
+static macro_t*
+mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -54,24 +54,24 @@ mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan);
  *  4.  For its length or its first five characters (whichever is less)
  *      it matches the string "false"
  */
-static ag_bool
+static bool
 eval_true(void)
 {
-    ag_bool needFree;
-    ag_bool res = AG_TRUE;
-    char const * pz = evalExpression(&needFree);
+    bool needFree;
+    bool res = true;
+    char const * pz = eval_mac_expr(&needFree);
 
     if (IS_DEC_DIGIT_CHAR(*pz))
-        res = (atoi(pz) == 0) ? AG_FALSE : AG_TRUE;
+        res = (atoi(pz) == 0) ? false : true;
 
     else switch (*pz) {
     case NUL:
-        res = AG_FALSE;
+        res = false;
         break;
 
     case '#':
         if ((pz[1] == 'f') || (pz[1] == 'F'))
-            res = AG_FALSE;
+            res = false;
         break;
 
     case 'f':
@@ -81,7 +81,7 @@ eval_true(void)
         if (len > 5)
             len = 5;
         if (strneqvcmp(EVAL_TRUE_FALSE_STR, pz, len) == 0)
-            res = AG_FALSE;
+            res = false;
         break;
     }
     }
@@ -138,47 +138,47 @@ eval_true(void)
  *    This macro ends the @code{IF} function template block.
  *    For a complete description @xref{IF}.
 =*/
-tMacro*
-mFunc_If(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_If(templ_t* pT, macro_t* pMac)
 {
-    tMacro* pRet = pT->aMacros + pMac->endIndex;
-    tMacro* pIf  = pMac;
+    macro_t* pRet = pT->td_macros + pMac->md_end_idx;
+    macro_t* pIf  = pMac;
 
     do  {
         /*
          *  The current macro becomes the 'ELIF' or 'ELSE' macro
          */
-        pCurMacro = pMac;
+        cur_macro = pMac;
 
         /*
          *  'ELSE' is equivalent to 'ELIF true'
          */
-        if (  (pMac->funcCode == FTYP_ELSE)
+        if (  (pMac->md_code == FTYP_ELSE)
            || eval_true()) {
 
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, TRACE_FN_IF, (pMac->funcCode == FTYP_ELSE)
-                        ? FN_IF_ELSE : pT->pzTemplText + pMac->ozText,
-                        pMac->lineNo);
+                fprintf(trace_fp, TRACE_FN_IF, (pMac->md_code == FTYP_ELSE)
+                        ? FN_IF_ELSE : pT->td_text + pMac->md_txt_off,
+                        pMac->md_line);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
-                            pCurTemplate->pzTplFile, pIf->lineNo);
+                    fprintf(trace_fp, TAB_FILE_LINE_FMT,
+                            current_tpl->td_file, pIf->md_line);
             }
 
-            generateBlock(pT, pMac+1, pT->aMacros + pMac->sibIndex);
+            generateBlock(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
             break;
         }
-        pMac = pT->aMacros + pMac->sibIndex;
+        pMac = pT->td_macros + pMac->md_sib_idx;
     } while (pMac < pRet);
 
     if ((OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) && (pMac >= pRet)) {
-        fprintf(pfTrace, TRACE_FN_IF_NOTHING,
-                pCurTemplate->pzTemplText + pCurMacro->ozText);
+        fprintf(trace_fp, TRACE_FN_IF_NOTHING,
+                current_tpl->td_text + cur_macro->md_txt_off);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, TAB_FILE_LINE_FMT,
-                    pCurTemplate->pzTplFile, pIf->lineNo);
+            fprintf(trace_fp, TAB_FILE_LINE_FMT,
+                    current_tpl->td_file, pIf->md_line);
     }
 
     return pRet;
@@ -221,32 +221,32 @@ mFunc_If(tTemplate* pT, tMacro* pMac)
  *    This macro ends the @code{WHILE} function template block.
  *    For a complete description @xref{WHILE}.
 =*/
-tMacro*
-mFunc_While(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_While(templ_t* pT, macro_t* pMac)
 {
-    tMacro* pRet = pT->aMacros + pMac->endIndex;
+    macro_t* pRet = pT->td_macros + pMac->md_end_idx;
     int     ct   = 0;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, TRACE_FN_WHILE_START,
-                pCurTemplate->pzTemplText + pCurMacro->ozText,
-                pT->pzTplFile, pMac->lineNo);
+        fprintf(trace_fp, TRACE_FN_WHILE_START,
+                current_tpl->td_text + cur_macro->md_txt_off,
+                pT->td_file, pMac->md_line);
 
     for (;;) {
-        pCurTemplate = pT;
-        pCurMacro    = pMac;
+        current_tpl = pT;
+        cur_macro    = pMac;
 
         if (! eval_true())
             break;
         ct++;
-        generateBlock(pT, pMac+1, pT->aMacros + pMac->sibIndex);
+        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(pfTrace, TRACE_FN_WHILE_END, ct);
+        fprintf(trace_fp, TRACE_FN_WHILE_END, ct);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, TAB_FILE_LINE_FMT, pT->pzTplFile, pMac->lineNo);
+            fprintf(trace_fp, TAB_FILE_LINE_FMT, pT->td_file, pMac->md_line);
     }
 
     return pRet;
@@ -265,17 +265,17 @@ mFunc_While(tTemplate* pT, tMacro* pMac)
  *    @code{IF} function.  Its expression argument is evaluated as are
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
-static tMacro*
-mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+static macro_t*
+mLoad_Elif(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    if ((int)pMac->res == 0)
+    if ((int)pMac->md_res == 0)
         AG_ABEND_IN(pT, pMac, NO_IF_EXPR);
     /*
      *  Load the expression
      */
     (void)mLoad_Expr(pT, pMac, ppzScan);
 
-    current_if.pElse->sibIndex = pMac - pT->aMacros;
+    current_if.pElse->md_sib_idx = pMac - pT->td_macros;
     current_if.pElse = pMac;
     return pMac + 1;
 }
@@ -292,8 +292,8 @@ mLoad_Elif(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
  *    It denotes the start of an alternate template block for
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
-static tMacro*
-mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+static macro_t*
+mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
     /*
      *  After processing an "ELSE" macro,
@@ -308,9 +308,9 @@ mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 
     papLoadProc = apElseLoad;
 
-    current_if.pElse->sibIndex = pMac - pT->aMacros;
+    current_if.pElse->md_sib_idx = pMac - pT->td_macros;
     current_if.pElse = pMac;
-    pMac->ozText = 0;
+    pMac->md_txt_off = 0;
 
     return pMac+1;
 }
@@ -320,21 +320,21 @@ mLoad_Else(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
  *  mLoad_Ending is the common block termination function.
  *  By returning NULL, it tells the macro parsing loop to return.
  */
-tMacro*
-mLoad_Ending(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_Ending(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
     memset((void*)pMac, 0, sizeof(*pMac));
     return NULL;
 }
 
 
-tMacro*
-mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_If(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    size_t              srcLen     = (size_t)pMac->res; /* macro len  */
+    size_t              srcLen     = (size_t)pMac->md_res; /* macro len  */
     tIfStack            save_stack = current_if;
     tpLoadProc const *  papLP      = papLoadProc;
-    tMacro *            pEndifMac;
+    macro_t *            pEndifMac;
 
     /*
      *  While processing an "IF" macro,
@@ -381,8 +381,8 @@ mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_IF_NO_ENDIF);
 
-    current_if.pIf->endIndex   = \
-    current_if.pElse->sibIndex = pEndifMac - pT->aMacros;
+    current_if.pIf->md_end_idx   = \
+    current_if.pElse->md_sib_idx = pEndifMac - pT->td_macros;
 
     /*
      *  Restore the context of any encompassing block macros
@@ -393,12 +393,12 @@ mLoad_If(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
 }
 
 
-tMacro *
-mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t *
+mLoad_While(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    size_t              srcLen = (size_t)pMac->res; /* macro len  */
+    size_t              srcLen = (size_t)pMac->md_res; /* macro len  */
     tpLoadProc const *  papLP  = papLoadProc;
-    tMacro *            pEndMac;
+    macro_t *            pEndMac;
 
     /*
      *  While processing an "IF" macro,
@@ -436,7 +436,7 @@ mLoad_While(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_WHILE_NO_ENDWHILE);
 
-    pMac->sibIndex = pMac->endIndex = pEndMac - pT->aMacros;
+    pMac->md_sib_idx = pMac->md_end_idx = pEndMac - pT->td_macros;
 
     /*
      *  Restore the context of any encompassing block macros
@@ -463,8 +463,8 @@ ag_scm_set_writable(SCM set)
     switch (STATE_OPT(WRITABLE)) {
     case OPTST_DEFINED:
     case OPTST_PRESET:
-        fprintf(pfTrace, SET_WRITE_WARN, pCurTemplate->pzTplFile,
-                pCurMacro->lineNo);
+        fprintf(trace_fp, SET_WRITE_WARN, current_tpl->td_file,
+                cur_macro->md_line);
         break;
 
     default:

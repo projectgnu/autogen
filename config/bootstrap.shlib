@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-11-08 09:18:53 bkorb"
+# Time-stamp:        "2012-03-04 19:35:31 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -103,7 +103,11 @@ then
         local tag=${1} ; shift
         # local vgfile=/tmp/vglog/${tag}-%p.txt
         local tfile='>>'ag-${tag}-$$.log
-        tag="-MFstamp-${tag} --trace=every --trace-out=${tfile}"
+        if test -n "$DEPFILE"
+        then tag="-MTstamp-${tag} -MF${DEPFILE} -MP"
+        else tag="-MFstamp-${tag} -MP"
+        fi
+        tag="${tag} --trace=every --trace-out=${tfile}"
 
         MALLOC_CHECK_=2 \
             ${AGexe} ${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"
@@ -112,7 +116,11 @@ else
     run_ag()
     {
         # local vgfile=/tmp/vglog/${1}-%p.txt
-        local tag="-MFstamp-${1}" ; shift
+        if test -n "$DEPFILE"
+        then tag="-MTstamp-${1} -MF${DEPFILE} -MP"
+        else tag="-MFstamp-${1} -MP"
+        fi
+        shift
 
         echo ${AGexe} ${tpl_dir} ${tag} "$@"
         ${AGexe} ${tpl_dir} ${tag} "$@" || die "FAILED: ${AGexe} $*"

@@ -2,7 +2,7 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2012-01-29 07:43:06 bkorb"
+ *  Time-stamp:        "2012-03-04 19:41:13 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -25,7 +25,6 @@
 #ifndef AUTOGEN_BUILD
 #define AUTOGEN_BUILD 1
 
-#include "compat/compat.h"
 #include "compat/unlocked-io.h"
 
 #include REGEX_HEADER
@@ -68,28 +67,26 @@
  *  Dual pipe opening of a child process
  */
 typedef struct {
-    int     readFd;
-    int     writeFd;
-}  tFdPair;
+    int     fd_read;
+    int     fd_write;
+}  fd_pair_t;
 
 typedef struct {
-    FILE*   pfRead;  /* parent read fp  */
-    FILE*   pfWrite; /* parent write fp */
-}  tpfPair;
+    FILE *  fp_read;  /* parent read fp  */
+    FILE *  fp_write; /* parent write fp */
+}  fp_pair_t;
 
 #define NOPROCESS   ((pid_t)-1)
 #define NULLPROCESS ((pid_t)0)
 #define NL          '\n'
 #define TAB         '\t'
 
-typedef unsigned char * tpChar;
-
 #include "cgi-fsm.h"
 #include "defParse-fsm.h"
 
 typedef union {
-    tpChar      pzStr;
-    char        ch;
+    unsigned char * pzStr;
+    unsigned char   ch;
 } def_token_u_t;
 
 #define STATE_TABLE           /* set up `atexit' and load Guile   */  \
@@ -111,19 +108,19 @@ typedef enum { STATE_TABLE COUNT_PROC_STATE } teProcState;
 
 #define EXPORT
 
-typedef struct fp_stack      tFpStack;
-typedef struct outSpec       tOutSpec;
-typedef struct scanContext   tScanCtx;
-typedef struct defEntry      tDefEntry;
-typedef struct macro_desc    tMacro;
-typedef struct template_desc tTemplate;
-typedef struct for_info      tForInfo;
-typedef struct for_state     tForState;
-typedef struct template_lib_marker tTlibMark;
+typedef struct out_stack        out_stack_t;
+typedef struct out_spec         out_spec_t;
+typedef struct scan_context     scan_ctx_t;
+typedef struct defEntry         def_ent_t;
+typedef struct macro_desc       macro_t;
+typedef struct template_desc    templ_t;
+typedef struct for_info         for_info_t;
+typedef struct for_state        for_state_t;
+typedef struct tlib_mark        tlib_mark_t;
 
-#define MAX_SUFFIX_LEN     8  /* maximum length of a file name suffix */
-#define MAX_HEREMARK_LEN  64  /* max length of a here mark */
-#define SCRIBBLE_SIZE    256  /* much larger than any short name */
+#define MAX_SUFFIX_LEN       8  /* maximum length of a file name suffix */
+#define MAX_HEREMARK_LEN    64  /* max length of a here mark */
+#define SCRIBBLE_SIZE      256  /* much larger than any short name */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -131,17 +128,17 @@ typedef struct template_lib_marker tTlibMark;
  *
  *  Procedure for loading a template function
  */
-typedef tMacro* (tLoadProc)( tTemplate*, tMacro*, char const** ppzScan );
+typedef macro_t* (tLoadProc)( templ_t*, macro_t*, char const** ppzScan );
 typedef tLoadProc* tpLoadProc;
 
-typedef void (tUnloadProc)( tMacro* );
+typedef void (tUnloadProc)( macro_t* );
 typedef tUnloadProc* tpUnloadProc;
 
 /*
  *  Procedure for handling a template function
  *  during the text emission phase.
  */
-typedef tMacro* (tHdlrProc)( tTemplate*, tMacro* );
+typedef macro_t* (tHdlrProc)( templ_t*, macro_t* );
 typedef tHdlrProc* tpHdlrProc;
 
 /*
@@ -156,13 +153,13 @@ typedef tHdlrProc* tpHdlrProc;
 #define TEMPLATE_MAGIC_MARKER {{{'A', 'G', 'L', 'B'}}, \
                                TEMPLATE_REVISION, FUNCTION_CKSUM }
 
-struct template_lib_marker {
+struct tlib_mark {
     union {
         unsigned char   str[4];  /* {'A', 'G', 'L', 'B'} */
         unsigned int    i[1];
-    }           magic;
-    unsigned short      revision;    /* TEMPLATE_REVISION    */
-    unsigned short      funcSum;     /* FUNCTION_CKSUM       */
+    }           tlm_magic;
+    unsigned short  tlm_revision;   /* TEMPLATE_REVISION    */
+    unsigned short  tlm_cksum;      /* FUNCTION_CKSUM       */
 };
 
 /*
@@ -185,29 +182,29 @@ struct template_lib_marker {
 #define EMIT_NO_DEFINE      0x0800  /* don't get defined value */
 
 struct macro_desc {
-    teFuncType    funcCode;    /* Macro function           */
-    int           lineNo;      /* of macro def             */
-    int           endIndex;    /* End of block macro       */
-    int           sibIndex;    /* Sibling macro (ELIF or SELECT) */
+    teFuncType    md_code;     /* Macro function           */
+    int           md_line;     /* of macro def             */
+    int           md_end_idx;  /* End of block macro       */
+    int           md_sib_idx;  /* Sibling macro (ELIF or SELECT) */
 
-    uintptr_t     ozName;      /* macro name (sometimes)   */
-    uintptr_t     ozText;      /* associated text          */
-    uintptr_t     res;         /* some sort of result      */
-    void *        funcPrivate;
+    uintptr_t     md_name_off; /* macro name (sometimes)   */
+    uintptr_t     md_txt_off;  /* associated text          */
+    uintptr_t     md_res;      /* some sort of result      */
+    void *        md_pvt;
 };
 
 struct template_desc {
-    tTlibMark     magic;       /* TEMPLATE_MAGIC_MARKER    */
-    size_t        descSize;    /* Structure Size           */
-    char *        pNext;       /* Next Pointer             */
-    int           macroCt;     /* Count of Macros          */
-    char const *  pzTplFile;   /* Name of template file    */
-    char *        pzTplName;   /* Defined Macro Name       */
-    char *        pzTemplText; /* offset of the text       */
-    char          zStartMac[MAX_SUFFIX_LEN];
-    char          zEndMac[MAX_SUFFIX_LEN];
-    tMacro        aMacros[1];  /* Array of Macros          */
-/*  char          text[...];    * strings at end of macros */
+    tlib_mark_t   td_magic;    /* TEMPLATE_MAGIC_MARKER    */
+    size_t        td_size;     /* Structure Size           */
+    char *        td_scan;     /* Next Pointer             */
+    int           td_mac_ct;   /* Count of Macros          */
+    char const *  td_file;     /* Name of template file    */
+    char *        td_name;     /* Defined Macro Name       */
+    char *        td_text;     /* offset of the text       */
+    char          td_start_mac[MAX_SUFFIX_LEN];
+    char          td_end_mac[  MAX_SUFFIX_LEN];
+    macro_t       td_macros[1]; /* Array of Macros          */
+/*  char          td_text[...];  * strings at end of macros */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -223,43 +220,43 @@ typedef enum {
 
 #define NO_INDEX ((short)0x80DEAD)
 
-typedef struct sDefCtx tDefCtx;
-struct sDefCtx {
-    tDefEntry* pDefs;           /* ptr to current def set     */
-    tDefCtx*   pPrev;           /* ptr to previous def set    */
+typedef struct def_ctx def_ctx_t;
+struct def_ctx {
+    def_ent_t *   dcx_defent;   /* ptr to current def set     */
+    def_ctx_t *   dcx_prev;     /* ptr to previous def set    */
 };
 
 typedef union {
-    tDefEntry*  pDefEntry;
-    char*       pzText;
-} uDefValue;
+    def_ent_t *   dvu_entry;
+    char *        dvu_text;
+} def_val_u;
 
 struct defEntry {
-    tDefEntry* pNext;           /* next member of same level  */
-    tDefEntry* pTwin;           /* next member with same name */
-    tDefEntry* pPrevTwin;       /* previous memb. of level    */
-    tDefEntry* pEndTwin;        /* head of chain to end ptr   */
-    char*      pzDefName;       /* name of this member        */
-    long       index;           /* index among twins          */
-    uDefValue  val;             /* string or list of children */
-    char*      pzSrcFile;       /* definition file name       */
-    int        srcLineNum;      /* def file source line       */
-    teValType  valType;         /* text/block/not defined yet */
+    def_ent_t *   de_next;      /* next member of same level  */
+    def_ent_t *   de_twin;      /* next member with same name */
+    def_ent_t *   de_ptwin;     /* previous memb. of level    */
+    def_ent_t *   de_etwin;     /* head of chain to end ptr   */
+    char *        de_name;      /* name of this member        */
+    long          de_index;     /* index among twins          */
+    def_val_u     de_val;       /* string or list of children */
+    char *        de_file;      /* definition file name       */
+    int           de_line;      /* def file source line       */
+    teValType     de_type;      /* text/block/not defined yet */
 };
 
-struct scanContext {
-    tScanCtx *    pCtx;
-    char*         pzScan;
-    char const *  pzCtxFname;
-    char *        pzData;
-    int           lineNo;
+struct scan_context {
+    scan_ctx_t *  scx_next;
+    char *        scx_scan;
+    char const *  scx_fname;
+    char *        scx_data;
+    int           scx_line;
 };
 
-struct outSpec {
-    tOutSpec*   pNext;
-    char const* pzFileFmt;
-    ag_bool     deallocFmt;
-    char        zSuffix[ 1 ];
+struct out_spec {
+    out_spec_t *  os_next;
+    char const *  os_file_fmt;
+    bool          os_dealloc_fmt;
+    char          os_sfx[ 1 ];
 };
 
 #define FPF_FREE        0x0001   /* free the fp structure   */
@@ -269,11 +266,11 @@ struct outSpec {
 #define FPF_NOCHMOD     0x0010   /* do not chmod(2) file    */
 #define FPF_TEMPFILE    0x0020   /* the file is a temp      */
 
-struct fp_stack {
-    int                 flags;
-    tFpStack *          pPrev;
-    FILE *              pFile;
-    char const *        pzOutName;
+struct out_stack {
+    int           stk_flags;
+    out_stack_t * stk_prev;
+    FILE *        stk_fp;
+    char const *  stk_fname;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -281,47 +278,37 @@ struct fp_stack {
  *  FOR loop processing state
  */
 struct for_info {
-    int          fi_depth;
-    int          fi_alloc;
-    tForState*   fi_data;
+    int           fi_depth;
+    int           fi_alloc;
+    for_state_t * fi_data;
 };
 
 struct for_state {
-    ag_bool      for_loading;
-    int          for_from;
-    int          for_to;
-    int          for_by;
-    int          for_index;
-    char*        for_pzSep;
-    char*        for_pzName;
-    ag_bool      for_lastFor;
-    ag_bool      for_firstFor;
+    bool          for_loading;
+    int           for_from;
+    int           for_to;
+    int           for_by;
+    int           for_index;
+    char *        for_sep_str;
+    char *        for_name;
+    bool          for_islast;
+    bool          for_isfirst;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Parsing stuff
  */
-typedef struct {
-    int     entryCt;
-    int     allocCt;
-    char*   entries[1];
-} tList;
-
 #define _MkStr(_s) #_s
 #define MK_STR(_s) _MkStr(_s)
 
-typedef struct {
-    int          line;
-    char const * file;
-    char const * text;
-} file_line_t;
-
-#define SCM_EVAL_CONST(_s) \
-    do { static file_line_t const fl = { __LINE__ - 1, __FILE__, _s }; \
-        pzLastScheme = fl.text; \
-        ag_scm_c_eval_string_from_file_line(fl.text, fl.file, fl.line); \
-    } while (0)
+#define SCM_EVAL_CONST(_s)                                      \
+    do { static int const line   = __LINE__ - 1;                \
+        static char const file[] = __FILE__;                    \
+        static char const * text = _s;                          \
+        last_scm_cmd = text;                                    \
+        ag_scm_c_eval_string_from_file_line(text, file, line);  \
+    } while (false)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -329,36 +316,34 @@ typedef struct {
  *
  *  General Processing Globals
  */
-#define pzProg      autogenOptions.pzProgName
-MODE teProcState    procState        VALUE( PROC_STATE_INIT );
-MODE tTemplate*     pNamedTplList    VALUE( NULL );
-MODE char const *   pzOopsPrefix     VALUE( "" );
+#define ag_pname    autogenOptions.pzProgName
+MODE teProcState    processing_state VALUE( PROC_STATE_INIT );
+MODE templ_t *      named_tpls       VALUE( NULL );
+MODE char const *   oops_pfx         VALUE( "" );
 /*
- *  "evalExpression" must be able to return a distinct empty string so that
+ *  "eval_mac_expr" must be able to return a distinct empty string so that
  *  the "CASE" function can distinguish an empty string due to it being a
  *  value from an empty string due to an absent definition.
  */
-MODE char const     zNotDefined[1]   VALUE( "" );
+MODE char const     no_def_str[1]    VALUE( "" );
 
 /*
  *  Template Processing Globals
  */
-MODE char const *   pzCurSfx         VALUE( NULL );
+MODE char const *   curr_sfx         VALUE( NULL );
 /**
  * The time to set for the modification times of the output files.
  */
-MODE time_t         outTime          VALUE( 0 );
+MODE time_t         outfile_time     VALUE( 0 );
 /**
  * The original time autogen started
  */
-MODE time_t         startTime        VALUE( 0 );
-MODE tFpStack *     pCurFp           VALUE( NULL );
-MODE tOutSpec *     pOutSpecList     VALUE( NULL );
-MODE jmp_buf        fileAbort;
-MODE char *         pzCurStart       VALUE( NULL );
-MODE uintptr_t      curStartOff      VALUE( 0 );
-MODE tForInfo       forInfo          VALUE( { 0 } );
-MODE FILE *         pfTrace          VALUE( NULL );
+MODE time_t         start_time       VALUE( 0 );
+MODE out_stack_t *  cur_fpstack      VALUE( NULL );
+MODE out_spec_t *   output_specs     VALUE( NULL );
+MODE jmp_buf        abort_jmp_buf;
+MODE for_info_t     forInfo          VALUE( { 0 } );
+MODE FILE *         trace_fp         VALUE( NULL );
 /**
  * temporary file name template
  */
@@ -370,15 +355,15 @@ MODE size_t         temp_tpl_dir_len VALUE( 0 );
 /**
  * dependency file file pointer.
  */
-MODE FILE*          pfDepends        VALUE( NULL );
+MODE FILE*          dep_fp           VALUE( NULL );
 /**
  * name of target of rule
  */
-MODE char const *   pzDepTarget      VALUE( NULL );
+MODE char const *   dep_target       VALUE( NULL );
 /**
  * name of dependency file
  */
-MODE char const *   pzDepFile        VALUE( NULL );
+MODE char const *   dep_file         VALUE( NULL );
 /**
  * base name of both source and derived files.
  * Either "_TList" or "_SList" gets put on the end.
@@ -387,22 +372,22 @@ MODE char const *   pz_targ_base     VALUE( NULL );
 /**
  * The actual list of input (source) files.
  */
-MODE char const *   pzSourceList     VALUE( NULL );
+MODE char const *   source_list      VALUE( NULL );
 MODE size_t         source_size      VALUE( 0 );
 MODE size_t         source_used      VALUE( 0 );
-MODE ag_bool        dep_phonies      VALUE( AG_FALSE );
+MODE bool           dep_phonies      VALUE( false );
 MODE char *         cgi_stderr       VALUE( NULL );
 
-MODE char const *   serverArgs[2]    VALUE( { NULL } );
-MODE char const *   pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
+MODE char const *   server_args[2]   VALUE( { NULL } );
+MODE char const *   shell_program    VALUE( MK_STR(CONFIG_SHELL) );
 
 /*
  *  AutoGen definiton and template context
  *
- *  currDefCtx is the current, active list of name/value pairs.
+ *  curr_def_ctx is the current, active list of name/value pairs.
  *  Points to its parent list for full search resolution.
  *
- *  pCurTemplate the template (and DEFINE macro) from which
+ *  current_tpl the template (and DEFINE macro) from which
  *  the current set of macros is being extracted.
  *
  *  These are set in exactly ONE place:
@@ -410,16 +395,16 @@ MODE char const *   pzShellProgram   VALUE( MK_STR(CONFIG_SHELL) );
  *  must restore the values: mFunc_Define and mFunc_For.  They are the only
  *  routines that dynamically push name/value pairs on the definition stack.
  */
-MODE tDefCtx        currDefCtx       VALUE( { NULL } );
-MODE tDefCtx        rootDefCtx       VALUE( { NULL } );
-MODE tTemplate *    pCurTemplate     VALUE( NULL );
-MODE char const *   pzLastScheme     VALUE( NULL );
+MODE def_ctx_t      curr_def_ctx     VALUE( { NULL } );
+MODE def_ctx_t      root_def_ctx     VALUE( { NULL } );
+MODE templ_t *      current_tpl      VALUE( NULL );
+MODE char const *   last_scm_cmd     VALUE( NULL );
 #ifdef DAEMON_ENABLED
 /*
  *  When operating as a daemon, autogen can be told to reload
  *  its options the next time it wakes up (send it a SIGHUP).
  */
-MODE ag_bool        redoOptions      VALUE( AG_TRUE );
+MODE bool           redo_opts        VALUE( true );
 #endif
 
 /*
@@ -432,34 +417,33 @@ MODE ag_bool        redoOptions      VALUE( AG_TRUE );
  *      alternation macros
  *  3.  mFunc_Case may transfer to one of its selection clauses.
  */
-MODE tMacro *       pCurMacro        VALUE( NULL );
+MODE macro_t *       cur_macro        VALUE( NULL );
 
 /*
  *  Template Parsing Globals
  */
-MODE int            templLineNo      VALUE( 1 );
-MODE tScanCtx *     pBaseCtx         VALUE( NULL );
-MODE tScanCtx *     pCurCtx          VALUE( NULL );
-MODE tScanCtx *     pDoneCtx         VALUE( NULL );
-MODE size_t         endMacLen        VALUE( 0  );
-MODE char           zEndMac[   8 ]   VALUE( "" );
-MODE size_t         startMacLen      VALUE( 0  );
-MODE char           zStartMac[  8 ]  VALUE( "" );
+MODE int            tpl_line         VALUE( 1 );
+MODE scan_ctx_t *   base_ctx         VALUE( NULL );
+MODE scan_ctx_t *   cctx             VALUE( NULL );
+MODE scan_ctx_t *   end_ctx          VALUE( NULL );
+MODE size_t         end_mac_len      VALUE( 0  );
+MODE char           end_mac[   8 ]   VALUE( "" );
+MODE size_t         st_mac_len       VALUE( 0  );
+MODE char           start_mac[  8 ]  VALUE( "" );
 MODE int            guileFailure     VALUE( 0 );
 #define name_sep_ch '.'
 
 /*
  *  Definition Parsing Globals
  */
-MODE char *         pzDefineData     VALUE( NULL );
-MODE char *         pz_token         VALUE( NULL );
-MODE te_dp_event    lastToken        VALUE( DP_EV_INVALID );
+MODE char *         token_str        VALUE( NULL );
+MODE te_dp_event    token_code       VALUE( DP_EV_INVALID );
 
-MODE int            stackDepth       VALUE( 0 );
-MODE int            stackSize        VALUE( 16 );
-MODE tDefEntry *    parseStack[16]   VALUE( { 0 } );
-MODE tDefEntry **   ppParseStack     VALUE( parseStack );
-MODE tDefEntry *    pCurrentEntry    VALUE( NULL );
+MODE int            ent_stack_depth  VALUE( 0 );
+MODE int            ent_stack_sz     VALUE( 16 );
+MODE def_ent_t *    dft_ent_stack[16] VALUE( { 0 } );
+MODE def_ent_t **   ent_stack        VALUE( dft_ent_stack );
+MODE def_ent_t *    curr_ent         VALUE( NULL );
 
 MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
 
@@ -493,13 +477,7 @@ MODE v2c_t p2p VALUE( { NULL } );
 #endif
 
 #define AG_ABEND_IN(t,m,s) \
-    STMTS( pCurTemplate=(t); pCurMacro=(m); AG_ABEND(s);)
-
-#if defined(DEBUG_ENABLED)
-  extern void manageAllocatedData(void* pd);
-#else
-# define manageAllocatedData(_ptr)
-#endif
+    STMTS( current_tpl=(t); cur_macro=(m); AG_ABEND(s);)
 
 #if __STDC_VERSION__ < 199901L
 # if __GNUC__ >= 2
@@ -519,13 +497,13 @@ MODE v2c_t p2p VALUE( { NULL } );
 static inline SCM ag_eval(char const * pzStr)
 {
     SCM res;
-    char const * pzSaveScheme = pzLastScheme; /* Watch for nested calls */
-    pzLastScheme = pzStr;
+    char const * pzSaveScheme = last_scm_cmd; /* Watch for nested calls */
+    last_scm_cmd = pzStr;
 
     res = ag_scm_c_eval_string_from_file_line(
-        pzStr, pCurTemplate->pzTplFile, pCurMacro->lineNo);
+        pzStr, current_tpl->td_file, cur_macro->md_line);
 
-    pzLastScheme = pzSaveScheme;
+    last_scm_cmd = pzSaveScheme;
     return res;
 }
 

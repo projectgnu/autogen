@@ -2,7 +2,7 @@
  *
  *    getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2011-12-17 21:21:06 bkorb"
+ *  Time-stamp:        "2012-02-28 19:45:07 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -25,8 +25,6 @@
 #ifndef GETDEFS_HEADER
 #define GETDEFS_HEADER
 
-#include "config.h"
-#include "compat/compat.h"
 #include <sys/wait.h>
 #include <utime.h>
 #include <stdarg.h>

@@ -1,4 +1,34 @@
+2012-03-04  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agDep.c (start_dep_file): handle temp suffix here so it can
+	be done consistently.  Also, only list program name in comment once.
+	(tidy_dep_file) check for target == dep file after moving dep file.
+	(wrap_up_depends): emit cleanup rules on request
+	* agen5/ag-text.def (DEP_FILE_CLOBBER_FMT): cleanup format
+	* agen5/*: replace AG_BOOL with stdbool definitions
+	* autoopts/autogen.map (inversion): new char class
+	* autoopts/enum.c (find_name): use it.  Set error message format
+	pointer when a too-large number is used for an enum.
+	* autoopts/usage-txt.def (TooLarge): new error message
+	* autoopts/test/keyword.test: test ~0/-1
+	* autoopts/test/vendor.test: adjust for stdbool
+	* autoopts/tpl/cmd-doc.tlib (get-cvt): function for converting
+	texi-isms to man page/mdoc page isms for descrip and doc attributes
+	* autoopts/tpl/optlib.tlib (get-text): function for stripping
+	texi-isms entirely for use in help text.
+	* compat/compat.h (stdbool.h): new accommodation
+	* config/bootstrap.shlib (run_ag): use -MP option
+	* config/misc.def: check stdbool.h header
+	* autoopts/tpl/aginfo.tpl: disable
+	* autoopts/tpl/agman1.tpl: disable
+	* agen5/defLex.c (build_here_str): stop stripping tabs with backslash
+	tab, and skip the backslash, too.
+	* agen5/ag-text.def (DEP_FILE_WRAP_FMT): use it.
+	* everywhere: use global replacement tools to de-camelize many variables.
+
 2012-02-25  Bruce Korb  <bkorb@gnu.org>
+
+	5.15 release
 
 	* autoopts/tpl/optcode.tlib: make sure config header is included
 	before any system headers.

@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2012-01-29 07:34:52 bkorb"
+ *  Time-stamp:        "2012-03-04 19:32:13 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -55,23 +55,23 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
 {
     char*   pzEnd = (char*)pzData + strlen(pzData);
     char    ch;
-    tMacro* pCM = pCurMacro;
-    tMacro  mac = { (teFuncType)~0, 0, 0, 0, 0, 0, 0, NULL };
+    macro_t* pCM = cur_macro;
+    macro_t  mac = { (teFuncType)~0, 0, 0, 0, 0, 0, 0, NULL };
 
-    mac.lineNo  = templLineNo;
+    mac.md_line = tpl_line;
     pzEnd       = (char*)skipScheme(pzData, pzEnd);
     ch          = *pzEnd;
     *pzEnd      = NUL;
-    pCurMacro   = &mac;
+    cur_macro   = &mac;
 
     ag_scm_c_eval_string_from_file_line(
-          (char*)pzData, pzFileName, templLineNo );
+          (char*)pzData, pzFileName, tpl_line );
 
-    pCurMacro = pCM;
+    cur_macro = pCM;
     *pzEnd    = ch;
     while (pzData < pzEnd)
         if (*(pzData++) == NL)
-            templLineNo++;
+            tpl_line++;
     return (char const *)pzEnd;
 }
 
@@ -92,11 +92,11 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    tOutSpec   *       pOS;
+    out_spec_t   *       pOS;
     char const *       pzSfxFmt;
     char const *       pzResult;
     size_t             spn;
-    static tOutSpec ** ppOSList = &pOutSpecList;
+    static out_spec_t ** ppOSList = &output_specs;
 
     /*
      *  Skip over the suffix construct
@@ -128,7 +128,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      *  and only when the --select-suffix option was not specified.
      */
     if (  (pzFileName != NULL)
-       && (  (procState != PROC_STATE_LOAD_TPL)
+       && (  (processing_state != PROC_STATE_LOAD_TPL)
           || HAVE_OPT(SELECT_SUFFIX)))
         return pzResult;
 
@@ -145,9 +145,9 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
     }
 
     *ppOSList  = pOS;
-    ppOSList   = &pOS->pNext; /* NULL, from memset */
-    memcpy(pOS->zSuffix, pzData, spn);
-    pOS->zSuffix[spn] = NUL;
+    ppOSList   = &pOS->os_next; /* NULL, from memset */
+    memcpy(pOS->os_sfx, pzData, spn);
+    pOS->os_sfx[spn] = NUL;
 
     /*
      *  IF the suffix contains its own formatting construct,
@@ -156,17 +156,17 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      */
     if (pzSfxFmt != NULL) {
         size_t sfx_len = pzSfxFmt - pzData;
-        pOS->zSuffix[sfx_len-1] = NUL;
-        pOS->pzFileFmt = pOS->zSuffix + sfx_len;
+        pOS->os_sfx[sfx_len-1] = NUL;
+        pOS->os_file_fmt = pOS->os_sfx + sfx_len;
 
-        if (*pOS->pzFileFmt == '(') {
+        if (*pOS->os_file_fmt == '(') {
             SCM str =
                 ag_scm_c_eval_string_from_file_line(
-                    pOS->pzFileFmt, pzFileName, lineNo );
+                    pOS->os_file_fmt, pzFileName, lineNo );
             size_t str_length;
             char const * pz;
 
-            pzSfxFmt = pz = resolveSCM(str);
+            pzSfxFmt = pz = scm2display(str);
             str_length = strlen(pzSfxFmt);
 
             if (str_length == 0)
@@ -181,10 +181,10 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
              *  mess with allocating another string.
              */
             if (str_length < spn - sfx_len)
-                strcpy(pOS->zSuffix + sfx_len, pzSfxFmt);
+                strcpy(pOS->os_sfx + sfx_len, pzSfxFmt);
             else {
-                AGDUPSTR(pOS->pzFileFmt, pzSfxFmt, "suffix format");
-                pOS->deallocFmt = AG_TRUE;
+                AGDUPSTR(pOS->os_file_fmt, pzSfxFmt, "suffix format");
+                pOS->os_dealloc_fmt = true;
             }
         }
 
@@ -193,7 +193,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
          *  IF the suffix does not start with punctuation,
          *  THEN we will insert a '.' of our own.
          */
-        pOS->pzFileFmt = IS_VAR_FIRST_CHAR(pOS->zSuffix[0])
+        pOS->os_file_fmt = IS_VAR_FIRST_CHAR(pOS->os_sfx[0])
             ? DOT_SFX_FMT : SFX_FMT;
     }
 
@@ -231,8 +231,8 @@ handle_hash_line(char const * pz)
             char * sp = malloc(len + 7); // len + "SHELL=" + NUL byte
             sprintf(sp, HANDLE_HASH_ENV_FMT, HANDLE_HASH_SHELL, nmbuf);
             putenv(sp);
-            AGDUPSTR(pzShellProgram, nmbuf, "prog shell");
-            AGDUPSTR(serverArgs[0],  nmbuf, "shell name");
+            AGDUPSTR(shell_program, nmbuf, "prog shell");
+            AGDUPSTR(server_args[0],  nmbuf, "shell name");
         }
     }
 
@@ -257,13 +257,13 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
      *  start macro marker is illegal.  Otherwise, our scan pointer is
      *  after some valid token, which won't be the start of a line, either.
      */
-    ag_bool line_start = AG_FALSE;
+    bool line_start = false;
 
  skipWhiteSpace:
     while (IS_WHITESPACE_CHAR(*pzData)) {
         if (*(pzData++) == NL) {
-            line_start = AG_TRUE;
-            templLineNo++;
+            line_start = true;
+            tpl_line++;
 
             /*
              *  IF we are done with the macro markers,
@@ -366,7 +366,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
         if (! IS_PUNCTUATION_CHAR(ch))
             break;
         *(pzMark++) = ch;
-        if (++ct >= sizeof(zStartMac))
+        if (++ct >= sizeof(start_mac))
             return NULL;
 
         pzData++;
@@ -376,7 +376,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
     *pzMark = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, TRACE_COPY_MARK, pzMark - ct);
+        fprintf(trace_fp, TRACE_COPY_MARK, pzMark - ct);
 
     return pzData;
 }
@@ -395,7 +395,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
 
     te_pm_state fsm_state  = PM_ST_INIT;
 
-    templLineNo  = 1;
+    tpl_line  = 1;
 
     while (fsm_state != PM_ST_DONE) {
         te_pm_event fsm_tkn = next_pm_token(&pzData, fsm_state, pzFileName);
@@ -423,14 +423,14 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copy_mark(pzData, zStartMac, &startMacLen);
+            pzData = copy_mark(pzData, start_mac, &st_mac_len);
             if (pzData == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copy_mark(pzData, zEndMac, &endMacLen);
+            pzData = copy_mark(pzData, end_mac, &end_mac_len);
             if (pzData == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
@@ -439,21 +439,21 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
              *  it is exactly twice as long as the start macro, then
              *  presume that someone ran the two markers together.
              */
-            if (  (endMacLen == 2 * startMacLen)
-               && (strcmp(zStartMac, zEndMac + startMacLen) == 0))  {
-                pzData -= startMacLen;
-                zEndMac[ startMacLen ] = NUL;
-                endMacLen = startMacLen;
+            if (  (end_mac_len == 2 * st_mac_len)
+               && (strcmp(start_mac, end_mac + st_mac_len) == 0))  {
+                pzData -= st_mac_len;
+                end_mac[ st_mac_len ] = NUL;
+                end_mac_len = st_mac_len;
             }
 
-            if (strstr(zEndMac, zStartMac) != NULL)
+            if (strstr(end_mac, start_mac) != NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_ENDER);
-            if (strstr(zStartMac, zEndMac) != NULL)
+            if (strstr(start_mac, end_mac) != NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_STARTER);
             break;
 
         case PM_TR_TEMPL_SUFFIX:
-            pzData = do_suffix(pzData, pzFileName, templLineNo);
+            pzData = do_suffix(pzData, pzFileName, tpl_line);
             break;
 
         case PM_TR_TEMPL_SCHEME:
@@ -484,7 +484,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
     return pzData;
 
  abort_load:
-    AG_ABEND(aprf(PSEUDO_MAC_ERR_FMT, pzFileName, templLineNo, pzBadness));
+    AG_ABEND(aprf(PSEUDO_MAC_ERR_FMT, pzFileName, tpl_line, pzBadness));
 #   undef BAD_MARKER
     return NULL;
 }

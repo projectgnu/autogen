@@ -1764,6 +1764,13 @@ GNU layout, with the @code{AUTOOPTS_USAGE} environment variable used
 to request @code{autoopts} layout.
 See @xref{Caveats, Developer and User Notes}.
 
+@item usage-opt
+@vindex usage-opt
+I apologize for too many confusing usages of usage.
+This attribute specifies that @code{--usage} and/or @code{-u} be
+supported.  The help (usage) text displayed will be abbreviated
+when compared to the default help text.
+
 @item no-misuse-usage
 @vindex no-misuse-usage
 When there is a command line syntax error, by default AutoOpts will
@@ -3194,6 +3201,7 @@ default: /* utterly impossible */ ;
 @end example
 
 AutoOpts produces a special purpose procedure for this option.
+You may not specify an alternate handling procedure.
 
 If you have need for the string name of the selected keyword, you
 may obtain this with the macro, @code{OPT_OPTN_NAME_VAL2STR(val)}.
@@ -3213,6 +3221,12 @@ printf( "you selected the %s keyword\n",
 another prefix by specifying a
 @vindex prefix-enum
 @code{prefix-enum} attribute.
+
+Finally, users may specify the argument either by name or by number.
+Since the numeric equivalents change by having new entries inserted
+into the keyword list, this would not be a recommended practice.
+However, either @code{-1} or @code{~0} will always be equivalent to
+specifying the last keyword.
 
 @node arg-type set membership
 @subsubsection Arg Type Set Membership

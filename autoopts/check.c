@@ -32,7 +32,7 @@
 /**
  *  Check for conflicts based on "must" and "cannot" attributes.
  */
-static ag_bool
+static bool
 has_conflict(tOptions * pOpts, tOptDesc * pOD)
 {
     if (pOD->pOptMust != NULL) {
@@ -43,7 +43,7 @@ has_conflict(tOptions * pOpts, tOptDesc * pOD)
             if (UNUSED_OPT(p)) {
                 const tOptDesc * pN = pOpts->pOptDesc + pMust[-1];
                 fprintf(stderr, zReqFmt, pOD->pz_Name, pN->pz_Name);
-                return AG_TRUE;
+                return true;
             }
         }
     }
@@ -56,18 +56,18 @@ has_conflict(tOptions * pOpts, tOptDesc * pOD)
             if (SELECTED_OPT(p)) {
                 const tOptDesc* pN = pOpts->pOptDesc + pCant[-1];
                 fprintf(stderr, zCantFmt, pOD->pz_Name, pN->pz_Name);
-                return AG_TRUE;
+                return true;
             }
         }
     }
 
-    return AG_FALSE;
+    return false;
 }
 
 /**
  *  Check that the option occurs often enough.  Too often is already checked.
  */
-static ag_bool
+static bool
 occurs_enough(tOptions * pOpts, tOptDesc * pOD)
 {
     /*
@@ -75,7 +75,7 @@ occurs_enough(tOptions * pOpts, tOptDesc * pOD)
      *  THEN there is no problem.
      */
     if (pOD->optOccCt >= pOD->optMinCt)
-        return AG_TRUE;
+        return true;
 
     /*
      *  IF MUST_SET means SET and PRESET are okay,
@@ -83,12 +83,12 @@ occurs_enough(tOptions * pOpts, tOptDesc * pOD)
      */
     if (  (pOD->fOptState & OPTST_MUST_SET)
        && (pOD->fOptState & (OPTST_PRESET | OPTST_SET)) )
-        return AG_TRUE;
+        return true;
 
     if (pOD->optMinCt > 1)
          fprintf(stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt);
     else fprintf(stderr, zNeedOne, pOD->pz_Name);
-    return AG_FALSE;
+    return false;
 }
 
 /**
@@ -96,7 +96,7 @@ occurs_enough(tOptions * pOpts, tOptDesc * pOD)
  *
  *  Make sure that the argument list passes our consistency tests.
  */
-LOCAL ag_bool
+LOCAL bool
 is_consistent(tOptions * pOpts)
 {
     tOptDesc * pOD   = pOpts->pOptDesc;
@@ -114,7 +114,7 @@ is_consistent(tOptions * pOpts)
          */
         if (SELECTED_OPT(pOD)) {
             if (has_conflict(pOpts, pOD))
-                return AG_FALSE;
+                return false;
         }
 
         /*
@@ -126,7 +126,7 @@ is_consistent(tOptions * pOpts)
            || (pOD->optEquivIndex == pOD->optIndex) )
 
             if (! occurs_enough(pOpts, pOD))
-                return AG_FALSE;
+                return false;
 
         if (--oCt <= 0)
             break;
@@ -145,7 +145,7 @@ is_consistent(tOptions * pOpts)
         if ((pOpts->fOptSet & OPTPROC_NO_ARGS) != 0) {
             if (pOpts->origArgCt > pOpts->curOptIdx) {
                 fprintf(stderr, zNoArgs, pOpts->pzProgName);
-                return AG_FALSE;
+                return false;
             }
         }
 
@@ -155,10 +155,10 @@ is_consistent(tOptions * pOpts)
         else if ((pOpts->fOptSet & OPTPROC_ARGS_REQ) != 0) {
             if (pOpts->origArgCt <= pOpts->curOptIdx) {
                 fprintf(stderr, zArgsMust, pOpts->pzProgName);
-                return AG_FALSE;
+                return false;
             }
         }
     }
 
-    return AG_TRUE;
+    return true;
 }

@@ -2,7 +2,7 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2012-01-29 09:42:56 bkorb"
+ *  Time-stamp:        "2012-03-04 13:54:56 bkorb"
  *
  *  This module implements formatting expression functions.
  *
@@ -115,18 +115,18 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
 
     {
         char const * pz;
-        tFpStack *   pfp = pCurFp;
-        char const * tpl_name = strrchr(pzTemplFileName, DIRCH);
+        out_stack_t *   pfp = cur_fpstack;
+        char const * tpl_name = strrchr(tpl_fname, DIRCH);
         if (tpl_name == NULL)
-            tpl_name = pzTemplFileName;
+            tpl_name = tpl_fname;
         else
             tpl_name++;
 
-        while (pfp->flags & FPF_UNLINK)  pfp = pfp->pPrev;
+        while (pfp->stk_flags & FPF_UNLINK)  pfp = pfp->stk_prev;
         if (! ENABLED_OPT(DEFINITIONS))
             pz = "<<no definitions>>";
 
-        else if (*pzOopsPrefix != NUL)
+        else if (*oops_pfx != NUL)
             pz = "<<CGI-definitions>>";
 
         else {
@@ -136,7 +136,7 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         }
 
         pzRes = aprf(ENABLED_OPT(WRITABLE) ? EXP_FMT_DNE2 : EXP_FMT_DNE,
-                     pzPrefix, pfp->pzOutName, date_str,
+                     pzPrefix, pfp->stk_fname, date_str,
                      pz, tpl_name, pzFirst);
     }
 
@@ -240,15 +240,15 @@ ag_scm_error(SCM res)
      */
     if (*pzMsg != NUL) {
         char* pz = aprf(DEF_NOTE_FMT, (abrt != PROBLEM) ? ERROR_STR : WARN_STR,
-                        pCurTemplate->pzTplFile, pCurMacro->lineNo,
-                        pCurFp->pzOutName, pzMsg);
+                        current_tpl->td_file, cur_macro->md_line,
+                        cur_fpstack->stk_fname, pzMsg);
         if (abrt != PROBLEM)
             AG_ABEND(pz);
-        fputs(pz, pfTrace);
+        fputs(pz, trace_fp);
         AGFREE((void*)pz);
     }
 
-    longjmp(fileAbort, abrt);
+    longjmp(abort_jmp_buf, abrt);
     /* NOTREACHED */
     return SCM_UNDEFINED;
 }
@@ -385,7 +385,7 @@ find_lic_text(
     if (strcmp(lic_pz, FIND_LIC_TEXT_MBSD+1) == 0)
         lic_pz = FIND_LIC_TEXT_MBSD;
 
-    if (! SUCCESSFUL(findFile(lic_pz, fname, lic_sfx, NULL)))
+    if (! SUCCESSFUL(find_file(lic_pz, fname, lic_sfx, NULL)))
         return NULL;
 
     {
@@ -415,7 +415,7 @@ find_lic_text(
         fclose(fp);
     }
 
-    if (pfDepends != NULL)
+    if (dep_fp != NULL)
         add_source_file(fname);
 
     {
@@ -617,8 +617,7 @@ ag_scm_license_name(SCM lic)
     char * e;
 
     txt = SPN_WHITESPACE_CHARS(txt);
-    e   = txt + strlen(txt);
-    while (IS_WHITESPACE_CHAR(e[-1]) && (e > txt))  e--;
+    e   = SPN_WHITESPACE_BACK(txt, txt);
     *e  = NUL;
     lic = AG_SCM_STR02SCM(txt);
     return lic;
@@ -757,7 +756,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         /*
          *  Find the template file somewhere
          */
-        if (! SUCCESSFUL(findFile(pzLicense, fname, apzSfx, NULL))) {
+        if (! SUCCESSFUL(find_file(pzLicense, fname, apzSfx, NULL))) {
             errno = ENOENT;
             AG_CANT(MK_LIC_NO_LIC, pzLicense);
         }
@@ -773,7 +772,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
             if (TEXT_MMAP_FAILED_ADDR(lic.mi.txt_data))
                 AG_ABEND(aprf(MK_LIC_NO_OPEN, pzLicense));
 
-            if (pfDepends != NULL)
+            if (dep_fp != NULL)
                 add_source_file(pzLicense);
 
             AGDUPSTR(lic.pzFN, fname, "lic f name");

@@ -2,7 +2,7 @@
 /**
  * @file expMake.c
  *
- *  Time-stamp:        "2012-01-29 20:15:59 bkorb"
+ *  Time-stamp:        "2012-03-04 13:54:13 bkorb"
  *
  *  This module implements Makefile construction functions.
  *
@@ -22,7 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-static char const zNl[]  = " ; \\\n";
 
 /**
  * Figure out how to handle the line continuation.
@@ -38,10 +37,10 @@ static char const zNl[]  = " ; \\\n";
  * @param  tabch line prefix (tab) character
  * @param  bol   pointer to start of currently-being-output line
  *
- * @returns AG_FALSE to say the newline is dropped becase we're done
- *          AG_TRUE  to say the line was appended with the newline.
+ * @returns false to say the newline is dropped becase we're done
+ *          true  to say the line was appended with the newline.
  */
-static ag_bool
+static bool
 handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
 {
     char * pzScn = *ppzi;
@@ -51,7 +50,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
     /*
      *  Backup past trailing white space (other than newline).
      */
-    while (IS_WHITESPACE_CHAR(pzOut[ -1 ]) && (pzOut[ -1 ] != NL))
+    while (IS_NON_NL_WHITE_CHAR(pzOut[-1]))
         pzOut--;
 
     /*
@@ -70,7 +69,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
      *  The final newline is dropped.
      */
     if (*pzScn == NUL)
-        return AG_FALSE;
+        return false;
 
     switch (pzOut[-1]) {
     case '\\':
@@ -83,9 +82,8 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
 
     case '&':
         /*
-         *  A single ampersand is a backgrounded command.
-         *  We must terminate those statements, but not
-         *  statements conjoined with '&&'.
+         *  A single ampersand is a backgrounded command.  We must terminate
+         *  those statements, but not statements conjoined with '&&'.
          */
         if ('&' != pzOut[-2])
             goto append_statement_end;
@@ -95,11 +93,11 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
     case ';':
     skip_semi_colon:
         /*
-         *  Whatever the reason for a final '|' or ';' we will not
-         *  add a semi-colon after it.
+         *  Whatever the reason for a final '|', '&' or ';',
+         *  we will not add a semi-colon after it.
          */
-        strcpy(pzOut, zNl + 2);
-        pzOut += sizeof(zNl) - 3;
+        memcpy(pzOut, MAKE_SCRIPT_NL + 2, MAKE_SCRIPT_NL_LEN - 2);
+        pzOut += MAKE_SCRIPT_NL_LEN - 2;
         break;
 
     case 'n': // "then" or "in"
@@ -116,7 +114,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
            || (  (l_len > 5)
               && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
             goto append_statement_end;
-        if (strncmp(pzOut-4, HANDLE_EOL__THE, 3) == 0)
+        if (strncmp(pzOut-4, HANDLE_EOL__THE, HANDLE_EOL__THE_LEN) == 0)
             goto skip_semi_colon;
         goto append_statement_end;
 
@@ -125,7 +123,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
            || (  (l_len > 5)
               && ! IS_WHITESPACE_CHAR(pzOut[-5]) ))
             goto append_statement_end;
-        if (strncmp(pzOut-4, HANDLE_EOL__ELS, 3) == 0)
+        if (strncmp(pzOut-4, HANDLE_EOL__ELS, HANDLE_EOL__ELS_LEN) == 0)
             goto skip_semi_colon;
         goto append_statement_end;
 
@@ -134,14 +132,14 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
         /*
          *  Terminate the current command and escape the newline.
          */
-        strcpy(pzOut, zNl);
-        pzOut += sizeof(zNl) - 1;
+        memcpy(pzOut, MAKE_SCRIPT_NL, MAKE_SCRIPT_NL_LEN);
+        pzOut += MAKE_SCRIPT_NL_LEN;
     }
 
     /*
-     *  We have now started our next output line and there are
-     *  still data.  Indent with a tab, if called for.  If we do
-     *  insert a tab, then skip leading tabs on the line.
+     *  We have now started our next output line and there are still data.
+     *  Indent with a tab, if called for.  If we do insert a tab, then skip
+     *  leading tabs on the line.
      */
     if (tabch) {
         *(pzOut++) = tabch;
@@ -150,7 +148,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
 
     *ppzi = pzScn;
     *ppzo = pzOut;
-    return AG_TRUE;
+    return true;
 }
 
 /**
@@ -159,10 +157,10 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
  *
  * @param txt   pointer to text.  We skip initial white space.
  * @param tab   pointer to where we stash the tab character to use
- * @returns     AG_TRUE to say this was a sed line and was emitted,
- *              AG_FALSE to say it was not and needs to be copied out.
+ * @returns     true to say this was a sed line and was emitted,
+ *              false to say it was not and needs to be copied out.
  */
-static ag_bool
+static bool
 handle_sed_expr(char ** src_p, char ** out_p)
 {
     char * src = *src_p;
@@ -170,36 +168,41 @@ handle_sed_expr(char ** src_p, char ** out_p)
 
     switch (src[1]) {
     case 'i':
-        if (strncmp(src+2, HANDLE_SED_IFNDEF, 6) == 0)
+        if (strncmp(src+2, HANDLE_SED_IFNDEF, HANDLE_SED_IFNDEF_LEN) == 0)
             break;
-        if (strncmp(src+2, HANDLE_SED_IFDEF, 5) == 0)
+        if (strncmp(src+2, HANDLE_SED_IFDEF, HANDLE_SED_IFDEF_LEN) == 0)
             break;
-        return AG_FALSE;
+        return false;
 
     case 'e':
-        if (strncmp(src+2, HANDLE_SED_ELSE, 4) == 0)
+        if (strncmp(src+2, HANDLE_SED_ELSE, HANDLE_SED_ELSE_LEN) == 0)
             break;
-        if (strncmp(src+2, HANDLE_SED_ENDIF, 5) == 0)
+        if (strncmp(src+2, HANDLE_SED_ENDIF, HANDLE_SED_ENDIF_LEN) == 0)
             break;
         /* FALLTHROUGH */
     default:
-        return AG_FALSE;
+        return false;
     }
 
-    for (;;) {
-        char ch = *(src);
-        *(out++) = ch;
-        if (ch == NL)
-            break;
+    {
+        char * p = BRK_NEWLINE_CHARS(src);
+        size_t l;
+        if (*p == NL) /* do not skip NUL */
+            p++;
+        l = p - src;
+        memcpy(out, src, l);
+        *src_p = src + l;
+        *out_p = out + l;
     }
-    *out_p = out;
-    *src_p = src;
-    return AG_TRUE;
+
+    return true;
 }
 
 /**
- * Compute a maximal size for the output script.
- * Leading and trailing white space are trimmed.
+ * Compute a maximal size for the output script.  Leading and trailing white
+ * space are trimmed.  Dollar characters will likely be doubled and newlines
+ * may get as many as MAKE_SCRIPT_NL_LEN characters inserted.  Make sure
+ * there's space.
  *
  * @param txt   pointer to text.  We skip initial white space.
  * @param tab   pointer to where we stash the tab character to use
@@ -210,7 +213,7 @@ script_size(char ** txt_p, char * tab)
 {
     char * txt = *txt_p;
     char * ptxte;
-    size_t sz = 0;
+    size_t sz  = 0;
 
     /*
      *  skip all blank lines and other initial white space
@@ -232,21 +235,19 @@ script_size(char ** txt_p, char * tab)
     /*
      *  "txt" is now our starting point.  Do not modify it any more.
      */
-    *txt_p = ptxte = txt;
+    *txt_p = txt;
 
-    for (;;)  {
-        char * p = strpbrk(ptxte+1, SCRIPT_SIZE_SCAN_END);
-        if (p == NULL)
+    for (ptxte = txt - 1;;)  {
+        ptxte = BRK_MAKE_SCRIPT_CHARS(ptxte+1);
+        if (*ptxte == NUL)
             break;
-        sz += (*p == NL) ? sizeof(zNl) : 1;
-        ptxte = p;
+        sz += (*ptxte == '$') ? 1 : MAKE_SCRIPT_NL_LEN;
     }
 
-    ptxte += strlen(ptxte);
-    while (IS_WHITESPACE_CHAR(ptxte[-1]))
-        ptxte--;
+    ptxte = SPN_WHITESPACE_BACK(txt, ptxte);
     *ptxte = NUL;
-    return (ptxte - txt) + sz;
+    sz += (ptxte - txt);
+    return sz;
 }
 
 /*=gfunc makefile_script
@@ -278,9 +279,9 @@ script_size(char ** txt_p, char * tab)
  *  If the line ends with a backslash, it is left alone.
  *
  *  @item
- *  If the line ends with a semi-colon, conjunction operator,
- *  pipe (vertical bar) or one of the keywords "then", "else" or "in", then
- *  a space and a backslash is added, but no semi-colon.
+ *  If the line ends with a semi-colon, conjunction operator, pipe (vertical
+ *  bar) or one of the keywords "then", "else" or "in", then a space and a
+ *  backslash is added, but no semi-colon.
  *
  *  @item
  *  The dollar sign character is doubled, unless it immediately precedes an
@@ -330,81 +331,93 @@ script_size(char ** txt_p, char * tab)
  *  @end example
 =*/
 SCM
-ag_scm_makefile_script(SCM text)
+ag_scm_makefile_script(SCM text_scm)
 {
-    SCM    res;
-    char*  pzText = ag_scm2zchars(text, "GPL line prefix");
-    char   tabch;
-    size_t sz     = script_size(&pzText, &tabch);
+    char * res_str; /*@< result string */
+    char * out;     /*@< output scanning ptr */
+    char * bol;     /*@< start of last output line */
+    char   tabch;   /*@< char to use for start-of-line tab */
+
+    char * text = ag_scm2zchars(text_scm, "make script");
+    size_t sz   = script_size(&text, &tabch);
 
     if (sz == 0)
         return AG_SCM_STR02SCM(zNil);
 
-    {
-        char * res_str    = ag_scribble(sz);
-        char * out_scan   = res_str;
-        char * src_scan   = pzText;
-        char * start_line = out_scan;
-        /*
-         *  Force the initial line to start with a tab.
-         */
-        *(out_scan++) = TAB;
+    bol = out = res_str = ag_scribble(sz);
 
-        for (;;) {
-            char ch = *(src_scan++);
-            switch (ch) {
-            case NL:
-                if (! handle_eol(&src_scan, &out_scan, tabch, start_line))
-                    goto copy_done;
-                start_line = out_scan;
+    /*
+     *  Force the initial line to start with a real tab.
+     */
+    *(out++) = TAB;
+
+    for (;;) {
+        char * p = BRK_MAKE_SCRIPT_CHARS(text);
+        size_t l = p - text;
+        if (l > 0) {
+            memcpy(out, text, l);
+            text  = p;
+            out += l;
+        }
+
+        /*
+         * "text" now points to one of three characters:
+         * a newline, a dollar or a NUL byte.
+         */
+        if (*text == NUL)
+            break;
+
+        if (*text == NL) {
+            if (! handle_eol(&text, &out, tabch, bol))
                 break;
 
-            case NUL:
-                goto copy_done;
+            bol = out;
+
+            /*
+             * As a special "hack", if a line starts with "@ifdef", "@ifndef",
+             * "@else" or "@endif", then we assume post processing sed will
+             * fix it up.  Those lines get left alone.
+             */
+            if (*text == '@') {
+                if (handle_sed_expr(&text, &out))
+                    bol = out;
+            }
+
+        } else {
+            /*
+             * Quadruple a double dollar, leave alone make-interesting
+             * dollars, and double it otherwise.
+             */
+            switch (text[1]) {
+            case '(': case '*': case '@': case '<': case '%': case '?':
+                /* one only */
+                break;
 
             case '$':
                 /*
-                 *  Double the dollar -- IFF it is not a makefile macro
+                 *  $$ in the shell means process id.  Avoid having to do a
+                 *  backward scan on the second '$' by handling the next '$'
+                 *  now.  We get FOUR '$' chars.
                  */
-                switch (*src_scan) {
-                case '(': case '*': case '@': case '<': case '%': case '?':
-                    break;
-
-                case '$':
-                    /*
-                     *  Another special case:  $$ in the shell means process id
-                     *  Avoid having to do a backward scan on the second '$'
-                     *  by handling the next '$' now.  We get FOUR '$' chars.
-                     */
-                    src_scan++;
-                    *(out_scan++) = '$';
-                    *(out_scan++) = '$';
-                    *(out_scan++) = '$';
-                    break;
-
-                default:
-                    *(out_scan++) = '$'; /* double, not quadruple */
-                }
-                *(out_scan++) = ch;
+                text++;
+                *(out++) = '$';
+                *(out++) = '$';
+                *(out++) = '$';
+                /* quadruple */
                 break;
 
-            case '@':
-                if (start_line == out_scan)
-                    if (handle_sed_expr(&src_scan, &out_scan)) {
-                        start_line = out_scan;
-                        break;
-                    }
-                /* FALLTHROUGH */
-
             default:
-                *(out_scan++) = ch;
+                *(out++) = '$'; /* double */
             }
-        } copy_done:;
 
-        res = AG_SCM_STR2SCM(res_str, out_scan - res_str);
+            *(out++) = *(text++);
+        }
     }
 
-    return res;
+    {
+        SCM res = AG_SCM_STR2SCM(res_str, out - res_str);
+        return res;
+    }
 }
 
 /*

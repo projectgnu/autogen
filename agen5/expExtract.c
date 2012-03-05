@@ -1,7 +1,7 @@
 /**
  * @file expExtract.c
  *
- *  Time-stamp:        "2011-12-30 15:19:39 bkorb"
+ *  Time-stamp:        "2012-03-04 09:16:59 bkorb"
  *
  *  This module implements a file extraction function.
  *
@@ -101,8 +101,8 @@ load_extract_file(char const* pzNewFile)
             goto bad_return;
         }
 
-        if (outTime <= stbf.st_mtime)
-            outTime = stbf.st_mtime + 1;
+        if (outfile_time < stbf.st_mtime)
+            outfile_time = stbf.st_mtime;
 
         do  {
             size_t sz = fread(pzIn, (size_t)1, (size_t)sbuf.st_size, fp);
@@ -119,7 +119,7 @@ load_extract_file(char const* pzNewFile)
         *pzIn = NUL;
         fclose(fp);
 
-        if (pfDepends != NULL)
+        if (dep_fp != NULL)
             add_source_file(pzNewFile);
     }
 
@@ -341,10 +341,10 @@ ag_scm_find_file(SCM file, SCM suffix)
             char* apz[2];
             apz[0] = (char *)ag_scm2zchars(suffix, "file suffix");
             apz[1] = NULL;
-            if (SUCCESSFUL(findFile(pz, z, (char const **)apz, NULL)))
+            if (SUCCESSFUL(find_file(pz, z, (char const **)apz, NULL)))
                 res = AG_SCM_STR02SCM(z);
 
-        } else if (SUCCESSFUL(findFile(pz, z, NULL, NULL)))
+        } else if (SUCCESSFUL(find_file(pz, z, NULL, NULL)))
             res = AG_SCM_STR02SCM(z);
     }
 

@@ -2,7 +2,7 @@
 /**
  * @file agCgi.c
  *
- *  Time-stamp:        "2011-12-30 17:51:56 bkorb"
+ *  Time-stamp:        "2012-03-04 19:19:12 bkorb"
  *
  *  This is a CGI wrapper for AutoGen.  It will take POST-method
  *  name-value pairs and emit AutoGen definitions to a spawned
@@ -86,7 +86,7 @@ loadCgi(void)
      */
     dup2(STDOUT_FILENO, STDERR_FILENO);
     (void)fdopen(STDERR_FILENO, "w" FOPEN_BINARY_FLAG);
-    pzOopsPrefix = CGI_ERR_MSG_FMT;
+    oops_pfx = CGI_ERR_MSG_FMT;
     {
         int tmpfd;
         AGDUPSTR(cgi_stderr, CGI_TEMP_ERR_FILE_STR, "stderr file");
@@ -112,8 +112,8 @@ loadCgi(void)
         } while (pNM++, ++ix < NAME_CT);
     }
 
-    pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "CGI ctx");
-    memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
+    base_ctx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t), "CGI ctx");
+    memset((void*)base_ctx, 0, sizeof(scan_ctx_t));
 
     {
         size_t textLen = strtoul(pzCgiLength, NULL, 0);
@@ -129,13 +129,13 @@ loadCgi(void)
 
             pzText[ textLen ] = NUL;
 
-            pBaseCtx->pzData = parseInput(pzText, (int)textLen);
+            base_ctx->scx_data = parseInput(pzText, (int)textLen);
             AGFREE(pzText);
 
         } else if (strcasecmp(pzCgiMethod, LOAD_CGI_GET_NAME) == 0) {
             if (textLen == 0)
                 textLen = strlen(pzCgiQuery);
-            pBaseCtx->pzData = parseInput(pzCgiQuery, (int)textLen);
+            base_ctx->scx_data = parseInput(pzCgiQuery, (int)textLen);
 
         } else {
             AG_ABEND(aprf(LOAD_CGI_INVAL_REQ_FMT, pzCgiMethod));
@@ -146,9 +146,9 @@ loadCgi(void)
         }
     }
 
-    pBaseCtx->lineNo     = 1;
-    pBaseCtx->pzCtxFname = LOAD_CGI_DEFS_MARKER;
-    pBaseCtx->pzScan     = pBaseCtx->pzData;
+    base_ctx->scx_line  = 1;
+    base_ctx->scx_fname = LOAD_CGI_DEFS_MARKER;
+    base_ctx->scx_scan  = base_ctx->scx_data;
 }
 
 

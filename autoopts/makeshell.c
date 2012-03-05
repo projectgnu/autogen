@@ -716,7 +716,7 @@ open_out(char const * pzFile)
          */
         script_trailer = pzScan + END_MARK_LEN;
         script_leader  = pzData;
-    } while (AG_FALSE);
+    } while (false);
 
     if (freopen(pzFile, "w" FOPEN_BINARY_FLAG, stdout) != stdout) {
         fprintf(stderr, zFreopenFail, errno, strerror(errno));

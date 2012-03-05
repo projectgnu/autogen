@@ -2,7 +2,7 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-01-29 20:21:28 bkorb"
+ *  Time-stamp:        "2012-03-04 19:17:32 bkorb"
  *
  *  This module implements text functions.
  *
@@ -40,23 +40,23 @@
  *  @samp{IF} and @samp{WHILE}; extending through their respective
  *  terminating macro functions.
 =*/
-tMacro*
-mFunc_Include(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Include(templ_t* pT, macro_t* pMac)
 {
-    tTemplate *   pNewTpl;
-    ag_bool       needFree;
-    char const *  pzFile = evalExpression(&needFree);
-    tMacro*       pM;
+    templ_t *   pNewTpl;
+    bool       needFree;
+    char const *  pzFile = eval_mac_expr(&needFree);
+    macro_t*       pM;
 
     if (*pzFile != NUL) {
-        pNewTpl = loadTemplate(pzFile, pT->pzTplFile);
+        pNewTpl = tpl_load(pzFile, pT->td_file);
 
         /*
          *  Strip off trailing white space from included templates
          */
-        pM = pNewTpl->aMacros + (pNewTpl->macroCt - 1);
-        if (pM->funcCode == FTYP_TEXT) {
-            char* pz  = pNewTpl->pzTemplText + pM->ozText;
+        pM = pNewTpl->td_macros + (pNewTpl->td_mac_ct - 1);
+        if (pM->md_code == FTYP_TEXT) {
+            char* pz  = pNewTpl->td_text + pM->md_txt_off;
             char* pzE = pz + strlen(pz);
             while ((pzE > pz) && IS_WHITESPACE_CHAR(pzE[-1]))  --pzE;
 
@@ -64,21 +64,21 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
              *  IF there is no text left, remove the macro entirely
              */
             if (pz == pzE)
-                 pNewTpl->macroCt--;
+                 pNewTpl->td_mac_ct--;
             else *pzE = NUL;
         }
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE) {
-            fprintf(pfTrace, TRACE_FN_INC_TPL, pNewTpl->pzTplFile);
+            fprintf(trace_fp, TRACE_FN_INC_TPL, pNewTpl->td_file);
             if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                fprintf(pfTrace, TRACE_FN_INC_LINE, pCurTemplate->pzTplFile,
-                        pMac->lineNo);
+                fprintf(trace_fp, TRACE_FN_INC_LINE, current_tpl->td_file,
+                        pMac->md_line);
         }
 
-        generateBlock(pNewTpl, pNewTpl->aMacros,
-                      pNewTpl->aMacros + pNewTpl->macroCt);
-        unloadTemplate(pNewTpl);
-        pCurTemplate = pT;
+        generateBlock(pNewTpl, pNewTpl->td_macros,
+                      pNewTpl->td_macros + pNewTpl->td_mac_ct);
+        tpl_unload(pNewTpl);
+        current_tpl = pT;
     }
 
     if (needFree)
@@ -94,10 +94,10 @@ mFunc_Include(tTemplate* pT, tMacro* pMac)
  *  Simply verify that there is some argument to this macro.
  *  Regular "expr" macros are their own argument, so there is always one.
  */
-tMacro*
-mLoad_Include(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_Include(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    if ((int)pMac->res == 0)
+    if ((int)pMac->md_res == 0)
         AG_ABEND_IN(pT, pMac, LD_INC_NO_FNAME);
     return mLoad_Expr(pT, pMac, ppzScan);
 }
@@ -119,40 +119,41 @@ mLoad_Include(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
  *
  *  You may not specify @code{UNKNOWN} explicitly.
 =*/
-tMacro*
-mFunc_Unknown(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Unknown(templ_t* pT, macro_t* pMac)
 {
-    tTemplate * pInv = findTemplate(pT->pzTemplText + pMac->ozName);
+    templ_t * pInv = findTemplate(pT->td_text + pMac->md_name_off);
     if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf(pfTrace, TRACE_FN_REMAPPED, TRACE_FN_REMAP_INVOKE,
-                    pMac->funcCode, pT->pzTplFile, pMac->lineNo);
-        pMac->funcCode    = FTYP_DEFINE;
-        pMac->funcPrivate = (void*)pInv;
+            fprintf(trace_fp, TRACE_FN_REMAPPED, TRACE_FN_REMAP_INVOKE,
+                    pMac->md_code, pT->td_file, pMac->md_line);
+        pMac->md_code    = FTYP_DEFINE;
+        pMac->md_pvt = (void*)pInv;
         parseMacroArgs(pT, pMac);
         return mFunc_Define(pT, pMac);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-        fprintf(pfTrace, TRACE_FN_REMAPPED, TRACE_FN_REMAP_EXPR,
-                pMac->funcCode, pT->pzTplFile, pMac->lineNo);
-        fprintf(pfTrace, TRACE_FN_REMAP_BASE, pT->pzTemplText + pMac->ozName);
+        fprintf(trace_fp, TRACE_FN_REMAPPED, TRACE_FN_REMAP_EXPR,
+                pMac->md_code, pT->td_file, pMac->md_line);
+        fprintf(trace_fp, TRACE_FN_REMAP_BASE,
+                pT->td_text + pMac->md_name_off);
     }
 
-    pMac->funcCode = FTYP_EXPR;
-    if (pMac->ozText == 0) {
-        pMac->res = EMIT_VALUE;
+    pMac->md_code = FTYP_EXPR;
+    if (pMac->md_txt_off == 0) {
+        pMac->md_res = EMIT_VALUE;
 
     } else {
-        char* pzExpr = pT->pzTemplText + pMac->ozText;
+        char* pzExpr = pT->td_text + pMac->md_txt_off;
         switch (*pzExpr) {
         case ';':
         case '(':
-            pMac->res = EMIT_EXPRESSION;
+            pMac->md_res = EMIT_EXPRESSION;
             break;
 
         case '`':
-            pMac->res = EMIT_SHELL;
+            pMac->md_res = EMIT_SHELL;
             spanQuote(pzExpr);
             break;
 
@@ -162,11 +163,11 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
             /* FALLTHROUGH */
 
         default:
-            pMac->res = EMIT_STRING;
+            pMac->md_res = EMIT_STRING;
         }
 
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            fprintf(pfTrace, TRACE_UNKNOWN_FMT, pMac->res, pzExpr);
+            fprintf(trace_fp, TRACE_UNKNOWN_FMT, pMac->md_res, pzExpr);
     }
 
     return mFunc_Expr(pT, pMac);
@@ -180,12 +181,12 @@ mFunc_Unknown(tTemplate* pT, tMacro* pMac)
  *  load_proc:
  *  unnamed:
 =*/
-tMacro*
-mFunc_Bogus(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Bogus(templ_t* pT, macro_t* pMac)
 {
-    char * pz = aprf(FN_BOGUS_FMT, pMac->funcCode,
-                     (pMac->funcCode < FUNC_CT)
-                     ? apzFuncNames[ pMac->funcCode ]
+    char * pz = aprf(FN_BOGUS_FMT, pMac->md_code,
+                     (pMac->md_code < FUNC_CT)
+                     ? apzFuncNames[ pMac->md_code ]
                      : FN_BOGUS_HUH);
 
     AG_ABEND_IN(pT, pMac, pz);
@@ -200,11 +201,11 @@ mFunc_Bogus(tTemplate* pT, tMacro* pMac)
  *  handler_proc:
  *  unnamed:
 =*/
-tMacro*
-mFunc_Text(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Text(templ_t* pT, macro_t* pMac)
 {
-    fputs(pT->pzTemplText + pMac->ozText, pCurFp->pFile);
-    fflush(pCurFp->pFile);
+    fputs(pT->td_text + pMac->md_txt_off, cur_fpstack->stk_fp);
+    fflush(cur_fpstack->stk_fp);
     return pMac + 1;
 }
 
@@ -227,8 +228,8 @@ mFunc_Text(tTemplate* pT, tMacro* pMac)
  *    [+ # say what you want, but no '+' before any ']' chars +]
  *    @end example
 =*/
-tMacro *
-mLoad_Comment(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
+macro_t *
+mLoad_Comment(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     memset((void*)pMac, 0, sizeof(*pMac));
     return pMac;
@@ -241,17 +242,17 @@ mLoad_Comment(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
  *  Move any text into the text offset field.
  *  This is used as the default load mechanism.
  */
-tMacro *
-mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
+macro_t *
+mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
-    char *        pzCopy = pT->pNext;
+    char *        pzCopy = pT->td_scan;
     char const *  pzSrc;
-    size_t        srcLen = (size_t)pMac->res;         /* macro len  */
+    size_t        srcLen = (size_t)pMac->md_res;         /* macro len  */
 
     if (srcLen <= 0)
         goto return_emtpy_expression;
 
-    pzSrc = (char const*)pMac->ozText; /* macro text */
+    pzSrc = (char const*)pMac->md_txt_off; /* macro text */
 
     switch (*pzSrc) {
     case ';':
@@ -281,7 +282,7 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
          *  this time as a canonical name (i.e. with '[', ']' and '.'
          *  characters and all blanks squeezed out)
          */
-        pzCopy = pT->pzTemplText + pMac->ozName;
+        pzCopy = pT->td_text + pMac->md_name_off;
 
         /*
          *  Move back the source pointer.  We may have skipped blanks,
@@ -303,7 +304,7 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
         pzSrc  += srcLen - remLen;
         srcLen  = remLen;
 
-        pT->pNext = pzCopy + strlen(pzCopy) + 1;
+        pT->td_scan = pzCopy + strlen(pzCopy) + 1;
         if (srcLen <= 0)
             goto return_emtpy_expression;
         break;
@@ -313,20 +314,20 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
     /*
      *  Copy the expression
      */
-    pzCopy = pT->pNext; /* next text dest   */
-    pMac->ozText = (pzCopy - pT->pzTemplText);
-    pMac->res    = 0;
+    pzCopy = pT->td_scan; /* next text dest   */
+    pMac->md_txt_off = (pzCopy - pT->td_text);
+    pMac->md_res    = 0;
     memcpy(pzCopy, pzSrc, srcLen);
     pzCopy      += srcLen;
     *(pzCopy++)  = NUL;
     *pzCopy      = NUL; /* double terminate */
-    pT->pNext    = pzCopy;
+    pT->td_scan  = pzCopy;
 
     return pMac + 1;
 
  return_emtpy_expression:
-    pMac->ozText = 0;
-    pMac->res    = 0;
+    pMac->md_txt_off = 0;
+    pMac->md_res    = 0;
     return pMac + 1;
 }
 
@@ -337,10 +338,10 @@ mLoad_Unknown(tTemplate * pT, tMacro * pMac, char const ** ppzScan)
  *  However, the load function pointer for those functions points
  *  here, until an "IF" function is encountered.
  */
-tMacro*
-mLoad_Bogus(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_Bogus(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    char const * pzSrc = (char const*)pMac->ozText; /* macro text */
+    char const * pzSrc = (char const*)pMac->md_txt_off; /* macro text */
     char const * pzMac;
 
     char z[ 64 ];
@@ -356,14 +357,14 @@ mLoad_Bogus(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
         pzSrc = zNil;
 
     {
-        int ix = pMac->funcCode;
+        int ix = pMac->md_code;
         if ((unsigned)ix >= FUNC_CT)
             ix = 0;
 
         pzMac = apzFuncNames[ ix ];
     }
 
-    pzSrc = aprf(LD_BOGUS_UNKNOWN, pT->pzTplFile, pMac->lineNo, pzMac, pzSrc);
+    pzSrc = aprf(LD_BOGUS_UNKNOWN, pT->td_file, pMac->md_line, pzMac, pzSrc);
 
     AG_ABEND_IN(pT, pMac, pzSrc);
     /* NOTREACHED */

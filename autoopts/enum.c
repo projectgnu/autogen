@@ -2,7 +2,7 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2012-01-29 19:07:59 bkorb"
+ * Time-stamp:      "2012-02-28 19:48:20 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -166,7 +166,16 @@ enum_err(tOptions * pOpts, tOptDesc * pOD,
     }
 }
 
-
+/**
+ * Convert a name or number into a binary number.
+ * "~0" and "-1" will be converted to the largest value in the enumeration.
+ *
+ * @param pzName     the keyword name (number) to convert
+ * @param pOpts      the program's option descriptor
+ * @param pOD        the option descriptor for this option
+ * @param paz_names  the list of keywords for this option
+ * @param name_ct    the count of keywords
+ */
 static uintptr_t
 find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
           char const * const *  paz_names, unsigned int name_ct)
@@ -184,8 +193,17 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
         unsigned long val = strtoul(pz, &pz, 0);
         if ((*pz == NUL) && (val < name_ct))
             return (uintptr_t)val;
+        pz_enum_err_fmt = zTooLarge;
+        option_usage_fp = stderr;
         enum_err(pOpts, pOD, paz_names, (int)name_ct);
         return name_ct;
+    }
+
+    if (IS_INVERSION_CHAR(*pzName) && (pzName[2] == NUL)) {
+        if (  ((pzName[0] == '~') && (pzName[1] == '0'))
+           || ((pzName[0] == '-') && (pzName[1] == '1')))
+        return (uintptr_t)(name_ct - 1);
+        goto oops;
     }
 
     /*
@@ -203,6 +221,8 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
 
     if (res < name_ct)
         return res; /* partial match */
+
+oops:
 
     pz_enum_err_fmt = (res == name_ct) ? zNoKey : zAmbigKey;
     option_usage_fp = stderr;
@@ -494,7 +514,7 @@ optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
                 if (iv)
                      res &= ~bit;
                 else res |= bit;
-            } while (0);
+            } while (false);
 
             if (pzArg[len] == NUL)
                 break;

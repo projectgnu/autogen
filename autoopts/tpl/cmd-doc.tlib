@@ -4,7 +4,7 @@
 
 # cmd-doc.tlib -- Template for command line man/mdoc pages
 #
-# Time-stamp:      "2012-02-19 12:06:56 bkorb"
+# Time-stamp:      "2012-02-28 19:42:43 bkorb"
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
@@ -56,6 +56,7 @@
 (define sect-name      "")
 (define macro-name     "")
 (define tmp-str        "")
+(define fname-line     "")
 (define use-flags      (exist? "flag.value"))
 (define named-mode     (not (or use-flags (exist? "long-opts") )))
 
@@ -103,6 +104,19 @@
 (define environ-init  (exist? "environrc"))
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
+
+(shell (string-append "cvt_prog='"
+       (find-file (if man-page "texi2man" "texi2mdoc"))
+       "'\ntest -x \"$cvt_prog\" || die 'no conversion program'" ))
+
+(define get-cvt (lambda (nm)
+    (shell (string-append
+      "{\n${cvt_prog} || die ${cvt_prog} failed in $PWD\n"
+      "}  <<\\_EndOfTexiSection_\n"
+      (get nm)
+      "\n_EndOfTexiSection_"
+    ))
+))
 
 (emit (head-line))
 (dne ".\\\"  ")                       :+][+:#
@@ -281,9 +295,9 @@ DEFINE cond-section                     :+][+:
          (out-pop)                      :+][+:
 
      ==  insert                         :+][+:
-         (set! tmp-str (shellf "sed '1s/.Sh .*/.Pp/' %s" file-name)) :+][+:
+         (set! fname-line (shellf "sed '1s/.Sh .*/.Pp/' %s" file-name)) :+][+:
          INVOKE (sect-line-fname)       :+][+:
-         (emit tmp-str)
+         (emit fname-line)
          (out-pop)                      :+][+:
 
      # * -- otherwise, do nothing       :+][+:
@@ -387,10 +401,10 @@ FOR flag                              :+][+:
 
   ELIF (. man-page)                   :+]
 .PP
-[+: descrip                           :+][+:
+[+: (get-cvt "descrip")               :+][+:
 
   ELSE                                :+]
-.Ss "[+: (string-substitute (get "descrip") "-" "\\-") :+]"[+:
+.Ss "[+: (string-substitute (get-cvt "descrip") "-" "\\-") :+]"[+:
   ENDIF                               :+][+:
 ENDFOR flag
 
@@ -552,19 +566,41 @@ DEFINE mk-exit-status                \:+]
 One of the following exit values will be returned:
 .Bl -tag
 [+:
-(ag-fprintf 0 ".It 0\n%s\n"
+(ag-fprintf 0 ".It 0 \" (EXIT_%s)\"\n%s\n"
+    (string->c-name! (string-upcase (get "exit-name[0]" "SUCCESS")))
     (get "exit-desc[0]" "Successful program execution.") )
 
-(ag-fprintf 0 ".It 1\n%s\n"
+(define need-ex-noinput  (exist? "homerc"))
+(define need-ex-software #t)
+
+(ag-fprintf 0 ".It 1 \" (EXIT_%s)\"\n%s\n"
+    (string->c-name! (string-upcase (get "exit-name[1]" "FAILURE")))
     (get "exit-desc[1]"
     "The operation failed or the command syntax was not valid.")) :+][+:
 
 FOR exit-desc (for-from 2)            :+][+:
-  (sprintf ".It %d\n%s\n"
-    (for-index) (get "exit-desc"))    :+][+:
+  (if (= (for-index) 66)
+      (set! need-ex-noinput  #f)
+      (if (= (for-index) 70)
+          (set! need-ex-software #f) ))
+
+  (set! tmp-str (get (sprintf "exit-name[%d]" (for-index)) "* unnamed *"))
+  (sprintf ".It %d \" (EXIT_%s)\"\n%s\n"
+    (for-index)
+    (string-upcase (string->c-name! tmp-str))
+    (get "exit-desc"))    :+][+:
 ENDFOR exit-desc                      :+][+:
-(if (> (string-length tmp-str) 1)
-    (emit tmp-str)) :+]
+(if need-ex-noinput
+    (emit ".It 66 \" (EX_NOINPUT)\"
+A specified configuration file could not be loaded.\n"))
+
+(if need-ex-noinput
+    (emit ".It 70 \" (EX_SOFTWARE)\"
+libopts had an internal operational error.  Please report
+it to autogen-users@lists.sourceforge.net.  Thank you.\n"))
+
+(if (> (string-length fname-line) 1)
+    (emit fname-line)) :+]
 .El
 [+:
 
@@ -815,7 +851,7 @@ DEFINE emit-flag-text                 :+][+:
       ENDIF                             :+][+:
     ENDIF                               :+][+:
   ENDIF                                 :+]
-[+: (string-substitute (get "descrip") "\\" "\\\\") :+].[+:
+[+: (string-substitute (get-cvt "descrip") "\\" "\\\\") :+].[+:
 
   IF (exist? "min")                     :+]
 This option is required to appear.[+:
@@ -944,7 +980,7 @@ The default [+: (. opt-arg) :+] for this option is:
 .sp
 [+:
  (if (exist? "doc")
-        (string-substitute (get "doc") "\\" "\\\\")
+        (string-substitute (get-cvt "doc") "\\" "\\\\")
         "This option has not been fully documented." ) :+][+:
   IF (exist? "deprecated")            :+]
 .sp

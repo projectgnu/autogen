@@ -224,7 +224,7 @@ typedef enum {
 
 #else
 #  define SNV_STMT_START	do
-#  define SNV_STMT_END		while (0)
+#  define SNV_STMT_END		while (false)
 #endif
 
 #ifdef _WIN32

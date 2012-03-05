@@ -2,7 +2,7 @@
 /*
  * \file save.c
  *
- * Time-stamp:      "2012-01-29 19:30:39 bkorb"
+ * Time-stamp:      "2012-02-28 19:43:11 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -201,7 +201,7 @@ find_file_name(tOptions * pOpts, int * p_free_name)
         if ((stat(z, &stBuf) != 0) || ! S_ISDIR(stBuf.st_mode))
             goto bogus_name;
         stBuf.st_mode = S_IFREG; /* file within this directory */
-    } while (0);
+    } while (false);
 
     /*
      *  IF what we found was a directory,

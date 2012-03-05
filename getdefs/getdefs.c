@@ -3,7 +3,7 @@
  *
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2011-01-31 13:06:12 bkorb"
+ *  Time-stamp:        "2012-02-28 19:41:53 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -245,7 +245,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
         *pz = ' ';
         pzMatch = strchr(pzMatch + len, '[');
         idx = strtol(pzMatch+1, (char**)NULL, 0)+1;
-    } while (0);
+    } while (false);
 
     /*
      *  Add the new entry to our text database and
@@ -297,14 +297,14 @@ buildDefinition(char * pzDef, char const * pzFile, int line, char * pzOut)
     static char const zSrcFile[] = "    %s = '%s';\n";
     static char const zLineNum[] = "    %s = '%d';\n";
 
-    ag_bool    these_are_global_defs;
+    bool    these_are_global_defs;
     tSuccess   preamble;
     int        re_res;
     char*      pzNextDef = NULL;
     regmatch_t match[2];
 
     if (*pzDef == '*') {
-        these_are_global_defs = AG_TRUE;
+        these_are_global_defs = true;
         strcpy(pzOut, zGlobal);
         pzOut += sizeof(zGlobal)-1;
         pzOut += sprintf(pzOut, zLineId, line, pzFile);
@@ -313,7 +313,7 @@ buildDefinition(char * pzDef, char const * pzFile, int line, char * pzOut)
         preamble = PROBLEM;
 
     } else {
-        these_are_global_defs = AG_FALSE;
+        these_are_global_defs = false;
         preamble = buildPreamble(&pzDef, &pzOut, pzFile, line);
         if (FAILED(preamble)) {
             *pzOut = NUL;

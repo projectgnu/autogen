@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-04-20 09:52:36 bkorb"
+## Time-stamp:      "2012-03-04 19:21:12 bkorb"
 ## Author:	    Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -35,9 +35,9 @@ RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
 	 -L$(top_builddir)/autoopts/tpl
 
 if AMDEP
-DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@
-INF_DEP         = -b$(TARG) -MF$(DEPDIR)/info-dep -MT$@
-MAN_DEP         = -b$(TARG) -MF$(DEPDIR)/man-dep  -MT$@
+DEP_ARG         = -MF$(DEPDIR)/opts-dep -MT$@ -MP
+INF_DEP         = -b$(TARG) -MF$(DEPDIR)/info-dep -MT$@ -MP
+MAN_DEP         = -b$(TARG) -MF$(DEPDIR)/man-dep  -MTstamp-man -MP
 include $(DEPDIR)/opts-dep
 include $(DEPDIR)/info-dep
 include $(DEPDIR)/man-dep
@@ -65,8 +65,6 @@ gd.c : $(gdsrcs)
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
 	echo ; echo '#define  DEFINING 1' ; \
 	echo '#include "autoopts/project.h"' ; \
-	echo '// #define AUTOOPTS_INTERNAL 1' ; \
-	echo '#include "autoopts/ag-char-map.h"' ; \
 	for f in opts.c $(gdsrcs) ; \
 	do echo "#include \"$$f\"" ; done
 
@@ -74,7 +72,8 @@ $(getdefs_OBJECTS) opts.h opts.c : stamp-opts
 stamp-opts : opts.def
 	@test -x $(AGexe) || { cd ../agen5   && $(MAKE) $(AGnam) ; }
 	@test -x $(CLexe) || { cd ../columns && $(MAKE) $(CLnam) ; }
-	$(AG_ENV) ; $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
+	$(AG_ENV) ; DEPFILE=$(DEPFILE_opts) \
+	  $(RUNAG) $(DEP_ARG) $(srcdir)/opts.def
 
 $(DOCFILES) : stamp-doc
 stamp-doc :
@@ -86,5 +85,9 @@ stamp-doc :
 	$(RUNAG) $(INF_DEP) -Tagtexi-cmd -DLEVEL=section $(srcdir)/opts.def
 
 .NOTPARALLEL:
+
+.PHONY : local-maintainer-clean
+local-maintainer-clean : clean-stamp-opts clean-stamp-doc clean-stamp-man
+	rm -f *~
 
 # getdefs/Makefile.am ends here

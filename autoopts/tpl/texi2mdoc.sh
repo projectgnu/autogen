@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2012-02-25 12:54:32 bkorb"
+## Time-stamp:      "2012-02-28 19:49:10 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -133,7 +133,7 @@ do_item() {
 
 do_line() {
     case "${line}" in
-    '@subheading*' ) echo "$line" | sed 's/@subheading/.SS /' ;;
+    '@subheading'* ) echo "$line" | sed 's/@subheading/.SS /' ;;
     '@*' ) echo .br ;;
     ''   ) echo .sp ;;
     '@'[{}]* ) echo "${line}" | sed 's/@\([{}]\)/\1/g' ;;

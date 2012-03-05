@@ -636,6 +636,10 @@ utxt = { ut-name = ThreeSpaces;
          ut-text = "   ";
 };
 
+utxt = { ut-name = TooLarge;
+         ut-text = "%s error:  %s exceeds %s keyword count\n";
+};
+
 utxt = { ut-name = TwoSpaces;
          ut-text = "  ";
 };

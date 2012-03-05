@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2012-01-29 20:18:27 bkorb"
+ *  Time-stamp:        "2012-03-04 09:13:16 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -33,6 +33,11 @@ static char const *
 skipQuote(char const * pzQte);
 /* = = = END-STATIC-FORWARD = = = */
 
+/**
+ * Allocating printf function.  It either works or kills the program.
+ * @param pzFmt the input format
+ * @returns the allocated, formatted result string.
+ */
 LOCAL char *
 aprf(char const * pzFmt, ...)
 {
@@ -50,6 +55,10 @@ aprf(char const * pzFmt, ...)
     return pz;
 }
 
+/**
+ * Figure out what base name to use.  --base-name was not specified.
+ * Base it on the definitions file, if available.
+ */
 static void
 define_base_name(void)
 {
@@ -86,6 +95,10 @@ define_base_name(void)
     *pzD = NUL;
 }
 
+/**
+ * Put the -D option arguments into the environment.
+ * This makes them accessible to Guile/Scheme code, too.
+ */
 static void
 put_defines_into_env(void)
 {
@@ -126,6 +139,9 @@ put_defines_into_env(void)
  *
  *  The trace output starts with the command and arguments used to
  *  start autogen.
+ *
+ * @param av    autogen's argument vector
+ * @param odsc  use to provide the output file or shell pipe.
  */
 LOCAL void
 open_trace_file(char ** av, tOptDesc * odsc)
@@ -134,34 +150,34 @@ open_trace_file(char ** av, tOptDesc * odsc)
 
     trace_is_to_pipe = (*fname == '|');
     if (trace_is_to_pipe)
-        pfTrace = popen(++fname, "w");
+        trace_fp = popen(++fname, "w");
 
     else if ((fname[0] == '>') && (fname[1] == '>')) {
         fname = SPN_WHITESPACE_CHARS(fname + 2);
-        pfTrace = fopen(fname, "a");
+        trace_fp = fopen(fname, "a");
     }
 
     else
-        pfTrace = fopen(fname, "w");
+        trace_fp = fopen(fname, "w");
 
-    if (pfTrace == NULL)
+    if (trace_fp == NULL)
         AG_ABEND(aprf(OPEN_ERROR_FMT, errno, strerror(errno), fname));
 
 #ifdef _IONBF
-    setvbuf(pfTrace, NULL, _IONBF, 0);
+    setvbuf(trace_fp, NULL, _IONBF, 0);
 #endif
 
-    fprintf(pfTrace, TRACE_START_FMT, (unsigned int)getpid(), *av);
+    fprintf(trace_fp, TRACE_START_FMT, (unsigned int)getpid(), *av);
     while (*(++av) != NULL)
-        fprintf(pfTrace, TRACE_AG_ARG_FMT, *av);
-    putc(NL, pfTrace);
+        fprintf(trace_fp, TRACE_AG_ARG_FMT, *av);
+    putc(NL, trace_fp);
 }
 
 LOCAL void
 check_make_dep_env(void)
 {
-    ag_bool have_opt_string = AG_FALSE;
-    ag_bool set_opt         = AG_FALSE;
+    bool have_opt_string = false;
+    bool set_opt         = false;
 
     char const * mdep = getenv(AG_MAKE_DEP_NAME);
     if (mdep == NULL) {
@@ -177,12 +193,12 @@ check_make_dep_env(void)
 
     case '0':
         if (mdep[1] != NUL)
-            have_opt_string = AG_TRUE;
+            have_opt_string = true;
         break;
 
     case 'y':
     case 'Y':
-        set_opt = AG_TRUE;
+        set_opt = true;
         have_opt_string = (streqvcmp(mdep + 1, YES_NAME_STR+1) != 0);
         break;
 
@@ -194,7 +210,7 @@ check_make_dep_env(void)
 
     case 't':
     case 'T':
-        set_opt = AG_TRUE;
+        set_opt = true;
         have_opt_string = (streqvcmp(mdep + 1, TRUE_NAME_STR+1) != 0);
         break;
 
@@ -206,7 +222,7 @@ check_make_dep_env(void)
 
     default:
         have_opt_string = \
-            set_opt = AG_TRUE;
+            set_opt = true;
     }
     if (! set_opt) return;
     if (! have_opt_string) {
@@ -270,7 +286,7 @@ doOptions(int arg_ct, char ** arg_vec)
             /* FALLTHROUGH */
 
         default:
-            usage_message(DOOPT_TOO_MANY_DEFS, pzProg);
+            usage_message(DOOPT_TOO_MANY_DEFS, ag_pname);
             /* NOTREACHED */
 
         case 0:
@@ -283,7 +299,7 @@ doOptions(int arg_ct, char ** arg_vec)
     if ((OPT_VALUE_TRACE > TRACE_NOTHING) && HAVE_OPT(TRACE_OUT))
         open_trace_file(arg_vec, &DESC(TRACE_OUT));
 
-    startTime = time(NULL);
+    start_time = time(NULL) - 1;
 
     if (! HAVE_OPT(TIMEOUT))
         OPT_ARG(TIMEOUT) = (char const *)AG_DEFAULT_TIMEOUT;
@@ -317,7 +333,7 @@ doOptions(int arg_ct, char ** arg_vec)
 }
 
 LOCAL char const *
-getDefine(char const * pzDefName, ag_bool check_env)
+getDefine(char const * de_name, bool check_env)
 {
     char const **   ppz;
     int     ct;
@@ -333,7 +349,7 @@ getDefine(char const * pzDefName, ag_bool check_env)
             if (pzEq != NULL)
                 *pzEq = NUL;
 
-            res = strcmp(pzDefName, pz);
+            res = strcmp(de_name, pz);
             if (pzEq != NULL)
                 *pzEq = '=';
 
@@ -341,7 +357,7 @@ getDefine(char const * pzDefName, ag_bool check_env)
                 return (pzEq != NULL) ? pzEq+1 : zNil;
         }
     }
-    return check_env ? getenv(pzDefName) : NULL;
+    return check_env ? getenv(de_name) : NULL;
 }
 
 

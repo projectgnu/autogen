@@ -185,7 +185,7 @@ static char const spaces[16] = "                ";
         _len -= _this;                                                        \
       }                                                                       \
     while (_len > 0);                                                         \
-  } while (0)
+  } while (false)
 #else
 # define memset_space(P, Len) memset ((P), ' ', (size_t) (Len))
 #endif
@@ -206,7 +206,7 @@ static char const spaces[16] = "                ";
           p += _n;                                                            \
         }                                                                     \
       i += _incr;                                                             \
-    } while (0)
+    } while (false)
 
 #define cpy(n, s) \
     add ((n),                                                                 \

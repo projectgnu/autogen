@@ -46,13 +46,13 @@ void
 optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
 {
     char* pz;
-    ag_bool  res = AG_TRUE;
+    bool  res = true;
 
     if ((pOD->fOptState & OPTST_RESET) != 0)
         return;
 
     if (pOD->optArg.argString == NULL) {
-        pOD->optArg.argBool = AG_FALSE;
+        pOD->optArg.argBool = false;
         return;
     }
 
@@ -69,12 +69,12 @@ optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
     case 'F':
     case 'f':
     case NUL:
-        res = AG_FALSE;
+        res = false;
         break;
     case '#':
         if (pOD->optArg.argString[1] != 'f')
             break;
-        res = AG_FALSE;
+        res = false;
     }
 
     if (pOD->fOptState & OPTST_ALLOC_ARG) {

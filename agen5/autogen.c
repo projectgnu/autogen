@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-01-07 10:40:56 bkorb"
+ *  Time-stamp:        "2012-03-04 19:15:23 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -80,26 +80,26 @@ inner_main(void * closure, int argc, char ** argv)
     atexit(done_check);
     initialize(argc, argv);
 
-    procState = PROC_STATE_LOAD_DEFS;
-    readDefines();
+    processing_state = PROC_STATE_LOAD_DEFS;
+    read_defs();
 
     /*
      *  Activate the AutoGen specific Scheme functions.
      *  Then load, process and unload the main template
      */
-    procState = PROC_STATE_LOAD_TPL;
+    processing_state = PROC_STATE_LOAD_TPL;
 
     {
-        tTemplate* pTF = loadTemplate(pzTemplFileName, NULL);
+        templ_t* pTF = tpl_load(tpl_fname, NULL);
 
-        procState = PROC_STATE_EMITTING;
+        processing_state = PROC_STATE_EMITTING;
         processTemplate(pTF);
 
-        procState = PROC_STATE_CLEANUP;
+        processing_state = PROC_STATE_CLEANUP;
         cleanup(pTF);
     }
 
-    procState = PROC_STATE_DONE;
+    processing_state = PROC_STATE_DONE;
     setup_signals(SIG_DFL, SIG_IGN, SIG_DFL);
     exit_code = AUTOGEN_EXIT_SUCCESS;
     done_check();
@@ -124,7 +124,7 @@ main(int argc, char ** argv)
 
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
     optionSaveState(&autogenOptions);
-    pfTrace = stderr;
+    trace_fp = stderr;
 
     /*
      *  as of 2.0.2, Guile will fiddle with strings all on its own accord.
@@ -160,7 +160,7 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
         static int exit_cleanup_done = 0;
         if (exit_cleanup_done) {
             if (OPT_VALUE_TRACE > TRACE_NOTHING)
-                fprintf(pfTrace, EXIT_CLEANUP_MULLIGAN);
+                fprintf(trace_fp, EXIT_CLEANUP_MULLIGAN);
             return;
         }
 
@@ -174,28 +174,28 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
     close_server_shell();
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        fprintf(pfTrace, EXIT_CLEANUP_DONE_FMT,
+        fprintf(trace_fp, EXIT_CLEANUP_DONE_FMT,
                 (cl_wait == EXIT_PCLOSE_WAIT)
                 ? EXIT_CLEANUP_WAITED : EXIT_CLEANUP_NOWAIT,
                 (unsigned int)getpid());
 
     do  {
-        if (pfTrace == stderr)
+        if (trace_fp == stderr)
             break;
 
         if (! trace_is_to_pipe) {
-            fclose(pfTrace);
+            fclose(trace_fp);
             break;
         }
 
 
-        fflush(pfTrace);
-        pclose(pfTrace);
+        fflush(trace_fp);
+        pclose(trace_fp);
         if (cl_wait == EXIT_PCLOSE_WAIT) {
             int status;
             while (wait(&status) > 0)  ;
         }
-    } while (0);
+    } while (false);
 
     fflush(stdout);
     fflush(stderr);
@@ -208,47 +208,47 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
 static void
 cleanup_and_abort(int sig)
 {
-    if (*pzOopsPrefix != NUL) {
-        fputs(pzOopsPrefix, stderr);
-        pzOopsPrefix = zNil;
+    if (*oops_pfx != NUL) {
+        fputs(oops_pfx, stderr);
+        oops_pfx = zNil;
     }
 
     fprintf(stderr, AG_SIG_ABORT_FMT, sig, strsignal(sig),
-            ((unsigned)procState <= PROC_STATE_DONE)
-            ? state_names[ procState ] : BOGUS_TAG);
+            ((unsigned)processing_state <= PROC_STATE_DONE)
+            ? state_names[ processing_state ] : BOGUS_TAG);
 
-    if (procState == PROC_STATE_ABORTING) {
+    if (processing_state == PROC_STATE_ABORTING) {
         exit_cleanup(EXIT_PCLOSE_NOWAIT);
         _exit(sig + 128);
     }
 
-    procState = PROC_STATE_ABORTING;
+    processing_state = PROC_STATE_ABORTING;
     setup_signals(SIG_DFL, SIG_DFL, SIG_DFL);
 
     /*
      *  IF there is a current template, then we should report where we are
      *  so that the template writer knows where to look for their problem.
      */
-    if (pCurTemplate != NULL) {
+    if (current_tpl != NULL) {
         int line;
         teFuncType fnCd;
         char const * pzFn;
         char const * pzFl;
 
-        if (pCurMacro == NULL) {
+        if (cur_macro == NULL) {
             pzFn = PSEUDO_MACRO_NAME_STR;
             line = 0;
             fnCd = -1;
 
         } else {
             teFuncType f =
-                (pCurMacro->funcCode > FUNC_CT)
-                    ? FTYP_SELECT : pCurMacro->funcCode;
+                (cur_macro->md_code > FUNC_CT)
+                    ? FTYP_SELECT : cur_macro->md_code;
             pzFn = apzFuncNames[ f ];
-            line = pCurMacro->lineNo;
-            fnCd = pCurMacro->funcCode;
+            line = cur_macro->md_line;
+            fnCd = cur_macro->md_code;
         }
-        pzFl = pCurTemplate->pzTplFile;
+        pzFl = current_tpl->td_file;
         if (pzFl == NULL)
             pzFl = NULL_FILE_NAME_STR;
         fprintf(stderr, AG_ABORT_LOC_FMT, pzFl, line, pzFn, fnCd);
@@ -280,7 +280,7 @@ cleanup_and_abort(int sig)
 static void
 catch_sig_and_bail(int sig)
 {
-    switch (procState) {
+    switch (processing_state) {
     case PROC_STATE_ABORTING:
         exit_code = AUTOGEN_EXIT_SIGNAL;
 
@@ -325,44 +325,44 @@ done_check(void)
         static int done_check_done = 0;
         if (done_check_done) {
             if (OPT_VALUE_TRACE > TRACE_NOTHING)
-                fprintf(pfTrace, DONE_CHECK_REDONE);
+                fprintf(trace_fp, DONE_CHECK_REDONE);
             return;
         }
         done_check_done = 1;
     }
 
-    switch (procState) {
+    switch (processing_state) {
     case PROC_STATE_EMITTING:
     case PROC_STATE_INCLUDING:
         /*
-         *  A library (viz., Guile) procedure has called exit(3C).
-         *  The AutoGen abort paths all set procState to PROC_STATE_ABORTING.
+         * A library (viz., Guile) procedure has called exit(3C).  The
+         * AutoGen abort paths all set processing_state to PROC_STATE_ABORTING.
          */
-        if (*pzOopsPrefix != NUL) {
+        if (*oops_pfx != NUL) {
             /*
              *  Emit the CGI page header for an error message.  We will rewind
              *  stderr and write the contents to stdout momentarily.
              */
-            fputs(pzOopsPrefix, stdout);
-            pzOopsPrefix = zNil;
+            fputs(oops_pfx, stdout);
+            oops_pfx = zNil;
         }
 
         if (OPT_VALUE_TRACE > TRACE_NOTHING)
             scm_backtrace();
 
-        fprintf(stderr, SCHEME_EVAL_ERR_FMT, pCurTemplate->pzTplFile,
-                pCurMacro->lineNo);
+        fprintf(stderr, SCHEME_EVAL_ERR_FMT, current_tpl->td_file,
+                cur_macro->md_line);
 
         /*
          *  We got here because someone called exit early.
          */
         do  {
 #ifndef DEBUG_ENABLED
-            out_close(AG_FALSE);
+            out_close(false);
 #else
-            out_close(AG_TRUE);
+            out_close(true);
 #endif
-        } while (pCurFp->pPrev != NULL);
+        } while (cur_fpstack->stk_prev != NULL);
         exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
         break; /* continue failure exit */
 
@@ -371,20 +371,20 @@ done_check(void)
         /* FALLTHROUGH */
 
     default:
-        fprintf(stderr, AG_ABEND_STATE_FMT, state_names[procState]);
+        fprintf(stderr, AG_ABEND_STATE_FMT, state_names[processing_state]);
         goto autogen_aborts;
 
     case PROC_STATE_ABORTING:
         exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
 
     autogen_aborts:
-        if (*pzOopsPrefix != NUL) {
+        if (*oops_pfx != NUL) {
             /*
              *  Emit the CGI page header for an error message.  We will rewind
              *  stderr and write the contents to stdout momentarily.
              */
-            fputs(pzOopsPrefix, stdout);
-            pzOopsPrefix = zNil;
+            fputs(oops_pfx, stdout);
+            oops_pfx = zNil;
         }
         break; /* continue failure exit */
 
@@ -396,8 +396,8 @@ done_check(void)
         break; /* continue normal exit */
     }
 
-    if (pzLastScheme != NULL)
-        fprintf(stderr, GUILE_CMD_FAIL_FMT, pzLastScheme);
+    if (last_scm_cmd != NULL)
+        fprintf(stderr, GUILE_CMD_FAIL_FMT, last_scm_cmd);
 
     /*
      *  IF we diverted stderr, then now is the time to copy the text to stdout.
@@ -419,7 +419,7 @@ done_check(void)
             fread( pz, (size_t)1, (size_t)pos, stderr);
             fwrite(pz, (size_t)1, (size_t)pos, stdout);
             AGFREE(pz);
-        } while (0);
+        } while (false);
 
         unlink(cgi_stderr);
         AGFREE(cgi_stderr);
@@ -429,7 +429,7 @@ done_check(void)
     ag_scribble_deinit();
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
-        fprintf(pfTrace, DONE_CHECK_DONE);
+        fprintf(trace_fp, DONE_CHECK_DONE);
 
     exit_cleanup(EXIT_PCLOSE_WAIT);
 
@@ -439,7 +439,7 @@ done_check(void)
      *  exit code.  (Always EXIT_FAILURE, unless this was called at the end
      *  of inner_main().)
      */
-    if (procState != PROC_STATE_OPTIONS)
+    if (processing_state != PROC_STATE_OPTIONS)
         _exit(exit_code);
 }
 
@@ -451,18 +451,18 @@ ag_abend_at(char const * pzMsg
 #endif
     )
 {
-    if (*pzOopsPrefix != NUL) {
-        fputs(pzOopsPrefix, stderr);
-        pzOopsPrefix = zNil;
+    if (*oops_pfx != NUL) {
+        fputs(oops_pfx, stderr);
+        oops_pfx = zNil;
     }
 
 #ifdef DEBUG_ENABLED
     fprintf(stderr, "Giving up in %s line %d\n", pzFile, line);
 #endif
 
-    if ((procState >= PROC_STATE_LIB_LOAD) && (pCurTemplate != NULL)) {
-        int l_no = (pCurMacro == NULL) ? -1 : pCurMacro->lineNo;
-        fprintf(stderr, ERROR_IN_TPL_FMT, pCurTemplate->pzTplFile, l_no);
+    if ((processing_state >= PROC_STATE_LIB_LOAD) && (current_tpl != NULL)) {
+        int l_no = (cur_macro == NULL) ? -1 : cur_macro->md_line;
+        fprintf(stderr, ERROR_IN_TPL_FMT, current_tpl->td_file, l_no);
     }
     fputs(pzMsg, stderr);
     pzMsg += strlen(pzMsg);
@@ -470,14 +470,14 @@ ag_abend_at(char const * pzMsg
         fputc(NL, stderr);
 
     {
-        teProcState oldState = procState;
-        procState = PROC_STATE_ABORTING;
+        teProcState oldState = processing_state;
+        processing_state = PROC_STATE_ABORTING;
 
         switch (oldState) {
         case PROC_STATE_EMITTING:
         case PROC_STATE_INCLUDING:
         case PROC_STATE_CLEANUP:
-            longjmp(fileAbort, FAILURE);
+            longjmp(abort_jmp_buf, FAILURE);
             /* NOTREACHED */
         default:
             exit(EXIT_FAILURE);

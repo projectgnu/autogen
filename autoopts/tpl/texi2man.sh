@@ -2,7 +2,7 @@
 
 ## texi2man.sh -- script to convert texi-isms to man page isms
 ##
-## Time-stamp:      "2012-02-25 12:54:32 bkorb"
+## Time-stamp:      "2012-03-04 20:46:47 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -37,8 +37,8 @@ bold='\(code\|command\|var\|samp\|option\|strong\)'
 ital='\(i\|file\|emph\)'
 
 sed \
- -e "s;@${bold}{"'\([^}]*\)};\\fB\2\\fP;g' \
- -e "s;@${ital}{"'\([^}]*\)};\\fI\2\\fP;g' \
+ -e "s;@${bold}{"'\([^}]*\)};\fB\2\fP;g' \
+ -e "s;@${ital}{"'\([^}]*\)};\fI\2\fP;g' \
  -e 's;@pxref{\([^}]*\)};see: \1;g' \
  -e 's;@xref{\([^}]*\)};see: \1;g' \
  -e 's/@\([{}]\)/\1/g' \

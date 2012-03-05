@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-02-18 09:47:00 bkorb"
+# Time-stamp:      "2012-02-28 19:42:14 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -191,6 +191,9 @@ typedef enum {[=
   ;; emit the a default value into the enumeration..
   =][= ;;  */
   (set! tmp-val "")
+  (define need-ex-noinput  (exist? "homerc"))
+  (define need-ex-software #t)
+
   (define succ-exit-code (string-append pname-up "_EXIT_SUCCESS"))
   (if (exist? "exit-name[0]")
       (set! succ-exit-code (string-append
@@ -226,9 +229,20 @@ typedef enum {[=
   tmp-val                             =][=
 
   FOR exit-name ","                   =]
-    [= (. pname-up) =]_EXIT_[= (get-up-name "exit-name")
+    [=
+    (if (= (for-index) 66)
+        (set! need-ex-noinput  #f)
+        (if (= (for-index) 70)
+            (set! need-ex-software #f) ))
+
+    pname-up =]_EXIT_[= (get-up-name "exit-name")
        =] = [= (for-index)            =][=
-  ENDFOR                              =]
+  ENDFOR                              =][=
+  (if need-ex-noinput
+   (ag-fprintf 0 ",\n    %s_EXIT_NO_CONFIG_INPUT = 66" pname-up))
+  (if need-ex-software
+   (ag-fprintf 0 ",\n    %s_EXIT_LIBOPTS_FAILURE = 70" pname-up))
+=]
 } [= (. pname-down) =]_exit_code_t;[=
 DEBUG =][=
 CASE guard-option-names               =][=

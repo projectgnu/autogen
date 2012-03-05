@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2012-01-29 09:49:11 bkorb"
+ *  Time-stamp:        "2012-03-04 19:50:53 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -25,17 +25,22 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static inline char const *
-tpl_text(tTemplate * tpl, tMacro * mac);
+tpl_text(templ_t * tpl, macro_t * mac);
 
 static void
-tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg);
+tpl_warning(templ_t * tpl, macro_t * mac, char const * msg);
 
 static int
-exprType(char* pz);
+expr_type(char * pz);
 /* = = = END-STATIC-FORWARD = = = */
 
+/**
+ * Convert SCM to displayable string.
+ * @param s the input scm
+ * @returns a string a human can read
+ */
 LOCAL char const *
-resolveSCM(SCM s)
+scm2display(SCM s)
 {
     static char  z[48];
     char const * pzRes = z;
@@ -99,18 +104,18 @@ resolveSCM(SCM s)
  * Return the text associated with a macro.
  */
 static inline char const *
-tpl_text(tTemplate * tpl, tMacro * mac)
+tpl_text(templ_t * tpl, macro_t * mac)
 {
-    if (mac->ozText == 0)
+    if (mac->md_txt_off == 0)
         return zNil;
 
-    return tpl->pzTemplText + mac->ozText;
+    return tpl->td_text + mac->md_txt_off;
 }
 
 static void
-tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg)
+tpl_warning(templ_t * tpl, macro_t * mac, char const * msg)
 {
-    fprintf(pfTrace, TPL_WARN_FMT, tpl->pzTplFile, mac->lineNo, msg);
+    fprintf(trace_fp, TPL_WARN_FMT, tpl->td_file, mac->md_line, msg);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -124,39 +129,42 @@ tpl_warning(tTemplate * tpl, tMacro * mac, char const * msg)
  *  empty string".  This is used by the Select_Match_Existence and
  *  Select_Match_NonExistence code to distinguish non-existence from
  *  an empty string value.
+ *
+ * @param allocated tell caller if result has been allocated
+ * @returns a string representing the result.
  */
 LOCAL char const *
-evalExpression(ag_bool* pMustFree)
+eval_mac_expr(bool * allocated)
 {
-    tTemplate *   pT      = pCurTemplate;
-    tMacro *      pMac    = pCurMacro;
-    ag_bool       isIndexed;
-    tDefEntry *   pDef;
-    int           code    = pMac->res;
-    char const *  pzText  = NULL; /* warning patrol */
+    templ_t *     tpl   = current_tpl;
+    macro_t *     mac   = cur_macro;
+    int           code  = mac->md_res;
+    char const *  text  = NULL; /* warning patrol */
+    def_ent_t *   ent;
 
-    *pMustFree = AG_FALSE;
+    *allocated = false;
 
     if ((code & EMIT_NO_DEFINE) != 0) {
-        pzText = tpl_text(pT, pMac);
-        code  &= EMIT_PRIMARY_TYPE;
-        pDef   = NULL; /* warning patrol */
+        text  = tpl_text(tpl, mac);
+        code &= EMIT_PRIMARY_TYPE;
+        ent   = NULL; /* warning patrol */
     }
 
     else {
         /*
          *  Get the named definition entry, maybe
          */
-        pDef = findDefEntry(pT->pzTemplText + pMac->ozName, &isIndexed);
+        bool indexed;
+        ent = findDefEntry(tpl->td_text + mac->md_name_off, &indexed);
 
-        if (pDef == NULL) {
+        if (ent == NULL) {
             switch (code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) {
             case EMIT_IF_ABSENT:
                 /*
                  *  There is only one expression.  It applies because
                  *  we did not find a definition.
                  */
-                pzText = tpl_text(pT, pMac);
+                text = tpl_text(tpl, mac);
                 code &= EMIT_PRIMARY_TYPE;
                 break;
 
@@ -164,8 +172,8 @@ evalExpression(ag_bool* pMustFree)
                 /*
                  *  There are two expressions.  Take the second one.
                  */
-                pzText =  pT->pzTemplText + pMac->endIndex;
-                code   = ((code & EMIT_SECONDARY_TYPE)
+                text = tpl->td_text + mac->md_end_idx;
+                code = ((code & EMIT_SECONDARY_TYPE)
                           >> EMIT_SECONDARY_SHIFT);
                 break;
 
@@ -173,13 +181,13 @@ evalExpression(ag_bool* pMustFree)
                 /*
                  *  Emit only if found
                  */
-                return zNotDefined;
+                return no_def_str;
 
             case (EMIT_IF_ABSENT | EMIT_ALWAYS):
                 /*
                  *  Emit inconsistently :-}
                  */
-                AG_ABEND_IN(pT, pMac, EVAL_EXPR_PROG_ERR);
+                AG_ABEND_IN(tpl, mac, EVAL_EXPR_PROG_ERR);
                 /* NOTREACHED */
             }
         }
@@ -191,9 +199,9 @@ evalExpression(ag_bool* pMustFree)
             if ((code & EMIT_IF_ABSENT) != 0)
                 return (char*)zNil;
 
-            if (  (pDef->valType != VALTYP_TEXT)
+            if (  (ent->de_type != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
-                tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
+                tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
                 return (char*)zNil;
             }
 
@@ -212,28 +220,28 @@ evalExpression(ag_bool* pMustFree)
                 /*
                  *  And make sure what we found is a text value
                  */
-                if (pDef->valType != VALTYP_TEXT) {
-                    tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
+                if (ent->de_type != VALTYP_TEXT) {
+                    tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
                     return (char*)zNil;
                 }
 
-                *pMustFree = AG_TRUE;
-                pzText = aprf(tpl_text(pT, pMac), pDef->val.pzText);
+                *allocated = true;
+                text = aprf(tpl_text(tpl, mac), ent->de_val.dvu_text);
             }
 
-            else if (pMac->ozText != 0)
-                pzText = pT->pzTemplText + pMac->ozText;
+            else if (mac->md_txt_off != 0)
+                text = tpl->td_text + mac->md_txt_off;
 
             else {
                 /*
                  *  And make sure what we found is a text value
                  */
-                if (pDef->valType != VALTYP_TEXT) {
-                    tpl_warning(pT, pMac, EVAL_EXPR_BLOCK_IN_EVAL);
+                if (ent->de_type != VALTYP_TEXT) {
+                    tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
                     return (char*)zNil;
                 }
 
-                pzText = pDef->val.pzText;
+                text = ent->de_val.dvu_text;
             }
 
             code &= EMIT_PRIMARY_TYPE;
@@ -245,42 +253,42 @@ evalExpression(ag_bool* pMustFree)
      */
     switch (code) {
     case EMIT_VALUE:
-        assert(pDef != NULL);
-        if (*pMustFree) {
-            AGFREE((void*)pzText);
-            *pMustFree = AG_FALSE;
+        assert(ent != NULL);
+        if (*allocated) {
+            AGFREE((void*)text);
+            *allocated = false;
         }
 
-        pzText = pDef->val.pzText;
+        text = ent->de_val.dvu_text;
         break;
 
     case EMIT_EXPRESSION:
     {
-        SCM res = ag_eval(pzText);
+        SCM res = ag_eval(text);
 
-        if (*pMustFree) {
-            AGFREE((void*)pzText);
-            *pMustFree = AG_FALSE;
+        if (*allocated) {
+            AGFREE((void*)text);
+            *allocated = false;
         }
 
-        pzText = resolveSCM(res);
+        text = scm2display(res);
         break;
     }
 
     case EMIT_SHELL:
     {
-        char* pz = shell_cmd(pzText);
+        char* pz = shell_cmd(text);
 
-        if (*pMustFree)
-            AGFREE((void*)pzText);
+        if (*allocated)
+            AGFREE((void*)text);
 
         if (pz != NULL) {
-            *pMustFree = AG_TRUE;
-            pzText = pz;
+            *allocated = true;
+            text = pz;
         }
         else {
-            *pMustFree = AG_FALSE;
-            pzText = (char*)zNil;
+            *allocated = false;
+            text = (char*)zNil;
         }
         break;
     }
@@ -289,9 +297,8 @@ evalExpression(ag_bool* pMustFree)
         break;
     }
 
-    return pzText;
+    return text;
 }
-
 
 /*=gfunc error_source_line
  *
@@ -305,8 +312,8 @@ evalExpression(ag_bool* pMustFree)
 SCM
 ag_scm_error_source_line(void)
 {
-    fprintf(stderr, SCM_ERROR_FMT, pCurTemplate->pzTplName, pCurMacro->lineNo,
-            pCurTemplate->pzTemplText + pCurMacro->ozText);
+    fprintf(stderr, SCM_ERROR_FMT, current_tpl->td_name, cur_macro->md_line,
+            current_tpl->td_text + cur_macro->md_txt_off);
     fflush(stderr);
     guileFailure = 1;
 
@@ -334,27 +341,27 @@ ag_scm_emit(SCM val)
     switch (depth) {
     case 1:
     {
-        tFpStack* pSaveFp;
+        out_stack_t* pSaveFp;
         unsigned long pnum;
 
         if (! AG_SCM_NUM_P(val))
             break;
 
-        pSaveFp = pCurFp;
+        pSaveFp = cur_fpstack;
         pnum    = AG_SCM_TO_ULONG(val);
 
         for (; pnum > 0; pnum--) {
-            pSaveFp = pSaveFp->pPrev;
+            pSaveFp = pSaveFp->stk_prev;
             if (pSaveFp == NULL)
                 AG_ABEND(aprf(EMIT_INVAL_PORT, AG_SCM_TO_ULONG(val)));
         }
 
-        fp = pSaveFp->pFile;
+        fp = pSaveFp->stk_fp;
         return SCM_UNDEFINED;
     }
 
     case 0:
-        fp = pCurFp->pFile; // initialize the first time through
+        fp = cur_fpstack->stk_fp; // initialize the first time through
         break;
     } 
 
@@ -380,7 +387,7 @@ ag_scm_emit(SCM val)
             continue;
 
         default:
-            fputs(resolveSCM(val), fp);
+            fputs(scm2display(val), fp);
             fflush(fp);
             break;
         }
@@ -392,52 +399,52 @@ ag_scm_emit(SCM val)
     return SCM_UNDEFINED;
 }
 
-/*
- *  eval
- *
+/**
  *  The global evaluation function.
- *  The string to "evaluate" may be a literal string, or may
- *  need Scheme interpretation.  So, we do one of three things:
- *  if the string starts with a Scheme comment character or
- *  evaluation character (';' or '('), then run a Scheme eval.
- *  If it starts with a quote character ('\'' or '"'), then
- *  digest the string and return that.  Otherwise, just return
- *  the string.
+ *
+ *  The string to "evaluate" may be a literal string, or may need Scheme
+ *  interpretation.  So, we do one of three things: if the string starts with
+ *  a Scheme comment character or evaluation character (';' or '('), then run
+ *  a Scheme eval.  If it starts with a quote character ('\'' or '"'), then
+ *  digest the string and return that.  Otherwise, just return the string.
+ *
+ * @param expr input expression string
+ * @returns an SCM value representing the result
  */
 LOCAL SCM
-eval(char const* pzExpr)
+eval(char const * expr)
 {
-    ag_bool allocated = AG_FALSE;
-    char*   pzTemp;
-    SCM   res;
+    bool   allocated = false;
+    char * pzTemp;
+    SCM    res;
 
-    switch (*pzExpr) {
+    switch (*expr) {
     case '(':
     case ';':
-        res = ag_eval((char*)pzExpr);
+        res = ag_eval((char*)expr);
         break;
 
     case '`':
-        AGDUPSTR(pzTemp, pzExpr, "shell script");
+        AGDUPSTR(pzTemp, expr, "shell script");
         (void)spanQuote(pzTemp);
-        pzExpr = shell_cmd(pzTemp);
+        expr = shell_cmd(pzTemp);
         AGFREE((void*)pzTemp);
-        res = AG_SCM_STR02SCM((char*)pzExpr);
-        AGFREE((void*)pzExpr);
+        res = AG_SCM_STR02SCM((char*)expr);
+        AGFREE((void*)expr);
         break;
 
     case '"':
     case '\'':
-        AGDUPSTR(pzTemp, pzExpr, "quoted string");
+        AGDUPSTR(pzTemp, expr, "quoted string");
         (void)spanQuote(pzTemp);
-        allocated = AG_TRUE;
-        pzExpr = pzTemp;
+        allocated = true;
+        expr = pzTemp;
         /* FALLTHROUGH */
 
     default:
-        res = AG_SCM_STR02SCM((char*)pzExpr);
+        res = AG_SCM_STR02SCM((char*)expr);
         if (allocated)
-            AGFREE((void*)pzExpr);
+            AGFREE((void*)expr);
     }
 
     return res;
@@ -459,15 +466,15 @@ eval(char const* pzExpr)
  *   macro is inferred.  The result of the expression evaluation
  *   (@pxref{expression syntax}) is written to the current output.
 =*/
-tMacro*
-mFunc_Expr(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_Expr(templ_t* pT, macro_t* pMac)
 {
-    ag_bool needFree;
-    char const * pz = evalExpression(&needFree);
+    bool needFree;
+    char const * pz = eval_mac_expr(&needFree);
 
     if (*pz != NUL) {
-        fputs(pz, pCurFp->pFile);
-        fflush(pCurFp->pFile);
+        fputs(pz, cur_fpstack->stk_fp);
+        fflush(cur_fpstack->stk_fp);
     }
 
     if (needFree)
@@ -476,9 +483,18 @@ mFunc_Expr(tTemplate* pT, tMacro* pMac)
     return pMac + 1;
 }
 
-
+/**
+ * Determine the expression type.  It may be Scheme (starts with a semi-colon
+ * or an opening parenthesis), a shell command (starts with a back tick),
+ * a quoted string (either single or double), or it is some sort of plain
+ * string.  In that case, just return the text.
+ *
+ * @param pz pointer to string to diagnose
+ * @returns the EMIT_* compound value, though actually only
+ * EXPRESSION, SHELL or STRING can really ever be returned.
+ */
 static int
-exprType(char* pz)
+expr_type(char * pz)
 {
     switch (*pz) {
     case ';':
@@ -500,104 +516,106 @@ exprType(char* pz)
 }
 
 
-/*
- *  mLoad_Expression
+/**
+ *  mLoad_Expr
  */
-tMacro*
-mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 {
-    char *        pzCopy; /* next text dest   */
-    char const *  pzSrc    = (char const*)pMac->ozText; /* macro text */
-    size_t        srcLen   = (long)pMac->res;           /* macro len  */
-    char const *  pzSrcEnd = pzSrc + srcLen;
-    tMacro *      pNextMac;
+    char *        copy; /* next text dest   */
+    char const *  src     = (char const*)mac->md_txt_off; /* macro text */
+    size_t        src_len = (long)mac->md_res;           /* macro len  */
+    char const *  end_src = src + src_len;
 
-    switch (*pzSrc) {
+    switch (*src) {
+        macro_t * nxt_mac;
+
     case '-':
-        pMac->res = EMIT_IF_ABSENT;
-        pzSrc++;
+        mac->md_res = EMIT_IF_ABSENT;
+        src++;
         break;
 
     case '?':
-        pMac->res = EMIT_ALWAYS;
-        pzSrc++;
-        if (*pzSrc == '%') {
-            pMac->res |= EMIT_FORMATTED;
-            pzSrc++;
+        mac->md_res = EMIT_ALWAYS;
+        src++;
+        if (*src == '%') {
+            mac->md_res |= EMIT_FORMATTED;
+            src++;
         }
         break;
 
     case '%':
-        pMac->res = EMIT_FORMATTED;
-        pzSrc++;
+        mac->md_res = EMIT_FORMATTED;
+        src++;
+        break;
+
+    default:
+        mac->md_res = EMIT_VALUE; /* zero */
         break;
 
     case '`':
-        pNextMac  = mLoad_Unknown(pT, pMac, ppzScan);
-        pMac->res = EMIT_NO_DEFINE | EMIT_SHELL;
-        spanQuote(pT->pzTemplText + pMac->ozText);
-        return pNextMac;
+        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        mac->md_res = EMIT_NO_DEFINE | EMIT_SHELL;
+        spanQuote(tpl->td_text + mac->md_txt_off);
+        return nxt_mac;
 
     case '"':
     case '\'':
-        pNextMac  = mLoad_Unknown(pT, pMac, ppzScan);
-        pMac->res = EMIT_NO_DEFINE | EMIT_STRING;
-        spanQuote(pT->pzTemplText + pMac->ozText);
-        return pNextMac;
+        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        mac->md_res = EMIT_NO_DEFINE | EMIT_STRING;
+        spanQuote(tpl->td_text + mac->md_txt_off);
+        return nxt_mac;
 
     case '(':
     case ';':
-        pNextMac  = mLoad_Unknown(pT, pMac, ppzScan);
-        pMac->res = EMIT_NO_DEFINE | EMIT_EXPRESSION;
-        return pNextMac;
-
-    default:
-        pMac->res = EMIT_VALUE; /* zero */
+        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        mac->md_res = EMIT_NO_DEFINE | EMIT_EXPRESSION;
+        return nxt_mac;
     }
 
-    pzCopy = pT->pNext;
-    pMac->ozName = (pzCopy - pT->pzTemplText);
+    copy = tpl->td_scan;
+    mac->md_name_off = (copy - tpl->td_text);
     {
-        size_t remLen = canonicalizeName(pzCopy, pzSrc, (int)srcLen);
-        if (remLen > srcLen)
-            AG_ABEND_IN(pT, pMac, LD_EXPR_BAD_NAME);
-        pzSrc  += srcLen - remLen;
-        srcLen  = remLen;
-        pzCopy += strlen(pzCopy) + 1;
+        size_t remLen = canonicalizeName(copy, src, (int)src_len);
+        if (remLen > src_len)
+            AG_ABEND_IN(tpl, mac, LD_EXPR_BAD_NAME);
+        src  += src_len - remLen;
+        src_len  = remLen;
+        copy += strlen(copy) + 1;
     }
 
-    if (pzSrc >= pzSrcEnd) {
-        if (pMac->res != EMIT_VALUE)
-            AG_ABEND_IN(pT, pMac, LD_EXPR_NO_TEXT);
+    if (src >= end_src) {
+        if (mac->md_res != EMIT_VALUE)
+            AG_ABEND_IN(tpl, mac, LD_EXPR_NO_TEXT);
 
-        pMac->ozText = 0;
+        mac->md_txt_off = 0;
 
     } else {
-        char* pz = pzCopy;
-        long  ct = srcLen = (long)(pzSrcEnd - pzSrc);
+        char* pz = copy;
+        long  ct = src_len = (long)(end_src - src);
 
-        pMac->ozText = (pzCopy - pT->pzTemplText);
+        mac->md_txt_off = (copy - tpl->td_text);
         /*
          *  Copy the expression
          */
-        do { *(pzCopy++) = *(pzSrc++); } while (--ct > 0);
-        *(pzCopy++) = NUL; *(pzCopy++) = NUL; /* double terminate */
+        do { *(copy++) = *(src++); } while (--ct > 0);
+        *(copy++) = NUL; *(copy++) = NUL; /* double terminate */
 
         /*
          *  IF this expression has an "if-present" and "if-not-present"
          *  THEN find the ending expression...
          */
-        if ((pMac->res & EMIT_ALWAYS) != 0) {
-            char* pzNextExpr = (char*)skipExpression(pz, srcLen);
+        if ((mac->md_res & EMIT_ALWAYS) != 0) {
+            char* pzNextExpr = (char*)skipExpression(pz, src_len);
 
             /*
              *  The next expression must be within bounds and space separated
              */
-            if (pzNextExpr >= pz + srcLen)
-                AG_ABEND_IN(pT, pMac, LD_EXPR_NEED_TWO);
+            if (pzNextExpr >= pz + src_len)
+                AG_ABEND_IN(tpl, mac, LD_EXPR_NEED_TWO);
 
             if (! IS_WHITESPACE_CHAR(*pzNextExpr))
-                AG_ABEND_IN(pT, pMac, LD_EXPR_NO_SPACE);
+                AG_ABEND_IN(tpl, mac, LD_EXPR_NO_SPACE);
 
             /*
              *  NUL terminate the first expression, skip intervening
@@ -606,15 +624,15 @@ mLoad_Expr(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
              */
             *(pzNextExpr++) = NUL;
             pzNextExpr = SPN_WHITESPACE_CHARS(pzNextExpr);
-            pMac->res |= (exprType(pzNextExpr) << EMIT_SECONDARY_SHIFT);
-            pMac->endIndex = pzNextExpr - pT->pzTemplText;
+            mac->md_res |= (expr_type(pzNextExpr) << EMIT_SECONDARY_SHIFT);
+            mac->md_end_idx = pzNextExpr - tpl->td_text;
         }
 
-        pMac->res |= exprType(pz);
+        mac->md_res |= expr_type(pz);
     }
 
-    pT->pNext = pzCopy;
-    return pMac + 1;
+    tpl->td_scan = copy;
+    return mac + 1;
 }
 /*
  * Local Variables:

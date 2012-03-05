@@ -204,6 +204,7 @@ mk_noag_boot() {
 
     exec 5>&-
 
+    chmod +x ${cfgfile}
     mv -f ${cfgfile} ${progdir}/noag-boot.sh
 }
 

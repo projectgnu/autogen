@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-12-30 11:40:17 bkorb"
+## Time-stamp:      "2012-03-04 19:09:08 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -45,17 +45,16 @@ FUNCLIST        = \
 # The list of source files with Guile expression functions defined
 #
 EXPRLIST        = \
-	expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
-	expOutput.c  expPrint.c  expState.c expString.c agShell.c \
-	$(FUNCLIST)
+    expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
+    expOutput.c  expPrint.c  expState.c expString.c agShell.c \
+    $(FUNCLIST)
 
 FSMLIST         = cgi-fsm.c defParse-fsm.c
 csrc = \
-    autogen.c    ag-text.c    $(FSMLIST) $(EXPRLIST)  \
-    agCgi.c      agDep.c      agInit.c   agUtils.c    \
-    defDirect.c  defFind.c    defLex.c   defLoad.c    \
-    fmemopen.c   loadPseudo.c opts.c     scmStrings.c \
-    tpLoad.c     tpParse.c    tpProcess.c
+    autogen.c    ag-text.c $(FSMLIST) $(EXPRLIST)  agCgi.c \
+    agDep.c      agInit.c  agUtils.c  defDirect.c  defFind.c \
+    defLex.c     defLoad.c fmemopen.c loadPseudo.c opts.c \
+    scmStrings.c tpLoad.c  tpParse.c  tpProcess.c
 
 hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 
@@ -91,52 +90,64 @@ ag.c : Makefile
 ## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
 ## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
 ##
-BOOTENV  = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+BOOTENV  := top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
+
+list_stamps     := \
+    stamp-ag-text   stamp-cgi       stamp-directive stamp-fmem \
+    stamp-func      stamp-gver      stamp-man       stamp-opts \
+    stamp-parse     stamp-pseudo    stamp-texi
+
+MAKE_STAMP      = $(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ## stamp-opts GEN-RULE
 stamp-opts: opts.def $(top_srcdir)/VERSION $(CLexe)
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-directive GEN-RULE
 stamp-directive: defDirect.c
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-exprini GEN-RULE
 stamp-exprini : $(EXPRLIST) snarf.tpl
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-fsm GEN-RULE
 stamp-fsm : pseudo.def $(FSMTPL)
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-parse GEN-RULE
 stamp-parse : defParse.def $(FSMTPL)
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-ag-text GEN-RULE
 stamp-ag-text : ag-text.def
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## proto.h GEN-RULE
 proto.h :
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-texi GEN-RULE
 stamp-texi : $(AGnam)
 	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
 	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 ## stamp-man GEN-RULE
 stamp-man : opts.def $(AGnam)
 	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
 	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+	@$(MAKE_STAMP)
 
 autogen.1       : stamp-man
 invoke-autogen.texi    : stamp-texi
-gen      : stamp-texi
+gen      : $(list_stamps)
+
+maintainer-clean-local :
+	for t in $(list_stamps) ; do \
+	    test -f $$t && $(MAKE) -f $$t clean-$$t ; \
+	done
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \

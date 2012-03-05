@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-02-25 12:54:32 bkorb"
+# Time-stamp:      "2012-03-04 19:00:23 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -83,6 +83,10 @@ DEFINE init-and-validate                =][=
         #f
         (> (string->number (get "max")) 1)
 )   )   )
+
+(define get-text (lambda (nm) (shell (string-append
+        "sed 's/@{\\([^}]*\\)}/\\1/g' <<\\_EODesc_\n"
+        (get nm) "\n_EODesc_" ))))
 
 (define do-ifdefs (or (exist? "flag.ifdef") (exist? "flag.ifndef")))
 
@@ -817,10 +821,7 @@ DEFINE   emit-nondoc-option     =][=
 %s
 _EOF_" (get "translators")  ) " */" )  ) =]
 #define [= (. UP-name) =]_DESC      ([=
-    (set! tmp-val (shell (string-append
-          "sed 's/@{\\([^}]*\\)}/\\1/g' <<\\_EODesc_\n"
-          (get "descrip") "\n_EODesc_" )))
-    (string-table-add-ref opt-strs tmp-val) =])
+  (string-table-add-ref opt-strs (get-text "descrip")) =])
 #define [= (. UP-name) =]_NAME      ([=
     (string-table-add-ref opt-strs UP-name) =])[=
 
@@ -876,8 +877,8 @@ _EOF_" (get "translators")  ) " */" )  ) =]
 
      =* bool                  =][=
         CASE arg-default      =][=
-        ~ n.*|f.*|0           =](char const*)AG_FALSE[=
-        *                     =](char const*)AG_TRUE[=
+        ~ n.*|f.*|0           =](char const*)false[=
+        *                     =](char const*)true[=
         ESAC                  =][=
 
      =* key                   =](char const*)[=
@@ -998,7 +999,7 @@ DEFINE opt-strs
 
   IF (exist? "documentation")           =]
 #define [= (. UP-name) =]_DESC      ([=
-    (string-table-add-ref opt-strs (get "descrip")) =])
+    (string-table-add-ref opt-strs (get-text "descrip")) =])
 #define [= (. UP-name) =]_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ELIF (exist? "aliases")               =][=
      INVOKE emit-alias-option           =][=

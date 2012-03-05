@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
+ *  Time-stamp:        "2012-03-04 19:48:37 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -94,13 +94,13 @@ include = <<-  _END_INCLUDE
 	#endif
 
 	typedef void (init_proc_t)(void);
-	char const * pzTemplFileName  = NULL;
-	ag_bool      trace_is_to_pipe = AG_FALSE;
+	char const * tpl_fname  = NULL;
+	bool      trace_is_to_pipe = false;
 	_END_INCLUDE;
 
 export = <<- _EOExport_
-	extern char const * pzTemplFileName;
-	extern ag_bool      trace_is_to_pipe;
+	extern char const * tpl_fname;
+	extern bool      trace_is_to_pipe;
 	_EOExport_;
 #endif /* XML2AG */
 
@@ -156,7 +156,7 @@ flag = {
 	This option will override that name and expand a different template.
 	_EOF_;
 
-    flag-code = "    pzTemplFileName = pOptDesc->optArg.argString;";
+    flag-code = "    tpl_fname = pOptDesc->optArg.argString;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -177,11 +177,11 @@ flag = {
 	_EOF_;
 
     flag-code = <<- _EOCode_
-	    tTemplate* pT;
-	    procState = PROC_STATE_LIB_LOAD;
-	    pT = loadTemplate(pOptDesc->optArg.argString, NULL);
-	    unloadTemplate(pT);
-	    procState = PROC_STATE_OPTIONS;
+	    templ_t* pT;
+	    processing_state = PROC_STATE_LIB_LOAD;
+	    pT = tpl_load(pOptDesc->optArg.argString, NULL);
+	    tpl_unload(pT);
+	    processing_state = PROC_STATE_OPTIONS;
 	_EOCode_;
 #else
     stack-arg;
@@ -265,14 +265,14 @@ flag = {
 	option processing is complete.
 	_EOF_;
 
-    flag-code = <<-  _EOF_
-	    teProcState saveState = procState;
+    flag-code = <<-  _EOCode_
+	    teProcState saveState = processing_state;
 	    char* pz;
 	    char  zPath[MAXPATHLEN];
 	    static char const * const apzSfx[] = { "scm", NULL };
 
 	    if (! SUCCESSFUL(
-	        findFile(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {
+	        find_file(pOptDesc->optArg.argString, zPath, apzSfx, NULL))) {
 
 	        usage_message(CANNOT_LOCATE_FMT,
 	                      pOptDesc->optArg.argString);
@@ -280,12 +280,12 @@ flag = {
 	    }
 
 	    pz = aprf(LOAD_GUILE_FILE_FMT, zPath);
-	    procState = PROC_STATE_GUILE_PRELOAD;
+	    processing_state = PROC_STATE_GUILE_PRELOAD;
 	    (void)ag_scm_c_eval_string_from_file_line(
 	                   pz, __FILE__, __LINE__);
 	    free(pz);
-	    procState = saveState;
-	_EOF_;
+	    processing_state = saveState;
+	_EOCode_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -315,7 +315,7 @@ flag = {
 	these routines or data.
 	_EOF_;
 
-    flag-code = <<-  _EOF_
+    flag-code = <<-  _EOCode_
 	    void* hdl = dlopen(
 	        pOptDesc->optArg.argString, RTLD_NOW|RTLD_GLOBAL);
 	    init_proc_t* proc;
@@ -332,7 +332,7 @@ flag = {
 	                pOptDesc->optArg.argString);
 	    }
 	    else (*proc)();
-	_EOF_;
+	_EOCode_;
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -377,11 +377,11 @@ flag = {
 	you can use one or more copies of this option.  See the suffix
 	specification in the @ref{pseudo macro} section of the info doc.
 	_EOF_;
-    flag-code = <<- _EOF_
+    flag-code = <<- _EOCode_
 	    char const * arg = pOptDesc->optArg.argString;
 	    if ((arg != NULL) && (*arg != NUL))
 	        (void)do_suffix(arg, NULL, -1);
-	_EOF_;
+	_EOCode_;
 #else
     doc = "Pass-through AutoGen argument";
     stack-arg;
@@ -509,7 +509,7 @@ flag = {
 	with this option on the command line, with an environment variable
 	(@code{SHELL}) or in the configuration/initialization file.
 	_EOF_;
-    flag-code   = "    pzShellProgram = pOptDesc->optArg.argString;";
+    flag-code   = "    shell_program = pOptDesc->optArg.argString;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -822,22 +822,31 @@ flag = {
 	@code{-M "F <file>"} is acceptable because the @code{F} is part of the
 	option argument.
 
-	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or
-	G.  However, only F and T are meaningful and the latter has a somewhat
-	different meaning: @code{-MT<name>} is interpreted as meaning
+	@code{-M} may be followed by any of the letters M, F, P, T, Q, D, or G.
+	However, only F, Q, T and P are meaningful.  All but F have somewhat
+	different meanings.  @code{-MT<name>} is interpreted as meaning
 	@code{<name>} is a sentinel file that will depend on all inputs
 	(templates and definition files) and all the output files will depend
 	on this sentinel file.  It is suitable for use as a real make target.
+	Q is treated identically to T, except dollar characters ('$') are
+	doubled.  P causes a special clean (clobber) phoney rule to be inserted
+	into the make file fragment.  An empty rule is always created for
+	building the list of targets.
 
 	This is the recommended usage:
 	@example
-	-MFwhatever-you-like.dep -MTyour-sentinel-file
+	  -MFwhatever-you-like.dep -MTyour-sentinel-file -MP
 	@end example
 	and then in your @code{Makefile}, make the @file{autogen} rule:
 	@example
-	-include whatever-you-like.dep
-	your-sentinel-file:
-	    autogen -MT$@@ -MF$*.d .....
+	  -include whatever-you-like.dep
+	  clean_targets += clean-your-sentinel-file
+
+	  your-sentinel-file:
+	      autogen -MT$@@ -MF$*.d .....
+
+	  local-clean :
+	      rm -f $(clean_targets)
 	@end example
 
 	The modification time on the dependency file is adjusted to be one

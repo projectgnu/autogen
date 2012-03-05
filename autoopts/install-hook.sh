@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2012-02-12 09:00:21 bkorb"
+# Time-stamp:        "2012-02-28 19:40:17 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -37,16 +37,23 @@ cfgf=${top_builddir}/config.h
 {
     sed '/^#include <stdio/q' ${opthdrsrc}
 
-    if egrep 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
+    if grep -E 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
     then echo '#include <stdint.h>'
     else echo '#include <inttypes.h>' ; fi
 
-    if egrep 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
+    if grep -E 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
     then echo '#include <limits.h>'
     else echo '#include <sys/limits>' ; fi
 
-    if egrep 'define +HAVE_SYSEXITS_H' ${cfgf} >/dev/null
-    then echo '#include <sysexits.h>' ; fi
+    if grep -E 'define +HAVE_STDBOOL_H' ${cfgf}
+    then echo '#include <stdbool.h>'
+    else cat <<- _EOF_
+	typedef enum { false = 0, true = 1 } _Bool;
+	#define bool   _Bool
+	#define true   1
+	#define false  0
+	_EOF_
+    fi
 
     egrep 'define +NO_OPTIONAL_OPT_ARGS' ${cfgf}
 
@@ -57,16 +64,18 @@ cfgf=${top_builddir}/config.h
             sed 's/.*SIZEOF_CHARP *//'`
         sizeof_long=` egrep 'define +SIZEOF_LONG '  ${cfgf} | \
             sed 's/.*SIZEOF_LONG *//'`
-        echo "#ifndef HAVE_UINTPTR_T"
-        echo "#define HAVE_UINTPTR_T 1"
-        echo "#define HAVE_INTPTR_T  1"
         if test "X${sizeof_charp}" = "X${sizeof_long}"
-        then echo "typedef long intptr_t;"
-             echo "typedef unsigned long uintptr_t;"
-        else echo "typedef int intptr_t;"
-             echo "typedef unsigned int uintptr_t;"
+        then ptrtype=long
+        else ptrtype=int
         fi
-        echo "#endif /* HAVE_UINTPTR_T */"
+        cat <<- _EOF_
+		#ifndef HAVE_UINTPTR_T
+		#define HAVE_UINTPTR_T 1
+		#define HAVE_INTPTR_T  1
+		typedef $ptrtype intptr_t;
+		typedef unsigned $ptrtype uintptr_t;
+		#endif /* HAVE_UINTPTR_T */
+		_EOF_
     fi
 
     sedcmd='1,/END-CONFIGURED-HEADERS/d'

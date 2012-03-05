@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2012-01-29 09:24:26 bkorb"
+ * Time-stamp:        "2012-03-04 09:22:57 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -23,34 +23,34 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static tTlibMark magicMark = TEMPLATE_MAGIC_MARKER;
+static tlib_mark_t magicMark = TEMPLATE_MAGIC_MARKER;
 
 /* = = = START-STATIC-FORWARD = = = */
-static ag_bool
+static bool
 read_okay(char const * pzFName);
 
 static size_t
 cnt_macros(char const * pz);
 
 static void
-load_macs(tTemplate * pT, char const * pzF, char const * pzN,
+load_macs(templ_t * pT, char const * pzF, char const * pzN,
           char const * pzData);
 
-static tTemplate *
+static templ_t *
 digest_pseudo_macro(tmap_info_t * minfo, char * real_file);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
  * Return the template structure matching the name passed in.
  */
-LOCAL tTemplate *
+LOCAL templ_t *
 findTemplate(char const * pzTemplName)
 {
-    tTemplate * pT = pNamedTplList;
+    templ_t * pT = named_tpls;
     while (pT != NULL) {
-        if (streqvcmp(pzTemplName, pT->pzTplName) == 0)
+        if (streqvcmp(pzTemplName, pT->td_name) == 0)
             break;
-        pT = (tTemplate*)(void*)(pT->pNext);
+        pT = (templ_t*)(void*)(pT->td_scan);
     }
     return pT;
 }
@@ -58,15 +58,15 @@ findTemplate(char const * pzTemplName)
 /**
  * the name is a regular file with read access
  */
-static ag_bool
+static bool
 read_okay(char const * pzFName)
 {
     struct stat stbf;
     if (stat(pzFName, &stbf) != 0)
-        return AG_FALSE;
+        return false;
     if (! S_ISREG(stbf.st_mode))
-        return AG_FALSE;
-    return (access(pzFName, R_OK) == 0) ? AG_TRUE : AG_FALSE;
+        return false;
+    return (access(pzFName, R_OK) == 0) ? true : false;
 }
 
 
@@ -75,10 +75,10 @@ read_okay(char const * pzFName)
  *  list trying to find the base template file name.
  */
 LOCAL tSuccess
-findFile(char const * pzFName,
-         char * pzFullName,
-         char const * const * papSuffixList,
-         char const * pzReferrer)
+find_file(char const * pzFName,
+          char * pzFullName,
+          char const * const * papSuffixList,
+          char const * pzReferrer)
 {
     char * pzRoot;
     char * pzSfx;
@@ -243,13 +243,13 @@ cnt_macros(char const * pz)
 {
     size_t  ct = 2;
     for (;;) {
-        pz = strstr(pz, zStartMac);
+        pz = strstr(pz, start_mac);
         if (pz == NULL)
             break;
         ct += 2;
-        if (strncmp(pz - endMacLen, zEndMac, endMacLen) == 0)
+        if (strncmp(pz - end_mac_len, end_mac, end_mac_len) == 0)
             ct--;
-        pz += startMacLen;
+        pz += st_mac_len;
     }
     return ct;
 }
@@ -261,29 +261,29 @@ cnt_macros(char const * pz)
  *  Load the macro array and file name.
  */
 static void
-load_macs(tTemplate * pT, char const * pzF, char const * pzN,
+load_macs(templ_t * pT, char const * pzF, char const * pzN,
           char const * pzData)
 {
-    tMacro* pMac   = pT->aMacros;
+    macro_t* pMac   = pT->td_macros;
 
     {
-        char*   pzText = (char*)(pMac + pT->macroCt);
+        char*   pzText = (char*)(pMac + pT->td_mac_ct);
         size_t  len;
 
-        AGDUPSTR(pT->pzTplFile, pzF, "templ file");
+        AGDUPSTR(pT->td_file, pzF, "templ file");
 
         len = strlen(pzN) + 1;
         memcpy((void*)pzText, (void*)pzN, len);
-        pT->pzTplName   = pzText;
-        pzText         += len;
-        pT->pzTemplText = pzText;
-        pT->pNext       = pzText + 1;
+        pT->td_name = pzText;
+        pzText     += len;
+        pT->td_text = pzText;
+        pT->td_scan = pzText + 1;
     }
 
-    pCurTemplate = pT;
+    current_tpl = pT;
 
     {
-        tMacro* pMacEnd = parseTemplate(pMac, &pzData);
+        macro_t* pMacEnd = parseTemplate(pMac, &pzData);
         int     ct;
 
         /*
@@ -298,22 +298,22 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
-        if (ct < pT->macroCt) {
-            int     delta = sizeof(tMacro) * (pT->macroCt - ct);
+        if (ct < pT->td_mac_ct) {
+            int     delta = sizeof(macro_t) * (pT->td_mac_ct - ct);
             void*   data  =
-                (pT->pzTplName == NULL) ? pT->pzTemplText : pT->pzTplName;
-            size_t  size  = pT->pNext - (char*)data;
+                (pT->td_name == NULL) ? pT->td_text : pT->td_name;
+            size_t  size  = pT->td_scan - (char*)data;
             memmove((void*)pMacEnd, data, size);
 
-            pT->pzTemplText -= delta;
-            pT->pNext       -= delta;
-            pT->pzTplName   -= delta;
-            pT->macroCt      = ct;
+            pT->td_text -= delta;
+            pT->td_scan       -= delta;
+            pT->td_name   -= delta;
+            pT->td_mac_ct      = ct;
         }
     }
 
-    pT->descSize = pT->pNext - (char*)pT;
-    pT->pNext    = NULL;
+    pT->td_size = pT->td_scan - (char*)pT;
+    pT->td_scan    = NULL;
 
     /*
      *  We cannot reallocate a smaller array because
@@ -325,7 +325,7 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
         static char const zSum[] =
             "loaded %d macros from %s\n"
             "\tBinary template size:  0x%zX\n\n";
-        fprintf(pfTrace, zSum, pT->macroCt, pzF, pT->descSize);
+        fprintf(trace_fp, zSum, pT->td_mac_ct, pzF, pT->td_size);
     }
 #endif
 }
@@ -333,10 +333,10 @@ load_macs(tTemplate * pT, char const * pzF, char const * pzN,
 /**
  * Process the stuff in the pseudo macro.
  */
-static tTemplate *
+static templ_t *
 digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
 {
-    tTemplate * pRes;
+    templ_t * pRes;
 
     /*
      *  Count the number of macros in the template.  Compute
@@ -347,32 +347,32 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
     char const * pzData =
         loadPseudoMacro((char const *)minfo->txt_data, real_file);
 
-    size_t macroCt  = cnt_macros(pzData);
-    size_t alocSize = (sizeof(*pRes) + (macroCt * sizeof(tMacro))
+    size_t mac_ct   = cnt_macros(pzData);
+    size_t alloc_sz = (sizeof(*pRes) + (mac_ct * sizeof(macro_t))
                        + minfo->txt_size
                        - (pzData - (char const *)minfo->txt_data)
                        + strlen(real_file) + 0x10) & ~0x0F;
 
-    pRes = (tTemplate*)AGALOC(alocSize, "main template");
-    memset((void*)pRes, 0, alocSize);
+    pRes = (templ_t*)AGALOC(alloc_sz, "main template");
+    memset((void*)pRes, 0, alloc_sz);
 
     /*
      *  Initialize the values:
      */
-    pRes->magic     = magicMark;
-    pRes->descSize  = alocSize;
-    pRes->macroCt   = macroCt;
+    pRes->td_magic  = magicMark;
+    pRes->td_size  = alloc_sz;
+    pRes->td_mac_ct = mac_ct;
 
-    strcpy(pRes->zStartMac, zStartMac); /* must fit */
-    strcpy(pRes->zEndMac, zEndMac);     /* must fit */
+    strcpy(pRes->td_start_mac, start_mac); /* must fit */
+    strcpy(pRes->td_end_mac,   end_mac);   /* must fit */
     load_macs(pRes, real_file, PSEUDO_MAC_TPL_FILE, pzData);
 
-    pRes->pzTplName   -= (long)pRes;
-    pRes->pzTemplText -= (long)pRes;
-    pRes = (tTemplate*)AGREALOC((void*)pRes, pRes->descSize,
+    pRes->td_name   -= (long)pRes;
+    pRes->td_text -= (long)pRes;
+    pRes = (templ_t*)AGREALOC((void*)pRes, pRes->td_size,
                                 "resize template");
-    pRes->pzTplName   += (long)pRes;
-    pRes->pzTemplText += (long)pRes;
+    pRes->td_name   += (long)pRes;
+    pRes->td_text += (long)pRes;
 
     return pRes;
 }
@@ -382,8 +382,8 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
  *  Starting with the current directory, search the directory
  *  list trying to find the base template file name.
  */
-LOCAL tTemplate *
-loadTemplate(char const * pzFileName, char const * referrer)
+LOCAL templ_t *
+tpl_load(char const * pzFileName, char const * referrer)
 {
     static tmap_info_t mapInfo;
     static char        tpl_file[ AG_PATH_MAX ];
@@ -394,7 +394,7 @@ loadTemplate(char const * pzFileName, char const * referrer)
     {
         static char const * const apzSfx[] = {
             LOAD_TPL_SFX_TPL, LOAD_TPL_SFX_AGL, NULL };
-        if (! SUCCESSFUL(findFile(pzFileName, tpl_file, apzSfx, referrer))) {
+        if (! SUCCESSFUL(find_file(pzFileName, tpl_file, apzSfx, referrer))) {
             errno = ENOENT;
             AG_CANT(LOAD_TPL_CANNOT_MAP, pzFileName);
         }
@@ -414,15 +414,15 @@ loadTemplate(char const * pzFileName, char const * referrer)
             AG_CANT(LOAD_TPL_IRREGULAR, pzFileName);
         }
 
-        if (outTime <= stbf.st_mtime)
-            outTime = stbf.st_mtime + 1;
+        if (outfile_time < stbf.st_mtime)
+            outfile_time = stbf.st_mtime;
     }
 
     text_mmap(tpl_file, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo);
     if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
         AG_ABEND(aprf(LOAD_TPL_CANNOT_OPEN, tpl_file));
 
-    if (pfDepends != NULL)
+    if (dep_fp != NULL)
         add_source_file(tpl_file);
 
     /*
@@ -430,12 +430,12 @@ loadTemplate(char const * pzFileName, char const * referrer)
      *  starts immediately after it.
      */
     {
-        tMacro    * pSaveMac = pCurMacro;
-        tTemplate * pRes;
-        pCurMacro = NULL;
+        macro_t    * pSaveMac = cur_macro;
+        templ_t * pRes;
+        cur_macro = NULL;
 
         pRes = digest_pseudo_macro(&mapInfo, tpl_file);
-        pCurMacro = pSaveMac;
+        cur_macro = pSaveMac;
         text_munmap(&mapInfo);
 
         return pRes;
@@ -447,14 +447,14 @@ loadTemplate(char const * pzFileName, char const * referrer)
  * including the pointer passed in.
  */
 LOCAL void
-unloadTemplate(tTemplate* pT)
+tpl_unload(templ_t* pT)
 {
-    tMacro* pMac = pT->aMacros;
-    int ct = pT->macroCt;
+    macro_t* pMac = pT->td_macros;
+    int ct = pT->td_mac_ct;
 
     while (--ct >= 0) {
         tpUnloadProc proc;
-        unsigned int ix = pMac->funcCode;
+        unsigned int ix = pMac->md_code;
 
         /*
          * "select" functions get remapped, depending on the alias used for
@@ -470,7 +470,7 @@ unloadTemplate(tTemplate* pT)
         pMac++;
     }
 
-    AGFREE((void*)(pT->pzTplFile));
+    AGFREE((void*)(pT->td_file));
     AGFREE(pT);
 }
 
@@ -478,27 +478,27 @@ unloadTemplate(tTemplate* pT)
  *  This gets called when all is well at the end.
  */
 LOCAL void
-cleanup(tTemplate* pTF)
+cleanup(templ_t* pTF)
 {
     if (HAVE_OPT(USED_DEFINES))
         print_used_defines();
 
-    if (pfDepends != NULL)
+    if (dep_fp != NULL)
         wrap_up_depends();
 
     optionFree(&autogenOptions);
 
     for (;;) {
-        tTemplate* pT = pNamedTplList;
+        templ_t* pT = named_tpls;
         if (pT == NULL)
             break;
-        pNamedTplList = (tTemplate*)(void*)(pT->pNext);
-        unloadTemplate(pT);
+        named_tpls = (templ_t*)(void*)(pT->td_scan);
+        tpl_unload(pT);
     }
 
     AGFREE(forInfo.fi_data);
-    unloadTemplate(pTF);
-    unloadDefs();
+    tpl_unload(pTF);
+    unload_defs();
 }
 
 /*

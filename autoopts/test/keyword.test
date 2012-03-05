@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2011-08-07 17:33:08 bkorb"
+# Time-stamp:        "2012-02-28 19:42:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -114,16 +114,22 @@ cmp -s ${testname}.*-help || \
   failure "help output: `diff ${testname}.*-help`"
 
 ./${testname} --trace=exp > /dev/null 2>&1 && \
-  failure ${testname} accepted ambiguous keyword
+  failure "${testname} accepted ambiguous keyword"
+
+./${testname} --trace=999 > /dev/null 2>&1 && \
+  failure "${testname} accepted too much tracing"
+
+./${testname} --trace=~0 > /dev/null 2>&1 || \
+  failure "${testname} would not accept max tracing"
 
 ./${testname} --trace=expr --set=thirteen,ninth,third > ${testname}.t1-s || \
-  failure ${testname} did not handle its options
+  failure "${testname} did not handle its options"
 
 ./${testname} --trace=expr --set=thirteen,ninth,third --save=${testname}.cfg || \
-  failure ${testname} could not save its options
+  failure "${testname} could not save its options"
 
 ${EGREP} -v '^#' ${testname}.cfg > ${testname}res.cfg || \
-  failure ${testname} could not create ${testname}.cfg
+  failure "${testname} could not create ${testname}.cfg"
 
 cat > ${testname}base.cfg <<- \_EndIni_
 	trace               expressions
@@ -260,11 +266,18 @@ See \fBOPTION PRESETS\fP for configuration files.
 .SH "EXIT STATUS"
 One of the following exit values will be returned:
 .TP
-.BR 0
+.BR 0 " (EXIT_SUCCESS)"
 Successful program execution.
 .TP
-.BR 1
+.BR 1 " (EXIT_FAILURE)"
 The operation failed or the command syntax was not valid.
+.TP
+.BR 66 " (EX_NOINPUT)"
+A specified configuration file could not be loaded.
+.TP
+.BR 70 " (EX_SOFTWARE)"
+libopts had an internal operational error.  Please report
+it to autogen-users@lists.sourceforge.net.  Thank you.
 .SH "NOTES"
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
 option definitions.
@@ -374,10 +387,15 @@ See \fBOPTION PRESETS\fP for configuration files.
 .Sh "EXIT STATUS"
 One of the following exit values will be returned:
 .Bl -tag
-.It 0
+.It 0 " (EXIT_SUCCESS)"
 Successful program execution.
-.It 1
+.It 1 " (EXIT_FAILURE)"
 The operation failed or the command syntax was not valid.
+.It 66 " (EX_NOINPUT)"
+A specified configuration file could not be loaded.
+.It 70 " (EX_SOFTWARE)"
+libopts had an internal operational error.  Please report
+it to autogen-users@lists.sourceforge.net.  Thank you.
 .El
 .Sh "NOTES"
 This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP

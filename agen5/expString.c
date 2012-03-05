@@ -2,7 +2,7 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2012-02-12 09:01:34 bkorb"
+ *  Time-stamp:        "2012-03-04 19:01:34 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -884,8 +884,8 @@ ag_scm_stack(SCM obj)
 {
     SCM         res;
     SCM *       pos = &res;
-    tDefEntry** ppDE;
-    tDefEntry*  pDE;
+    def_ent_t** ppDE;
+    def_ent_t*  pDE;
     SCM         str;
 
     res = SCM_EOL;
@@ -900,10 +900,10 @@ ag_scm_stack(SCM obj)
         if (pDE == NULL)
             break;
 
-        if (pDE->valType != VALTYP_TEXT)
+        if (pDE->de_type != VALTYP_TEXT)
             return SCM_UNDEFINED;
 
-        str  = AG_SCM_STR02SCM(pDE->val.pzText);
+        str  = AG_SCM_STR02SCM(pDE->de_val.dvu_text);
         *pos = scm_cons(str, SCM_EOL);
         pos  = SCM_CDRLOC(*pos);
     }

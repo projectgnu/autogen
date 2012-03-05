@@ -2,7 +2,7 @@
 /**
  * @file defLoad.c
  *
- *  Time-stamp:        "2011-12-30 15:33:37 bkorb"
+ *  Time-stamp:        "2012-03-04 11:02:51 bkorb"
  *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
@@ -31,78 +31,45 @@ typedef enum {
     INPUT_FILE
 } def_input_mode_t;
 
-static tDefEntry* pFreeEntryList = NULL;
+static def_ent_t* pFreeEntryList = NULL;
 static void*      pAllocList     = NULL;
 
 #define ENTRY_SPACE        (4096 - sizeof(void*))
-#define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(tDefEntry))
+#define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(def_ent_t))
 #define ENTRY_ALLOC_SIZE   \
-    ((ENTRY_ALLOC_CT * sizeof(tDefEntry)) + sizeof(void*))
+    ((ENTRY_ALLOC_CT * sizeof(def_ent_t)) + sizeof(void*))
 
 /* = = = START-STATIC-FORWARD = = = */
-static tDefEntry*
-insertDef(tDefEntry* pDef);
+static def_ent_t*
+insert_ent(def_ent_t* pDef);
 
 static def_input_mode_t
-ready_input(char const ** ppzfile, size_t * psz);
+ready_def_input(char const ** ppzfile, size_t * psz);
 /* = = = END-STATIC-FORWARD = = = */
 
-#if defined(DEBUG_ENABLED)
-void
-manageAllocatedData(void* pd)
+LOCAL def_ent_t *
+new_def_ent(void)
 {
-    static int    allocPtrCt   = 0;
-    static int    usedPtrCt    = 0;
-    static void** papAllocData = NULL;
-
-    if (pd == NULL) {
-        void** pp = papAllocData;
-        if (pp == NULL)
-            return;
-
-        while (--usedPtrCt >= 0)
-            AGFREE(*(pp++));
-
-        AGFREE(papAllocData);
-        papAllocData = NULL;
-
-    } else {
-        if (++usedPtrCt > allocPtrCt) {
-            allocPtrCt += 16;
-            papAllocData = (usedPtrCt > 1)
-                ? AGREALOC(papAllocData, allocPtrCt * sizeof(void*), "atbl")
-                : AGALOC(allocPtrCt * sizeof(void*), "atbl");
-        }
-        papAllocData[usedPtrCt-1] = pd;
-    }
-}
-#endif
-
-LOCAL tDefEntry*
-getEntry(void)
-{
-    tDefEntry*  pRes = pFreeEntryList;
+    def_ent_t * pRes = pFreeEntryList;
 
     if (pRes != NULL) {
-        pFreeEntryList = pRes->pNext;
+        pFreeEntryList = pRes->de_next;
 
     } else {
         int   ct = ENTRY_ALLOC_CT-1;
         void* p  = AGALOC(ENTRY_ALLOC_SIZE, "def headers");
 
-        manageAllocatedData(p);
-
         *((void**)p) = pAllocList;
         pAllocList   = p;
-        pRes = pFreeEntryList = (tDefEntry*)((void**)p + 1);
+        pRes = pFreeEntryList = (def_ent_t*)((void**)p + 1);
 
         /*
          *  This is a post-loop test loop.  It will cycle one fewer times
-         *  than there are 'tDefEntry' structs in the memory we just alloced.
+         *  than there are 'def_ent_t' structs in the memory we just alloced.
          */
         do  {
-            tDefEntry* pNxt = pRes+1;
-            pRes->pNext = pNxt;
+            def_ent_t* pNxt = pRes+1;
+            pRes->de_next = pNxt;
 
             /*
              *  When the loop ends, "pRes" will point to the last allocated
@@ -116,7 +83,7 @@ getEntry(void)
          *  routine is called, the *FIRST* structure in this list will
          *  be returned.
          */
-        pRes[-1].pNext = NULL;
+        pRes[-1].de_next = NULL;
     }
 
     memset((void*)pRes, 0, sizeof(*pRes));
@@ -127,62 +94,66 @@ getEntry(void)
  *  Append a new entry at the end of a sibling (or twin) list.
  */
 LOCAL void
-print_def(tDefEntry * pDef)
+print_ent(def_ent_t * pDef)
 {
-    int ix = 32 - (2 * stackDepth);
+    int ix = 32 - (2 * ent_stack_depth);
     char const * space = PRINT_DEF_SPACES + ((ix < 0) ? 0 : ix);
 
     char const * vtyp;
 
-    switch (pDef->valType) {
+    switch (pDef->de_type) {
     case VALTYP_UNKNOWN: vtyp = DEF_TYPE_UNKNOWN; break;
     case VALTYP_TEXT:    vtyp = DEF_TYPE_TEXT;    break;
     case VALTYP_BLOCK:   vtyp = DEF_TYPE_BLOCK;   break;
     default:             vtyp = DEF_TYPE_INVALID; break;
     }
 
-    fprintf(pfTrace, PRINT_DEF_SHOW_FMT,
+    fprintf(trace_fp, PRINT_DEF_SHOW_FMT,
             space,
-            pDef->pzDefName, (unsigned int)pDef->index,
+            pDef->de_name, (unsigned int)pDef->de_index,
             vtyp,
-            pDef->pzSrcFile, pDef->srcLineNum);
+            pDef->de_file, pDef->de_line);
 }
 
-/*
- *  Append a new entry at the end of a sibling (or twin) list.
+/**
+ *  Append a new entry into a sibling (or twin) list.
+ *
+ * @param pDef new definition
+ * @returns usually, the input, but sometimes it is necessary to move
+ *  the data, so returns the address of the incoming data regardless.
  */
-static tDefEntry*
-insertDef(tDefEntry* pDef)
+static def_ent_t*
+insert_ent(def_ent_t* pDef)
 {
-    tDefEntry* pList = ppParseStack[ stackDepth ];
+    def_ent_t* pList = ent_stack[ ent_stack_depth ];
 
     /*
      *  If the current level is empty, then just insert this one and quit.
      */
-    if (pList->val.pDefEntry == NULL) {
-        if (pDef->index == NO_INDEX)
-            pDef->index = 0;
-        pList->val.pDefEntry = pDef;
+    if (pList->de_val.dvu_entry == NULL) {
+        if (pDef->de_index == NO_INDEX)
+            pDef->de_index = 0;
+        pList->de_val.dvu_entry = pDef;
 
         return pDef;
     }
-    pList = pList->val.pDefEntry;
+    pList = pList->de_val.dvu_entry;
 
     /*
      *  Scan the list looking for a "twin" (same-named entry).
      */
-    while (strcmp(pDef->pzDefName, pList->pzDefName) != 0) {
+    while (strcmp(pDef->de_name, pList->de_name) != 0) {
         /*
          *  IF we are at the end of the list,
          *  THEN put the new entry at the end of the list.
          *       This is a new name in the current context.
          *       The value type is forced to be the same type.
          */
-        if (pList->pNext == NULL) {
-            pList->pNext = pDef;
+        if (pList->de_next == NULL) {
+            pList->de_next = pDef;
 
-            if (pDef->index == NO_INDEX)
-                pDef->index = 0;
+            if (pDef->de_index == NO_INDEX)
+                pDef->de_index = 0;
 
             return pDef;
         }
@@ -190,78 +161,78 @@ insertDef(tDefEntry* pDef)
         /*
          *  Check the next sibling for a twin value.
          */
-        pList = pList->pNext;
+        pList = pList->de_next;
     }
 
     /*  * * * * *  WE HAVE FOUND A TWIN
      *
      *  Link in the new twin chain entry into the list.
      */
-    if (pDef->index == NO_INDEX) {
-        tDefEntry* pT = pList->pEndTwin;
+    if (pDef->de_index == NO_INDEX) {
+        def_ent_t* pT = pList->de_etwin;
         if (pT == NULL)
             pT = pList;
 
-        pDef->index = pT->index + 1;
-        pT->pTwin = pDef;
-        pDef->pPrevTwin = pT;
-        pList->pEndTwin = pDef;
+        pDef->de_index  = pT->de_index + 1;
+        pT->de_twin     = pDef;
+        pDef->de_ptwin  = pT;
+        pList->de_etwin = pDef;
 
-    } else if (pList->index > pDef->index) {
+    } else if (pList->de_index > pDef->de_index) {
 
         /*
          *  Insert the new entry before any other in the list.
          *  We actually do this by leaving the pList pointer alone and swapping
          *  the contents of the definition entry.
          */
-        tDefEntry def = *pDef;
+        def_ent_t def = *pDef;
 
-        memcpy(&(pDef->pzDefName), &(pList->pzDefName),
-               sizeof(def) - ag_offsetof(tDefEntry, pzDefName));
+        memcpy(&(pDef->de_name), &(pList->de_name),
+               sizeof(def) - ag_offsetof(def_ent_t, de_name));
 
-        memcpy(&(pList->pzDefName), &(def.pzDefName),
-               sizeof(def) - ag_offsetof(tDefEntry, pzDefName));
+        memcpy(&(pList->de_name), &(def.de_name),
+               sizeof(def) - ag_offsetof(def_ent_t, de_name));
 
         /*
          * Contents are swapped.  Link "pDef" after "pList" and return "pList".
          */
-        pDef->pTwin = pList->pTwin;
-        if (pDef->pTwin != NULL)
-            pDef->pTwin->pPrevTwin = pDef;
+        pDef->de_twin = pList->de_twin;
+        if (pDef->de_twin != NULL)
+            pDef->de_twin->de_ptwin = pDef;
 
-        pDef->pPrevTwin = pList;
-        pList->pTwin  = pDef;
+        pDef->de_ptwin = pList;
+        pList->de_twin  = pDef;
 
         /*
          *  IF this is the first twin, then the original list head is now
          *  the "end twin".
          */
-        if (pList->pEndTwin == NULL)
-            pList->pEndTwin = pDef;
+        if (pList->de_etwin == NULL)
+            pList->de_etwin = pDef;
 
         pDef = pList;  /* Return the replacement structure address */
 
     } else {
-        tDefEntry* pL = pList;
-        tDefEntry* pT = pL->pTwin;
+        def_ent_t* pL = pList;
+        def_ent_t* pT = pL->de_twin;
 
         /*
          *  Insert someplace after the first entry.  Scan the list until
          *  we either find a larger index or we get to the end.
          */
-        while ((pT != NULL) && (pT->index < pDef->index)) {
+        while ((pT != NULL) && (pT->de_index < pDef->de_index)) {
             pL = pT;
-            pT = pT->pTwin;
+            pT = pT->de_twin;
         }
 
-        pDef->pTwin = pT;
+        pDef->de_twin = pT;
 
-        pL->pTwin = pDef;
-        pDef->pPrevTwin = pL;
+        pL->de_twin = pDef;
+        pDef->de_ptwin = pL;
         if (pT == NULL)
-            pList->pEndTwin = pDef;
+            pList->de_etwin = pDef;
         else
-            pT->pPrevTwin = pDef;
+            pT->de_ptwin = pDef;
     }
 
     return pDef; /* sometimes will change */
@@ -270,57 +241,56 @@ insertDef(tDefEntry* pDef)
 /**
  * Figure out where to insert an entry in a list of twins.
  */
-LOCAL tDefEntry*
-findPlace(char* name, char const * pzIndex)
+LOCAL def_ent_t *
+number_and_insert_ent(char * name, char const * idx_str)
 {
-    tDefEntry* pE = getEntry();
+    def_ent_t * ent = new_def_ent();
 
-    pE->pzDefName = name;
+    ent->de_name = name;
 
-    if (pzIndex == NULL)
-        pE->index = NO_INDEX;
+    if (idx_str == NULL)
+        ent->de_index = NO_INDEX;
 
-    else if (IS_DEC_DIGIT_CHAR(*pzIndex) || (*pzIndex == '-'))
-        pE->index = strtol(pzIndex, NULL, 0);
+    else if (IS_SIGNED_NUMBER_CHAR(*idx_str))
+        ent->de_index = strtol(idx_str, NULL, 0);
 
     else {
-        pzIndex = getDefine(pzIndex, AG_TRUE);
-        if (pzIndex != NULL)
-             pE->index = strtol(pzIndex, NULL, 0);
-        else pE->index = NO_INDEX;
+        idx_str = getDefine(idx_str, true);
+        if (idx_str != NULL)
+             ent->de_index = strtol(idx_str, NULL, 0);
+        else ent->de_index = NO_INDEX;
     }
 
-    strtransform(pE->pzDefName, pE->pzDefName);
-    pE->valType     = VALTYP_UNKNOWN;
-    pE->pzSrcFile   = (char*)pCurCtx->pzCtxFname;
-    pE->srcLineNum  = pCurCtx->lineNo;
-    return (pCurrentEntry = insertDef(pE));
+    strtransform(ent->de_name, ent->de_name);
+    ent->de_type  = VALTYP_UNKNOWN;
+    ent->de_file  = (char*)cctx->scx_fname;
+    ent->de_line  = cctx->scx_line;
+    return (curr_ent = insert_ent(ent));
 }
 
 /**
  * figure out which file descriptor to use for reading definitions.
  */
 static def_input_mode_t
-ready_input(char const ** ppzfile, size_t * psz)
+ready_def_input(char const ** ppzfile, size_t * psz)
 {
     struct stat stbf;
 
     if (! ENABLED_OPT(DEFINITIONS)) {
-        pBaseCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx), "scan context");
-        memset((void*)pBaseCtx, 0, sizeof(tScanCtx));
-        pBaseCtx->lineNo     = 1;
-        pBaseCtx->pzCtxFname = READY_INPUT_NODEF;
-        manageAllocatedData(pBaseCtx);
+        base_ctx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t), "scan context");
+        memset((void*)base_ctx, 0, sizeof(scan_ctx_t));
+        base_ctx->scx_line  = 1;
+        base_ctx->scx_fname = READY_INPUT_NODEF;
 
         if (! ENABLED_OPT(SOURCE_TIME))
-            outTime = time(NULL);
+            outfile_time = time(NULL);
         return INPUT_DONE;
     }
 
     *ppzfile = OPT_ARG(DEFINITIONS);
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(pfTrace, TRACE_DEF_LOAD);
+        fprintf(trace_fp, TRACE_DEF_LOAD);
 
     /*
      *  Check for stdin as the input file.  We use the current time
@@ -332,14 +302,14 @@ ready_input(char const ** ppzfile, size_t * psz)
         *ppzfile = OPT_ARG(DEFINITIONS) = "stdin";
         if (getenv(REQUEST_METHOD) != NULL) {
             loadCgi();
-            pCurCtx = pBaseCtx;
+            cctx = base_ctx;
             dp_run_fsm();
             return INPUT_DONE;
         }
 
     accept_fifo:
-        outTime  = time(NULL);
-        *psz = 0x4000 - (4+sizeof(*pBaseCtx));
+        outfile_time  = time(NULL);
+        *psz = 0x4000 - (4+sizeof(*base_ctx));
         return INPUT_STDIN;
     }
 
@@ -366,9 +336,7 @@ ready_input(char const ** ppzfile, size_t * psz)
      */
     *psz = stbf.st_size;
 
-    if (ENABLED_OPT(SOURCE_TIME))
-         outTime = stbf.st_mtime + 1;
-    else outTime = time(NULL);
+    outfile_time = ENABLED_OPT(SOURCE_TIME) ? stbf.st_mtime : time(NULL);
 
     return INPUT_FILE;
 }
@@ -377,14 +345,14 @@ ready_input(char const ** ppzfile, size_t * psz)
  *  Suck in the entire definitions file and parse it.
  */
 LOCAL void
-readDefines(void)
+read_defs(void)
 {
     char const *  pzDefFile;
     char *        pzData;
     size_t        dataSize;
     size_t        sizeLeft;
     FILE *        fp;
-    def_input_mode_t in_mode = ready_input(&pzDefFile, &dataSize);
+    def_input_mode_t in_mode = ready_def_input(&pzDefFile, &dataSize);
 
     if (in_mode == INPUT_DONE)
         return;
@@ -392,10 +360,10 @@ readDefines(void)
     /*
      *  Allocate the space we need for our definitions.
      */
-    sizeLeft = dataSize+4+sizeof(*pBaseCtx);
-    pBaseCtx = (tScanCtx*)AGALOC(sizeLeft, "file buf");
-    memset((void*)pBaseCtx, 0, sizeLeft);
-    pBaseCtx->lineNo = 1;
+    sizeLeft = dataSize+4+sizeof(*base_ctx);
+    base_ctx = (scan_ctx_t*)AGALOC(sizeLeft, "file buf");
+    memset((void*)base_ctx, 0, sizeLeft);
+    base_ctx->scx_line = 1;
     sizeLeft = dataSize;
 
     /*
@@ -405,9 +373,9 @@ readDefines(void)
      *  value.  (It may get reallocated here in this routine, tho...)
      */
     pzData =
-        pBaseCtx->pzScan =
-        pBaseCtx->pzData = (char*)(pBaseCtx+1);
-    pBaseCtx->pCtx = NULL;
+        base_ctx->scx_scan =
+        base_ctx->scx_data = (char*)(base_ctx+1);
+    base_ctx->scx_next     = NULL;
 
     /*
      *  Set the input file pointer, as needed
@@ -420,7 +388,7 @@ readDefines(void)
         if (fp == NULL)
             AG_CANT(READ_DEF_OPEN, pzDefFile);
 
-        if (pfDepends != NULL)
+        if (dep_fp != NULL)
             add_source_file(pzDefFile);
     }
 
@@ -454,7 +422,7 @@ readDefines(void)
          *  See if there is any space left
          */
         if (sizeLeft == 0) {
-            tScanCtx* p;
+            scan_ctx_t* p;
             off_t dataOff;
 
             /*
@@ -468,8 +436,8 @@ readDefines(void)
              *  Try to reallocate our input buffer.
              */
             dataSize += (sizeLeft = 0x1000);
-            dataOff = pzData - pBaseCtx->pzData;
-            p = AGREALOC((void*)pBaseCtx, dataSize+4+sizeof(*pBaseCtx),
+            dataOff = pzData - base_ctx->scx_data;
+            p = AGREALOC((void*)base_ctx, dataSize+4+sizeof(*base_ctx),
                          "expand f buf");
 
             /*
@@ -477,22 +445,20 @@ readDefines(void)
              *  offset within the new buffer and make sure our base pointer
              *  has been corrected as well.
              */
-            if (p != pBaseCtx) {
-                p->pzScan = \
-                    p->pzData = (char*)(p+1);
-                pzData = p->pzData + dataOff;
-                pBaseCtx = p;
+            if (p != base_ctx) {
+                p->scx_scan = \
+                    p->scx_data = (char*)(p+1);
+                pzData = p->scx_data + dataOff;
+                base_ctx = p;
             }
         }
     }
 
-    if (pzData == pBaseCtx->pzData)
+    if (pzData == base_ctx->scx_data)
         AG_ABEND(READ_DEF_NO_DEFS);
 
     *pzData = NUL;
-    AGDUPSTR(pBaseCtx->pzCtxFname, pzDefFile, "def file name");
-    manageAllocatedData(pBaseCtx);
-    manageAllocatedData((void*)pBaseCtx->pzCtxFname);
+    AGDUPSTR(base_ctx->scx_fname, pzDefFile, "def file name");
 
     /*
      *  Close the input file, parse the data
@@ -501,13 +467,13 @@ readDefines(void)
     if (in_mode != INPUT_STDIN)
         fclose(fp);
 
-    pCurCtx = pBaseCtx;
+    cctx = base_ctx;
     dp_run_fsm();
 }
 
 
 LOCAL void
-unloadDefs(void)
+unload_defs(void)
 {
     return;
 }

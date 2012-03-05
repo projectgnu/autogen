@@ -1,7 +1,7 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2012-01-29 20:36:21 bkorb"
+ *  Time-stamp:        "2012-03-04 19:08:09 bkorb"
  *
  *  Manage a server shell process
  *
@@ -139,9 +139,9 @@ HIDE_FN(char * shell_cmd(char const* pzCmd)) {
 /*
  *  Dual pipe opening of a child process
  */
-static tpfPair      serv_pair     = { NULL, NULL };
+static fp_pair_t      serv_pair     = { NULL, NULL };
 static pid_t        serv_id       = NULLPROCESS;
-static ag_bool      was_close_err = AG_FALSE;
+static bool      was_close_err = false;
 static int          log_ct        = 0;
 static char const * last_cmd      = NULL;
 
@@ -152,7 +152,7 @@ handle_signal(int signo);
 static void
 set_orig_dir(void);
 
-static ag_bool
+static bool
 send_cmd_ok(char const * cmd);
 
 static void
@@ -165,13 +165,13 @@ static void
 server_setup(void);
 
 static int
-chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild);
+chain_open(int in_fd, char const ** arg_v, pid_t * child_pid);
 
 static pid_t
-server_open(tFdPair* pPair, char const ** ppArgs);
+server_open(fd_pair_t * fd_pair, char const ** ppArgs);
 
 static pid_t
-server_fp_open(tpfPair* pfPair, char const ** ppArgs);
+server_fp_open(fp_pair_t * fp_pair, char const ** ppArgs);
 
 static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len);
@@ -201,8 +201,8 @@ close_server_shell(void)
      *  needs that lock, so we hang waiting for it.  Oops.  So, when we
      *  are aborting, we just let the OS close these file descriptors.
      */
-    if (procState != PROC_STATE_ABORTING) {
-        (void)fclose(serv_pair.pfRead);
+    if (processing_state != PROC_STATE_ABORTING) {
+        (void)fclose(serv_pair.fp_read);
         /*
          *  This is _completely_ wrong, but sometimes there are data left
          *  hanging about that gets sucked up by the _next_ server shell
@@ -211,11 +211,11 @@ close_server_shell(void)
          *  the initialization string twice.  It must be a broken timing
          *  issue in the Linux stdio code.  I have no other explanation.
          */
-        fflush(serv_pair.pfWrite);
-        (void)fclose(serv_pair.pfWrite);
+        fflush(serv_pair.fp_write);
+        (void)fclose(serv_pair.fp_write);
     }
 
-    serv_pair.pfRead = serv_pair.pfWrite = NULL;
+    serv_pair.fp_read = serv_pair.fp_write = NULL;
 }
 
 /**
@@ -229,14 +229,14 @@ handle_signal(int signo)
     if ((signo == SIGALRM) && (--timeout_limit <= 0))
         AG_ABEND(TOO_MANY_TIMEOUTS_MSG);
 
-    fprintf(pfTrace, SHELL_DIE_ON_SIGNAL_FMT, strsignal(signo), signo);
-    was_close_err = AG_TRUE;
+    fprintf(trace_fp, SHELL_DIE_ON_SIGNAL_FMT, strsignal(signo), signo);
+    was_close_err = true;
 
-    (void)fputs(SHELL_LAST_CMD_MSG, pfTrace);
+    (void)fputs(SHELL_LAST_CMD_MSG, trace_fp);
     {
         char const* pz = (last_cmd == NULL)
             ? SHELL_UNK_LAST_CMD_MSG : last_cmd;
-        fprintf(pfTrace, SHELL_CMD_FMT, cur_dir, pz, SH_DONE_MARK, log_ct);
+        fprintf(trace_fp, SHELL_CMD_FMT, cur_dir, pz, SH_DONE_MARK, log_ct);
     }
     last_cmd = NULL;
     close_server_shell();
@@ -256,28 +256,28 @@ set_orig_dir(void)
     cur_dir = getcwd(p, AG_PATH_MAX);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs(TRACE_SHELL_FIRST_START, pfTrace);
+        fputs(TRACE_SHELL_FIRST_START, trace_fp);
 }
 
 /**
  * Send a command string down to the server shell
  */
-static ag_bool
+static bool
 send_cmd_ok(char const * cmd)
 {
     last_cmd = cmd;
-    fprintf(serv_pair.pfWrite, SHELL_CMD_FMT, cur_dir, last_cmd,
+    fprintf(serv_pair.fp_write, SHELL_CMD_FMT, cur_dir, last_cmd,
             SH_DONE_MARK, ++log_ct);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, LOG_SEP_FMT, log_ct);
-        fprintf(pfTrace, SHELL_CMD_FMT, cur_dir, last_cmd,
+        fprintf(trace_fp, LOG_SEP_FMT, log_ct);
+        fprintf(trace_fp, SHELL_CMD_FMT, cur_dir, last_cmd,
                 SH_DONE_MARK, log_ct);
     }
 
-    (void)fflush(serv_pair.pfWrite);
+    (void)fflush(serv_pair.fp_write);
     if (was_close_err)
-        fprintf(pfTrace, CMD_FAIL_FMT, cmd);
+        fprintf(trace_fp, CMD_FAIL_FMT, cmd);
     return ! was_close_err;
 }
 
@@ -289,11 +289,11 @@ send_cmd_ok(char const * cmd)
 static void
 start_server_cmd_trace(void)
 {
-    fputs(TRACE_XTRACE_MSG, pfTrace);
+    fputs(TRACE_XTRACE_MSG, trace_fp);
     if (send_cmd_ok(SHELL_XTRACE_CMDS)) {
         char * pz = load_data();
-        fputs(SHELL_RES_DISCARD_MSG, pfTrace);
-        fprintf(pfTrace, TRACE_TRAP_STATE_FMT, pz);
+        fputs(SHELL_RES_DISCARD_MSG, trace_fp);
+        fprintf(trace_fp, TRACE_TRAP_STATE_FMT, pz);
         AGFREE((void*)pz);
     }
 }
@@ -305,7 +305,7 @@ start_server_cmd_trace(void)
 static void
 send_server_init_cmds(void)
 {
-    was_close_err = AG_FALSE;
+    was_close_err = false;
 
     {
         char * pzc = AGALOC(SHELL_INIT_STR_LEN
@@ -314,7 +314,7 @@ send_server_init_cmds(void)
                             "server init");
         sprintf(pzc, SHELL_INIT_STR, (unsigned int)getpid(),
                 autogenOptions.pzProgPath,
-                (pfDepends == NULL) ? "" : pzDepFile);
+                (dep_fp == NULL) ? "" : dep_file);
 
         if (send_cmd_ok(pzc))
             AGFREE((void*)load_data());
@@ -322,7 +322,7 @@ send_server_init_cmds(void)
     }
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs(SHELL_RES_DISCARD_MSG, pfTrace);
+        fputs(SHELL_RES_DISCARD_MSG, trace_fp);
 
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
         start_server_cmd_trace();
@@ -338,7 +338,7 @@ server_setup(void)
     if (cur_dir == NULL)
         set_orig_dir();
     else if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fputs(SHELL_RESTART_MSG, pfTrace);
+        fputs(SHELL_RESTART_MSG, trace_fp);
 
     {
         struct sigaction new_sa;
@@ -368,68 +368,69 @@ server_setup(void)
  * @returns the read end of a pipe the child process uses for stdout
  */
 static int
-chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
+chain_open(int in_fd, char const ** arg_v, pid_t * child_pid)
 {
-    tFdPair   stdoutPair = { -1, -1 };
-    pid_t     chId;
-    char const *      pzShell;
+    fd_pair_t out_pair = { -1, -1 };
+    pid_t     ch_pid;
+    char const * shell;
 
     /*
      *  If we did not get an arg list, use the default
      */
-    if (ppArgs == NULL)
-        ppArgs = serverArgs;
+    if (arg_v == NULL)
+        arg_v = server_args;
 
     /*
      *  If the arg list does not have a program,
      *  assume the zShellProg from the environment, or, failing
      *  that, then sh.  Set argv[0] to whatever we decided on.
      */
-    if (pzShell = *ppArgs,
-       (pzShell == NULL) || (*pzShell == NUL)) {
+    if (shell = *arg_v,
+       (shell == NULL) || (*shell == NUL))
 
-        pzShell = pzShellProgram;
-        *ppArgs = pzShell;
-    }
+        *arg_v = shell = shell_program;
 
     /*
      *  Create a pipe it will be the child process' stdout,
      *  and the parent will read from it.
      */
-    if (pipe((int*)&stdoutPair) < 0) {
-        if (pChild != NULL)
-            *pChild = NOPROCESS;
+    if (pipe((int*)&out_pair) < 0) {
+        if (child_pid != NULL)
+            *child_pid = NOPROCESS;
         return -1;
     }
 
+    /*
+     *  Make sure our standard streams are all flushed out before forking.
+     *  (avoid duplicate output). Call fork() and see which process we become
+     */
     fflush(stdout);
     fflush(stderr);
-    fflush(pfTrace);
+    if (trace_fp != stderr)
+        fflush(trace_fp);
 
-    /*
-     *  Call fork() and see which process we become
-     */
-    chId = fork();
-    switch (chId) {
+    ch_pid = fork();
+    switch (ch_pid) {
     case NOPROCESS:    /* parent - error in call */
-        close(stdinFd);
-        close(stdoutPair.readFd);
-        close(stdoutPair.writeFd);
-        if (pChild != NULL)
-            *pChild = NOPROCESS;
+        close(in_fd);
+        close(out_pair.fd_read);
+        close(out_pair.fd_write);
+        if (child_pid != NULL)
+            *child_pid = NOPROCESS;
         return -1;
 
     default:           /* parent - return opposite FD's */
-        if (pChild != NULL)
-            *pChild = chId;
+        if (child_pid != NULL)
+            *child_pid = ch_pid;
 
-        close(stdinFd);
-        close(stdoutPair.writeFd);
-        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-            fprintf(pfTrace, TRACE_SHELL_PID_FMT, (unsigned int)chId);
+        close(in_fd);
+        close(out_pair.fd_write);
+        if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
+            fprintf(trace_fp, TRACE_SHELL_PID_FMT, (unsigned int)ch_pid);
+            fflush(trace_fp);
+        }
 
-        fflush(pfTrace);
-        return stdoutPair.readFd;
+        return out_pair.fd_read;
 
     case NULLPROCESS:  /* child - continue processing */
         break;
@@ -439,22 +440,22 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
      *  Close the pipe end handed back to the parent process,
      *  plus stdin and stdout.
      */
-    close(stdoutPair.readFd);
+    close(out_pair.fd_read);
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
 
     /*
      *  Set stdin/out to the fd passed in and the write end of our new pipe.
      */
-    fcntl(stdoutPair.writeFd, F_DUPFD, STDOUT_FILENO);
-    fcntl(stdinFd,            F_DUPFD, STDIN_FILENO);
+    fcntl(out_pair.fd_write, F_DUPFD, STDOUT_FILENO);
+    fcntl(in_fd, F_DUPFD, STDIN_FILENO);
 
     /*
      *  set stderr to our trace file (if not stderr).
      */
-    if (pfTrace != stderr) {
+    if (trace_fp != stderr) {
         close(STDERR_FILENO);
-        fcntl(fileno(pfTrace), F_DUPFD, STDERR_FILENO);
+        fcntl(fileno(trace_fp), F_DUPFD, STDERR_FILENO);
     }
 
     /*
@@ -464,13 +465,13 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
     setvbuf(stdout, NULL, _IONBF, (size_t)0);
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) {
-        fprintf(pfTrace, TRACE_SHELL_STARTS_FMT, pzShell);
+        fprintf(trace_fp, TRACE_SHELL_STARTS_FMT, shell);
 
-        fflush(pfTrace);
+        fflush(trace_fp);
     }
 
-    execvp((char*)pzShell, (char**)ppArgs);
-    AG_CANT("execvp", pzShell);
+    execvp((char*)shell, (char**)arg_v);
+    AG_CANT("execvp", shell);
     /* NOTREACHED */
     return -1;
 }
@@ -478,13 +479,13 @@ chain_open(int stdinFd, char const ** ppArgs, pid_t * pChild)
 /**
  *  Given a pointer to an argument vector, start a process and
  *  place its stdin and stdout file descriptors into an fd pair
- *  structure.  The "writeFd" connects to the inferior process
- *  stdin, and the "readFd" connects to its stdout.  The calling
- *  process should write to "writeFd" and read from "readFd".
+ *  structure.  The "fd_write" connects to the inferior process
+ *  stdin, and the "fd_read" connects to its stdout.  The calling
+ *  process should write to "fd_write" and read from "fd_read".
  *  The return value is the process id of the created process.
  */
 static pid_t
-server_open(tFdPair* pPair, char const ** ppArgs)
+server_open(fd_pair_t * fd_pair, char const ** ppArgs)
 {
     pid_t chId = NOPROCESS;
 
@@ -493,12 +494,12 @@ server_open(tFdPair* pPair, char const ** ppArgs)
      *  and vice versa, so the parent and child processes will
      *  read and write to opposite FD's.
      */
-    if (pipe((int*)pPair) < 0)
+    if (pipe((int*)fd_pair) < 0)
         return NOPROCESS;
 
-    pPair->readFd = chain_open(pPair->readFd, ppArgs, &chId);
+    fd_pair->fd_read = chain_open(fd_pair->fd_read, ppArgs, &chId);
     if (chId == NOPROCESS)
-        close(pPair->writeFd);
+        close(fd_pair->fd_write);
 
     return chId;
 }
@@ -509,16 +510,16 @@ server_open(tFdPair* pPair, char const ** ppArgs)
  *  into file pointers instead.
  */
 static pid_t
-server_fp_open(tpfPair* pfPair, char const ** ppArgs)
+server_fp_open(fp_pair_t * fp_pair, char const ** ppArgs)
 {
-    tFdPair   fdPair;
-    pid_t     chId = server_open(&fdPair, ppArgs);
+    fd_pair_t   fd_pair;
+    pid_t     chId = server_open(&fd_pair, ppArgs);
 
     if (chId == NOPROCESS)
         return chId;
 
-    pfPair->pfRead  = fdopen(fdPair.readFd,  "r" FOPEN_BINARY_FLAG);
-    pfPair->pfWrite = fdopen(fdPair.writeFd, "w" FOPEN_BINARY_FLAG);
+    fp_pair->fp_read  = fdopen(fd_pair.fd_read,  "r" FOPEN_BINARY_FLAG);
+    fp_pair->fp_write = fdopen(fd_pair.fd_write, "w" FOPEN_BINARY_FLAG);
     return chId;
 }
 
@@ -538,17 +539,16 @@ realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
 static char*
 load_data(void)
 {
-    char*   pzText;
-    size_t  textSize = 4096;
-    size_t  usedCt   = 0;
-    char*   pzScan;
+    char*   text;
+    size_t  text_sz = 4096;
+    size_t  used_ct = 0;
+    char*   scan;
     char    zLine[ 1024 ];
-    int     retryCt = 0;
+    int     retry_ct = 0;
+#define LOAD_RETRY_LIMIT 4
 
-    pzScan   = \
-        pzText = AGALOC(textSize, "Text Block");
-
-    *pzText  = NUL;
+    scan  = text = AGALOC(text_sz, "Text Block");
+    *text = NUL;
 
     for (;;) {
         char * line_p;
@@ -558,7 +558,7 @@ load_data(void)
          *  at all and we should.  Retry in those cases (but not on EOF).
          */
         alarm((unsigned int)OPT_VALUE_TIMEOUT);
-        line_p = fgets(zLine, (int)sizeof(zLine), serv_pair.pfRead);
+        line_p = fgets(zLine, (int)sizeof(zLine), serv_pair.fp_read);
         alarm(0);
 
         if (line_p == NULL) {
@@ -568,10 +568,10 @@ load_data(void)
             if (serv_id == NULLPROCESS)
                 break;
 
-            if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retryCt++ > 0))
-                fprintf(pfTrace, SHELL_READ_ERR_FMT, errno, strerror(errno));
+            if ((OPT_VALUE_TRACE >= TRACE_SERVER_SHELL) || (retry_ct++ > 0))
+                fprintf(trace_fp, SHELL_READ_ERR_FMT, errno, strerror(errno));
 
-            if (feof(serv_pair.pfRead) || (retryCt > 32))
+            if (feof(serv_pair.fp_read) || (retry_ct > LOAD_RETRY_LIMIT))
                 break;
 
             continue;  /* no data - retry */
@@ -585,21 +585,21 @@ load_data(void)
 
         {
             size_t llen = strlen(zLine);
-            if (textSize <= usedCt + llen) {
-                realloc_text(&pzText, &textSize, llen);
-                pzScan = pzText + usedCt;
+            if (text_sz <= used_ct + llen) {
+                realloc_text(&text, &text_sz, llen);
+                scan = text + used_ct;
             }
 
-            memcpy(pzScan, zLine, llen);
-            usedCt += llen;
-            pzScan += llen;
+            memcpy(scan, zLine, llen);
+            used_ct += llen;
+            scan    += llen;
         }
 
         /*
          *  Stop now if server timed out or if we are at EOF
          */
-        if ((serv_id == NULLPROCESS) || feof(serv_pair.pfRead)) {
-            fputs(SHELL_NO_END_MARK_MSG, pfTrace);
+        if ((serv_id == NULLPROCESS) || feof(serv_pair.fp_read)) {
+            fputs(SHELL_NO_END_MARK_MSG, trace_fp);
             break;
         }
     }
@@ -608,27 +608,31 @@ load_data(void)
      *  Trim off all trailing white space and shorten the buffer
      *  to the size actually used.
      */
-    while (  (pzScan > pzText)
-          && IS_WHITESPACE_CHAR(pzScan[-1]))
-        pzScan--;
-    textSize = (pzScan - pzText) + 1;
-    *pzScan  = NUL;
+    while (  (scan > text)
+          && IS_WHITESPACE_CHAR(scan[-1]))
+        scan--;
+    text_sz = (scan - text) + 1;
+    *scan  = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
-        fprintf(pfTrace, TRACE_SHELL_RESULT_MSG, (int)textSize, pzText, zLine);
+        fprintf(trace_fp, TRACE_SHELL_RESULT_MSG,
+                (int)text_sz, text, zLine);
 
-    return AGREALOC((void*)pzText, textSize, "resize output");
+    return AGREALOC((void*)text, text_sz, "resize output");
+#undef LOAD_RETRY_LIMIT
 }
-
 
 /**
  *  Run a semi-permanent server shell.  The program will be the
  *  one named by the environment variable $SHELL, or default to "sh".
  *  If one of the commands we send to it takes too long or it dies,
  *  we will shoot it and restart one later.
+ *
+ *  @param cmd the input command string
+ *  @returns an allocated string, even if it is empty.
  */
-LOCAL char*
-shell_cmd(char const * pzCmd)
+LOCAL char *
+shell_cmd(char const * cmd)
 {
     /*
      *  IF the shell server process is not running yet,
@@ -636,7 +640,7 @@ shell_cmd(char const * pzCmd)
      */
     if (serv_id == NULLPROCESS) {
         putenv((char *)SHELL_SET_PS4_FMT);
-        serv_id = server_fp_open(&serv_pair, serverArgs);
+        serv_id = server_fp_open(&serv_pair, server_args);
         if (serv_id > 0)
             server_setup();
     }
@@ -657,7 +661,7 @@ shell_cmd(char const * pzCmd)
      *  send the supplied command, and then
      *  have it output a special marker that we can find.
      */
-    if (! send_cmd_ok(pzCmd))
+    if (! send_cmd_ok(cmd))
         return NULL;
 
     /*
@@ -667,14 +671,14 @@ shell_cmd(char const * pzCmd)
     {
         char* pz = load_data();
         if (pz == NULL) {
-            fprintf(pfTrace, CMD_FAIL_FMT, pzCmd);
+            fprintf(trace_fp, CMD_FAIL_FMT, cmd);
             close_server_shell();
             pz = (char*)AGALOC(1, "Text Block");
 
             *pz = NUL;
 
         } else if (was_close_err)
-            fprintf(pfTrace, CMD_FAIL_FMT, pzCmd);
+            fprintf(trace_fp, CMD_FAIL_FMT, cmd);
 
         last_cmd = NULL;
         return pz;

@@ -1,7 +1,7 @@
 /**
  * @file defDirect.c
  *
- *  Time-stamp:        "2012-01-29 20:35:55 bkorb"
+ *  Time-stamp:        "2012-03-04 09:14:32 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -29,7 +29,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #define NO_MATCH_ERR(_typ) \
-AG_ABEND(aprf(DIRECT_NOMATCH_FMT, pCurCtx->pzCtxFname, pCurCtx->lineNo, _typ))
+AG_ABEND(aprf(DIRECT_NOMATCH_FMT, cctx->scx_fname, cctx->scx_line, _typ))
 
 static int  ifdefLevel = 0;
 
@@ -67,7 +67,7 @@ processDirective(char* pzScan)
             pzEnd = pzScan + strlen(pzScan);
             break;
         }
-        pCurCtx->lineNo++;
+        cctx->scx_line++;
 
         if (pzEnd[-1] != '\\') {
             /*
@@ -172,8 +172,8 @@ findDirective(char* pzDirName)
             ch = NUL;
         }
 
-        fprintf(pfTrace, FIND_DIRECT_UNKNOWN, pCurCtx->pzCtxFname,
-                pCurCtx->lineNo, pzDirName);
+        fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
+                cctx->scx_line, pzDirName);
 
         if (ch != NUL)
             pzDirName[32] = ch;
@@ -209,8 +209,8 @@ skipToEndif(char* pzStart)
         else {
             char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, pCurCtx->pzCtxFname,
-                              pCurCtx->lineNo));
+                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
+                              cctx->scx_line));
 
             pzScan = pz + 2;
         }
@@ -249,7 +249,7 @@ skipToEndif(char* pzStart)
  leave_func:
     while (pzStart < pzRet) {
         if (*(pzStart++) == NL)
-            pCurCtx->lineNo++;
+            cctx->scx_line++;
     }
     return pzRet;
 }
@@ -272,8 +272,8 @@ skipToEndmac(char* pzStart)
         else {
             char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, pCurCtx->pzCtxFname,
-                              pCurCtx->lineNo));
+                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
+                              cctx->scx_line));
 
             pzScan = pz + 2;
         }
@@ -294,7 +294,7 @@ skipToEndmac(char* pzStart)
 
     while (pzStart < pzRet) {
         if (*(pzStart++) == NL)
-            pCurCtx->lineNo++;
+            cctx->scx_line++;
     }
     return pzRet;
 }
@@ -324,8 +324,8 @@ skipToElseEnd(char* pzStart)
         else {
             char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, pCurCtx->pzCtxFname,
-                              pCurCtx->lineNo));
+                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
+                              cctx->scx_line));
 
             pzScan = pz + 2;
         }
@@ -376,7 +376,7 @@ skipToElseEnd(char* pzStart)
  leave_func:
     while (pzStart < pzRet) {
         if (*(pzStart++) == NL)
-            pCurCtx->lineNo++;
+            cctx->scx_line++;
     }
     return pzRet;
 }
@@ -451,9 +451,9 @@ doDir_assert(char* pzArg, char* pzScan)
     case '(':
     {
         SCM res = ag_scm_c_eval_string_from_file_line(
-            pzArg, pCurCtx->pzCtxFname, pCurCtx->lineNo );
+            pzArg, cctx->scx_fname, cctx->scx_line );
 
-        check_assert_str(resolveSCM(res), pzArg);
+        check_assert_str(scm2display(res), pzArg);
         break;
     }
 
@@ -548,7 +548,7 @@ doDir_define(char* pzArg, char* pzScan)
 static char*
 doDir_elif(char* pzArg, char* pzScan)
 {
-    AG_ABEND(aprf(DIRECT_ELIF_BAD_FMT, pCurCtx->pzCtxFname, pCurCtx->lineNo));
+    AG_ABEND(aprf(DIRECT_ELIF_BAD_FMT, cctx->scx_fname, cctx->scx_line));
     /* NOTREACHED */
     return NULL;
 }
@@ -631,7 +631,7 @@ doDir_endshell(char* pzArg, char* pzScan)
 static char*
 doDir_error(char* pzArg, char* pzScan)
 {
-    AG_ABEND(aprf(DIRECT_ERROR_FMT, pCurCtx->pzCtxFname, pCurCtx->lineNo,
+    AG_ABEND(aprf(DIRECT_ERROR_FMT, cctx->scx_fname, cctx->scx_line,
                   pzArg));
     /* NOTREACHED */
     return NULL;
@@ -671,7 +671,7 @@ doDir_if(char* pzArg, char* pzScan)
 static char*
 doDir_ifdef(char* pzArg, char* pzScan)
 {
-    if (getDefine(pzArg, AG_FALSE) == NULL)
+    if (getDefine(pzArg, false) == NULL)
         return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;
@@ -690,7 +690,7 @@ doDir_ifdef(char* pzArg, char* pzScan)
 static char*
 doDir_ifndef(char* pzArg, char* pzScan)
 {
-    if (getDefine(pzArg, AG_FALSE) != NULL)
+    if (getDefine(pzArg, false) != NULL)
         return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;
@@ -711,7 +711,7 @@ static char*
 doDir_include(char* pzArg, char* pzScan)
 {
     static char const * const apzSfx[] = { DIRECT_INC_DEF_SFX, NULL };
-    tScanCtx*  pCtx;
+    scan_ctx_t*  pCtx;
     size_t     inclSize;
     char       zFullName[ AG_PATH_MAX + 1 ];
 
@@ -721,11 +721,11 @@ doDir_include(char* pzArg, char* pzScan)
      */
     if ((*pzArg == '"') || (*pzArg == '<'))
         return pzScan;
-    pCurCtx->pzScan  = pzScan;
+    cctx->scx_scan  = pzScan;
 
     if (! SUCCESSFUL(
-            findFile(pzArg, zFullName, apzSfx, pCurCtx->pzCtxFname))) {
-        fprintf(pfTrace, DIRECT_INC_CANNOT_FIND,
+            find_file(pzArg, zFullName, apzSfx, cctx->scx_fname))) {
+        fprintf(trace_fp, DIRECT_INC_CANNOT_FIND,
                 pzArg);
         return pzScan;
     }
@@ -737,17 +737,17 @@ doDir_include(char* pzArg, char* pzScan)
     {
         struct stat stbf;
         if (stat(zFullName, &stbf) != 0) {
-            fprintf(pfTrace, DIRECT_INC_CANNOT_STAT, errno, strerror(errno),
+            fprintf(trace_fp, DIRECT_INC_CANNOT_STAT, errno, strerror(errno),
                     zFullName);
             return pzScan;
         }
         if (! S_ISREG(stbf.st_mode)) {
-            fprintf(pfTrace, DIRECT_INC_NOT_REG, zFullName);
+            fprintf(trace_fp, DIRECT_INC_NOT_REG, zFullName);
             return pzScan;
         }
         inclSize = stbf.st_size;
-        if (outTime <= stbf.st_mtime)
-            outTime = stbf.st_mtime + 1;
+        if (outfile_time < stbf.st_mtime)
+            outfile_time = stbf.st_mtime;
     }
 
     if (inclSize == 0)
@@ -759,23 +759,23 @@ doDir_include(char* pzArg, char* pzScan)
      *  'loadData()' for this special context.
      */
     {
-        size_t sz = sizeof(tScanCtx) + 4 + inclSize;
-        pCtx = (tScanCtx*)AGALOC(sz, "inc def head");
+        size_t sz = sizeof(scan_ctx_t) + 4 + inclSize;
+        pCtx = (scan_ctx_t*)AGALOC(sz, "inc def head");
 
         memset((void*)pCtx, 0, sz);
-        pCtx->lineNo = 1;
+        pCtx->scx_line = 1;
     }
 
     /*
      *  Link it into the context stack
      */
-    pCtx->pCtx       = pCurCtx;
-    pCurCtx          = pCtx;
-    AGDUPSTR(pCtx->pzCtxFname, zFullName, "def file");
+    pCtx->scx_next  = cctx;
+    cctx            = pCtx;
+    AGDUPSTR(pCtx->scx_fname, zFullName, "def file");
 
-    pCtx->pzScan     =
-    pCtx->pzData     =
-    pzScan           = (char*)(pCtx + 1);
+    pCtx->scx_scan  =
+    pCtx->scx_data  =
+    pzScan          = (char*)(pCtx + 1);
 
     /*
      *  Read all the data.  Usually in a single read, but loop
@@ -788,7 +788,7 @@ doDir_include(char* pzArg, char* pzScan)
         if (fp == NULL)
             AG_CANT(DIRECT_INC_CANNOT_OPEN, zFullName);
 
-        if (pfDepends != NULL)
+        if (dep_fp != NULL)
             add_source_file(zFullName);
 
         do  {
@@ -837,7 +837,7 @@ doDir_line(char* pzArg, char* pzScan)
     if (! IS_DEC_DIGIT_CHAR(*pzArg))
         return pzScan;
 
-    pCurCtx->lineNo = strtol(pzArg, &pzArg, 0);
+    cctx->scx_line = strtol(pzArg, &pzArg, 0);
 
     /*
      *  Now extract the quoted file name string.
@@ -853,7 +853,7 @@ doDir_line(char* pzArg, char* pzScan)
         *pz = NUL;
     }
 
-    AGDUPSTR(pCurCtx->pzCtxFname, pzArg, "#line");
+    AGDUPSTR(cctx->scx_fname, pzArg, "#line");
 
     return pzScan;
 }
@@ -922,14 +922,14 @@ doDir_shell(char* pzArg, char* pzScan)
 {
     static size_t const endshell_len = sizeof("\n#endshell") - 1;
 
-    tScanCtx*  pCtx;
+    scan_ctx_t*  pCtx;
     char*      pzText = pzScan;
 
     /*
      *  The output time will always be the current time.
      *  The dynamic content is always current :)
      */
-    outTime = time(NULL);
+    outfile_time = time(NULL);
 
     /*
      *  IF there are no data after the '#shell' directive,
@@ -942,11 +942,11 @@ doDir_shell(char* pzArg, char* pzScan)
     {
         char* pz = strstr(pzScan, DIRECT_SHELL_END_SHELL);
         if (pz == NULL)
-            AG_ABEND(aprf(DIRECT_SHELL_NOEND, pCurCtx->pzCtxFname,
-                          pCurCtx->lineNo));
+            AG_ABEND(aprf(DIRECT_SHELL_NOEND, cctx->scx_fname,
+                          cctx->scx_line));
 
         while (pzScan < pz) {
-            if (*(pzScan++) == NL) pCurCtx->lineNo++;
+            if (*(pzScan++) == NL) cctx->scx_line++;
         }
 
         *pzScan = NUL;
@@ -964,7 +964,7 @@ doDir_shell(char* pzArg, char* pzScan)
     /*
      *  Save the scan pointer into the current context
      */
-    pCurCtx->pzScan  = pzScan;
+    cctx->scx_scan  = pzScan;
 
     /*
      *  Run the shell command.  The output text becomes the
@@ -984,26 +984,26 @@ doDir_shell(char* pzArg, char* pzScan)
      *  This is an extra allocation and copy, but easier than rewriting
      *  'loadData()' for this special context.
      */
-    pCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx) + strlen(pzText) + 4,
+    pCtx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t) + strlen(pzText) + 4,
                              "shell output");
 
     /*
      *  Link the new scan data into the context stack
      */
-    pCtx->pCtx  = pCurCtx;
-    pCurCtx     = pCtx;
+    pCtx->scx_next = cctx;
+    cctx           = pCtx;
 
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR(pCtx->pzCtxFname, DIRECT_SHELL_COMP_DEFS, DIRECT_SHELL_COMP_DEFS);
-    pCtx->pzScan     =
-    pCtx->pzData     = (char*)(pCtx+1);
-    pCtx->lineNo     = 0;
-    strcpy(pCtx->pzScan, pzText);
+    AGDUPSTR(pCtx->scx_fname, DIRECT_SHELL_COMP_DEFS, DIRECT_SHELL_COMP_DEFS);
+    pCtx->scx_scan  =
+    pCtx->scx_data  = (char*)(pCtx+1);
+    pCtx->scx_line  = 0;
+    strcpy(pCtx->scx_scan, pzText);
     AGFREE(pzText);
 
-    return pCtx->pzScan;
+    return pCtx->scx_scan;
 }
 
 

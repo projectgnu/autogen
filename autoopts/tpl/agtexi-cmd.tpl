@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-02-18 09:30:42 bkorb"
+# Time-stamp:        "2012-02-28 19:42:33 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -148,17 +148,44 @@ ENDIF
 
 One of the following exit values will be returned:
 @table @samp
-@item 0
-[=(get "exit-desc[0]" "Successful program execution.")=]
-@item 1
-[= (out-push-new) (out-suspend "doc-sec")
-   (get "exit-desc[1]"
+@item 0 (EXIT_[=
+  (set! tmp-str (get "exit-name[0]" "SUCCESS"))
+  (string-upcase (string->c-name! tmp-str))
+  =])
+[=
+  (define need-ex-noinput  (exist? "homerc"))
+  (define need-ex-software #t)
+  (get "exit-desc[0]" "Successful program execution.")=]
+@item 1 (EXIT_[=
+
+  (set! tmp-str (get "exit-name[1]" "FAILURE"))
+  (string-upcase (string->c-name! tmp-str))=])
+[= (get "exit-desc[1]"
         "The operation failed or the command syntax was not valid.") =][=
 
 FOR exit-desc (for-from 2)   =][=
- (sprintf "\n@item %d\n%s" (for-index)
- (get (sprintf "exit-desc[%d]" (for-index))))        =][=
+  (if (= (for-index) 66)
+      (set! need-ex-noinput  #f)
+      (if (= (for-index) 70)
+          (set! need-ex-software #f) ))
+  (set! tmp-str (get (sprintf "exit-name[%d]" (for-index)) "* unnamed *"))
+  (sprintf "\n@item %d (EXIT_%s)\n%s" (for-index)
+    (string-upcase (string->c-name! tmp-str))
+    (get (sprintf "exit-desc[%d]" (for-index))))
+  =][=
 ENDFOR exit-desc                        =][=
+
+(if need-ex-noinput
+    (emit "\n@item 66 (EX_NOINPUT)
+A specified configuration file could not be loaded."))
+
+(if need-ex-noinput
+    (emit "\n@item 70 (EX_SOFTWARE)
+libopts had an internal operational error.  Please report
+it to autogen-users@@lists.sourceforge.net.  Thank you."))
+
+(out-push-new)
+(out-suspend "doc-sec")                 =][=
 
 FOR doc-section                         =][=
 

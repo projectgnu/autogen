@@ -2,7 +2,7 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2012-01-29 09:39:37 bkorb"
+ *  Time-stamp:        "2012-03-04 13:56:27 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -49,8 +49,6 @@ te_dp_event aKeywordTkn[] = { KEYWORD_TABLE };
 #define ERROR  (-1)
 #define FINISH (-1)
 
-#define SET_LIT_TKN(t) lastToken = DP_EV_LIT_ ## t; *(pCurCtx->pzScan++) = NUL;
-
 /* = = = START-STATIC-FORWARD = = = */
 static void
 pop_context(void);
@@ -80,7 +78,7 @@ static char*
 gather_name(char * pzScan, te_dp_event * pRetVal);
 
 static char*
-assembleHereString(char* pzScan);
+build_here_str(char* pzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
@@ -89,33 +87,33 @@ assembleHereString(char* pzScan);
 static void
 pop_context(void)
 {
-    tScanCtx* pCX = pCurCtx;
-    pCurCtx   = pCurCtx->pCtx;
-    pCX->pCtx = pDoneCtx;
-    pDoneCtx  = pCX;
+    scan_ctx_t* pCX = cctx;
+    cctx          = cctx->scx_next;
+    pCX->scx_next = end_ctx;
+    end_ctx       = pCX;
 }
 
 static void
 trim_whitespace(void)
 {
-    char * pz = pCurCtx->pzScan;
+    char * pz = cctx->scx_scan;
 
     /*
      *  This ensures that any names found previously
      *  are NUL terminated.
      */
     if (*pz == NL)
-        pCurCtx->lineNo++;
+        cctx->scx_line++;
     *pz = NUL;
 
     for (;;) {
         pz = SPN_HORIZ_WHITE_CHARS(pz+1);
         if (*pz != NL)
             break;
-        pCurCtx->lineNo++;
+        cctx->scx_line++;
     }
 
-    pCurCtx->pzScan = pz;
+    cctx->scx_scan = pz;
 }
 
 static void
@@ -123,11 +121,11 @@ lex_escaped_char(void)
 {
     static int const semi_colon = ';';
 
-    char* pz = strchr(pCurCtx->pzScan, semi_colon);
+    char* pz = strchr(cctx->scx_scan, semi_colon);
 
     for (;;) {
         if (pz == NULL) {
-            pz = pCurCtx->pzScan + strlen(pCurCtx->pzScan);
+            pz = cctx->scx_scan + strlen(cctx->scx_scan);
             break;
         }
         if (IS_WHITESPACE_CHAR(pz[1])) {
@@ -138,32 +136,31 @@ lex_escaped_char(void)
         pz = strchr(pz+1, semi_colon);
     }
 
-    lastToken = DP_EV_STRING;
-    pz_token = pz;
+    token_code = DP_EV_STRING;
+    token_str = pz;
 }
 
 static tSuccess
 lex_backquote(void)
 {
-    int line_no = pCurCtx->lineNo;
-    char* pz = ao_string_cook(pCurCtx->pzScan, &line_no);
+    int line_no = cctx->scx_line;
+    char* pz = ao_string_cook(cctx->scx_scan, &line_no);
 
     if (pz == NULL)
         return FAILURE;
 
-    pz_token = pCurCtx->pzScan;
+    token_str = cctx->scx_scan;
 
-    pCurCtx->pzScan = pz;
+    cctx->scx_scan = pz;
 
-    lastToken = DP_EV_STRING;
-    pz = shell_cmd((char const*)pz_token);
-    pCurCtx->lineNo = line_no;
+    token_code = DP_EV_STRING;
+    pz = shell_cmd((char const*)token_str);
+    cctx->scx_line = line_no;
 
     if (pz == NULL)
         return PROBLEM;
-    TAGMEM(pz, "shell def str");
-    pz_token = pz;
-    manageAllocatedData(pz);
+
+    token_str = pz;
     return SUCCESS;
 }
 
@@ -173,29 +170,29 @@ lex_comment(void)
     /*
      *  Allow for a comment, C or C++ style
      */
-    switch (pCurCtx->pzScan[1]) {
+    switch (cctx->scx_scan[1]) {
     case '*':
     {
-        char* pz = strstr(pCurCtx->pzScan+2, END_C_COMMENT);
+        char* pz = strstr(cctx->scx_scan+2, END_C_COMMENT);
         if (pz != NULL) {
-            char* p = pCurCtx->pzScan+1;
+            char* p = cctx->scx_scan+1;
             for (;;) {
                 p = strchr(p+1, NL);
                 if ((p == NULL) || (p > pz))
                     break;
-                pCurCtx->lineNo++;
+                cctx->scx_line++;
             }
-            pCurCtx->pzScan = pz+2;
+            cctx->scx_scan = pz+2;
             return SUCCESS;
         }
         break;
     }
     case '/':
     {
-        char* pz = strchr(pCurCtx->pzScan+2, NL);
+        char* pz = strchr(cctx->scx_scan+2, NL);
         if (pz != NULL) {
-            pCurCtx->pzScan = pz+1;
-            pCurCtx->lineNo++;
+            cctx->scx_scan = pz+1;
+            cctx->scx_line++;
             return SUCCESS;
         }
         break;
@@ -209,17 +206,17 @@ static tSuccess
 lex_here_string(void)
 {
     char* pz;
-    if (pCurCtx->pzScan[1] != '<')
+    if (cctx->scx_scan[1] != '<')
         return FAILURE;
 
-    pz = assembleHereString(pCurCtx->pzScan + 2);
+    pz = build_here_str(cctx->scx_scan + 2);
     if (pz == NULL) {
-        lastToken = DP_EV_INVALID;
+        token_code = DP_EV_INVALID;
         return PROBLEM;
     }
 
-    lastToken = DP_EV_HERE_STRING;
-    pCurCtx->pzScan = pz;
+    token_code = DP_EV_HERE_STRING;
+    cctx->scx_scan = pz;
     return SUCCESS;
 }
 
@@ -230,7 +227,10 @@ lex_here_string(void)
 LOCAL te_dp_event
 yylex(void)
 {
-    lastToken = DP_EV_INVALID;
+#define SET_LIT_TKN(t) \
+    token_code = DP_EV_LIT_ ## t; *(cctx->scx_scan++) = NUL;
+
+    token_code = DP_EV_INVALID;
 
 scanAgain:
     /*
@@ -238,16 +238,16 @@ scanAgain:
      *  We branch here after skipping over a comment
      *  or processing a directive (which may change our context).
      */
-    if (IS_WHITESPACE_CHAR(*pCurCtx->pzScan))
+    if (IS_WHITESPACE_CHAR(*cctx->scx_scan))
         trim_whitespace();
 
-    switch (*pCurCtx->pzScan) {
+    switch (*cctx->scx_scan) {
     case NUL:
         /*
          *  IF we are not inside an include context,
          *  THEN go finish.
          */
-        if (pCurCtx->pCtx == NULL)
+        if (cctx->scx_next == NULL)
             goto lex_done;
 
         pop_context();
@@ -256,12 +256,12 @@ scanAgain:
     case '#':
     {
         extern char * processDirective(char*);
-        char * pz = processDirective(pCurCtx->pzScan+1);
+        char * pz = processDirective(cctx->scx_scan+1);
         /*
          *  Ensure that the compiler doesn't try to save a copy of
-         *  "pCurCtx" in a register.  It must be reloaded from memory.
+         *  "cctx" in a register.  It must be reloaded from memory.
          */
-        pCurCtx->pzScan = pz;
+        cctx->scx_scan = pz;
         goto scanAgain;
     }
 
@@ -276,14 +276,14 @@ scanAgain:
     case '\'':
     case '"':
     {
-        char* pz = ao_string_cook(pCurCtx->pzScan, &(pCurCtx->lineNo));
+        char* pz = ao_string_cook(cctx->scx_scan, &(cctx->scx_line));
         if (pz == NULL)
             goto NUL_error;
 
-        pz_token = pCurCtx->pzScan;
+        token_str = cctx->scx_scan;
 
-        lastToken = DP_EV_STRING;
-        pCurCtx->pzScan = pz;
+        token_code = DP_EV_STRING;
+        cctx->scx_scan = pz;
         break;
     }
 
@@ -300,7 +300,7 @@ scanAgain:
         break;
 
     case '\\':
-        if (strncmp(pCurCtx->pzScan+1, START_SCHEME_LIST, (size_t)2) == 0) {
+        if (strncmp(cctx->scx_scan+1, START_SCHEME_LIST, (size_t)2) == 0) {
             alist_to_autogen_def();
             goto scanAgain;
         }
@@ -324,16 +324,16 @@ scanAgain:
 
     default:
     BrokenToken:
-        pCurCtx->pzScan = gather_name(pCurCtx->pzScan, &lastToken);
+        cctx->scx_scan = gather_name(cctx->scx_scan, &token_code);
         break;
-    }   /* switch (*pCurCtx->pzScan) */
+    }   /* switch (*cctx->scx_scan) */
 
-    return lastToken;
+    return token_code;
 
 NUL_error:
 
-    AG_ABEND(aprf(DEF_ERR_FMT, pzProg, YYLEX_UNENDING_QUOTE,
-                  pCurCtx->pzCtxFname, pCurCtx->lineNo));
+    AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, YYLEX_UNENDING_QUOTE,
+                  cctx->scx_fname, cctx->scx_line));
     return DP_EV_INVALID;
 
 lex_done:
@@ -341,15 +341,16 @@ lex_done:
      *  First time through, return the DP_EV_END token.
      *  Second time through, we really finish.
      */
-    if (pCurCtx->pzScan == zNil) {
-        pCurCtx->pCtx = pDoneCtx;
-        pDoneCtx      = pCurCtx;
+    if (cctx->scx_scan == zNil) {
+        cctx->scx_next = end_ctx;
+        end_ctx        = cctx;
 
         return DP_EV_INVALID;
     }
 
-    pCurCtx->pzScan = (char*)zNil;
+    cctx->scx_scan = (char*)zNil;
     return DP_EV_END;
+#undef SET_LIT_TKN
 }
 
 
@@ -358,32 +359,32 @@ yyerror(char* s)
 {
     char * pz;
 
-    if (strlen(pCurCtx->pzScan) > 64 )
-        pCurCtx->pzScan[64] = NUL;
+    if (strlen(cctx->scx_scan) > 64 )
+        cctx->scx_scan[64] = NUL;
 
-    switch (lastToken) {
+    switch (token_code) {
     case DP_EV_VAR_NAME:
     case DP_EV_OTHER_NAME:
     case DP_EV_STRING:
     case DP_EV_NUMBER:
-        if (strlen(pz_token) > 64 )
-            pz_token[64] = NUL;
+        if (strlen(token_str) > 64 )
+            token_str[64] = NUL;
 
-        pz = aprf(YYLEX_TOKEN_STR, DP_EVT_NAME(lastToken), pz_token);
+        pz = aprf(YYLEX_TOKEN_STR, DP_EVT_NAME(token_code), token_str);
         break;
 
     default:
-        pz = aprf(YYLEX_DF_STR, DP_EVT_NAME(lastToken));
+        pz = aprf(YYLEX_DF_STR, DP_EVT_NAME(token_code));
     }
-    AG_ABEND(aprf(YYLEX_ERR_FMT, s, pCurCtx->pzCtxFname, pCurCtx->lineNo,
-                  pz, pCurCtx->pzScan));
+    AG_ABEND(aprf(YYLEX_ERR_FMT, s, cctx->scx_fname, cctx->scx_line,
+                  pz, cctx->scx_scan));
 }
 
 
 static void
 loadScheme(void)
 {
-    char*    pzText    = pCurCtx->pzScan;
+    char*    pzText    = cctx->scx_scan;
     char*    pzEnd     = (char*)skipScheme(pzText, pzText + strlen(pzText));
     char     endCh     = *pzEnd;
     int      schemeLen = (pzEnd - pzText);
@@ -395,27 +396,26 @@ loadScheme(void)
      *  the NUL-ed character.
      */
     if (*pzEnd == NUL)
-        AG_ABEND(aprf(DEF_ERR_FMT, pzProg, LOAD_SCM_ENDLESS,
-                      pCurCtx->pzCtxFname, pCurCtx->lineNo));
+        AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, LOAD_SCM_ENDLESS,
+                      cctx->scx_fname, cctx->scx_line));
 
     *pzEnd  = NUL;
-    next_ln = pCurCtx->lineNo + count_nl(pzText);
+    next_ln = cctx->scx_line + count_nl(pzText);
 
-    procState = PROC_STATE_GUILE_PRELOAD;
+    processing_state = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
-        pzText, pCurCtx->pzCtxFname, pCurCtx->lineNo );
-    procState = PROC_STATE_LOAD_DEFS;
+        pzText, cctx->scx_fname, cctx->scx_line );
+    processing_state = PROC_STATE_LOAD_DEFS;
     *pzEnd = endCh;
 
-    pCurCtx->pzScan = pzEnd;
-    pzEnd = (char*)resolveSCM(res); /* ignore const-ness */
-    pCurCtx->lineNo = next_ln;
+    cctx->scx_scan = pzEnd;
+    pzEnd = (char*)scm2display(res); /* ignore const-ness */
+    cctx->scx_line = next_ln;
 
     if (strlen(pzEnd) >= schemeLen) {
         AGDUPSTR(pzEnd, pzEnd, "SCM Result");
 
-        pz_token = pzEnd;
-        manageAllocatedData(pz_token);
+        token_str = pzEnd;
     }
 
     else {
@@ -423,10 +423,10 @@ loadScheme(void)
          *  We know the result is smaller than the source.  Copy in place.
          */
         strcpy(pzText, pzEnd);
-        pz_token = pzText;
+        token_str = pzText;
     }
 
-    lastToken = DP_EV_STRING;
+    token_code = DP_EV_STRING;
 }
 
 /*
@@ -436,12 +436,12 @@ loadScheme(void)
 static void
 alist_to_autogen_def(void)
 {
-    char*  pzText  = ++(pCurCtx->pzScan);
+    char*  pzText  = ++(cctx->scx_scan);
     char*  pzEnd   = (char*)skipScheme(pzText, pzText + strlen(pzText));
 
     SCM    res;
     size_t res_len;
-    tScanCtx*  pCtx;
+    scan_ctx_t*  pCtx;
 
     /*
      *  Wrap the scheme expression with the `alist->autogen-def' function
@@ -456,9 +456,9 @@ alist_to_autogen_def(void)
     /*
      *  Run the scheme expression.  The result is autogen definition text.
      */
-    procState = PROC_STATE_GUILE_PRELOAD;
+    processing_state = PROC_STATE_GUILE_PRELOAD;
     res = ag_scm_c_eval_string_from_file_line(
-        pzText, pCurCtx->pzCtxFname, pCurCtx->lineNo );
+        pzText, cctx->scx_fname, cctx->scx_line );
 
     /*
      *  The result *must* be a string, or we choke.
@@ -467,33 +467,33 @@ alist_to_autogen_def(void)
         AG_ABEND(ALIST_TO_AG_ERR);
 
     res_len   = AG_SCM_STRLEN(res);
-    procState = PROC_STATE_LOAD_DEFS;
-    pCurCtx->pzScan = pzEnd;
+    processing_state = PROC_STATE_LOAD_DEFS;
+    cctx->scx_scan = pzEnd;
     AGFREE(pzText);
 
     /*
      *  Now, push the resulting string onto the input stack
      *  and link the new scan data into the context stack
      */
-    pCtx = (tScanCtx*)AGALOC(sizeof(tScanCtx) + 4 + res_len, "lex ctx");
-    pCtx->pCtx  = pCurCtx;
-    pCurCtx     = pCtx;
+    pCtx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t) + 4 + res_len, "lex ctx");
+    pCtx->scx_next = cctx;
+    cctx           = pCtx;
 
     /*
      *  Set up the rest of the context structure
      */
-    AGDUPSTR(pCtx->pzCtxFname, ALIST_TO_AG_TEXT, "scheme text");
-    pCtx->pzScan = \
-    pCtx->pzData = (char*)(pCtx+1);
-    pCtx->lineNo = 0;
-    memcpy((void*)(pCtx->pzScan), (void*)AG_SCM_CHARS(res), res_len);
-    pCtx->pzScan[ res_len ] = NUL;
+    AGDUPSTR(pCtx->scx_fname, ALIST_TO_AG_TEXT, "scheme text");
+    pCtx->scx_scan = \
+    pCtx->scx_data = (char*)(pCtx+1);
+    pCtx->scx_line = 0;
+    memcpy((void*)(pCtx->scx_scan), (void*)AG_SCM_CHARS(res), res_len);
+    pCtx->scx_scan[ res_len ] = NUL;
 
     /*
-     *  At this point, the next token will be obtained
-     *  from the newly allocated context structure.
-     *  When empty, input will resume from the '}' that we
-     *  left as the next input token in the old context.
+     *  At this point, the next token will be obtained from the newly
+     *  allocated context structure.  When empty, input will resume
+     *  from the '}' that we left as the next input token in the old
+     *  context.
      */
 }
 
@@ -514,15 +514,15 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
        || (  (*pzScan == '-')
           && IS_DEC_DIGIT_CHAR(pzScan[1])
        )  )  {
-        pz_token = pzScan;
+        token_str = pzScan;
         (void)strtol(pzScan, &pzScan, 0);
         *pRetVal = DP_EV_NUMBER;
         return pzScan;
     }
 
     if (! IS_UNQUOTABLE_CHAR(*pzScan))
-        AG_ABEND(aprf("%s Error: Invalid input char '%c' in %s on line %d\n",
-                      pzProg, *pzScan, pCurCtx->pzCtxFname, pCurCtx->lineNo));
+        AG_ABEND(aprf(ASSEMBLE_NAME_ERR, ag_pname, *pzScan, cctx->scx_fname,
+                      cctx->scx_line));
 
     {
         char* pz = SPN_VALUE_NAME_CHARS(pzScan);
@@ -539,7 +539,7 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
          *  If the name is actually a keyword,
          *  we will return that token code instead.
          */
-        pz_token = pzScan;
+        token_str = pzScan;
         pzScan   = (char*)pz;
     }
 
@@ -552,7 +552,7 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
         *pzScan = NUL;         /* NUL terminate the name           */
 
         do  {
-            if (streqvcmp(apzKeywords[ kw_ix ], (char*)pz_token) == 0) {
+            if (streqvcmp(apzKeywords[ kw_ix ], (char*)token_str) == 0) {
                 /*
                  *  Return the keyword token code instead of DP_EV_NAME
                  */
@@ -567,109 +567,107 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
     return pzScan;
 }
 
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
 static char*
-assembleHereString(char* pzScan)
+build_here_str(char* scan)
 {
-    ag_bool  trimTabs = AG_FALSE;
+    bool     no_tabs = false;
     char     zMark[ MAX_HEREMARK_LEN ];
     size_t   markLen = 0;
-    char*    pzDest;
-    int      here_string_line_no;
+    char*    dest;
+    int      here_str_line;
 
     /*
      *  See if we are to strip leading tab chars
      */
-    if (*pzScan == '-') {
-        trimTabs = AG_TRUE;
-        pzScan++;
+    if (*scan == '-') {
+        no_tabs = true;
+        scan++;
     }
 
     /*
      *  Skip white space up to the marker or EOL
      */
-    while (IS_WHITESPACE_CHAR(*pzScan)) {
-        if (*pzScan++ == NL)
-            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, "HereString missing the mark",
-                          pCurCtx->pzCtxFname, pCurCtx->lineNo));
-    }
+    scan = SPN_NON_NL_WHITE_CHARS(scan);
+    if (*scan == NL)
+        AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MISS_MARK_STR,
+                      cctx->scx_fname, cctx->scx_line));
 
     /*
      *  Copy the marker, noting its length
      */
     {
-        char * pz = SPN_VARIABLE_NAME_CHARS(pzScan);
-        markLen = pz - pzScan;
+        char * pz = SPN_VARIABLE_NAME_CHARS(scan);
+        markLen = pz - scan;
 
         if (markLen == 0)
-            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_MISS_MARK_STR,
-                          pCurCtx->pzCtxFname, pCurCtx->lineNo));
+            AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MISS_MARK_STR,
+                          cctx->scx_fname, cctx->scx_line));
 
         if (markLen >= sizeof(zMark))
-            AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_MARK_TOO_LONG,
-                          pCurCtx->pzCtxFname, pCurCtx->lineNo));
+            AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MARK_TOO_LONG,
+                          cctx->scx_fname, cctx->scx_line));
 
-        memcpy(zMark, pzScan, markLen);
+        memcpy(zMark, scan, markLen);
         zMark[markLen] = NUL;
     }
 
-    pzDest   = pzScan;
-    pz_token = pzDest;
+    token_str = dest = scan;
 
     /*
      *  Skip forward to the EOL after the marker.
      */
-    pzScan = strchr(pzScan, NL);
-    if (pzScan == NULL)
-        AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_ENDLESS_STR,
-                      pCurCtx->pzCtxFname, pCurCtx->lineNo));
+    scan = strchr(scan, NL);
+    if (scan == NULL)
+        AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_ENDLESS_STR,
+                      cctx->scx_fname, cctx->scx_line));
 
     /*
      *  And skip the first new line + conditionally skip tabs
      */
-    here_string_line_no = pCurCtx->lineNo++;
-    pzScan++;
+    here_str_line = cctx->scx_line++;
+    scan++;
 
-    if (trimTabs)
-        while (*pzScan == TAB)  ++pzScan;
+    for (;;) {
+    next_line:
+        if (no_tabs) {
+            while (*scan == TAB)  ++scan;
+            if ((scan[0] == '\\') && (scan[1] == TAB))
+                ++scan;
+        }
 
-    /*
-     *  FOR as long as the text does not match the mark
-     *       OR it matches but is a substring
-     *  DO copy characters
-     */
-    while (  (strncmp(pzScan, zMark, markLen) != 0)
-          || IS_VARIABLE_NAME_CHAR(pzScan[markLen]) )  {
+        /*
+         *  If we recognize the end mark, break out.
+         */
+        if (! IS_VARIABLE_NAME_CHAR(scan[markLen]))
+            if (strncmp(scan, zMark, markLen) == 0)
+                break;
 
         for (;;) {
-            switch (*(pzDest++) = *(pzScan++)) {
+            switch (*(dest++) = *(scan++)) {
             case NL:
-                pCurCtx->lineNo++;
-                goto lineDone;
+                cctx->scx_line++;
+                goto next_line;
 
             case NUL:
-                AG_ABEND(aprf(DEF_ERR_FMT, pzProg, HERE_ENDLESS_STR,
-                              pCurCtx->pzCtxFname, here_string_line_no));
+                AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_ENDLESS_STR,
+                              cctx->scx_fname, here_str_line));
             }
-        } lineDone:;
-
-        if (trimTabs)
-            while (*pzScan == TAB)  ++pzScan;
+        }
     } /* while strncmp ... */
 
     /*
-     *  pzDest may still equal pz_token, if no data were copied
+     *  dest may still equal token_str, if no data were copied
      */
-    if (pzDest > (char*)pz_token)
-         pzDest[-1] = NUL;
-    else pzDest[0]  = NUL;
+    if (dest > (char*)token_str)
+         dest[-1] = NUL;
+    else dest[0]  = NUL;
 
-    return pzScan + markLen;
+    return scan + markLen;
 }
 /*
  * Local Variables:

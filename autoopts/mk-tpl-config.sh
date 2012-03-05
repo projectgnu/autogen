@@ -31,9 +31,8 @@ collect_src() {
     cd ${builddir}
     sentinel_file=${1} ; shift
     cat 1>&8 <<- _EOF_
-	#include "autoopts/project.h"
 	#define  AUTOOPTS_INTERNAL 1
-	#include "compat/compat.h"
+	#include "autoopts/project.h"
 	#define  LOCAL static
 	#include "ao-strs.h"
 	_EOF_

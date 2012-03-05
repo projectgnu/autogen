@@ -2,7 +2,7 @@
 /**
  * @file expPrint.c
  *
- *  Time-stamp:        "2012-01-14 10:45:59 bkorb"
+ *  Time-stamp:        "2012-03-04 19:45:59 bkorb"
  *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
@@ -82,7 +82,7 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
          *  THEN perform that fprintf
          */
         if (sigsetjmp(printJumpEnv, 0) == 0)
-            fprintf(pfTrace, SAFE_PRINTF_BAD_FMT, pzProg,
+            fprintf(trace_fp, SAFE_PRINTF_BAD_FMT, ag_pname,
                     strsignal(printJumpSignal), pzFmt);
 
         /*

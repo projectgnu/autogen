@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-02-12 12:14:50 bkorb"
+ *  Time-stamp:      "2012-03-04 19:07:15 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -32,14 +32,14 @@ static void
 dep_usage(char const * fmt, ...);
 
 static void
-add_sys_env(char* pzEnvName);
+add_sys_env(char * pzEnvName);
 
 static void
 add_env_vars(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef DAEMON_ENABLED
- static ag_bool evalProto(char const ** ppzS, uint16_t* pProto);
+ static bool evalProto(char const ** ppzS, uint16_t* pProto);
  static void spawnPipe(char const* pzFile);
  static void spawnListens(char const * pzPort, sa_family_t af);
  static void daemonize(char const *, char const *, char const *,
@@ -49,7 +49,10 @@ add_env_vars(void);
 #include "expr.ini"
 
 /**
- * Various initializations
+ * Various initializations.
+ *
+ * @param arg_ct  the count of program arguments, plus 1.
+ * @param arg_vec the program name plus its arguments
  */
 LOCAL void
 initialize(int arg_ct, char** arg_vec)
@@ -60,14 +63,14 @@ initialize(int arg_ct, char** arg_vec)
      *  Initialize all the Scheme functions.
      */
     ag_init();
-    pzLastScheme = SCHEME_INIT_TEXT;
+    last_scm_cmd = SCHEME_INIT_TEXT;
     ag_scm_c_eval_string_from_file_line(
         SCHEME_INIT_TEXT, AG_TEXT_STRTABLE_FILE, SCHEME_INIT_TEXT_LINENO);
 
     SCM_EVAL_CONST(INIT_SCM_ERRS_FMT);
 
-    pzLastScheme = NULL;
-    procState = PROC_STATE_OPTIONS;
+    last_scm_cmd = NULL;
+    processing_state = PROC_STATE_OPTIONS;
     add_env_vars();
 
     doOptions(arg_ct, arg_vec);
@@ -104,6 +107,10 @@ initialize(int arg_ct, char** arg_vec)
 
 /**
  * make a name resilient to machinations made by 'make'.
+ * Basically, dollar sign characters are doubled.
+ *
+ * @param str the input string
+ * @returns a newly allocated string with the '$' characters doubled
  */
 static char const *
 make_quote_str(char const * str)
@@ -120,7 +127,7 @@ make_quote_str(char const * str)
         scan = scan + 1;
     }
 
-    res  = AGALOC(sz, "t name");
+    res  = AGALOC(sz, "q name");
     scan = res;
 
     for (;;) {
@@ -141,6 +148,8 @@ make_quote_str(char const * str)
 
 /**
  * Error in dependency specification
+ *
+ * @param fmt the error message format 
  */
 static void
 dep_usage(char const * fmt, ...)
@@ -159,12 +168,17 @@ dep_usage(char const * fmt, ...)
 }
 
 /**
- * Configure dependency option
+ * Configure a dependency option.
+ * Handles any of these letters:  MFQTPGD as the first part of the option
+ * argument.
+ *
+ * @param opts the autogen options data structure
+ * @param pOptDesc the option descriptor for this option.
  */
 LOCAL void
-config_dep(tOptions * pOptions, tOptDesc * pOptDesc)
+config_dep(tOptions * opts, tOptDesc * od)
 {
-    char const * popt = pOptDesc->optArg.argString;
+    char const * popt = od->optArg.argString;
 
     /*
      *  The option argument is optional.  Make sure we have one.
@@ -173,28 +187,35 @@ config_dep(tOptions * pOptions, tOptDesc * pOptDesc)
         return;
 
     while (*popt == 'M')  popt++;
-
-retry:
+    popt = SPN_WHITESPACE_CHARS(popt);
 
     switch (*popt) {
-    case ' ': case TAB: case '\r': case NL:
-        popt = SPN_WHITESPACE_CHARS(popt + 1);
-        goto retry;
-
-    case 'Q':
-        if (pzDepTarget != NULL)
+    case 'F':
+        if (dep_file != NULL)
             dep_usage(CFGDEP_DUP_TARGET_MSG);
 
         popt = SPN_WHITESPACE_CHARS(popt + 1);
-        pzDepTarget = make_quote_str(popt);
+        AGDUPSTR(dep_file, popt, "f name");
         break;
 
+    case 'Q':
     case 'T':
-        if (pzDepTarget != NULL)
+    {
+        bool quote_it = (*popt == 'Q');
+
+        if (dep_target != NULL)
             dep_usage(CFGDEP_DUP_TARGET_MSG);
 
         popt = SPN_WHITESPACE_CHARS(popt + 1);
-        AGDUPSTR(pzDepTarget, popt, "t name");
+        if (quote_it)
+            dep_target = make_quote_str(popt);
+        else
+            AGDUPSTR(dep_target, popt, "t name");
+        break;
+    }
+
+    case 'P':
+        dep_phonies = true;
         break;
 
     case 'D':
@@ -202,20 +223,8 @@ retry:
     case NUL:
         /*
          *  'D' and 'G' make sense to GCC, not us.  Ignore 'em.  If we
-         *  found a NUL byte, then we found -MM on the command line.
+         *  found a NUL byte, then act like we found -MM on the command line.
          */
-        break;
-
-    case 'F':
-        if (pzDepFile != NULL)
-            dep_usage(CFGDEP_DUP_TARGET_MSG);
-
-        popt = SPN_WHITESPACE_CHARS(popt + 1);
-        pzDepFile = aprf(CFGDEP_TARGET_TMP_FMT, popt);
-        break;
-
-    case 'P':
-        dep_phonies = AG_TRUE;
         break;
 
     default:
@@ -223,18 +232,25 @@ retry:
     }
 }
 
+/**
+ * Add a system name to the environment.  The input name is up-cased and
+ * made to conform to environment variable names.  If not already in the
+ * environment, it is added with the string value "1".
+ *
+ * @param env_name in/out: system name to export
+ */
 static void
-add_sys_env(char* pzEnvName)
+add_sys_env(char * env_name)
 {
     int i = 2;
 
     for (;;) {
-        if (IS_UPPER_CASE_CHAR(pzEnvName[i]))
-            pzEnvName[i] = tolower(pzEnvName[i]);
-        else if (! IS_ALPHANUMERIC_CHAR(pzEnvName[i]))
-            pzEnvName[i] = '_';
+        if (IS_UPPER_CASE_CHAR(env_name[i]))
+            env_name[i] = tolower(env_name[i]);
+        else if (! IS_ALPHANUMERIC_CHAR(env_name[i]))
+            env_name[i] = '_';
 
-        if (pzEnvName[ ++i ] == NUL)
+        if (env_name[ ++i ] == NUL)
             break;
     }
 
@@ -242,17 +258,21 @@ add_sys_env(char* pzEnvName)
      *  If the user already has something in the environment, do not
      *  override it.
      */
-    if (getenv(pzEnvName) == NULL) {
+    if (getenv(env_name) == NULL) {
         char* pz;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
-            fprintf(pfTrace, TRACE_ADD_TO_ENV_FMT, pzEnvName);
-        pz = aprf(ADD_SYS_ENV_VAL_FMT, pzEnvName);
-        TAGMEM(pz, ADD_TO_ENV_MSG);
+            fprintf(trace_fp, TRACE_ADD_TO_ENV_FMT, env_name);
+
+        pz = aprf(ADD_SYS_ENV_VAL_FMT, env_name);
         putenv(pz);
     }
 }
 
+/**
+ * Define system environment variables.  "__autogen__=1" is exported,
+ * along with various ones derivable from Solaris sysinfo(3p) or uname.
+ */
 static void
 add_env_vars(void)
 {
@@ -318,7 +338,7 @@ add_env_vars(void)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #ifdef DAEMON_ENABLED
 
-  static ag_bool
+  static bool
 evalProto(char const ** ppzS, uint16_t* pProto)
 {
     char const * pzS = *ppzS;
@@ -329,7 +349,7 @@ evalProto(char const ** ppzS, uint16_t* pProto)
             if (strncmp(pzS, pMap->pz_name, pMap->nm_len) == 0) {
                 *pProto = pMap->family;
                 *ppzS += pMap->nm_len;
-                return AG_TRUE;
+                return true;
             }
         } while ((++pMap)->pz_name != NULL);
     }
@@ -340,7 +360,7 @@ evalProto(char const ** ppzS, uint16_t* pProto)
   LOCAL void
 handleSighup(int sig)
 {
-    redoOptions = AG_TRUE;
+    redoOptions = true;
 }
 
   static void
@@ -348,7 +368,7 @@ spawnPipe(char const * pzFile)
 {
 #   define S_IRW_ALL \
         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-    tFdPair fdpair;
+    fd_pair_t fdpair;
     char* pzIn;
     char* pzOut;
 
@@ -367,13 +387,13 @@ spawnPipe(char const * pzFile)
     if ((mkfifo(pzOut, S_IRW_ALL) != 0) && (errno != EEXIST))
         AG_CANT(PIPE_MKFIFO_NAME,    pzOut);
 
-    fdpair.readFd = open(pzIn, O_RDONLY);
-    if (fdpair.readFd < 0)
+    fdpair.fd_read = open(pzIn, O_RDONLY);
+    if (fdpair.fd_read < 0)
         AG_CANT(PIPE_FIFO_OPEN, pzIn);
 
     {
         struct pollfd polls[1];
-        polls[0].fd     = fdpair.readFd;
+        polls[0].fd     = fdpair.fd_read;
         polls[0].events = POLLIN | POLLPRI;
 
         for (;;) {
@@ -408,19 +428,19 @@ spawnPipe(char const * pzFile)
                 case 0:
                 }
 
-                if (dup2(fdpair.readFd, STDIN_FILENO) != STDIN_FILENO)
+                if (dup2(fdpair.fd_read, STDIN_FILENO) != STDIN_FILENO)
                     AG_CANT(PIPE_DUP2_NAME_STR, PIPE_DEFS_STDIN_NAME);
 
-                fdpair.writeFd = open(pzOut, O_WRONLY);
-                if (fdpair.writeFd < 0)
+                fdpair.fd_write = open(pzOut, O_WRONLY);
+                if (fdpair.fd_write < 0)
                     AG_CANT(PIPE_FIFO_OPEN, pzOut);
 
-                polls[0].fd = fdpair.writeFd;
+                polls[0].fd = fdpair.fd_write;
                 polls[0].events = POLLOUT;
                 if (poll(polls, 1, -1) != 1)
                     AG_CANT(PIPE_POLL_NAME_STR, PIPE_WRITE_NAME_STR);
 
-                if (dup2(fdpair.writeFd, STDOUT_FILENO) != STDOUT_FILENO)
+                if (dup2(fdpair.fd_write, STDOUT_FILENO) != STDOUT_FILENO)
                     AG_CANT(PIPE_DUP2_NAME_STR, pzOut);
 
                 return;

@@ -2,7 +2,7 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2012-01-29 20:13:07 bkorb"
+ *  Time-stamp:        "2012-03-04 19:35:40 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -26,22 +26,22 @@
 #define ENTRY_END  INT_MAX
 #define UNASSIGNED 0x7BAD0BAD
 
-static tForState*  pFS;  /* Current "FOR" information (state) */
+static for_state_t*  pFS;  /* Current "FOR" information (state) */
 
 static char const zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-static ag_bool
-nextDefinition(ag_bool invert, tDefEntry** ppList);
+static bool
+nextDefinition(bool invert, def_ent_t** ppList);
 
 static int
-doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef);
+doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef);
 
 static int
-doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef);
+doForEach(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef);
 
 static void
-load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac);
+load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -64,17 +64,17 @@ ag_scm_first_for_p(SCM which)
         return SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P(which))
-        return (pFS->for_firstFor) ? SCM_BOOL_T : SCM_BOOL_F;
+        return (pFS->for_isfirst) ? SCM_BOOL_T : SCM_BOOL_F;
 
     {
-        tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
+        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char *     pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp(p->for_pzName, pz) == 0) {
-                res = (p->for_firstFor ? SCM_BOOL_T : SCM_BOOL_F);
+            if (strcmp(p->for_name, pz) == 0) {
+                res = (p->for_isfirst ? SCM_BOOL_T : SCM_BOOL_F);
                 break;
             }
             p--;
@@ -101,17 +101,17 @@ ag_scm_last_for_p(SCM which)
         return SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P(which))
-        return (pFS->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
+        return (pFS->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
 
     {
-        tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
+        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char*      pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp(p->for_pzName, pz) == 0) {
-                res = (p->for_lastFor ? SCM_BOOL_T : SCM_BOOL_F);
+            if (strcmp(p->for_name, pz) == 0) {
+                res = (p->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
                 break;
             }
             p--;
@@ -141,13 +141,13 @@ ag_scm_for_index(SCM which)
         return AG_SCM_INT2SCM(pFS->for_index);
 
     {
-        tForState* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
+        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
         char*      pz  = ag_scm2zchars(which, "which for");
         SCM        res = SCM_UNDEFINED;
         int        ct  = forInfo.fi_depth;
 
         do  {
-            if (strcmp(p->for_pzName, pz) == 0) {
+            if (strcmp(p->for_name, pz) == 0) {
                 res = AG_SCM_INT2SCM(p->for_index);
                 break;
             }
@@ -235,16 +235,16 @@ ag_scm_for_sep(SCM obj)
 {
     if (! pFS->for_loading)
         return SCM_UNDEFINED;
-    AGDUPSTR(pFS->for_pzSep, ag_scm2zchars(obj, "sep str"), "sep str");
+    AGDUPSTR(pFS->for_sep_str, ag_scm2zchars(obj, "sep str"), "sep str");
     return SCM_BOOL_T;
 }
 
 
-static ag_bool
-nextDefinition(ag_bool invert, tDefEntry** ppList)
+static bool
+nextDefinition(bool invert, def_ent_t** ppList)
 {
-    ag_bool     haveMatch = AG_FALSE;
-    tDefEntry*  pList     = *ppList;
+    bool     haveMatch = false;
+    def_ent_t*  pList     = *ppList;
 
     while (pList != NULL) {
         /*
@@ -253,8 +253,8 @@ nextDefinition(ag_bool invert, tDefEntry** ppList)
          *  IF we found an entry for the current index,
          *  THEN break out and use it
          */
-        if (pList->index == pFS->for_index) {
-            haveMatch = AG_TRUE;
+        if (pList->de_index == pFS->for_index) {
+            haveMatch = true;
             break;
         }
 
@@ -265,24 +265,24 @@ nextDefinition(ag_bool invert, tDefEntry** ppList)
          *       only the set passed in.
          */
         if ((invert)
-            ? (pList->index < pFS->for_index)
-            : (pList->index > pFS->for_index)) {
+            ? (pList->de_index < pFS->for_index)
+            : (pList->de_index > pFS->for_index)) {
 
             /*
              *  When the "by" step is zero, force syncronization.
              */
             if (pFS->for_by == 0) {
-                pFS->for_index = pList->index;
-                haveMatch = AG_TRUE;
+                pFS->for_index = pList->de_index;
+                haveMatch = true;
             }
             break;
         }
 
         /*
          *  The current index (pFS->for_index) is past the current value
-         *  (pB->index), so advance to the next entry and test again.
+         *  (pB->de_index), so advance to the next entry and test again.
          */
-        pList = (invert) ? pList->pPrevTwin : pList->pTwin;
+        pList = (invert) ? pList->de_ptwin : pList->de_twin;
     }
 
     /*
@@ -294,16 +294,16 @@ nextDefinition(ag_bool invert, tDefEntry** ppList)
 
 
 static int
-doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
+doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef)
 {
     int         loopCt    = 0;
-    tDefEntry   textDef;
-    ag_bool     invert    = (pFS->for_by < 0) ? AG_TRUE : AG_FALSE;
+    def_ent_t   textDef;
+    bool     invert    = (pFS->for_by < 0) ? true : false;
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
-    tDefCtx     ctx       = currDefCtx;
+    def_ctx_t     ctx       = curr_def_ctx;
 
-    if (pFS->for_pzSep == NULL)
-        pFS->for_pzSep = (char*)zNil;
+    if (pFS->for_sep_str == NULL)
+        pFS->for_sep_str = (char*)zNil;
 
     /*
      *  IF the for-from and for-to values have not been set,
@@ -311,22 +311,22 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
      *       entries of the twin set.
      */
     {
-        tDefEntry* pLast = (pFoundDef->pEndTwin != NULL)
-                           ? pFoundDef->pEndTwin : pFoundDef;
+        def_ent_t* pLast = (pFoundDef->de_etwin != NULL)
+                           ? pFoundDef->de_etwin : pFoundDef;
 
         if (pFS->for_from == UNASSIGNED)
-            pFS->for_from = (invert) ? pLast->index : pFoundDef->index;
+            pFS->for_from = (invert) ? pLast->de_index : pFoundDef->de_index;
 
         if (pFS->for_to == UNASSIGNED)
-            pFS->for_to = (invert) ? pFoundDef->index : pLast->index;
+            pFS->for_to = (invert) ? pFoundDef->de_index : pLast->de_index;
 
         /*
          *  "loopLimit" is intended to catch runaway ending conditions.
          *  However, if you really have a gazillion entries, who am I
          *  to stop you?
          */
-        if (loopLimit < pLast->index - pFoundDef->index)
-            loopLimit = (pLast->index - pFoundDef->index) + 1;
+        if (loopLimit <  pLast->de_index - pFoundDef->de_index)
+            loopLimit = (pLast->de_index - pFoundDef->de_index) + 1;
     }
 
     /*
@@ -348,13 +348,13 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
      */
     for (;;) {
         int     nextIdx;
-        ag_bool gotNewDef = nextDefinition(invert, &pFoundDef);
+        bool gotNewDef = nextDefinition(invert, &pFoundDef);
 
         if (loopLimit-- < 0) {
-            fprintf(pfTrace, TRACE_FOR_STEP_TOO_FAR,
-                    pT->pzTplName, pMac->lineNo);
-            fprintf(pfTrace, TRACE_FOR_BY_STEP,
-                    pT->pzTemplText + pMac->ozText,
+            fprintf(trace_fp, TRACE_FOR_STEP_TOO_FAR,
+                    pT->td_name, pMac->md_line);
+            fprintf(trace_fp, TRACE_FOR_BY_STEP,
+                    pT->td_text + pMac->md_txt_off,
                     pFS->for_from, pFS->for_to, pFS->for_by,
                     (int)OPT_VALUE_LOOP_LIMIT);
             break;
@@ -364,32 +364,32 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
             nextIdx = pFS->for_index + pFS->for_by;
 
         } else if (invert) {
-            nextIdx = (pFoundDef->pPrevTwin == NULL)
+            nextIdx = (pFoundDef->de_ptwin == NULL)
                 ? pFS->for_to - 1  /* last iteration !! */
-                : pFoundDef->pPrevTwin->index;
+                : pFoundDef->de_ptwin->de_index;
 
         } else {
-            nextIdx = (pFoundDef->pTwin == NULL)
+            nextIdx = (pFoundDef->de_twin == NULL)
                 ? pFS->for_to + 1  /* last iteration !! */
-                : pFoundDef->pTwin->index;
+                : pFoundDef->de_twin->de_index;
         }
 
         /*
          *  IF we have a non-base definition, use the old def context
          */
         if (! gotNewDef)
-            currDefCtx = ctx;
+            curr_def_ctx = ctx;
 
         /*
          *  ELSE IF this macro is a text type
          *  THEN create an un-twinned version of it to be found first
          */
-        else if (pFoundDef->valType == VALTYP_TEXT) {
+        else if (pFoundDef->de_type == VALTYP_TEXT) {
             textDef = *pFoundDef;
-            textDef.pNext = textDef.pTwin = NULL;
+            textDef.de_next    = textDef.de_twin = NULL;
 
-            currDefCtx.pDefs = &textDef;
-            currDefCtx.pPrev = &ctx;
+            curr_def_ctx.dcx_defent = &textDef;
+            curr_def_ctx.dcx_prev = &ctx;
         }
 
         /*
@@ -397,41 +397,41 @@ doForByStep(tTemplate* pT, tMacro* pMac, tDefEntry * pFoundDef)
          *       macro's values
          */
         else {
-            currDefCtx.pDefs = pFoundDef->val.pDefEntry;
-            currDefCtx.pPrev = &ctx;
+            curr_def_ctx.dcx_defent = pFoundDef->de_val.dvu_entry;
+            curr_def_ctx.dcx_prev = &ctx;
         }
 
-        pFS->for_lastFor = (invert)
-            ? ((nextIdx < pFS->for_to) ? AG_TRUE : AG_FALSE)
-            : ((nextIdx > pFS->for_to) ? AG_TRUE : AG_FALSE);
+        pFS->for_islast = (invert)
+            ? ((nextIdx < pFS->for_to) ? true : false)
+            : ((nextIdx > pFS->for_to) ? true : false);
 
-        generateBlock(pT, pMac+1, pT->aMacros + pMac->endIndex);
+        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
         loopCt++;
         pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
 
-        if (pFS->for_lastFor)
+        if (pFS->for_islast)
             break;
 
-        fputs(pFS->for_pzSep, pCurFp->pFile);
-        fflush(pCurFp->pFile);
-        pFS->for_firstFor = AG_FALSE;
+        fputs(pFS->for_sep_str, cur_fpstack->stk_fp);
+        fflush(cur_fpstack->stk_fp);
+        pFS->for_isfirst = false;
         pFS->for_index = nextIdx;
     }
 
-    currDefCtx = ctx;  /* Restore the def context */
+    curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
 static int
-doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef)
+doForEach(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
 {
     int     loopCt = 0;
-    tDefCtx ctx    = currDefCtx;
+    def_ctx_t ctx    = curr_def_ctx;
 
-    currDefCtx.pPrev = &ctx;
+    curr_def_ctx.dcx_prev = &ctx;
 
     for (;;) {
-        tDefEntry  textDef;
+        def_ent_t  textDef;
 
         /*
          *  IF this loops over a text macro,
@@ -440,56 +440,56 @@ doForEach(tTemplate * pT, tMacro * pMac, tDefEntry * pFoundDef)
          *       is found as a macro invocation, the current value
          *       will be extracted, instead of the value list.
          */
-        if (pFoundDef->valType == VALTYP_TEXT) {
+        if (pFoundDef->de_type == VALTYP_TEXT) {
             textDef = *pFoundDef;
-            textDef.pNext = textDef.pTwin = NULL;
+            textDef.de_next    = textDef.de_twin = NULL;
 
-            currDefCtx.pDefs = &textDef;
+            curr_def_ctx.dcx_defent = &textDef;
         } else {
-            currDefCtx.pDefs = pFoundDef->val.pDefEntry;
+            curr_def_ctx.dcx_defent = pFoundDef->de_val.dvu_entry;
         }
 
         /*
          *  Set the global current index
          */
-        pFS->for_index = pFoundDef->index;
+        pFS->for_index = pFoundDef->de_index;
 
         /*
          *  Advance to the next twin
          */
-        pFoundDef = pFoundDef->pTwin;
+        pFoundDef = pFoundDef->de_twin;
         if (pFoundDef == NULL)
-            pFS->for_lastFor = AG_TRUE;
+            pFS->for_islast = true;
 
-        generateBlock(pT, pMac+1, pT->aMacros + pMac->endIndex);
+        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
 
         loopCt++;
         pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
 
         if (pFoundDef == NULL)
             break;
-        pFS->for_firstFor = AG_FALSE;
+        pFS->for_isfirst = false;
 
         /*
          *  Emit the iteration separation
          */
-        fputs(pFS->for_pzSep, pCurFp->pFile);
-        fflush(pCurFp->pFile);
+        fputs(pFS->for_sep_str, cur_fpstack->stk_fp);
+        fflush(cur_fpstack->stk_fp);
     }
 
-    currDefCtx = ctx;  /* Restore the def context */
+    curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
+load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac)
 {
-    char* pzName = pT->pzTemplText + pMac->ozName;
+    char* pzName = pT->td_text + pMac->md_name_off;
     int   ix     = 0;
     char* pz;
-    tDefEntry*  pPrev = NULL;
+    def_ent_t * prev_ent = NULL;
 
     /*
      *  Find the first text value
@@ -506,7 +506,6 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
         pz = AGALOC(srcLen + 2 + nmlen, "copy FOR text");
         strcpy(pz, pzName);
         pzName = pz;
-        manageAllocatedData(pz);
         pz += nmlen + 1;
     }
 
@@ -514,12 +513,12 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
     pz[ srcLen ] = NUL;
 
     do  {
-        tDefEntry* pDef = getEntry();
+        def_ent_t* pDef = new_def_ent();
 
-        pDef->pzDefName  = pzName;
-        pDef->index      = ix++;
-        pDef->valType    = VALTYP_TEXT;
-        pDef->val.pzText = pz;
+        pDef->de_name    = pzName;
+        pDef->de_index   = ix++;
+        pDef->de_type    = VALTYP_TEXT;
+        pDef->de_val.dvu_text = pz;
 
         switch (*pz) {
         case '\'':
@@ -568,17 +567,17 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
         /*
          *  IF there is a previous entry, link its twin to this one.
          *  OTHERWISE, it is the head of the twin list.
-         *  Link to funcPrivate.
+         *  Link to md_pvt.
          */
-        if (pPrev != NULL)
-            pPrev->pTwin = pDef;
+        if (prev_ent != NULL)
+            prev_ent->de_twin = pDef;
         else
-            pMac->funcPrivate = pDef;
+            pMac->md_pvt = pDef;
 
-        pPrev = pDef;
+        prev_ent = pDef;
     } while (*pz != NUL);
 
-    pMac->ozText = 0;
+    pMac->md_txt_off = 0;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -671,33 +670,33 @@ load_ForIn(char const * pzSrc, size_t srcLen, tTemplate* pT, tMacro* pMac)
  *    This macro ends the @code{FOR} function template block.
  *    For a complete description @xref{FOR}.
 =*/
-tMacro*
-mFunc_For(tTemplate* pT, tMacro* pMac)
+macro_t*
+mFunc_For(templ_t* pT, macro_t* pMac)
 {
-    tMacro*     pMRet = pT->aMacros + pMac->endIndex;
-    ag_bool     isIndexed;
-    tDefEntry*  pDef;
+    macro_t*     pMRet = pT->td_macros + pMac->md_end_idx;
+    bool     isIndexed;
+    def_ent_t*  pDef;
     int         loopCt;
 
     /*
-     *  "funcPrivate" is used by the "FOR x IN ..." variation of the macro.
-     *  When parsed, a chain of text definitions are hung off of "funcPrivate".
+     *  "md_pvt" is used by the "FOR x IN ..." variation of the macro.
+     *  When parsed, a chain of text definitions are hung off of "md_pvt".
      *  "doForEach()" will then chase through the linked list of text
      *  values.  This winds up being identical to [+ FOR var +] where
      *  a list of "var" values has been set.
      */
-    if (pMac->funcPrivate != NULL)
-        pDef = pMac->funcPrivate;
+    if (pMac->md_pvt != NULL)
+        pDef = pMac->md_pvt;
     else {
-        pDef = findDefEntry(pT->pzTemplText + pMac->ozName, &isIndexed);
+        pDef = findDefEntry(pT->td_text + pMac->md_name_off, &isIndexed);
         if (pDef == NULL) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(pfTrace, TRACE_FN_FOR_SKIP,
-                        pT->pzTemplText + pMac->ozName);
+                fprintf(trace_fp, TRACE_FN_FOR_SKIP,
+                        pT->td_text + pMac->md_name_off);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-                    fprintf(pfTrace, TAB_FILE_LINE_FMT,
-                            pT->pzTplFile, pMac->lineNo);
+                    fprintf(trace_fp, TAB_FILE_LINE_FMT,
+                            pT->td_file, pMac->md_line);
             }
 
             return pMRet;
@@ -710,63 +709,63 @@ mFunc_For(tTemplate* pT, tMacro* pMac)
     if (++(forInfo.fi_depth) > forInfo.fi_alloc) {
         forInfo.fi_alloc += 5;
         if (forInfo.fi_data == NULL)
-             forInfo.fi_data = (tForState*)
-                 AGALOC(5 * sizeof(tForState), "Init FOR sate");
-        else forInfo.fi_data = (tForState*)
+             forInfo.fi_data = (for_state_t*)
+                 AGALOC(5 * sizeof(for_state_t), "Init FOR sate");
+        else forInfo.fi_data = (for_state_t*)
                  AGREALOC((void*)forInfo.fi_data,
-                          forInfo.fi_alloc * sizeof(tForState), "FOR state");
+                          forInfo.fi_alloc * sizeof(for_state_t), "FOR state");
     }
 
     pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
-    memset((void*)pFS, 0, sizeof(tForState));
-    pFS->for_firstFor = AG_TRUE;
-    pFS->for_pzName   = pT->pzTemplText + pMac->ozName;
+    memset((void*)pFS, 0, sizeof(for_state_t));
+    pFS->for_isfirst = true;
+    pFS->for_name   = pT->td_text + pMac->md_name_off;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(pfTrace, TRACE_FN_FOR, pT->pzTemplText + pMac->ozName,
-                pT->pzTplFile, pMac->lineNo);
+        fprintf(trace_fp, TRACE_FN_FOR, pT->td_text + pMac->md_name_off,
+                pT->td_file, pMac->md_line);
 
     /*
      *  Check for a FOR iterating based on scheme macros
      */
-    if (pT->pzTemplText[ pMac->ozText ] == '(') {
+    if (pT->td_text[ pMac->md_txt_off ] == '(') {
         pFS->for_from  = \
         pFS->for_to    = UNASSIGNED;
 
-        pFS->for_loading = AG_TRUE;
-        (void) eval(pT->pzTemplText + pMac->ozText);
-        pFS->for_loading = AG_FALSE;
+        pFS->for_loading = true;
+        (void) eval(pT->td_text + pMac->md_txt_off);
+        pFS->for_loading = false;
         loopCt = doForByStep(pT, pMac, pDef);
     }
     else {
         /*
          *  The FOR iterates over a list of definitions
          */
-        pFS->for_pzSep = pT->pzTemplText + pMac->ozText;
+        pFS->for_sep_str = pT->td_text + pMac->md_txt_off;
         loopCt = doForEach(pT, pMac, pDef);
     }
 
     forInfo.fi_depth--;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(pfTrace, TRACE_FN_FOR_REPEAT, pT->pzTemplText + pMac->ozName,
+        fprintf(trace_fp, TRACE_FN_FOR_REPEAT, pT->td_text + pMac->md_name_off,
                 loopCt);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(pfTrace, TAB_FILE_LINE_FMT, pT->pzTplFile, pMac->lineNo);
+            fprintf(trace_fp, TAB_FILE_LINE_FMT, pT->td_file, pMac->md_line);
     }
 
     return pMRet;
 }
 
 
-tMacro*
-mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
+macro_t*
+mLoad_For(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
-    char *        pzCopy = pT->pNext; /* next text dest   */
-    char const *  pzSrc  = (char const*)pMac->ozText; /* macro text */
-    size_t        srcLen = (size_t)pMac->res;         /* macro len  */
-    tMacro *      pEndMac;
+    char *        pzCopy = pT->td_scan; /* next text dest   */
+    char const *  pzSrc  = (char const*)pMac->md_txt_off; /* macro text */
+    size_t        srcLen = (size_t)pMac->md_res;         /* macro len  */
+    macro_t *      pEndMac;
 
     /*
      *  Save the global macro loading mode
@@ -796,7 +795,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      *  Special hack:  if the name is preceeded by a `.',
      *  then the lookup is local-only and we will accept it.
      */
-    pMac->ozName = pT->pNext - pT->pzTemplText;
+    pMac->md_name_off = pT->td_scan - pT->td_text;
     if (*pzSrc == '.') {
         *(pzCopy++) = *(pzSrc++);
         if (! IS_VAR_FIRST_CHAR(*pzSrc))
@@ -806,21 +805,21 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     while (IS_VALUE_NAME_CHAR(*pzSrc)) *(pzCopy++) = *(pzSrc++);
     *(pzCopy++) = NUL;
 
-    if (pT->pzTemplText[ pMac->ozName ] == NUL)
+    if (pT->td_text[ pMac->md_name_off ] == NUL)
         AG_ABEND_IN(pT, pMac, LD_FOR_INVALID_VAR);
 
     /*
      *  Skip space to the start of the text following the iterator name
      */
     pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
-    srcLen -= pzSrc - (char*)pMac->ozText;
+    srcLen -= pzSrc - (char*)pMac->md_txt_off;
 
     /* * * * *
      *
      *  No source -> zero offset to text
      */
     if ((ssize_t)srcLen <= 0) {
-        pMac->ozText = 0;
+        pMac->md_txt_off = 0;
     }
 
     /* * * * *
@@ -839,7 +838,7 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
      */
     else {
         char* pzCopied = pzCopy;
-        pMac->ozText = pzCopy - pT->pzTemplText;
+        pMac->md_txt_off = pzCopy - pT->td_text;
         do  {
             *(pzCopy++) = *(pzSrc++);
         } while (--srcLen > 0);
@@ -850,13 +849,13 @@ mLoad_For(tTemplate* pT, tMacro* pMac, char const ** ppzScan)
     /*
      * * * * */
 
-    pT->pNext = pzCopy;
+    pT->td_scan = pzCopy;
 
     pEndMac = parseTemplate(pMac + 1, ppzScan);
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_FOR_NO_ENDFOR);
 
-    pMac->endIndex = pMac->sibIndex = pEndMac - pT->aMacros;
+    pMac->md_end_idx = pMac->md_sib_idx = pEndMac - pT->td_macros;
 
     papLoadProc = papLP;
     return pEndMac;

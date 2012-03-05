@@ -1,7 +1,7 @@
 /**
  * @file defFind.c
  *
- *  Time-stamp:        "2012-01-29 07:42:06 bkorb"
+ *  Time-stamp:        "2012-03-04 19:09:43 bkorb"
  *
  *  This module locates definitions.
  *
@@ -22,18 +22,20 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-struct defEntryList {
-    size_t         allocCt;
-    size_t         usedCt;
-    tDefEntry**    papDefEntry;
-    int            nestLevel;
-};
-typedef struct defEntryList tDefEntryList;
+/**
+ * autogen definitions entry list.
+ */
+typedef struct {
+    size_t        del_alloc_ct;     //!< entry allocation count
+    size_t        del_used_ct;      //!< entries in actual use
+    def_ent_t **  del_def_ent_ary;  //!< pointer to list of entries
+    int           del_level;        //!< how deep into it we are
+} def_ent_list_t;
 
 typedef struct hash_name_s hash_name_t;
 struct hash_name_s {
-    hash_name_t *   next;
-    char            str[0];
+    hash_name_t * hn_next;
+    char          hn_str[0];
 };
 
 static hash_name_t ** hash_table = NULL;
@@ -42,62 +44,80 @@ static char zDefinitionName[ AG_PATH_MAX ];
 
 #define ILLFORMEDNAME() \
     AG_ABEND(aprf(BAD_NAME_FMT, zDefinitionName, \
-              pCurTemplate->pzTplFile, pCurMacro->lineNo));
+              current_tpl->td_file, cur_macro->md_line));
 
 /* = = = START-STATIC-FORWARD = = = */
-static tDefEntry *
-find_by_index(tDefEntry * pE, char * pzScan);
+static def_ent_t *
+find_by_index(def_ent_t * ent, char * scan);
 
 static void
-add_to_def_list(tDefEntry* pDE, tDefEntryList* pDEL);
+add_to_def_list(def_ent_t * ent, def_ent_list_t * del);
 
 static size_t
 bad_def_name(char * pzD, char const * pzS, size_t srcLen);
 
-static tDefEntry*
-find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed);
+static def_ent_t *
+find_def(char * name, def_ctx_t * pDefCtx, bool * indexed);
 
 static int
 hash_string(unsigned char const * pz);
 
 static void
-stringAdd(char const * pz);
+add_string(char const * pz);
 
-static tDefEntry **
-get_def_list(char * pzName, tDefCtx * pDefCtx);
+static def_ent_t **
+get_def_list(char * name, def_ctx_t * pDefCtx);
 /* = = = END-STATIC-FORWARD = = = */
 
-static tDefEntry *
-find_by_index(tDefEntry * pE, char * pzScan)
+/**
+ * Find a def entry by an index.  Valid indexes are:
+ * * empty, meaning the first
+ * * '$', meaning the last
+ * * a decimal, octal or hex number
+ * * an environment variable with a decimal, octal or hex number
+ *
+ * The "twins" of the passed in entry are searched for a matching
+ * "de_index" value.
+ *
+ * @param ent  the eldest twin/sibling of the list to search
+ * @param scan the scanning pointer pointing to the first non-white
+ *  character after the open bracket.
+ *
+ * @returns a pointer to the matching definition entry, if any.
+ * Otherwise, NULL.
+ */
+static def_ent_t *
+find_by_index(def_ent_t * ent, char * scan)
 {
     int  idx;
 
     /*
      *  '[]' means the first entry of whatever index number
      */
-    if (*pzScan == ']')
-        return pE;
+    if (*scan == ']')
+        return ent;
 
     /*
-     *  '[$]' means the last entry of whatever index number
+     *  '[$]' means the last entry of whatever the last one is.
+     *  "de_etwin" points to it, or is NULL.
      */
-    if (*pzScan == '$') {
-        pzScan = SPN_WHITESPACE_CHARS(pzScan + 1);
-        if (*pzScan != ']')
+    if (*scan == '$') {
+        scan = SPN_WHITESPACE_CHARS(scan + 1);
+        if (*scan != ']')
             return NULL;
 
-        if (pE->pEndTwin != NULL)
-            return pE->pEndTwin;
+        if (ent->de_etwin != NULL)
+            return ent->de_etwin;
 
-        return pE;
+        return ent;
     }
 
     /*
      *  '[nn]' means the specified index number
      */
-    if (IS_DEC_DIGIT_CHAR(*pzScan)) {
-        char* pz;
-        idx = strtol(pzScan, &pz, 0);
+    if (IS_DEC_DIGIT_CHAR(*scan)) {
+        char * pz;
+        idx = strtol(scan, &pz, 0);
 
         /*
          *  Skip over any trailing space and make sure we have a closer
@@ -111,44 +131,44 @@ find_by_index(tDefEntry * pE, char * pzScan)
         /*
          *  '[XX]' means get the index from our definitions
          */
-        char* pzDef = pzScan;
-        char const* pzVal;
+        char * def = scan;
+        char const * val;
 
-        if (! IS_VAR_FIRST_CHAR(*pzScan))
+        if (! IS_VAR_FIRST_CHAR(*scan))
             return NULL;
 
-        pzScan = SPN_VALUE_NAME_CHARS(pzScan);
+        scan = SPN_VALUE_NAME_CHARS(scan);
 
         /*
-         *  Temporarily remove the character under *pzScan and
+         *  Temporarily remove the character under *scan and
          *  find the corresponding defined value.
          */
         {
-            char  svch = *pzScan;
-            *pzScan = NUL;
-            pzVal   = getDefine(pzDef, AG_TRUE);
-            *pzScan = svch;
+            char  svch = *scan;
+            *scan = NUL;
+            val   = getDefine(def, true);
+            *scan = svch;
         }
 
         /*
          *  Skip over any trailing space and make sure we have a closer
          */
-        pzScan = SPN_WHITESPACE_CHARS(pzScan);
-        if (*pzScan != ']')
+        scan = SPN_WHITESPACE_CHARS(scan);
+        if (*scan != ']')
             return NULL;
 
         /*
          *  make sure we found a defined value
          */
-        if ((pzVal == NULL) || (*pzVal == NUL))
+        if ((val == NULL) || (*val == NUL))
             return NULL;
 
-        idx = strtol(pzVal, &pzDef, 0);
+        idx = strtol(val, &def, 0);
 
         /*
          *  Make sure we got a legal number
          */
-        if (*pzDef != NUL)
+        if (*def != NUL)
             return NULL;
     }
 
@@ -156,14 +176,14 @@ find_by_index(tDefEntry * pE, char * pzScan)
      *  Search for the entry with the specified index.
      */
     do  {
-        if (pE->index > idx)
+        if (ent->de_index > idx)
             return NULL;
-        if (pE->index == idx)
+        if (ent->de_index == idx)
             break;
-        pE = pE->pTwin;
-    } while (pE != NULL);
+        ent = ent->de_twin;
+    } while (ent != NULL);
 
-    return pE;
+    return ent;
 }
 
 
@@ -174,16 +194,16 @@ find_by_index(tDefEntry * pE, char * pzScan)
  *              list of found definitions (reallocating list size as needed).
  */
 static void
-add_to_def_list(tDefEntry* pDE, tDefEntryList* pDEL)
+add_to_def_list(def_ent_t * ent, def_ent_list_t * del)
 {
-    if (++(pDEL->usedCt) > pDEL->allocCt) {
-        pDEL->allocCt += pDEL->allocCt + 8; /* 8, 24, 56, ... */
-        pDEL->papDefEntry = (tDefEntry**)
-            AGREALOC((void*)pDEL->papDefEntry, pDEL->allocCt * sizeof(void*),
-                     "add find");
+    if (++(del->del_used_ct) > del->del_alloc_ct) {
+        del->del_alloc_ct   += del->del_alloc_ct + 8; /* 8, 24, 56, ... */
+        del->del_def_ent_ary = (def_ent_t**)
+            AGREALOC((void*)del->del_def_ent_ary,
+                     del->del_alloc_ct * sizeof(void*), "add find");
     }
 
-    pDEL->papDefEntry[ pDEL->usedCt-1 ] = pDE;
+    del->del_def_ent_ary[del->del_used_ct-1] = ent;
 }
 
 static size_t
@@ -191,8 +211,8 @@ bad_def_name(char * pzD, char const * pzS, size_t srcLen)
 {
     memcpy((void*)pzD, (void*)pzS, srcLen);
     pzD[srcLen] = NUL;
-    fprintf(pfTrace, BAD_NAME_FMT, pzD,
-            pCurTemplate->pzTplFile, pCurMacro->lineNo);
+    fprintf(trace_fp, BAD_NAME_FMT, pzD,
+            current_tpl->td_file, cur_macro->md_line);
     return srcLen + 1;
 }
 
@@ -208,7 +228,7 @@ bad_def_name(char * pzD, char const * pzS, size_t srcLen)
  *  We start in CN_START.
  */
 LOCAL int
-canonicalizeName(char* pzD, char const* pzS, int srcLen)
+canonicalizeName(char * pzD, char const * pzS, int srcLen)
 {
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
@@ -395,14 +415,14 @@ canonicalizeName(char* pzD, char const* pzS, int srcLen)
  *  the element has been indexed (so the caller will not try
  *  to traverse the list of twins).
  */
-static tDefEntry*
-find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
+static def_ent_t *
+find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
 {
     char *       brace;
     char         br_ch;
-    tDefEntry *  ent;
-    ag_bool      dummy;
-    ag_bool      noNesting    = AG_FALSE;
+    def_ent_t *  ent;
+    bool      dummy;
+    bool      noNesting    = false;
 
     static int   nestingDepth = 0;
 
@@ -413,31 +433,31 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
      *  an index yet).
      */
     if (nestingDepth == 0) {
-        canonicalizeName(zDefinitionName, pzName, (int)strlen(pzName));
-        pzName = zDefinitionName;
+        canonicalizeName(zDefinitionName, name, (int)strlen(name));
+        name = zDefinitionName;
 
-        if (pIsIndexed != NULL)
-             *pIsIndexed = AG_FALSE;
-        else pIsIndexed  = &dummy;
+        if (indexed != NULL)
+             *indexed = false;
+        else indexed  = &dummy;
 
-        if (*pzName == name_sep_ch) {
-            noNesting = AG_TRUE;
-            pzName++;
+        if (*name == name_sep_ch) {
+            noNesting = true;
+            name++;
         }
     }
 
-    brace  = BRK_NAME_SEP_CHARS(pzName);
+    brace  = BRK_NAME_SEP_CHARS(name);
     br_ch  = *brace;
     *brace = NUL;
 
-    if (br_ch == '[') *pIsIndexed = AG_TRUE;
+    if (br_ch == '[') *indexed = true;
 
     for (;;) {
         /*
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        ent = pDefCtx->pDefs;
+        ent = pDefCtx->dcx_defent;
         if (ent == NULL)
             return NULL;
 
@@ -446,10 +466,10 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp(ent->pzDefName, pzName) == 0)
+            if (strcmp(ent->de_name, name) == 0)
                 goto found_def_entry;
 
-            ent = ent->pNext;
+            ent = ent->de_next;
         } while (ent != NULL);
 
         /*
@@ -462,7 +482,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefCtx = pDefCtx->pPrev;
+        pDefCtx = pDefCtx->dcx_prev;
         if (pDefCtx == NULL)
             return NULL;
     } found_def_entry:;
@@ -510,7 +530,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
              *  at compile time.
              */
             if (*brace == name_sep_ch) {
-                pzName = brace + 1;
+                name = brace + 1;
                 break;
             }
             /* FALLTHROUGH */
@@ -530,7 +550,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
              *  to the next segment and search starting from the newly
              *  available set of definitions.
              */
-            pzName = brace + 1;
+            name = brace + 1;
             break;
         }
         /* FALLTHROUGH */
@@ -542,7 +562,7 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
     /*
      *  We cannot find a member of a non-block type macro definition.
      */
-    if (ent->valType != VALTYP_BLOCK)
+    if (ent->de_type != VALTYP_BLOCK)
         return NULL;
 
     /*
@@ -552,22 +572,22 @@ find_def(char * pzName, tDefCtx* pDefCtx, ag_bool* pIsIndexed)
      */
     nestingDepth++;
     {
-        tDefCtx ctx = { NULL, &currDefCtx };
+        def_ctx_t ctx = { NULL, &curr_def_ctx };
 
-        ctx.pDefs = ent->val.pDefEntry;
+        ctx.dcx_defent = ent->de_val.dvu_entry;
 
         for (;;) {
-            tDefEntry* res;
+            def_ent_t* res;
 
-            res = find_def(pzName, &ctx, pIsIndexed);
+            res = find_def(name, &ctx, indexed);
             if ((res != NULL) || (br_ch == '[')) {
                 nestingDepth--;
                 return res;
             }
-            ent = ent->pTwin;
+            ent = ent->de_twin;
             if (ent == NULL)
                 break;
-            ctx.pDefs = ent->val.pDefEntry;
+            ctx.dcx_defent = ent->de_val.dvu_entry;
         }
     }
 
@@ -591,7 +611,7 @@ hash_string(unsigned char const * pz)
 }
 
 static void
-stringAdd(char const * pz)
+add_string(char const * pz)
 {
     unsigned char z[SCRIBBLE_SIZE];
     size_t z_len;
@@ -600,7 +620,7 @@ stringAdd(char const * pz)
      *  If there is no hash table, create one.
      */
     if (hash_table_ct == 0) {
-        size_t ct = pCurTemplate->macroCt;
+        size_t ct = current_tpl->td_mac_ct;
         if (ct < SCRIBBLE_SIZE)
             ct = SCRIBBLE_SIZE;
         else {
@@ -654,29 +674,29 @@ stringAdd(char const * pz)
 
         hash_name_t ** hptr = &(hash_table[ix]), *new;
         while (*hptr != NULL) {
-            int cmp = memcmp(z, (*hptr)->str, z_len);
+            int cmp = memcmp(z, (*hptr)->hn_str, z_len);
             if (cmp == 0)
                 return; /* old name */
 
             if (cmp > 0)
                 break; /* no matching name can be found */
 
-            hptr = &((*hptr)->next);
+            hptr = &((*hptr)->hn_next);
         }
 
-        new       = malloc(sizeof (*new) + z_len);
-        new->next = *hptr;
-        *hptr     = new;
-        memcpy(new->str, z, z_len);
+        new          = AGALOC(sizeof (*new) + z_len, "hn");
+        new->hn_next = *hptr;
+        *hptr        = new;
+        memcpy(new->hn_str, z, z_len);
     }
 }
 
-LOCAL tDefEntry*
-findDefEntry(char * pzName, ag_bool* pIsIndexed)
+LOCAL def_ent_t *
+findDefEntry(char * name, bool * indexed)
 {
     if (HAVE_OPT(USED_DEFINES))
-        stringAdd(pzName);
-    return find_def(pzName, &currDefCtx, pIsIndexed);
+        add_string(name);
+    return find_def(name, &curr_def_ctx, indexed);
 }
 
 
@@ -695,8 +715,8 @@ print_used_defines(void)
         while (ix < hash_table_ct) {
             hash_name_t * hn = hash_table[ix++];
             while (hn != NULL) {
-                fprintf(fp, USED_DEFINES_LINE_FMT, hn->str);
-                hn = hn->next;
+                fprintf(fp, USED_DEFINES_LINE_FMT, hn->hn_str);
+                hn = hn->hn_next;
             }
         }
         pclose(fp);
@@ -711,15 +731,15 @@ print_used_defines(void)
  *  indicator saying if the element has been indexed (so the caller will
  *  not try to traverse the list of twins).
  */
-static tDefEntry **
-get_def_list(char * pzName, tDefCtx * pDefCtx)
+static def_ent_t **
+get_def_list(char * name, def_ctx_t * pDefCtx)
 {
-    static tDefEntryList defList = { 0, 0, NULL, 0 };
+    static def_ent_list_t defList = { 0, 0, NULL, 0 };
 
     char*      pcBrace;
     char       breakCh;
-    tDefEntry* pE;
-    ag_bool    noNesting = AG_FALSE;
+    def_ent_t* ent;
+    bool    noNesting = false;
 
     /*
      *  IF we are at the start of a search, then canonicalize the name
@@ -727,24 +747,24 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
      *  initialize the "indexed" boolean to false (we have not found
      *  an index yet).
      */
-    if (defList.nestLevel == 0) {
-        if (*pzName == name_sep_ch) {
-            noNesting = AG_TRUE;
-            pzName = SPN_WHITESPACE_CHARS(pzName + 1);
+    if (defList.del_level == 0) {
+        if (*name == name_sep_ch) {
+            noNesting = true;
+            name = SPN_WHITESPACE_CHARS(name + 1);
         }
 
-        if (! IS_VAR_FIRST_CHAR(*pzName)) {
-            strncpy(zDefinitionName, pzName, sizeof(zDefinitionName) - 1);
+        if (! IS_VAR_FIRST_CHAR(*name)) {
+            strncpy(zDefinitionName, name, sizeof(zDefinitionName) - 1);
             zDefinitionName[ sizeof(zDefinitionName) - 1] = NUL;
             ILLFORMEDNAME();
         }
 
-        canonicalizeName(zDefinitionName, pzName, (int)strlen(pzName));
-        pzName = zDefinitionName;
-        defList.usedCt = 0;
+        canonicalizeName(zDefinitionName, name, (int)strlen(name));
+        name = zDefinitionName;
+        defList.del_used_ct = 0;
     }
 
-    pcBrace  = BRK_NAME_SEP_CHARS(pzName);
+    pcBrace  = BRK_NAME_SEP_CHARS(name);
     breakCh  = *pcBrace;
     *pcBrace = NUL;
 
@@ -753,14 +773,14 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        pE = pDefCtx->pDefs;
-        if (pE == NULL) {
+        ent = pDefCtx->dcx_defent;
+        if (ent == NULL) {
             /*
              *  Make sure we are not nested.  Once we start to nest,
              *  then we cannot "change definition levels"
              */
         not_found:
-            if (defList.nestLevel != 0)
+            if (defList.del_level != 0)
                 ILLFORMEDNAME();
 
             /*
@@ -774,23 +794,23 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
              *  IF the name matches
              *  THEN go add it, plus all its twins
              */
-            if (strcmp(pE->pzDefName, pzName) == 0)
+            if (strcmp(ent->de_name, name) == 0)
                 goto found_def_entry;
 
-            pE = pE->pNext;
-        } while (pE != NULL);
+            ent = ent->de_next;
+        } while (ent != NULL);
 
         /*
          *  IF we are nested, then we cannot change the definition level.
          *  Just go and return what we have found so far.
          */
-        if ((defList.nestLevel != 0) || noNesting)
+        if ((defList.del_level != 0) || noNesting)
             goto returnResult;
 
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefCtx = pDefCtx->pPrev;
+        pDefCtx = pDefCtx->dcx_prev;
         if (pDefCtx == NULL)
             goto not_found;
     } found_def_entry:;
@@ -805,9 +825,9 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
     switch (breakCh) {
     case NUL:
         do  {
-            add_to_def_list(pE, &defList);
-            pE = pE->pTwin;
-        } while (pE != NULL);
+            add_to_def_list(ent, &defList);
+            ent = ent->de_twin;
+        } while (ent != NULL);
         goto returnResult;
 
     case '[':
@@ -816,8 +836,8 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
          */
         pcBrace = SPN_WHITESPACE_CHARS(pcBrace + 1);
 
-        pE = find_by_index(pE, pcBrace);
-        if (pE == NULL)
+        ent = find_by_index(ent, pcBrace);
+        if (ent == NULL)
             goto returnResult;
 
         /*
@@ -847,7 +867,7 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
         default:
             ILLFORMEDNAME();
         }
-        pzName = pcBrace + 1;
+        name = pcBrace + 1;
         break;
 
     case '.': case '/':
@@ -860,7 +880,7 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
              *  next segment and search starting from the newly available set
              *  of definitions.
              */
-            pzName = pcBrace + 1;
+            name = pcBrace + 1;
             break;
         }
 
@@ -873,33 +893,33 @@ get_def_list(char * pzName, tDefCtx * pDefCtx)
      *  a subscript.  Ignore any entry types that are not "Blocks" because
      *  text entries won't have any children.
      */
-    defList.nestLevel++;
+    defList.del_level++;
     do  {
-        tDefCtx ctx = { pE->val.pDefEntry, &currDefCtx };
+        def_ctx_t ctx = { ent->de_val.dvu_entry, &curr_def_ctx };
 
-        if (pE->valType == VALTYP_BLOCK)
-            (void)get_def_list(pzName, &ctx);
+        if (ent->de_type == VALTYP_BLOCK)
+            (void)get_def_list(name, &ctx);
 
         if (breakCh == '[')
             break;
 
-        pE = pE->pTwin;
-    } while (pE != NULL);
+        ent = ent->de_twin;
+    } while (ent != NULL);
 
-    defList.nestLevel--;
+    defList.del_level--;
 
  returnResult:
-    if (defList.nestLevel == 0)
+    if (defList.del_level == 0)
         add_to_def_list(NULL, &defList);
 
-    return defList.papDefEntry;
+    return defList.del_def_ent_ary;
 }
 
 
-LOCAL tDefEntry**
-findEntryList(char* pzName)
+LOCAL def_ent_t **
+findEntryList(char * name)
 {
-    return get_def_list(pzName, &currDefCtx);
+    return get_def_list(name, &curr_def_ctx);
 }
 /*
  * Local Variables:

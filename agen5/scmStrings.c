@@ -4,7 +4,7 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2012-01-29 09:48:03 bkorb"
+ * Time-stamp:        "2012-03-04 19:29:47 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -160,8 +160,13 @@ LOCAL char *
 ag_scm2zchars(SCM s, const char * type)
 {
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
-#   error Your Guile is too old.
-    choke me.
+
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf(zNotStr, type));
+
+    if (SCM_SUBSTRP(s))
+        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
+    return SCM_CHARS(s);
 
 #else
     size_t len;

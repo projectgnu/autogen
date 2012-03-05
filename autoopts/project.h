@@ -3,6 +3,8 @@
 #define AUTOGEN_PROJECT_H
 
 #include "config.h"
+#include "compat/compat.h"
+#include "autoopts/ag-char-map.h"
 
 /*
  *  Procedure success codes

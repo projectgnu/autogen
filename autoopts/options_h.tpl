@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2012-02-12 09:20:29 bkorb"
+# Time-stamp:      "2012-02-28 19:42:04 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -41,25 +41,46 @@ h=options.h
 #include <sys/types.h>
 #include <stdio.h>
 
-#if defined(HAVE_STDINT_H)
-# include <stdint.h>
-#elif defined(HAVE_INTTYPES_H)
-# include <inttypes.h>
-#endif /* HAVE_STDINT/INTTYPES_H */
+#ifndef COMPAT_H_GUARD
+/*
+ * This is needed for test compilations where the "compat.h"
+ * header is not usually available.
+ */
+#  if defined(HAVE_STDINT_H)
+#    include <stdint.h>
+#  elif defined(HAVE_INTTYPES_H)
+#    include <inttypes.h>
+#  endif /* HAVE_STDINT/INTTYPES_H */
 
-#if defined(HAVE_LIMITS_H)
-# include <limits.h>
-#elif defined(HAVE_SYS_LIMITS_H)
-# include <sys/limits.h>
-#endif /* HAVE_LIMITS/SYS_LIMITS_H */
+#  if defined(HAVE_LIMITS_H)
+#    include <limits.h>
+#  elif defined(HAVE_SYS_LIMITS_H)
+#    include <sys/limits.h>
+#  endif /* HAVE_LIMITS/SYS_LIMITS_H */
 
-#if defined(HAVE_SYSEXITS_H)
-#  include <sysexits.h>
-#endif /* HAVE_SYSEXITS_H */
+#  if defined(HAVE_SYSEXITS_H)
+#    include <sysexits.h>
+#  endif /* HAVE_SYSEXITS_H */
+
+#  if defined(HAVE_STDBOOL_H)
+#    include <stdbool.h>
+#  else
+     typedef enum { false = 0, true = 1 } _Bool;
+#    define bool _Bool
+
+     /* The other macros must be usable in preprocessor directives.  */
+#    define false 0
+#    define true 1
+#  endif /* HAVE_SYSEXITS_H */
+#endif /* COMPAT_H_GUARD */
 // END-CONFIGURED-HEADERS
-#ifndef  EX_USAGE
-# define EX_USAGE               64
-#endif
+
+/**
+ * Defined to normal value of EX_USAGE.  Used to indicate that paged usage
+ * was requested.  It is used to distinguish a --usage from a --help request.
+ * --usage is abbreviated and --help gives as much help as possible.
+ */
+#define AO_EXIT_REQ_USAGE 64
 
 /*
  *  PUBLIC DEFINES
@@ -184,7 +205,7 @@ rm  -f proc-state.h
 
 ` =]
 
-#define STMTS(s)  do { s; } while (0)
+#define STMTS(s)  do { s; } while (false)
 
 /*
  *  The following must be #defined instead of typedef-ed

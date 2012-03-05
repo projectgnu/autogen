@@ -291,7 +291,7 @@ set_define_re(void)
     static char const pat_wrapper[] = "/\\*=(%s)";
 
     char const * def_pat;
-    ag_bool      free_pat = AG_FALSE;
+    bool      free_pat = false;
 
     /*
      *  Our default pattern is to accept all names following
@@ -317,7 +317,7 @@ set_define_re(void)
          */
         snprintf(bf, len, pat_wrapper, pz);
         def_pat  = bf;
-        free_pat = AG_TRUE;
+        free_pat = true;
     }
 
     /*
