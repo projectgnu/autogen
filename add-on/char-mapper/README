@@ -15,52 +15,29 @@ PURPOSE:
 
 EXAMPLE:
 
-Here are the character classes I use in my test (and in autogen):
+Here is a short example:
 
     lower-case      "a-z"
     upper-case      "A-Z"
     alphabetic      +lower-case   +upper-case
+    unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
     oct-digit       "0-7"
     dec-digit       "89"          +oct-digit
     hex-digit       "a-fA-F"      +dec-digit
-    alphanumeric    +alphabetic   +dec-digit
-    var-first       "_"           +alphabetic
-    variable-name   +var-first    +dec-digit
-    option-name     "^-"          +variable-name
-    value-name      ":"           +option-name
-    horiz-white     "\t "
-    compound-name   "[.]"         +value-name   +horiz-white
-    whitespace      "\v\f\r\n\b"  +horiz-white
-    unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
-    end-xml-token   "/>"          +whitespace
-    graphic         "!-~"
-    plus-n-space    "+"           +whitespace
-    punctuation     "!-~"         -alphanumeric -"_"
-    suffix          "-._"         +alphanumeric
-    suffix-fmt      "%/"          +suffix     
-    false-type      "nNfF0\x00"
-    file-name       "/"           +suffix
-    end-token       "\x00"        +whitespace
-    end-list-entry  ","           +end-token
-    set-separator   "|+"          +end-list-entry
 
 The syntax is: class-name [ literal-string ] [{+|-}another-class]...
 If a literal string is specified, then a new test bit is added.
 If a character class is named, its bits are included or removed
-from the character class set.
+from the character class set.  If a class does not have a literal
+string specified, then you cannot remove members.  Only the literal
+members of a class can be removed from that class.
 
-This table produces these (among other) macros and the "is_test_cmap_char" array:
+This table produces these (among other) macros for each character class,
+plus a hidden array of 128 mask values:
 
 #define  IS_LOWER_CASE_CHAR( _c)       is_ag_char_map_char((char)( _c), 0x000001)
 #define SPN_LOWER_CASE_CHARS(_s)      spn_ag_char_map_chars((char *)_s, 0x000001)
 #define BRK_LOWER_CASE_CHARS(_s)      brk_ag_char_map_chars((char *)_s, 0x000001)
-#define  IS_UPPER_CASE_CHAR( _c)       is_ag_char_map_char((char)( _c), 0x000002)
-#define SPN_UPPER_CASE_CHARS(_s)      spn_ag_char_map_chars((char *)_s, 0x000002)
-#define BRK_UPPER_CASE_CHARS(_s)      brk_ag_char_map_chars((char *)_s, 0x000002)
-[...]
-#define  IS_SET_SEPARATOR_CHAR( _c)    is_ag_char_map_char((char)( _c), 0x700500)
-#define SPN_SET_SEPARATOR_CHARS(_s)   spn_ag_char_map_chars((char *)_s, 0x700500)
-#define BRK_SET_SEPARATOR_CHARS(_s)   brk_ag_char_map_chars((char *)_s, 0x700500)
 
 and the code to scan over a valid variable name, for example,
 looks like this:
@@ -70,3 +47,15 @@ looks like this:
 
 "spn" and "brk" return pointers to the next (non-)matching character.
 They do not return character counts.
+
+If "%backup" is specified, two backup spanner macros are also created:
+
+#define SPN_LOWER_CASE_BACK(s,e)         \
+        spn_ag_char_map_back((char *)s, (char *)e, 0x0000001)
+#define BRK_LOWER_CASE_BACK(s,e)         \
+        brk_ag_char_map_back((char *)s, (char *)e, 0x0000001)
+
+where the "s" points to the start of the string and "e" points
+to either the start or one character past the end of the string.
+If they are equal, the "e" pointer is advanced to the end of
+the string.

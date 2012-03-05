@@ -120,6 +120,28 @@ string = { nm = inline_functions;
 	_EOString_;
 };
 
+string = { nm = inline_backup;
+  str = <<- _EOString_
+
+	static inline char *
+	spn_%1$s_back(char * s, char * e, %2$s mask)
+	{
+	    if (s == e) e += strlen(e);
+	    while ((e > s) && is_%1$s_char(e[-1], mask))  e--;
+	    return e;
+	}
+
+	static inline char *
+	brk_%1$s_back(char * s, char * e, %2$s mask)
+	{
+	    if (s == e) e += strlen(e);
+	    while ((e > s) && (! is_%1$s_char(e[-1], mask)))  e--;
+	    return e;
+	}
+
+	_EOString_;
+};
+
 /*
  * "extra" text requested to be included in the output.
  */
@@ -150,6 +172,13 @@ string = { nm = macro_def_fmt;
   str = "#define  IS_%1$s_CHAR( _c)%2$s  is_%3$s_char((char)( _c), %4$s)\n"
         "#define SPN_%1$s_CHARS(_s)%2$s spn_%3$s_chars((char *)_s, %4$s)\n"
         "#define BRK_%1$s_CHARS(_s)%2$s brk_%3$s_chars((char *)_s, %4$s)\n";
+};
+
+string = { nm = backup_def_fmt;
+  str = "#define SPN_%1$s_BACK(s,e)%2$s "
+                "spn_%3$s_back((char *)s, (char *)e, %4$s)\n"
+        "#define BRK_%1$s_BACK(s,e)%2$s "
+                "brk_%3$s_back((char *)s, (char *)e, %4$s)\n";
 };
 
 string = { nm = mask_fmt_fmt;

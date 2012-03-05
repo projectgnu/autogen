@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
+ *  Time-stamp:        "2012-03-04 12:29:29 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -66,7 +66,6 @@ die(char const * fmt, ...)
 static void
 emit_leader(char * input)
 {
-
     if (add_test_code) {
         if (out_file_nm != NULL)
             printf(test_script_fmt, base_fn_nm, base_ucase, out_file_nm);
@@ -286,6 +285,8 @@ emit_macros(int bit_count)
         snprintf(z, sizeof(z), mask_fmt, map->mask);
 
         printf(macro_def_fmt, map->vname, pz, base_fn_nm, z);
+        if (add_backup_code)
+            printf(backup_def_fmt, map->vname, pz, base_fn_nm, z);
     }
 
     putc('\n', stdout);
@@ -331,6 +332,9 @@ emit_functions(void)
 
     printf(inline_functions,
            base_fn_nm, mask_name, table_size, table_name);
+
+    if (add_backup_code)
+        printf(inline_backup, base_fn_nm, mask_name);
 
     if (add_on_text != NULL)
         printf(emit_text_fmt, add_on_text);
@@ -941,6 +945,21 @@ handle_guard(char * scan)
     while (isspace(*scan))   scan++;
     data_guard = pz = strdup(scan);
     make_define_name(pz);
+    return scan + strlen(scan);
+}
+
+/**
+ * handle backup directive.
+ *
+ * specifies emitting code to backup over matching text at the end of a string.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_backup(char * scan)
+{
+    add_backup_code = 1;
     return scan + strlen(scan);
 }
 

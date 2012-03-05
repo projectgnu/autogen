@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-02-18 09:27:10 bkorb"
+ *  Time-stamp:        "2012-03-04 12:16:00 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -79,6 +79,7 @@ static int          table_is_static = 0;
 static int const    table_size = TABLE_SIZE;
 static char buffer[BUF_SIZE];
 static int          add_test_code = 0;
+static int          add_backup_code = 0;
 
 value_map_t    all_map      = { NULL, "total", 0, 0, { 0 }};
 value_map_t ** end_map      = &(all_map.next);
