@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-03-04 12:29:29 bkorb"
+ *  Time-stamp:        "2012-03-10 11:31:00 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -81,7 +81,8 @@ emit_leader(char * input)
                   : type_64bits ));
 
         strftime(buffer, BUF_SIZE, "%x %X", tmp);
-        printf(leader_fmt, buffer, commentary, file_guard, mask_type);
+        printf(leader_fmt, bit_count, buffer,
+               commentary, file_guard, mask_type);
     }
 
     if (fseek(stdin, 0, SEEK_SET) == 0)

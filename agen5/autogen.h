@@ -2,7 +2,7 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2012-03-04 19:41:13 bkorb"
+ *  Time-stamp:        "2012-03-10 09:43:54 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -283,17 +283,48 @@ struct for_info {
     for_state_t * fi_data;
 };
 
+/**
+ * The current state of each active FOR loop.
+ */
 struct for_state {
-    bool          for_loading;
-    int           for_from;
-    int           for_to;
-    int           for_by;
-    int           for_index;
-    char *        for_sep_str;
-    char *        for_name;
-    bool          for_islast;
-    bool          for_isfirst;
+    bool          for_loading;  //!< the FOR macro is getting ready
+    int           for_from;     //!< the first index of loop
+    int           for_to;       //!< the last index of loop
+    int           for_by;       //!< the loop increment (usually 1)
+    int           for_index;    //!< the current index
+    char *        for_sep_str;  //!< inter-iteration string (allocated)
+    char *        for_name;     //!< name of iterator (not allocated)
+    bool          for_islast;   //!< true for last iteration
+    bool          for_isfirst;  //!< true for first iteration
+    jmp_buf       for_env;      //!< long jump buffer
 };
+
+typedef enum {
+    FOR_JMP_DONE    = 0,
+    FOR_JMP_NEXT    = 1,
+    FOR_JMP_BREAK   = 2
+} for_jmp_type_t;
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ *  Invocation of a defined macro processing state
+ */
+typedef struct ivk_info ivk_info_t;
+struct ivk_info {
+    ivk_info_t *  ii_prev;      //!< previous layer
+    int           ii_depth;     //!< Invocation nesting depth
+    jmp_buf       ii_env;       //!< long jump buffer
+    int           ii_for_depth; //!< for depth for this invocation
+    int           ii_for_alloc; //!< for state buffer allocation count
+    for_state_t * ii_for_data;  //!< array of "for" macro states
+};
+#define IVK_INFO_INITIALIZER(_p) {                      \
+        .ii_prev  = (_p),                               \
+        .ii_depth = curr_ivk_info->ii_depth + 1,        \
+        .ii_for_depth = 0,                              \
+        .ii_for_alloc = 0,                              \
+        .ii_for_data  = NULL                            \
+    }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -342,7 +373,11 @@ MODE time_t         start_time       VALUE( 0 );
 MODE out_stack_t *  cur_fpstack      VALUE( NULL );
 MODE out_spec_t *   output_specs     VALUE( NULL );
 MODE jmp_buf        abort_jmp_buf;
-MODE for_info_t     forInfo          VALUE( { 0 } );
+MODE ivk_info_t     root_ivk_info    VALUE( { 0 } );
+MODE ivk_info_t *   curr_ivk_info    VALUE( &root_ivk_info );
+MODE for_state_t *  for_state        VALUE( NULL );
+MODE for_info_t *   cur_for_info VALUE( (void *)&root_ivk_info.ii_for_depth );
+#define forInfo     (*cur_for_info)
 MODE FILE *         trace_fp         VALUE( NULL );
 /**
  * temporary file name template
@@ -391,7 +426,7 @@ MODE char const *   shell_program    VALUE( MK_STR(CONFIG_SHELL) );
  *  the current set of macros is being extracted.
  *
  *  These are set in exactly ONE place:
- *  On entry to the dispatch routine (generateBlock).  Two routines, however,
+ *  On entry to the dispatch routine (gen_block).  Two routines, however,
  *  must restore the values: mFunc_Define and mFunc_For.  They are the only
  *  routines that dynamically push name/value pairs on the definition stack.
  */
@@ -411,7 +446,7 @@ MODE bool           redo_opts        VALUE( true );
  *  Current Macro
  *
  *  This may be set in exactly three places:
- *  1.  The dispatch routine (generateBlock) that steps through
+ *  1.  The dispatch routine (gen_block) that steps through
  *      a list of macros
  *  2.  mFunc_If may transfer to one of its 'ELIF' or 'ELSE'
  *      alternation macros
@@ -427,9 +462,9 @@ MODE scan_ctx_t *   base_ctx         VALUE( NULL );
 MODE scan_ctx_t *   cctx             VALUE( NULL );
 MODE scan_ctx_t *   end_ctx          VALUE( NULL );
 MODE size_t         end_mac_len      VALUE( 0  );
-MODE char           end_mac[   8 ]   VALUE( "" );
+MODE char           end_mac_mark[   8 ]   VALUE( "" );
 MODE size_t         st_mac_len       VALUE( 0  );
-MODE char           start_mac[  8 ]  VALUE( "" );
+MODE char           st_mac_mark[  8 ]  VALUE( "" );
 MODE int            guileFailure     VALUE( 0 );
 #define name_sep_ch '.'
 

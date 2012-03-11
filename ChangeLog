@@ -1,3 +1,12 @@
+2012-03-11  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c (ag_scm_string_eqv_p): compare booleans, too
+	* autoopts/tpl/agtexi-cmd.tpl: if documentation "flags" are
+	specified, use them for node sectioning for groups of options.
+	* agen5/opts.def: reorganize to use above properly
+	* autoopts/tpl/optlib.tlib: fill "descrip" option attributes to
+	72 columns.
+
 2012-03-04  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agDep.c (start_dep_file): handle temp suffix here so it can

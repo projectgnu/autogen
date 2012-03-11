@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2012-03-04 19:13:18 bkorb"
+# Time-stamp:        "2013-03-10 07:34:07 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -189,6 +189,7 @@ sanity_check()
   test -x ${AGexe} || (cd `dirname ${AGexe}` ; ${MAKE}) || exit 0
   test -x ${GDexe} || (cd `dirname ${GDexe}` ; ${MAKE}) || exit 0
   test -x ${CLexe} || (cd `dirname ${CLexe}` ; ${MAKE}) || exit 0
+  PATH="`dirname ${AGexe}`:`dirname ${CLexe}`:$PATH"
 
   # See to it that the .texi files have been generated, too.
   #

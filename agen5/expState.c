@@ -67,7 +67,7 @@ do_tpl_file_line(int line_delta, char const * fmt);
 static int
 entry_length(char* name)
 {
-    def_ent_t**  papDefs = findEntryList(name);
+    def_ent_t**  papDefs = find_def_ent_list(name);
     int          res     = 0;
 
     if (papDefs == NULL)
@@ -89,7 +89,7 @@ entry_length(char* name)
 static int
 count_entries(char* name)
 {
-    def_ent_t**  papDefs = findEntryList(name);
+    def_ent_t**  papDefs = find_def_ent_list(name);
     int          res     = 0;
 
     if (papDefs == NULL)
@@ -390,7 +390,7 @@ ag_scm_ag_function_p(SCM obj)
 {
     SCM     res;
 
-    if (findTemplate(ag_scm2zchars(obj, "ag user macro")) == NULL)
+    if (find_tpl(ag_scm2zchars(obj, "ag user macro")) == NULL)
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
 

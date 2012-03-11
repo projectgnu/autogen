@@ -890,7 +890,7 @@ ag_scm_stack(SCM obj)
 
     res = SCM_EOL;
 
-    ppDE = findEntryList(ag_scm2zchars(obj, "AG Object"));
+    ppDE = find_def_ent_list(ag_scm2zchars(obj, "AG Object"));
     if (ppDE == NULL)
         return SCM_EOL;
 

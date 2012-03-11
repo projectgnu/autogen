@@ -2,7 +2,7 @@
 
 ## mdoc2man.sh -- script to convert mdoc-isms to man-isms
 ##
-## Time-stamp:      "2011-09-25 10:31:27 bkorb"
+## Time-stamp:      "2013-03-10 07:07:10 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -279,6 +279,7 @@ do_line() {
 
 easy_fixes='
 s/^\.Sh/.SH/
+s/^\.Ss/.SS/
 s/^\.Em/.I/
 s/^\.Pp/.PP/
 s/^.in *\\-/.in -/

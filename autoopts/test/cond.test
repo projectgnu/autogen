@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2012-01-14 11:24:40 bkorb"
+# Time-stamp:        "2012-03-11 08:59:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -79,7 +79,7 @@ _EOF_
 cmp -s ${testname}-1.help ${testname}.help || \
   failure "TEST 1 FAILED${nl}`diff ${testname}-1.help ${testname}.help`"
 
-./${testname}-1 -c 123 && \
+./${testname}-1 -c 123 2>/dev/null && \
     failure "*DID* process -c option"
 
 # # # # # # # # # # SECOND TEST # # # # # # # # #

@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2011-12-30 12:34:03 bkorb"
+# Time-stamp:        "2013-03-10 07:27:24 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -62,19 +62,19 @@ marker ``<='' loaded
 marker ``=>'' loaded
 Starting test template
 open_output_file 'debug.test' mode wb+
-Text       (12) in debug.tpl at line 2
+Text       (13) in debug.tpl at line 2
   The last of each list:
 FOR        ( D) in debug.tpl at line 3
 FOR list loop in debug.tpl on line 3 begins:
 DEBUG      ( 3) in debug.tpl at line 3
   slot 64
   --  DEBUG slot 64 -- FOR index 0
-Text       (12) in debug.tpl at line 3
+Text       (13) in debug.tpl at line 3
   
-Unknown    (13) in debug.tpl at line 4
-remapped to 'Expr' (13) in debug.tpl at line 4
+Unknown    (14) in debug.tpl at line 4
+remapped to 'Expr' (14) in debug.tpl at line 4
 	based on val[$]
-Text       (12) in debug.tpl at line 4
+Text       (13) in debug.tpl at line 4
   
 FOR        ( D) in debug.tpl at line 7
   , 
@@ -82,27 +82,27 @@ FOR val loop in debug.tpl on line 7 begins:
 DEBUG      ( 3) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 0
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
    val[
 EXPR       ( C) in debug.tpl at line 7
   (for-index)
 eval from file debug.tpl line 7:
 (for-index)
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
   ]=
-Unknown    (13) in debug.tpl at line 7
-remapped to 'Expr' (13) in debug.tpl at line 7
+Unknown    (14) in debug.tpl at line 7
+remapped to 'Expr' (14) in debug.tpl at line 7
 	based on val
 DEBUG      ( 3) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 1
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
    val[
 EXPR       ( C) in debug.tpl at line 7
   (for-index)
 eval from file debug.tpl line 7:
 (for-index)
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
   ]=
 EXPR       ( C) in debug.tpl at line 7
 FOR val repeated 2 times
@@ -110,10 +110,10 @@ FOR val repeated 2 times
 DEBUG      ( 3) in debug.tpl at line 3
   slot 64
   --  DEBUG slot 64 -- FOR index 3
-Text       (12) in debug.tpl at line 3
+Text       (13) in debug.tpl at line 3
   
 EXPR       ( C) in debug.tpl at line 4
-Text       (12) in debug.tpl at line 4
+Text       (13) in debug.tpl at line 4
   
 FOR        ( D) in debug.tpl at line 7
   , 
@@ -121,20 +121,20 @@ FOR val loop in debug.tpl on line 7 begins:
 DEBUG      ( 3) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 0
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
    val[
 EXPR       ( C) in debug.tpl at line 7
   (for-index)
 eval from file debug.tpl line 7:
 (for-index)
-Text       (12) in debug.tpl at line 7
+Text       (13) in debug.tpl at line 7
   ]=
 EXPR       ( C) in debug.tpl at line 7
 FOR val repeated 1 times
 	from debug.tpl line 7
 FOR list repeated 2 times
 	from debug.tpl line 3
-Text       (12) in debug.tpl at line 9
+Text       (13) in debug.tpl at line 9
   
 out_close 'debug.test'
 _EOF_

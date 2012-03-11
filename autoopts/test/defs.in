@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-02-12 09:18:48 bkorb"
+# Time-stamp:     "2012-03-11 09:19:36 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -159,7 +159,7 @@ init_tests()
   builddir=`pwd`
   testsubdir=testdir
   INCS="-I${top_builddir} -I${top_builddir}/autoopts"
-  CFLAGS="${INCS} "`echo ${CFLAGS} | ${SED} 's/-Werror//'`
+  CFLAGS="${INCS} "`echo ${CFLAGS} | ${SED} "s/-Werror[^ ${ht}]*//g"`
 
   export PATH
   echo PATH is ${PATH} >&2

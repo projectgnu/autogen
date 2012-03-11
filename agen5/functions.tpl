@@ -166,7 +166,7 @@ ENDFOR                                  =]
  *
  *  Parsing function tables for load processing (template scanning phase)
  */
-static tpLoadProc const apLoadProc[ FUNC_CT ] = {[=
+static tpLoadProc const base_load_table[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s" =]*/ mLoad_[=
   IF   (> (len "load-proc") 0)=][=% load-proc (string-capitalize! "%s") =][=
@@ -182,18 +182,18 @@ ENDFOR macfunc =]
  *  The block functions (CASE, DEFINE, FOR, and IF) change this to point
  *  to their tables that include relevant additional functions.
  */
-tpLoadProc const * papLoadProc = apLoadProc;
+tpLoadProc const * load_proc_table = base_load_table;
 
 /*
  *  name-to-function type mapping table.
  *  This table must be sorted alphabetically by the content
  *  of the naming string.
  */
-typedef struct name_type tNameType;
-struct name_type {
-    size_t        cmpLen;  /* compare length (sans NUL) */
-    char const *  pName;   /* ptr to name */
-    teFuncType    fType;   /* function type enum */
+typedef struct fn_name_type fn_name_type_t;
+struct fn_name_type {
+    size_t        cmpLen;  /*!< compare length (sans NUL) */
+    char const *  pName;   /*!< ptr to name */
+    teFuncType    fType;   /*!< function type enum */
 };
 
 /*
@@ -264,7 +264,7 @@ cat <<_EOF_
  *
  *  And now, the table separated by aliasing and then sorted by string content
  */
-static tNameType const nameTypeTable[ FUNCTION_NAME_CT ] = {
+static fn_name_type_t const fn_name_types[ FUNCTION_NAME_CT ] = {
 _EOF_
 egrep -v '^[A-Z]' $file | sort | sed -e 's/^.*:://'
 echo

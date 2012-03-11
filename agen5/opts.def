@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-03-04 19:48:37 bkorb"
+ *  Time-stamp:        "2013-03-10 07:05:11 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -121,6 +121,17 @@ exit-desc[5]  = <<- _EndDesc_
 	may have been interrupted with a @code{kill(2)} signal.
 	_EndDesc_;
 
+#ifndef XML2AG
+flag = {
+    name        = input-select;
+    documentation;
+
+    descrip =
+'The following options select definitions, templates and '
+'scheme functions to use';
+};
+#endif
+
 flag = {
     name      = templ-dirs;
     value     = L;
@@ -190,34 +201,7 @@ flag = {
 };
 
 flag = {
-    name      = base-name;
-    value     = b;
-    arg-type  = string;
-    arg-name  = name;
-    descrip   = "Base name for output file(s)";
-#ifndef XML2AG
-    no-preset;
-    doc = <<-  _EOF_
-	A template may specify the exact name of the output file.  Normally,
-	it does not.  Instead, the name is composed of the base name of the
-	definitions file with suffixes appended.  This option will override the
-	base name derived from the definitions file name.  This is required if
-	there is no definitions file and advisable if definitions are being
-	read from stdin.  If the definitions are being read from standard in,
-	the base name defaults to @file{stdin}.  Any leading directory components
-	in the name will be silently removed.  If you wish the output file to
-	appear in a particular directory, it is recommended that you "cd" into
-	that directory first, or use directory names in the format specification
-	for the output suffix lists, @xref{pseudo macro}.
-	_EOF_;
-#else
-    settable;
-    doc = "Pass-through AutoGen argument";
-#endif
-};
-
-flag = {
-    name      = "definitions";
+    name      = 'definitions';
     arg-type  = string;
     arg-name  = file;
     descrip   = "Definitions input file";
@@ -232,7 +216,7 @@ flag = {
 	there must be a command line argument that specifies the file,
 	even if only to specify stdin with a hyphen (@code{-}).
 	Specify, @code{--no-definitions} when you wish to process
-	a template without any active AutoGen definitions.\n
+	a template without any active AutoGen definitions.
 	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";
@@ -339,67 +323,21 @@ flag = {
 };
 
 flag = {
-    name       = skip-suffix;
-    value      = s;
-    arg-type   = string;
-    arg-name   = suffix;
-    descrip    = "Omit the file with this suffix";
-    max        = NOLIMIT;
-    flags-cant = select-suffix;
-    stack-arg;
+    name        = shell;
+    arg-type    = string;
+    arg-name    = shell;
 
+    descrip     = "name or path name of shell to use";
 #ifndef XML2AG
-    no-preset;
+    ifdef       = SHELL_ENABLED;
     doc = <<-  _EOF_
-	Occasionally, it may not be desirable to produce all of the output
-	files specified in the template.  (For example, only the @file{.h}
-	header file, but not the @file{.c} program text.)  To do this
-	specify @code{--skip-suffix=c} on the command line.
+	By default, when AutoGen is built, the configuration is probed for a
+	reasonable Bourne-like shell to use for shell script processing.  If
+	a particular template needs an alternate shell, it must be specified
+	with this option on the command line, with an environment variable
+	(@code{SHELL}) or in the configuration/initialization file.
 	_EOF_;
-#else
-    doc = "Pass-through AutoGen argument";
-#endif
-};
-
-flag = {
-    name       = select-suffix;
-    value      = o;
-    arg-type   = string;
-    arg-name   = suffix;
-    arg-optional;
-    descrip    = "specify this output suffix";
-    max        = NOLIMIT;
-
-#ifndef XML2AG
-    no-preset;
-    doc = <<-	_EOF_
-	If you wish to override the suffix specifications in the template,
-	you can use one or more copies of this option.  See the suffix
-	specification in the @ref{pseudo macro} section of the info doc.
-	_EOF_;
-    flag-code = <<- _EOCode_
-	    char const * arg = pOptDesc->optArg.argString;
-	    if ((arg != NULL) && (*arg != NUL))
-	        (void)do_suffix(arg, NULL, -1);
-	_EOCode_;
-#else
-    doc = "Pass-through AutoGen argument";
-    stack-arg;
-#endif
-};
-
-flag = {
-    name       = source-time;
-    descrip    = "set mod times to latest source";
-#ifndef XML2AG
-    disable    = no;
-    doc = <<-  _EOF_
-	If you stamp your output files with the @code{DNE} macro output, then
-	your output files will always be different, even if the content has
-	not really changed.  If you use this option, then the modification
-	time of the output files will change only if the input files change.
-	This will help reduce unneeded builds.
-	_EOF_;
+    flag-code   = "    shell_program = pOptDesc->optArg.argString;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -448,6 +386,58 @@ flag = {
 #endif
 };
 
+#ifndef XML2AG
+flag = {
+    name        = out-handling;
+    documentation;
+    descrip = 'The following options modify how output is handled';
+};
+#endif
+
+flag = {
+    name      = base-name;
+    value     = b;
+    arg-type  = string;
+    arg-name  = name;
+    descrip   = "Base name for output file(s)";
+#ifndef XML2AG
+    no-preset;
+    doc = <<-  _EOF_
+	A template may specify the exact name of the output file.  Normally,
+	it does not.  Instead, the name is composed of the base name of the
+	definitions file with suffixes appended.  This option will override the
+	base name derived from the definitions file name.  This is required if
+	there is no definitions file and advisable if definitions are being
+	read from stdin.  If the definitions are being read from standard in,
+	the base name defaults to @file{stdin}.  Any leading directory components
+	in the name will be silently removed.  If you wish the output file to
+	appear in a particular directory, it is recommended that you "cd" into
+	that directory first, or use directory names in the format specification
+	for the output suffix lists, @xref{pseudo macro}.
+	_EOF_;
+#else
+    settable;
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+flag = {
+    name       = source-time;
+    descrip    = "set mod times to latest source";
+#ifndef XML2AG
+    disable    = no;
+    doc = <<-  _EOF_
+	If you stamp your output files with the @code{DNE} macro output, then
+	your output files will always be different, even if the content has
+	not really changed.  If you use this option, then the modification
+	time of the output files will change only if the input files change.
+	This will help reduce unneeded builds.
+	_EOF_;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
 flag = {
     name       = writable;
     descrip    = "Allow output files to be writable";
@@ -465,10 +455,13 @@ flag = {
 
 #ifndef XML2AG
 flag = {
-    name        = doc-debug;
-    documentation;
+    name        = debug-tpl;
+    documentation = <<- _EODoc_
+	They specify limits that prevent the template from taking overly long
+	or producing more output than expected.
+	_EODoc_;
     descrip =
-'The following options are often useful while debugging new templates:';
+'The following options are often useful while debugging new templates';
 };
 #endif
 
@@ -489,27 +482,6 @@ flag = {
 	long time to finish.  If you do have more than 256 entries in tables,
 	you will need to specify a new limit with this option.
 	_EODoc_;
-#else
-    doc = "Pass-through AutoGen argument";
-#endif
-};
-
-flag = {
-    name        = shell;
-    arg-type    = string;
-    arg-name    = shell;
-
-    descrip     = "name or path name of shell to use";
-#ifndef XML2AG
-    ifdef       = SHELL_ENABLED;
-    doc = <<-  _EOF_
-	By default, when AutoGen is built, the configuration is probed for a
-	reasonable Bourne-like shell to use for shell script processing.  If
-	a particular template needs an alternate shell, it must be specified
-	with this option on the command line, with an environment variable
-	(@code{SHELL}) or in the configuration/initialization file.
-	_EOF_;
-    flag-code   = "    shell_program = pOptDesc->optArg.argString;";
 #else
     doc = "Pass-through AutoGen argument";
 #endif
@@ -659,6 +631,22 @@ flag = {
 #endif
 };
 
+flag = {
+    name        = core;
+    value       = C;
+    descrip     = 'Leave a core dump on a failure exit';
+    ifdef       = HAVE_SYS_RESOURCE_H;
+
+    doc = <<- _EOF_
+	Many systems default to a zero sized core limit.  If the system
+	has the sys/resource.h header and if this option is supplied,
+	then in the failure exit path, autogen will attempt to set the
+	soft core limit to whatever the hard core limit is.  If that
+	does not work, then an administrator must raise the hard core
+	size limit.
+	_EOF_;
+};
+
 #ifdef DAEMON_ENABLED
 flag = {
     name        = daemon;
@@ -705,14 +693,66 @@ flag = {
 
 #ifndef XML2AG
 flag = {
-    name        = doc-control;
-    documentation;
+    name        = processing;
+    documentation = <<- _EODoc_
+	They specify which outputs and parts of outputs to produce.
+	_EODoc_;
+
     descrip = <<-  _EODoc_
 	These options can be used to control what gets processed
-	in the definitions files and template files.
+	in the definitions files and template files
 	_EODoc_;
 };
 #endif
+
+flag = {
+    name       = skip-suffix;
+    value      = s;
+    arg-type   = string;
+    arg-name   = suffix;
+    descrip    = "Omit the file with this suffix";
+    max        = NOLIMIT;
+    flags-cant = select-suffix;
+    stack-arg;
+
+#ifndef XML2AG
+    no-preset;
+    doc = <<-  _EOF_
+	Occasionally, it may not be desirable to produce all of the output
+	files specified in the template.  (For example, only the @file{.h}
+	header file, but not the @file{.c} program text.)  To do this
+	specify @code{--skip-suffix=c} on the command line.
+	_EOF_;
+#else
+    doc = "Pass-through AutoGen argument";
+#endif
+};
+
+flag = {
+    name       = select-suffix;
+    value      = o;
+    arg-type   = string;
+    arg-name   = suffix;
+    descrip    = "specify this output suffix";
+    max        = NOLIMIT;
+
+#ifndef XML2AG
+    no-preset;
+    doc = <<-	_EOF_
+	If you wish to override the suffix specifications in the template,
+	you can use one or more copies of this option.  See the suffix
+	specification in the @ref{pseudo macro} section of the info doc.
+	_EOF_;
+    flag-code = <<- _EOCode_
+	    char const * arg = pOptDesc->optArg.argString;
+	    if ((arg != NULL) && (*arg != NUL))
+	        (void)do_suffix(arg, NULL, -1);
+	_EOCode_;
+#else
+    doc = "Pass-through AutoGen argument";
+    stack-arg;
+#endif
+};
 
 flag = {
     name        = define;
@@ -780,11 +820,9 @@ flag = {
 
 #ifndef XML2AG
 flag = {
-    name        = doc-dependencies;
+    name        = dep-track;
     documentation;
-    descrip = <<-  _EODoc_
-	These options can be used to automate dependency tracking.
-	_EODoc_;
+    descrip = 'This option is used to automate dependency tracking';
 };
 #endif
 
@@ -872,22 +910,6 @@ flag = {
 #else
     doc = "Pass-through AutoGen argument";
 #endif
-};
-
-flag = {
-    name        = core;
-    value       = C;
-    descrip     = 'Leave a core dump on a failure exit';
-    ifdef       = HAVE_SYS_RESOURCE_H;
-
-    doc = <<- _EOF_
-	Many systems default to a zero sized core limit.  If the system
-	has the sys/resource.h header and if this option is supplied,
-	then in the failure exit path, autogen will attempt to set the
-	soft core limit to whatever the hard core limit is.  If that
-	does not work, then an administrator must raise the hard core
-	size limit.
-	_EOF_;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

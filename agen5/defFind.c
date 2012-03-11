@@ -1,7 +1,7 @@
 /**
  * @file defFind.c
  *
- *  Time-stamp:        "2012-03-04 19:09:43 bkorb"
+ *  Time-stamp:        "2012-03-10 12:16:40 bkorb"
  *
  *  This module locates definitions.
  *
@@ -79,8 +79,8 @@ get_def_list(char * name, def_ctx_t * pDefCtx);
  * The "twins" of the passed in entry are searched for a matching
  * "de_index" value.
  *
- * @param ent  the eldest twin/sibling of the list to search
- * @param scan the scanning pointer pointing to the first non-white
+ * @param[in] ent   the eldest twin/sibling of the list to search
+ * @param[in] scan  the scanning pointer pointing to the first non-white
  *  character after the open bracket.
  *
  * @returns a pointer to the matching definition entry, if any.
@@ -146,7 +146,7 @@ find_by_index(def_ent_t * ent, char * scan)
         {
             char  svch = *scan;
             *scan = NUL;
-            val   = getDefine(def, true);
+            val   = get_define_str(def, true);
             *scan = svch;
         }
 
@@ -217,8 +217,8 @@ bad_def_name(char * pzD, char const * pzS, size_t srcLen)
 }
 
 
-/*
- *  canonicalizeName:  remove white space and roughly verify the syntax.
+/**
+ *  remove white space and roughly verify the syntax.
  *  This procedure will consume everything from the source string that
  *  forms a valid AutoGen compound definition name.
  *  We leave legally when:
@@ -226,9 +226,15 @@ bad_def_name(char * pzD, char const * pzS, size_t srcLen)
  *  2.  We stumble into a character that is not either '[' or name_sep_ch
  *      (always skipping white space).
  *  We start in CN_START.
+ *
+ * @param[out] pzD      place to put canonicalized name
+ * @param[in]  pzS      input non-canonicalized name
+ * @param[in]  srcLen   length of input text
+ *
+ * @returns the length of un-consumed source text
  */
 LOCAL int
-canonicalizeName(char * pzD, char const * pzS, int srcLen)
+canonical_name(char * pzD, char const * pzS, int srcLen)
 {
     typedef enum {
         CN_START_NAME = 0,   /* must find a name */
@@ -408,23 +414,26 @@ canonicalizeName(char * pzD, char const * pzS, int srcLen)
 
 
 /**
- *  Find the definition entry for the name passed in.
- *  It is okay to find block entries IFF they are found on the
- *  current level.  Once you start traversing up the tree,
- *  the macro must be a text macro.  Return an indicator saying if
- *  the element has been indexed (so the caller will not try
- *  to traverse the list of twins).
+ *  Find the definition entry for the name passed in.  It is okay to
+ *  find block entries IFF they are found on the current level.  Once
+ *  you start traversing up the tree, the macro must be a text macro.
+ *  Return an indicator saying if the element has been indexed (so the
+ *  caller will not try to traverse the list of twins).
+ *
+ * @param[in]  name      name to look for
+ * @param[in]  pDefCtx   definition context
+ * @param[out] indexed   whether the name was indexed or not
  */
 static def_ent_t *
 find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
 {
+    static int   nestingDepth = 0;
+
     char *       brace;
     char         br_ch;
     def_ent_t *  ent;
-    bool      dummy;
-    bool      noNesting    = false;
-
-    static int   nestingDepth = 0;
+    bool         dummy;
+    bool         noNesting    = false;
 
     /*
      *  IF we are at the start of a search, then canonicalize the name
@@ -433,7 +442,7 @@ find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
      *  an index yet).
      */
     if (nestingDepth == 0) {
-        canonicalizeName(zDefinitionName, name, (int)strlen(name));
+        canonical_name(zDefinitionName, name, (int)strlen(name));
         name = zDefinitionName;
 
         if (indexed != NULL)
@@ -759,7 +768,7 @@ get_def_list(char * name, def_ctx_t * pDefCtx)
             ILLFORMEDNAME();
         }
 
-        canonicalizeName(zDefinitionName, name, (int)strlen(name));
+        canonical_name(zDefinitionName, name, (int)strlen(name));
         name = zDefinitionName;
         defList.del_used_ct = 0;
     }
@@ -917,7 +926,7 @@ get_def_list(char * name, def_ctx_t * pDefCtx)
 
 
 LOCAL def_ent_t **
-findEntryList(char * name)
+find_def_ent_list(char * name)
 {
     return get_def_list(name, &curr_def_ctx);
 }

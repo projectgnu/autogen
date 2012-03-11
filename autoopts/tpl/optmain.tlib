@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-02-28 19:43:49 bkorb"
+# Time-stamp:      "2012-03-10 09:33:38 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -572,7 +572,7 @@ DEFINE decl-callbacks
   )))
   =][=
 
-  FOR    flag   =][=
+  FOR flag =][=
 
     ;;  Fill in four strings with names of callout procedures:
     ;;  extern-test-list - external callouts done IFF test main is built
@@ -606,7 +606,7 @@ DEFINE decl-callbacks
   (emit-decl-list static-proc-list #f)
   (set! static-proc-list "")                    =][=
 
-  FOR     flag                                  =][=
+  FOR flag                                      =][=
 
     (set! flg-name (get "name"))
     (if (not (= (hash-ref cb-proc-name  flg-name)
@@ -650,7 +650,7 @@ DEFINE emit-testing-defines
     (emit-decl-list static-test-list #f)
     (set! static-test-list "")                  =][=
 
-    FOR     flag                                =][=
+    FOR flag                                    =][=
 
       (set! flg-name (get "name"))
       (if (not (= (hash-ref cb-proc-name  flg-name)
@@ -975,7 +975,7 @@ ENDDEF   file-name-code
 DEFINE define-option-callbacks      =][=
 
   FOR flag                          =][=
-
+    (define flag-index (for-index))
     (set-flag-names)
     (define endif-test-main "")     =][=
 

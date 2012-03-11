@@ -2,7 +2,7 @@
 /**
  * @file funcIf.c
  *
- *  Time-stamp:        "2012-03-04 19:17:20 bkorb"
+ *  Time-stamp:        "2013-03-10 07:17:20 bkorb"
  *
  *  This module implements the _IF text function.
  *
@@ -166,7 +166,7 @@ mFunc_If(templ_t* pT, macro_t* pMac)
                             current_tpl->td_file, pIf->md_line);
             }
 
-            generateBlock(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
+            gen_block(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
             break;
         }
         pMac = pT->td_macros + pMac->md_sib_idx;
@@ -239,7 +239,7 @@ mFunc_While(templ_t* pT, macro_t* pMac)
         if (! eval_true())
             break;
         ct++;
-        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
+        gen_block(pT, pMac+1, pT->td_macros + pMac->md_sib_idx);
     }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
@@ -302,11 +302,11 @@ mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     static tpLoadProc apElseLoad[ FUNC_CT ] = { NULL };
 
     if (apElseLoad[0] == NULL) {
-        memcpy((void*)apElseLoad, apLoadProc, sizeof(apLoadProc));
+        memcpy((void*)apElseLoad, base_load_table, sizeof(base_load_table));
         apElseLoad[ FTYP_ENDIF ] = &mLoad_Ending;
     }
 
-    papLoadProc = apElseLoad;
+    load_proc_table = apElseLoad;
 
     current_if.pElse->md_sib_idx = pMac - pT->td_macros;
     current_if.pElse = pMac;
@@ -333,7 +333,7 @@ mLoad_If(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
     size_t              srcLen     = (size_t)pMac->md_res; /* macro len  */
     tIfStack            save_stack = current_if;
-    tpLoadProc const *  papLP      = papLoadProc;
+    tpLoadProc const *  papLP      = load_proc_table;
     macro_t *            pEndifMac;
 
     /*
@@ -351,13 +351,13 @@ mLoad_If(templ_t* pT, macro_t* pMac, char const ** ppzScan)
         AG_ABEND_IN(pT, pMac, NO_IF_EXPR);
 
     if (apIfLoad[0] == NULL) {
-        memcpy((void*)apIfLoad, apLoadProc, sizeof(apLoadProc));
+        memcpy((void*)apIfLoad, base_load_table, sizeof(base_load_table));
         apIfLoad[ FTYP_ELIF ]  = &mLoad_Elif;
         apIfLoad[ FTYP_ELSE ]  = &mLoad_Else;
         apIfLoad[ FTYP_ENDIF ] = &mLoad_Ending;
     }
 
-    papLoadProc = apIfLoad;
+    load_proc_table = apIfLoad;
 
     /*
      *  We will need to chain together the 'IF', 'ELIF', and 'ELSE'
@@ -373,11 +373,11 @@ mLoad_If(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Now, do a nested parse of the template.
      *  When the matching 'ENDIF' macro is encountered,
-     *  the handler routine will cause 'parseTemplate()'
+     *  the handler routine will cause 'parse_tpl()'
      *  to return with the text scanning pointer pointing
      *  to the remaining text.
      */
-    pEndifMac = parseTemplate(pMac+1, ppzScan);
+    pEndifMac = parse_tpl(pMac+1, ppzScan);
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_IF_NO_ENDIF);
 
@@ -388,7 +388,7 @@ mLoad_If(templ_t* pT, macro_t* pMac, char const ** ppzScan)
      *  Restore the context of any encompassing block macros
      */
     current_if  = save_stack;
-    papLoadProc = papLP;
+    load_proc_table = papLP;
     return pEndifMac;
 }
 
@@ -397,7 +397,7 @@ macro_t *
 mLoad_While(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
     size_t              srcLen = (size_t)pMac->md_res; /* macro len  */
-    tpLoadProc const *  papLP  = papLoadProc;
+    tpLoadProc const *  papLP  = load_proc_table;
     macro_t *            pEndMac;
 
     /*
@@ -415,11 +415,11 @@ mLoad_While(templ_t* pT, macro_t* pMac, char const ** ppzScan)
         AG_ABEND_IN(pT, pMac, LD_WHILE_NO_EXPR);
 
     if (apWhileLoad[0] == NULL) {
-        memcpy((void*)apWhileLoad, apLoadProc, sizeof(apLoadProc));
+        memcpy((void*)apWhileLoad, base_load_table, sizeof(base_load_table));
         apWhileLoad[ FTYP_ENDWHILE ] = &mLoad_Ending;
     }
 
-    papLoadProc = apWhileLoad;
+    load_proc_table = apWhileLoad;
 
     /*
      *  Load the expression
@@ -428,11 +428,11 @@ mLoad_While(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 
     /*
      *  Now, do a nested parse of the template.  When the matching 'ENDWHILE'
-     *  macro is encountered, the handler routine will cause 'parseTemplate()'
+     *  macro is encountered, the handler routine will cause 'parse_tpl()'
      *  to return with the text scanning pointer pointing to the remaining
      *  text.
      */
-    pEndMac = parseTemplate(pMac+1, ppzScan);
+    pEndMac = parse_tpl(pMac+1, ppzScan);
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_WHILE_NO_ENDWHILE);
 
@@ -441,7 +441,7 @@ mLoad_While(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Restore the context of any encompassing block macros
      */
-    papLoadProc = papLP;
+    load_proc_table = papLP;
     return pEndMac;
 }
 

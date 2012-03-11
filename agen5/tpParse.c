@@ -2,7 +2,7 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2012-03-04 14:22:47 bkorb"
+ * Time-stamp:        "2012-03-10 11:53:03 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -50,7 +50,7 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan);
 static teFuncType
 func_code(char const ** ppzScan)
 {
-    tNameType const * pNT;
+    fn_name_type_t const * pNT;
     char const *      pzFuncName = *ppzScan;
     int               hi, lo, av;
     int               cmp;
@@ -64,7 +64,7 @@ func_code(char const ** ppzScan)
         lo = FUNC_ALIAS_LOW_INDEX;
         do  {
             av  = (hi + lo)/2;
-            pNT = nameTypeTable + av;
+            pNT = fn_name_types + av;
             cmp = (int)(*(pNT->pName)) - (int)(*pzFuncName);
 
             /*
@@ -90,7 +90,7 @@ func_code(char const ** ppzScan)
 
     do  {
         av  = (hi + lo)/2;
-        pNT = nameTypeTable + av;
+        pNT = fn_name_types + av;
         cmp = strneqvcmp(pNT->pName, pzFuncName, (int)pNT->cmpLen);
         if (cmp == 0) {
             /*
@@ -171,7 +171,7 @@ find_mac_end(char const ** ppzMark)
      *  Find the end.  (We must.)  If the thing is empty, treat as a comment,
      *  but warn about it.
      */
-    pzEndMark = strstr(pzMark, end_mac);
+    pzEndMark = strstr(pzMark, end_mac_mark);
     if (pzEndMark == NULL)
         AG_ABEND(FIND_MAC_END_NOPE);
 
@@ -189,7 +189,7 @@ find_mac_end(char const ** ppzMark)
     if (pzEndMark[-1] == '\\')
         pzEndMark--;
 
-    pzNextMark = strstr(pzMark, start_mac);
+    pzNextMark = strstr(pzMark, st_mac_mark);
     if (pzNextMark == NULL)
         return pzEndMark;
 
@@ -204,7 +204,7 @@ find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
 {
     char *       pzCopy;
     char const * pzEnd;
-    char const * res = strstr(pz, start_mac);
+    char const * res = strstr(pz, st_mac_mark);
     macro_t *     pM  = *ppM;
 
     if (res == pz)
@@ -293,7 +293,7 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan)
      *  IF the end macro mark was preceded by a backslash, then we remove
      *  trailing white space from there to the end of the line.
      */
-    if ((*pzScan != '\\') || (strncmp(end_mac, pzScan, end_mac_len) == 0))
+    if ((*pzScan != '\\') || (strncmp(end_mac_mark, pzScan, end_mac_len) == 0))
         pzScan += end_mac_len;
 
     else {
@@ -310,11 +310,11 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan)
     return pzMark;
 }
 
-LOCAL macro_t*
-parseTemplate(macro_t* pM, char const ** ppzText)
+LOCAL macro_t *
+parse_tpl(macro_t * mac, char const ** p_scan)
 {
-    char const * pzScan = *ppzText;
-    templ_t* pTpl = current_tpl;
+    char const * scan = *p_scan;
+    templ_t *    tpl  = current_tpl;
 
 #if defined(DEBUG_ENABLED)
     static char const zTUndef[] = "%-10s (%d) line %d - MARKER\n";
@@ -324,9 +324,9 @@ parseTemplate(macro_t* pM, char const ** ppzText)
     if (  ((tplNestLevel++) > 0)
        && HAVE_OPT(SHOW_DEFS)) {
         int ct = tplNestLevel;
-        macro_t* pPm = pM-1;
+        macro_t* pPm = mac-1;
 
-        fprintf(trace_fp, "%3u ", (unsigned int)(pPm - pTpl->td_macros));
+        fprintf(trace_fp, "%3u ", (unsigned int)(pPm - tpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
         fprintf(trace_fp, zTUndef, apzFuncNames[ pPm->md_code ],
@@ -337,9 +337,11 @@ parseTemplate(macro_t* pM, char const ** ppzText)
 #endif
 
     for (;;) {
-        char const * pzMark = find_macro(pTpl, &pM, &pzScan);
-        if (pzMark == NULL)
-            break;
+        {
+            char const * mark = find_macro(tpl, &mac, &scan);
+            if (mark == NULL)
+                break;
+        }
 
         /*
          *  IF the called function returns a NULL next macro pointer,
@@ -347,41 +349,42 @@ parseTemplate(macro_t* pM, char const ** ppzText)
          *       will be non-NULL.
          */
         {
-            macro_t * pNM = (*(papLoadProc[ pM->md_code]))(pTpl, pM, &pzScan);
+            tpLoadProc const fn = load_proc_table[mac->md_code];
+            macro_t *   nxt_mac = fn(tpl, mac, &scan);
 
 #if defined(DEBUG_ENABLED)
             if (HAVE_OPT(SHOW_DEFS)) {
-                teFuncType ft  = pM->md_code;
-                int        ln  = pM->md_line;
+                teFuncType ft  = mac->md_code;
+                int        ln  = mac->md_line;
                 int ct = tplNestLevel;
-                if (pM->md_code == FTYP_BOGUS)
+                if (mac->md_code == FTYP_BOGUS)
                      fputs("    ", trace_fp);
                 else fprintf(trace_fp, "%3u ",
-                             (unsigned int)(pM - pTpl->td_macros));
+                             (unsigned int)(mac - tpl->td_macros));
 
                 do { fputs("  ", trace_fp); } while (--ct > 0);
 
-                if (pM->md_code == FTYP_BOGUS)
+                if (mac->md_code == FTYP_BOGUS)
                      fprintf(trace_fp, zTUndef, apzFuncNames[ ft ], ft, ln);
                 else {
                     char const * pz;
                     if (ft >= FUNC_CT)
                         ft = FTYP_SELECT;
-                    pz = (pM->md_txt_off == 0)
+                    pz = (mac->md_txt_off == 0)
                         ? zNil
-                        : (pTpl->td_text + pM->md_txt_off);
-                    fprintf(trace_fp, zTDef, apzFuncNames[ ft ], pM->md_code,
-                            ln, pM->md_end_idx, (unsigned int)strlen(pz));
+                        : (tpl->td_text + mac->md_txt_off);
+                    fprintf(trace_fp, zTDef, apzFuncNames[ft], mac->md_code,
+                            ln, mac->md_end_idx, (unsigned int)strlen(pz));
                 }
             }
 #endif
 
-            if (pNM == NULL) {
-                *ppzText = pzScan;
+            if (nxt_mac == NULL) {
+                *p_scan = scan;
                 DEBUG_DEC(tplNestLevel);
-                return pM;
+                return mac;
             }
-            pM = pNM;
+            mac = nxt_mac;
         }
     }
 
@@ -391,8 +394,8 @@ parseTemplate(macro_t* pM, char const ** ppzText)
      *  We reached the end of the input string.
      *  Return a NULL scanning pointer and a pointer to the end.
      */
-    *ppzText = NULL;
-    return pM;
+    *p_scan = NULL;
+    return mac;
 }
 /*
  * Local Variables:

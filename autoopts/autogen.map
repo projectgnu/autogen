@@ -38,6 +38,8 @@ horiz-white     "\t "
 alt-white       "\v\f\r\b"
 whitespace      +horiz-white  +newline +alt-white
 non-nl-white    +horiz-white  +alt-white
+quote           "'\""
+parentheses     "()"
 
 graphic         "!-~"
 inversion       "~-"
@@ -54,8 +56,9 @@ option-name     "^-"          +variable-name
 value-name      +colon        +option-name
 name-sep        "[.]"
 compound-name   +value-name   +name-sep +horiz-white
+scheme-note     +parentheses  +quote
 
-unquotable      "!-~"         -"\"#(),;<=>[\\]`{}?*'"
+unquotable      "!-~"         -"#,;<=>[\\]`{}?*" -quote -parentheses
 end-xml-token   "/>"          +whitespace
 plus-n-space    +plus         +whitespace
 punctuation     "!-~"         -alphanumeric -"_"

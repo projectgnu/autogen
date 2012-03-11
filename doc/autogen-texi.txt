@@ -3037,9 +3037,15 @@ argument to the default option.
 @node opt-attr documentation
 @subsubsection Option Sectioning Comment
 This attribute means the option exists for the purpose of separating option
-description text in the usage output.  Libraries may choose to make it
-settable so that the library can determine which command line option is the
-first one that pertains to the library.
+description text in the usage output and texi documentation.  Without this
+attribute, every option is a separate node in the texi docs.  With this
+attribute, the documentation options become texi doc nodes and the options are
+collected under them.  Choose the name attribute carefully because it will
+appear in the texi documentation.
+
+Libraries may also choose to make it settable so that the library can
+determine which command line option is the first one that pertains to the
+library.
 
 @vindex documentation
 If the ``@code{documentation}'' attribute is present, then all other
@@ -3048,14 +3054,13 @@ attributes are disabled except @code{settable}, @code{call-proc} and
 @code{call-proc}, @code{extract-code} or @code{flag-code} has been specified.
 When present, the @code{descrip} attribute will be displayed only when the
 @code{--help} option has been specified.  It will be displayed flush to the
-left hand margin and may consist of one or more lines of text.  The name of
-the option will not be printed.
+left hand margin and may consist of one or more lines of text, filled to 72
+columns.
 
-Documentation options are for clarifying the usage text and will not usually
-appear in generated man pages or in the generated invoking texinfo doc.  They
-may be gotten to appear in texinfo documents if the @code{USAGE_NODES}
-environment variable is set to ``doc''.  In that case, the invoking menu will
-have entries for these documentation flags, but not the individual options.
+The name of the option will not be printed in the help text.  It @i{will},
+however, be printed as section headers in the texi documentation.  If the
+attribute is given a non-empty value, this text will be reproduced in the man
+page and texi doc immediately after the @code{descrip} text.
 
 @node opt-attr translators
 @subsubsection Translator Notes

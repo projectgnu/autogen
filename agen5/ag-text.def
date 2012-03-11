@@ -9,9 +9,6 @@ string = { nm = ADD_ENV_VARS_SUFFIX_FMT;
 string = { nm = ADD_SYS_ENV_VAL_FMT;
    str = "%s=1"; };
 
-string = { nm = ADD_TO_ENV_MSG;
-   str = "Added environment var"; };
-
 string = { nm = AG_ABEND_STATE_FMT;
    str = "ABEND-ing in %s state\n"; };
 

@@ -59,7 +59,7 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
     macro_t  mac = { (teFuncType)~0, 0, 0, 0, 0, 0, 0, NULL };
 
     mac.md_line = tpl_line;
-    pzEnd       = (char*)skipScheme(pzData, pzEnd);
+    pzEnd       = (char*)skip_scheme(pzData, pzEnd);
     ch          = *pzEnd;
     *pzEnd      = NUL;
     cur_macro   = &mac;
@@ -112,7 +112,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
 
         if (*pzSfxFmt == '(') {
             char const *pe  = pzSfxFmt + strlen(pzSfxFmt);
-            pzResult = skipScheme(pzSfxFmt, pe);
+            pzResult = skip_scheme(pzSfxFmt, pe);
 
         } else {
             pzResult = SPN_SUFFIX_FMT_CHARS(pzSfxFmt);
@@ -366,7 +366,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
         if (! IS_PUNCTUATION_CHAR(ch))
             break;
         *(pzMark++) = ch;
-        if (++ct >= sizeof(start_mac))
+        if (++ct >= sizeof(st_mac_mark))
             return NULL;
 
         pzData++;
@@ -423,14 +423,14 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copy_mark(pzData, start_mac, &st_mac_len);
+            pzData = copy_mark(pzData, st_mac_mark, &st_mac_len);
             if (pzData == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copy_mark(pzData, end_mac, &end_mac_len);
+            pzData = copy_mark(pzData, end_mac_mark, &end_mac_len);
             if (pzData == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
@@ -440,15 +440,15 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
              *  presume that someone ran the two markers together.
              */
             if (  (end_mac_len == 2 * st_mac_len)
-               && (strcmp(start_mac, end_mac + st_mac_len) == 0))  {
+               && (strcmp(st_mac_mark, end_mac_mark + st_mac_len) == 0))  {
                 pzData -= st_mac_len;
-                end_mac[ st_mac_len ] = NUL;
+                end_mac_mark[ st_mac_len ] = NUL;
                 end_mac_len = st_mac_len;
             }
 
-            if (strstr(end_mac, start_mac) != NULL)
+            if (strstr(end_mac_mark, st_mac_mark) != NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_ENDER);
-            if (strstr(start_mac, end_mac) != NULL)
+            if (strstr(st_mac_mark, end_mac_mark) != NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_STARTER);
             break;
 

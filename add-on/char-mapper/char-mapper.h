@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-03-04 12:16:00 bkorb"
+ *  Time-stamp:        "2012-03-10 11:31:58 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -86,7 +86,7 @@ value_map_t ** end_map      = &(all_map.next);
 size_t         max_name_len = 0;
 size_t         curr_name_len= 0;
 int            need_comma   = 0;
-int            bit_count    = 0;
+unsigned int   bit_count    = 0;
 int            skip_comment = 0;
 
 void   die(char const *, ...);

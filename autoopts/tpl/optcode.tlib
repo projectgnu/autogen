@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-02-25 12:54:32 bkorb"
+# Time-stamp:      "2012-03-10 09:29:16 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -221,7 +221,8 @@ extern tUsageProc [=
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 FOR flag "\n"           =][=
-  INVOKE opt-strs       =][=
+  (define flag-index (for-index)) =][=
+  INVOKE emit-opt-strs  =][=
 
   (if (exist? "lib-name") (begin
       (set! lib-opt-ptr (string->c-name! (string-append
@@ -586,8 +587,9 @@ UP-prefix
 =]OPTION_CT] = {[=
 
 FOR flag "\n"           =][=
+  (define flag-index (for-index)) =][=
 
-  INVOKE opt-desc       =][=
+  INVOKE emit-opt-desc  =][=
 
 ENDFOR flag
 

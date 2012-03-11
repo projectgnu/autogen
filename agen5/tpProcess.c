@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2012-03-04 19:37:00 bkorb"
+ * Time-stamp:        "2012-03-10 09:15:11 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -27,69 +27,72 @@ static out_stack_t fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-trace_macro(templ_t * pT, macro_t * pMac);
+trace_macro(templ_t * tpl, macro_t * mac);
 
 static void
-do_stdout_tpl(templ_t * pTF);
+do_stdout_tpl(templ_t * tpl);
 
 static void
 open_output(out_spec_t * spec);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
- *  Generate all the text within a block.  The caller must
- *  know the exact bounds of the block.  "pEnd" actually
- *  must point to the first entry that is *not* to be emitted.
+ *  Generate all the text within a block.
+ *  The caller must know the exact bounds of the block.
+ *
+ * @param tpl   template containing block of macros
+ * @param mac   first macro in series
+ * @param emac  one past last macro in series
  */
 LOCAL void
-generateBlock(templ_t * pT, macro_t * pMac, macro_t * pEnd)
+gen_block(templ_t * tpl, macro_t * mac, macro_t * emac)
 {
     /*
      *  Set up the processing context for this block of macros.
      *  It is used by the Guile callback routines and the exception
      *  handling code.  It is all for user friendly diagnostics.
      */
-    current_tpl = pT;
+    current_tpl = tpl;
 
-    while ((pMac != NULL) && (pMac < pEnd)) {
-        teFuncType fc = pMac->md_code;
+    while ((mac != NULL) && (mac < emac)) {
+        teFuncType fc = mac->md_code;
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
-            trace_macro(pT, pMac);
+            trace_macro(tpl, mac);
 
-        cur_macro = pMac;
-        pMac = (*(apHdlrProc[ fc ]))(pT, pMac);
+        cur_macro = mac;
+        mac = (*(apHdlrProc[ fc ]))(tpl, mac);
         ag_scribble_free();
     }
 }
 
 /**
- *  Print out information about the invocation of a macro
+ *  Print out information about the invocation of a macro.
+ *  Print up to the first 32 characters in the macro, for context.
+ *
+ * @param tpl   template containing macros
+ * @param mac   first macro in series
  */
 static void
-trace_macro(templ_t * pT, macro_t * pMac)
+trace_macro(templ_t * tpl, macro_t * mac)
 {
-    teFuncType fc = pMac->md_code;
+    teFuncType fc = mac->md_code;
     if (fc >= FUNC_CT)
         fc = FTYP_BOGUS;
 
-    fprintf(trace_fp, TRACE_MACRO_FMT, apzFuncNames[fc], pMac->md_code,
-            pT->td_file, pMac->md_line);
+    fprintf(trace_fp, TRACE_MACRO_FMT, apzFuncNames[fc], mac->md_code,
+            tpl->td_file, mac->md_line);
 
-    if (pMac->md_txt_off > 0) {
-        int   ct;
-        char* pz = pT->td_text + pMac->md_txt_off;
-        fputs("  ", trace_fp);
-        for (ct=0; ct < 32; ct++) {
-            char ch = *(pz++);
-            if (ch == NUL)
-                break;
-            if (ch == NL)
-                break;
-            putc(ch, trace_fp);
-        }
+    if (mac->md_txt_off > 0) {
+        char * pz = tpl->td_text + mac->md_txt_off;
+        char * pe = BRK_NEWLINE_CHARS(pz);
+        if (pe > pz + 32)
+            pz = pz + 32;
+
+        putc(' ', trace_fp); putc(' ', trace_fp);
+        fwrite(pz, pe - pz, 1, trace_fp);
         putc(NL, trace_fp);
     }
 }
@@ -98,11 +101,12 @@ trace_macro(templ_t * pT, macro_t * pMac)
  *  The template output goes to stdout.  Perhaps because output
  *  is for a CGI script.  In any case, this case must be handled
  *  specially.
+ *
+ * @param tpl   template to be processed
  */
 static void
-do_stdout_tpl(templ_t * pTF)
+do_stdout_tpl(templ_t * tpl)
 {
-    char   const *    pzRes;
     SCM    res;
 
     last_scm_cmd = NULL; /* We cannot be in Scheme processing */
@@ -141,12 +145,13 @@ do_stdout_tpl(templ_t * pTF)
      *  the output will be clean for any error messages we have to emit.
      */
     if (*oops_pfx == NUL)
-        generateBlock(pTF, pTF->td_macros, pTF->td_macros + pTF->td_mac_ct);
+        gen_block(tpl, tpl->td_macros, tpl->td_macros + tpl->td_mac_ct);
 
     else {
+        char const * pzRes;
         (void)ag_scm_out_push_new(SCM_UNDEFINED);
 
-        generateBlock(pTF, pTF->td_macros, pTF->td_macros + pTF->td_mac_ct);
+        gen_block(tpl, tpl->td_macros, tpl->td_macros + tpl->td_mac_ct);
 
         /*
          *  Read back in the spooled output.  Make sure it starts with
@@ -155,11 +160,11 @@ do_stdout_tpl(templ_t * pTF)
         res   = ag_scm_out_pop(SCM_BOOL_T);
         pzRes = AG_SCM_CHARS(res);
 
-        /* 13:  "content-type:" */
+        /* 13 char prefix is:  "content-type:" */
         if (strneqvcmp(pzRes, DO_STDOUT_TPL_CONTENT, 13) != 0)
             fputs(DO_STDOUT_TPL_CONTENT, stdout);
 
-        fwrite(pzRes, AG_SCM_STRLEN(res), (size_t)1, stdout);
+        fwrite(pzRes, AG_SCM_STRLEN(res), 1, stdout);
     }
 
     fclose(stdout);
@@ -170,23 +175,20 @@ do_stdout_tpl(templ_t * pTF)
  * file name, too, if necessary.
  */
 LOCAL out_spec_t *
-nextOutSpec(out_spec_t * pOS)
+next_out_spec(out_spec_t * os)
 {
-    out_spec_t * res = pOS->os_next;
+    out_spec_t * res = os->os_next;
 
-    if (pOS->os_dealloc_fmt)
-        AGFREE(pOS->os_file_fmt);
+    if (os->os_dealloc_fmt)
+        AGFREE(os->os_file_fmt);
 
-    AGFREE(pOS);
+    AGFREE(os);
     return res;
 }
 
-
 LOCAL void
-processTemplate(templ_t* tpl)
+process_tpl(templ_t * tpl)
 {
-    forInfo.fi_depth = 0;
-
     /*
      *  IF the template file does not specify any output suffixes,
      *  THEN we will generate to standard out with the suffix set to zNoSfx.
@@ -198,7 +200,7 @@ processTemplate(templ_t* tpl)
     }
 
     do  {
-        out_spec_t*  pOS    = output_specs;
+        out_spec_t * ospec = output_specs;
 
         /*
          * We cannot be in Scheme processing.  We've either just started
@@ -214,22 +216,22 @@ processTemplate(templ_t* tpl)
         switch (setjmp(abort_jmp_buf)) {
         case SUCCESS:
             if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
-                fprintf(trace_fp, PROC_TPL_START, pOS->os_sfx);
+                fprintf(trace_fp, PROC_TPL_START, ospec->os_sfx);
                 fflush(trace_fp);
             }
             /*
              *  Set the output file name buffer.
              *  It may get switched inside open_output.
              */
-            open_output(pOS);
+            open_output(ospec);
             memcpy(&fpRoot, cur_fpstack, sizeof(fpRoot));
             AGFREE(cur_fpstack);
-            cur_fpstack         = &fpRoot;
-            curr_sfx       = pOS->os_sfx;
-            curr_def_ctx     = root_def_ctx;
+            cur_fpstack    = &fpRoot;
+            curr_sfx       = ospec->os_sfx;
+            curr_def_ctx   = root_def_ctx;
             cur_fpstack->stk_flags &= ~FPF_FREE;
-            cur_fpstack->stk_prev  = NULL;
-            generateBlock(tpl, tpl->td_macros, tpl->td_macros+tpl->td_mac_ct);
+            cur_fpstack->stk_prev   = NULL;
+            gen_block(tpl, tpl->td_macros, tpl->td_macros+tpl->td_mac_ct);
 
             do  {
                 out_close(false);  /* keep output */
@@ -263,12 +265,12 @@ processTemplate(templ_t* tpl)
              *  On failure (or unknown jump type), we quit the program, too.
              */
             processing_state = PROC_STATE_ABORTING;
-            do pOS = nextOutSpec(pOS);
-            while (pOS != NULL);
+            do ospec = next_out_spec(ospec);
+            while (ospec != NULL);
             exit(EXIT_FAILURE);
         }
 
-        output_specs = nextOutSpec(pOS);
+        output_specs = next_out_spec(ospec);
     } while (output_specs != NULL);
 }
 
@@ -328,7 +330,6 @@ out_close(bool purge)
         AGFREE((void*)p);
     }
 }
-
 
 /**
  *  Figure out what to use as the base name of the output file.

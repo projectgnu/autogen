@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-03-04 19:00:23 bkorb"
+# Time-stamp:      "2012-03-10 09:49:55 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -85,7 +85,7 @@ DEFINE init-and-validate                =][=
 )   )   )
 
 (define get-text (lambda (nm) (shell (string-append
-        "sed 's/@{\\([^}]*\\)}/\\1/g' <<\\_EODesc_\n"
+        "{ sed 's/@{\\([^}]*\\)}/\\1/g' | fmt -w 72\n}<<\\_EODesc_\n"
         (get nm) "\n_EODesc_" ))))
 
 (define do-ifdefs (or (exist? "flag.ifdef") (exist? "flag.ifndef")))
@@ -472,7 +472,7 @@ DEFINE save-name-morphs
   )
 
   (if (exist? "default")
-      (set! default-opt-index (for-index)) )
+      (set! default-opt-index (. flag-index)) )
 
 =][=
 
@@ -487,7 +487,7 @@ DEFINE set-defines
 =]
 #define SET_[=(. opt-name)=][= (if (exist? "arg-type") "(a)")
   =]   STMTS( \
-        [=set-desc=].optActualIndex = [=(for-index)=]; \
+        [=set-desc=].optActualIndex = [=(. flag-index)=]; \
         [=set-desc=].optActualValue = VALUE_[=(. opt-name)=]; \
         [=set-desc=].fOptState &= OPTST_PERSISTENT_MASK; \
         [=set-desc=].fOptState |= [=opt-state=][=
@@ -721,7 +721,7 @@ DEFINE set-option-define        =][=
 
       set-defines
            set-desc  = (string-append UP-prefix "DESC(" UP-name ")" )
-           set-index = (for-index)
+           set-index = (. flag-index)
            opt-state = OPTST_SET  =][=
 
     ENDIF is/not equivalenced   =][=
@@ -743,11 +743,10 @@ DEFINE option-defines             =]
           (if (exist? "equivalence")
               (get-up-name "equivalence")
               UP-name) ")" ))
-  (define tmp-val (for-index))
   (sprintf "%-18s" opt-name)=] [=
 
   CASE  value    =][=
-  !E             =][= (get-opt-value tmp-val) =][=
+  !E             =][= (get-opt-value flag-index) =][=
   ==  "'"        =]'\''[=
   ==  "\\"       =]'\\'[=
   ~~  "[ -~]"    =]'[=value=]'[=
@@ -755,8 +754,8 @@ DEFINE option-defines             =]
   =*  num        =][=
       (if (>= number-opt-index 0)
           (error "only one number option is allowed")  )
-      (set! number-opt-index tmp-val)
-      (get-opt-value tmp-val)   =][=
+      (set! number-opt-index flag-index)
+      (get-opt-value flag-index)   =][=
 
   *              =][=(error (sprintf
     "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
@@ -983,7 +982,7 @@ ENDDEF   emit-nondoc-option
 
 Define the arrays of values associated with an option (strings, etc.) =][=
 
-DEFINE opt-strs
+DEFINE emit-opt-strs
 
 =]
 /*
@@ -999,7 +998,8 @@ DEFINE opt-strs
 
   IF (exist? "documentation")           =]
 #define [= (. UP-name) =]_DESC      ([=
-    (string-table-add-ref opt-strs (get-text "descrip")) =])
+    (string-table-add-ref opt-strs
+       (string-append (get-text "descrip") ":")) =])
 #define [= (. UP-name) =]_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ELIF (exist? "aliases")               =][=
      INVOKE emit-alias-option           =][=
@@ -1163,7 +1163,7 @@ ENDDEF   help-strs
 
 Define the values for an option descriptor   =][=
 
-DEFINE opt-desc         =][=
+DEFINE emit-opt-desc    =][=
   IF
      (set-flag-names)
 
@@ -1194,7 +1194,7 @@ DEFINE opt-desc         =][=
   ELSE
 
 =]
-  {  /* entry idx, value */ [=(for-index)=], [=
+  {  /* entry idx, value */ [=(. flag-index)=], [=
                               (string-append VALUE-pfx UP-name)=],
      /* equiv idx, value */ [=
           IF (== (get-up-name "equivalence") UP-name)
@@ -1202,7 +1202,7 @@ DEFINE opt-desc         =][=
           ELIF (or (exist? "equivalence") (exist? "unstack-arg"))
               =]NOLIMIT, NOLIMIT[=
           ELSE
-              =][=(for-index)=], [=(string-append VALUE-pfx UP-name)=][=
+              =][=(. flag-index)=], [=(string-append VALUE-pfx UP-name)=][=
           ENDIF=],
      /* equivalenced to  */ [=
          (if (exist? "unstack-arg")

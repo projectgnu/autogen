@@ -14,8 +14,6 @@
 * Function Index::       Function index
 @end menu
 
-@end ifinfo
-
 @ignore
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 @end ignore

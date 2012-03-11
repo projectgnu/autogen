@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-03-04 19:07:15 bkorb"
+ *  Time-stamp:      "2012-03-10 10:14:18 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -32,7 +32,7 @@ static void
 dep_usage(char const * fmt, ...);
 
 static void
-add_sys_env(char * pzEnvName);
+add_sys_env(char * env_name);
 
 static void
 add_env_vars(void);
@@ -73,7 +73,7 @@ initialize(int arg_ct, char** arg_vec)
     processing_state = PROC_STATE_OPTIONS;
     add_env_vars();
 
-    doOptions(arg_ct, arg_vec);
+    process_ag_opts(arg_ct, arg_vec);
     exit_code = AUTOGEN_EXIT_LOAD_ERROR;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
@@ -407,7 +407,7 @@ spawnPipe(char const * pzFile)
                     goto spawnpipe_finish;
 
                 optionRestore(&autogenOptions);
-                doOptions(autogenOptions.origArgCt,
+                process_ag_opts(autogenOptions.origArgCt,
                           autogenOptions.origArgVect);
                 SET_OPT_DEFINITIONS(PIPE_DEFS_STDIN_STR);
                 break;
@@ -544,7 +544,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
             }
 
             optionRestore(&autogenOptions);
-            doOptions(autogenOptions.origArgCt,
+            process_ag_opts(autogenOptions.origArgCt,
                       autogenOptions.origArgVect);
             SET_OPT_DEFINITIONS("-");
 

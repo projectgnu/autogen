@@ -671,7 +671,7 @@ doDir_if(char* pzArg, char* pzScan)
 static char*
 doDir_ifdef(char* pzArg, char* pzScan)
 {
-    if (getDefine(pzArg, false) == NULL)
+    if (get_define_str(pzArg, false) == NULL)
         return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;
@@ -690,7 +690,7 @@ doDir_ifdef(char* pzArg, char* pzScan)
 static char*
 doDir_ifndef(char* pzArg, char* pzScan)
 {
-    if (getDefine(pzArg, false) != NULL)
+    if (get_define_str(pzArg, false) != NULL)
         return skipToElseEnd(pzScan);
     ifdefLevel++;
     return pzScan;

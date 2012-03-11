@@ -3,7 +3,7 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2012-03-04 09:13:16 bkorb"
+ *  Time-stamp:        "2012-03-10 13:11:54 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -30,12 +30,12 @@ static void
 put_defines_into_env(void);
 
 static char const *
-skipQuote(char const * pzQte);
+skip_quote(char const * qstr);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
  * Allocating printf function.  It either works or kills the program.
- * @param pzFmt the input format
+ * @param[in] pzFmt the input format
  * @returns the allocated, formatted result string.
  */
 LOCAL char *
@@ -140,8 +140,8 @@ put_defines_into_env(void)
  *  The trace output starts with the command and arguments used to
  *  start autogen.
  *
- * @param av    autogen's argument vector
- * @param odsc  use to provide the output file or shell pipe.
+ * @param[in] av    autogen's argument vector
+ * @param[in] odsc  option descriptor with file name string argument
  */
 LOCAL void
 open_trace_file(char ** av, tOptDesc * odsc)
@@ -173,6 +173,19 @@ open_trace_file(char ** av, tOptDesc * odsc)
     putc(NL, trace_fp);
 }
 
+/**
+ * Check the environment for make dependency info.  We look for
+ * AUTOGEN_MAKE_DEP, but if that is not found, we also look for
+ * DEPENDENCIES_OUTPUT.  To do dependency tracking at all, we
+ * must find one of these environment variables and it must
+ *
+ * * be non-empty
+ * * not contain a variation on "no"
+ * * not contain a variation on "false"
+ *
+ * Furthermore, to specify a file name, the contents must not contain
+ * some variation on "yes" or "true".
+ */
 LOCAL void
 check_make_dep_env(void)
 {
@@ -265,7 +278,7 @@ check_make_dep_env(void)
 }
 
 LOCAL void
-doOptions(int arg_ct, char ** arg_vec)
+process_ag_opts(int arg_ct, char ** arg_vec)
 {
     /*
      *  Advance the argument counters and pointers past any
@@ -332,8 +345,17 @@ doOptions(int arg_ct, char ** arg_vec)
         put_defines_into_env();
 }
 
+/**
+ *  look for a define string.  It may be in our DEFINE option list
+ *  (preferred result) or in the environment.  Look up both.
+ *
+ *  @param[in] de_name   name to look for
+ *  @param[in] check_env whether or not to look in environment
+ *
+ *  @returns a pointer to the string, if found, or NULL.
+ */
 LOCAL char const *
-getDefine(char const * de_name, bool check_env)
+get_define_str(char const * de_name, bool check_env)
 {
     char const **   ppz;
     int     ct;
@@ -361,37 +383,39 @@ getDefine(char const * de_name, bool check_env)
 }
 
 
-/*
- *  The following routine scans over quoted text, shifting
- *  it in the process and eliminating the starting quote,
- *  ending quote and any embedded backslashes.  They may
- *  be used to embed the quote character in the quoted text.
- *  The quote character is whatever character the argument
- *  is pointing at when this procedure is called.
+/**
+ *  The following routine scans over quoted text, shifting it in the process
+ *  and eliminating the starting quote, ending quote and any embedded
+ *  backslashes.  They may be used to embed the quote character in the quoted
+ *  text.  The quote character is whatever character the argument is pointing
+ *  at when this procedure is called.
+ *
+ *  @param[in,out] in_q   input quoted string/output unquoted
+ *  @returns the address of the byte after the original closing quote.
  */
-LOCAL char*
-spanQuote(char* pzQte)
+LOCAL char *
+span_quote(char * in_q)
 {
-    char  q = *pzQte;          /*  Save the quote character type */
-    char* p = pzQte++;         /*  Destination pointer           */
+    char   qc = *in_q;          /*  Save the quote character type */
+    char * dp = in_q++;         /*  Destination pointer           */
 
-    while (*pzQte != q) {
-        switch (*p++ = *pzQte++) {
+    while (*in_q != qc) {
+        switch (*dp++ = *in_q++) {
         case NUL:
-            return pzQte-1;      /* Return address of terminating NUL */
+            return in_q-1;      /* Return address of terminating NUL */
 
         case '\\':
-            if (q != '\'') {
-                int ct = ao_string_cook_escape_char(pzQte, p-1, 0x7F);
-                if (p[-1] == 0x7F)  p--;
-                pzQte += ct;
+            if (qc != '\'') {
+                int ct = ao_string_cook_escape_char(in_q, dp-1, 0x7F);
+                if (dp[-1] == 0x7F)  dp--;
+                in_q += ct;
 
             } else {
-                switch (*pzQte) {
+                switch (*in_q) {
                 case '\\':
                 case '\'':
                 case '#':
-                    p[-1] = *pzQte++;
+                    dp[-1] = *in_q++;
                 }
             }
             break;
@@ -401,70 +425,83 @@ spanQuote(char* pzQte)
         }
     }
 
-    *p = NUL;
-    return pzQte+1; /* Return addr of char after the terminating quote */
+    *dp = NUL;
+    return in_q+1; /* Return addr of char after the terminating quote */
 }
 
-/*
- *  The following routine skips over quoted text.
- *  The quote character is whatever character the argument
- *  is pointing at when this procedure is called.
+/**
+ *  The following routine skips over quoted text.  The quote character is
+ *  whatever character the argument is pointing at when this procedure is
+ *  called.
+ *
+ *  @param[in] qstr   input quoted string/output unquoted
+ *  @returns the address of the byte after the original closing quote.
  */
 static char const *
-skipQuote(char const * pzQte)
+skip_quote(char const * qstr)
 {
-    char  q = *pzQte++;        /*  Save the quote character type */
+    char qc = *qstr++;        /*  Save the quote character type */
 
-    while (*pzQte != q) {
-        switch (*pzQte++) {
+    while (*qstr != qc) {
+        switch (*qstr++) {
         case NUL:
-            return pzQte-1;      /* Return address of terminating NUL */
+            return qstr-1;      /* Return address of terminating NUL */
 
         case '\\':
-            if (q == '\'') {
+            if (qc == '\'') {
                 /*
                  *  Single quoted strings process the backquote specially
                  *  only in fron of these three characters:
                  */
-                switch (*pzQte) {
+                switch (*qstr) {
                 case '\\':
                 case '\'':
                 case '#':
-                    pzQte++;
+                    qstr++;
                 }
 
             } else {
                 char p[10];  /* provide a scratch pad for escape processing */
-                int ct = ao_string_cook_escape_char(pzQte, p, 0x7F);
-                pzQte += ct;
+                int ct = ao_string_cook_escape_char(qstr, p, 0x7F);
+                qstr += ct;
             } /* if (q == '\'')      */
-        }     /* switch (*pzQte++)   */
-    }         /* while (*pzQte != q) */
+        }     /* switch (*qstr++)   */
+    }         /* while (*qstr != q) */
 
-    return pzQte+1; /* Return addr of char after the terminating quote */
+    return qstr+1; /* Return addr of char after the terminating quote */
 }
 
-
+/**
+ * Skip over scheme expression.  We need to find what follows it.
+ * Guile will carefully parse it later.
+ *
+ * @param[in]  scan  where to start search
+ * @param[in]  end   point beyond which not to go
+ * @returns    character after closing parenthesis or "end",
+ * which ever comes first.
+ */
 LOCAL char const *
-skipScheme(char const * pzSrc,  char const * pzEnd)
+skip_scheme(char const * scan,  char const * end)
 {
     int  level = 0;
 
     for (;;) {
-        if (pzSrc >= pzEnd)
-            return pzEnd;
-        switch (*(pzSrc++)) {
+        scan = BRK_SCHEME_NOTE_CHARS(scan);
+        if (scan >= end)
+            return end;
+
+        switch (*(scan++)) {
         case '(':
             level++;
             break;
 
         case ')':
             if (--level == 0)
-                return pzSrc;
+                return scan;
             break;
 
         case '"':
-            pzSrc = skipQuote(pzSrc-1);
+            scan = skip_quote(scan-1);
         }
     }
 }
@@ -486,7 +523,7 @@ count_nl(char const * pz)
 
 
 LOCAL char const *
-skipExpression(char const * pzSrc, size_t len)
+skip_expr(char const * pzSrc, size_t len)
 {
     char const * pzEnd = pzSrc + len;
 
@@ -503,12 +540,12 @@ skipExpression(char const * pzSrc, size_t len)
         goto guess_again;
 
     case '(':
-        return skipScheme(pzSrc, pzEnd);
+        return skip_scheme(pzSrc, pzEnd);
 
     case '"':
     case '\'':
     case '`':
-        pzSrc = skipQuote(pzSrc);
+        pzSrc = skip_quote(pzSrc);
         return (pzSrc > pzEnd) ? pzEnd : pzSrc;
 
     default:

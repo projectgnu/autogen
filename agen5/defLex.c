@@ -2,7 +2,7 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2012-03-04 13:56:27 bkorb"
+ *  Time-stamp:        "2012-03-10 10:12:20 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -78,7 +78,7 @@ static char*
 gather_name(char * pzScan, te_dp_event * pRetVal);
 
 static char*
-build_here_str(char* pzScan);
+build_here_str(char* scan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
@@ -385,7 +385,7 @@ static void
 loadScheme(void)
 {
     char*    pzText    = cctx->scx_scan;
-    char*    pzEnd     = (char*)skipScheme(pzText, pzText + strlen(pzText));
+    char*    pzEnd     = (char*)skip_scheme(pzText, pzText + strlen(pzText));
     char     endCh     = *pzEnd;
     int      schemeLen = (pzEnd - pzText);
     int      next_ln;
@@ -437,7 +437,7 @@ static void
 alist_to_autogen_def(void)
 {
     char*  pzText  = ++(cctx->scx_scan);
-    char*  pzEnd   = (char*)skipScheme(pzText, pzText + strlen(pzText));
+    char*  pzEnd   = (char*)skip_scheme(pzText, pzText + strlen(pzText));
 
     SCM    res;
     size_t res_len;

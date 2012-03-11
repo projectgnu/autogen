@@ -44,7 +44,7 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file);
  * Return the template structure matching the name passed in.
  */
 LOCAL templ_t *
-findTemplate(char const * pzTemplName)
+find_tpl(char const * pzTemplName)
 {
     templ_t * pT = named_tpls;
     while (pT != NULL) {
@@ -243,11 +243,11 @@ cnt_macros(char const * pz)
 {
     size_t  ct = 2;
     for (;;) {
-        pz = strstr(pz, start_mac);
+        pz = strstr(pz, st_mac_mark);
         if (pz == NULL)
             break;
         ct += 2;
-        if (strncmp(pz - end_mac_len, end_mac, end_mac_len) == 0)
+        if (strncmp(pz - end_mac_len, end_mac_mark, end_mac_len) == 0)
             ct--;
         pz += st_mac_len;
     }
@@ -283,7 +283,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
     current_tpl = pT;
 
     {
-        macro_t* pMacEnd = parseTemplate(pMac, &pzData);
+        macro_t* pMacEnd = parse_tpl(pMac, &pzData);
         int     ct;
 
         /*
@@ -363,8 +363,8 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
     pRes->td_size  = alloc_sz;
     pRes->td_mac_ct = mac_ct;
 
-    strcpy(pRes->td_start_mac, start_mac); /* must fit */
-    strcpy(pRes->td_end_mac,   end_mac);   /* must fit */
+    strcpy(pRes->td_start_mac, st_mac_mark); /* must fit */
+    strcpy(pRes->td_end_mac,   end_mac_mark);   /* must fit */
     load_macs(pRes, real_file, PSEUDO_MAC_TPL_FILE, pzData);
 
     pRes->td_name   -= (long)pRes;
@@ -496,7 +496,7 @@ cleanup(templ_t* pTF)
         tpl_unload(pT);
     }
 
-    AGFREE(forInfo.fi_data);
+    AGFREE(curr_ivk_info->ii_for_data);
     tpl_unload(pTF);
     unload_defs();
 }

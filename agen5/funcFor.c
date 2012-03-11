@@ -2,7 +2,7 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2012-03-04 19:35:40 bkorb"
+ *  Time-stamp:        "2012-03-10 11:56:53 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -26,19 +26,18 @@
 #define ENTRY_END  INT_MAX
 #define UNASSIGNED 0x7BAD0BAD
 
-static for_state_t*  pFS;  /* Current "FOR" information (state) */
-
-static char const zNoEnd[] = "%s ERROR:  FOR loop `%s' does not end\n";
-
 /* = = = START-STATIC-FORWARD = = = */
+static for_state_t *
+find_for_state(SCM which_scm);
+
 static bool
-nextDefinition(bool invert, def_ent_t** ppList);
+next_def(bool invert, def_ent_t** ppList);
 
 static int
-doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef);
+for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef);
 
 static int
-doForEach(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef);
+for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef);
 
 static void
 load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac);
@@ -48,40 +47,57 @@ load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac);
  *
  *  Operational Functions */
 
+static for_state_t *
+find_for_state(SCM which_scm)
+{
+    ivk_info_t * srch = curr_ivk_info;
+    char const * which = AG_SCM_STRING_P(which_scm)
+        ? ag_scm2zchars(which_scm, "which for") : NULL;
+
+    for (; srch != NULL; srch = srch->ii_prev) {
+        int ix;
+
+        if (srch->ii_for_depth <= 0)
+            continue;
+
+        /*
+         * If "which" is not specified, then accept first found
+         */
+        ix = srch->ii_for_depth - 1;
+        if (which == NULL)
+            return srch->ii_for_data + ix;
+
+        for (; ix >= 0; ix--) {
+            for_state_t * fs = srch->ii_for_data + ix;
+            if (strcmp(fs->for_name, which) == 0)
+                return fs;
+        }
+    }
+    return NULL;
+}
+
 /*=gfunc first_for_p
  *
  * what:    detect first iteration
  * exparg:  for_var, which for loop, opt
- * doc:     Returns SCM_BOOL_T if the named FOR loop (or, if not named, the
- *          current innermost loop) is on the first pass through the data.
- *          Outside of any FOR loop, it returns SCM_UNDEFINED.
- *          @xref{FOR}.
+ * doc:
+ *
+ *    Returns @code{SCM_BOOL_T} if the named FOR loop (or, if not named, the
+ *    current innermost loop) is on the first pass through the data.  Outside
+ *    of any @code{FOR} loop, it returns @code{SCM_UNDEFINED}, @pxref{FOR}.
 =*/
 SCM
 ag_scm_first_for_p(SCM which)
 {
-    if (forInfo.fi_depth <= 0)
+    for_state_t * p = find_for_state(which);
+    if (p == NULL)
         return SCM_UNDEFINED;
 
     if (! AG_SCM_STRING_P(which))
-        return (pFS->for_isfirst) ? SCM_BOOL_T : SCM_BOOL_F;
+        return (for_state->for_isfirst) ? SCM_BOOL_T : SCM_BOOL_F;
 
-    {
-        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char *     pz  = ag_scm2zchars(which, "which for");
-        SCM        res = SCM_UNDEFINED;
-        int        ct  = forInfo.fi_depth;
-
-        do  {
-            if (strcmp(p->for_name, pz) == 0) {
-                res = (p->for_isfirst ? SCM_BOOL_T : SCM_BOOL_F);
-                break;
-            }
-            p--;
-        } while (--ct > 0);
-
-        return res;
-    }
+    which = (p->for_isfirst ? SCM_BOOL_T : SCM_BOOL_F);
+    return which;
 }
 
 
@@ -97,28 +113,12 @@ ag_scm_first_for_p(SCM which)
 SCM
 ag_scm_last_for_p(SCM which)
 {
-    if (forInfo.fi_depth <= 0)
+    for_state_t * p = find_for_state(which);
+    if (p == NULL)
         return SCM_UNDEFINED;
 
-    if (! AG_SCM_STRING_P(which))
-        return (pFS->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
-
-    {
-        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars(which, "which for");
-        SCM        res = SCM_UNDEFINED;
-        int        ct  = forInfo.fi_depth;
-
-        do  {
-            if (strcmp(p->for_name, pz) == 0) {
-                res = (p->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
-                break;
-            }
-            p--;
-        } while (--ct > 0);
-
-        return res;
-    }
+    which = (p->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
+    return which;
 }
 
 
@@ -126,36 +126,21 @@ ag_scm_last_for_p(SCM which)
  *
  * what:    get current loop index
  * exparg:  for_var, which for loop, opt
- * doc:     Returns the current index for the named FOR loop.
- *          If not named, then the index for the innermost loop.
- *          Outside of any FOR loop, it returns SCM_UNDEFINED.
- *          @xref{FOR}.
+ * doc:
+ *
+ *    Returns the current index for the named @code{FOR} loop.
+ *    If not named, then the index for the innermost loop.
+ *    Outside of any FOR loop, it returns @code{SCM_UNDEFINED}, @xref{FOR}.
 =*/
 SCM
 ag_scm_for_index(SCM which)
 {
-    if (forInfo.fi_depth <= 0)
+    for_state_t * p = find_for_state(which);
+    if (p == NULL)
         return SCM_UNDEFINED;
 
-    if (! AG_SCM_STRING_P(which))
-        return AG_SCM_INT2SCM(pFS->for_index);
-
-    {
-        for_state_t* p   = forInfo.fi_data + (forInfo.fi_depth - 1);
-        char*      pz  = ag_scm2zchars(which, "which for");
-        SCM        res = SCM_UNDEFINED;
-        int        ct  = forInfo.fi_depth;
-
-        do  {
-            if (strcmp(p->for_name, pz) == 0) {
-                res = AG_SCM_INT2SCM(p->for_index);
-                break;
-            }
-            p--;
-        } while (--ct > 0);
-
-        return res;
-    }
+    which = AG_SCM_INT2SCM(p->for_index);
+    return which;
 }
 
 
@@ -172,9 +157,10 @@ ag_scm_for_index(SCM which)
 SCM
 ag_scm_for_from(SCM from)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(from)))
+    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(from)))
         return SCM_UNDEFINED;
-    pFS->for_from = AG_SCM_TO_INT(from);
+
+    for_state->for_from = AG_SCM_TO_INT(from);
     return SCM_BOOL_T;
 }
 
@@ -192,9 +178,10 @@ ag_scm_for_from(SCM from)
 SCM
 ag_scm_for_to(SCM to)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(to)))
+    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(to)))
         return SCM_UNDEFINED;
-    pFS->for_to = AG_SCM_TO_INT(to);
+
+    for_state->for_to = AG_SCM_TO_INT(to);
     return SCM_BOOL_T;
 }
 
@@ -212,12 +199,12 @@ ag_scm_for_to(SCM to)
 SCM
 ag_scm_for_by(SCM by)
 {
-    if ((! pFS->for_loading) || (! AG_SCM_NUM_P(by)))
+    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(by)))
         return SCM_UNDEFINED;
-    pFS->for_by = AG_SCM_TO_INT(by);
+
+    for_state->for_by = AG_SCM_TO_INT(by);
     return SCM_BOOL_T;
 }
-
 
 /*=gfunc for_sep
  *
@@ -233,15 +220,15 @@ ag_scm_for_by(SCM by)
 SCM
 ag_scm_for_sep(SCM obj)
 {
-    if (! pFS->for_loading)
+    if ((! for_state->for_loading) || (! AG_SCM_STRING_P(obj)))
         return SCM_UNDEFINED;
-    AGDUPSTR(pFS->for_sep_str, ag_scm2zchars(obj, "sep str"), "sep str");
+
+    AGDUPSTR(for_state->for_sep_str, ag_scm2zchars(obj, "sep"), "seps");
     return SCM_BOOL_T;
 }
 
-
 static bool
-nextDefinition(bool invert, def_ent_t** ppList)
+next_def(bool invert, def_ent_t** ppList)
 {
     bool     haveMatch = false;
     def_ent_t*  pList     = *ppList;
@@ -253,7 +240,7 @@ nextDefinition(bool invert, def_ent_t** ppList)
          *  IF we found an entry for the current index,
          *  THEN break out and use it
          */
-        if (pList->de_index == pFS->for_index) {
+        if (pList->de_index == for_state->for_index) {
             haveMatch = true;
             break;
         }
@@ -265,21 +252,21 @@ nextDefinition(bool invert, def_ent_t** ppList)
          *       only the set passed in.
          */
         if ((invert)
-            ? (pList->de_index < pFS->for_index)
-            : (pList->de_index > pFS->for_index)) {
+            ? (pList->de_index < for_state->for_index)
+            : (pList->de_index > for_state->for_index)) {
 
             /*
              *  When the "by" step is zero, force syncronization.
              */
-            if (pFS->for_by == 0) {
-                pFS->for_index = pList->de_index;
+            if (for_state->for_by == 0) {
+                for_state->for_index = pList->de_index;
                 haveMatch = true;
             }
             break;
         }
 
         /*
-         *  The current index (pFS->for_index) is past the current value
+         *  The current index (for_state->for_index) is past the current value
          *  (pB->de_index), so advance to the next entry and test again.
          */
         pList = (invert) ? pList->de_ptwin : pList->de_twin;
@@ -292,18 +279,14 @@ nextDefinition(bool invert, def_ent_t** ppList)
     return haveMatch;
 }
 
-
 static int
-doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef)
+for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * found)
 {
     int         loopCt    = 0;
     def_ent_t   textDef;
-    bool     invert    = (pFS->for_by < 0) ? true : false;
+    bool        invert    = (for_state->for_by < 0) ? true : false;
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
-    def_ctx_t     ctx       = curr_def_ctx;
-
-    if (pFS->for_sep_str == NULL)
-        pFS->for_sep_str = (char*)zNil;
+    def_ctx_t   ctx       = curr_def_ctx;
 
     /*
      *  IF the for-from and for-to values have not been set,
@@ -311,81 +294,81 @@ doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef)
      *       entries of the twin set.
      */
     {
-        def_ent_t* pLast = (pFoundDef->de_etwin != NULL)
-                           ? pFoundDef->de_etwin : pFoundDef;
+        def_ent_t* pLast = (found->de_etwin != NULL)
+                           ? found->de_etwin : found;
 
-        if (pFS->for_from == UNASSIGNED)
-            pFS->for_from = (invert) ? pLast->de_index : pFoundDef->de_index;
+        if (for_state->for_from == UNASSIGNED)
+            for_state->for_from = (invert) ? pLast->de_index : found->de_index;
 
-        if (pFS->for_to == UNASSIGNED)
-            pFS->for_to = (invert) ? pFoundDef->de_index : pLast->de_index;
+        if (for_state->for_to == UNASSIGNED)
+            for_state->for_to = (invert) ? found->de_index : pLast->de_index;
 
         /*
          *  "loopLimit" is intended to catch runaway ending conditions.
          *  However, if you really have a gazillion entries, who am I
          *  to stop you?
          */
-        if (loopLimit <  pLast->de_index - pFoundDef->de_index)
-            loopLimit = (pLast->de_index - pFoundDef->de_index) + 1;
+        if (loopLimit <  pLast->de_index - found->de_index)
+            loopLimit = (pLast->de_index - found->de_index) + 1;
     }
 
     /*
      *  Make sure we have some work to do before we start.
      */
     if (invert) {
-        if (pFS->for_from < pFS->for_to)
+        if (for_state->for_from < for_state->for_to)
             return 0;
     } else {
-        if (pFS->for_from > pFS->for_to)
+        if (for_state->for_from > for_state->for_to)
             return 0;
     }
 
-    pFS->for_index = pFS->for_from;
+    for_state->for_index = for_state->for_from;
 
     /*
      *  FROM `from' THROUGH `to' BY `by',
      *  DO...
      */
     for (;;) {
-        int     nextIdx;
-        bool gotNewDef = nextDefinition(invert, &pFoundDef);
+        int  next_ix;
+        bool have_next = next_def(invert, &found);
 
         if (loopLimit-- < 0) {
             fprintf(trace_fp, TRACE_FOR_STEP_TOO_FAR,
                     pT->td_name, pMac->md_line);
             fprintf(trace_fp, TRACE_FOR_BY_STEP,
                     pT->td_text + pMac->md_txt_off,
-                    pFS->for_from, pFS->for_to, pFS->for_by,
+                    for_state->for_from, for_state->for_to, for_state->for_by,
                     (int)OPT_VALUE_LOOP_LIMIT);
             break;
         }
 
-        if (pFS->for_by != 0) {
-            nextIdx = pFS->for_index + pFS->for_by;
+        if (for_state->for_by != 0) {
+            next_ix = for_state->for_index + for_state->for_by;
 
         } else if (invert) {
-            nextIdx = (pFoundDef->de_ptwin == NULL)
-                ? pFS->for_to - 1  /* last iteration !! */
-                : pFoundDef->de_ptwin->de_index;
+            next_ix = (found->de_ptwin == NULL)
+                ? for_state->for_to - 1  /* last iteration !! */
+                : found->de_ptwin->de_index;
 
         } else {
-            nextIdx = (pFoundDef->de_twin == NULL)
-                ? pFS->for_to + 1  /* last iteration !! */
-                : pFoundDef->de_twin->de_index;
+            next_ix = (found->de_twin == NULL)
+                ? for_state->for_to + 1  /* last iteration !! */
+                : found->de_twin->de_index;
         }
 
         /*
          *  IF we have a non-base definition, use the old def context
          */
-        if (! gotNewDef)
+        if (! have_next)
             curr_def_ctx = ctx;
 
         /*
          *  ELSE IF this macro is a text type
          *  THEN create an un-twinned version of it to be found first
          */
-        else if (pFoundDef->de_type == VALTYP_TEXT) {
-            textDef = *pFoundDef;
+        else if (found->de_type == VALTYP_TEXT) {
+            textDef = *found;
             textDef.de_next    = textDef.de_twin = NULL;
 
             curr_def_ctx.dcx_defent = &textDef;
@@ -397,33 +380,48 @@ doForByStep(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef)
          *       macro's values
          */
         else {
-            curr_def_ctx.dcx_defent = pFoundDef->de_val.dvu_entry;
+            curr_def_ctx.dcx_defent = found->de_val.dvu_entry;
             curr_def_ctx.dcx_prev = &ctx;
         }
 
-        pFS->for_islast = (invert)
-            ? ((nextIdx < pFS->for_to) ? true : false)
-            : ((nextIdx > pFS->for_to) ? true : false);
+        for_state->for_islast = (invert)
+            ? ((next_ix < for_state->for_to) ? true : false)
+            : ((next_ix > for_state->for_to) ? true : false);
 
-        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
-        loopCt++;
-        pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
-
-        if (pFS->for_islast)
+        switch (setjmp(for_state->for_env)) {
+        case FOR_JMP_DONE:
+            gen_block(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
             break;
 
-        fputs(pFS->for_sep_str, cur_fpstack->stk_fp);
+        case FOR_JMP_NEXT:
+            break;
+
+        case FOR_JMP_BREAK:
+            goto leave_loop;
+        }
+
+        loopCt++;
+        for_state = curr_ivk_info->ii_for_data
+            + (curr_ivk_info->ii_for_depth - 1);
+
+        if (for_state->for_islast)
+            break;
+
+        if (  (for_state->for_sep_str != NULL)
+           && (*for_state->for_sep_str != NUL))
+            fputs(for_state->for_sep_str, cur_fpstack->stk_fp);
+
         fflush(cur_fpstack->stk_fp);
-        pFS->for_isfirst = false;
-        pFS->for_index = nextIdx;
-    }
+        for_state->for_isfirst = false;
+        for_state->for_index   = next_ix;
+    } leave_loop:
 
     curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
 static int
-doForEach(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
+for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
 {
     int     loopCt = 0;
     def_ctx_t ctx    = curr_def_ctx;
@@ -452,30 +450,41 @@ doForEach(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
         /*
          *  Set the global current index
          */
-        pFS->for_index = pFoundDef->de_index;
+        for_state->for_index = pFoundDef->de_index;
 
         /*
          *  Advance to the next twin
          */
         pFoundDef = pFoundDef->de_twin;
         if (pFoundDef == NULL)
-            pFS->for_islast = true;
+            for_state->for_islast = true;
 
-        generateBlock(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
+        switch (setjmp(for_state->for_env)) {
+        case FOR_JMP_DONE:
+            gen_block(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
+            break;
+
+        case FOR_JMP_NEXT:
+            break;
+
+        case FOR_JMP_BREAK:
+            goto leave_loop;
+        }
 
         loopCt++;
-        pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
+        for_state = curr_ivk_info->ii_for_data
+            + (curr_ivk_info->ii_for_depth - 1);
 
         if (pFoundDef == NULL)
             break;
-        pFS->for_isfirst = false;
+        for_state->for_isfirst = false;
 
         /*
          *  Emit the iteration separation
          */
-        fputs(pFS->for_sep_str, cur_fpstack->stk_fp);
+        fputs(for_state->for_sep_str, cur_fpstack->stk_fp);
         fflush(cur_fpstack->stk_fp);
-    }
+    } leave_loop:;
 
     curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
@@ -523,7 +532,7 @@ load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac)
         switch (*pz) {
         case '\'':
         case '"':
-            pz = spanQuote(pz);
+            pz = span_quote(pz);
             /*
              *  Clean up trailing commas
              */
@@ -670,165 +679,175 @@ load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac)
  *    This macro ends the @code{FOR} function template block.
  *    For a complete description @xref{FOR}.
 =*/
-macro_t*
-mFunc_For(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_For(templ_t * tpl, macro_t * mac)
 {
-    macro_t*     pMRet = pT->td_macros + pMac->md_end_idx;
-    bool     isIndexed;
-    def_ent_t*  pDef;
+    macro_t *   ret_mac = tpl->td_macros + mac->md_end_idx;
+    bool        isIndexed;
+    def_ent_t * pDef;
     int         loopCt;
 
     /*
      *  "md_pvt" is used by the "FOR x IN ..." variation of the macro.
      *  When parsed, a chain of text definitions are hung off of "md_pvt".
-     *  "doForEach()" will then chase through the linked list of text
+     *  "for_each()" will then chase through the linked list of text
      *  values.  This winds up being identical to [+ FOR var +] where
      *  a list of "var" values has been set.
      */
-    if (pMac->md_pvt != NULL)
-        pDef = pMac->md_pvt;
+    if (mac->md_pvt != NULL)
+        pDef = mac->md_pvt;
     else {
-        pDef = findDefEntry(pT->td_text + pMac->md_name_off, &isIndexed);
+        pDef = findDefEntry(tpl->td_text + mac->md_name_off, &isIndexed);
         if (pDef == NULL) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf(trace_fp, TRACE_FN_FOR_SKIP,
-                        pT->td_text + pMac->md_name_off);
+                        tpl->td_text + mac->md_name_off);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf(trace_fp, TAB_FILE_LINE_FMT,
-                            pT->td_file, pMac->md_line);
+                            tpl->td_file, mac->md_line);
             }
 
-            return pMRet;
+            return ret_mac;
         }
     }
 
     /*
      *  Push the current FOR context onto a stack.
      */
-    if (++(forInfo.fi_depth) > forInfo.fi_alloc) {
-        forInfo.fi_alloc += 5;
-        if (forInfo.fi_data == NULL)
-             forInfo.fi_data = (for_state_t*)
-                 AGALOC(5 * sizeof(for_state_t), "Init FOR sate");
-        else forInfo.fi_data = (for_state_t*)
-                 AGREALOC((void*)forInfo.fi_data,
-                          forInfo.fi_alloc * sizeof(for_state_t), "FOR state");
+    if (++(curr_ivk_info->ii_for_depth) > curr_ivk_info->ii_for_alloc) {
+        void * dta = curr_ivk_info->ii_for_data;
+        size_t sz  = (curr_ivk_info->ii_for_alloc += 5) * sizeof(for_state_t);
+
+        if (dta == NULL)
+             dta = AGALOC(sz, "Init FOR sate");
+        else dta = AGREALOC(dta, sz, "FOR state");
+        curr_ivk_info->ii_for_data = dta;
     }
 
-    pFS = forInfo.fi_data + (forInfo.fi_depth - 1);
-    memset((void*)pFS, 0, sizeof(for_state_t));
-    pFS->for_isfirst = true;
-    pFS->for_name   = pT->td_text + pMac->md_name_off;
+    for_state = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
+    memset((void*)for_state, 0, sizeof(for_state_t));
+    for_state->for_isfirst = true;
+    for_state->for_name    = tpl->td_text + mac->md_name_off;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
-        fprintf(trace_fp, TRACE_FN_FOR, pT->td_text + pMac->md_name_off,
-                pT->td_file, pMac->md_line);
+        fprintf(trace_fp, TRACE_FN_FOR, tpl->td_text + mac->md_name_off,
+                tpl->td_file, mac->md_line);
 
     /*
      *  Check for a FOR iterating based on scheme macros
      */
-    if (pT->td_text[ pMac->md_txt_off ] == '(') {
-        pFS->for_from  = \
-        pFS->for_to    = UNASSIGNED;
+    if (tpl->td_text[ mac->md_txt_off ] == '(') {
+        for_state->for_from  = \
+        for_state->for_to    = UNASSIGNED;
 
-        pFS->for_loading = true;
-        (void) eval(pT->td_text + pMac->md_txt_off);
-        pFS->for_loading = false;
-        loopCt = doForByStep(pT, pMac, pDef);
-    }
-    else {
+        for_state->for_loading = true;
+        (void) eval(tpl->td_text + mac->md_txt_off);
+        for_state->for_loading = false;
+        loopCt = for_by_step(tpl, mac, pDef);
+
+    } else {
         /*
          *  The FOR iterates over a list of definitions
          */
-        pFS->for_sep_str = pT->td_text + pMac->md_txt_off;
-        loopCt = doForEach(pT, pMac, pDef);
+        AGDUPSTR(for_state->for_sep_str, tpl->td_text + mac->md_txt_off, "ss");
+        loopCt = for_each(tpl, mac, pDef);
     }
 
-    forInfo.fi_depth--;
+    if (for_state->for_sep_str != NULL)
+        AGFREE(for_state->for_sep_str);
+
+    if (--(curr_ivk_info->ii_for_depth) == 0) {
+        AGFREE(curr_ivk_info->ii_for_data);
+        curr_ivk_info->ii_for_data  = NULL;
+        curr_ivk_info->ii_for_alloc = 0;
+    }
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(trace_fp, TRACE_FN_FOR_REPEAT, pT->td_text + pMac->md_name_off,
+        fprintf(trace_fp, TRACE_FN_FOR_REPEAT, tpl->td_text + mac->md_name_off,
                 loopCt);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
-            fprintf(trace_fp, TAB_FILE_LINE_FMT, pT->td_file, pMac->md_line);
+            fprintf(trace_fp, TAB_FILE_LINE_FMT, tpl->td_file, mac->md_line);
     }
 
-    return pMRet;
+    return ret_mac;
 }
 
-
+/**
+ * Function to initiate loading of FOR block.
+ * It must replace the dispatch table to handle the ENDFOR function,
+ * which will unload the dispatch table.
+ */
 macro_t*
-mLoad_For(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
-    char *        pzCopy = pT->td_scan; /* next text dest   */
-    char const *  pzSrc  = (char const*)pMac->md_txt_off; /* macro text */
-    size_t        srcLen = (size_t)pMac->md_res;         /* macro len  */
-    macro_t *      pEndMac;
+    char *        scan_out = tpl->td_scan; /* next text dest   */
+    char const *  scan_in  = (char const*)mac->md_txt_off; /* macro text */
+    size_t        in_len   = (size_t)mac->md_res;          /* macro len  */
 
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc const * papLP = papLoadProc;
+    tpLoadProc const * save_load_procs = load_proc_table;
 
-    static tpLoadProc apForLoad[ FUNC_CT ] = { NULL };
+    static tpLoadProc load_for_macro_procs[ FUNC_CT ] = { NULL };
 
-    papLoadProc = apForLoad;
-    if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, LD_FOR_NAMELESS);
+    load_proc_table = load_for_macro_procs;
 
     /*
-     *  IF this is the first time here,
-     *  THEN set up the "FOR" mode callout table.
-     *  It is the standard table, except entries are inserted
-     *  for functions that are enabled only while processing
-     *  a FOR macro
+     *  IF this is the first time here, THEN set up the "FOR" mode callout
+     *  table.  It is the standard table, except entries are inserted for
+     *  functions that are enabled only while processing a FOR macro
      */
-    if (apForLoad[0] == NULL) {
-        memcpy((void*)apForLoad, apLoadProc, sizeof(apLoadProc));
-        apForLoad[ FTYP_ENDFOR ] = &mLoad_Ending;
+    if (load_for_macro_procs[0] == NULL) {
+        memcpy((void*)load_for_macro_procs, base_load_table,
+               sizeof(base_load_table));
+        load_for_macro_procs[ FTYP_ENDFOR ] = &mLoad_Ending;
     }
 
+    if (in_len == 0)
+        AG_ABEND_IN(tpl, mac, LD_FOR_NAMELESS);
+
     /*
-     *  pzSrc points to the name of the iteration "variable"
+     *  src points to the name of the iteration "variable"
      *  Special hack:  if the name is preceeded by a `.',
      *  then the lookup is local-only and we will accept it.
      */
-    pMac->md_name_off = pT->td_scan - pT->td_text;
-    if (*pzSrc == '.') {
-        *(pzCopy++) = *(pzSrc++);
-        if (! IS_VAR_FIRST_CHAR(*pzSrc))
-            pzCopy--; /* force an error */
+    mac->md_name_off = tpl->td_scan - tpl->td_text;
+    if (*scan_in == '.') {
+        *(scan_out++) = *(scan_in++);
+        if (! IS_VAR_FIRST_CHAR(*scan_in))
+            scan_out--; /* force an error */
     }
 
-    while (IS_VALUE_NAME_CHAR(*pzSrc)) *(pzCopy++) = *(pzSrc++);
-    *(pzCopy++) = NUL;
+    while (IS_VALUE_NAME_CHAR(*scan_in)) *(scan_out++) = *(scan_in++);
+    *(scan_out++) = NUL;
 
-    if (pT->td_text[ pMac->md_name_off ] == NUL)
-        AG_ABEND_IN(pT, pMac, LD_FOR_INVALID_VAR);
+    if (tpl->td_text[ mac->md_name_off ] == NUL)
+        AG_ABEND_IN(tpl, mac, LD_FOR_INVALID_VAR);
 
     /*
      *  Skip space to the start of the text following the iterator name
      */
-    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
-    srcLen -= pzSrc - (char*)pMac->md_txt_off;
+    scan_in = SPN_WHITESPACE_CHARS(scan_in);
+    in_len -= scan_in - (char*)mac->md_txt_off;
 
     /* * * * *
      *
      *  No source -> zero offset to text
      */
-    if ((ssize_t)srcLen <= 0) {
-        pMac->md_txt_off = 0;
+    if ((ssize_t)in_len <= 0) {
+        mac->md_txt_off = 0;
     }
 
     /* * * * *
      *
      *  FOR foo IN ...  -> no text, but we create an array of text values
      */
-    else if (  (strneqvcmp(pzSrc, LD_FOR_IN, 2) == 0)
-            && IS_WHITESPACE_CHAR(pzSrc[2])) {
-        load_ForIn(pzSrc, srcLen, pT, pMac);
+    else if (  (strneqvcmp(scan_in, LD_FOR_IN, 2) == 0)
+            && IS_WHITESPACE_CHAR(scan_in[2])) {
+        load_ForIn(scan_in, in_len, tpl, mac);
     }
 
     /* * * * *
@@ -837,28 +856,27 @@ mLoad_For(templ_t* pT, macro_t* pMac, char const ** ppzScan)
      *  *OR*         FOR foo (scheme ...) ...
      */
     else {
-        char* pzCopied = pzCopy;
-        pMac->md_txt_off = pzCopy - pT->td_text;
-        do  {
-            *(pzCopy++) = *(pzSrc++);
-        } while (--srcLen > 0);
-        *(pzCopy++) = NUL;
-        if ((*pzCopied == '"') || (*pzCopied == '\''))
-            spanQuote(pzCopied);
+        mac->md_txt_off = scan_out - tpl->td_text;
+        memmove(scan_out, scan_in, in_len);
+        scan_out[in_len] = NUL;
+        if (IS_QUOTE_CHAR(*scan_out))
+            span_quote(scan_out);
+        scan_out += in_len + 1;
     }
     /*
      * * * * */
 
-    pT->td_scan = pzCopy;
+    tpl->td_scan = scan_out;
+    {
+        macro_t * next_mac = parse_tpl(mac + 1, p_scan);
+        if (*p_scan == NULL)
+            AG_ABEND_IN(tpl, mac, LD_FOR_NO_ENDFOR);
 
-    pEndMac = parseTemplate(pMac + 1, ppzScan);
-    if (*ppzScan == NULL)
-        AG_ABEND_IN(pT, pMac, LD_FOR_NO_ENDFOR);
+        mac->md_end_idx = mac->md_sib_idx = next_mac - tpl->td_macros;
 
-    pMac->md_end_idx = pMac->md_sib_idx = pEndMac - pT->td_macros;
-
-    papLoadProc = papLP;
-    return pEndMac;
+        load_proc_table = save_load_procs;
+        return next_mac;
+    }
 }
 /*
  * Local Variables:

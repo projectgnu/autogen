@@ -128,7 +128,7 @@ utxt = { ut-name = AtMost;
 };
 
 utxt = { ut-name = Auto;
-         ut-text = "version and help options:";
+         ut-text = "version, usage and configuration options:";
 };
 
 utxt = { ut-name = BadPipe;

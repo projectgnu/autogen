@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # library.test     ---  test library options
 #
-# Time-stamp:        "2011-08-07 17:29:11 bkorb"
+# Time-stamp:        "2013-03-10 07:14:58 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -40,7 +40,7 @@ cat > ${testname}-libopts.def <<- _EODefs_
 	  lib-name = zzyzx;
 	  descrip = ${DEND}
 		This option introduces the options for the
-		zzyzx library.
+		zzyzx library
 		_DESC_END_;
 	};
 	flag = {
@@ -142,13 +142,12 @@ USAGE:  library [ -<flag> ]...
   Flg Arg Option-Name    Description
    -p no  program        library program test
 
-This option introduces the options for the
-zzyzx library.
+This option introduces the options for the zzyzx library:
 
   Flg Arg Option-Name    Description
    -c no  library        library test
 
-version and help options:
+version, usage and configuration options:
 
   Flg Arg Option-Name    Description
    -? no  help           Display extended usage information and exit

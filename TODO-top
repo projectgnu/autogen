@@ -1,6 +1,6 @@
 #  -*- Mode: Outline -*-
 
-* Group option nodes in texi doc.
+* NEXT, BREAK and RETURN macros
 
 * It should be possible to adjust AutoGen to use xpath naming.
   http://www.w3.org/TR/xpath

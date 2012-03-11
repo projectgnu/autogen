@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-02-28 19:42:14 bkorb"
+# Time-stamp:      "2012-03-10 09:50:05 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -254,7 +254,7 @@ CASE guard-option-names               =][=
 /*
  *  Make sure there are no #define name conflicts with the option names
  */[=
-    FOR  flag                         =]
+    FOR flag                          =]
 #undef [= (get-up-name "name")        =][=
     ENDFOR flag                       =][=
 
@@ -272,7 +272,7 @@ CASE guard-option-names               =][=
  *  Make sure there are no #define name conflicts with the option names
  */
 #ifndef     NO_OPTION_NAME_WARNINGS[=
-    FOR  flag               =][=
+    FOR flag                =][=
 
     (set! opt-name   (get-up-name "name"))
     (set! undef-list (string-append undef-list "\n# undef " opt-name))
@@ -294,6 +294,7 @@ ESAC on guard-option-names
  */[=
 
 FOR flag =][=
+            (define flag-index (for-index)) =][=
 
   INVOKE save-name-morphs   =][=
 
@@ -313,7 +314,7 @@ FOR flag =][=
  ELSE                       =][=
    INVOKE option-defines    =][=
  ENDIF                      =][=
-ENDFOR  flag
+ENDFOR flag
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

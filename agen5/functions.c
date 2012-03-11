@@ -2,7 +2,7 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-03-04 19:17:32 bkorb"
+ *  Time-stamp:        "2012-03-10 08:46:42 bkorb"
  *
  *  This module implements text functions.
  *
@@ -40,66 +40,65 @@
  *  @samp{IF} and @samp{WHILE}; extending through their respective
  *  terminating macro functions.
 =*/
-macro_t*
-mFunc_Include(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_Include(templ_t * tpl, macro_t * mac)
 {
-    templ_t *   pNewTpl;
-    bool       needFree;
-    char const *  pzFile = eval_mac_expr(&needFree);
-    macro_t*       pM;
+    bool         allocated_name;
+    char const * fname = eval_mac_expr(&allocated_name);
 
-    if (*pzFile != NUL) {
-        pNewTpl = tpl_load(pzFile, pT->td_file);
+    if (*fname != NUL) {
+        templ_t * new_tpl = tpl_load(fname, tpl->td_file);
+        macro_t * last_mac = new_tpl->td_macros + (new_tpl->td_mac_ct - 1);
 
-        /*
-         *  Strip off trailing white space from included templates
-         */
-        pM = pNewTpl->td_macros + (pNewTpl->td_mac_ct - 1);
-        if (pM->md_code == FTYP_TEXT) {
-            char* pz  = pNewTpl->td_text + pM->md_txt_off;
-            char* pzE = pz + strlen(pz);
-            while ((pzE > pz) && IS_WHITESPACE_CHAR(pzE[-1]))  --pzE;
+        if (last_mac->md_code == FTYP_TEXT) {
+            /*
+             *  Strip off trailing white space from included templates
+             */
+            char * pz = new_tpl->td_text + last_mac->md_txt_off;
+            pz = SPN_WHITESPACE_BACK(pz, pz);
 
             /*
              *  IF there is no text left, remove the macro entirely
              */
-            if (pz == pzE)
-                 pNewTpl->td_mac_ct--;
-            else *pzE = NUL;
+            if (pz != new_tpl->td_text + last_mac->md_txt_off) {
+                *pz = NUL;
+            } else {
+                new_tpl->td_mac_ct--;
+                last_mac--;
+            }
         }
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE) {
-            fprintf(trace_fp, TRACE_FN_INC_TPL, pNewTpl->td_file);
+            fprintf(trace_fp, TRACE_FN_INC_TPL, new_tpl->td_file);
             if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                 fprintf(trace_fp, TRACE_FN_INC_LINE, current_tpl->td_file,
-                        pMac->md_line);
+                        mac->md_line);
         }
 
-        generateBlock(pNewTpl, pNewTpl->td_macros,
-                      pNewTpl->td_macros + pNewTpl->td_mac_ct);
-        tpl_unload(pNewTpl);
-        current_tpl = pT;
+        gen_block(new_tpl, new_tpl->td_macros, last_mac + 1);
+        tpl_unload(new_tpl);
+        current_tpl = tpl;
     }
 
-    if (needFree)
-        AGFREE((void*)pzFile);
+    if (allocated_name)
+        AGFREE((void*)fname);
 
-    return pMac + 1;
+    return mac + 1;
 }
 
 
-/*
- *  mLoad_Include  --  digest an INCLUDE macro
+/**
+ *  digest an INCLUDE macro.
  *
  *  Simply verify that there is some argument to this macro.
  *  Regular "expr" macros are their own argument, so there is always one.
  */
-macro_t*
-mLoad_Include(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+macro_t *
+mLoad_Include(templ_t * tpl, macro_t * mac, char const ** ppz)
 {
-    if ((int)pMac->md_res == 0)
-        AG_ABEND_IN(pT, pMac, LD_INC_NO_FNAME);
-    return mLoad_Expr(pT, pMac, ppzScan);
+    if ((int)mac->md_res == 0)
+        AG_ABEND_IN(tpl, mac, LD_INC_NO_FNAME);
+    return mLoad_Expr(tpl, mac, ppz);
 }
 
 
@@ -119,17 +118,17 @@ mLoad_Include(templ_t* pT, macro_t* pMac, char const ** ppzScan)
  *
  *  You may not specify @code{UNKNOWN} explicitly.
 =*/
-macro_t*
-mFunc_Unknown(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_Unknown(templ_t * pT, macro_t * pMac)
 {
-    templ_t * pInv = findTemplate(pT->td_text + pMac->md_name_off);
+    templ_t * pInv = find_tpl(pT->td_text + pMac->md_name_off);
     if (pInv != NULL) {
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
             fprintf(trace_fp, TRACE_FN_REMAPPED, TRACE_FN_REMAP_INVOKE,
                     pMac->md_code, pT->td_file, pMac->md_line);
         pMac->md_code    = FTYP_DEFINE;
         pMac->md_pvt = (void*)pInv;
-        parseMacroArgs(pT, pMac);
+        parse_mac_args(pT, pMac);
         return mFunc_Define(pT, pMac);
     }
 
@@ -154,12 +153,12 @@ mFunc_Unknown(templ_t* pT, macro_t* pMac)
 
         case '`':
             pMac->md_res = EMIT_SHELL;
-            spanQuote(pzExpr);
+            span_quote(pzExpr);
             break;
 
         case '"':
         case '\'':
-            spanQuote(pzExpr);
+            span_quote(pzExpr);
             /* FALLTHROUGH */
 
         default:
@@ -247,10 +246,10 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     char *        pzCopy = pT->td_scan;
     char const *  pzSrc;
-    size_t        srcLen = (size_t)pMac->md_res;         /* macro len  */
+    size_t        src_len = (size_t)pMac->md_res; /* macro len  */
 
-    if (srcLen <= 0)
-        goto return_emtpy_expression;
+    if (src_len <= 0)
+        goto return_emtpy_expr;
 
     pzSrc = (char const*)pMac->md_txt_off; /* macro text */
 
@@ -260,14 +259,14 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
          *  Strip off scheme comments
          */
         do  {
-            while (--srcLen, (*++pzSrc != NL)) {
-                if (srcLen <= 0)
-                    goto return_emtpy_expression;
+            while (--src_len, (*++pzSrc != NL)) {
+                if (src_len <= 0)
+                    goto return_emtpy_expr;
             }
 
-            while (--srcLen, IS_WHITESPACE_CHAR(*++pzSrc)) {
-                if (srcLen <= 0)
-                    goto return_emtpy_expression;
+            while (--src_len, IS_WHITESPACE_CHAR(*++pzSrc)) {
+                if (src_len <= 0)
+                    goto return_emtpy_expr;
             }
         } while (*pzSrc == ';');
         break;
@@ -289,24 +288,24 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
          *  so skip over however many first, then back up over the name.
          */
         while (IS_WHITESPACE_CHAR(pzSrc[-1]))
-            pzSrc--, srcLen++;
-        remLen  = strlen(pzCopy);
-        pzSrc  -= remLen;
-        srcLen += remLen;
+            pzSrc--, src_len++;
+        remLen   = strlen(pzCopy);
+        pzSrc   -= remLen;
+        src_len += remLen;
 
         /*
          *  Now copy over the full canonical name.  Check for errors.
          */
-        remLen = canonicalizeName(pzCopy, pzSrc, (int)srcLen);
-        if (remLen > srcLen)
+        remLen = canonical_name(pzCopy, pzSrc, (int)src_len);
+        if (remLen > src_len)
             AG_ABEND_IN(pT, pMac, LD_UNKNOWN_INVAL_DEF);
 
-        pzSrc  += srcLen - remLen;
-        srcLen  = remLen;
+        pzSrc  += src_len - remLen;
+        src_len = remLen;
 
         pT->td_scan = pzCopy + strlen(pzCopy) + 1;
-        if (srcLen <= 0)
-            goto return_emtpy_expression;
+        if (src_len <= 0)
+            goto return_emtpy_expr;
         break;
     }
     }
@@ -314,18 +313,18 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
     /*
      *  Copy the expression
      */
-    pzCopy = pT->td_scan; /* next text dest   */
+    pzCopy       = pT->td_scan; /* next text dest   */
     pMac->md_txt_off = (pzCopy - pT->td_text);
-    pMac->md_res    = 0;
-    memcpy(pzCopy, pzSrc, srcLen);
-    pzCopy      += srcLen;
+    pMac->md_res = 0;
+    memcpy(pzCopy, pzSrc, src_len);
+    pzCopy      += src_len;
     *(pzCopy++)  = NUL;
     *pzCopy      = NUL; /* double terminate */
     pT->td_scan  = pzCopy;
 
     return pMac + 1;
 
- return_emtpy_expression:
+ return_emtpy_expr:
     pMac->md_txt_off = 0;
     pMac->md_res    = 0;
     return pMac + 1;

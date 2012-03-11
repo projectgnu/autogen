@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2012-02-28 19:49:11 bkorb"
+# Time-stamp:        "2013-03-10 07:14:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,51 +80,45 @@ mv -f ${testname}.$$ ${testname}.help
 
 clean_help > ${testname}.hlp <<_EOF_
 USAGE:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
-
+The following options select definitions, templates and scheme
+functions to use:
    -L str     Template search directory list
 				- may appear multiple times
    -T str     Override template file
 				- may not be preset
    -l str     Library template file
 				- may appear multiple times
-   -b str     Base name for output file(s)
-				- may not be preset
    -S str     Scheme code file to load
    -F str     Load scheme function library
+   -m         Do not use in-mem streams
+The following options modify how output is handled:
+   -b str     Base name for output file(s)
+				- may not be preset
+The following options are often useful while debugging new templates:
+   -t num     Time limit for server shell
+				- It must be in the range:
+				  0 to 3600
+       --- show-defs      This option has been disabled
+   -C         Leave a core dump on a failure exit
+These options can be used to control what gets processed in the
+definitions files and template files:
    -s str     Omit the file with this suffix
 				- prohibits these options:
 				select-suffix
 				- may not be preset
 				- may appear multiple times
-   -o [arg]   specify this output suffix
+   -o str     specify this output suffix
 				- may not be preset
 				- may appear multiple times
-   -m         Do not use in-mem streams
-
-The following options are often useful while debugging new templates:
-
-   -t num     Time limit for server shell
-				- It must be in the range:
-				  0 to 3600
-       --- show-defs      This option has been disabled
-
-These options can be used to control what gets processed
-in the definitions files and template files.
-
    -D str     name to add to definition list
 				- may appear multiple times
    -U str     definition list removal pattern
 				- an alternate for define
-
-These options can be used to automate dependency tracking.
-
+This option is used to automate dependency tracking:
    -M [arg]   emit make dependency file
 				- may not be preset
 				- may appear multiple times
-   -C         Leave a core dump on a failure exit
-
-version and help options:
-
+version, usage and configuration options:
    -R str     Reset an option's state
    -v [arg]   Output version information and exit
    -h         Display extended usage information and exit
@@ -134,18 +128,17 @@ version and help options:
    -P str     Load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
-
 The next option supports vendor supported extra options:
-
    -W str     vendor supported additional options
 				These additional options are:
       definitions=str  Definitions input file
 				- disabled as --no-definitions
 				- enabled by default
 				- may not be preset
+      shell=str        name or path name of shell to use
+      equate=str       characters considered equivalent
       source-time      set mod times to latest source
 				- disabled as --no-source-time
-      equate=str       characters considered equivalent
       writable         Allow output files to be writable
 				- disabled as --not-writable
       loop-limit=num   Limit on increment loops
@@ -153,13 +146,10 @@ The next option supports vendor supported extra options:
 				- It must lie in one of the ranges:
 				  -1 exactly, or
 				  1 to 16777216
-      shell=str        name or path name of shell to use
       trace=KWd        tracing level of detail
       trace-out=str    tracing output file or filter
       used-defines     Show the definitions used
 				- may not be preset
-
-
 ${testname} creates text files from templates using external definitions.
 
 The following option preset mechanisms are supported:

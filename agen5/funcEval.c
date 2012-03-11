@@ -426,7 +426,7 @@ eval(char const * expr)
 
     case '`':
         AGDUPSTR(pzTemp, expr, "shell script");
-        (void)spanQuote(pzTemp);
+        (void)span_quote(pzTemp);
         expr = shell_cmd(pzTemp);
         AGFREE((void*)pzTemp);
         res = AG_SCM_STR02SCM((char*)expr);
@@ -436,7 +436,7 @@ eval(char const * expr)
     case '"':
     case '\'':
         AGDUPSTR(pzTemp, expr, "quoted string");
-        (void)spanQuote(pzTemp);
+        (void)span_quote(pzTemp);
         allocated = true;
         expr = pzTemp;
         /* FALLTHROUGH */
@@ -502,12 +502,12 @@ expr_type(char * pz)
         return EMIT_EXPRESSION;
 
     case '`':
-        spanQuote(pz);
+        span_quote(pz);
         return EMIT_SHELL;
 
     case '"':
     case '\'':
-        spanQuote(pz);
+        span_quote(pz);
         /* FALLTHROUGH */
 
     default:
@@ -556,14 +556,14 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     case '`':
         nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_SHELL;
-        spanQuote(tpl->td_text + mac->md_txt_off);
+        span_quote(tpl->td_text + mac->md_txt_off);
         return nxt_mac;
 
     case '"':
     case '\'':
         nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_STRING;
-        spanQuote(tpl->td_text + mac->md_txt_off);
+        span_quote(tpl->td_text + mac->md_txt_off);
         return nxt_mac;
 
     case '(':
@@ -576,7 +576,7 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     copy = tpl->td_scan;
     mac->md_name_off = (copy - tpl->td_text);
     {
-        size_t remLen = canonicalizeName(copy, src, (int)src_len);
+        size_t remLen = canonical_name(copy, src, (int)src_len);
         if (remLen > src_len)
             AG_ABEND_IN(tpl, mac, LD_EXPR_BAD_NAME);
         src  += src_len - remLen;
@@ -606,7 +606,7 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
          *  THEN find the ending expression...
          */
         if ((mac->md_res & EMIT_ALWAYS) != 0) {
-            char* pzNextExpr = (char*)skipExpression(pz, src_len);
+            char* pzNextExpr = (char*)skip_expr(pz, src_len);
 
             /*
              *  The next expression must be within bounds and space separated

@@ -5,7 +5,7 @@ texi
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2011-01-31 12:09:40 bkorb"
+## Time-stamp:        "2012-03-10 14:06:51 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -118,8 +118,6 @@ Published by Bruce Korb, 910 Redwood Dr., Santa Cruz, CA  95060
 
 @insertcopying
 @end titlepage
-
-@ifinfo
 
 @node Top, Introduction, , (dir)
 @top The Automated Program Generator

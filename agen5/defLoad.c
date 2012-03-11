@@ -255,7 +255,7 @@ number_and_insert_ent(char * name, char const * idx_str)
         ent->de_index = strtol(idx_str, NULL, 0);
 
     else {
-        idx_str = getDefine(idx_str, true);
+        idx_str = get_define_str(idx_str, true);
         if (idx_str != NULL)
              ent->de_index = strtol(idx_str, NULL, 0);
         else ent->de_index = NO_INDEX;

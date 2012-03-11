@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2011-08-07 17:34:06 bkorb"
+# Time-stamp:        "2013-03-10 07:14:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -67,7 +67,7 @@ clean_help > ${testname}.hbase <<- _EOF_
 	  Flg Arg Option-Name    Description
 	   -V KWd verbose        run program with progress info
 
-	version and help options:
+	version, usage and configuration options:
 
 	  Flg Arg Option-Name    Description
 	   -? no  help           Display extended usage information and exit

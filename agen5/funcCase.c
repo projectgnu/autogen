@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2012-03-04 19:16:13 bkorb"
+ *  Time-stamp:        "2013-03-10 07:11:23 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -405,7 +405,7 @@ ag_scm_string_starts_eqv_p(SCM text, SCM substr)
 
 /*=gfunc string_eqv_p
  *
- * what:   caseless string match
+ * what:   caseless match
  * general_use:
  *
  * exparg: text, text to test for pattern
@@ -419,8 +419,9 @@ ag_scm_string_starts_eqv_p(SCM text, SCM substr)
  *       equivalent.  If the arguments are not strings, then the result of the
  *       numeric comparison is returned.
  *
- *       This is an overloaded operation.  If the arguments are not both
- *       strings, then the query is passed through to @code{scm_num_eq_p()}.
+ *       This is an overloaded operation.  If the arguments are both
+ *       numbers, then the query is passed through to @code{scm_num_eq_p()},
+ *       otherwise the result depends on the SCMs being strictly equal.
 =*/
 static tSuccess
 Select_Equivalent_Full(char const * sample, char const * pattern)
@@ -431,20 +432,32 @@ Select_Equivalent_Full(char const * sample, char const * pattern)
 SCM
 ag_scm_string_eqv_p(SCM text, SCM substr)
 {
-    char* pzText;
-    char* pzSubstr;
-
     /*
      *  We are overloading the "=" operator.  Our arguments may be
-     *  numbers...
+     *  numbers or booleans...
      */
-    if (! AG_SCM_STRING_P(text) || ! AG_SCM_STRING_P(substr))
+    teGuileType tt = ag_scm_type_e(text);
+    {
+        teGuileType st = ag_scm_type_e(substr);
+        if (st != tt)
+            return SCM_BOOL_F;
+    }
+
+    switch (tt) {
+    case GH_TYPE_NUMBER:
         return scm_num_eq_p(text, substr);
 
-    pzText   = ag_scm2zchars(text, "text to match");
-    pzSubstr = ag_scm2zchars(substr, "match expr");
+    case GH_TYPE_STRING:
+    {
+        char * pzText   = ag_scm2zchars(text,   "text");
+        char * pzSubstr = ag_scm2zchars(substr, "m expr");
+        return (streqvcmp(pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
+    }
 
-    return (streqvcmp(pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
+    case GH_TYPE_BOOLEAN:
+    default:
+        return (text == substr) ? SCM_BOOL_T : SCM_BOOL_F;
+    }
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -1029,7 +1042,7 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
                             current_tpl->td_file, pMac->md_line);
             }
 
-            generateBlock(pT, pMac + 1, pT->td_macros + pMac->md_sib_idx);
+            gen_block(pT, pMac + 1, pT->td_macros + pMac->md_sib_idx);
             break;
         }
         else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
@@ -1062,7 +1075,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc const * papLP = papLoadProc;
+    tpLoadProc const * papLP = load_proc_table;
 
     /*
      *  IF there is no associated text expression
@@ -1092,7 +1105,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
         for (i=0; i < FUNC_CT; i++)
             apSelectOnly[i] = mLoad_Bogus;
 
-        memcpy((void*)apCaseLoad, apLoadProc, sizeof( apLoadProc ));
+        memcpy((void*)apCaseLoad, base_load_table, sizeof( base_load_table ));
         apSelectOnly[ FTYP_COMMENT] = mLoad_Comment;
         apSelectOnly[ FTYP_SELECT ] = \
         apCaseLoad[   FTYP_SELECT ] = mLoad_Select;
@@ -1102,7 +1115,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Set the "select macro only" loading mode
      */
-    papLoadProc = apSelectOnly;
+    load_proc_table = apSelectOnly;
 
     /*
      *  Save global pointers to the current macro entry.
@@ -1114,7 +1127,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Continue parsing the template from this nested level
      */
-    pEsacMac = parseTemplate(pMac+1, ppzScan);
+    pEsacMac = parse_tpl(pMac+1, ppzScan);
     if (*ppzScan == NULL)
         AG_ABEND_IN(pT, pMac, LD_CASE_NO_ESAC);
 
@@ -1136,7 +1149,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Restore the global macro loading mode
      */
-    papLoadProc  = papLP;
+    load_proc_table  = papLP;
 
     /*
      *  Return the next available macro descriptor
@@ -1173,7 +1186,7 @@ mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Set the global macro loading mode
      */
-    papLoadProc = apCaseLoad;
+    load_proc_table = apCaseLoad;
     pMac->md_res   = 0;
     if (srcLen == 0)
         AG_ABEND_IN(pT, pMac, LD_SEL_EMPTY);
@@ -1301,7 +1314,7 @@ mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan)
      * process the string (backslash fixup).
      */
     if ((*pzScan == '"') || (*pzScan == '\''))
-        spanQuote((void *)pzScan);
+        span_quote((void *)pzScan);
 
  selection_done:
     pMac->md_code = (teFuncType)typ;

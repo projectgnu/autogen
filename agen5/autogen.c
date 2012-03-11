@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-03-04 19:15:23 bkorb"
+ *  Time-stamp:        "2013-03-10 07:29:30 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -93,7 +93,7 @@ inner_main(void * closure, int argc, char ** argv)
         templ_t* pTF = tpl_load(tpl_fname, NULL);
 
         processing_state = PROC_STATE_EMITTING;
-        processTemplate(pTF);
+        process_tpl(pTF);
 
         processing_state = PROC_STATE_CLEANUP;
         cleanup(pTF);
@@ -148,7 +148,8 @@ main(int argc, char ** argv)
 }
 
 /**
- *  This code must run regardless of which exit path is taken
+ * This code must run regardless of which exit path is taken
+ * @param [in] cl_wait Whether or not a child process should be waited for.
  */
 static void
 exit_cleanup(wait_for_pclose_enum_t cl_wait)
@@ -204,6 +205,7 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
 /**
  *  A signal was caught, siglongjmp called and main() has called this.
  *  We do not deallocate stuff so it can be found in the core dump.
+ *  @param[in] sig the signal number
  */
 static void
 cleanup_and_abort(int sig)
@@ -276,6 +278,7 @@ cleanup_and_abort(int sig)
  *  catch_sig_and_bail catches signals we abend on.  The "siglongjmp"
  *  goes back to the real "main()" procedure and it will call
  *  "cleanup_and_abort()", above.
+ *  @param[in] sig the signal number
  */
 static void
 catch_sig_and_bail(int sig)
@@ -300,6 +303,7 @@ catch_sig_and_bail(int sig)
  *  it will kill us.  If we set it to ignore, it will be inherited.
  *  Therefore, always in all programs set it to call a procedure.
  *  The "wait(3)" call will do magical things, but will not override SIGIGN.
+ *  @param[in] sig the signal number
  */
 static void
 ignore_signal(int sig)

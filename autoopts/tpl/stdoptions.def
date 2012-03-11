@@ -1,7 +1,7 @@
 
 /* -*- Mode: Text -*-
  *
- * Time-stamp:      "2010-02-24 08:40:14 bkorb"
+ * Time-stamp:      "2013-03-10 07:50:01 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -31,8 +31,8 @@ flag = {
     name        = autoopts_std_options;
     documentation;
     descrip = <<- _EOF_
-	The following options are commonly used and are provided and supported
-	by AutoOpts:
+	The following options are commonly used and are
+	provided and supported by AutoOpts
 	_EOF_;
 };
 # endif
