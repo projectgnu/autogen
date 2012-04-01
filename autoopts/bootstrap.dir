@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2012-01-29 16:06:25 bkorb"
+# Time-stamp:      "2012-03-31 13:06:25 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -26,17 +26,7 @@ burn_aover() {
     eval "${agvars}"
     vers_curr=$(expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION)
 
-    sedcmd="s=@CONFIG_SHELL@=$(which bash)=
-	s=@AO_TEMPLATE_VERSION@=${vers_curr}=
-	s=@bindir@=$(dirname $(which columns))="
-    for f in $(echo "${agvars}" | sed 's/=.*//')
-    do
-        eval v=\${$f}
-        sedcmd="${sedcmd}${nl}s%@${f}@%${v}%g"
-    done
-
     cd tpl
-    sed "${sedcmd}" tpl-config-tlib.in > tpl-config.tlib
     for f in *.sh *.pl
     do  g=${f%.sh} ; g=${g%.pl}
         cat $f > $g

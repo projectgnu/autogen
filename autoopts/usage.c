@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2012-03-04 13:11:14 bkorb"
+ * Time-stamp:      "2012-03-31 13:20:53 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -55,11 +55,11 @@ prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
                arg_types_t * pAT, char const * usefmt);
 
 static void
-prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle);
+prt_vendor_opts(tOptions * pOpts, char const * pOptTitle);
 
 static void
 prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
-               arg_types_t * pAT, char const * pOptTitle);
+               char const * pOptTitle);
 
 static void
 prt_ini_list(char const * const * papz, bool * pInitIntro,
@@ -116,7 +116,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
     };
 #   undef  _aof_
 
-    ao_flags_t flg = 0;
+    ao_flags_t flg = (ao_flags_t)0;
 
     if (flg_txt == NULL) {
         flg_txt = getenv("AUTOOPTS_USAGE");
@@ -146,7 +146,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
         if (! IS_END_LIST_ENTRY_CHAR(flg_txt[fnt->fnm_len]))
             return;
 
-        flg |= 1 << ix;
+        flg |= (ao_flags_t)(1 << ix);
         flg_txt = SPN_WHITESPACE_CHARS(flg_txt + fnt->fnm_len);
 
         if (*flg_txt == NUL)
@@ -493,10 +493,9 @@ bogus_desc:
  *
  * @param pOptions the program option descriptor
  * @param pOD      the option descriptor
- * @param pAT      names of the option argument types
  */
 static void
-prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle)
+prt_vendor_opts(tOptions * pOpts, char const * pOptTitle)
 {
     static unsigned int const not_vended_mask =
         OPTST_NO_USAGE_MASK | OPTST_DOCUMENT;
@@ -534,7 +533,7 @@ prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle)
             continue;
 
         prt_one_vendor(pOpts, pOD, &argTypes, vfmt);
-        prt_extd_usage(pOpts, pOD, &argTypes, pOptTitle);
+        prt_extd_usage(pOpts, pOD, pOptTitle);
 
     } while (pOD++, (--ct > 0));
 }
@@ -548,11 +547,11 @@ prt_vendor_opts(tOptions * pOpts, arg_types_t * pAT, char const * pOptTitle)
  */
 static void
 prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
-               arg_types_t * pAT, char const * pOptTitle)
+               char const * pOptTitle)
 {
     if (  ((pOpts->fOptSet & OPTPROC_VENDOR_OPT) != 0)
        && (pOD->optActualValue == VENDOR_OPTION_VALUE)) {
-        prt_vendor_opts(pOpts, pAT, pOptTitle);
+        prt_vendor_opts(pOpts, pOptTitle);
         return;
     }
 
@@ -879,7 +878,7 @@ prt_opt_usage(tOptions * pOpts, int ex_code, char const * pOptTitle)
          *  THEN print all the extra info
          */
         if (ex_code == EXIT_SUCCESS)
-            prt_extd_usage(pOpts, pOD, &argTypes, pOptTitle);
+            prt_extd_usage(pOpts, pOD, pOptTitle);
 
     } while (pOD++, optNo++, (--ct > 0));
 

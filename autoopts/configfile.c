@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-03-04 14:34:47 bkorb"
+ *  Time-stamp:      "2012-03-31 13:56:11 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -210,6 +210,8 @@ optionFindValue(const tOptDesc* pOptDesc, char const* pzName,
 
 /*=export_func  optionFindNextValue
  *
+ * FIXME: the handling of 'pzName' and 'pzVal' is just wrong.
+ *
  * what:  find a hierarcicaly valued option instance
  * arg:   + const tOptDesc* + pOptDesc + an option with a nested arg type +
  * arg:   + const tOptionValue* + pPrevVal + the last entry +
@@ -238,8 +240,11 @@ tOptionValue const *
 optionFindNextValue(const tOptDesc * pOptDesc, const tOptionValue * pPrevVal,
                     char const * pzName, char const * pzVal)
 {
-    int foundOldVal = 0;
+    bool old_found = false;
     tOptionValue* pRes = NULL;
+
+    (void)pzName;
+    (void)pzVal;
 
     if (  (pOptDesc == NULL)
        || (OPTST_GET_ARGTYPE(pOptDesc->fOptState) != OPARG_TYPE_HIERARCHY))  {
@@ -255,19 +260,14 @@ optionFindNextValue(const tOptDesc * pOptDesc, const tOptionValue * pPrevVal,
         int    ct   = pAL->useCt;
         void** ppOV = (void**)pAL->apzArgs;
 
-        if (ct == 0) {
-            errno = ENOENT;
-            break;
-        }
-
         while (--ct >= 0) {
             tOptionValue* pOV = *(ppOV++);
-            if (foundOldVal) {
+            if (old_found) {
                 pRes = pOV;
                 break;
             }
             if (pOV == pPrevVal)
-                foundOldVal = 1;
+                old_found = true;
         }
         if (pRes == NULL)
             errno = ENOENT;
@@ -1240,6 +1240,9 @@ parse_attrs(tOptions * pOpts, char * pzText, tOptionLoadMode * pMode,
 static char*
 parse_keyword(tOptions * pOpts, char * pzText, tOptionValue * pType)
 {
+    (void)pOpts;
+    (void)pType;
+
     return skip_unkn(pzText);
 }
 
@@ -1252,6 +1255,9 @@ parse_keyword(tOptions * pOpts, char * pzText, tOptionValue * pType)
 static char*
 parse_set_mem(tOptions * pOpts, char * pzText, tOptionValue * pType)
 {
+    (void)pOpts;
+    (void)pType;
+
     return skip_unkn(pzText);
 }
 

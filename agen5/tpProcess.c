@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2012-03-10 09:15:11 bkorb"
+ * Time-stamp:        "2012-03-31 13:30:30 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -55,7 +55,7 @@ gen_block(templ_t * tpl, macro_t * mac, macro_t * emac)
     current_tpl = tpl;
 
     while ((mac != NULL) && (mac < emac)) {
-        teFuncType fc = mac->md_code;
+        mac_func_t fc = mac->md_code;
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
@@ -78,7 +78,7 @@ gen_block(templ_t * tpl, macro_t * mac, macro_t * emac)
 static void
 trace_macro(templ_t * tpl, macro_t * mac)
 {
-    teFuncType fc = mac->md_code;
+    mac_func_t fc = mac->md_code;
     if (fc >= FUNC_CT)
         fc = FTYP_BOGUS;
 
@@ -107,11 +107,11 @@ trace_macro(templ_t * tpl, macro_t * mac)
 static void
 do_stdout_tpl(templ_t * tpl)
 {
-    SCM    res;
+    SCM res;
 
     last_scm_cmd = NULL; /* We cannot be in Scheme processing */
 
-    switch (setjmp (abort_jmp_buf)) {
+    switch (setjmp(abort_jmp_buf)) {
     case SUCCESS:
         break;
 
@@ -128,6 +128,7 @@ do_stdout_tpl(templ_t * tpl)
 
     case FAILURE:
         exit(EXIT_FAILURE);
+        /* NOTREACHED */
     }
 
     curr_sfx         = DO_STDOUT_TPL_NOSFX;
@@ -268,6 +269,7 @@ process_tpl(templ_t * tpl)
             do ospec = next_out_spec(ospec);
             while (ospec != NULL);
             exit(EXIT_FAILURE);
+            /* NOTREACHED */
         }
 
         output_specs = next_out_spec(ospec);

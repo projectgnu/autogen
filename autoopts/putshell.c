@@ -2,7 +2,7 @@
 /**
  * \file putshell.c
  *
- * Time-stamp:      "2012-03-04 13:31:38 bkorb"
+ * Time-stamp:      "2012-03-31 13:14:18 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and print them to standard out in a fashion that
@@ -182,11 +182,13 @@ print_stacked_arg(tOptions * pOpts, tOptDesc * pOD)
 static void
 print_reordering(tOptions * pOpts)
 {
-    int  optIx;
+    unsigned int optIx;
 
     fputs(set_dash, stdout);
 
-    for (optIx = pOpts->curOptIdx; optIx < pOpts->origArgCt; optIx++) {
+    for (optIx = pOpts->curOptIdx;
+         optIx < pOpts->origArgCt;
+         optIx++) {
 
         char* pzArg = pOpts->origArgVect[ optIx ];
 

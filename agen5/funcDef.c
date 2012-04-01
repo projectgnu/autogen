@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2012-03-10 10:46:06 bkorb"
+ *  Time-stamp:        "2012-03-31 13:47:27 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -51,7 +51,7 @@ static void
 prep_invoke_args(macro_t * mac);
 
 static void
-build_defs(int defCt, def_list_t * pList);
+build_defs(int def_ct, def_list_t * def_list);
 
 static templ_t *
 new_template(templ_t * base_tpl, macro_t * mac, char const * scan);
@@ -400,6 +400,8 @@ prep_invoke_args(macro_t * mac)
 macro_t *
 mFunc_Return(templ_t * tpl, macro_t * mac)
 {
+    (void)tpl;
+    (void)mac;
     longjmp(curr_ivk_info->ii_env, 1);
 }
 

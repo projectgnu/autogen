@@ -1,7 +1,7 @@
 
 /**
  *  \file load.c
- *  Time-stamp:      "2012-03-04 13:19:13 bkorb"
+ *  Time-stamp:      "2012-03-31 13:13:34 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -34,8 +34,7 @@ add_prog_path(char * pzBuf, int bufSize, char const * pzName,
               char const * pzProgPath);
 
 static bool
-add_env_val(char * pzBuf, int bufSize, char const * pzName,
-            char const * pzProgPath);
+add_env_val(char * pzBuf, int bufSize, char const * pzName);
 
 static char *
 assemble_arg_val(char * pzTxt, tOptionLoadMode mode);
@@ -141,7 +140,7 @@ optionMakePath(char * pzBuf, int bufSize, char const * pzName,
         break;
 
     default:
-        if (! add_env_val(pzBuf, bufSize, pzName, pzProgPath))
+        if (! add_env_val(pzBuf, bufSize, pzName))
             return false;
     }
 
@@ -152,7 +151,7 @@ optionMakePath(char * pzBuf, int bufSize, char const * pzName,
             return false;
 
         name_len = strlen(pz);
-        if (name_len >= bufSize) {
+        if (name_len >= (size_t)bufSize) {
             free(pz);
             return false;
         }
@@ -242,10 +241,9 @@ add_prog_path(char * pzBuf, int bufSize, char const * pzName,
 
 
 static bool
-add_env_val(char * pzBuf, int bufSize, char const * pzName,
-            char const * pzProgPath)
+add_env_val(char * pzBuf, int bufSize, char const * pzName)
 {
-    char* pzDir = pzBuf;
+    char * pzDir = pzBuf;
 
     for (;;) {
         int ch = (int)*++pzName;

@@ -2,7 +2,7 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2012-03-10 10:12:20 bkorb"
+ *  Time-stamp:        "2012-03-31 13:00:08 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -412,7 +412,7 @@ loadScheme(void)
     pzEnd = (char*)scm2display(res); /* ignore const-ness */
     cctx->scx_line = next_ln;
 
-    if (strlen(pzEnd) >= schemeLen) {
+    if ((int)strlen(pzEnd) >= schemeLen) {
         AGDUPSTR(pzEnd, pzEnd, "SCM Result");
 
         token_str = pzEnd;
@@ -559,7 +559,7 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
                 *pRetVal = aKeywordTkn[ kw_ix ];
                 break;
             }
-        } while (++kw_ix < KEYWORD_CT);
+        } while (++kw_ix < (int)KEYWORD_CT);
 
         *pzScan = sv_ch;         /* restore the following character  */
     }

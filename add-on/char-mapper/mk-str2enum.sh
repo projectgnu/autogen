@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#  Time-stamp:        "2012-02-12 16:21:21 bkorb"
+#  Time-stamp:        "2012-03-31 13:33:05 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -184,6 +184,20 @@ init() {
     ( *x* ) eval "trap 'echo ${tmpdir} left undisturbed' EXIT" ;;
     (  *  ) eval "trap 'cd ${HOME} ; rm -rf ${tmpdir}' EXIT" ;;
     esac
+
+    command -v columns >/dev/null || {
+        columns() {
+            while [[ "$1" =~ -.* ]]
+            do shift ; done
+            while :
+            do
+                if test $# -gt 1
+                then echo "        $1,"; shift
+                else echo "        $1;" ; break
+                fi
+            done
+        }
+    }
 }
 
 mk_header() {

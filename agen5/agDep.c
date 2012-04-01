@@ -2,7 +2,7 @@
 /**
  * @file tpDep.c
  *
- * Time-stamp:        "2012-03-04 19:03:50 bkorb"
+ * Time-stamp:        "2012-03-31 17:15:43 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -64,10 +64,11 @@ add_source_file(char const * pz)
     }
 
     {
-        flist_t * p = AGALOC(sizeof(*p) + strlen(pz), "sfile");
+        size_t    l = strlen(pz);
+        flist_t * p = AGALOC(sizeof(*p) + l, "sfile");
         *lp = p;
         p->next = NULL;
-        strcpy(p->fname, pz);
+        memcpy(p->fname, pz, l + 1);
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
             fprintf(trace_fp, TRACE_ADD_SRC_FILE_FMT, p->fname);
     }
@@ -136,10 +137,11 @@ add_target_file(char const * pz)
     }
 
     {
-        flist_t * p = AGALOC(sizeof(*p) + strlen(pz), "tfile");
+        size_t    l = strlen(pz);
+        flist_t * p = AGALOC(sizeof(*p) + l, "tfile");
         *lp = p;
         p->next = NULL;
-        strcpy(p->fname, pz);
+        memcpy(p->fname, pz, l + 1);
         if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
             fprintf(trace_fp, TRACE_ADD_TARG_FILE_FMT, p->fname);
     }
@@ -293,10 +295,15 @@ tidy_dep_file(void)
         memcpy(pzn, dep_file, len);
         pzn[len] = NUL;
 
+        unlink(pzn);
         rename(dep_file, pzn);
         AGFREE(dep_file);
         dep_file = pzn;
     } while (false);
+
+    fchmod(fileno(dep_fp), fil_mode);
+    fclose(dep_fp);
+    dep_fp = NULL;
 
     {
         struct utimbuf tbuf = {
@@ -319,7 +326,6 @@ tidy_dep_file(void)
         }
     }
 
-    chmod(dep_file, fil_mode);
     AGFREE(dep_file);
 }
 
@@ -391,18 +397,19 @@ wrap_up_depends(void)
          *  the dependency file name.  The dependency file will not be
          *  removed, but it will be sent waaay back in time.
          */
-        char * p, * q;
+        char * p, *q;
         AGDUPSTR(p, dep_file, "xx");
+
         q = p + strlen(p) - (TEMP_SUFFIX_LEN - 2);
         if ((q > p) && (*q == '-'))
             *q = NUL;
+        q = p;
 
         /* DO NOT REMOVE DEPENDENCY FILE */
         if (strcmp(dep_target, p) == 0)
-            *p = NUL;
-
-        fprintf(dep_fp, DEP_FILE_CLEAN_FMT, p, pz_targ_base, dep_target);
-        AGFREE(p);
+            p = (char *)zNil;
+        fprintf(dep_fp, DEP_FILE_CLEAN_FMT, dep_target, pz_targ_base, p);
+        AGFREE(q);
     }
 
 #if 0
@@ -417,11 +424,13 @@ wrap_up_depends(void)
              */
             static char const incfmt[] =
                 "\n%s : %s\ninclude %s\n";
-
+            static char const targ[] = ".targ";
             size_t ln = strlen(pz);
-            char * pt = AGALOC(ln + 6, "targ");
-            memcpy(pt, pz, ln - 3);
-            strcpy(pt + ln - 3, "targ");
+            char * pt = AGALOC(ln + sizeof(targ), targ);
+            if (strcmp(pz + ln - 4, ".dep") == 0)
+                ln -= 4;
+            memcpy(pt, pz, ln);
+            memcpy(pt + ln, targ, sizeof(targ));
             fprintf(dep_fp, incfmt, dep_target, pt, pz);
             AGFREE(pt);
         }
@@ -429,7 +438,5 @@ wrap_up_depends(void)
         AGFREE(pz);
     }
 #endif
-    fclose(dep_fp);
-    dep_fp = NULL;
     tidy_dep_file();
 }

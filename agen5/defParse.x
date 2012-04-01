@@ -4,7 +4,7 @@
  *
  * Definition parser functions.
  *
- *  Time-stamp:        "2012-03-04 19:50:52 bkorb"
+ *  Time-stamp:        "2012-03-31 13:30:28 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -45,16 +45,16 @@ dp_invalid_transition(te_dp_state st, te_dp_event evt)
 }
 
 static te_dp_state
-dp_do_empty_val(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_empty_val(te_dp_state initial, te_dp_state maybe_next,
+                te_dp_event trans_evt)
 {
     /*
      *  Our state is either "have-name" or "indx-name" and we found a ';',
      *  end of statement.  It is a string value with an empty string.
      */
     def_ent_t * pDE = number_and_insert_ent(pz_new_name, NULL);
+
+    (void)initial; (void)trans_evt;
 
     pDE->de_val.dvu_text = (char *)zNil;
     pDE->de_type    = VALTYP_TEXT;
@@ -64,24 +64,23 @@ dp_do_empty_val(
 }
 
 static te_dp_state
-dp_do_end_block(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_end_block(te_dp_state initial, te_dp_state maybe_next,
+                te_dp_event trans_evt)
 {
     if (ent_stack_depth <= 0)
         yyerror((void*)"Too many close braces");
+
+    (void)initial; (void)trans_evt;
 
     curr_ent = ent_stack[ ent_stack_depth-- ];
     return maybe_next;
 }
 
 static te_dp_state
-dp_do_have_name_lit_eq(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_have_name_lit_eq(te_dp_state initial, te_dp_state maybe_next,
+                       te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     /*
      *  Create a new entry but defer "makeMacro" call until we have the
      *  assigned value.
@@ -91,11 +90,10 @@ dp_do_have_name_lit_eq(
 }
 
 static te_dp_state
-dp_do_indexed_name(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_indexed_name(te_dp_state initial, te_dp_state maybe_next,
+                   te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     /*
      *  Create a new entry with a specified indes, but defer "makeMacro" call
      *  until we have the assigned value.
@@ -105,11 +103,10 @@ dp_do_indexed_name(
 }
 
 static te_dp_state
-dp_do_invalid(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_invalid(te_dp_state initial, te_dp_state maybe_next,
+              te_dp_event trans_evt)
 {
+    (void)maybe_next;
     dp_invalid_transition(initial, trans_evt);
     yyerror((void*)"invalid transition");
     /* NOTREACHED */
@@ -117,11 +114,10 @@ dp_do_invalid(
 }
 
 static te_dp_state
-dp_do_need_name_end(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_need_name_end(te_dp_state initial, te_dp_state maybe_next,
+                    te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     if (ent_stack_depth != 0)
         yyerror((void*)"definition blocks were left open");
 
@@ -141,21 +137,19 @@ dp_do_need_name_end(
 }
 
 static te_dp_state
-dp_do_need_name_var_name(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_need_name_var_name(te_dp_state initial, te_dp_state maybe_next,
+                         te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     pz_new_name = token_str;
     return maybe_next;
 }
 
 static te_dp_state
-dp_do_next_val(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_next_val(te_dp_state initial, te_dp_state maybe_next,
+               te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     /*
      *  Clone the entry name of the current entry.
      */
@@ -164,11 +158,10 @@ dp_do_next_val(
 }
 
 static te_dp_state
-dp_do_start_block(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_start_block(te_dp_state initial, te_dp_state maybe_next,
+                  te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     if (curr_ent->de_type == VALTYP_TEXT)
         yyerror((void*)"assigning a block value to text name");
     curr_ent->de_type = VALTYP_BLOCK; /* in case not yet determined */
@@ -195,11 +188,10 @@ dp_do_start_block(
 }
 
 static te_dp_state
-dp_do_str_value(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_str_value(te_dp_state initial, te_dp_state maybe_next,
+                te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     if (curr_ent->de_type == VALTYP_BLOCK)
         yyerror((void*)"assigning a block value to text name");
 
@@ -218,11 +210,10 @@ dp_do_str_value(
 }
 
 static te_dp_state
-dp_do_tpl_name(
-    te_dp_state initial,
-    te_dp_state maybe_next,
-    te_dp_event trans_evt )
+dp_do_tpl_name(te_dp_state initial, te_dp_state maybe_next,
+               te_dp_event trans_evt)
 {
+    (void)initial; (void)trans_evt;
     /*
      *  Allow this routine to be called multiple times.
      *  This may happen if we include another definition file.

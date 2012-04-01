@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2012-02-12 09:59:30 bkorb"
+ *  Time-stamp:        "2012-03-31 13:39:34 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -535,7 +535,7 @@ subblock_str(char ** ppzText, uint_t sepChar, char * pzOut)
          *  separation character.
          */
         while (isspace(*pzText)) pzText++;
-        if (*pzText == sepChar) {
+        if ((uint_t)*pzText == sepChar) {
             pzText++;
             while (isspace(*pzText)) pzText++;
         }

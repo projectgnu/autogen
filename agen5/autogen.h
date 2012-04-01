@@ -2,7 +2,7 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2012-03-10 09:43:54 bkorb"
+ *  Time-stamp:        "2012-03-31 13:32:23 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -114,7 +114,6 @@ typedef struct scan_context     scan_ctx_t;
 typedef struct defEntry         def_ent_t;
 typedef struct macro_desc       macro_t;
 typedef struct template_desc    templ_t;
-typedef struct for_info         for_info_t;
 typedef struct for_state        for_state_t;
 typedef struct tlib_mark        tlib_mark_t;
 
@@ -182,7 +181,7 @@ struct tlib_mark {
 #define EMIT_NO_DEFINE      0x0800  /* don't get defined value */
 
 struct macro_desc {
-    teFuncType    md_code;     /* Macro function           */
+    mac_func_t    md_code;     /* Macro function           */
     int           md_line;     /* of macro def             */
     int           md_end_idx;  /* End of block macro       */
     int           md_sib_idx;  /* Sibling macro (ELIF or SELECT) */
@@ -215,15 +214,15 @@ typedef enum {
     VALTYP_UNKNOWN = 0,
     VALTYP_TEXT,
     VALTYP_BLOCK
-} teValType;
+} val_typ_t;
 
 
 #define NO_INDEX ((short)0x80DEAD)
 
 typedef struct def_ctx def_ctx_t;
 struct def_ctx {
-    def_ent_t *   dcx_defent;   /* ptr to current def set     */
-    def_ctx_t *   dcx_prev;     /* ptr to previous def set    */
+    def_ent_t *   dcx_defent;   //!< ptr to current def set
+    def_ctx_t *   dcx_prev;     //!< ptr to previous def set
 };
 
 typedef union {
@@ -232,16 +231,16 @@ typedef union {
 } def_val_u;
 
 struct defEntry {
-    def_ent_t *   de_next;      /* next member of same level  */
-    def_ent_t *   de_twin;      /* next member with same name */
-    def_ent_t *   de_ptwin;     /* previous memb. of level    */
-    def_ent_t *   de_etwin;     /* head of chain to end ptr   */
-    char *        de_name;      /* name of this member        */
-    long          de_index;     /* index among twins          */
-    def_val_u     de_val;       /* string or list of children */
-    char *        de_file;      /* definition file name       */
-    int           de_line;      /* def file source line       */
-    teValType     de_type;      /* text/block/not defined yet */
+    def_ent_t *   de_next;      //!< next member of same level
+    def_ent_t *   de_twin;      //!< next member with same name
+    def_ent_t *   de_ptwin;     //!< previous memb. of level
+    def_ent_t *   de_etwin;     //!< head of chain to end ptr
+    char *        de_name;      //!< name of this member
+    long          de_index;     //!< index among twins
+    def_val_u     de_val;       //!< string or list of children
+    char *        de_file;      //!< definition file name
+    int           de_line;      //!< def file source line
+    val_typ_t     de_type;      //!< text/block/not defined yet
 };
 
 struct scan_context {
@@ -277,12 +276,6 @@ struct out_stack {
  *
  *  FOR loop processing state
  */
-struct for_info {
-    int           fi_depth;
-    int           fi_alloc;
-    for_state_t * fi_data;
-};
-
 /**
  * The current state of each active FOR loop.
  */
@@ -376,8 +369,6 @@ MODE jmp_buf        abort_jmp_buf;
 MODE ivk_info_t     root_ivk_info    VALUE( { 0 } );
 MODE ivk_info_t *   curr_ivk_info    VALUE( &root_ivk_info );
 MODE for_state_t *  for_state        VALUE( NULL );
-MODE for_info_t *   cur_for_info VALUE( (void *)&root_ivk_info.ii_for_depth );
-#define forInfo     (*cur_for_info)
 MODE FILE *         trace_fp         VALUE( NULL );
 /**
  * temporary file name template

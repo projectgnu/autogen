@@ -1,5 +1,5 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2011-04-03 13:51:36 bkorb"
+[= # Time-stamp:        "2012-03-31 13:43:01 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -30,20 +30,21 @@
 static char const zFsError[] = "%s fs ERROR %d (%s) on %s\n";
 
 static void
-add_arg(char const* pzArg, int ix)
+add_arg(char const * arg, int ix)
 {
-    char** pArgv = xml2agOptions.origArgVect;
-    if (ix >= xml2agOptions.origArgCt) {
-        xml2agOptions.origArgCt += 5;
-        pArgv = realloc(pArgv, sizeof( void* ) * (xml2agOptions.origArgCt+1));
-        if (pArgv == NULL) {
-            fprintf(stderr, "No memory for %d args\n",
-                    xml2agOptions.origArgCt);
+    char ** arg_vec = xml2agOptions.origArgVect;
+    int  arg_ct = xml2agOptions.origArgCt;
+
+    if (ix >= (int)arg_ct) {
+        arg_ct += 5;
+        arg_vec = realloc(arg_vec, sizeof(void*) * (arg_ct+1));
+        if (arg_vec == NULL) {
+            fprintf(stderr, "No memory for %d args\n", arg_ct);
             exit(EXIT_FAILURE);
         }
-        xml2agOptions.origArgVect = pArgv;
+        xml2agOptions.origArgVect = arg_vec;
     }
-    pArgv[ ix ] = (void*)pzArg;
+    arg_vec[ ix ] = (void*)arg;
 }
 
 static int

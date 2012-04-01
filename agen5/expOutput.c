@@ -2,7 +2,7 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2012-03-04 13:51:35 bkorb"
+ *  Time-stamp:        "2012-03-31 13:45:53 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -41,30 +41,6 @@ static int            suspendCt   = 0;
 static int            suspAllocCt = 0;
 static tSuspendName*  pSuspended  = NULL;
 static int            outputDepth = 1;
-
-/**
- * chmod u+w on a file.
- */
-static void
-make_writable(char* pzFileName)
-{
-    struct stat sbuf;
-
-#ifdef DEBUG_ENABLED
-    /*
-     *  "stat(2)" does not initialize the entire structure.
-     */
-    memset(&sbuf, NUL, sizeof(sbuf));
-#endif
-
-    stat(pzFileName, &sbuf);
-
-    /*
-     *  Or in the user write bit
-     */
-    sbuf.st_mode |= S_IWUSR;
-    chmod(pzFileName, sbuf.st_mode & S_IAMB);
-}
 
 /**
  * return the current line number
@@ -175,14 +151,15 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
             AG_CANT(OUTPUT_NO_UNLINK, pz);
     }
 
-    {
-        static int const w_ok = ~WRITE_MASK;
+    /*
+     * If we cannot write to the file, try to change permissions.
+     */
+    if (  (access(fname, W_OK) != 0)
+       && (errno != ENOENT)) {
         struct stat sbuf;
         if (stat(fname, &sbuf) == 0) {
-            if ((sbuf.st_mode & w_ok) == 0) {
-                sbuf.st_mode |= w_ok;
-                chmod(fname, sbuf.st_mode & 07777);
-            }
+            sbuf.st_mode |= S_IWUSR;
+            chmod(fname, sbuf.st_mode & 07777);
         }
     }
 
@@ -190,12 +167,10 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
     if (p->stk_fp == NULL)
         AG_CANT(OUTPUT_NO_OPEN, pz);
 
-    p->stk_prev = cur_fpstack;
-    cur_fpstack   = p;
+    p->stk_prev  = cur_fpstack;
+    cur_fpstack  = p;
     p->stk_flags = FPF_FREE | flags;
     outputDepth++;
-
-    make_writable(pz);
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(trace_fp, TRACE_OPEN_OUT, __func__, fname, mode);

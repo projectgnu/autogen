@@ -192,10 +192,14 @@ typedef int snv_wint_t;
 #define SNV_LONG_TO_POINTER(i)	((snv_pointer)(long)(i))
 #define SNV_ULONG_TO_POINTER(u)	((snv_pointer)(unsigned long)(u))
 
+#ifdef HAVE_STDBOOL_H
+#include <stdbool.h>
+#else
 typedef enum {
-    SNV_FALSE = 0,
-    SNV_TRUE  = 1
-} snv_bool_t;
+    false = 0,
+    true  = 1
+} bool;
+#endif
 
 #ifdef __CYGWIN32__
 #  ifndef __CYGWIN__

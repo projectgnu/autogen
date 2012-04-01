@@ -1,3 +1,35 @@
+2012-03-31  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am: Remove lists of generated things and derive them
+	from the script that has to know about them:  bootstrap.dir
+	* agen5/ag-text.def: make the touchback silent and fix the format numbers
+	* agen5/agDep.c (wrap_up_depends): use the fixed format correctly
+	* agen5/bootstrap.dir: edit Makefile.am, too
+	* agen5/fsm-macro.tlib: use the built-in temp directory
+	* agen5/fsm-trans.tlib: likewise
+	* config/bootstrap.shlib (make_opts) cleanup for dependency generation
+	(make_proto): likewise
+	* doc/auto_gen-tpl.in: remove use of ADDON_MENU
+	* doc/mk-agen-texi-in: stop providing ADDON_MENU
+
+2012-03-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/ag-text.def: correct which file is to be removed
+	* agen5/agDep.c: prefer memcpy to strcpy
+	(tidy_dep_file): prefer fchmod to chmod
+	* agen5/expOutput.c (make_writable): obsolete
+	* agen5/expString.c (stringify_for_sh): remove unused parameter
+	* agen5/funcFor.c (call_gen_block): new function to ensure longjmp works
+	* autoopts/test/defs.in (CFLAGS): -Werror may be suffixed.  Remove all.
+	(clean_help): no need for "egrep -v" when sed can do the job
+	* autoopts/load.c (add_env_val): no need to fix -Werror here
+	* autoopts/tpl/opt*: remove texi-isms from help text.
+	* autoopts/usage.c (prt_extd_usage): arg types param is not used.
+	(prt_one_vendor): thus, here, too.
+	(prt_vendor_opts): and here as well.
+	* doc/mk-agen-texi-in: -Werror removal needed here, too.
+	* everywhere: warning cleanups & de-camelization
+
 2012-03-11  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcCase.c (ag_scm_string_eqv_p): compare booleans, too

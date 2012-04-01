@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # vendor.test ---  test the vendor-opt option
 #
-# Time-stamp:        "2013-03-10 07:14:19 bkorb"
+# Time-stamp:        "2012-03-31 13:11:19 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -32,7 +32,8 @@
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 
-sedcmd='
+{
+    sedcmd='
 s/long-opts;/vendor-opt;/
 /#include "autogen.h"/d
 /^prog-name/s/=.*/= '${testname}';/
@@ -48,7 +49,6 @@ s/AutoGen/'${testname}'/g
 /flag-code *=/d
 '
 
-{
     ${SED} "$sedcmd" ${top_srcdir}/agen5/opts.def
     cat <<- _EOF_
 	config-header = ${testname}-config.h;
@@ -74,14 +74,15 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
+sedcmd=''
 HOME=${TMPDIR} compile "-h"
 ${SED} 1d ${testname}.help > ${testname}.$$
 mv -f ${testname}.$$ ${testname}.help
 
 clean_help > ${testname}.hlp <<_EOF_
 USAGE:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
-The following options select definitions, templates and scheme
-functions to use:
+The following options select definitions, templates and scheme functions
+to use:
    -L str     Template search directory list
 				- may appear multiple times
    -T str     Override template file

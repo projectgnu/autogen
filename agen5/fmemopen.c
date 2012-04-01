@@ -452,7 +452,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
         buf_bytes_t *p = (buf_bytes_t*)buf;
 
         pFMC->eof = 0;
-        while ((*p != NUL) && (++(pFMC->eof) < len))  p++;
+        while ((*p != NUL) && (++(pFMC->eof) < (size_t)len))  p++;
         pFMC->next_ix =
             (pFMC->mode & FLAG_BIT(append)) ? pFMC->eof : 0;
     }
@@ -461,7 +461,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
      *  text mode - NUL terminate buffer, if it fits.
      */
     if (  ((pFMC->mode & FLAG_BIT(binary)) == 0)
-       && (pFMC->next_ix < len)) {
+       && (pFMC->next_ix < (size_t)len)) {
         pFMC->buffer[pFMC->next_ix] = NUL;
     }
 
@@ -698,7 +698,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
     fmem_cookie_t * cookie;
     fmemc_get_buf_addr_t * gba;
 
-    if (req != IOCTL_FMEMC_GET_BUF_ADDR) {
+    if ((unsigned int)req != IOCTL_FMEMC_GET_BUF_ADDR) {
         /*
          *  It is not any of the IOCTL commands we know about.
          */

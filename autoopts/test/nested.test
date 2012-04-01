@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nested.test ---  test nested option values
 #
-# Time-stamp:        "2011-08-07 17:33:25 bkorb"
+# Time-stamp:        "2012-03-31 13:10:48 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -188,7 +188,7 @@ cmp -s ${testname}-res1.* || \
 
 # # # # # # # # # # DOUBLE ARG TEST # # # # # # # # #
 
-arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
+arg1="stumble, <foo>foo${ht}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 (./${testname} -s "${arg1}" -s "${arg2}" \
     | ${SED} '/ nested:/s/ 0x.*/ 0xXXXXXXXX/' ) > ${testname}-res2.out || \

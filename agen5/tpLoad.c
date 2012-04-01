@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2012-03-04 09:22:57 bkorb"
+ * Time-stamp:        "2012-03-31 13:22:57 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -458,7 +458,7 @@ tpl_unload(templ_t* pT)
 
         /*
          * "select" functions get remapped, depending on the alias used for
-         * the selection.  See the "teFuncType" enumeration in functions.h.
+         * the selection.  See the "mac_func_t" enumeration in functions.h.
          */
         if (ix >= FUNC_CT)
             ix = FTYP_SELECT;

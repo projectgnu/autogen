@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # cond.test     ---  test conditionally compiled option
 #
-# Time-stamp:        "2012-03-11 08:59:00 bkorb"
+# Time-stamp:        "2012-03-31 13:09:15 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -110,7 +110,7 @@ echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || failure AutoGen could not process
 
 ( cc_cmd=`echo ${cc_cmd} | \
-  ${SED} 's/-Werror//;s/-DTEST_TEST/-DSECOND -DTEST_TEST/' `
+  ${SED} "s/-DTEST_TEST/-DSECOND -DTEST_TEST/" `
   eval "$cc_cmd" 2>&1 ) \
   | ${SED} -n '/undefining SECOND due to option name conflict/p' \
     > ${testname}-cc.log

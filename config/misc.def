@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2012-02-28 19:40:26 bkorb"
+/*  Time-stamp:        "2012-03-31 13:14:16 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -389,7 +389,7 @@ do-always = <<- _END_ALWAYS_
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
 	AC_DECL_SYS_SIGLIST
-	AC_CHECK_FUNCS([putenv getdate_r])
+	AC_CHECK_FUNCS([putenv getdate_r utimes futimes])
 	AC_CHECK_FUNCS([fopencookie funopen], [break])
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
 	*yes* )

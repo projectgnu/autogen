@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-02-18 09:15:12 bkorb"
+# Time-stamp:        "2012-03-31 13:58:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -123,8 +123,9 @@ cat > ${testname}.sample <<\_EOF_
 static void
 doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 {
-    (void)pOptions;
     USAGE(HANDLER_EXIT_SUCCESS);
+    (void)pOptDesc;
+    (void)pOptions;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -140,6 +141,8 @@ doOptFirst(tOptions* pOptions, tOptDesc* pOptDesc)
 /*  START =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
 SampleCode();
 /*  END   =-= First Opt Code =-= DO NOT CHANGE THIS COMMENT */
+    (void)pOptDesc;
+    (void)pOptions;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -180,6 +183,8 @@ doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
 {
     /* extracted from handler.def, line 21 */
     SomeCodeOrOther();
+    (void)pOptDesc;
+    (void)pOptions;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

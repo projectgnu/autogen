@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2012-03-04 19:50:53 bkorb"
+ *  Time-stamp:        "2012-03-31 13:43:29 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -467,20 +467,22 @@ eval(char const * expr)
  *   (@pxref{expression syntax}) is written to the current output.
 =*/
 macro_t*
-mFunc_Expr(templ_t* pT, macro_t* pMac)
+mFunc_Expr(templ_t * tpl, macro_t * mac)
 {
-    bool needFree;
-    char const * pz = eval_mac_expr(&needFree);
+    bool allocated_str;
+    char const * pz = eval_mac_expr(&allocated_str);
+
+    (void)tpl;
 
     if (*pz != NUL) {
         fputs(pz, cur_fpstack->stk_fp);
         fflush(cur_fpstack->stk_fp);
     }
 
-    if (needFree)
+    if (allocated_str)
         AGFREE((void*)pz);
 
-    return pMac + 1;
+    return mac + 1;
 }
 
 /**

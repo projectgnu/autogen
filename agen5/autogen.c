@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2013-03-10 07:29:30 bkorb"
+ *  Time-stamp:        "2012-03-31 13:22:09 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -104,6 +104,7 @@ inner_main(void * closure, int argc, char ** argv)
     exit_code = AUTOGEN_EXIT_SUCCESS;
     done_check();
     /* NOTREACHED */
+    (void)closure;
 }
 
 /**
@@ -233,17 +234,17 @@ cleanup_and_abort(int sig)
      */
     if (current_tpl != NULL) {
         int line;
-        teFuncType fnCd;
+        mac_func_t fnCd;
         char const * pzFn;
         char const * pzFl;
 
         if (cur_macro == NULL) {
             pzFn = PSEUDO_MACRO_NAME_STR;
             line = 0;
-            fnCd = -1;
+            fnCd = (mac_func_t)-1;
 
         } else {
-            teFuncType f =
+            mac_func_t f =
                 (cur_macro->md_code > FUNC_CT)
                     ? FTYP_SELECT : cur_macro->md_code;
             pzFn = apzFuncNames[ f ];
@@ -308,6 +309,7 @@ catch_sig_and_bail(int sig)
 static void
 ignore_signal(int sig)
 {
+    (void)sig;
     return;
 }
 

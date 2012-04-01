@@ -5,7 +5,7 @@ texi
 ##  Documentation template
 ##
 ## Author:            Bruce Korb <bkorb@gnu.org>
-## Time-stamp:        "2012-03-10 14:06:51 bkorb"
+## Time-stamp:        "2012-03-31 18:05:17 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -464,10 +464,13 @@ the primary reason why many people would even look into AutoGen
 at all, I decided to leave it in the list of chapters.
 
 @menu
-* AutoFSM::                        Automated Finite State Machine
-* AutoXDR::                        Combined RPC Marshalling
-* AutoEvents::                     Automated Event Management
-[=`cat  ${ADDON_MENU}`=]
+* AutoFSM::                        Automated Finite State Machine.
+* AutoXDR::                        Combined RPC Marshalling.
+* AutoEvents::                     Automated Event Management.
+* columns Invocation::             Invoking columns.
+* getdefs Invocation::             Invoking getdefs.
+* xml2ag Invocation::              Invoking xml2ag.
+* snprintfv::                      The extensible format printing library.
 @end menu
 [=
 

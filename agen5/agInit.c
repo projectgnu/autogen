@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-03-10 10:14:18 bkorb"
+ *  Time-stamp:      "2012-03-31 13:56:26 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -178,39 +178,40 @@ dep_usage(char const * fmt, ...)
 LOCAL void
 config_dep(tOptions * opts, tOptDesc * od)
 {
-    char const * popt = od->optArg.argString;
+    char const * opt_arg = od->optArg.argString;
+    (void)opts;
 
     /*
      *  The option argument is optional.  Make sure we have one.
      */
-    if (popt == NULL)
+    if (opt_arg == NULL)
         return;
 
-    while (*popt == 'M')  popt++;
-    popt = SPN_WHITESPACE_CHARS(popt);
+    while (*opt_arg == 'M')  opt_arg++;
+    opt_arg = SPN_WHITESPACE_CHARS(opt_arg);
 
-    switch (*popt) {
+    switch (*opt_arg) {
     case 'F':
         if (dep_file != NULL)
             dep_usage(CFGDEP_DUP_TARGET_MSG);
 
-        popt = SPN_WHITESPACE_CHARS(popt + 1);
-        AGDUPSTR(dep_file, popt, "f name");
+        opt_arg = SPN_WHITESPACE_CHARS(opt_arg + 1);
+        AGDUPSTR(dep_file, opt_arg, "f name");
         break;
 
     case 'Q':
     case 'T':
     {
-        bool quote_it = (*popt == 'Q');
+        bool quote_it = (*opt_arg == 'Q');
 
         if (dep_target != NULL)
             dep_usage(CFGDEP_DUP_TARGET_MSG);
 
-        popt = SPN_WHITESPACE_CHARS(popt + 1);
+        opt_arg = SPN_WHITESPACE_CHARS(opt_arg + 1);
         if (quote_it)
-            dep_target = make_quote_str(popt);
+            dep_target = make_quote_str(opt_arg);
         else
-            AGDUPSTR(dep_target, popt, "t name");
+            AGDUPSTR(dep_target, opt_arg, "t name");
         break;
     }
 
@@ -228,7 +229,7 @@ config_dep(tOptions * opts, tOptDesc * od)
         break;
 
     default:
-        dep_usage(CFGDEP_UNKNOWN_DEP_FMT, popt);
+        dep_usage(CFGDEP_UNKNOWN_DEP_FMT, opt_arg);
     }
 }
 

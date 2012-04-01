@@ -485,6 +485,8 @@ static int
 printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
+  (void)n;
+  (void)argtypes;
 
   if (!(pinfo->state & (SNV_STATE_BEGIN | SNV_STATE_FLAG)))
     {
@@ -499,7 +501,7 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
       switch (*pinfo->format)
 	{
 	case '#':
-	  pinfo->alt = SNV_TRUE;
+	  pinfo->alt = true;
 	  pinfo->format++;
 	  break;
 
@@ -511,22 +513,22 @@ printf_flag_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 
 	case '-':
 	  pinfo->pad = ' ';
-	  pinfo->left = SNV_TRUE;
+	  pinfo->left = true;
 	  pinfo->format++;
 	  break;
 
 	case ' ':
-	  pinfo->space = SNV_TRUE;
+	  pinfo->space = true;
 	  pinfo->format++;
 	  break;
 
 	case '+':
-	  pinfo->showsign = SNV_TRUE;
+	  pinfo->showsign = true;
 	  pinfo->format++;
 	  break;
 
 	case '\'':
-	  pinfo->group = SNV_TRUE;
+	  pinfo->group = true;
 	  pinfo->format++;
 	  break;
 
@@ -619,7 +621,7 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n, int *argty
 
     /* We found a *n$ specification */
     case 14:
-      if (n + pinfo->argindex > position - 1)
+        if (n + pinfo->argindex > (unsigned)position - 1)
 	argtypes[position - 1 - pinfo->argindex] = PA_INT;
 
       /* Else there is not enough space, reallocate and retry please...
@@ -644,7 +646,7 @@ printf_numeric_param_info (struct printf_info *const pinfo, size_t n, int *argty
       if (value < 0)
 	{
 	  pinfo->pad = ' ';
-	  pinfo->left = SNV_TRUE;
+	  pinfo->left = true;
 	  value = -value;
 	}
 
@@ -686,6 +688,8 @@ static int
 printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 {
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
+  (void)n;
+  (void)argtypes;
 
   /* Check for valid pre-state. */
   if (!(pinfo->state & (SNV_STATE_BEGIN | SNV_STATE_MODIFIER)))
@@ -701,28 +705,28 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'h':
 	  if (*++pinfo->format != 'h')
 	    {
-	      pinfo->is_short = SNV_TRUE;
+	      pinfo->is_short = true;
 	      break;
 	    }
 
-	  pinfo->is_char = SNV_TRUE;
+	  pinfo->is_char = true;
 	  pinfo->format++;
 	  break;
 
 	case 'z':
 	  if (sizeof (size_t) > sizeof (char *))
-	    pinfo->is_long_double = SNV_TRUE;
+	    pinfo->is_long_double = true;
 	  else
-	    pinfo->is_long = SNV_TRUE;
+	    pinfo->is_long = true;
 
 	  pinfo->format++;
 	  break;
 
 	case 't':
 	  if (sizeof (ptrdiff_t) > sizeof (char *))
-	    pinfo->is_long_double = SNV_TRUE;
+	    pinfo->is_long_double = true;
 	  else
-	    pinfo->is_long = SNV_TRUE;
+	    pinfo->is_long = true;
 
 	  pinfo->format++;
 	  break;
@@ -730,7 +734,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'l':
 	  if (*++pinfo->format != 'l')
 	    {
-	      pinfo->is_long = SNV_TRUE;
+	      pinfo->is_long = true;
 	      break;
 	    }
 	 /*FALLTHROUGH*/
@@ -738,7 +742,7 @@ printf_modifier_info (struct printf_info *const pinfo, size_t n, int *argtypes)
 	case 'j':
 	case 'q':
 	case 'L':
-	  pinfo->is_long_double = SNV_TRUE;
+	  pinfo->is_long_double = true;
 	  pinfo->format++;
 	  break;
 
@@ -876,6 +880,8 @@ printf_float (STREAM *stream,
 static int
 printf_count (STREAM *stream, struct printf_info *const pinfo, union printf_arg const *args)
 {
+  (void)stream;
+
   if (pinfo->is_char)
     *(char *) (args->pa_pointer) = pinfo->count;
 
@@ -905,7 +911,7 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   uintmax_t value = 0L;
   int type, count_or_errorcode = SNV_OK;
   char buffer[256], *p, *end;
-  snv_bool_t is_negative = SNV_FALSE;
+  bool is_negative = false;
 
   return_val_if_fail (pinfo != NULL, SNV_ERROR);
 
@@ -936,8 +942,8 @@ printf_integer (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   if (type & PA_FLAG_UNSIGNED)
     {
       value = fetch_uintmax (pinfo, args);
-      is_negative = SNV_FALSE;
-      pinfo->showsign = pinfo->space = SNV_FALSE;
+      is_negative = false;
+      pinfo->showsign = pinfo->space = false;
     }
   else
     {

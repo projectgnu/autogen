@@ -123,11 +123,11 @@ string = { nm = DEP_FILE_TARG_FMT;
 string = { nm = DEP_FILE_CLEAN_FMT;
    str = <<_EOF_
 
-.PHONY : clean-%3$s
+.PHONY : clean-%1$s
 
-clean-%3$s :
-	rm -f %1$s $(%2$s_TList)
-	touch -t 199912312359 %3$s
+clean-%1$s :
+	rm -f %3$s $(%2$s_TList)
+	@-touch -t 199912312359 %1$s
 
 _EOF_; };
 

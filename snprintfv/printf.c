@@ -95,7 +95,7 @@ spec_hash (unsigned spec)
 static void
 spec_init (void)
 {
-  static snv_bool_t is_init = SNV_FALSE;
+  static bool is_init = false;
 
   if (!is_init)
     {
@@ -109,7 +109,7 @@ spec_init (void)
 	  spec_table[hash] = snv_default_spec_table + ix;
 	}
 
-      is_init = SNV_TRUE;
+      is_init = true;
     }
 }
 

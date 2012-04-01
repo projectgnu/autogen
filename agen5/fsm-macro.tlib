@@ -1,6 +1,6 @@
 [= AutoGen5 Template  -*- Mode: Scheme -*-
 
-#; Time-stamp:        "2011-04-22 07:48:18 bkorb"
+#; Time-stamp:        "2012-03-31 17:04:56 bkorb"
 #;
 #; This file is part of AutoGen.
 #; AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -172,7 +172,7 @@ ENDDEF build-callback
 
 DEFINE callbacks     =][=
 
-  `set -- \`sed 's/,//' .fsm.xlist\`` =][=
+  `set -- \`sed 's/,//' ${tmp_dir}/xlist\`` =][=
 
   WHILE `echo $#`       =][=
 
@@ -227,7 +227,7 @@ DEFINE run-switch         =][=
 (define example-code "")  =]
 
     switch (trans) {[=
-  `set -- \`sed 's/,//' .fsm.xlist\`` =][=
+  `set -- \`sed 's/,//' ${tmp_dir}/xlist\`` =][=
 
   WHILE `echo $#`         =][=
 
@@ -390,8 +390,8 @@ ENDFOR   transition           =][=
   (shellf
     "env | egrep '^FSM_TRANS_' | \
     sed '/, NULL }/d;s/^.*%s//;s/ .*$/,/' | \
-    sort -u > .fsm.xlist
-    echo `wc -l < .fsm.xlist` "
+    sort -u > ${tmp_dir}/xlist
+    echo `wc -l < ${tmp_dir}/xlist` "
     (if (=* (get "method") "call")
         (string-append pfx "_do_")
         (string-append PFX "_TR_"))

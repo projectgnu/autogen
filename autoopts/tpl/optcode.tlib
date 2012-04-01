@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-03-10 09:29:16 bkorb"
+# Time-stamp:      "2012-03-31 13:07:46 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -196,7 +196,7 @@ ELSE  =][=
         "zCopyright"
         (begin
            (set! ext-text (string-append (shell (string-append
-             "fmt -w 75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
+             "${CLexe} --fill -I0 -W75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
 
            (string-table-add-ref opt-strs ext-text)
     )   )
@@ -297,7 +297,7 @@ s/^@item *$/\
 /[=
 
 (define patch-text-sed
-  (sprintf "sed %s <<\\_EODetail_ | fmt -w 75\n"
+  (sprintf "sed %s <<\\_EODetail_ | ${CLexe} --fill -I0 -W75\n"
     (raw-shell-str (out-pop #t)) ) )
 
 (define patch-text (lambda (t-name)

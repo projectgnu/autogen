@@ -2,7 +2,7 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2012-03-10 11:56:53 bkorb"
+ *  Time-stamp:        "2012-03-31 13:43:32 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -34,13 +34,16 @@ static bool
 next_def(bool invert, def_ent_t** ppList);
 
 static int
-for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * pFoundDef);
+call_gen_block(templ_t * tpl, macro_t * mac, macro_t * end_mac);
 
 static int
-for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef);
+for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found);
+
+static int
+for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent);
 
 static void
-load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac);
+load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -280,13 +283,31 @@ next_def(bool invert, def_ent_t** ppList)
 }
 
 static int
-for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * found)
+call_gen_block(templ_t * tpl, macro_t * mac, macro_t * end_mac)
+{
+    switch (setjmp(for_state->for_env)) {
+    case FOR_JMP_DONE: // 0
+        gen_block(tpl, mac, end_mac);
+        /* FALLTHROUGH */
+
+    case FOR_JMP_NEXT:
+        return FOR_JMP_DONE;
+
+    case FOR_JMP_BREAK:
+    default:
+        return FOR_JMP_BREAK;
+    }
+}
+
+static int
+for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
 {
     int         loopCt    = 0;
     def_ent_t   textDef;
     bool        invert    = (for_state->for_by < 0) ? true : false;
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
     def_ctx_t   ctx       = curr_def_ctx;
+    macro_t *   end_mac   = pT->td_macros + pMac->md_end_idx;
 
     /*
      *  IF the for-from and for-to values have not been set,
@@ -388,11 +409,8 @@ for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * found)
             ? ((next_ix < for_state->for_to) ? true : false)
             : ((next_ix > for_state->for_to) ? true : false);
 
-        switch (setjmp(for_state->for_env)) {
+        switch (call_gen_block(pT, pMac+1, end_mac)) {
         case FOR_JMP_DONE:
-            gen_block(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
-            break;
-
         case FOR_JMP_NEXT:
             break;
 
@@ -421,15 +439,17 @@ for_by_step(templ_t* pT, macro_t* pMac, def_ent_t * found)
 }
 
 static int
-for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
+for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
 {
-    int     loopCt = 0;
-    def_ctx_t ctx    = curr_def_ctx;
+    int       loopCt  = 0;
+    def_ctx_t ctx     = curr_def_ctx;
+    macro_t * end_mac = tpl->td_macros + mac->md_end_idx;
 
     curr_def_ctx.dcx_prev = &ctx;
+    mac++;
 
     for (;;) {
-        def_ent_t  textDef;
+        def_ent_t  txt_def_ent;
 
         /*
          *  IF this loops over a text macro,
@@ -438,32 +458,29 @@ for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
          *       is found as a macro invocation, the current value
          *       will be extracted, instead of the value list.
          */
-        if (pFoundDef->de_type == VALTYP_TEXT) {
-            textDef = *pFoundDef;
-            textDef.de_next    = textDef.de_twin = NULL;
+        if (def_ent->de_type == VALTYP_TEXT) {
+            txt_def_ent = *def_ent;
+            txt_def_ent.de_next = txt_def_ent.de_twin = NULL;
 
-            curr_def_ctx.dcx_defent = &textDef;
+            curr_def_ctx.dcx_defent = &txt_def_ent;
         } else {
-            curr_def_ctx.dcx_defent = pFoundDef->de_val.dvu_entry;
+            curr_def_ctx.dcx_defent = def_ent->de_val.dvu_entry;
         }
 
         /*
          *  Set the global current index
          */
-        for_state->for_index = pFoundDef->de_index;
+        for_state->for_index = def_ent->de_index;
 
         /*
          *  Advance to the next twin
          */
-        pFoundDef = pFoundDef->de_twin;
-        if (pFoundDef == NULL)
+        def_ent = def_ent->de_twin;
+        if (def_ent == NULL)
             for_state->for_islast = true;
 
-        switch (setjmp(for_state->for_env)) {
+        switch (call_gen_block(tpl, mac, end_mac)) {
         case FOR_JMP_DONE:
-            gen_block(pT, pMac+1, pT->td_macros + pMac->md_end_idx);
-            break;
-
         case FOR_JMP_NEXT:
             break;
 
@@ -475,7 +492,7 @@ for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
         for_state = curr_ivk_info->ii_for_data
             + (curr_ivk_info->ii_for_depth - 1);
 
-        if (pFoundDef == NULL)
+        if (def_ent == NULL)
             break;
         for_state->for_isfirst = false;
 
@@ -493,7 +510,7 @@ for_each(templ_t * pT, macro_t * pMac, def_ent_t * pFoundDef)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac)
+load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
 {
     char* pzName = pT->td_text + pMac->md_name_off;
     int   ix     = 0;
@@ -519,7 +536,7 @@ load_ForIn(char const * pzSrc, size_t srcLen, templ_t* pT, macro_t* pMac)
     }
 
     memcpy(pz, pzSrc, srcLen);
-    pz[ srcLen ] = NUL;
+    pz[srcLen] = NUL;
 
     do  {
         def_ent_t* pDef = new_def_ent();
@@ -847,7 +864,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      */
     else if (  (strneqvcmp(scan_in, LD_FOR_IN, 2) == 0)
             && IS_WHITESPACE_CHAR(scan_in[2])) {
-        load_ForIn(scan_in, in_len, tpl, mac);
+        load_for_in(scan_in, in_len, tpl, mac);
     }
 
     /* * * * *

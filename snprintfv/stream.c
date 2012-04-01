@@ -51,12 +51,15 @@ struct stream
 static int
 stream_not_readable (STREAM *stream)
 {
+  (void)stream;
   return -1;
 }
 
 static int
 stream_not_writable (int ch, STREAM *stream)
 {
+  (void)stream;
+  (void)ch;
   return -1;
 }
 

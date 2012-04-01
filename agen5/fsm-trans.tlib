@@ -17,6 +17,8 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =][=
+(make-tmp-dir)
+
 (define get-up (lambda (nm)
     (string-upcase! (string->c-name! (get nm)))  ))
 
@@ -59,10 +61,10 @@ DEFINE  enumerate-transitions   =]
  */
 typedef enum {
 [=(string-upcase! (shellf
- "sed '$s/,$//;s/^/    %s_TR_/' .fsm.xlist" PFX))=]
+ "sed '$s/,$//;s/^/    %s_TR_/' ${tmp_dir}/xlist" PFX))=]
 } te_[=(. pfx)=]_trans;
 #define [=(. PFX)=]_TRANSITION_CT  [=
-   `tct="\`wc -l < .fsm.xlist\`"
+   `tct="\`wc -l < ${tmp_dir}/xlist\`"
    echo $tct`=]
 
 /*
@@ -132,7 +134,7 @@ typedef te_[=(. pfx)=]_state ([=(. pfx)=]_callback_t)([=
     te_[=(. pfx)=]_event trans_evt );
 
 static [=(. pfx)=]_callback_t
-[=(shellf "sed '$s/,$/;/;s/^/    %s_do_/' .fsm.xlist" pfx)=]
+[=(shellf "sed '$s/,$/;/;s/^/    %s_do_/' ${tmp_dir}/xlist" pfx)=]
 
 /*
  *  This declares all the state transition handling routines
@@ -297,10 +299,10 @@ DEFINE looping-machine
 [=(extract fsm-source "        /* %s == FIND TRANSITION == %s */" ""
            "        trans_evt = GET_NEXT_TRANS();" ) =][=
   ENDIF =]
-[=  (out-push-new ".fsm.cktbl")=][=
+[=  (out-push-new (string-append tmp-dir "/cktbl"))=][=
     INVOKE machine-step =][=
     (out-pop)
-    (shell "sed 's/^ /     /;s/                /            /' .fsm.cktbl") =]
+    (shell "sed 's/^ /     /;s/                /            /' ${tmp_dir}/cktbl") =]
     }
     return [=(. pfx)=]_state;
 }[=

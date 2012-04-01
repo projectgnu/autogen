@@ -2,7 +2,7 @@
 /**
  * @file funcIf.c
  *
- *  Time-stamp:        "2013-03-10 07:17:20 bkorb"
+ *  Time-stamp:        "2012-03-31 13:16:51 bkorb"
  *
  *  This module implements the _IF text function.
  *
@@ -37,10 +37,10 @@ static bool
 eval_true(void);
 
 static macro_t*
-mLoad_Elif(templ_t* pT, macro_t* pMac, char const ** ppzScan);
+mLoad_Elif(templ_t * pT, macro_t * pMac, char const ** ppzScan);
 
-static macro_t*
-mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan);
+static macro_t *
+mLoad_Else(templ_t * pT, macro_t * pMac, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -266,7 +266,7 @@ mFunc_While(templ_t* pT, macro_t* pMac)
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
 static macro_t*
-mLoad_Elif(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+mLoad_Elif(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     if ((int)pMac->md_res == 0)
         AG_ABEND_IN(pT, pMac, NO_IF_EXPR);
@@ -292,21 +292,23 @@ mLoad_Elif(templ_t* pT, macro_t* pMac, char const ** ppzScan)
  *    It denotes the start of an alternate template block for
  *    the @code{IF} function.  For a complete description @xref{IF}.
 =*/
-static macro_t*
-mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+static macro_t *
+mLoad_Else(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     /*
      *  After processing an "ELSE" macro,
      *  we have a special handler function for 'ENDIF' only.
      */
-    static tpLoadProc apElseLoad[ FUNC_CT ] = { NULL };
+    static tpLoadProc load_for_if_after_else_procs[ FUNC_CT ] = { NULL };
+    (void)ppzScan;
 
-    if (apElseLoad[0] == NULL) {
-        memcpy((void*)apElseLoad, base_load_table, sizeof(base_load_table));
-        apElseLoad[ FTYP_ENDIF ] = &mLoad_Ending;
+    if (load_for_if_after_else_procs[0] == NULL) {
+        memcpy((void*)load_for_if_after_else_procs, base_load_table,
+               sizeof(base_load_table));
+        load_for_if_after_else_procs[ FTYP_ENDIF ] = &mLoad_Ending;
     }
 
-    load_proc_table = apElseLoad;
+    load_proc_table = load_for_if_after_else_procs;
 
     current_if.pElse->md_sib_idx = pMac - pT->td_macros;
     current_if.pElse = pMac;
@@ -320,10 +322,12 @@ mLoad_Else(templ_t* pT, macro_t* pMac, char const ** ppzScan)
  *  mLoad_Ending is the common block termination function.
  *  By returning NULL, it tells the macro parsing loop to return.
  */
-macro_t*
-mLoad_Ending(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+macro_t *
+mLoad_Ending(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
-    memset((void*)pMac, 0, sizeof(*pMac));
+    (void)tpl;
+    (void)p_scan;
+    memset((void*)mac, 0, sizeof(*mac));
     return NULL;
 }
 

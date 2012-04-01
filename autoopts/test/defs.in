@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-03-11 09:19:36 bkorb"
+# Time-stamp:     "2012-03-31 13:50:03 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -58,7 +58,6 @@ cfg_vals()
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
   PS4=">${testname}-\${FUNCNAME}> "
-  tabch='	'
   test -z "$srcdir"       && exit 1
   srcdir=`cd $srcdir >/dev/null && pwd`
   test -z "$top_srcdir"   && exit 1
@@ -159,7 +158,8 @@ init_tests()
   builddir=`pwd`
   testsubdir=testdir
   INCS="-I${top_builddir} -I${top_builddir}/autoopts"
-  CFLAGS="${INCS} "`echo ${CFLAGS} | ${SED} "s/-Werror[^ ${ht}]*//g"`
+  CFLAGS="${INCS} "`echo ${CFLAGS} | \
+    ${SED} "s/-Werror[^ ${ht}]*//g;s/-Wextra//g"`
 
   export PATH
   echo PATH is ${PATH} >&2
@@ -190,7 +190,7 @@ init_tests()
   }
 
   AG_L=run_ag\ ao
-  agl_opts="-L${top_srcdir}/autoopts/tpl -L${top_builddir}/autoopts/tpl"
+  agl_opts="-L${top_builddir}/autoopts/tpl -L${top_srcdir}/autoopts/tpl"
 
   export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe AG_L GDexe CLexe \
     agl_opts AG_L
@@ -278,10 +278,13 @@ cfg_inc()
 }
 
 clean_help() {
-  test "X${sedcmd}" = X && s= || s=${nl}${sedcmd}
-  s="/^Packaged by/d${nl}/^Report .* bugs to/d${s}"
-  s="/[Pp]lease send bug reports/d${nl}${s}"
-  ${SED} "${s}" | egrep -v '^[ 	]*$'
+  test -z "$sedcmd" && s= || s="${sedcmd}${nl}"
+  s="${s}/^Packaged by/d${nl}"
+  s="${s}/^Report .* bugs to/d${nl}"
+  s="${s}/[Pp]lease send bug reports/d${nl}"
+  s="${s}/^[ ${ht}]*\$/d"
+
+  ${SED} "${s}"
 }
 
 compile()
@@ -329,7 +332,9 @@ failure()
   exec > /dev/tty 2>&8
   cat ${logfile} >&2
 
-  ( mv -f ${testname}* .*${testname}* ../FAILURES || : ) 2>/dev/null
+  {
+    mv -f ${testname}* .*${testname}* ../FAILURES || :
+  } 2>/dev/null
   for f in core*
   do test -f ${f} && mv -f ${f} ../FAILURES/${testname}-${f} ; done
 

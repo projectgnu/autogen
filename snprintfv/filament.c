@@ -151,7 +151,7 @@ filinit (Filament *fil, const char *const init, size_t len)
 	  /* If we get to here then we never try to shrink the already
 	     allocated dynamic buffer (if any), we just leave it in
 	     place all ready to expand into later... */
-	  fil_maybe_extend (fil, len, SNV_FALSE);
+	  fil_maybe_extend (fil, len, false);
 	}
 
       snv_assert (len < fil->size);
@@ -205,7 +205,7 @@ fildelete (Filament *fil)
  * for the prospective contents.
  */
 void
-_fil_extend (Filament *fil, size_t len, snv_bool_t copy)
+_fil_extend (Filament *fil, size_t len, bool copy)
 {
   /* Usually we will simply double the amount of space previously
      allocated, but if the extra data is larger than the current

@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-01-29 18:34:23 bkorb"
+# Time-stamp:        "2012-03-31 13:59:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -107,7 +107,7 @@ compile "-?"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}.hlp
+echo creating second ${testname}.hlp
 clean_help > ${testname}.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
 USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
@@ -149,19 +149,6 @@ Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 _EOF_
 
-while IFS='' read -r line
-do
-  test "X${line}" = X || {
-    echo "$line"
-    continue
-  }
-  IFS='' read -r line || break
-  case "${line}" in
-  'please send bug '* ) ;;
-  * ) echo "${nl}${line}" ;;
-  esac
-done < ${testname}.help > ${testname}.HELP
-mv -f ${testname}.HELP ${testname}.help
 files=${testname}.hlp\ ${testname}.help
 cmp -s ${files} || \
   failure "script generator help output mismatch: `diff -c ${files}`"

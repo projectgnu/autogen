@@ -2,7 +2,7 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2012-03-10 11:53:03 bkorb"
+ * Time-stamp:        "2012-03-31 13:53:03 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -30,7 +30,7 @@ static char const zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
-static teFuncType
+static mac_func_t
 func_code(char const ** ppzScan);
 
 static char const *
@@ -47,7 +47,7 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan);
  *  Return the enumerated function type corresponding
  *  to a name pointed to by the input argument.
  */
-static teFuncType
+static mac_func_t
 func_code(char const ** ppzScan)
 {
     fn_name_type_t const * pNT;
@@ -354,7 +354,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
 
 #if defined(DEBUG_ENABLED)
             if (HAVE_OPT(SHOW_DEFS)) {
-                teFuncType ft  = mac->md_code;
+                mac_func_t ft  = mac->md_code;
                 int        ln  = mac->md_line;
                 int ct = tplNestLevel;
                 if (mac->md_code == FTYP_BOGUS)

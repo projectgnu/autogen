@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-03-04 19:35:31 bkorb"
+# Time-stamp:        "2012-03-31 16:32:43 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -134,8 +134,9 @@ test "X${CDPATH}" = X || {
 }
 
 nl=$'\n'
+ht=$'\t'
 
-export setx dashx VERBOSE nl
+export setx dashx VERBOSE nl ht
 
 # # # # # # # # # # # # # # # # # # #
 #
@@ -162,8 +163,10 @@ make_opts()
 #
 make_proto()
 {
-    rm -f proto.h
-    exec 5> proto.h
+    local target=stamp-proto temp_proto=proto-h$$ proto_h=proto.h
+    echo '#' stamped `date` > ${target}-$$
+
+    exec 5> $temp_proto
 
     local files=`ls -1 *.c | grep -v 'fsm\.c$'`
     local dirname=
@@ -235,6 +238,21 @@ make_proto()
 	#endif /* ${marker} */
 	_EOF_
     exec 5>&-
+
+    if cmp -s ${temp_proto} ${proto_h}
+    then
+        rm -f ${temp_proto}
+        if test -f 
+        then
+            rm -f ${target}-$$
+        else
+            mv -f ${target}-$$  ${target}
+            touch ${proto_h}
+        fi
+    else
+        mv -f ${temp_proto} ${proto_h}
+        mv -f ${target}-$$  ${target}
+    fi
 }
 
 # Local Variables:

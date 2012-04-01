@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-03-10 14:47:08 bkorb"
+# Time-stamp:        "2012-03-31 13:47:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -120,24 +120,28 @@ FOR flag                        =][=
   IF (set! opt-name (string-tr! (get "name") optname-from optname-to))
      (exist? "documentation")   =][=
 
-    (if have-doc-options (begin
-        (ag-fprintf 0 "\n@node %1$s %2$s\n@%3$s %2$s options\n\n%4$s.\n"
-             down-prog-name opt-name sub-level (get "descrip"))
-        (set! tmp-str (get "documentation"))
-        (if (> (string-length tmp-str) 1)
-            (string-append tmp-str "\n"))
-    ))  =][=
+     (ag-fprintf 0 "\n@node %1$s %2$s\n@%3$s %2$s options\n\n%4$s.\n"
+          down-prog-name opt-name sub-level (get "descrip"))
+     (set! tmp-str (get "documentation"))
+     (if (> (string-length tmp-str) 1)
+         (string-append tmp-str "\n"))
+     =][=
 
-  ELIF (exist? "aliases")       =][=
-    INVOKE emit-aliases         =][=
-  ELSE                          =][=
-    INVOKE emit-opt-text        =][=
+  ELSE                          =]
+[= (set! tmp-str (string-append opt-name " option"))
+   (if (exist? "value")
+       (set! tmp-str (string-append tmp-str " (-" (get "value") ")")) )
+   (sprintf opt-node-fmt opt-name tmp-str) =]
+@cindex [=(string-append down-prog-name "-" opt-name)=][=
+
+    IF (exist? "aliases")       =][=
+      INVOKE emit-aliases       =][=
+    ELSE                        =][=
+      INVOKE emit-opt-text      =][=
+    ENDIF                       =][=
   ENDIF                         =][=
 
 ENDFOR flag                     =][=
-
-`cat ${tmp_dir}/opt-text-*
-rm -rf ${tmp_dir}`              =][=
 
 IF
    (define home-rc-files (exist? "homerc"))
@@ -275,16 +279,10 @@ ENDDEF emit-top-menu
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE emit-aliases             =][=
-
-(set! tmp-str (string-append opt-name " option"))
-   (if (exist? "value")
-       (set! tmp-str (string-append tmp-str " (-" (get "value") ")")) )
-   (print-node opt-name tmp-str) =]
-@cindex [=(. down-prog-name)=]-[=(. opt-name)=]
+DEFINE emit-aliases             =]
 
 This is an alias for the [= aliases =] option,
-[= (sprintf "@pxref{%1$s %2$s, the %2$s documentation}.\n"
+[= (sprintf "@pxref{%1$s %2$s, the %2$s option documentation}.\n"
       down-prog-name (get "aliases")) =][=
 
 ENDDEF emit-aliases
@@ -292,17 +290,13 @@ ENDDEF emit-aliases
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE emit-opt-text            =]
-[= (set! tmp-str (string-append opt-name " option"))
-   (if (exist? "value")
-       (set! tmp-str (string-append tmp-str " (-" (get "value") ")")) )
-   (sprintf opt-node-fmt opt-name tmp-str) =]
-@cindex [=(string-append down-prog-name "-" opt-name)=]
 
 This is the ``[=(string-downcase! (get "descrip"))=]'' option.[=
     IF (exist? "arg-type")     =]
 This option takes an [= (if (exist? "arg-optional") "optional " "")
  =]argument [= arg-type =][=
-(if (exist? "arg-name") (string-append " @file{" (get "arg-name") "}"))
+(if (exist? "arg-name") (string-append " @file{"
+    (string-substitute (get "arg-name") "@" "@@") "}"))
  =].[=
     ENDIF           =][=
 

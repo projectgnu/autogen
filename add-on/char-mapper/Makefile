@@ -48,4 +48,4 @@ tarball : $(GENSRC)
 	sed '/^ *TOP =/s/=.*/= ./' Makefile > $(EXE)/Makefile
 	tar cJvf $(EXE).txz $(EXE)
 	cd $(EXE) ; $(MAKE)
-	@-rm -rf $(EXE) ; test -f $(EXE).exe && mv $(EXE).exe $(EXE)
+	@-rm -rf $(EXE) ; if test -f $(EXE).exe ; then mv $(EXE).exe $(EXE) ; fi

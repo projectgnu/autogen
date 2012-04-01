@@ -142,7 +142,7 @@ ENDFOR                                  =]
     FTYP_SELECT_MATCH_ANYTHING        = 0x801C,  /*  *   */
     FTYP_SELECT_MATCH_EXISTENCE       = 0x801D,  /*  @   */
     FTYP_SELECT_MATCH_NONEXISTENCE    = 0x801E   /* !@   */
-} teFuncType;
+} mac_func_t;
 
 /*
  *  The function processing procedures.
@@ -193,7 +193,7 @@ typedef struct fn_name_type fn_name_type_t;
 struct fn_name_type {
     size_t        cmpLen;  /*!< compare length (sans NUL) */
     char const *  pName;   /*!< ptr to name */
-    teFuncType    fType;   /*!< function type enum */
+    mac_func_t    fType;   /*!< function type enum */
 };
 
 /*

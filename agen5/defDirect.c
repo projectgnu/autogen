@@ -1,7 +1,7 @@
 /**
  * @file defDirect.c
  *
- *  Time-stamp:        "2012-03-04 09:14:32 bkorb"
+ *  Time-stamp:        "2012-03-31 13:59:07 bkorb"
  *
  *  This module processes definition file directives.
  *
@@ -395,10 +395,11 @@ skipToElseEnd(char* pzStart)
  *  needs or may take arguments (e.g. '#define'), then there should
  *  also be an 'arg:' section describing the argument(s).
  */
-static char*
-doDir_IGNORE(char* pzArg, char* pzScan)
+static char *
+doDir_IGNORE(char * arg, char * scan)
 {
-    return pzScan;
+    (void)arg;
+    return scan;
 }
 
 
@@ -545,9 +546,11 @@ doDir_define(char* pzArg, char* pzScan)
  *  otherwise it will generate an error.
  *  It will be ignored.
 =*/
-static char*
-doDir_elif(char* pzArg, char* pzScan)
+static char *
+doDir_elif(char * arg, char * scan)
 {
+    (void)arg;
+    (void)scan;
     AG_ABEND(aprf(DIRECT_ELIF_BAD_FMT, cctx->scx_fname, cctx->scx_line));
     /* NOTREACHED */
     return NULL;
@@ -561,13 +564,14 @@ doDir_elif(char* pzArg, char* pzScan)
  *  If it follows the @code{#if}, then it will be ignored.  Otherwise,
  *  it will change the processing state to the reverse of what it was.
 =*/
-static char*
-doDir_else(char* pzArg, char* pzScan)
+static char *
+doDir_else(char * arg, char * scan)
 {
+    (void)arg;
     if (--ifdefLevel < 0)
         NO_MATCH_ERR(DIRECT_ELSE_BAD);
 
-    return skipToEndif(pzScan);
+    return skipToEndif(scan);
 }
 
 
@@ -577,13 +581,14 @@ doDir_else(char* pzArg, char* pzScan)
  *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
  *  In all cases, this will resume normal processing of text.
 =*/
-static char*
-doDir_endif(char* pzArg, char* pzScan)
+static char *
+doDir_endif(char * arg, char * scan)
 {
+    (void)arg;
     if (--ifdefLevel < 0)
         NO_MATCH_ERR(DIRECT_ENDIF_BAD);
 
-    return pzScan;
+    return scan;
 }
 
 
@@ -592,10 +597,12 @@ doDir_endif(char* pzArg, char* pzScan)
  *  text:
  *  This terminates a "macdef", but must not ever be encountered directly.
 =*/
-static char*
-doDir_endmac(char* pzArg, char* pzScan)
+static char *
+doDir_endmac(char * arg, char * scan)
 {
     NO_MATCH_ERR(DIRECT_ENDMAC_BAD);
+    (void)arg;
+    (void)scan;
     /* NOTREACHED */
     return NULL;
 }
@@ -606,15 +613,16 @@ doDir_endmac(char* pzArg, char* pzScan)
  *  text:
  *  Ends the text processed by a command shell into autogen definitions.
 =*/
-static char*
-doDir_endshell(char* pzArg, char* pzScan)
+static char *
+doDir_endshell(char * arg, char * scan)
 {
     /*
      *  In actual practice, the '#endshell's must be consumed inside
      *  the 'doDir_shell()' procedure.
      */
     NO_MATCH_ERR(DIRECT_ENDSHELL_BAD);
-
+    (void)arg;
+    (void)scan;
     /* NOTREACHED */
     return NULL;
 }
@@ -628,11 +636,12 @@ doDir_endshell(char* pzArg, char* pzScan)
  *  This directive will cause AutoGen to stop processing
  *  and exit with a status of EXIT_FAILURE.
 =*/
-static char*
-doDir_error(char* pzArg, char* pzScan)
+static char *
+doDir_error(char * arg, char * scan)
 {
-    AG_ABEND(aprf(DIRECT_ERROR_FMT, cctx->scx_fname, cctx->scx_line,
-                  pzArg));
+    (void)scan;
+
+    AG_ABEND(aprf(DIRECT_ERROR_FMT, cctx->scx_fname, cctx->scx_line, arg));
     /* NOTREACHED */
     return NULL;
 }
@@ -652,9 +661,11 @@ doDir_error(char* pzArg, char* pzScan)
  *  @code{#if} expressions are not analyzed.  @strong{Everything} from here
  *  to the matching @code{#endif} is skipped.
 =*/
-static char*
-doDir_if(char* pzArg, char* pzScan)
+static char *
+doDir_if(char * arg, char * pzScan)
 {
+    (void)arg;
+
     return skipToEndif(pzScan);
 }
 
@@ -668,8 +679,8 @@ doDir_if(char* pzArg, char* pzScan)
  *  processed only if there is a corresponding @code{-Dname} command line
  *  option or if a @code{#define} of that name has been previously encountered.
 =*/
-static char*
-doDir_ifdef(char* pzArg, char* pzScan)
+static char *
+doDir_ifdef(char * pzArg, char * pzScan)
 {
     if (get_define_str(pzArg, false) == NULL)
         return skipToElseEnd(pzScan);
@@ -687,8 +698,8 @@ doDir_ifdef(char* pzArg, char* pzScan)
  *  processed only if there is @strong{not} a corresponding @code{-Dname}
  *  command line option or there was a canceling @code{-Uname} option.
 =*/
-static char*
-doDir_ifndef(char* pzArg, char* pzScan)
+static char *
+doDir_ifndef(char * pzArg, char * pzScan)
 {
     if (get_define_str(pzArg, false) != NULL)
         return skipToElseEnd(pzScan);
@@ -866,8 +877,10 @@ doDir_line(char* pzArg, char* pzScan)
  *  a multi-line #define that may include other preprocessing directives.
 =*/
 static char*
-doDir_macdef(char* pzArg, char* pzScan)
+doDir_macdef(char* arg, char* pzScan)
 {
+    (void)arg;
+
     return skipToEndmac(pzScan);
 }
 
@@ -917,13 +930,15 @@ doDir_option(char* pzArg, char* pzScan)
  *  process that handles the back-quoted @code{`} text.
  *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
 =*/
-static char*
-doDir_shell(char* pzArg, char* pzScan)
+static char *
+doDir_shell(char * arg, char * pzScan)
 {
     static size_t const endshell_len = sizeof("\n#endshell") - 1;
 
-    scan_ctx_t*  pCtx;
-    char*      pzText = pzScan;
+    scan_ctx_t * pCtx;
+    char *       pzText = pzScan;
+
+    (void)arg;
 
     /*
      *  The output time will always be the current time.

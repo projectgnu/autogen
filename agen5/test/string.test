@@ -95,7 +95,7 @@ char zExpect[] = "'\f\r\b\v\t\a\n\n"
        "\"Wow!\"  This'll be \\hard\\'\n"
        "#endif /* .\n"
        "and it'll be a \"hassle\"."
-       "\001\002\003\177\n'";
+       "\001\002\003\n'";
 #define expectSize ((int)(sizeof(zExpect) - 1))
 int checkStr( char* pz, char const* pzWhat );
 int checkStr( char* pz, char const* pzWhat )
@@ -219,7 +219,7 @@ string =
 \#endif /* .
 '
     "and it'll be a \"hassle\"."
-    "\001\x02\X03\177\n'";
+    "\001\x02\X03\n'";
 
 _EOF_
 

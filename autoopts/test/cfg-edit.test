@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2011-08-07 17:39:44 bkorb"
+# Time-stamp:        "2012-03-31 13:10:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -227,7 +227,7 @@ case "${members}" in
 * ) failure "members entry not removed"
 esac
 
-arg1="stumble, <foo>foo${tabch}lish</foo>, <bar type=integer>1234</bar>, able"
+arg1="stumble, <foo>foo${ht}lish</foo>, <bar type=integer>1234</bar>, able"
 arg2='foo, <bar type=integer>4321</bar> <gr type=nested>one, two=2, three</gr>'
 dir=`echo ${TMPDIR} | ${SED} "s@^\`pwd\`//*@@"`
 out_file=${dir}/${testname}-out-file

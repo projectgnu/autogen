@@ -1,7 +1,7 @@
 #! /bin/bash
 #  mk-opt-table.sh
 #
-#  Time-stamp:        "2012-02-18 09:53:25 bkorb"
+#  Time-stamp:        "2012-03-31 13:59:05 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -25,6 +25,7 @@ declare -r program=${progdir}/${prognam}
 
 die() {
     echo "mk-opt-table error:  $*"
+    rm -f ${temp_stamp}
     exit 1
 } >&2
 
@@ -37,26 +38,37 @@ init() {
         egrep '^handle_[a-z_]+\(' ${exe_name}.c | \
             sed '/^handle_invalid(/d;s/^handle_//;s/(.*//' | \
             sort)
+
+    declare -g new_source=false
+}
+
+is_up_to_date() {
+    declare svnew=${new_source}
+    declare base=$1 ; shift
+    new_source=true
+
+    test -f ${base}.c -a -f ${base}.h || return 1
+
+    for f
+    do
+        test ${base}.c -nt ${f} -a ${base}.h -nt ${f} || return 1
+    done
+
+    new_source=${svnew}
+    return 0
 }
 
 mk_enum() {
-    test -f ${base_name}.c \
-        -a ${base_name}.c -nt ${exe_name}.c \
-        -a -f ${base_name}.h \
-        -a ${base_name}.h -nt ${exe_name}.c \
-        -a ${base_name}.h -nt ${progdir}/mk-str2enum.sh && {
-        echo "${base_name}.[ch] are up to date"
-        return 0
-    }
+    is_up_to_date ${base_name} ${progdir}/mk-str2enum.sh && return 0
 
+    echo "updating ${base_name}.[ch]"
     declare opts=--base-name=${base_name}
     declare dashx=
     [[ X$- =~ .*x.* ]] && dashx=-x
     declare dispfmt=--dispatch="char * handle_%s(char * scan)"
-    declare BOILERPLATE=$'/*\n'$(
+    declare -x BOILERPLATE=$'/*\n'$(
         sed '1d;/^$/,$d;s/^#/ */' $program)$'\n */\n'
 
-    echo "${base_name}.[ch]" >&5
     PS4='>mt> ' bash ${dashx} -e \
         ${progdir}/mk-str2enum.sh "${dispfmt}" ${opts} ${hdl_list}
 }
@@ -87,17 +99,25 @@ assemble_usage() {
 
     cat <<- _EOF_
 	Otherwise, input lines that are blank or start with a hash ('#') are
-	ignored.
+	ignored.  All other lines must conform to the following syntax:
 
-	The lines that are not ignored must begin with a name and be followed
-	by space separated character membership specifications.  A quoted
-	string is "cooked" and the characters found added to the set of
-	member characters for the given name.  If the string is preceded by a
-	hyphen ('-'), then the characters are removed from the set.  Ranges of
-	characters are specified by a hyphen between two characters.  If you
-	want a hyphen in the set, use it at the start or end of the string.
-	You may also add or remove members of previously defined sets by name,
-	preceded with a plus ('+') or hyphen ('-'), respectively.
+	    <name> { <literal-set> | <existing-name> } \
+	        [-]{<literal-set> | <existing-name>}...
+
+	<name> must begin with an alphabetic character and consist of
+	alphanumerics, plus the hyphen and underscore.
+
+	<literal-set> is a double quoted string (not apostrophe quoted) and
+	it gets cooked first.  "Cooking" consists of escape processing
+	(hex "\x00", plus the traditional "\n\f\v\t\b" escapes) and
+	hyphenated range expansion.  New fangled POSIX character class names
+	are not expanded.
+
+	A hyphen will cause the characters selected to be removed from any
+	literal sets applied previously.  So:
+	    foo " -~" -alphanumeric
+	represents all characters from space through tilde, except for
+	alphanumerics.
 
 	If the input file can be rewound and re-read, then the input text will
 	also be inserted into the output as a comment.
@@ -107,38 +127,41 @@ assemble_usage() {
 }
 
 mk_text_def() {
+    is_up_to_date map-text ${program} && return 0
+
+    echo "updating map-text.[ch]"
     declare ag=$(command -v autogen)
     test -x "$ag" || {
         test -f map-text.c -a -f map-text.h || \
-            die "map-text.c and .h are missing and cannot be recreated"
+            die "map-text.c and .h are missing and cannot be rebuilt"
         echo "warning: map-text.c and .h are out of date and cannot be rebuilt"
+        touch map-text.c map-text.h
         return 0
     } 1>&2
 
-    test -f map-text.c -a -f map-text.h && {
-        test map-text.c -nt ${exe_name}.c \
-            -a map-text.h -nt ${exe_name}.c \
-            -a map-text.h -nt ${program} && {
-            echo 'map-text.[ch] are up to date'
-            return 0
-        }
-    }
-
+    # pull the name of the included file from the def file and then
+    # put our assembled text into that file.
+    #
     declare tmp_text=$(awk '/^#include/{print $2}' map-text.def)
     assemble_usage > $tmp_text
-    autogen map-text.def
-    echo 'map-text.[ch]' >&5
+    ${ag} map-text.def
     rm -f $tmp_text
 }
 
 trap "die failure" EXIT
-exec 5> ${1}-temp
-date >&5
+stamp_file=${1}
+temp_stamp=${1}-temp
+date > ${temp_stamp}
 
 init "$1"
 mk_enum
 mk_text_def
 
-exec 5>&-
-mv -f $1-temp $1
+if ${new_source}
+then mv -f ${temp_stamp} ${stamp_file}
+else rm -f ${temp_stamp}
+     echo no changes to generated source
+fi
+
 trap '' EXIT
+exit 0

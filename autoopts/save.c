@@ -2,7 +2,7 @@
 /*
  * \file save.c
  *
- * Time-stamp:      "2012-02-28 19:43:11 bkorb"
+ * Time-stamp:      "2012-03-31 13:15:19 bkorb"
  *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
@@ -192,7 +192,7 @@ find_file_name(tOptions * pOpts, int * p_free_name)
             break; /* found directory -- viz.,  "." */
         }
 
-        if ((dirchp - pzDir) >= sizeof(z))
+        if ((size_t)(dirchp - pzDir) >= sizeof(z))
             goto bogus_name;
 
         memcpy(z, pzDir, (size_t)(dirchp - pzDir));

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-03-04 19:09:08 bkorb"
+## Time-stamp:      "2012-03-31 18:12:49 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -25,16 +25,10 @@ INCLUDES        = @INCLIST@
 FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
 TEMPLATES       = directive.tpl snarf.tpl $(FSMTPL)
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
-CLEANFILES      = invoke-autogen.texi invoke-autogen.menu autogen.1
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
-STAMPS          = stamp-opts stamp-directive stamp-exprini stamp-fsm \
-                  stamp-man stamp-parse
 pkgdata_DATA    = $(FSMTPL)
-nodist_man_MANS = autogen.1
-
-DISTCLEANFILES  = $(STAMPS) ag.c
-MAINTAINERCLEANFILES = $(GEN_CSRC)
-
+man_MANS        = autogen.1
+DISTCLEANFILES  = stamp-* ag.c
 bin_PROGRAMS    = autogen
 
 # The list of source files with AutoGen functions
@@ -58,9 +52,10 @@ csrc = \
 
 hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 
-EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) \
-             defParse.x bootstrap.dir schemedef.scm \
-             guile-iface.def guile-iface.tpl
+EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) $(man_MANS) \
+		defParse.x bootstrap.dir schemedef.scm \
+		guile-iface.def guile-iface.tpl \
+		invoke-autogen.texi
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la
@@ -85,69 +80,10 @@ ag.c : Makefile
 	echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
-## Funny build rules for extracting definitions.  "Makefile.in"
-## should never depend on these, so they must *not* be listed in the
-## "BUILT_SOURCES" list.  They are to be rebuilt on explicit request:
-## make gen.  ALSO:  keep the "GEN - RULE" comments - used by bootstrap.dir
-##
-BOOTENV  := top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+BOOTENV     = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
 
-list_stamps     := \
-    stamp-ag-text   stamp-cgi       stamp-directive stamp-fmem \
-    stamp-func      stamp-gver      stamp-man       stamp-opts \
-    stamp-parse     stamp-pseudo    stamp-texi
-
-MAKE_STAMP      = $(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
-
-## stamp-opts GEN-RULE
-stamp-opts: opts.def $(top_srcdir)/VERSION $(CLexe)
-	@$(MAKE_STAMP)
-
-## stamp-directive GEN-RULE
-stamp-directive: defDirect.c
-	@$(MAKE_STAMP)
-
-## stamp-exprini GEN-RULE
-stamp-exprini : $(EXPRLIST) snarf.tpl
-	@$(MAKE_STAMP)
-
-## stamp-fsm GEN-RULE
-stamp-fsm : pseudo.def $(FSMTPL)
-	@$(MAKE_STAMP)
-
-## stamp-parse GEN-RULE
-stamp-parse : defParse.def $(FSMTPL)
-	@$(MAKE_STAMP)
-
-## stamp-ag-text GEN-RULE
-stamp-ag-text : ag-text.def
-	@$(MAKE_STAMP)
-
-## proto.h GEN-RULE
-proto.h :
-	@$(MAKE_STAMP)
-
-## stamp-texi GEN-RULE
-stamp-texi : $(AGnam)
-	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
-	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(MAKE_STAMP)
-
-## stamp-man GEN-RULE
-stamp-man : opts.def $(AGnam)
-	@test -x "$(CLexe)" || { cd ../columns && $(MAKE) $(CLnam) ; }
-	@test -x "$(GDexe)" || { cd ../getdefs && $(MAKE) $(GDnam) ; }
-	@$(MAKE_STAMP)
-
-autogen.1       : stamp-man
-invoke-autogen.texi    : stamp-texi
-gen      : $(list_stamps)
-
-maintainer-clean-local :
-	for t in $(list_stamps) ; do \
-	    test -f $$t && $(MAKE) -f $$t clean-$$t ; \
-	done
+MAKE_STAMP  = $(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
@@ -158,4 +94,16 @@ maintainer-clean-local :
 
 .NOTPARALLEL:
 
-# end of agen5/Makefile.am
+# Strip out maintainer only rules from distributed source.
+# Client make programs will otherwise think they can rebuild stuff.
+# Due to automake code motion, some macro definitions will remain
+# in the Makefile.in file.
+#
+dist-hook:
+	for f in Makefile.am Makefile.in ; do \
+	sed "/^maintainer-clean-local *:/,/^# *end-generated-text/d" \
+		$(distdir)/$$f > $(distdir)/xx ; \
+	mv -f $(distdir)/xx $(distdir)/$$f ; done
+
+# start-generated-text
+# end of agen5/MakeBase

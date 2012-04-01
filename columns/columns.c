@@ -2,7 +2,7 @@
 /*
  *  \file columns.c
  *
- *  Time-stamp:        "2011-03-04 10:17:17 bkorb"
+ *  Time-stamp:        "2012-03-31 13:37:39 bkorb"
  *
  *  Columns Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *  Columns is free software.
@@ -335,7 +335,7 @@ readLines(void)
         if (sepLen > 0)
             strcat(pzL, OPT_ARG(SEPARATION));
 
-        if (len > maxEntryWidth)
+        if ((int)len > maxEntryWidth)
             maxEntryWidth = len;
     next_line:;
     }
@@ -389,10 +389,12 @@ readLines(void)
      *  Otherwise, the column size has been set.  Ensure it is sane.
      */
     else {
+        bool compute_val = (columnCt == 0);
+
         /*
          *  Increase the column size to the width of the widest entry
          */
-        if (maxEntryWidth > columnSz)
+        if (maxEntryWidth > (int)columnSz)
             columnSz = maxEntryWidth;
 
         /*
@@ -400,8 +402,11 @@ readLines(void)
          *    *OR* we are set to overfill the output line,
          *  THEN compute the number of columns.
          */
-        if (  (columnCt == 0)
-           || (((columnSz * (columnCt-1)) + maxEntryWidth) > OPT_VALUE_WIDTH))
+        if (! compute_val) {
+            unsigned long width = maxEntryWidth + (columnSz * (columnCt-1));
+            compute_val = width > (unsigned)OPT_VALUE_WIDTH;
+        }
+        if (compute_val)
             columnCt = ((OPT_VALUE_WIDTH - maxEntryWidth) / columnSz) + 1;
     }
 
@@ -410,7 +415,7 @@ readLines(void)
      *  does not exceed the parameterized limit.
      */
     if (   HAVE_OPT( SPREAD )
-        && ((maxEntryWidth + OPT_VALUE_SPREAD - 1) < columnSz))
+           && ((maxEntryWidth + OPT_VALUE_SPREAD - 1) < (int)columnSz))
         columnSz = maxEntryWidth + OPT_VALUE_SPREAD - 1;
 }
 
@@ -466,7 +471,7 @@ writeColumns(void)
          *  IF the final column is not empty,
          *  THEN break out and start printing.
          */
-        if (pPL[colCt-1].index < usedCt)
+        if (pPL[colCt-1].index < (int)usedCt)
             break;
 
         /*
@@ -498,7 +503,7 @@ writeColumns(void)
          *  IF it goes beyond the end of the entries in use,
          *  THEN reduce our column count.
          */
-        if ((pPL[colCt-1].index)++ >= usedCt)
+        if ((pPL[colCt-1].index)++ >= (int)usedCt)
             colCt--;
 
         /*
@@ -652,7 +657,7 @@ emitWord(char const * word, size_t len, int col)
     static int ended_with_period = 0;
 
     if (col > 0) {
-        if (len >= (OPT_VALUE_WIDTH - col)) {
+        if ((int)len >= (OPT_VALUE_WIDTH - col)) {
             putc('\n', stdout);
             if (pzLinePfx != NULL)
                 fputs(pzLinePfx, stdout);

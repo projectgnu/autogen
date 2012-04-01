@@ -5,7 +5,7 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2012-03-04 19:32:13 bkorb"
+ *  Time-stamp:        "2012-03-31 13:03:19 bkorb"
  *
  *  This module processes the "pseudo" macro
  *
@@ -56,7 +56,7 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
     char*   pzEnd = (char*)pzData + strlen(pzData);
     char    ch;
     macro_t* pCM = cur_macro;
-    macro_t  mac = { (teFuncType)~0, 0, 0, 0, 0, 0, 0, NULL };
+    macro_t  mac = { (mac_func_t)~0, 0, 0, 0, 0, 0, 0, NULL };
 
     mac.md_line = tpl_line;
     pzEnd       = (char*)skip_scheme(pzData, pzEnd);
@@ -173,7 +173,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
                 AG_ABEND(DO_SUFFIX_EMPTY);
             pz = SPN_SUFFIX_FMT_CHARS(pz);
 
-            if ((pz - pzSfxFmt) != str_length)
+            if ((unsigned)(pz - pzSfxFmt) != str_length)
                 AG_ABEND(aprf(DO_SUFFIX_BAD_CHARS, pz));
 
             /*
@@ -366,7 +366,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
         if (! IS_PUNCTUATION_CHAR(ch))
             break;
         *(pzMark++) = ch;
-        if (++ct >= sizeof(st_mac_mark))
+        if (++ct >= (int)sizeof(st_mac_mark))
             return NULL;
 
         pzData++;

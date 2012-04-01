@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2013-03-10 07:11:23 bkorb"
+ *  Time-stamp:        "2012-03-31 13:41:36 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -587,7 +587,7 @@ Select_Match_End(char const * sample, char const * pattern)
     if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
-    if (m[0].rm_eo != strlen(sample))
+    if (m[0].rm_eo != (int)strlen(sample))
         return FAILURE;
     return SUCCESS;
 }
@@ -605,7 +605,7 @@ ag_scm_string_end_match_p(SCM text, SCM substr)
 
     if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
-    else if (m[0].rm_eo != strlen(pzText))
+    else if (m[0].rm_eo != (int)strlen(pzText))
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
 
@@ -627,7 +627,7 @@ ag_scm_string_end_eqv_match_p(SCM text, SCM substr)
 
     if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
-    else if (m[0].rm_eo != strlen(pzText))
+    else if (m[0].rm_eo != (int)strlen(pzText))
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
 
@@ -783,7 +783,7 @@ Select_Match_Full(char const * sample, char const * pattern)
         != 0)
         return FAILURE;
 
-    if (  (m[0].rm_eo != strlen( sample ))
+    if (  (m[0].rm_eo != (int)strlen( sample ))
        || (m[0].rm_so != 0))
         return FAILURE;
     return SUCCESS;
@@ -802,7 +802,7 @@ ag_scm_string_match_p(SCM text, SCM substr)
 
     if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
-    else if (  (m[0].rm_eo != strlen(pzText))
+    else if (  (m[0].rm_eo != (int)strlen(pzText))
             || (m[0].rm_so != 0) )
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
@@ -825,7 +825,7 @@ ag_scm_string_eqv_match_p(SCM text, SCM substr)
 
     if (regexec(&re, pzText, (size_t)2, m, 0) != 0)
          res = SCM_BOOL_F;
-    else if (  (m[0].rm_eo != strlen(pzText))
+    else if (  (m[0].rm_eo != (int)strlen(pzText))
             || (m[0].rm_so != 0) )
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
@@ -843,6 +843,8 @@ ag_scm_string_eqv_match_p(SCM text, SCM substr)
 static tSuccess
 Select_Match_Always(char const * sample, char const * pattern)
 {
+    (void)sample;
+    (void)pattern;
     return SUCCESS;
 }
 
@@ -854,6 +856,7 @@ Select_Match_Always(char const * sample, char const * pattern)
 static tSuccess
 Select_Match_Existence(char const * sample, char const * pattern)
 {
+    (void)pattern;
     return (sample != no_def_str) ? SUCCESS : FAILURE;
 }
 
@@ -865,6 +868,7 @@ Select_Match_Existence(char const * sample, char const * pattern)
 static tSuccess
 Select_Match_NonExistence(char const * sample, char const * pattern)
 {
+    (void)pattern;
     return (sample == no_def_str) ? SUCCESS : FAILURE;
 }
 
@@ -1317,7 +1321,7 @@ mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan)
         span_quote((void *)pzScan);
 
  selection_done:
-    pMac->md_code = (teFuncType)typ;
+    pMac->md_code = (mac_func_t)typ;
 
     current_case.pSelect->md_sib_idx = (pMac - pT->td_macros);
     current_case.pSelect = (macro_t*)pMac;

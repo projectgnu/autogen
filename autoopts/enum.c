@@ -2,7 +2,7 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2012-02-28 19:48:20 bkorb"
+ * Time-stamp:      "2012-03-31 13:22:33 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -215,7 +215,10 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
             if (paz_names[idx][len] == NUL)
                 return idx;  /* full match */
 
-            res = (res != name_ct) ? ~0 : idx; /* save partial match */
+            if (res == name_ct)
+                res = idx; /* save partial match */
+            else
+                res = ~0;  /* may yet find full match */
         }
     }
 
@@ -246,9 +249,9 @@ oops:
 char const *
 optionKeywordName(tOptDesc * pOD, unsigned int enum_val)
 {
-    tOptDesc od;
+    tOptDesc od = {
+        .optArg.argEnum = enum_val };
 
-    od.optArg.argEnum = enum_val;
     (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, &od );
     return od.optArg.argString;
 }
@@ -337,6 +340,7 @@ set_memb_usage(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
     /*
      *  print the list of enumeration names.
      */
+    (void)pOpts;
     enum_err(OPTPROC_EMIT_USAGE, pOD, paz_names, (int)name_ct );
 }
 
@@ -351,6 +355,7 @@ set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
     uintptr_t  bits = (uintptr_t)pOD->optCookie;
     size_t     len  = 0;
 
+    (void)pOpts;
     bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
 
     while (bits != 0) {
@@ -372,6 +377,7 @@ set_memb_names(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
     unsigned int ix = 0;
     size_t     len  = NONE_STR_LEN + 1;
 
+    (void)pOpts;
     bits &= ((uintptr_t)1 << (uintptr_t)name_ct) - (uintptr_t)1;
 
     /*

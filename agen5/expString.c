@@ -2,7 +2,7 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2012-03-04 19:01:34 bkorb"
+ *  Time-stamp:        "2012-03-31 13:33:55 bkorb"
  *
  *  This module implements expression functions that
  *  manipulate string values.
@@ -32,7 +32,7 @@ static SCM
 makeString(char const * pzText, char const * pzNewLine, size_t newLineSize);
 
 static size_t
-stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta, size_t dtaSize);
+stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta);
 
 static SCM
 shell_stringify(SCM obj, uint_t qt);
@@ -216,7 +216,7 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
 }
 
 static size_t
-stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta, size_t dtaSize)
+stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta)
 {
     char * pz = pzNew;
     *(pz++) = qt;
@@ -227,7 +227,6 @@ stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta, size_t dtaSize)
         case NUL:
             pz[-1]  = qt;
             *pz     = NUL;
-            dtaSize = (pz - pzNew);
 
             return (pz - pzNew);
 
@@ -253,7 +252,7 @@ stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta, size_t dtaSize)
                  *  then we will double the backslash and a third backslash
                  *  will be inserted when we emit the quote character.
                  */
-                if (c != qt)
+                if ((unsigned)c != qt)
                     break;
                 /* FALLTHROUGH */
 
@@ -263,7 +262,7 @@ stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta, size_t dtaSize)
             break;
 
         case '"': case '`':
-            if (c == qt) {
+            if ((unsigned)c == qt) {
                 /*
                  *  This routine does both `xx` and "xx" strings, we have
                  *  to worry about this stuff differently.  I.e., in ""
@@ -302,7 +301,7 @@ shell_stringify(SCM obj, uint_t qt)
     } loopDone1:;
 
     pzNew = AGALOC(dtaSize, "shell string");
-    dtaSize = stringify_for_sh(pzNew, qt, pzDta, dtaSize);
+    dtaSize = stringify_for_sh(pzNew, qt, pzDta);
 
     {
         SCM res = AG_SCM_STR2SCM(pzNew, dtaSize);
@@ -990,7 +989,7 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
         ch_map[i] = i;
     } while (--i > 0);
 
-    for (;i <= sizeof(ch_map) - 1;i++) {
+    for (; i <= (int)sizeof(ch_map) - 1; i++) {
         unsigned char fch = (unsigned char)*(pzFrom++);
         unsigned char tch = (unsigned char)*(pzTo++);
 

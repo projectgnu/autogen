@@ -3,7 +3,7 @@
  *
  * @brief consistency checks.
  *
- *  Time-stamp:      "2011-05-24 17:50:10 bkorb"
+ *  Time-stamp:      "2012-03-31 13:46:35 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -70,6 +70,8 @@ has_conflict(tOptions * pOpts, tOptDesc * pOD)
 static bool
 occurs_enough(tOptions * pOpts, tOptDesc * pOD)
 {
+    (void)pOpts;
+
     /*
      *  IF the occurrence counts have been satisfied,
      *  THEN there is no problem.

@@ -2,7 +2,7 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-03-10 08:46:42 bkorb"
+ *  Time-stamp:        "2012-03-31 13:55:12 bkorb"
  *
  *  This module implements text functions.
  *
@@ -228,10 +228,12 @@ mFunc_Text(templ_t* pT, macro_t* pMac)
  *    @end example
 =*/
 macro_t *
-mLoad_Comment(templ_t * pT, macro_t * pMac, char const ** ppzScan)
+mLoad_Comment(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
-    memset((void*)pMac, 0, sizeof(*pMac));
-    return pMac;
+    (void)tpl;
+    (void)p_scan;
+    memset((void*)mac, 0, sizeof(*mac));
+    return mac;
 }
 
 
@@ -242,11 +244,12 @@ mLoad_Comment(templ_t * pT, macro_t * pMac, char const ** ppzScan)
  *  This is used as the default load mechanism.
  */
 macro_t *
-mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
+mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** p_scan)
 {
     char *        pzCopy = pT->td_scan;
     char const *  pzSrc;
     size_t        src_len = (size_t)pMac->md_res; /* macro len  */
+    (void)p_scan;
 
     if (src_len <= 0)
         goto return_emtpy_expr;
@@ -338,12 +341,13 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** ppzScan)
  *  here, until an "IF" function is encountered.
  */
 macro_t*
-mLoad_Bogus(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+mLoad_Bogus(templ_t* pT, macro_t* pMac, char const ** p_scan)
 {
     char const * pzSrc = (char const*)pMac->md_txt_off; /* macro text */
     char const * pzMac;
 
     char z[ 64 ];
+    (void)p_scan;
 
     if (pzSrc != NULL) {
         z[0] = ':';

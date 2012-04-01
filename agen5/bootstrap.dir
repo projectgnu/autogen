@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-03-04 19:42:18 bkorb"
+# Time-stamp:        "2012-03-31 17:53:23 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -23,18 +23,23 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------
 #
-#  This script rebuilds sources not kept in the CVS repository.
+#  This script rebuilds sources not kept in the GIT repository.
 #  These files are distributed, so it is not necessary to invoke
-#  AutoGen before building AutoGen.  (Like I had to do long ago :)
+#  AutoGen before building AutoGen.
 
 #  "make" will invoke this file with the name of the desired output
 #  as an argument.  We do this here rather than in the make file
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
+readonly stamp_list=$(echo \
+        ag_text cgi directive exprini fmem func gver man opts \
+        parse pseudo texi proto)
+
 test "X${mainpid}" = X && {
     . ${top_srcdir}/config/bootstrap.shlib
     free_trap=true
+
 } || {
     free_trap=false
 }
@@ -80,8 +85,8 @@ set_defaults()
         arglist=""
         local f
 
-        for f
-        do test -f $f || arglist="$arglist $f"
+        for f in $stamp_list
+        do test -f stamp-$f || arglist="$arglist stamp-$f"
         done
         ;;
 
@@ -163,10 +168,14 @@ make_parse()
 #
 # Make the pseudo-macro processing Finite State Machine
 #
-make_fsm()
+make_cgi()
+{
+    run_ag cgi cgi.def
+}
+
+make_pseudo()
 {
     run_ag pseudo pseudo.def
-    run_ag cgi    cgi.def
     rm -f .fsm.*
 }
 
@@ -208,8 +217,6 @@ make_exprini()
       egrep -v 'no copies of pattern' >&2
     set -e
     run_ag exprini expr.def
-    test ${#DEBUGGING_AUTOGEN} -eq 0 -a "$t" != "expr.def" && \
-        rm -f expr.cfg expr.def stamp-exprini
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -229,16 +236,30 @@ make_directive()
 
     ${GDexe} load=directive.cfg ${srcdir}/defDirect.c
     run_ag directive -t30 directive.def
-    rm -f directive.def directive.cfg
+    rm -f directive.cfg
 }
 
 # # # # # # # # # # # # # # # # # # #
 #
 # Construct the texinfo doc
 #
+check_exe()
+{
+    eval local exe=\$${1}exe
+    test -x $exe && return 0
+
+    exe=`cd ../$2 >/dev/null && pwd`/$2
+    cd ../$2
+    ${MAKE:-make} $2 || die "Cannot make $2"
+    cd -
+    test -x $exe || die "Cannot locate $exe"
+    eval ${1}exe=$exe
+}
+
 make_texi()
 {
-    test -z "${CLexe}" && die "Cannot locate columns"
+    check_exe CL columns
+    check_exe GD getdefs
 
     eopt="-Tagtexi-cmd.tpl -DLEVEL=chapter -binvoke-autogen"
     run_ag texi ${eopt} ${srcdir}/opts.def
@@ -251,24 +272,34 @@ make_texi()
 make_ag_text()
 {
     export srcdir AG_VERSION
-    run_ag ag-text ${srcdir}/ag-text.def
+    run_ag ag_text ${srcdir}/ag-text.def
 }
 
 # # # # # # # # # # # # # # # # # # #
 #
 # Construct the man page
 #
-make_man()
+make_fmem()
 {
-    test -z "${CLexe}" && die "Cannot locate columns"
-
-    run_ag man -Tagman-cmd -DMAN_SECTION=1 ${srcdir}/opts.def
-
+    check_exe GD getdefs
+    check_exe CL columns
     ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
     run_ag fmem fmemopen.def
     rmlist=${rmlist}\ fmemopen.def
 }
 
+make_man()
+{
+    check_exe CL columns
+    check_exe GD getdefs
+
+    run_ag man -Tagman-cmd -DMAN_SECTION=1 ${srcdir}/opts.def
+}
+
+# # # # # # # # # # # # # # # # # # #
+#
+# Construct the function tables
+#
 make_func()
 {
     test -z "${CLexe}" -o -z "${GDexe}" && \
@@ -279,14 +310,69 @@ make_func()
 
     ${GDexe} output=functions.def template=functions.tpl ${opts} ${files}
     run_ag func functions.def
+}
+
+make_gver()
+{
+    test -f guile-iface.def || make_func
     run_ag gver guile-iface.def
+}
+
+assemble_Makefile() {
+    local defined_elsewhere='
+make_opts(){;}
+make_proto(){;}'
+
+    ct=`grep -E '# *(start|end)-generated-text$' ${srcdir}/Makefile.am | wc -l`
+    test $ct -eq 1 || return
+
+    {
+        sed '/# *start-generated-text/q' ${srcdir}/Makefile.am
+        echo
+
+        echo list_stamps = '\'
+        sflist=''
+        for f in $stamp_list
+        do sflist=${sflist}stamp-$f${nl}
+        done
+        printf %s "$sflist" | \
+            ${CLexe} --spread=1 -I4 --line=' \'
+
+        printf '\ngen : $(list_stamps)\n\n'
+
+        fmt='stamp-%s:\n\t@$(MAKE_STAMP)\n\n'
+        for f in $stamp_list
+        do printf "$fmt" $f
+        done
+
+        echo 'maintainer-clean-local : \'
+        sed -n '/^clean-/{;s/^/    /;s/:/\\/p;}' stamp-* | \
+            sed '$s/ \\//'
+        echo
+
+        set -- $sflist
+        head -n 1 $1
+
+        for f in $*
+        do
+            echo
+            sed 1d $f
+        done
+        printf '# end-generated-text\n# end of Makefile.am\n'
+    } > Makefile.XX
+
+    if  cmp -s Makefile.XX Makefile.am
+    then rm -f Makefile.XX
+    else mv -f Makefile.XX Makefile.am
+    fi
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #  M A I N
 #
-set_defaults "$@"
+PS4='>bsag-${FUNCNAME}> '
+set_defaults ${1+"$@"}
 
 #  FOR each output target,
 #   DO the appropriate rule...
@@ -295,32 +381,23 @@ for t in ${arglist}
 do
   echo Re-building "$t"
   case "$t" in
-  ( stamp-parse     | \
-    defParse-fsm.c  | \
+  ( stamp-* )                   eval make_${t#stamp-} ;;
+  ( defParse-fsm.c  | \
     defParse-fsm.h  )           make_parse ;;
 
-  ( stamp-opts      | \
-    opts.[ch]       )           make_opts ;;
+  ( opts.[ch]       )           make_opts ;;
 
-  (stamp-fsm        )           make_fsm ;;
-
-  (stamp-ag-text    )           make_ag_text ;;
-
-  ( stamp-exprini   | \
-    expr.h          | \
+  ( expr.h          | \
     expr.def        | \
     expr.ini        )           make_exprini ;;
 
-  ( stamp-directive | \
-    directive.def   | \
+  ( directive.def   | \
     directive.h     )           make_directive ;;
 
-  ( stamp-texi      | \
-    autogen.texi    | \
+  ( autogen.texi    | \
     autogen.menu    )           make_texi ;;
 
-  ( stamp-man       | \
-    autogen.1       | \
+  ( autogen.1       | \
     fmemopen.3      )           make_man ;;
 
   ( proto.h         )           make_proto ;;
@@ -330,12 +407,12 @@ do
   (*) die "Don't know how to make $t" ;;
   esac
 done
+assemble_Makefile
 
 #  IF we symlinked in columns or getdefs,
 #  THEN it is time to unlink them
 #
-if [ ! -z "$rmlist" ]
-then rm -f $rmlist ; fi
+test -z "$rmlist" || rm -f $rmlist
 
 ${free_trap} && trap '' 0
 

@@ -2,7 +2,7 @@
 /**
  * \file boolean.c
  *
- * Time-stamp:      "2010-07-10 11:02:10 bkorb"
+ * Time-stamp:      "2012-03-31 13:46:19 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -43,10 +43,12 @@
  *  it is an empty string or it is a number that evaluates to zero.
 =*/
 void
-optionBooleanVal( tOptions* pOpts, tOptDesc* pOD )
+optionBooleanVal(tOptions * pOpts, tOptDesc * pOD )
 {
     char* pz;
     bool  res = true;
+
+    (void)pOpts;
 
     if ((pOD->fOptState & OPTST_RESET) != 0)
         return;
