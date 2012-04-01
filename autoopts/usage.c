@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2012-03-31 13:20:53 bkorb"
+ * Time-stamp:      "2012-03-31 19:19:26 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -116,7 +116,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
     };
 #   undef  _aof_
 
-    ao_flags_t flg = (ao_flags_t)0;
+    unsigned int flg = (ao_flags_t)0;
 
     if (flg_txt == NULL) {
         flg_txt = getenv("AUTOOPTS_USAGE");
@@ -146,7 +146,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
         if (! IS_END_LIST_ENTRY_CHAR(flg_txt[fnt->fnm_len]))
             return;
 
-        flg |= (ao_flags_t)(1 << ix);
+        flg |= 1 << ix;
         flg_txt = SPN_WHITESPACE_CHARS(flg_txt + fnt->fnm_len);
 
         if (*flg_txt == NUL)

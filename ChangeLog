@@ -1,3 +1,12 @@
+2012-04-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/agtexi-cmd.tpl: omit texi doc for options with emtpy
+	"doc" clauses.
+	* agen5/bootstrap.dir: remove code used only by "make"
+	* agen5/mk-stamps.sh: removed to here
+	* autoopts/env.c (doPrognameEnv): warning patrol
+	* autoopts/usage.c (set_usage_flags): warning patrol
+
 2012-03-31  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am: Remove lists of generated things and derive them

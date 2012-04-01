@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-03-31 18:12:49 bkorb"
+## Time-stamp:      "2012-04-01 05:21:26 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -55,7 +55,7 @@ hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) $(man_MANS) \
 		defParse.x bootstrap.dir schemedef.scm \
 		guile-iface.def guile-iface.tpl \
-		invoke-autogen.texi
+		invoke-autogen.texi mk-stamps.sh
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la
@@ -80,10 +80,11 @@ ag.c : Makefile
 	echo '#include "autogen.h"' ; \
 	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
 
-BOOTENV     = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
-	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe)
+STAMPENV = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
+	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
+	DEPDIR="$(DEPDIR)"
 
-MAKE_STAMP  = $(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
@@ -93,17 +94,6 @@ MAKE_STAMP  = $(BOOTENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 	cd ../snprintfv ; $(MAKE) libsnprintfv.la
 
 .NOTPARALLEL:
-
-# Strip out maintainer only rules from distributed source.
-# Client make programs will otherwise think they can rebuild stuff.
-# Due to automake code motion, some macro definitions will remain
-# in the Makefile.in file.
-#
-dist-hook:
-	for f in Makefile.am Makefile.in ; do \
-	sed "/^maintainer-clean-local *:/,/^# *end-generated-text/d" \
-		$(distdir)/$$f > $(distdir)/xx ; \
-	mv -f $(distdir)/xx $(distdir)/$$f ; done
 
 # start-generated-text
 # end of agen5/MakeBase

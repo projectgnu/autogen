@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-03-31 17:53:23 bkorb"
+# Time-stamp:        "2012-04-01 05:22:22 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -32,117 +32,34 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
-readonly stamp_list=$(echo \
-        ag_text cgi directive exprini fmem func gver man opts \
-        parse pseudo texi proto)
-
-test "X${mainpid}" = X && {
-    . ${top_srcdir}/config/bootstrap.shlib
-    free_trap=true
-
-} || {
-    free_trap=false
-}
-
-set_exe_var()
-{
-    if test -d "$dir" && test -x "$dir/$prog"
-    then 
-        exe=$(\cd $dir >/dev/null ; pwd)/$prog
-
-    else
-        eval f=\$${var}exe
-        if test -x "$f"
-        then
-            exe=$f
-
-        else
-            f=$(which $prog 2> /dev/null)
-            case ${f} in
-            ( */${prog} )  exe=${f} ;;
-            ( * )          echo unset ${var}exe ; return ;;
-            esac
-        fi
-    fi
-
-    echo ${var}exe=${exe} export ${var}exe
-}
+readonly stamp_list=$(echo "stamp-opts${nl}stamp-proto"
+    sed -n '/^make_[a-z_]*[(]/{;s/^make_/stamp-/;s/[()].*//;p;}' \
+        ${srcdir}/mk-stamps.sh)
 
 set_defaults()
 {
-    #  If the argument is "recursive", then we are bootstrapping.
-    #  Otherwise, we are being invoked from "make".
-    #
-    case "${1}" in
-    ( "" ) die "Specify what you want to bootstrap" ;;
+    builddir=$(pwd)
+    srcdir=${srcdir:-$builddir}
+    AGexe=$(command -v autogen)
+    CLexe=$(command -v columns)
+    GDexe=$(command -v getdefs)
 
-    ( recursive )
-        builddir=$(pwd)
-        srcdir=${srcdir}
+    test -x "${AGexe}" -a -x "${GDexe}" -a -x "${CLexe}" || \
+        die "autogen is required"
 
-        set -- $(egrep '##.*GEN-RULE' ${srcdir}/Makefile.am | \
-            awk '{ print $2 }' ) functions.h
-        arglist=""
-        local f
-
-        for f in $stamp_list
-        do test -f stamp-$f || arglist="$arglist stamp-$f"
-        done
-        ;;
-
-    ( * )
-        top_srcdir=${top_srcdir-$(cd .. >/dev/null ; pwd)}
-        top_builddir=${top_builddir-$(dirname ${progdir})}
-        builddir=$(pwd)
-        srcdir=${srcdir-${builddir}}
-
-        arglist=$(echo $*)
-
-        AGexe=${AGexe-$(which autogen)}
-        GDexe=${GDexe-$(which getdefs)}
-        CLexe=${CLexe-$(which columns)}
-        export AGexe GDexe CLexe
-        ;;
-    esac
-
-    test -x "${AGexe}" || die "autogen is required"
-
-    export runAG top_srcdir top_builddir builddir srcdir arglist
+    export builddir srcdir AGexe CLexe GDexe
 
     #  Make sure we have a default for top build and source.
     #  Some of the templates need this information.
     #
     local verdata=$(egrep '^AG_' ${top_srcdir}/VERSION | \
        sed 's,^\(AG[^=]*\)\(.*\),\1\2 export \1,')
-    eval "${verdata}"
+    eval "set -a;${verdata};set +a"
 
     #  disable any $HOME defaults
     #
     HOME=/dev/null
     SHELL=${POSIX_SHELL-/bin/sh}
-
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    #
-    # For the following to work, we must temporarily find or install
-    # autogen, columns and getdefs from wherever they are found:
-    #
-    rmlist=
-
-    #  Name our executable in one place and disable any $HOME defaults
-    #  Use the local tools, if available.  Otherwise, look for them.
-    #
-    txt=$(
-        while read var prog dir
-        do
-            test -n ${#dir} && set_exe_var
-        done <<- EOF
-
-	AG  ${AGnam-autogen}  ${builddir}
-	GD  ${GDnam-getdefs}  ${builddir}/../getdefs
-	CL  ${CLnam-columns}  ${builddir}/../columns
-	EOF
-    )
-    eval "$txt"
 
     ${VERBOSE:-false} && set -x || :
     #  Ensure complete success or a noticable failure
@@ -150,182 +67,7 @@ set_defaults()
     set -e
 }
 
-# # # # # # # # # # # # # # # # # # #
-#
-# Make the definition parser
-#
-make_parse()
-{
-    local opts=''
-
-    test ${#DEBUG_ENABLED} -gt 0 && \
-        opts=-DDEBUG_ENABLED
-
-    run_ag parse ${opts} defParse.def
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Make the pseudo-macro processing Finite State Machine
-#
-make_cgi()
-{
-    run_ag cgi cgi.def
-}
-
-make_pseudo()
-{
-    run_ag pseudo pseudo.def
-    rm -f .fsm.*
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Make the expression processing code
-#
-# NOTE: the expr.test test extracts this function!!
-#
-make_exprini()
-{
-    test -z "${CLexe}" -o -z "${GDexe}" && \
-        die "Cannot locate columns or getdefs"
-
-    #  funcCase.c must be first file in list.
-    #  It has the exparg attribute names.
-    #
-    exec 3> expr.cfg
-    cat >&3 <<- _EOConfig_
-	defs-to-get gfunc
-	template    snarf
-	srcfile
-	assign      two-phase = yes
-	assign      group     = ag
-	output      expr.def
-	subblock    exparg    = arg_name,arg_desc,arg_optional,arg_list
-	_EOConfig_
-
-    test ${#DEBUG_ENABLED} -gt 0 && \
-        printf '%-15s %s\n' assign 'debug-enabled = true' >&3
-
-    for f in func*.c exp*.c agShell.c
-    do echo input ${f} ; done >&3
-    exec 3>&-
-
-    echo ${GDexe} load=expr.cfg
-    set +e
-    ( SHELL=sh ${GDexe} load=expr.cfg ${files} 2>&1 ) | \
-      egrep -v 'no copies of pattern' >&2
-    set -e
-    run_ag exprini expr.def
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-#  Make the directive.h header
-#
-make_directive()
-{
-    test -z "${CLexe}" && die "Cannot locate columns"
-
-    cat > directive.cfg <<- _EOConfig_
-	defs-to-get    directive
-	template       directive
-	output         directive.def
-	linenum
-	_EOConfig_
-
-    ${GDexe} load=directive.cfg ${srcdir}/defDirect.c
-    run_ag directive -t30 directive.def
-    rm -f directive.cfg
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Construct the texinfo doc
-#
-check_exe()
-{
-    eval local exe=\$${1}exe
-    test -x $exe && return 0
-
-    exe=`cd ../$2 >/dev/null && pwd`/$2
-    cd ../$2
-    ${MAKE:-make} $2 || die "Cannot make $2"
-    cd -
-    test -x $exe || die "Cannot locate $exe"
-    eval ${1}exe=$exe
-}
-
-make_texi()
-{
-    check_exe CL columns
-    check_exe GD getdefs
-
-    eopt="-Tagtexi-cmd.tpl -DLEVEL=chapter -binvoke-autogen"
-    run_ag texi ${eopt} ${srcdir}/opts.def
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Construct the ag-text strings
-#
-make_ag_text()
-{
-    export srcdir AG_VERSION
-    run_ag ag_text ${srcdir}/ag-text.def
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Construct the man page
-#
-make_fmem()
-{
-    check_exe GD getdefs
-    check_exe CL columns
-    ${GDexe} templ=agman3.tpl linenum output=fmemopen.def ${srcdir}/fmemopen.c
-    run_ag fmem fmemopen.def
-    rmlist=${rmlist}\ fmemopen.def
-}
-
-make_man()
-{
-    check_exe CL columns
-    check_exe GD getdefs
-
-    run_ag man -Tagman-cmd -DMAN_SECTION=1 ${srcdir}/opts.def
-}
-
-# # # # # # # # # # # # # # # # # # #
-#
-# Construct the function tables
-#
-make_func()
-{
-    test -z "${CLexe}" -o -z "${GDexe}" && \
-        die "Cannot locate columns or getdefs"
-
-    local files=$(grep -F -l '/*=macfunc' *.c)
-    local opts='srcfile linenum defs=macfunc listattr=alias'
-
-    ${GDexe} output=functions.def template=functions.tpl ${opts} ${files}
-    run_ag func functions.def
-}
-
-make_gver()
-{
-    test -f guile-iface.def || make_func
-    run_ag gver guile-iface.def
-}
-
 assemble_Makefile() {
-    local defined_elsewhere='
-make_opts(){;}
-make_proto(){;}'
-
-    ct=`grep -E '# *(start|end)-generated-text$' ${srcdir}/Makefile.am | wc -l`
-    test $ct -eq 1 || return
-
     {
         sed '/# *start-generated-text/q' ${srcdir}/Makefile.am
         echo
@@ -333,32 +75,27 @@ make_proto(){;}'
         echo list_stamps = '\'
         sflist=''
         for f in $stamp_list
-        do sflist=${sflist}stamp-$f${nl}
+        do sflist=${sflist}$f${nl}
         done
         printf %s "$sflist" | \
             ${CLexe} --spread=1 -I4 --line=' \'
 
-        printf '\ngen : $(list_stamps)\n\n'
-
-        fmt='stamp-%s:\n\t@$(MAKE_STAMP)\n\n'
+        echo "if AMDEP"
         for f in $stamp_list
-        do printf "$fmt" $f
-        done
-
-        echo 'maintainer-clean-local : \'
-        sed -n '/^clean-/{;s/^/    /;s/:/\\/p;}' stamp-* | \
-            sed '$s/ \\//'
-        echo
-
-        set -- $sflist
-        head -n 1 $1
-
-        for f in $*
         do
-            echo
-            sed 1d $f
+            echo "@am__include@ @am__quote@./\$(DEPDIR)/${f}.d@am__quote@"
         done
-        printf '# end-generated-text\n# end of Makefile.am\n'
+        echo endif
+
+        fmt='\n%s:\n\t@target="$(AUTOGEN_%s_TList)" \\\n'
+        fmt=${fmt}'\t$(MAKE_STAMP)\n'
+        for f in $stamp_list
+        do
+            g=$(echo $f | sed 's/[^a-zA-Z0-9]/_/g')
+            printf "$fmt" $f $g
+        done
+        printf '\n# end-generated-text\n# end of Makefile.am\n'
+
     } > Makefile.XX
 
     if  cmp -s Makefile.XX Makefile.am
@@ -373,48 +110,14 @@ make_proto(){;}'
 #
 PS4='>bsag-${FUNCNAME}> '
 set_defaults ${1+"$@"}
-
-#  FOR each output target,
-#   DO the appropriate rule...
-#
-for t in ${arglist}
-do
-  echo Re-building "$t"
-  case "$t" in
-  ( stamp-* )                   eval make_${t#stamp-} ;;
-  ( defParse-fsm.c  | \
-    defParse-fsm.h  )           make_parse ;;
-
-  ( opts.[ch]       )           make_opts ;;
-
-  ( expr.h          | \
-    expr.def        | \
-    expr.ini        )           make_exprini ;;
-
-  ( directive.def   | \
-    directive.h     )           make_directive ;;
-
-  ( autogen.texi    | \
-    autogen.menu    )           make_texi ;;
-
-  ( autogen.1       | \
-    fmemopen.3      )           make_man ;;
-
-  ( proto.h         )           make_proto ;;
-
-  ( functions.h     )           make_func ;;
-
-  (*) die "Don't know how to make $t" ;;
-  esac
-done
+DEPDIR=
+. ${srcdir}/mk-stamps.sh $stamp_list
 assemble_Makefile
 
 #  IF we symlinked in columns or getdefs,
 #  THEN it is time to unlink them
 #
 test -z "$rmlist" || rm -f $rmlist
-
-${free_trap} && trap '' 0
 
 # Local Variables:
 # mode:shell-script

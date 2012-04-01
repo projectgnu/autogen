@@ -3,7 +3,7 @@
 
 # rc.test ---  test loading and saving of rc files
 #
-# Time-stamp:        "2011-08-07 17:33:45 bkorb"
+# Time-stamp:        "2012-04-01 05:51:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -92,16 +92,9 @@ cmp ${testname}-*1.help || \
 #  We change into the ${testname}.run directory and run the program.
 #  It should pick up the value saved into the ${testname}.rc dir.
 #
-
-echo from `pwd`:
-echo "./${testname} --second=third '->'${testname}.rc/${testname}.file"
 ./${testname} --second=third '->'${testname}.rc/${testname}.file
 
-ls -l ${testname}.rc/${testname}.file
-
 cd ${testname}.run
-echo from `pwd`:
-echo '../${testname} -t xxx MUMBLE > ${testname}.cmds'
 ../${testname} -t xxx MUMBLE > ${testname}.cmds
 
 #  This is what the output should be:

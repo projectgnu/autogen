@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2011-04-20 17:11:27 bkorb"
+# Time-stamp:      "2012-04-01 04:59:47 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -143,12 +143,13 @@ pre_local()
 post_local()
 {
     for f in $(find . -name bootstrap.dir)
-    do
-        (   ${setx} ; cd $(dirname $f)
-            srcdir=.
-            echo running POST-bootstrap.dir in ${PWD}
-            PS4='>Abs-${FUNCNAME}> '
-            . ./bootstrap.dir recursive || :
+    do  (
+        ${setx}
+        cd $(dirname $f)
+        srcdir=`pwd`
+        echo running POST-bootstrap.dir in ${srcdir}
+        PS4='>Abs-${FUNCNAME}> '
+        . ./bootstrap.dir recursive || :
         )
     done
 

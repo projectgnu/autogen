@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # expr.test --- [= % name (sprintf "%%-18s" "%s") =] expression
 #
-# Time-stamp:      "2011-12-15 12:52:48 bkorb"
+# Time-stamp:      "2012-04-01 06:07:01 bkorb"
 # Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -75,7 +75,7 @@ else
 	_EOF_
 fi
 
-${SED} -n '/^make_exprini()/,/^[}]$/p' ${top_srcdir}/agen5/bootstrap.dir | \
+${SED} -n '/^make_exprini()/,/^[}]$/p' ${top_srcdir}/agen5/mk-stamps.sh | \
   ${SED} 's/rm -f /echo rm -f/' >&3
 cat >&3 <<- _EOF_
 	make_exprini
