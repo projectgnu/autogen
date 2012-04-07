@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-03-31 13:16:15 bkorb"
+## Time-stamp:      "2012-04-07 09:55:51 bkorb"
 ## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -45,19 +45,16 @@ RUNAG       = $(BOOTENV) $(AGexe) $(AGDEPS) \
 	-L$(top_srcdir)/autoopts/tpl -L$(top_builddir)/autoopts/tpl \
 	--definition=$(srcdir)/xmlopts.def
 
-if AMDEP
 CLEAN_RULES = \
 	clean-stamp-opts clean-stamp-texi clean-stamp-man clean-stamp-fork
-clean-local : $(CLEAN_RULES)
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-opts.d@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-texi.d@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-man.d@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-fork.d@am__quote@
+@AMDEP_TRUE@clean-local : $(CLEAN_RULES)
 
-@am__include@ @am__quote@./$(DEPDIR)/stamp-opts.d@am__quote@
-@am__include@ @am__quote@./$(DEPDIR)/stamp-texi.d@am__quote@
-@am__include@ @am__quote@./$(DEPDIR)/stamp-man.d@am__quote@
-@am__include@ @am__quote@./$(DEPDIR)/stamp-fork.d@am__quote@
-AGDEPS      = -MF$(DEPDIR)/$@.d -MT$@ -MP
-else
-AGDEPS      =
-endif
+@AMDEP_TRUE@AGDEPS      = -MF$(DEPDIR)/$@.d -MT$@ -MP
+@AMDEP_FALSE@AGDEPS     =
 
 all 	    : gen
 gen 	    : $(gsrcs) $(DOCFILES)

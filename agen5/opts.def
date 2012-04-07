@@ -250,7 +250,7 @@ flag = {
 	_EOF_;
 
     flag-code = <<-  _EOCode_
-	    teProcState saveState = processing_state;
+	    proc_state_t saveState = processing_state;
 	    char* pz;
 	    char  zPath[MAXPATHLEN];
 	    static char const * const apzSfx[] = { "scm", NULL };

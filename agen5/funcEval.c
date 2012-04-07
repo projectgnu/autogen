@@ -4,7 +4,7 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2012-03-31 13:43:29 bkorb"
+ *  Time-stamp:        "2012-04-07 09:41:46 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -155,7 +155,7 @@ eval_mac_expr(bool * allocated)
          *  Get the named definition entry, maybe
          */
         bool indexed;
-        ent = findDefEntry(tpl->td_text + mac->md_name_off, &indexed);
+        ent = find_def_ent(tpl->td_text + mac->md_name_off, &indexed);
 
         if (ent == NULL) {
             switch (code & (EMIT_IF_ABSENT | EMIT_ALWAYS)) {
@@ -315,7 +315,6 @@ ag_scm_error_source_line(void)
     fprintf(stderr, SCM_ERROR_FMT, current_tpl->td_name, cur_macro->md_line,
             current_tpl->td_text + cur_macro->md_txt_off);
     fflush(stderr);
-    guileFailure = 1;
 
     return SCM_UNDEFINED;
 }
@@ -521,7 +520,7 @@ expr_type(char * pz)
 /**
  *  mLoad_Expr
  */
-macro_t*
+macro_t *
 mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 {
     char *        copy; /* next text dest   */
@@ -529,9 +528,15 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     size_t        src_len = (long)mac->md_res;           /* macro len  */
     char const *  end_src = src + src_len;
 
-    switch (*src) {
-        macro_t * nxt_mac;
+    if (src_len == 0) {
+        if (mac->md_code == FTYP_INCLUDE)
+            AG_ABEND_IN(tpl, mac, LD_INC_NO_FNAME);
+        mac->md_res = EMIT_VALUE;
+        mac->md_txt_off = 0;
+        return mac + 1;
+    }
 
+    switch (*src) {
     case '-':
         mac->md_res = EMIT_IF_ABSENT;
         src++;
@@ -551,28 +556,28 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
         src++;
         break;
 
-    default:
-        mac->md_res = EMIT_VALUE; /* zero */
-        break;
-
     case '`':
-        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        (void) mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_SHELL;
         span_quote(tpl->td_text + mac->md_txt_off);
-        return nxt_mac;
+        return mac + 1;
 
     case '"':
     case '\'':
-        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        (void) mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_STRING;
         span_quote(tpl->td_text + mac->md_txt_off);
-        return nxt_mac;
+        return mac + 1;
 
     case '(':
     case ';':
-        nxt_mac     = mLoad_Unknown(tpl, mac, ppzScan);
+        (void) mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_EXPRESSION;
-        return nxt_mac;
+        return mac + 1;
+
+    default:
+        mac->md_res = EMIT_VALUE; /* zero */
+        break;
     }
 
     copy = tpl->td_scan;
@@ -581,9 +586,9 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
         size_t remLen = canonical_name(copy, src, (int)src_len);
         if (remLen > src_len)
             AG_ABEND_IN(tpl, mac, LD_EXPR_BAD_NAME);
-        src  += src_len - remLen;
-        src_len  = remLen;
-        copy += strlen(copy) + 1;
+        src    += src_len - remLen;
+        src_len = remLen;
+        copy   += strlen(copy) + 1;
     }
 
     if (src >= end_src) {
@@ -594,13 +599,14 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 
     } else {
         char* pz = copy;
-        long  ct = src_len = (long)(end_src - src);
+        src_len = (long)(end_src - src);
 
         mac->md_txt_off = (copy - tpl->td_text);
         /*
          *  Copy the expression
          */
-        do { *(copy++) = *(src++); } while (--ct > 0);
+        memcpy(copy, src, src_len);
+        copy += src_len;
         *(copy++) = NUL; *(copy++) = NUL; /* double terminate */
 
         /*

@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-03-31 13:22:09 bkorb"
+ *  Time-stamp:        "2012-04-07 09:33:39 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -67,6 +67,10 @@ setup_signals(sighandler_proc_t * chldHandler,
               sighandler_proc_t * abrtHandler,
               sighandler_proc_t * dfltHandler);
 /* = = = END-STATIC-FORWARD = = = */
+
+#ifndef HAVE_CHMOD
+#  include "compat/chmod.c"
+#endif
 
 /**
  * main routine under Guile guidance
@@ -247,7 +251,7 @@ cleanup_and_abort(int sig)
             mac_func_t f =
                 (cur_macro->md_code > FUNC_CT)
                     ? FTYP_SELECT : cur_macro->md_code;
-            pzFn = apzFuncNames[ f ];
+            pzFn = ag_fun_names[ f ];
             line = cur_macro->md_line;
             fnCd = cur_macro->md_code;
         }
@@ -476,7 +480,7 @@ ag_abend_at(char const * pzMsg
         fputc(NL, stderr);
 
     {
-        teProcState oldState = processing_state;
+        proc_state_t oldState = processing_state;
         processing_state = PROC_STATE_ABORTING;
 
         switch (oldState) {

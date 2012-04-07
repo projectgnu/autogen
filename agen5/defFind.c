@@ -1,7 +1,7 @@
 /**
  * @file defFind.c
  *
- *  Time-stamp:        "2012-03-10 12:16:40 bkorb"
+ *  Time-stamp:        "2012-04-07 09:12:06 bkorb"
  *
  *  This module locates definitions.
  *
@@ -700,14 +700,19 @@ add_string(char const * pz)
     }
 }
 
+/**
+ * locate a definition by name.
+ *
+ * @param[in]  name     the name to find.  May be segmented and/or indexed.
+ * @param[out] indexed  whether or not the found name is indexed.
+ */
 LOCAL def_ent_t *
-findDefEntry(char * name, bool * indexed)
+find_def_ent(char * name, bool * indexed)
 {
     if (HAVE_OPT(USED_DEFINES))
         add_string(name);
     return find_def(name, &curr_def_ctx, indexed);
 }
-
 
 LOCAL void
 print_used_defines(void)

@@ -2,7 +2,7 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2012-03-31 13:53:03 bkorb"
+ * Time-stamp:        "2012-04-07 09:53:03 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -225,7 +225,7 @@ find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
         fprintf(trace_fp, "%3u ", (unsigned int)(pM - pTpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
-        fprintf(trace_fp, zTDef, apzFuncNames[ FTYP_TEXT ], FTYP_TEXT,
+        fprintf(trace_fp, zTDef, ag_fun_names[ FTYP_TEXT ], FTYP_TEXT,
                 pM->md_line, pM->md_end_idx, (unsigned int)(pzEnd - pz));
     }
 #endif
@@ -329,7 +329,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
         fprintf(trace_fp, "%3u ", (unsigned int)(pPm - tpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
-        fprintf(trace_fp, zTUndef, apzFuncNames[ pPm->md_code ],
+        fprintf(trace_fp, zTUndef, ag_fun_names[ pPm->md_code ],
                 pPm->md_code, pPm->md_line);
     }
 #else
@@ -349,7 +349,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
          *       will be non-NULL.
          */
         {
-            tpLoadProc const fn = load_proc_table[mac->md_code];
+            load_proc_p_t const fn = load_proc_table[mac->md_code];
             macro_t *   nxt_mac = fn(tpl, mac, &scan);
 
 #if defined(DEBUG_ENABLED)
@@ -365,7 +365,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
                 do { fputs("  ", trace_fp); } while (--ct > 0);
 
                 if (mac->md_code == FTYP_BOGUS)
-                     fprintf(trace_fp, zTUndef, apzFuncNames[ ft ], ft, ln);
+                     fprintf(trace_fp, zTUndef, ag_fun_names[ ft ], ft, ln);
                 else {
                     char const * pz;
                     if (ft >= FUNC_CT)
@@ -373,7 +373,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
                     pz = (mac->md_txt_off == 0)
                         ? zNil
                         : (tpl->td_text + mac->md_txt_off);
-                    fprintf(trace_fp, zTDef, apzFuncNames[ft], mac->md_code,
+                    fprintf(trace_fp, zTDef, ag_fun_names[ft], mac->md_code,
                             ln, mac->md_end_idx, (unsigned int)strlen(pz));
                 }
             }

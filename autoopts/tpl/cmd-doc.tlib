@@ -4,7 +4,7 @@
 
 # cmd-doc.tlib -- Template for command line man/mdoc pages
 #
-# Time-stamp:      "2013-03-10 07:52:16 bkorb"
+# Time-stamp:      "2012-04-07 11:44:48 bkorb"
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
@@ -105,8 +105,11 @@
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
 
-(shell (string-append "cvt_prog='"
-       (find-file (if man-page "texi2man" "texi2mdoc"))
+(set! tmp-str (find-file (if man-page "texi2man" "texi2mdoc")))
+(if (not (defined? 'tmp-str))
+    (error (string-append "cannot locate "
+           (if man-page "texi2man" "texi2mdoc"))))
+(shell (string-append "cvt_prog='" tmp-str
        "'\ntest -x \"$cvt_prog\" || die 'no conversion program'" ))
 
 (define get-cvt (lambda (nm)
@@ -153,7 +156,7 @@ do cat_n_rm $f ; done > ${tmp_dir}/.fini
 #.\" Insert the contents of all remaining files in alphabetic order,
 #.\" except remove any blank lines.
 #
-set ${tmp_dir}/*
+set XX ${tmp_dir}/* ; shift
 test -f "$1" && cat $* | grep -E -v '^[ 	]*$'
 
 #.\" Now insert the sections we squirreled away for the end.

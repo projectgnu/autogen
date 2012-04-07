@@ -1,6 +1,6 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-#  Time-stamp:        "2011-06-03 12:13:56 bkorb"
+#  Time-stamp:        "2012-04-07 09:06:13 bkorb"
 
 ##
 ## This file is part of AutoGen.
@@ -38,7 +38,7 @@
 [=(gpl "AutoGen" " *  ")=]
  *
  *  The [=(count "macfunc")
-         =] AutoGen functions are tagged with special attributes:
+         =] AutoGen macros are tagged with special attributes:
  *
  *  A - is invoked via an alias
  *
@@ -95,9 +95,8 @@ ENDFOR macfunc =]
 
 #define FUNC_CT    [= (count "macfunc") =]
 
-/*
- *  Enumerate all the function types, whether they have
- *  implementation functions or not.
+/**
+ *  Enumerate all the AutoGen macro types.
  */
 typedef enum {[=
 
@@ -105,16 +104,31 @@ FOR macfunc
 =][=
 
    (define func-name (string-capitalize! (get "name")))
-   (if (exist? "handler-proc")
+
+   (if (exist? "handler-proc") (begin
+       (set! temp-txt (get "handler-proc"))
+
+       (if (< 0 (string-length temp-txt))
+           (set! temp-txt (string-capitalize! temp-txt))
+           (set! temp-txt func-name) )
+
        (set! handle-list (string-append handle-list
-                        "\nmFunc_" func-name )) )
+                        "\nmFunc_" temp-txt ))
+   )   )
 
-   (if (exist? "load-proc")
+   (if (exist? "load-proc") (begin
+       (set! temp-txt (get "load-proc"))
+
+       (if (< 0 (string-length temp-txt))
+           (set! temp-txt (string-capitalize! temp-txt))
+           (set! temp-txt func-name) )
+
        (set! load-list (string-append load-list
-                        "\nmLoad_" func-name )) )
+                        "\nmLoad_" temp-txt ))
+   )   )
 
-   (sprintf "\n    FTYP_%-13s /* %-50s */"
-    (string-append (string-upcase! func-name) ",")
+   (sprintf "\n    FTYP_%-10s /* %-50s */"
+    (string-upcase! (string-append func-name ","))
     (get "what") )                      =][=
 
 ENDFOR                                  =]
@@ -140,33 +154,35 @@ ENDFOR                                  =]
     FTYP_SELECT_EQV_MATCH             = 0x800F,  /*  ~   */
 
     FTYP_SELECT_MATCH_ANYTHING        = 0x801C,  /*  *   */
-    FTYP_SELECT_MATCH_EXISTENCE       = 0x801D,  /*  @   */
-    FTYP_SELECT_MATCH_NONEXISTENCE    = 0x801E   /* !@   */
+    FTYP_SELECT_MATCH_EXISTENCE       = 0x801D,  /* +E   */
+    FTYP_SELECT_MATCH_NONEXISTENCE    = 0x801E   /* !E   */
 } mac_func_t;
 
-/*
+/**
  *  The function processing procedures.
  */
+hdlr_proc_t
 [=
 (shell (string-append
-"columns --first=tHdlrProc -S, -I4 --end=';' <<_EOList_"
+"{ sort -u | columns --spread=1 -S, -I4 --end=';'\n}<<_EOList_"
     handle-list "\n_EOList_"
 )      ) =]
 
-/*
- *  Template Loading Functions
+/**
+ *  Template Loading Functions.
  */
+load_proc_t
 [=
 (shell (string-append
-"columns --first=tLoadProc -S, -I4 --end=';' <<_EOList_"
+"{ sort -u | columns --spread=1 -S, -I4 --end=';'\n}<<_EOList_"
     load-list "\n_EOList_"
 )      ) =]
 
-/* tpParse.c use only * * * * * * * * * * * * * * * *
- *
- *  Parsing function tables for load processing (template scanning phase)
+/* tpParse.c use only * * * * * * * * * * * * * * * */
+/**
+ *  Parsing function tables for load processing (template scanning phase).
  */
-static tpLoadProc const base_load_table[ FUNC_CT ] = {[=
+static load_proc_p_t const base_load_table[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s" =]*/ mLoad_[=
   IF   (> (len "load-proc") 0)=][=% load-proc (string-capitalize! "%s") =][=
@@ -177,14 +193,14 @@ FOR macfunc "," =]
 ENDFOR macfunc =]
 };
 
-/*
+/**
  *  This global pointer is used to switch parsing tables.
  *  The block functions (CASE, DEFINE, FOR, and IF) change this to point
  *  to their tables that include relevant additional functions.
  */
-tpLoadProc const * load_proc_table = base_load_table;
+load_proc_p_t const * load_proc_table = base_load_table;
 
-/*
+/**
  *  name-to-function type mapping table.
  *  This table must be sorted alphabetically by the content
  *  of the naming string.
@@ -196,7 +212,7 @@ struct fn_name_type {
     mac_func_t    fType;   /*!< function type enum */
 };
 
-/*
+/**
  *  Define all the strings that are used to determine the function enumeration
  *  number.  These are used in a table separated by aliases and sorted by these
  *  ASCII values.
@@ -246,7 +262,7 @@ ENDFOR macfunc
 
 =];
 
-/*
+/**
  *  The number of names by which the macros go.
  *  Some have multiple names (aliases, e.g. selection clauses).
  */
@@ -260,8 +276,8 @@ cat <<_EOF_
 #define FUNC_NAMES_HIGH_INDEX   \`expr $hict + $loct - 1\`
 #define FUNCTION_NAME_CT        \`expr $hict + $loct\`
 
-/* * * * * * * * tpParse.c use only * * * * * * * * * * * * * * *
- *
+/* * * * * * * * tpParse.c use only * * * * * * * * * * * * * * */
+/**
  *  And now, the table separated by aliasing and then sorted by string content
  */
 static fn_name_type_t const fn_name_types[ FUNCTION_NAME_CT ] = {
@@ -272,7 +288,7 @@ egrep    '^[A-Z]' $file | sort | sed -e 's/^.*:://' -e '$s/,$//'
 
 rm -f $file ` =] };
 
-static char const * const apzFuncNames[ FUNC_CT ] = {
+static char const * const ag_fun_names[ FUNC_CT ] = {
 [=(out-push-new) =][=
 
 FOR macfunc "\n"    =]echo [=
@@ -292,26 +308,26 @@ ENDFOR macfunc      =][=
 
 =] };
 
-/* * * * * * * * tpProcess.c use only * * * * * * * * * * * * * *
- *
+/* * * * * * * * tpProcess.c use only * * * * * * * * * * * * * */
+/**
  *  Template Processing Function Table
  *
  *  Pointers to the procedure to call when the function code
  *  is encountered.
  */
-static tpHdlrProc const apHdlrProc[ FUNC_CT ] = {[=
+static hdlr_proc_p_t const load_procs[ FUNC_CT ] = {[=
 FOR macfunc "," =]
     /* [=% name "%-10s"=]*/ mFunc_[=
-  IF (exist? "handler_proc")
-     =][=% name (string-capitalize! "%s") =][=
-  ELSE
-     =]Bogus[=
-  ENDIF =][=
+  CASE handler-proc =][=
+  !E     =]Bogus[=
+  == ''  =][= (string-capitalize! (get "name")) =][=
+  *      =][= (string-capitalize! (get "handler-proc")) =][=
+  ESAC   =][=
 ENDFOR macfunc =]
 };
 
-/* * * * * * * * * * tpLoad.c use only * * * * * * * * * * * * * *
- *
+/* * * * * * * * * * tpLoad.c use only * * * * * * * * * * * * * */
+/**
  *  Template Unloading Function Table
  *
  *  Pointers to the procedure to call when the function code
@@ -333,9 +349,9 @@ FOR macfunc     =][=
 ENDFOR
 
 =]
-tUnloadProc [= (shellf "echo '%s'|sed 's/, $//'" decl-list) =];
+unload_proc_t [= (shellf "echo '%s'|sed 's/, $//'" decl-list) =];
 
-static tpUnloadProc const apUnloadProc[ FUNC_CT ] = {
+static unload_proc_p_t const unload_procs[ FUNC_CT ] = {
 [= (shellf "columns -I4 --sep=, --spread=1<<_EOF_\n%s_EOF_" temp-txt) =]
 };
 

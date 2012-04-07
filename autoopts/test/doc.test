@@ -1,0 +1,693 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+#
+# doc.test      ---  test doc templates
+#
+# Time-stamp:        "2012-04-07 12:28:47 bkorb"
+# Author:            Bruce Korb <bkorb@gnu.org>
+#
+##  This file is part of AutoOpts, a companion to AutoGen.
+##  AutoOpts is free software.
+##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+##
+##  AutoOpts is available under any one of two licenses.  The license
+##  in use must be one of these two and the choice is under the control
+##  of the user of the license.
+##
+##   The GNU Lesser General Public License, version 3 or later
+##      See the files "COPYING.lgplv3" and "COPYING.gplv3"
+##
+##   The Modified Berkeley Software Distribution License
+##      See the file "COPYING.mbsd"
+##
+##  These files have the following md5sums:
+##
+##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
+##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+
+. ./defs
+
+test_src=${srcdir}/${testname}.test
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+echo make defs from test file
+sed "1,/^##* *BEGIN-DEFS/d
+     /^prog-name/s/=.*/= ${testname};/
+     \\@^// *END-DEFS@q" \
+    ${test_src} > ${testname}.def
+
+# # # # # # # # # # TEXI DOC CHECK # # # # # # # # #
+${AGexe} ${agl_opts} -Tagtexi-cmd ${testname}.def
+test -f invoke-${testname}.menu -a -f invoke-${testname}.texi || \
+    failure "invoke-${testname}.{menu,texi} not built"
+sed '/^@ignore/,/^@end ignore/d' \
+    invoke-${testname}.texi > ${testname}-res.texi
+rm -f invoke-${testname}.menu invoke-${testname}.texi
+
+sed "1,/^##* *BEGIN-TEXI/d
+    /^@ignore/,/^@end ignore/d
+    /^## END-TEXI/{;s/.*//;q;}" \
+    ${test_src} > ${testname}-base.texi
+
+outfiles="${testname}-res.texi ${testname}-base.texi"
+cmp -s ${outfiles} || \
+    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+
+# # # # # # # # # # MAN DOC CHECK # # # # # # # # #
+${AGexe} ${agl_opts} -Tagman-cmd ${testname}.def
+test -f ${testname}.1 || \
+    failure "${testname}.1 not built"
+
+{
+    grep -E -v '^\.\\"' ${testname}.1
+    rm -f ${testname}.1
+    echo
+} > ${testname}-res.1
+
+sed "1,/^##* *BEGIN-MAN/d
+    /^## END-MAN/{;s/.*//;q;}" ${test_src} > ${testname}-base.1
+
+outfiles="${testname}-base.1 ${testname}-res.1"
+cmp -s ${outfiles} || \
+    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+
+# # # # # # # # # # MDOC DOC CHECK # # # # # # # # #
+${AGexe} ${agl_opts} -Tagmdoc-cmd ${testname}.def
+test -f ${testname}.1 || \
+    failure "${testname}.1 not built"
+
+{
+    grep -E -v '^\.(Dd |Os |\\")' ${testname}.1
+    echo
+} > ${testname}-mdoc-res.1
+
+sed "1,/^##* *BEGIN-MDOC/d
+    /^## END-MDOC/{;s/.*//;q;}" ${test_src} > ${testname}-mdoc-base.1
+
+outfiles="${testname}-mdoc-base.1 ${testname}-mdoc-res.1"
+cmp -s ${outfiles} || \
+    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+
+# # # # # # # # # # # FINISH # # # # # # # # # # #
+
+cleanup
+
+exit 0
+
+# # # # # # # # # # # OPTION DEFS
+
+cat <<_End_Of_Definitions_
+## BEGIN-DEFS
+AutoGen Definitions options;
+prog-name     = gnutls-cli;
+prog-title    = "GnuTLS client";
+prog-desc     = "Simple client program to set up a TLS connection.";
+short-usage   = <<- _EOUsage_
+	Usage: gnutls-cli [options] hostname
+	gnutls-cli --help for usage instructions.
+	_EOUsage_;
+prog-group    = "GnuTLS";
+detail        = <<- _EODetail_
+	Simple client program to set up a TLS connection to some other computer.
+	It sets up a TLS connection and forwards data from the standard input
+	to the secured socket and vice versa.
+	_EODetail_;
+
+gnu-usage;
+no-misuse-usage;
+disable-save;
+reorder-args;
+no-xlate = opt;
+argument = "[hostname]";
+long-opts;
+
+copyright  = {
+    date   = "2000-2012";
+    owner  = "Free Software Foundation";
+    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; "
+             "see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
+    eaddr  = "bug-gnutls@gnu.org";
+    type   = gpl;
+};
+version       = "3.0.12";
+help-value    = h;
+more-help-value = M;
+
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-range = "0->9999";
+    descrip   = "Enable debugging";
+    doc = 'really enable debugging';
+};
+
+flag = {
+    name      = mtu;
+    arg-type  = number;
+    arg-range = "0->17000";
+    descrip   = "Set MTU for datagram TLS";
+    doc   = "Really set MTU for datagram TLS";
+};
+
+flag = {
+    name      = group-2;
+    descrip   = "second group of options";
+    documentation;
+};
+
+flag = {
+    name      = crlf;
+    descrip   = "Send CR LF instead of LF";
+    doc   = "Really send CR LF instead of LF";
+};
+
+flag = {
+    name      = x509fmtder;
+    descrip   = "Use DER format for certificates to read from";
+    doc   = "Really use DER format for certificates to read from";
+};
+
+flag = {
+    name      = group-3;
+    descrip   = "third group of options";
+    documentation;
+};
+
+flag = {
+    name      = recordsize;
+    arg-type  = number;
+    arg-range = "0->4096";
+    descrip   = "The maximum record size to advertize";
+    doc   = "Really the maximum record size to advertize";
+};
+
+flag = {
+    name      = priority;
+    arg-type  = string;
+    descrip   = "Priorities string";
+    doc       = <<- _EODoc_
+	TLS algorithms and protocols to enable. You can
+	use predefined sets of ciphersuites such as PERFORMANCE,
+	NORMAL, SECURE128, SECURE256.
+
+	Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+	information on allowed keywords
+	_EODoc_;
+};
+	
+
+doc-section = {
+  ds-type   = 'SEE ALSO';
+  ds-format = texi;
+  omit-texi;
+  ds-text   = 'gnutls-cli-debug(1), gnutls-serv(1)';
+};
+
+doc-section = {
+  ds-type   = EXAMPLES;
+  ds-format = texi;
+  ds-text   = <<- _EOT_
+	To connect to a server using PSK authentication, you need to enable
+	the choice of PSK by using a cipher priority parameter such as in the
+	example below.
+	@example
+	$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \\
+	    --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\
+	    --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
+	Resolving 'localhost'...
+	Connecting to '127.0.0.1:5556'...
+	- PSK authentication.
+	- Version: TLS1.1
+	- Key Exchange: PSK
+	- Cipher: AES-128-CBC
+	- MAC: SHA1
+	- Compression: NULL
+	- Handshake was completed
+	    
+	- Simple Client Mode:
+	@end example
+	By keeping the --pskusername parameter and removing the --pskkey
+	parameter, it will query only for the password during the handshake.
+	
+	To list the ciphersuites in a priority string:
+	@example
+	$ ./gnutls-cli --priority SECURE192 -l
+	Cipher suites for SECURE192
+	TLS_ECDHE_ECDSA_AES_256_CBC_SHA384  0xc0, 0x24	TLS1.2
+	TLS_ECDHE_ECDSA_AES_256_GCM_SHA384  0xc0, 0x2e	TLS1.2
+	TLS_ECDHE_RSA_AES_256_GCM_SHA384    0xc0, 0x30	TLS1.2
+	TLS_DHE_RSA_AES_256_CBC_SHA256      0x00, 0x6b	TLS1.2
+	TLS_DHE_DSS_AES_256_CBC_SHA256      0x00, 0x6a	TLS1.2
+	TLS_RSA_AES_256_CBC_SHA256          0x00, 0x3d	TLS1.2
+	@end example
+	_EOT_;
+};
+// END-DEFS
+_End_Of_Definitions_
+
+# # # # # # # # # # # TEXI TEXT
+
+cat <<_End_Of_TexInfo_
+## BEGIN-TEXI
+@node doc Invocation
+@section Invoking doc
+@pindex doc
+@cindex GnuTLS client
+Simple client program to set up a TLS connection to some other computer.
+It sets up a TLS connection and forwards data from the standard input
+to the secured socket and vice versa.
+
+This section was generated by @strong{AutoGen},
+using the @code{agtexi-cmd} template and the option descriptions for the @code{doc} program.
+This software is released under the GNU General Public License, version 3 or later.
+
+@menu
+* doc usage::                  doc help/usage (-h)
+* doc base-options::           Base options
+* doc group-2::                group-2 options
+* doc group-3::                group-3 options
+* doc exit status::            exit status
+* doc Examples::               Examples
+@end menu
+
+@node doc usage
+@subsection doc help/usage (-h)
+@cindex doc help
+
+This is the automatically generated usage text for doc.
+The text printed is the same whether for the @code{help} option (-h) or the @code{more-help} option (-M).  @code{more-help} will print
+the usage text by passing it through a pager program.
+@code{more-help} is disabled on platforms without a working
+@code{fork(2)} function.  The @code{PAGER} environment variable is
+used to select the program, defaulting to @file{more}.  Both will exit
+with a status code of 0.
+
+@exampleindent 0
+@example
+doc is unavailable - no -h
+@end example
+@exampleindent 4
+
+@node doc 
+@subsection Base options
+@subsubheading debug option (-d).
+@anchor{doc debug}
+@cindex doc-debug
+
+This is the ``enable debugging'' option.
+This option takes an argument number.
+really enable debugging
+@subsubheading mtu option.
+@anchor{doc mtu}
+@cindex doc-mtu
+
+This is the ``set mtu for datagram tls'' option.
+This option takes an argument number.
+Really set MTU for datagram TLS
+@node doc group-2
+@subsection group-2 options
+second group of options.
+@subsubheading crlf option.
+@anchor{doc crlf}
+@cindex doc-crlf
+
+This is the ``send cr lf instead of lf'' option.
+Really send CR LF instead of LF
+@subsubheading x509fmtder option.
+@anchor{doc x509fmtder}
+@cindex doc-x509fmtder
+
+This is the ``use der format for certificates to read from'' option.
+Really use DER format for certificates to read from
+@node doc group-3
+@subsection group-3 options
+third group of options.
+@subsubheading recordsize option.
+@anchor{doc recordsize}
+@cindex doc-recordsize
+
+This is the ``the maximum record size to advertize'' option.
+This option takes an argument number.
+Really the maximum record size to advertize
+@subsubheading priority option.
+@anchor{doc priority}
+@cindex doc-priority
+
+This is the ``priorities string'' option.
+This option takes an argument string.
+TLS algorithms and protocols to enable. You can
+use predefined sets of ciphersuites such as PERFORMANCE,
+NORMAL, SECURE128, SECURE256.
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on allowed keywords
+@node doc exit status
+@subsection doc exit status
+
+One of the following exit values will be returned:
+@table @samp
+@item 0 (EXIT_SUCCESS)
+Successful program execution.
+@item 1 (EXIT_FAILURE)
+The operation failed or the command syntax was not valid.
+@end table
+@node doc Examples
+@subsection doc Examples
+To connect to a server using PSK authentication, you need to enable
+the choice of PSK by using a cipher priority parameter such as in the
+example below.
+@example
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \\
+    --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\
+    --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication.
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES-128-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+    
+- Simple Client Mode:
+@end example
+By keeping the --pskusername parameter and removing the --pskkey
+parameter, it will query only for the password during the handshake.
+
+To list the ciphersuites in a priority string:
+@example
+$ ./gnutls-cli --priority SECURE192 -l
+Cipher suites for SECURE192
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384  0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384  0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384    0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256      0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256      0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256          0x00, 0x3d	TLS1.2
+@end example
+## END-TEXI
+_End_Of_TexInfo_
+
+# # # # # # # # # # # MAN PAGE
+
+cat <<_End_Of_ManPage_
+## BEGIN-MAN
+.TH doc 1 "07 Apr 2012" "3.0.12" "User Commands"
+.SH NAME
+doc \- GnuTLS client
+.SH SYNOPSIS
+.B doc
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP " [[=| ]\fIvalue\fP]]..." [hostname]
+.PP
+Operands and options may be intermixed.  They will be reordered.
+.SH "DESCRIPTION"
+Simple client program to set up a TLS connection to some other computer.
+It sets up a TLS connection and forwards data from the standard input
+to the secured socket and vice versa.
+.SH "OPTIONS"
+.TP
+.BR \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
+Enable debugging.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 9999
+.fi
+.in -4
+.sp
+really enable debugging
+.TP
+.BR \-\-mtu "=\fInumber\fP"
+Set MTU for datagram TLS.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 17000
+.fi
+.in -4
+.sp
+Really set MTU for datagram TLS
+.SS "second group of options"
+.TP
+.BR \-\-crlf
+Send CR LF instead of LF.
+.sp
+Really send CR LF instead of LF
+.TP
+.BR \-\-x509fmtder
+Use DER format for certificates to read from.
+.sp
+Really use DER format for certificates to read from
+.SS "third group of options"
+.TP
+.BR \-\-recordsize "=\fInumber\fP"
+The maximum record size to advertize.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 4096
+.fi
+.in -4
+.sp
+Really the maximum record size to advertize
+.TP
+.BR \-\-priority "=\fIstring\fP"
+Priorities string.
+.sp
+TLS algorithms and protocols to enable. You can
+use predefined sets of ciphersuites such as PERFORMANCE,
+NORMAL, SECURE128, SECURE256.
+Check  the  GnuTLS  manual  on  section  \\(lqPriority strings\\(rq for more
+information on allowed keywords
+.TP
+.BR \-h , " \-\-help"
+Display usage information and exit.
+.TP
+.BR \-M , " \-\-more-help"
+Pass the extended usage information through a pager.
+.TP
+.BR \-v " [{\fIv|c|n\fP}]," " \-\-version" "[=\fI{v|c|n}\fP]"
+Output version of program and exit.  The default mode is `v', a simple
+version.  The `c' mode will print copyright information and `n' will
+print the full copyright notice.
+.SH EXAMPLES
+To connect to a server using PSK authentication, you need to enable
+the choice of PSK by using a cipher priority parameter such as in the
+example below.
+.br
+.in +4
+.nf
+$ ./gnutls\-cli \-p 5556 localhost \-\-pskusername psk_identity \\
+    \-\-pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\
+    \-\-priority NORMAL:\-KX\-ALL:+ECDHE\-PSK:+DHE\-PSK:+PSK
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication.
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES\-128\-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+- Simple Client Mode:
+.in -4
+.fi
+By keeping the \-\-pskusername parameter and removing the \-\-pskkey
+parameter, it will query only for the password during the handshake.
+.sp
+To list the ciphersuites in a priority string:
+.br
+.in +4
+.nf
+$ ./gnutls\-cli \-\-priority SECURE192 \-l
+Cipher suites for SECURE192
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384  0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384  0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384    0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256      0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256      0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256          0x00, 0x3d	TLS1.2
+.in -4
+.fi
+.SH "EXIT STATUS"
+One of the following exit values will be returned:
+.TP
+.BR 0 " (EXIT_SUCCESS)"
+Successful program execution.
+.TP
+.BR 1 " (EXIT_FAILURE)"
+The operation failed or the command syntax was not valid.
+.SH "SEE ALSO"
+gnutls\-cli\-debug(1), gnutls\-serv(1)
+.SH "AUTHORS"
+Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.
+.SH "COPYRIGHT"
+Copyright (C) 2000-2012 Free Software Foundation all rights reserved.
+This program is released under the terms of the GNU General Public License, version 3 or later.
+.SH "BUGS"
+Please send bug reports to: bug-gnutls@gnu.org
+.SH "NOTES"
+This manual page was \fIAutoGen\fP-erated from the \fBdoc\fP
+option definitions.
+## END-MAN
+_End_Of_ManPage_
+
+# # # # # # # # # # # MAN PAGE
+
+cat <<_End_Of_MdocPage_
+## BEGIN-MDOC
+.Dt DOC 1 User Commands
+.Sh NAME
+.Nm doc
+.Nd GnuTLS client
+.Sh SYNOPSIS
+.Nm
+.Op Fl flags
+.Op Fl flag Ar value
+.Op Fl \-option-name Ar value
+[hostname]
+.Pp
+Operands and options may be intermixed.  They will be reordered.
+.Pp
+.Sh "DESCRIPTION"
+Simple client program to set up a TLS connection to some other computer.
+It sets up a TLS connection and forwards data from the standard input
+to the secured socket and vice versa.
+.Sh "OPTIONS"
+.Bl -tag
+.It  \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
+Enable debugging.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 9999
+.fi
+.in -4
+.sp
+really enable debugging
+.It  \-\-mtu "=\fInumber\fP"
+Set MTU for datagram TLS.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 17000
+.fi
+.in -4
+.sp
+Really set MTU for datagram TLS
+.Ss "second group of options"
+.It  \-\-crlf
+Send CR LF instead of LF.
+.sp
+Really send CR LF instead of LF
+.It  \-\-x509fmtder
+Use DER format for certificates to read from.
+.sp
+Really use DER format for certificates to read from
+.Ss "third group of options"
+.It  \-\-recordsize "=\fInumber\fP"
+The maximum record size to advertize.
+This option takes an integer number as its argument.
+The value of \fInumber\fP is constrained to being:
+.in +4
+.nf
+.na
+in the range  0 through 4096
+.fi
+.in -4
+.sp
+Really the maximum record size to advertize
+.It  \-\-priority "=\fIstring\fP"
+Priorities string.
+.sp
+TLS algorithms and protocols to enable. You can
+use predefined sets of ciphersuites such as PERFORMANCE,
+NORMAL, SECURE128, SECURE256.
+.sp
+Check  the  GnuTLS  manual  on  section  \\(lqPriority strings\\(rq for more
+information on allowed keywords
+.It \-h , " \-\-help"
+Display usage information and exit.
+.It \-M , " \-\-more-help"
+Pass the extended usage information through a pager.
+.It \-v " [{\fIv|c|n\fP}]," " \-\-version" "[=\fI{v|c|n}\fP]"
+Output version of program and exit.  The default mode is `v', a simple
+version.  The `c' mode will print copyright information and `n' will
+print the full copyright notice.
+.El
+.Sh EXAMPLES
+To connect to a server using PSK authentication, you need to enable
+the choice of PSK by using a cipher priority parameter such as in the
+example below.
+.Bd -literal -offset indent
+$ ./gnutls\-cli \-p 5556 localhost \-\-pskusername psk_identity \\
+    \-\-pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\
+    \-\-priority NORMAL:\-KX\-ALL:+ECDHE\-PSK:+DHE\-PSK:+PSK
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication.
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES\-128\-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+- Simple Client Mode:
+.Ed
+By keeping the \-\-pskusername parameter and removing the \-\-pskkey
+parameter, it will query only for the password during the handshake.
+.sp
+To list the ciphersuites in a priority string:
+.Bd -literal -offset indent
+$ ./gnutls\-cli \-\-priority SECURE192 \-l
+Cipher suites for SECURE192
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384  0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384  0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384    0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256      0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256      0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256          0x00, 0x3d	TLS1.2
+.Ed
+.Sh "EXIT STATUS"
+One of the following exit values will be returned:
+.Bl -tag
+.It 0 " (EXIT_SUCCESS)"
+Successful program execution.
+.It 1 " (EXIT_FAILURE)"
+The operation failed or the command syntax was not valid.
+.El
+.Sh "SEE ALSO"
+gnutls\-cli\-debug(1), gnutls\-serv(1)
+.Sh "AUTHORS"
+Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.
+.Sh "COPYRIGHT"
+Copyright (C) 2000-2012 Free Software Foundation all rights reserved.
+This program is released under the terms of the GNU General Public License, version 3 or later.
+.Sh "BUGS"
+Please send bug reports to: bug-gnutls@gnu.org
+.Sh "NOTES"
+This manual page was \fIAutoGen\fP-erated from the \fBdoc\fP
+option definitions.
+## END-MDOC
+_End_Of_MdocPage_
+
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## sh-indentation: 2
+## End:
+
+# end of doc.test

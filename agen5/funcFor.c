@@ -2,7 +2,7 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2012-03-31 13:43:32 bkorb"
+ *  Time-stamp:        "2012-04-07 09:13:53 bkorb"
  *
  *  This module implements the FOR text macro.
  *
@@ -31,10 +31,7 @@ static for_state_t *
 find_for_state(SCM which_scm);
 
 static bool
-next_def(bool invert, def_ent_t** ppList);
-
-static int
-call_gen_block(templ_t * tpl, macro_t * mac, macro_t * end_mac);
+next_def(bool invert, def_ent_t** de_lst);
 
 static int
 for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found);
@@ -230,20 +227,28 @@ ag_scm_for_sep(SCM obj)
     return SCM_BOOL_T;
 }
 
+/**
+ * search for matching definition entry.
+ * Only the current level is traversed, via the "de_twin" link.
+ *
+ * @param[in] invert  invert the sense of the search
+ *                    ("FOR" is running backwards)
+ * @param[in,out] de_lst  linked list of definitions
+ */
 static bool
-next_def(bool invert, def_ent_t** ppList)
+next_def(bool invert, def_ent_t** de_lst)
 {
     bool     haveMatch = false;
-    def_ent_t*  pList     = *ppList;
+    def_ent_t*  ent     = *de_lst;
 
-    while (pList != NULL) {
+    while (ent != NULL) {
         /*
          *  Loop until we find or pass the current index value
          *
          *  IF we found an entry for the current index,
          *  THEN break out and use it
          */
-        if (pList->de_index == for_state->for_index) {
+        if (ent->de_index == for_state->for_index) {
             haveMatch = true;
             break;
         }
@@ -255,14 +260,14 @@ next_def(bool invert, def_ent_t** ppList)
          *       only the set passed in.
          */
         if ((invert)
-            ? (pList->de_index < for_state->for_index)
-            : (pList->de_index > for_state->for_index)) {
+            ? (ent->de_index < for_state->for_index)
+            : (ent->de_index > for_state->for_index)) {
 
             /*
              *  When the "by" step is zero, force syncronization.
              */
             if (for_state->for_by == 0) {
-                for_state->for_index = pList->de_index;
+                for_state->for_index = ent->de_index;
                 haveMatch = true;
             }
             break;
@@ -272,31 +277,14 @@ next_def(bool invert, def_ent_t** ppList)
          *  The current index (for_state->for_index) is past the current value
          *  (pB->de_index), so advance to the next entry and test again.
          */
-        pList = (invert) ? pList->de_ptwin : pList->de_twin;
+        ent = (invert) ? ent->de_ptwin : ent->de_twin;
     }
 
     /*
      *  Save our restart point and return the find indication
      */
-    *ppList = pList;
+    *de_lst = ent;
     return haveMatch;
-}
-
-static int
-call_gen_block(templ_t * tpl, macro_t * mac, macro_t * end_mac)
-{
-    switch (setjmp(for_state->for_env)) {
-    case FOR_JMP_DONE: // 0
-        gen_block(tpl, mac, end_mac);
-        /* FALLTHROUGH */
-
-    case FOR_JMP_NEXT:
-        return FOR_JMP_DONE;
-
-    case FOR_JMP_BREAK:
-    default:
-        return FOR_JMP_BREAK;
-    }
 }
 
 static int
@@ -409,12 +397,12 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
             ? ((next_ix < for_state->for_to) ? true : false)
             : ((next_ix > for_state->for_to) ? true : false);
 
-        switch (call_gen_block(pT, pMac+1, end_mac)) {
-        case FOR_JMP_DONE:
-        case FOR_JMP_NEXT:
+        switch (call_gen_block(for_state->for_env, pT, pMac+1, end_mac)) {
+        case LOOP_JMP_OKAY:
+        case LOOP_JMP_NEXT:
             break;
 
-        case FOR_JMP_BREAK:
+        case LOOP_JMP_BREAK:
             goto leave_loop;
         }
 
@@ -479,12 +467,12 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
         if (def_ent == NULL)
             for_state->for_islast = true;
 
-        switch (call_gen_block(tpl, mac, end_mac)) {
-        case FOR_JMP_DONE:
-        case FOR_JMP_NEXT:
+        switch (call_gen_block(for_state->for_env, tpl, mac, end_mac)) {
+        case LOOP_JMP_OKAY:
+        case LOOP_JMP_NEXT:
             break;
 
-        case FOR_JMP_BREAK:
+        case LOOP_JMP_BREAK:
             goto leave_loop;
         }
 
@@ -700,9 +688,8 @@ macro_t *
 mFunc_For(templ_t * tpl, macro_t * mac)
 {
     macro_t *   ret_mac = tpl->td_macros + mac->md_end_idx;
-    bool        isIndexed;
-    def_ent_t * pDef;
-    int         loopCt;
+    def_ent_t * def;
+    int         lp_ct;
 
     /*
      *  "md_pvt" is used by the "FOR x IN ..." variation of the macro.
@@ -712,10 +699,11 @@ mFunc_For(templ_t * tpl, macro_t * mac)
      *  a list of "var" values has been set.
      */
     if (mac->md_pvt != NULL)
-        pDef = mac->md_pvt;
+        def = mac->md_pvt;
     else {
-        pDef = findDefEntry(tpl->td_text + mac->md_name_off, &isIndexed);
-        if (pDef == NULL) {
+        bool indexed;
+        def = find_def_ent(tpl->td_text + mac->md_name_off, &indexed);
+        if (def == NULL) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf(trace_fp, TRACE_FN_FOR_SKIP,
                         tpl->td_text + mac->md_name_off);
@@ -729,23 +717,8 @@ mFunc_For(templ_t * tpl, macro_t * mac)
         }
     }
 
-    /*
-     *  Push the current FOR context onto a stack.
-     */
-    if (++(curr_ivk_info->ii_for_depth) > curr_ivk_info->ii_for_alloc) {
-        void * dta = curr_ivk_info->ii_for_data;
-        size_t sz  = (curr_ivk_info->ii_for_alloc += 5) * sizeof(for_state_t);
-
-        if (dta == NULL)
-             dta = AGALOC(sz, "Init FOR sate");
-        else dta = AGREALOC(dta, sz, "FOR state");
-        curr_ivk_info->ii_for_data = dta;
-    }
-
-    for_state = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
-    memset((void*)for_state, 0, sizeof(for_state_t));
-    for_state->for_isfirst = true;
-    for_state->for_name    = tpl->td_text + mac->md_name_off;
+    for_state = new_for_context();
+    for_state->for_name = tpl->td_text + mac->md_name_off;
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS)
         fprintf(trace_fp, TRACE_FN_FOR, tpl->td_text + mac->md_name_off,
@@ -761,28 +734,24 @@ mFunc_For(templ_t * tpl, macro_t * mac)
         for_state->for_loading = true;
         (void) eval(tpl->td_text + mac->md_txt_off);
         for_state->for_loading = false;
-        loopCt = for_by_step(tpl, mac, pDef);
+        lp_ct = for_by_step(tpl, mac, def);
 
     } else {
         /*
          *  The FOR iterates over a list of definitions
          */
         AGDUPSTR(for_state->for_sep_str, tpl->td_text + mac->md_txt_off, "ss");
-        loopCt = for_each(tpl, mac, pDef);
+        lp_ct = for_each(tpl, mac, def);
     }
 
     if (for_state->for_sep_str != NULL)
         AGFREE(for_state->for_sep_str);
 
-    if (--(curr_ivk_info->ii_for_depth) == 0) {
-        AGFREE(curr_ivk_info->ii_for_data);
-        curr_ivk_info->ii_for_data  = NULL;
-        curr_ivk_info->ii_for_alloc = 0;
-    }
+    free_for_context(false);
 
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
         fprintf(trace_fp, TRACE_FN_FOR_REPEAT, tpl->td_text + mac->md_name_off,
-                loopCt);
+                lp_ct);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf(trace_fp, TAB_FILE_LINE_FMT, tpl->td_file, mac->md_line);
@@ -792,11 +761,56 @@ mFunc_For(templ_t * tpl, macro_t * mac)
 }
 
 /**
+ * allocate and zero out a FOR macro context.
+ *
+ * @returns the top of thecurr_ivk_info stack of contexts.
+ */
+LOCAL for_state_t *
+new_for_context(void)
+{
+    for_state_t * res;
+
+    /*
+     *  Push the current FOR context onto a stack.
+     */
+    if (++(curr_ivk_info->ii_for_depth) > curr_ivk_info->ii_for_alloc) {
+        void * dta = curr_ivk_info->ii_for_data;
+        size_t sz  = (curr_ivk_info->ii_for_alloc += 5) * sizeof(for_state_t);
+
+        if (dta == NULL)
+             dta = AGALOC(sz, "Init FOR sate");
+        else dta = AGREALOC(dta, sz, "FOR state");
+        curr_ivk_info->ii_for_data = dta;
+    }
+
+    res = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
+    memset((void*)res, 0, sizeof(for_state_t));
+    res->for_isfirst = true;
+    return res;
+}
+
+/**
+ * allocate and zero out a FOR macro context.
+ *
+ * @returns the top of thecurr_ivk_info stack of contexts.
+ */
+LOCAL void
+free_for_context(bool everything)
+{
+    if ((--(curr_ivk_info->ii_for_depth) == 0) || everything) {
+        AGFREE(curr_ivk_info->ii_for_data);
+        curr_ivk_info->ii_for_data  = NULL;
+        curr_ivk_info->ii_for_alloc = 0;
+        curr_ivk_info->ii_for_depth = 0;
+    }
+}
+
+/**
  * Function to initiate loading of FOR block.
  * It must replace the dispatch table to handle the ENDFOR function,
  * which will unload the dispatch table.
  */
-macro_t*
+macro_t *
 mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
     char *        scan_out = tpl->td_scan; /* next text dest   */
@@ -806,9 +820,9 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc const * save_load_procs = load_proc_table;
+    load_proc_p_t const * save_load_procs = load_proc_table;
 
-    static tpLoadProc load_for_macro_procs[ FUNC_CT ] = { NULL };
+    static load_proc_p_t load_for_macro_procs[ FUNC_CT ] = { NULL };
 
     load_proc_table = load_for_macro_procs;
 

@@ -2,7 +2,7 @@
 /**
  * @file tpDep.c
  *
- * Time-stamp:        "2012-03-31 17:15:43 bkorb"
+ * Time-stamp:        "2012-04-07 09:01:06 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -301,8 +301,13 @@ tidy_dep_file(void)
         dep_file = pzn;
     } while (false);
 
+#ifdef HAVE_FCHMOD
     fchmod(fileno(dep_fp), fil_mode);
     fclose(dep_fp);
+#else
+    fclose(dep_fp);
+    chmod(dep_file, fil_mode);
+#endif
     dep_fp = NULL;
 
     {

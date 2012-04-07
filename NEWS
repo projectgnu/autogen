@@ -1,4 +1,23 @@
-New in __CURRENT_VERSION__ February 2012
+New in __CURRENT_VERSION__ April 2012
+
+* "break", "continue", and "return" macros implemented.
+  "return" works in included templates and invoked macros (user defined
+  macros).  "break" and "continue" work within "for" and "while"
+  loops, though they cannot be used to leave invoked or included
+  templates.
+
+* a keyword option value of "-1" or "~0" now means "largest value".
+
+* much improved .texi documentation templates.
+
+* de-tabbed "here strings" may have output lines prefixed with tabs
+  by backslash escaping the first tab to output.
+
+* -Werror may be appended by "=warn-group".  That is accommodated now.
+
+* many warning fixes and CamelCase name removals
+
+New in 5.15 February 2012
 
 * aliasing options was only partially implemented.  Finished now.
 

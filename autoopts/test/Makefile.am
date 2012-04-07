@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2011-12-03 14:10:41 bkorb"
+## Time-stamp:      "2012-04-07 09:36:42 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -27,12 +27,12 @@
 
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
 TESTS      = \
-    alias.test   argument.test cfg-edit.test  cond.test    \
-    config.test  enums.test    equiv.test     errors.test  \
-    getopt.test  handler.test  immediate.test keyword.test \
-    library.test main.test     nested.test    nls.test     \
-    rc.test      shell.test    stdopts.test   time.test    \
-    usage.test   vendor.test   vers.test
+    alias.test   argument.test cfg-edit.test  cond.test      \
+    config.test  doc.test      enums.test     equiv.test     \
+    errors.test  getopt.test   handler.test   immediate.test \
+    keyword.test library.test  main.test      nested.test    \
+    nls.test     rc.test       shell.test     stdopts.test   \
+    time.test    usage.test    vendor.test    vers.test
 
 testsubdir = ./testdir
 

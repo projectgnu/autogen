@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-03-10 09:50:05 bkorb"
+# Time-stamp:      "2012-04-03 19:19:51 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -244,7 +244,7 @@ typedef enum {[=
    (ag-fprintf 0 ",\n    %s_EXIT_LIBOPTS_FAILURE = 70" pname-up))
 =]
 } [= (. pname-down) =]_exit_code_t;[=
-DEBUG =][=
+
 CASE guard-option-names               =][=
 !E                                    =][=
 =  full-enum                          =][=

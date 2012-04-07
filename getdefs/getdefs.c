@@ -3,7 +3,7 @@
  *
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2012-02-28 19:41:53 bkorb"
+ *  Time-stamp:        "2012-04-07 09:30:29 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -76,11 +76,15 @@ static FILE*
 startAutogen(void);
 
 static void
-updateDatabase(void);
+update_db(void);
 /* END-STATIC-FORWARD */
 
 #ifndef HAVE_STRSIGNAL
 #  include "compat/strsignal.c"
+#endif
+
+#ifndef HAVE_CHMOD
+#  include "compat/chmod.c"
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -124,6 +128,9 @@ main(int argc, char ** argv)
         qsort((void*)papzBlocks, blkUseCt, sizeof(char*), &compar_text);
 
     printEntries(outFp);
+#ifdef HAVE_FCHMOD
+    fchmod(fileno(outFp), S_IRUSR|S_IRGRP|S_IROTH);
+#endif
     fclose(outFp);
 
     /*
@@ -136,7 +143,9 @@ main(int argc, char ** argv)
         tbuf.actime  = time((time_t*)NULL);
         tbuf.modtime = modtime + 1;
         utime(OPT_ARG(OUTPUT), &tbuf);
+#ifndef HAVE_FCHMOD
         chmod(OPT_ARG(OUTPUT), S_IRUSR|S_IRGRP|S_IROTH);
+#endif
     }
 
     /*
@@ -145,7 +154,7 @@ main(int argc, char ** argv)
      *  THEN append the new entries to the file.
      */
     if ((pzIndexText != NULL) && (pzEndIndex != pzIndexEOF))
-        updateDatabase();
+        update_db();
 
     if (agPid != -1)
         return awaitAutogen();
@@ -1149,10 +1158,10 @@ startAutogen(void)
 
 
 /*
- *  updateDatabase
+ *  update_db
  */
 static void
-updateDatabase(void)
+update_db(void)
 {
     FILE* fp;
 
@@ -1169,8 +1178,13 @@ updateDatabase(void)
         fserr_die("opening %s for write/append\n", OPT_ARG(ORDERING));
 
     fwrite(pzIndexEOF, (size_t)(pzEndIndex - pzIndexEOF), (size_t)1, fp);
+#ifdef HAVE_FCHMOD
+    fchmod(fileno(fp), 0444);
+    fclose(fp);
+#else
     fclose(fp);
     chmod(OPT_ARG(ORDERING), 0444);
+#endif
 }
 
 /* emacs

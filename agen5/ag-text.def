@@ -47,6 +47,9 @@ string = { nm = ASPRINTFV_FAIL_FMT;
 string = { nm = ASSEMBLE_NAME_ERR;
    str = "%s Error: Invalid input char '%c' in %s on line %d\n"; };
 
+string = { nm = BAD_BREAK_FMT;
+   str = "Cannot %s from outside a loop"; };
+
 string = { nm = BAD_MAC_NM_FMT;
    str = "Could not resolve macro name: ``%s''"; };
 
@@ -61,6 +64,9 @@ string = { nm = BAD_RE_FMT;
 
 string = { nm = BOGUS_TAG;
    str = "** BOGUS **"; };
+
+string = { nm = BREAK_STR;
+   str = "break"; };
 
 string = { nm = BUILD_DEFS_LONG_FMT;
    str = "%ld"; };
@@ -89,6 +95,9 @@ string = { nm = CMD_FAIL_FMT;
 
 string = { nm = COMPILE_RE_BAD;
    str = "Bad regular expression"; };
+
+string = { nm = CONTINUE_STR;
+   str = "continue"; };
 
 string = { nm = C_STRING_NEWLINE;
    str = "\\n\"\n       \""; };
@@ -894,6 +903,9 @@ string = { nm = RESOLVE_SCM_UNKNOWN;
 
 string = { nm = RESOLVE_SCM_VECTOR;
    str = "** Vector **"; };
+
+string = { nm = RETURN_FROM_NOWHERE;
+   str = "RETURN out of context"; };
 
 string = { nm = RUN_PRINTF_HUH;
    str = "? Say, what ?"; };

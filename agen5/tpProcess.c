@@ -4,7 +4,7 @@
  *
  *  Parse and process the template data descriptions
  *
- * Time-stamp:        "2012-03-31 13:30:30 bkorb"
+ * Time-stamp:        "2012-04-07 09:26:41 bkorb"
  *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -22,8 +22,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-static out_stack_t fpRoot = { 0, NULL, NULL, NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
@@ -63,7 +61,7 @@ gen_block(templ_t * tpl, macro_t * mac, macro_t * emac)
             trace_macro(tpl, mac);
 
         cur_macro = mac;
-        mac = (*(apHdlrProc[ fc ]))(tpl, mac);
+        mac = (*(load_procs[ fc ]))(tpl, mac);
         ag_scribble_free();
     }
 }
@@ -82,7 +80,7 @@ trace_macro(templ_t * tpl, macro_t * mac)
     if (fc >= FUNC_CT)
         fc = FTYP_BOGUS;
 
-    fprintf(trace_fp, TRACE_MACRO_FMT, apzFuncNames[fc], mac->md_code,
+    fprintf(trace_fp, TRACE_MACRO_FMT, ag_fun_names[fc], mac->md_code,
             tpl->td_file, mac->md_line);
 
     if (mac->md_txt_off > 0) {
@@ -131,12 +129,12 @@ do_stdout_tpl(templ_t * tpl)
         /* NOTREACHED */
     }
 
-    curr_sfx         = DO_STDOUT_TPL_NOSFX;
-    curr_def_ctx     = root_def_ctx;
-    cur_fpstack      = &fpRoot;
-    fpRoot.stk_fp    = stdout;
-    fpRoot.stk_fname = DO_STDOUT_TPL_STDOUT;
-    fpRoot.stk_flags = FPF_NOUNLINK | FPF_STATIC_NM;
+    curr_sfx           = DO_STDOUT_TPL_NOSFX;
+    curr_def_ctx       = root_def_ctx;
+    cur_fpstack        = &out_root;
+    out_root.stk_fp    = stdout;
+    out_root.stk_fname = DO_STDOUT_TPL_STDOUT;
+    out_root.stk_flags = FPF_NOUNLINK | FPF_STATIC_NM;
     if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
         fputs(DO_STDOUT_TPL_START_STD, trace_fp);
 
@@ -225,9 +223,9 @@ process_tpl(templ_t * tpl)
              *  It may get switched inside open_output.
              */
             open_output(ospec);
-            memcpy(&fpRoot, cur_fpstack, sizeof(fpRoot));
+            memcpy(&out_root, cur_fpstack, sizeof(out_root));
             AGFREE(cur_fpstack);
-            cur_fpstack    = &fpRoot;
+            cur_fpstack    = &out_root;
             curr_sfx       = ospec->os_sfx;
             curr_def_ctx   = root_def_ctx;
             cur_fpstack->stk_flags &= ~FPF_FREE;
@@ -281,7 +279,7 @@ LOCAL void
 out_close(bool purge)
 {
     if ((cur_fpstack->stk_flags & FPF_NOCHMOD) == 0)
-        make_readonly(fileno(cur_fpstack->stk_fp));
+        make_readonly();
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(trace_fp, OUT_CLOSE_TRACE_WRAP, __func__,

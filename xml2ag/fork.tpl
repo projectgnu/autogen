@@ -1,5 +1,5 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2012-03-31 13:43:01 bkorb"
+[= # Time-stamp:        "2012-04-07 09:56:01 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -134,7 +134,40 @@ forkAutogen(char const* pzInput)
 
         FOR flag                   =][=
           IF (define opt-name (up-c-name "name"))
-             (not (~~ opt-name "OVERRIDE_TPL|OUTPUT") ) =]
+
+             (and
+                 (not (~~ opt-name "OVERRIDE_TPL|OUTPUT"))
+                 (not (exist? "documentation"))
+             )  =][=
+
+            INVOKE handle-option   =][=
+          ENDIF (not override)     =][=
+        ENDFOR                     =]
+
+        xml2agOptions.origArgVect[ix] = NULL;
+        execvp(xml2agOptions.origArgVect[0], xml2agOptions.origArgVect);
+
+        /*
+         *  IF the first try fails, it may be because xml2ag and autogen have
+         *  different paths.  Try again with just plain "autogen" and let
+         *  the OS search "PATH" for the program.
+         */
+        execvp(zAg, xml2agOptions.origArgVect);
+        fprintf(stderr, zFsError, xml2agOptions.pzProgName,
+                errno, strerror(errno), "execvp(2)");
+        exit(EXIT_FAILURE);
+    }
+}
+
+/*
+ * Local Variables:
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * end of [= (out-name) =] */
+[=
+
+DEFINE handle-option =]
 
         if (HAVE_OPT([=(. opt-name)=])) {[=
 
@@ -184,27 +217,7 @@ forkAutogen(char const* pzInput)
 
           ESAC arg-type            =]
         }[=
-          ENDIF (not override)  =][=
-        ENDFOR                     =]
 
-        xml2agOptions.origArgVect[ix] = NULL;
-        execvp(xml2agOptions.origArgVect[0], xml2agOptions.origArgVect);
+ENDDEF handle-option
 
-        /*
-         *  IF the first try fails, it may be because xml2ag and autogen have
-         *  different paths.  Try again with just plain "autogen" and let
-         *  the OS search "PATH" for the program.
-         */
-        execvp(zAg, xml2agOptions.origArgVect);
-        fprintf(stderr, zFsError, xml2agOptions.pzProgName,
-                errno, strerror(errno), "execvp(2)");
-        exit(EXIT_FAILURE);
-    }
-}
-
-/*
- * Local Variables:
- * c-file-style: "stroustrup"
- * indent-tabs-mode: nil
- * End:
- * end of autogen.c */
+\=]

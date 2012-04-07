@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-04-01 13:49:46 bkorb"
+# Time-stamp:        "2012-04-07 09:58:05 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -78,7 +78,14 @@ INVOKE emit-usage-opt   =][=
 (define invalid-doc   "* INVALID *")
 (if (exist? "preserve-case") (begin
    (set! optname-from "_^")
-   (set! optname-to   "--") ))  =][=#
+   (set! optname-to   "--") ))
+(if (and have-doc-options (not (exist? "flag[].documentation"))) (begin
+    (ag-fprintf "menu" menu-entry-fmt
+                "base-options:: " "Base options")
+    (print-node opt-name "Base options")
+)   )
+
+=][=#
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
@@ -155,19 +162,20 @@ DEFINE emit-doc-sections        =][=
 FOR doc-section                 =][=
 
   IF  (define opt-name (string-capitalize! (get "ds-type")))
-
-      (not (== opt-name "Exit Status")) =][=
-
-    (ag-fprintf "menu" menu-entry-fmt (string-append opt-name "::") opt-name)
-    (set! label-str (string-append
-          down-prog-name " " (string-capitalize opt-name)))
-    (print-node opt-name label-str)
-    (define cvt-fn (get "ds-format" "texi"))
-    (if (not (== cvt-fn "texi"))
-        (divert-convert cvt-fn) )       =][=
-    (emit (string-append "\n" (get "ds-text") "\n"))
-    (convert-divert)            =][=
+      (or (== opt-name "Exit Status")
+          (exist? "omit-texi")) =][=
+    CONTINUE                    =][=
   ENDIF                         =][=
+
+  (ag-fprintf "menu" menu-entry-fmt (string-append opt-name "::") opt-name)
+  (set! label-str (string-append
+        down-prog-name " " (string-capitalize opt-name)))
+  (print-node opt-name label-str)
+  (define cvt-fn (get "ds-format" "texi"))
+  (if (not (== cvt-fn "texi"))
+      (divert-convert cvt-fn) ) =][=
+  (emit (string-append "\n" (get "ds-text") "\n"))
+  (convert-divert)              =][=
 
 ENDFOR  doc-section             =][=
 

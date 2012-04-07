@@ -2,7 +2,7 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2012-03-31 13:32:23 bkorb"
+ *  Time-stamp:        "2012-04-07 09:45:02 bkorb"
  *
  *  Global header file for AutoGen
  *
@@ -103,7 +103,7 @@ typedef union {
     _State_( DONE )
 
 #define _State_(n)  PROC_STATE_ ## n,
-typedef enum { STATE_TABLE COUNT_PROC_STATE } teProcState;
+typedef enum { STATE_TABLE COUNT_PROC_STATE } proc_state_t;
 #undef _State_
 
 #define EXPORT
@@ -111,7 +111,7 @@ typedef enum { STATE_TABLE COUNT_PROC_STATE } teProcState;
 typedef struct out_stack        out_stack_t;
 typedef struct out_spec         out_spec_t;
 typedef struct scan_context     scan_ctx_t;
-typedef struct defEntry         def_ent_t;
+typedef struct def_entry        def_ent_t;
 typedef struct macro_desc       macro_t;
 typedef struct template_desc    templ_t;
 typedef struct for_state        for_state_t;
@@ -127,18 +127,18 @@ typedef struct tlib_mark        tlib_mark_t;
  *
  *  Procedure for loading a template function
  */
-typedef macro_t* (tLoadProc)( templ_t*, macro_t*, char const** ppzScan );
-typedef tLoadProc* tpLoadProc;
+typedef macro_t * (load_proc_t)(templ_t*, macro_t*, char const** ppzScan);
+typedef load_proc_t * load_proc_p_t;
 
-typedef void (tUnloadProc)( macro_t* );
-typedef tUnloadProc* tpUnloadProc;
+typedef void (unload_proc_t)(macro_t*);
+typedef unload_proc_t* unload_proc_p_t;
 
 /*
  *  Procedure for handling a template function
  *  during the text emission phase.
  */
-typedef macro_t* (tHdlrProc)( templ_t*, macro_t* );
-typedef tHdlrProc* tpHdlrProc;
+typedef macro_t* (hdlr_proc_t)(templ_t*, macro_t*);
+typedef hdlr_proc_t* hdlr_proc_p_t;
 
 /*
  *  This must be included after the function prototypes
@@ -230,7 +230,7 @@ typedef union {
     char *        dvu_text;
 } def_val_u;
 
-struct defEntry {
+struct def_entry {
     def_ent_t *   de_next;      //!< next member of same level
     def_ent_t *   de_twin;      //!< next member with same name
     def_ent_t *   de_ptwin;     //!< previous memb. of level
@@ -258,12 +258,15 @@ struct out_spec {
     char          os_sfx[ 1 ];
 };
 
-#define FPF_FREE        0x0001   /* free the fp structure   */
-#define FPF_UNLINK      0x0002   /* unlink file (temp file) */
-#define FPF_NOUNLINK    0x0004   /* do not unlink file      */
-#define FPF_STATIC_NM   0x0008   /* name statically alloced */
-#define FPF_NOCHMOD     0x0010   /* do not chmod(2) file    */
-#define FPF_TEMPFILE    0x0020   /* the file is a temp      */
+/**
+ * Output stack handling flags.
+ */
+#define FPF_FREE        0x0001  /*!< free the fp structure   */
+#define FPF_UNLINK      0x0002  /*!< unlink file (temp file) */
+#define FPF_NOUNLINK    0x0004  /*!< do not unlink file      */
+#define FPF_STATIC_NM   0x0008  /*!< name statically alloced */
+#define FPF_NOCHMOD     0x0010  /*!< do not chmod(2) file    */
+#define FPF_TEMPFILE    0x0020  /*!< the file is a temp      */
 
 struct out_stack {
     int           stk_flags;
@@ -289,14 +292,14 @@ struct for_state {
     char *        for_name;     //!< name of iterator (not allocated)
     bool          for_islast;   //!< true for last iteration
     bool          for_isfirst;  //!< true for first iteration
-    jmp_buf       for_env;      //!< long jump buffer
+    jmp_buf       for_env;      //!< long jump buffer (BREAK, CONTINUE)
 };
 
 typedef enum {
-    FOR_JMP_DONE    = 0,
-    FOR_JMP_NEXT    = 1,
-    FOR_JMP_BREAK   = 2
-} for_jmp_type_t;
+    LOOP_JMP_OKAY    = 0,
+    LOOP_JMP_NEXT    = 1,
+    LOOP_JMP_BREAK   = 2
+} loop_jmp_type_t;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
@@ -306,7 +309,7 @@ typedef struct ivk_info ivk_info_t;
 struct ivk_info {
     ivk_info_t *  ii_prev;      //!< previous layer
     int           ii_depth;     //!< Invocation nesting depth
-    jmp_buf       ii_env;       //!< long jump buffer
+    jmp_buf       ii_env;       //!< long jump buffer (RETURN)
     int           ii_for_depth; //!< for depth for this invocation
     int           ii_for_alloc; //!< for state buffer allocation count
     for_state_t * ii_for_data;  //!< array of "for" macro states
@@ -341,7 +344,9 @@ struct ivk_info {
  *  General Processing Globals
  */
 #define ag_pname    autogenOptions.pzProgName
-MODE teProcState    processing_state VALUE( PROC_STATE_INIT );
+MODE proc_state_t    processing_state VALUE( PROC_STATE_INIT );
+MODE unsigned int   include_depth    VALUE( 0 );
+MODE bool           defining_macro   VALUE( false );
 MODE templ_t *      named_tpls       VALUE( NULL );
 MODE char const *   oops_pfx         VALUE( "" );
 /*
@@ -444,6 +449,7 @@ MODE bool           redo_opts        VALUE( true );
  *  3.  mFunc_Case may transfer to one of its selection clauses.
  */
 MODE macro_t *       cur_macro        VALUE( NULL );
+MODE tlib_mark_t const magic_marker   VALUE( TEMPLATE_MAGIC_MARKER );
 
 /*
  *  Template Parsing Globals
@@ -453,10 +459,11 @@ MODE scan_ctx_t *   base_ctx         VALUE( NULL );
 MODE scan_ctx_t *   cctx             VALUE( NULL );
 MODE scan_ctx_t *   end_ctx          VALUE( NULL );
 MODE size_t         end_mac_len      VALUE( 0  );
-MODE char           end_mac_mark[   8 ]   VALUE( "" );
+MODE char           end_mac_mark[8]  VALUE( "" );
 MODE size_t         st_mac_len       VALUE( 0  );
-MODE char           st_mac_mark[  8 ]  VALUE( "" );
-MODE int            guileFailure     VALUE( 0 );
+MODE char           st_mac_mark[8]   VALUE( "" );
+MODE out_stack_t    out_root         VALUE({ 0 });
+
 #define name_sep_ch '.'
 
 /*

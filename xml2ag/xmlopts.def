@@ -2,7 +2,7 @@
 
 autogen definitions options;
 
-// Time-stamp:        "2011-03-24 23:19:16 bkorb"
+// Time-stamp:        "2012-04-07 09:05:33 bkorb"
 
 /*
  *  This file is part of AutoGen.
@@ -51,6 +51,12 @@ export = <<-  EOExport
 	EOExport;
 
 flag = {
+    name        = the-xml2ag-option;
+    documentation;
+    descrip = 'All other options are derived from autogen';
+};
+
+flag = {
     name        = output;
     value       = O;
     arg-type    = string;
@@ -70,6 +76,18 @@ flag = {
 	        exit(EXIT_FAILURE);
 	    }
 	FLAG_CODE_END ;
+};
+
+flag = {
+    name        = autogen-options;
+    documentation = <<- _EODoc_
+	These options are @i{mostly} just passed throug to @code{autogen}.
+	The one exception is @code{--override-tpl} which replaces the
+	default template in the output definitions.  It does not get passed
+	through on the command line.
+	_EODoc_;
+
+    descrip = 'All other options';
 };
 
 #define XML2AG

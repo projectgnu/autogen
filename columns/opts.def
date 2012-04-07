@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-01-29 13:32:36 bkorb"
+ *  Time-stamp:        "2012-04-07 09:30:18 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
@@ -49,6 +49,13 @@ export = <<- EOExport
 
 include = "[= AutoGen5 Template =]";
 include = "#include <errno.h>";
+
+flag = {
+    name        = dimensions;
+    documentation;
+
+    descrip = 'Specify the output dimensions';
+};
 
 flag = {
     name        = width;
@@ -99,6 +106,37 @@ flag = {
 };
 
 flag = {
+    name        = tab_width;
+    arg-type    = number;
+    arg-default = 8;
+    arg-name    = num;
+    descrip     = "tab width";
+    doc         = <<- _EODoc_
+	If an indentation string contains tabs, then this value is used to
+	compute the ending column of the prefix string.
+	_EODoc_;
+};
+
+#ifdef LATER
+flag = {
+    name        = page_len;
+    arg-type    = number;
+    arg-name    = num;
+    descrip     = "Page Length";
+    doc         = <<- _EODoc_
+	This many lines will be printed before a form feed is emitted.
+	The 'by_columns' ordering will wrap columns within a page.
+	_EODoc_;
+};
+#endif
+
+flag = {
+    name        = treatment;
+    documentation;
+    descrip = 'Specify how to lay out the text';
+};
+
+flag = {
     name        = spread;
     arg-type    = number;
     arg-default = 0;
@@ -108,7 +146,8 @@ flag = {
     doc         = <<- _EODoc_
 	Use this option to specify exactly how many characters may be
 	added to each column.  It allows you to prevent columns from
-	becoming too far apart.
+	becoming too far apart.  Without this option, @file{columns}
+	will attempt to widen columns to fill the full width.
 	_EODoc_;
 };
 
@@ -165,33 +204,6 @@ flag = {
 };
 
 flag = {
-    name        = tab_width;
-    arg-type    = number;
-    arg-default = 8;
-    arg-name    = num;
-    descrip     = "tab width";
-    doc         = <<- _EODoc_
-	If an indentation string contains tabs, then this value is used to
-	compute the ending column of the prefix string.
-	_EODoc_;
-};
-
-flag = {
-    name        = sort;
-    value       = s;
-    arg-type    = string;
-    arg-optional;
-    arg-name    = key-pat;
-    descrip     = "Sort input text";
-    doc         = <<- _EODoc_
-	Causes the input text to be sorted.  If an argument is supplied,
-	it is presumed to be a pattern and the sort is based upon the
-	matched text.  If the pattern starts with or consists of
-	an asterisk (@code{*}), then the sort is case insensitive.
-	_EODoc_;
-};
-
-flag = {
     name        = format;
     value       = f;
     arg-type    = string;
@@ -238,6 +250,12 @@ flag = {
 };
 
 flag = {
+    name        = ordering;
+    documentation;
+    descrip = 'Specify the ordering of the entries';
+};
+
+flag = {
     name        = by_columns;
     descrip     = "Print entries in column order";
     doc         = <<- _EODoc_
@@ -248,18 +266,26 @@ flag = {
 	_EODoc_;
 };
 
-#ifdef LATER
 flag = {
-    name        = page_len;
-    arg-type    = number;
-    arg-name    = num;
-    descrip     = "Page Length";
+    name        = sort;
+    value       = s;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = key-pat;
+    descrip     = "Sort input text";
     doc         = <<- _EODoc_
-	This many lines will be printed before a form feed is emitted.
-	The 'by_columns' ordering will wrap columns within a page.
+	Causes the input text to be sorted.  If an argument is supplied,
+	it is presumed to be a pattern and the sort is based upon the
+	matched text.  If the pattern starts with or consists of
+	an asterisk (@code{*}), then the sort is case insensitive.
 	_EODoc_;
 };
-#endif
+
+flag = {
+    name        = input-text;
+    documentation;
+    descrip = 'Redirecting stdin to an alternate file';
+};
 
 include =
   '#define OPEN_ERROR_FMT      ([=

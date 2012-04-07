@@ -40,6 +40,13 @@ explain       = <<- EndExplanation
 guard-option-names;
 
 flag = {
+    name        = def-selection;
+    documentation;
+    descrip = 'Specify which definitions are of interest and '
+              'what to say about them';
+};
+
+flag = {
     name      = "defs_to_get";
     arg-type  = string;
     arg-name  = reg-ex;
@@ -48,59 +55,7 @@ flag = {
 	If you want definitions only from a particular category, or even
 	with names matching particular patterns, then specify this regular
 	expression for the text that must follow the @code{/*=}.
-	_EOF_;
-};
-
-flag = {
-    name        = ordering;
-    arg-type    = string;
-    arg-optional;
-    arg-name    = file-name;
-    disable     = no;
-    enabled;
-    descrip     = "Alphabetize or use named file";
-    doc = <<-  _EOF_
-	By default, ordering is alphabetical by the entry name.  Use,
-	@code{no-ordering} if order is unimportant.  Use @code{ordering}
-	with no argument to order without case sensitivity.  Use
-	@code{ordering=<file-name>} if chronological order is important.
-	getdefs will maintain the text content of @code{file-name}.
-	@code{file-name} need not exist.
-	_EOF_;
-};
-
-flag = {
-    name        = first_index;
-    arg_type    = number;
-    arg-default = 0;
-    arg-name    = first-index;
-    descrip     = "The first index to apply to groups";
-    doc = <<-  _EOF_
-	By default, the first occurrence of a named definition will have an
-	index of zero.  Sometimes, that needs to be a reserved value.  Provide
-	this option to specify a different starting point.
-	_EOF_;
-};
-
-flag = {
-    name      = input;
-    arg-type  = string;
-    arg-name  = src-file;
-    max       = NOLIMIT;
-    settable;
-    stack_arg;
-    default;
-    descrip   = "Input file to search for defs";
-
-    doc = <<-  _EOF_
-	All files that are to be searched for definitions must be named on
-	the command line or read from @code{stdin}.  If there is only one
-	@code{input} option and it is the string, "-", then the input file
-	list is read from @code{stdin}.  If a command line argument is not
-	an option name and does not contain an assignment operator
-	(@code{=}), then it defaults to being an input file name.
-	At least one input file must be specified.
-	_EOF_;
+	_EOF_; // */
 };
 
 flag = {
@@ -158,6 +113,53 @@ flag = {
 };
 
 flag = {
+    name        = enumerating;
+    documentation;
+    descrip = 'specify how to number the definitions';
+};
+
+flag = {
+    name        = ordering;
+    arg-type    = string;
+    arg-optional;
+    arg-name    = file-name;
+    disable     = no;
+    enabled;
+    descrip     = "Alphabetize or use named file";
+    doc = <<-  _EOF_
+	By default, ordering is alphabetical by the entry name.  Use,
+	@code{no-ordering} if order is unimportant.  Use @code{ordering}
+	with no argument to order without case sensitivity.  Use
+	@code{ordering=<file-name>} if chronological order is important.
+	getdefs will maintain the text content of @code{file-name}.
+	@code{file-name} need not exist.
+	_EOF_;
+};
+
+flag = {
+    name        = first_index;
+    arg_type    = number;
+    arg-default = 0;
+    arg-name    = first-index;
+    descrip     = "The first index to apply to groups";
+    doc = <<-  _EOF_
+	By default, the first occurrence of a named definition will have an
+	index of zero.  Sometimes, that needs to be a reserved value.  Provide
+	this option to specify a different starting point.
+	_EOF_;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  Definition Insertion Options:
+ */
+flag = {
+    name        = doc_insert;
+    descrip     = "Definition insertion options";
+    documentation;
+};
+
+flag = {
     name        = filelist;
     arg-type    = string;
     arg-optional;
@@ -172,16 +174,6 @@ flag = {
 	If an argument is supplied, that string will be used for the entry
 	name instead of @var{infile}.
 	_EOF_;
-};
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Definition Insertion Options:
- */
-flag = {
-    name        = doc_insert;
-    descrip     = "Definition insertion options";
-    documentation;
 };
 
 flag = {
@@ -262,6 +254,33 @@ flag = {
 	name instead of @var{linenum}.
 	_EOF_;
 
+};
+
+flag = {
+    name        = input-files;
+    documentation;
+    descrip = 'specify which files to search for markers';
+};
+
+flag = {
+    name      = input;
+    arg-type  = string;
+    arg-name  = src-file;
+    max       = NOLIMIT;
+    settable;
+    stack_arg;
+    default;
+    descrip   = "Input file to search for defs";
+
+    doc = <<-  _EOF_
+	All files that are to be searched for definitions must be named on
+	the command line or read from @code{stdin}.  If there is only one
+	@code{input} option and it is the string, "-", then the input file
+	list is read from @code{stdin}.  If a command line argument is not
+	an option name and does not contain an assignment operator
+	(@code{=}), then it defaults to being an input file name.
+	At least one input file must be specified.
+	_EOF_;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -371,7 +390,7 @@ detail = <<- _EOF_
 	@code{=*/\n}.
 	_EOF_;
 
-prog_descrip = <<_EOF_
+prog-descrip = <<_EOF_
 This program extracts AutoGen definitions from a list of source files.
 Definitions are delimited by @code{/*=<entry-type> <entry-name>\n} and
 @code{=*/\n}.  From that, this program creates a definition of the following

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-01-29 13:14:52 bkorb"
+## Time-stamp:      "2012-04-07 09:31:30 bkorb"
 ## Copyright (c)    1997-2012 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
@@ -21,7 +21,8 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-COMPAT_CSRC = pathfind.c snprintf.c strchr.c strdup.c strftime.c strsignal.c
+COMPAT_CSRC = chmod.c pathfind.c snprintf.c strchr.c strdup.c strftime.c \
+	strsignal.c
 COMPAT_HDRS = compat.h strsignal.h windows-config.h unlocked-io.h
 COMPAT_GEN  = bootstrap.dir strsignal.def strsignal.tpl
 EXTRA_DIST  = $(COMPAT_CSRC) $(COMPAT_HDRS) $(COMPAT_GEN)

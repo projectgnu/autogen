@@ -6,6 +6,28 @@
 	* agen5/mk-stamps.sh: removed to here
 	* autoopts/env.c (doPrognameEnv): warning patrol
 	* autoopts/usage.c (set_usage_flags): warning patrol
+	* agen5/autogen.h: new globals for detecting block enclosures for
+	break/continue/return macros
+	* agen5/funcDef.c (mFunc_Define): extract code that invokes "gen_block"
+	to a separate function where long jumps can be handled better
+	(mLoad_Define): indicate that a new template is being loaded so that
+	"return" can function properly.
+	* agen5/funcFor.c (for_by_step): call gen_block wrapper to handle
+	long jump returns
+	(for_each): likewise
+	(mFunc_For): extract some convolutions into new procedures
+	* agen5/funcIf.c (mFunc_While): fake up a for loop context and call
+	the same gen_block wrapper to handle long jumps
+	* agen5/functions.c (mFunc_Break): handle next and continue
+	(call_gen_block): handle long jump returns for looping macros
+	(mFunc_Return): handle "return" for INCLUDE and INVOKE macros
+	(gen_new_block): gen_block wrapper for INCLUDE and INVOKE.
+	(mLoad_Skip): loading procedure for break and continue
+	* agen5/functions.tpl (handler-proc): may now specify the handler to use
+	* agen5/test/debug.test: adjust for new macro numbers
+	* agen5/test/leave.test: non-working initial draft to test this stuff.
+	* compat/chmod.c: new (no-op) compatibility function for Windows-32
+	* config/libopts.def: check for fchmod, fstat and chmod functions, too.
 
 2012-03-31  Bruce Korb  <bkorb@gnu.org>
 

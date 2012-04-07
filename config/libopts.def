@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2012-02-25 12:54:32 bkorb"
+ *  Time-stamp:        "2012-04-07 09:34:35 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -337,7 +337,7 @@ do-first = <<-_EOF_
 	AC_FUNC_VPRINTF
 	AC_FUNC_FORK
 	AC_CHECK_FUNCS([mmap canonicalize_file_name snprintf strdup strchr \
-	               strrchr strsignal])
+	               strrchr strsignal fchmod fstat chmod])
 	AC_PROG_SED
 	[while :
 	do

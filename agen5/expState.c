@@ -5,7 +5,7 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2012-03-04 19:50:32 bkorb"
+ *  Time-stamp:        "2012-04-07 09:50:32 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -124,7 +124,7 @@ find_entry_value(SCM op, SCM obj, SCM test)
         if (pzField != NULL)
             *(pzField++) = NUL;
 
-        pE = findDefEntry(name, &isIndexed);
+        pE = find_def_ent(name, &isIndexed);
     }
 
     /*
@@ -368,7 +368,7 @@ ag_scm_exist_p(SCM obj)
     bool x;
     SCM     res;
 
-    if (findDefEntry(ag_scm2zchars(obj, "ag object"), &x) == NULL)
+    if (find_def_ent(ag_scm2zchars(obj, "ag object"), &x) == NULL)
          res = SCM_BOOL_F;
     else res = SCM_BOOL_T;
 
@@ -451,7 +451,7 @@ ag_scm_get(SCM agName, SCM altVal)
     bool     x;
 
     pE = (! AG_SCM_STRING_P(agName)) ? NULL :
-        findDefEntry(ag_scm2zchars(agName, "ag value"), &x);
+        find_def_ent(ag_scm2zchars(agName, "ag value"), &x);
 
     if ((pE == NULL) || (pE->de_type != VALTYP_TEXT)) {
         if (AG_SCM_STRING_P(altVal))
@@ -550,7 +550,7 @@ ag_scm_high_lim(SCM obj)
     def_ent_t*  pE;
     bool     isIndexed;
 
-    pE = findDefEntry(ag_scm2zchars(obj, "ag value"), &isIndexed);
+    pE = find_def_ent(ag_scm2zchars(obj, "ag value"), &isIndexed);
 
     /*
      *  IF we did not find the entry we are looking for
@@ -605,7 +605,7 @@ ag_scm_low_lim(SCM obj)
     def_ent_t*  pE;
     bool     x;
 
-    pE = findDefEntry(ag_scm2zchars(obj, "ag value"), &x);
+    pE = find_def_ent(ag_scm2zchars(obj, "ag value"), &x);
 
     /*
      *  IF we did not find the entry we are looking for
@@ -780,7 +780,7 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
     char * buf;
     bool     x;
 
-    def_ent_t * pE = findDefEntry(ag_scm2zchars(obj, "ag value"), &x);
+    def_ent_t * pE = find_def_ent(ag_scm2zchars(obj, "ag value"), &x);
 
     /*
      *  IF we did not find the entry we are looking for

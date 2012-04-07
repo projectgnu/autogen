@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2012-03-31 13:41:36 bkorb"
+ *  Time-stamp:        "2012-04-07 09:41:36 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -66,10 +66,10 @@ struct case_stack {
 };
 
 static tCaseStack current_case;
-static tLoadProc  mLoad_Select;
+static load_proc_t  mLoad_Select;
 
-static tpLoadProc apCaseLoad[ FUNC_CT ]   = { NULL };
-static tpLoadProc apSelectOnly[ FUNC_CT ] = { NULL };
+static load_proc_p_t apCaseLoad[ FUNC_CT ]   = { NULL };
+static load_proc_p_t apSelectOnly[ FUNC_CT ] = { NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
@@ -1079,7 +1079,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     /*
      *  Save the global macro loading mode
      */
-    tpLoadProc const * papLP = load_proc_table;
+    load_proc_p_t const * papLP = load_proc_table;
 
     /*
      *  IF there is no associated text expression

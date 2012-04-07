@@ -2,7 +2,7 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2012-03-31 13:45:53 bkorb"
+ *  Time-stamp:        "2012-04-07 09:20:37 bkorb"
  *
  *  This module implements the output file manipulation function
  *
@@ -30,7 +30,7 @@
 #  define S_IAMB      (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)
 #endif
 
-#define WRITE_MASK ((unsigned)(~(S_IWUSR|S_IWGRP|S_IWOTH)))
+#define NO_WRITE_MASK ((unsigned)(~(S_IWUSR|S_IWGRP|S_IWOTH) & S_IAMB))
 
 typedef struct {
     char const *  pzSuspendName;
@@ -99,8 +99,11 @@ do_output_file_line(int line_delta, char const * fmt)
  * chmod a-w on a file descriptor.
  */
 LOCAL void
-make_readonly(int fd)
+make_readonly(void)
 {
+#if defined(HAVE_FSTAT) || defined(HAVE_FCHMOD)
+    int fd = fileno(cur_fpstack->stk_fp);
+#endif
     struct stat sbuf;
 
     /*
@@ -117,14 +120,25 @@ make_readonly(int fd)
      *  Set our usage mask to all all the access
      *  bits that do not provide for write access
      */
+#ifdef HAVE_FSTAT
     fstat(fd, &sbuf);
+#else
+    stat(cur_fpstack->stk_fname, &sbuf);
+#endif
 
     /*
      *  Mask off the write permission bits, but ensure that
      *  the user read bit is set.
      */
-    sbuf.st_mode = ((unsigned)sbuf.st_mode & WRITE_MASK) | S_IRUSR;
-    fchmod(fd, sbuf.st_mode & S_IAMB);
+    {
+        mode_t f_mode = (NO_WRITE_MASK & sbuf.st_mode) | S_IRUSR;
+
+#ifdef HAVE_FCHMOD
+        fchmod(fd, f_mode);
+#else
+        chmod(cur_fpstack->stk_fname, f_mode);
+#endif
+    }
 }
 
 /**
@@ -158,8 +172,8 @@ open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
        && (errno != ENOENT)) {
         struct stat sbuf;
         if (stat(fname, &sbuf) == 0) {
-            sbuf.st_mode |= S_IWUSR;
-            chmod(fname, sbuf.st_mode & 07777);
+            mode_t m = (sbuf.st_mode & 07777) | S_IWUSR;
+            chmod(fname, m);
         }
     }
 
@@ -675,7 +689,7 @@ ag_scm_out_switch(SCM new_file)
         return SCM_UNDEFINED;
     }
 
-    make_readonly(fileno(cur_fpstack->stk_fp));
+    make_readonly();
 
     /*
      *  Make sure we get a new file pointer!!

@@ -4,7 +4,7 @@
  *
  *  This module implements the DEFINE text function.
  *
- *  Time-stamp:        "2012-03-31 13:47:27 bkorb"
+ *  Time-stamp:        "2012-04-07 09:47:37 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -384,27 +384,6 @@ prep_invoke_args(macro_t * mac)
     }
 }
 
-/*=macfunc RETURN
- *
- *  handler-proc:
- *  in-context:
- *
- *  what:  Leave an INVOKE-d (DEFINE) macro
- *  desc:
- *
- *      This will unwind everything going on inside of a DEFINE-d macro
- *      and return to the invocation point.  When it is finished.
- *
- *      This is not fully implemented.  Do not think about using it.
-=*/
-macro_t *
-mFunc_Return(templ_t * tpl, macro_t * mac)
-{
-    (void)tpl;
-    (void)mac;
-    longjmp(curr_ivk_info->ii_env, 1);
-}
-
 /*=macfunc DEBUG
  *
  *  handler-proc:
@@ -622,22 +601,23 @@ build_defs(int def_ct, def_list_t * def_list)
  *    This macro ends the @code{DEFINE} function template block.
  *    For a complete description @xref{DEFINE}.
 =*/
-/*
- *  mFunc_Define
+/**
+ *  This routine runs the invocation of a defined macro.
  *
- *  This routine runs the invocation.
+ * @param tpl not used
+ * @param[in] mac the macro that holds the data for the defined macro
  */
 macro_t *
-mFunc_Define(templ_t * new_tpl, macro_t * mac)
+mFunc_Define(templ_t * tpl, macro_t * mac)
 {
     def_list_t * pList  = (def_list_t *)mac->md_res;
     int          defCt  = mac->md_sib_idx;
     def_ctx_t    ctx;
 
-    new_tpl = (templ_t*)mac->md_pvt;
-
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        fprintf(trace_fp, TPL_INVOKED, new_tpl->td_name, defCt);
+        tpl = (templ_t*)mac->md_pvt;
+
+        fprintf(trace_fp, TPL_INVOKED, tpl->td_name, defCt);
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf(trace_fp, TAB_FILE_LINE_FMT,
                     current_tpl->td_file, mac->md_line);
@@ -652,20 +632,7 @@ mFunc_Define(templ_t * new_tpl, macro_t * mac)
         build_defs(defCt, pList);
     }
 
-    {
-        templ_t *   oldt = current_tpl;
-        ivk_info_t    ii = IVK_INFO_INITIALIZER(curr_ivk_info);
-
-        curr_ivk_info = &ii;
-
-        if (setjmp(ii.ii_env) == 0) {
-            macro_t * m = new_tpl->td_macros;
-            gen_block(new_tpl, m, m + new_tpl->td_mac_ct);
-        }
-
-        current_tpl   = oldt;
-        curr_ivk_info = ii.ii_prev;
-    }
+    gen_new_block((templ_t*)mac->md_pvt);
 
     if (defCt != 0)
         curr_def_ctx = ctx;
@@ -684,7 +651,11 @@ mFunc_Define(templ_t * new_tpl, macro_t * mac)
     return mac+1;
 }
 
-
+/**
+ * unload a defined macro
+ *
+ * @param[in,out] mac macro containing the data to unload
+ */
 void
 mUnload_Define(macro_t * mac)
 {
@@ -692,7 +663,6 @@ mUnload_Define(macro_t * mac)
     if (p != NULL)
         AGFREE(p);
 }
-
 
 /*=macfunc INVOKE
  *
@@ -858,14 +828,14 @@ load_define_tpl(templ_t * tpl, char const ** ppzScan)
 macro_t *
 mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
 {
-    static tpLoadProc apDefineLoad[ FUNC_CT ] = { NULL };
+    static load_proc_p_t apDefineLoad[ FUNC_CT ] = { NULL };
 
     templ_t * new_tpl;
 
     /**
      *  Save the global macro loading mode
      */
-    tpLoadProc const * save_load_procs = load_proc_table;
+    load_proc_p_t const * save_load_procs = load_proc_table;
 
     if (mac->md_txt_off == 0)
         AG_ABEND_IN(ori_tpl, mac, LD_DEF_NEED_NAME);
@@ -880,11 +850,13 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
         memcpy((void*)apDefineLoad, base_load_table, sizeof(base_load_table));
         apDefineLoad[ FTYP_ENDDEF ] = &mLoad_Ending;
         apDefineLoad[ FTYP_DEFINE ] = &mLoad_Bogus;
-        apDefineLoad[ FTYP_RETURN ] = &mLoad_Unknown;
     }
+
     load_proc_table = apDefineLoad;
+    defining_macro  = true;
     new_tpl = new_template(ori_tpl, mac, *p_scan);
     load_define_tpl(new_tpl, p_scan);
+    defining_macro  = false;
 
     /*
      *  Adjust the sizes.  Remove absolute pointers.  Reallocate to the correct
@@ -912,10 +884,10 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
 #endif
 
     new_tpl->td_scan = (char*)named_tpls;
-    named_tpls     = new_tpl;
-    load_proc_table    = save_load_procs;
+    named_tpls      = new_tpl;
+    load_proc_table = save_load_procs;
     memset((void*)mac, 0, sizeof(*mac));
-    current_tpl    = ori_tpl;
+    current_tpl     = ori_tpl;
     return mac;
 }
 /*

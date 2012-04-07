@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2012-03-31 13:22:57 bkorb"
+ * Time-stamp:        "2012-04-07 09:03:08 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -23,8 +23,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static tlib_mark_t magicMark = TEMPLATE_MAGIC_MARKER;
-
 /* = = = START-STATIC-FORWARD = = = */
 static bool
 read_okay(char const * pzFName);
@@ -37,7 +35,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
           char const * pzData);
 
 static templ_t *
-digest_pseudo_macro(tmap_info_t * minfo, char * real_file);
+digest_tpl(tmap_info_t * minfo, char * fname);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
@@ -305,15 +303,15 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
             size_t  size  = pT->td_scan - (char*)data;
             memmove((void*)pMacEnd, data, size);
 
-            pT->td_text -= delta;
-            pT->td_scan       -= delta;
-            pT->td_name   -= delta;
-            pT->td_mac_ct      = ct;
+            pT->td_text  -= delta;
+            pT->td_scan  -= delta;
+            pT->td_name  -= delta;
+            pT->td_mac_ct = ct;
         }
     }
 
     pT->td_size = pT->td_scan - (char*)pT;
-    pT->td_scan    = NULL;
+    pT->td_scan = NULL;
 
     /*
      *  We cannot reallocate a smaller array because
@@ -331,12 +329,18 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
 }
 
 /**
- * Process the stuff in the pseudo macro.
+ * Load a template from mapped memory.  Load up the pseudo macro,
+ * count the macros, allocate the data, and parse all the macros.
+ *
+ * @param[in] minfo  information about the mapped memory.
+ * @param[in] fname  the full path input file name.
+ *
+ * @returns the digested data
  */
 static templ_t *
-digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
+digest_tpl(tmap_info_t * minfo, char * fname)
 {
-    templ_t * pRes;
+    templ_t * res;
 
     /*
      *  Count the number of macros in the template.  Compute
@@ -344,37 +348,37 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
      *  and the size of the template data.  These may get reduced
      *  by comments.
      */
-    char const * pzData =
-        loadPseudoMacro((char const *)minfo->txt_data, real_file);
+    char const * dta =
+        loadPseudoMacro((char const *)minfo->txt_data, fname);
 
-    size_t mac_ct   = cnt_macros(pzData);
-    size_t alloc_sz = (sizeof(*pRes) + (mac_ct * sizeof(macro_t))
+    size_t mac_ct   = cnt_macros(dta);
+    size_t alloc_sz = (sizeof(*res) + (mac_ct * sizeof(macro_t))
                        + minfo->txt_size
-                       - (pzData - (char const *)minfo->txt_data)
-                       + strlen(real_file) + 0x10) & ~0x0F;
+                       - (dta - (char const *)minfo->txt_data)
+                       + strlen(fname) + 0x10) & ~0x0F;
 
-    pRes = (templ_t*)AGALOC(alloc_sz, "main template");
-    memset((void*)pRes, 0, alloc_sz);
+    res = (templ_t*)AGALOC(alloc_sz, "main template");
+    memset((void*)res, 0, alloc_sz);
 
     /*
      *  Initialize the values:
      */
-    pRes->td_magic  = magicMark;
-    pRes->td_size  = alloc_sz;
-    pRes->td_mac_ct = mac_ct;
+    res->td_magic  = magic_marker;
+    res->td_size   = alloc_sz;
+    res->td_mac_ct = mac_ct;
 
-    strcpy(pRes->td_start_mac, st_mac_mark); /* must fit */
-    strcpy(pRes->td_end_mac,   end_mac_mark);   /* must fit */
-    load_macs(pRes, real_file, PSEUDO_MAC_TPL_FILE, pzData);
+    strcpy(res->td_start_mac, st_mac_mark); /* must fit */
+    strcpy(res->td_end_mac,   end_mac_mark);   /* must fit */
+    load_macs(res, fname, PSEUDO_MAC_TPL_FILE, dta);
 
-    pRes->td_name   -= (long)pRes;
-    pRes->td_text -= (long)pRes;
-    pRes = (templ_t*)AGREALOC((void*)pRes, pRes->td_size,
+    res->td_name -= (long)res;
+    res->td_text -= (long)res;
+    res = (templ_t*)AGREALOC((void*)res, res->td_size,
                                 "resize template");
-    pRes->td_name   += (long)pRes;
-    pRes->td_text += (long)pRes;
+    res->td_name += (long)res;
+    res->td_text += (long)res;
 
-    return pRes;
+    return res;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -383,20 +387,20 @@ digest_pseudo_macro(tmap_info_t * minfo, char * real_file)
  *  list trying to find the base template file name.
  */
 LOCAL templ_t *
-tpl_load(char const * pzFileName, char const * referrer)
+tpl_load(char const * fname, char const * referrer)
 {
-    static tmap_info_t mapInfo;
+    static tmap_info_t map_info;
     static char        tpl_file[ AG_PATH_MAX ];
 
     /*
      *  Find the template file somewhere
      */
     {
-        static char const * const apzSfx[] = {
+        static char const * const sfx_list[] = {
             LOAD_TPL_SFX_TPL, LOAD_TPL_SFX_AGL, NULL };
-        if (! SUCCESSFUL(find_file(pzFileName, tpl_file, apzSfx, referrer))) {
+        if (! SUCCESSFUL(find_file(fname, tpl_file, sfx_list, referrer))) {
             errno = ENOENT;
-            AG_CANT(LOAD_TPL_CANNOT_MAP, pzFileName);
+            AG_CANT(LOAD_TPL_CANNOT_MAP, fname);
         }
     }
 
@@ -407,19 +411,19 @@ tpl_load(char const * pzFileName, char const * referrer)
     {
         struct stat stbf;
         if (stat(tpl_file, &stbf) != 0)
-            AG_CANT(LOAD_TPL_CANNOT_STAT, pzFileName);
+            AG_CANT(LOAD_TPL_CANNOT_STAT, fname);
 
         if (! S_ISREG(stbf.st_mode)) {
             errno = EINVAL;
-            AG_CANT(LOAD_TPL_IRREGULAR, pzFileName);
+            AG_CANT(LOAD_TPL_IRREGULAR, fname);
         }
 
         if (outfile_time < stbf.st_mtime)
             outfile_time = stbf.st_mtime;
     }
 
-    text_mmap(tpl_file, PROT_READ|PROT_WRITE, MAP_PRIVATE, &mapInfo);
-    if (TEXT_MMAP_FAILED_ADDR(mapInfo.txt_data))
+    text_mmap(tpl_file, PROT_READ|PROT_WRITE, MAP_PRIVATE, &map_info);
+    if (TEXT_MMAP_FAILED_ADDR(map_info.txt_data))
         AG_ABEND(aprf(LOAD_TPL_CANNOT_OPEN, tpl_file));
 
     if (dep_fp != NULL)
@@ -430,31 +434,34 @@ tpl_load(char const * pzFileName, char const * referrer)
      *  starts immediately after it.
      */
     {
-        macro_t    * pSaveMac = cur_macro;
-        templ_t * pRes;
+        macro_t * sv_mac = cur_macro;
+        templ_t * res;
         cur_macro = NULL;
 
-        pRes = digest_pseudo_macro(&mapInfo, tpl_file);
-        cur_macro = pSaveMac;
-        text_munmap(&mapInfo);
+        res = digest_tpl(&map_info, tpl_file);
+        cur_macro = sv_mac;
+        text_munmap(&map_info);
 
-        return pRes;
+        return res;
     }
 }
 
 /**
- * Deallocate anything we allocated related to a template,
- * including the pointer passed in.
+ * Deallocate anything related to a template.
+ * This includes the pointer passed in and any macros that have an
+ * unload procedure associated with it.
+ *
+ *  @param[in] tpl  the template to unload
  */
 LOCAL void
-tpl_unload(templ_t* pT)
+tpl_unload(templ_t * tpl)
 {
-    macro_t* pMac = pT->td_macros;
-    int ct = pT->td_mac_ct;
+    macro_t * mac = tpl->td_macros;
+    int ct = tpl->td_mac_ct;
 
     while (--ct >= 0) {
-        tpUnloadProc proc;
-        unsigned int ix = pMac->md_code;
+        unload_proc_p_t proc;
+        unsigned int ix = mac->md_code;
 
         /*
          * "select" functions get remapped, depending on the alias used for
@@ -463,22 +470,25 @@ tpl_unload(templ_t* pT)
         if (ix >= FUNC_CT)
             ix = FTYP_SELECT;
 
-        proc = apUnloadProc[ ix ];
+        proc = unload_procs[ ix ];
         if (proc != NULL)
-            (*proc)(pMac);
+            (*proc)(mac);
 
-        pMac++;
+        mac++;
     }
 
-    AGFREE((void*)(pT->td_file));
-    AGFREE(pT);
+    AGFREE((void*)(tpl->td_file));
+    AGFREE(tpl);
 }
 
 /**
  *  This gets called when all is well at the end.
+ *  The supplied template and all named templates are unloaded.
+ *
+ *  @param[in] tpl  the last template standing
  */
 LOCAL void
-cleanup(templ_t* pTF)
+cleanup(templ_t * tpl)
 {
     if (HAVE_OPT(USED_DEFINES))
         print_used_defines();
@@ -489,15 +499,14 @@ cleanup(templ_t* pTF)
     optionFree(&autogenOptions);
 
     for (;;) {
-        templ_t* pT = named_tpls;
-        if (pT == NULL)
+        tpl_unload(tpl);
+        tpl = named_tpls;
+        if (tpl == NULL)
             break;
-        named_tpls = (templ_t*)(void*)(pT->td_scan);
-        tpl_unload(pT);
+        named_tpls = (templ_t*)(void*)(tpl->td_scan);
     }
 
-    AGFREE(curr_ivk_info->ii_for_data);
-    tpl_unload(pTF);
+    free_for_context(true);
     unload_defs();
 }
 

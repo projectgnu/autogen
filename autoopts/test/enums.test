@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2011-08-07 17:33:57 bkorb"
+# Time-stamp:        "2012-04-07 09:07:53 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -108,23 +108,20 @@ cat > ${testname}.def <<-  _EOF_
 		     */
 		    switch (WHICH_IDX_PRINT) {
 		    case NO_EQUIVALENT:
-		        /* FALLTHROUGH */
 		    case INDEX_OPT_PRINT:
-		        /* FALLTHROUGH */
 		    case INDEX_OPT_DUMP_LOG:
-		        /* FALLTHROUGH */
 		    case INDEX_OPT_ALL_DUMP:
 		        if (COUNT_OPT( MSG_NUM ) > 1) {
-		            fputs( "Except for 'set' and 'unset' functions, "
-		                   "only one 'msg-num' is allowed\n", stderr );
-		            USAGE( EXIT_FAILURE );
+		            fputs("Except for 'set' and 'unset' functions, "
+		                  "only one 'msg-num' is allowed\n", stderr);
+		            USAGE(EXIT_FAILURE);
 		        }
 		        break;
 		    case INDEX_OPT_SET:
-		        set_options( 1, pOptDesc->pzLastArg );
+		        set_options(1, pOptDesc->pzLastArg);
 		        break;
 		    case INDEX_OPT_UNSET:
-		        set_options( 0, pOptDesc->pzLastArg );
+		        set_options(0, pOptDesc->pzLastArg);
 		        break;
 		    };
 		_EndOfFlagCode_;
@@ -141,7 +138,7 @@ cat > ${testname}.def <<-  _EOF_
 		 "#include \"config.h\"\n"
 		 "#include \"compat/compat.h\"";
 
-		include = 'void set_options( int mode, char const* pzArg );';
+		include = 'void set_options(int mode, char const* pzArg);';
 
 	main = {
 	   main-type = include;
@@ -170,8 +167,8 @@ cat > ${testname}.tpl <<- \__EOF
 	[=(shellf "procs='%s' ; ix=0 ; for p in ${procs}
 	do
 	  p=`echo $p | sed s/,//`
-	  echo int ${p}'( void ) {'
-	  printf 'fputs( \"'${p}'\\\\n\", stdout );\n'
+	  echo int ${p}'(void) {'
+	  printf '    fputs(\"'${p}'\\\\n\", stdout);\n'
 	  echo return ${ix}'; }'
 	  ix=`expr $ix + 1`
 	done" proc-list) =]
@@ -189,21 +186,21 @@ cat > ${testname}.tpl <<- \__EOF
 	}
 
 	int
-	do_set( int which_way )
+	do_set(int which_way)
 	{
-	    printf( "PRINT = 0x%lX\n", DESC(PRINT).optCookie );
-	    printf( "SET   = 0x%lX\n", DESC(SET).optCookie );
+	    printf("PRINT = 0x%lX\n", DESC(PRINT).optCookie);
+	    printf("SET   = 0x%lX\n", DESC(SET).optCookie);
 	    if (which_way)
-	        printf( "0x%lX\n", OPT_VALUE_SET );
+	        printf("0x%lX\n", OPT_VALUE_SET);
 	    else
-	        printf( "0x%lX\n", (~ OPT_VALUE_SET) & SET_MEMBERSHIP_MASK );
+	        printf("0x%lX\n", (~ OPT_VALUE_SET) & SET_MEMBERSHIP_MASK);
 	    return 0;
 	}
 
 	void
-	set_options( int mode, char const* pzArg )
+	set_options(int mode, char const* pzArg)
 	{
-	    exit( atoi( pzArg ));
+	    exit(atoi(pzArg));
 	}
 	__EOF
 
@@ -212,7 +209,7 @@ cat >> ${testname}.tpl <<- __EOF
 	main( int argc, char** argv )
 	{
 	    {
-	        int ct = optionProcess( &${testname}_testOptions, argc, argv );
+	        int ct = optionProcess(&${testname}_testOptions, argc, argv);
 	        argc -= ct;
 	        argv += ct;
 	    }
@@ -229,8 +226,8 @@ cat >> ${testname}.tpl <<- __EOF
 	        case INDEX_OPT_PRINT:    res = do_proc[OPT_VALUE_PRINT](); break;
 	        case INDEX_OPT_DUMP_LOG: res = do_dump_log();  break;
 	        case INDEX_OPT_ALL_DUMP: res = do_all_dump();  break;
-	        case INDEX_OPT_SET:      res = do_set( 1 );    break;
-	        case INDEX_OPT_UNSET:    res = do_set( 0 );    break;
+	        case INDEX_OPT_SET:      res = do_set(1);    break;
+	        case INDEX_OPT_UNSET:    res = do_set(0);    break;
 	        }
 	        return res;
 	    }
