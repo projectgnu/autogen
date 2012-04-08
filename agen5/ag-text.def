@@ -502,8 +502,15 @@ string = { nm = INIT_SCM_DEBUG_FMT;
    str = "(debug-enable 'backtrace)"; };
 
 string = { nm = INIT_SCM_ERRS_FMT;
-   str = "(add-hook! before-error-hook error-source-line)\n"
+   str = "(use-modules (%s)) (read-enable 'positions)\n"
+         "(add-hook! before-error-hook error-source-line)\n"
          "(use-modules (ice-9 stack-catch))"; };
+
+string = { nm = SCHEME_INIT_DEBUG_2_0;
+   str = "system vm trace"; };
+
+string = { nm = SCHEME_INIT_DEBUG_1_8;
+   str = "ice-9 debug"; };
 
 string = { nm = KR_STRING_NEWLINE;
    str = "\\n\\\n"; };
@@ -1257,7 +1264,6 @@ sed  -e "s/AUTOGEN_VERSION/${AG_VERSION}/" \
      -e '/^;/d' \
      -e '/^$/d' ${srcdir}/schemedef.scm
 `; };
-
 
 string = { nm = SHELL_INIT_STR;
    str = <<- _EOF_

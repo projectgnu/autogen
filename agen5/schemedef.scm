@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2012-01-07 09:25:09 bkorb"
+;;; Time-stamp:        "2012-04-08 08:39:41 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -368,10 +368,6 @@
        -e '/^int main(/,$d' ${gpdir}/%s.c"
   gp-name
 )))
-
-(use-modules (ice-9 debug))
-
-(read-enable 'positions)
 
 ;;; /*=gfunc   stack_join
 ;;;  *

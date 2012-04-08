@@ -1,8 +1,15 @@
+2012-04-08  Bruce Korb  <bkorb@gnu.org>
+
+	* compat/chmod.c: new (no-op) compatibility function for Windows-32
+	* config/libopts.def: check for fchmod, fstat and chmod functions, too.
+	* agen5/agInit.c (initialize): new variation required for Guile 2.0.
+	* autoopts/test/doc.test: new test for man/mdoc/texi templates.
+
 2012-04-01  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/agtexi-cmd.tpl: omit texi doc for options with emtpy
 	"doc" clauses.
-	* agen5/bootstrap.dir: remove code used only by "make"
+	* agen5/bootstrap.dir: remove code used also in "make"
 	* agen5/mk-stamps.sh: removed to here
 	* autoopts/env.c (doPrognameEnv): warning patrol
 	* autoopts/usage.c (set_usage_flags): warning patrol
@@ -25,9 +32,7 @@
 	(mLoad_Skip): loading procedure for break and continue
 	* agen5/functions.tpl (handler-proc): may now specify the handler to use
 	* agen5/test/debug.test: adjust for new macro numbers
-	* agen5/test/leave.test: non-working initial draft to test this stuff.
-	* compat/chmod.c: new (no-op) compatibility function for Windows-32
-	* config/libopts.def: check for fchmod, fstat and chmod functions, too.
+	* agen5/test/leave.test: test this stuff.
 
 2012-03-31  Bruce Korb  <bkorb@gnu.org>
 

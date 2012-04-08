@@ -5,7 +5,7 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-03-31 13:56:26 bkorb"
+ *  Time-stamp:      "2012-04-08 08:54:02 bkorb"
  *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -67,7 +67,17 @@ initialize(int arg_ct, char** arg_vec)
     ag_scm_c_eval_string_from_file_line(
         SCHEME_INIT_TEXT, AG_TEXT_STRTABLE_FILE, SCHEME_INIT_TEXT_LINENO);
 
-    SCM_EVAL_CONST(INIT_SCM_ERRS_FMT);
+    {
+#if GUILE_VERSION > 200000
+        static char const * const module = SCHEME_INIT_DEBUG_2_0;
+#else
+        static char const * const module = SCHEME_INIT_DEBUG_1_6;
+#endif
+        char * p = aprf(INIT_SCM_ERRS_FMT, module);
+        last_scm_cmd = p;
+        ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
+        AGFREE(p);
+    }
 
     last_scm_cmd = NULL;
     processing_state = PROC_STATE_OPTIONS;
