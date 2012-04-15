@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-03-31 13:07:46 bkorb"
+# Time-stamp:      "2012-04-15 10:24:39 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -260,7 +260,7 @@ ENDIF  there is a version
 [= (. lib-externs) =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Define the [= (. pname-cap) =] Option Environment
+ *  Define the [= (. prog-name) =] Option Environment
  */
 #define zPROGNAME       ([= (string-table-add-ref opt-strs pname-up)   =])
 #define zUsageTitle     ([=
@@ -348,33 +348,39 @@ one per line; blank and '#'-prefixed lines are comments.
     (string-table-add-ref opt-strs version-text)
     "NULL")             =])[=
 (tpl-file-line extract-fmt)
-=]
+=][=
+
+   IF (exist? "no-nls-support") =]
+#define OPTPROC_BASE OPTPROC_NONE
+#define translate_option_strings NULL
+[= ELSE  =]
 #if defined(ENABLE_NLS)
 # define OPTPROC_BASE OPTPROC_TRANSLATE[=
-CASE   no-xlate         =][=
-!E                      =][=
-= opt-cfg               =] | OPTPROC_NXLAT_OPT_CFG[=
-= opt                   =] | OPTPROC_NXLAT_OPT[=
-*                       =][= (error "invalid value for 'no-xlate'") =][=
-ESAC   no-xlate         =]
+CASE   no-xlate             =][=
+!E                          =][=
+= opt-cfg                   =] | OPTPROC_NXLAT_OPT_CFG[=
+= opt                       =] | OPTPROC_NXLAT_OPT[=
+*                           =][= (error "invalid value for 'no-xlate'") =][=
+ESAC   no-xlate             =]
   static tOptionXlateProc translate_option_strings;
 #else
 # define OPTPROC_BASE OPTPROC_NONE
 # define translate_option_strings NULL
 #endif /* ENABLE_NLS */
-[= IF (exist? "resettable") =]
-static optArgBucket_t const original[=(. pname-cap)=]Defaults[ [=
+[= ENDIF no-nls             =][=
+   IF (exist? "resettable") =]
+static optArgBucket_t const original_[=(. pname-down)=]_defaults[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [= (shell (string-append
       "sed '$s@},@} @' <<\\_EOF_" default-text "\n_EOF_\n")) =]
 };
-static void * const original[=(. pname-cap)=]Cookies[ [=
+static void * const original_[=(. pname-down)=]_cookies[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [=
  (shell (string-append "columns -I4 -S, <<\\_EOF_\n" default-cookie "_EOF_"))
 =]
 };
-[= ENDIF =]
+[= ENDIF resettable=]
 [= INVOKE usage-text usage-type = full  \=]
 [= INVOKE usage-text usage-type = short \=]
 [= INVOKE emit-option-callbacks          =]
@@ -448,7 +454,7 @@ tOptions [=(. pname)=]Options = {
        (count "flag")=] /* user option count */,
     [= (. pname) =]_full_usage, [= (. pname) =]_short_usage,
 [= IF (exist? "resettable") \=]
-    original[=(. pname-cap)=]Defaults, original[=(. pname-cap)=]Cookies,
+    original_[=(. pname-down)=]_defaults, original_[=(. pname-down)=]_cookies,
 [= ELSE \=]
     NULL, NULL,
 [= ENDIF \=]
@@ -461,13 +467,19 @@ FOR lib-name
 =]
 tOptDesc* [= (string->c-name! (get "lib-name")) =]_optDesc_p = NULL;[=
 
-ENDFOR   =][=
+ENDFOR                      =][=
 
-INVOKE emit-nls-code         =][= #
+INVOKE emit-nls-code
+=]
+#ifdef  __cplusplus
+}
+#endif[= #
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE emit-nls-code
+
+=][= IF (exist? "no-nls-support") =][= RETURN =][= ENDIF
 
 =]
 #if ENABLE_NLS
@@ -564,10 +576,7 @@ translate_option_strings(void)
 }
 
 #endif /* ENABLE_NLS */
-
-#ifdef  __cplusplus
-}
-#endif[=
+[=
 
 ENDDEF emit-nls-code
 
@@ -578,7 +587,7 @@ DEFINE emit-option-desc-table
 =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Define the [=(. pname-cap)=] Option Descriptions.
+ *  Define the [=(. prog-name)=] Option Descriptions.
  */
 static tOptDesc optDesc[[=
 (define default-text   "")

@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-04-03 19:19:51 bkorb"
+# Time-stamp:      "2012-04-07 09:21:00 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -507,8 +507,9 @@ extern tOptions [=(. pname)=]Options;[=
      (begin
         (emit "\n")
         (shellf "sort -u <<_EOF_\n%s_EOF_" added-hdr)
- )   )
-=]
+ )   )                          =][=
+
+   IF (not (exist? "no-nls-support")) =]
 
 #if defined(ENABLE_NLS)
 # ifndef _
@@ -530,7 +531,8 @@ static inline char* aoGetsText(char const* pz) {
 # define OPT_XLAT_OPT_NAMES     STMTS([=(. pname)=]Options.fOptSet &= \
                                   ~OPTPROC_NXLAT_OPT;)
 
-#else   /* ENABLE_NLS */
+#else   /* ENABLE_NLS */[=
+   ENDIF no-nls-support         =]
 # define OPT_NO_XLAT_CFG_NAMES
 # define OPT_NO_XLAT_OPT_NAMES
 
@@ -539,8 +541,9 @@ static inline char* aoGetsText(char const* pz) {
 
 # ifndef _
 #   define _(_s)  _s
-# endif
-#endif  /* ENABLE_NLS */
+# endif[=
+
+(if (not (exist? "no-nls-support")) (emit "\n#endif  /* ENABLE_NLS */")) =]
 
 #ifdef  __cplusplus
 }
