@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-04-15 10:24:39 bkorb"
+# Time-stamp:      "2012-04-15 10:52:22 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -350,7 +350,7 @@ one per line; blank and '#'-prefixed lines are comments.
 (tpl-file-line extract-fmt)
 =][=
 
-   IF (exist? "no-nls-support") =]
+   IF (. omit-nls-code) =]
 #define OPTPROC_BASE OPTPROC_NONE
 #define translate_option_strings NULL
 [= ELSE  =]
@@ -479,7 +479,7 @@ INVOKE emit-nls-code
 
 DEFINE emit-nls-code
 
-=][= IF (exist? "no-nls-support") =][= RETURN =][= ENDIF
+=][= IF (. omit-nls-code) =][= RETURN =][= ENDIF
 
 =]
 #if ENABLE_NLS

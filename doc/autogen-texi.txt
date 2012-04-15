@@ -1400,8 +1400,10 @@ must provide GCC with the @code{-Wno-format-contains-nul} option.
 
 @item
 If you compile with @code{ENABLE_NLS} defined and @code{_()} defined to
-a localization function such as @code{gettext(3GNU)}, then the option
-processing code will be localizable (@pxref{i18n}).
+a localization function (e.g. @code{gettext(3GNU)}), then the option
+processing code will be localizable (@pxref{i18n}).  Provided also that
+you do not define the @code{no-xlate} attribute to @emph{anything}
+(@pxref{presentation attributes}).
 
 @item
 Provides a callable routine to parse
@@ -1745,9 +1747,10 @@ If it is longer than that, it is presumed to be the help text itself.
 This text will be inserted into the generated .c file.
 @end itemize
 
-This string should be readily translatable and provision will be made
-to translate it if this is provided and the source code is compiled with
-``ENABLE_NLS'' defined.
+This string should be readily translatable.  Provision will be made
+to translate it if this is provided, if the source code is compiled with
+@code{ENABLE_NLS} defined, and @code{no-xlate} has not been set to the
+value @emph{anything}.
 
 @item short-usage
 @vindex short-usage
@@ -2046,7 +2049,7 @@ One of the options may be specified as the default
 @item no-xlate
 @vindex no-xlate
 Modifies when or whether option names get translated.  If provided,
-it must be assigned one of two values:
+it must be assigned one of these values:
 @table @samp
 @item opt-cfg
 to suppress option name translation for configuration file and and environment
@@ -2055,8 +2058,10 @@ variable processing.
 to suppress option name translation completely.  The usage text will
 always be translated if @code{ENABLE_NLS} is defined and you have
 translations for that text.
+@item anything
+Specifies disabling all internationalization support for option code, completely.
 @end table
-See also the various ``@code{XLAT}'' interface entries in the
+See also the various @code{XLAT} interface entries in the
 AutoOpts Programmatic Interface section (@pxref{AutoOpts API}).
 
 @item reorder-args
@@ -3536,7 +3541,8 @@ environment variable names used to configure your program.
 If it is considered desireable to keep configuration files in the ``C''
 locale, then several macros are available to suppress or delay the
 translations of option names at run time.  These are all disabled if
-@code{ENABLE_NLS} is not defined at compile time.  These macros @strong{must}
+@code{ENABLE_NLS} is not defined at compile time or if @code{no-xlate} has
+been set to the value @emph{anything}.  These macros @strong{must}
 be invoked before the first invocation of @code{optionProcess}.
 
 @table @samp
@@ -4223,11 +4229,12 @@ int opt_val = OPT_VALUE_name;
 @subsection OPT_XLAT_CFG_NAMES - option name xlation
 @findex OPT_XLAT_CFG_NAMES
 
-If @code{ENABLE_NLS} is defined, this macro will cause the translation of
-option names to happen before starting the processing of configuration files
-and environment variables.  This will change the recognition of options within
-the @code{$PROGRAMNAME} environment variable, but will not alter the names
-used for setting options via @code{$PROGRAMNAME_name} environment variables.
+If @code{ENABLE_NLS} is defined and @code{no-xlate} has been not set to the
+value @emph{anything}, this macro will cause the translation of option names
+to happen before starting the processing of configuration files and
+environment variables.  This will change the recognition of options within the
+@code{$PROGRAMNAME} environment variable, but will not alter the names used
+for setting options via @code{$PROGRAMNAME_name} environment variables.
 
 This must be invoked before the first call to @code{optionProcess}.  You might
 need to use this macro if your option definition file contains the attribute
@@ -4238,10 +4245,11 @@ you have determined in some way that you wish to override that.
 @subsection OPT_XLAT_OPT_NAMES - option name xlation
 @findex OPT_XLAT_OPT_NAMES
 
-If @code{ENABLE_NLS} is defined, translate the option names before processing
-the command line options.  Long option names may thus be localized.
-(If the names were translated before configuration processing, they will
-not be re-translated.)
+If @code{ENABLE_NLS} is defined and @code{no-xlate} has been not set to the
+value @emph{anything}, translate the option names before processing the
+command line options.  Long option names may thus be localized.  (If the names
+were translated before configuration processing, they will not be
+re-translated.)
 
 This must be invoked before the first call to @code{optionProcess}.  You might
 need to use this macro if your option definition file contains the attribute
@@ -5576,16 +5584,17 @@ The following header files must also exist on the build platform:
 @cindex Internationalizing AutoOpts
 
 The generated code for AutoOpts will enable and disable the translation of
-AutoOpts run time messages.  If @code{ENABLE_NLS} is defined at compile time,
-then the @code{_()} macro may be used to specify a translation function.  If
-undefined, it will default to @code{gettext(3GNU)}.  This define will also
-enable a callback function that @code{optionProcess} invokes at the
-beginning of option processing.  The AutoOpts @code{libopts} library will
-always check for this ``compiled with NLS'' flag, so @code{libopts} does not
-need to be specially compiled.  The strings returned by the translation
-function will be @code{strdup(3)-ed} and kept.  They will not be
-re-translated, even if the locale changes, but they will also not be dependent
-upon reused or unmappable memory.
+AutoOpts run time messages.  If @code{ENABLE_NLS} is defined at compile time
+and @code{no-xlate} has been not set to the value @emph{anything}, then the
+@code{_()} macro may be used to specify a translation function.  If undefined,
+it will default to @code{gettext(3GNU)}.  This define will also enable a
+callback function that @code{optionProcess} invokes at the beginning of option
+processing.  The AutoOpts @code{libopts} library will always check for this
+@emph{compiled with NLS} flag, so @code{libopts} does not need to be specially
+compiled.  The strings returned by the translation function will be
+@code{strdup(3)-ed} and kept.  They will not be re-translated, even if the
+locale changes, but they will also not be dependent upon reused or unmappable
+memory.
 
 To internationalize option processing, you should first internationalize your
 program.  Then, the option processing strings can be added to your translation
@@ -5595,6 +5604,9 @@ yourself from the @file{usage-txt.h} file.)  When you call
 @code{optionProcess}, all of the user visible AutoOpts strings will be passed
 through the localization procedure established with the @code{_()}
 preprocessing macro.
+
+All of this is @emph{dis}-abled if you specify the global attribute
+@code{no-xlate} to @emph{anything}.
 
 @c === SECTION MARKER
 

@@ -2,7 +2,7 @@
 
 	* autoopts/tpl/def2pot.tpl: clean up
 	* autoopts/test/doc.test: test pot template, too.
-	* autoopts/tpl/optcode.tlib: support "no-nls-support" attribute
+	* autoopts/tpl/optcode.tlib: "no-xlate = anything" attribute
 	* autoopts/tpl/opthead.tlib: likewise
 	* agen5/opts.def: specify "no-nls-support".
 

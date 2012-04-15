@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-04-14 12:37:50 bkorb"
+## Time-stamp:      "2012-04-15 11:18:40 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -28,7 +28,8 @@
 INFO_DEPS       = autogen.info
 MIexe           = $(MAKEINFO) --no-split
 MAKEINFOFLAGS   = -I$(top_srcdir)/autoopts -I../autoopts
-passenv         = MAKE=$(MAKE) srcdir="$(srcdir)" SHELL="$(POSIX_SHELL)"
+passenv         = MAKE=$(MAKE) srcdir="$(srcdir)" SHELL="$(POSIX_SHELL)" \
+	top_srcdir="$(top_srcdir)"
 run_mktexi      = $(passenv) $(POSIX_SHELL) mk-agen-texi.sh
 all : $(INFO_DEPS)
 

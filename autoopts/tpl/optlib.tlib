@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-04-14 18:15:09 bkorb"
+# Time-stamp:      "2012-04-15 10:50:28 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -77,6 +77,7 @@ DEFINE init-and-validate                =][=
 (define tmp-ct          0)
 (define extract-fmt     "\n/* extracted from %s near line %d */\n")
 (define make-callback-procs #f)
+(define omit-nls-code   (~ (get "no-xlate") "(any|no)thing"))
 
 (define need-stacking (lambda()
     (if (not (exist? "max"))
