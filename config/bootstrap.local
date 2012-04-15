@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-06-25 09:29:54 bkorb"
+# Time-stamp:        "2012-04-14 14:37:59 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -59,39 +59,37 @@ locate_exe()
 
 config_configurables()
 {
-    exec 4> configure.files
     local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
     local inf=$(find ${tops} -type f -name '*.in')
     local in_list
-    for f in $inf
-    do
-        case "$f" in
-        *-tpl.in )  g=${f%-tpl.in}.tpl ;;
-        *-tlib.in ) g=${f%-tlib.in}.tlib ;;
-        *.in )      in_list=${in_list}${f%.in}$'\n' ; continue ;;
-        esac
-        printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
-    done >&4
+
     {
-        echo "$in_list"
-        find ${tops} -name 'Makefile.am' | sed 's/\.am$//'
-    } | columns --first='AC_CONFIG_FILES([' --end='])' -I4 >&4
-    exec 4>&-
+        for f in $inf
+        do
+            case "$f" in
+            *-tpl.in )  g=${f%-tpl.in}.tpl ;;
+            *-tlib.in ) g=${f%-tlib.in}.tlib ;;
+            *.in )      in_list=${in_list}${f%.in}$'\n' ; continue ;;
+            esac
+            printf 'AC_CONFIG_FILES([%s:%s])\n' $g $f
+        done
+        {
+            echo "$in_list"
+            find ${tops} -name 'Makefile.am' | sed 's/\.am$//'
+        } | columns --first='AC_CONFIG_FILES([' --end='])' -I4
+    } > configure.files
 
-    sed="-e 's/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/'"
-    sed="${sed} -e '/dnl Local Variables:/,\$d'"
-    case "${AG_PATCHLEVEL}" in
-    ( *[0-9]pre[1-9]* ) : ;;
-    ( * ) sed="${sed} -e '/^case .*GCC.* in/,/^esac/d'" ;;
-    esac
-    sed="${sed} -e '/==ADD_CONFIG_FILES==/{${nl}s/.*//${nl}"
-    sed="${sed}r configure.files${nl}}'"
+    sedcmd="
+	s/^AC_INIT(.*/AC_INIT([${PACKAGE}],[${AG_VERSION}],[${EADDR}])/
+	/dnl Local Variables:/,\$d
+	/==ADD_CONFIG_FILES==/{
+	    s/.*//
+	    r configure.files
+	}"
 
-    : "sed ${sed} ${config_file} > configure.tmp"
-    eval sed "${sed}" ${config_file} > configure.tmp
-
-    mv -f configure.tmp ${config_file}
-    rm -f configure.files
+    sed "$sedcmd" ${config_file} > configure.tmp
+    mv  -f configure.tmp ${config_file}
+    rm  -f configure.files
 }
 
 config_versions()
@@ -122,40 +120,31 @@ config_versions()
 
     marker='=== Component Todo:'
     rm -f TODO
-    exec 3> TODO
-    sed "/${marker}/,\$d" TODO-top >&3
-    for f in */TODO
-    do
-      test -f $f || continue
-      echo ; echo ${marker} ${f} '==='
-      cat ${f}
-    done >&3
-    exec 3>&-
+    {
+        sed "/${marker}/,\$d" TODO-top
+        for f in */TODO
+        do
+            test -s $f || continue
+            echo ; echo ${marker} ${f} '==='
+            cat ${f}
+        done
+    } > TODO
 
     cd ${srcdir}
 
-    GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
-    cp ${GNULIBDIR}/lib/parse-duration.[ch] autoopts/.
-    cp  ${GNULIBDIR}/build-aux/gendocs.sh \
-        ${GNULIBDIR}/doc/gendocs_template doc/.
+    glopts='--local-dir=tmp --source-base=autoopts --lib=do_not_make_me
+	--import
+	--makefile-name=gnulib.mk
+	--libtool
+	--no-changelog
+	--symlink
+	--m4-base=config'
+    glmods='parse-duration gendocs gettext-h'
 
-    fmemdir=~bkorb/tools/mine/lib/fmemopen
-    if test -f ${fmemdir}/fmemopen.c
-    then
-        test -f agen5/fmemopen.c && rm -f agen5/fmemopen.c
-        {
-            echo '#if defined(ENABLE_FMEMOPEN)'
-            echo '#include <sys/ioctl.h>'
-            echo
-            sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
-            sed -e '/^#if defined(HAVE_FOPENCOOKIE)/p' \
-                -e '/=--subblock/,/^#if defined(HAVE_FOPENCOOKIE)/d' \
-                -e "s% @file .*% @file $(realpath ${fmemdir}/fmemopen.c)%" \
-                ${fmemdir}/fmemopen.c
-            echo '#endif /* ENABLE_FMEMOPEN */'
-        } > agen5/fmemopen.c
-        
-    fi
+    GNULIBTOOL=${GNULIBDIR:-~gnu/proj/gnulib}/gnulib-tool
+    ${GNULIBTOOL} $glopts $glmods
+    sed -i 's/do_not_make_me_.*_SOURCES/EXTRA_DIST/;/do_not_make_me/d' \
+        autoopts/gnulib.mk
 }
 
 check_tools()

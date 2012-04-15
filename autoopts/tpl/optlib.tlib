@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-03-31 13:07:30 bkorb"
+# Time-stamp:      "2012-04-14 18:15:09 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -85,7 +85,7 @@ DEFINE init-and-validate                =][=
 )   )   )
 
 (define get-text (lambda (nm) (shell (string-append
-        "{ sed 's/@{\\([^}]*\\)}/\\1/g' | "
+        "{ sed 's/@[a-z]*{\\([^}]*\\)}/\\1/g' | "
           "${CLexe} --fill -I0 -W72\n}<<\\_EODesc_\n"
         (get nm) "\n_EODesc_" ))))
 

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-01-29 15:04:34 bkorb"
+## Time-stamp:      "2012-04-14 12:37:50 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -35,7 +35,7 @@ all : $(INFO_DEPS)
 BUILT_SOURCES   = autogen.texi
 info_TEXINFOS   = $(BUILT_SOURCES)
 EXTRA_DIST	= autogen-texi.txt auto-opts.tpl autogen-intro.texi \
-    gendocs_template      gendocs.sh \
+    gendocs_template      \
     agdoc.texi            autogen-intro.texi    \
     fdl.texi              invoke-autogen.texi   invoke-columns.texi \
     invoke-getdefs.texi   invoke-snprintfv.texi invoke-xml2ag.texi \

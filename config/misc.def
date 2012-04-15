@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2012-03-31 13:14:16 bkorb"
+/*  Time-stamp:        "2012-04-14 07:23:47 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -385,7 +385,7 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
-	AC_CHECK_HEADERS([libio.h ctype.h assert.h stdbool.h sys/resource.h])
+	AC_CHECK_HEADERS([libio.h ctype.h assert.h sys/resource.h])
 	INVOKE_LIBOPTS_MACROS
 	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
 	AC_DECL_SYS_SIGLIST

@@ -3,7 +3,7 @@
  *
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2012-04-07 09:30:29 bkorb"
+ *  Time-stamp:        "2012-04-14 11:15:08 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -143,7 +143,7 @@ main(int argc, char ** argv)
         tbuf.actime  = time((time_t*)NULL);
         tbuf.modtime = modtime + 1;
         utime(OPT_ARG(OUTPUT), &tbuf);
-#ifndef HAVE_FCHMOD
+#ifndef HAVE_CHMOD
         chmod(OPT_ARG(OUTPUT), S_IRUSR|S_IRGRP|S_IROTH);
 #endif
     }

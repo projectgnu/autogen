@@ -1,6 +1,6 @@
 #! @SHELL@
 
-# Time-stamp:        "2012-03-31 18:06:08 bkorb"
+# Time-stamp:        "2012-04-14 12:38:14 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -271,7 +271,7 @@ build_gnudocs()
   email=--email' '`sed -n "$sedcmd" agdoc.texi`
   opts="--texi2html ${email}"
   PS4='>${FUNCNAME:-gd}> ' ${SHELL} ${dashx} \
-    ${srcdir}/gendocs.sh $opts autogen "$title"
+    ${top_srcdir}/config/gendocs.sh $opts autogen "$title"
 }
 
 mk_autogen_texi() {

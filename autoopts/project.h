@@ -4,7 +4,7 @@
 
 #include "config.h"
 #include "compat/compat.h"
-#include "autoopts/ag-char-map.h"
+#include "ag-char-map.h"
 
 /*
  *  Procedure success codes
@@ -38,8 +38,6 @@ typedef int tSuccess;
 #  define __STR(s)      #s
 #  define STR(s)        __STR(s)
 #endif
-
-#define STRSIZE(s)      (sizeof(s)-1)
 
 #ifdef DEFINING
 #  define VALUE(s)      = s

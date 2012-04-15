@@ -281,10 +281,7 @@ do
 done
 assemble_Makefile
 
-#  IF we symlinked in columns or getdefs,
-#  THEN it is time to unlink them
-#
-test -z "$rmlist" || rm -f $rmlist
+rm -f $rmlist ag-*.log
 
 trap '' 0
 

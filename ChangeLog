@@ -1,3 +1,27 @@
+2012-04-15  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/def2pot.tpl: clean up
+	* autoopts/test/doc.test: test pot template, too.
+
+2012-04-14  Bruce Korb  <bkorb@gnu.org>
+
+	* config/libopts.def (AC_CHECK_HEADERS): check for stdbool, too.
+	* config/misc.def (AC_CHECK_HEADERS): stdbool not needed here now
+	* getdefs/getdefs.c (main): guard chmod() call with HAVE_CHMOD
+	instead of HAVE_FCHMOD
+	* config/bootstrap.local: remove building of fmemopen.c to agen5 dir.
+	* agen5/bootstrap.dir: rebuild fmemopen.c when needed
+	* agen5/mk-stamps.sh: always remove log files on success
+	* autoopts/Makefile.am (libopts_la_LIBADD): include libintl
+	* columns/bootstrap.dir: remove log files on success
+	* mkconfig.sh: Avoid unnecessary work and get VERSION from VERSION file.
+	Do not save the version stamp.
+	* noag-boot.sh: regenerated from mkconfig.sh
+	* autoopts/tpl/cmd-doc.tlib: remove backslash duplication
+	* autoopts/tpl/def2pot.tpl: remove texi-isms from translatable text
+	* autoopts/tpl/optlib.tlib: fix sed expression for removing texi-isms
+	* autoopts/test/doc.test: test doc changes
+
 2012-04-08  Bruce Korb  <bkorb@gnu.org>
 
 	* compat/chmod.c: new (no-op) compatibility function for Windows-32

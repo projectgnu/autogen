@@ -3,7 +3,7 @@
 #
 # bootstrap --- maintainer's bootstrap script
 #
-# Time-stamp:      "2012-04-01 04:59:47 bkorb"
+# Time-stamp:      "2012-04-14 08:11:20 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -72,7 +72,7 @@ config_tools()
 
     #  Check for AutoGen version 5.
     #
-    AGexe=$(which autogen)
+    AGexe=$(command -v autogen)
     case "${AGexe}" in
     ( /* )
         v=$($AGexe --version || :)
@@ -87,8 +87,8 @@ config_tools()
         ;;
     esac
 
-    GDexe=$(which getdefs)
-    CLexe=$(which columns)
+    GDexe=$(command -v getdefs)
+    CLexe=$(command -v columns)
     test -x "${GDexe}" -a -x "${CLexe}" || \
         die "autogen support programs are missing"
     export AGexe GDexe CLexe
@@ -101,14 +101,14 @@ config_tools()
     tools="autoconf autoheader aclocal automake libtoolize"
     for f in $tools
     do
-        tool=$(which ${f}) > /dev/null || die "No $f found"
+        tool=$(command -v ${f}) > /dev/null || die "No $f found"
         eval ${f}_reqver=$(
             set -- $(${tool} --version | sed 1q)
             eval echo \${$#})
         eval $(echo $f | tr a-z A-Z)=${tool}
     done
 
-    char_mapper=$(which char-mapper) 2>/dev/null
+    char_mapper=$(command -v char-mapper) 2>/dev/null
     test -x "${char_mapper}" || {
         char_mapper=$(
             cd add-on/char-mapper >&2

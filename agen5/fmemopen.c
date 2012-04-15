@@ -108,14 +108,6 @@ typedef struct {
     fmem_cookie_t * cookie;
 } cookie_fp_map_t;
 
-#ifndef AUTOGEN_BUILD
-/**
- * invent our own boolean rather than try to work around all the ways
- * different systems spell it.
- */
-typedef enum { false = 0, true = 1 } bool;
-#endif
-
 static cookie_fp_map_t const * map    = NULL;
 static unsigned int            map_ct = 0;
 static unsigned int            map_alloc_ct = 0;

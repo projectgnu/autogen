@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2012-03-31 13:06:25 bkorb"
+# Time-stamp:      "2012-04-14 14:12:20 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -85,26 +85,36 @@ add_files_to_mf() {
 
     eval "$tmpl"
 
-    sedcmd=$'/^GENMAN /a\\\n'"$(
+    {
         ls -1 *.3 | \
             sed '/^pathfind.3$/d' | \
-            columns -I4 --spread=1 --line=' \\\'
+            columns -I4 --spread=1 --line=' \'
 
-    )"$'\\\n\\\nnodist_pkgdata_DATA = \$(libsrc) \\\\\\\n'"$(
-        echo "${ndst}" | sort -u | columns -I4 --spread=1 --line=' \\\'
+        printf '\nnodist_pkgdata_DATA = $(libsrc) \\\n'
+        echo "${ndst}" | sort -u | columns -I4 --spread=1 --line=' \'
 
-    )"$'\\\n\\\npkgdata_DATA    = \\\\\\\n'"$(
-        echo "${pdta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
+        printf '\npkgdata_DATA    = \\\n'
+        echo "${pdta}" | sort -u | columns -I4 --spread=1 --line=' \'
 
-    )"$'\\\n\\\nEXTRA_DATA      = \$(pkgdata_DATA) \\\\\\\n'"$(
-        echo "${edta}" | sort -u | columns -I4 --spread=1 --line=' \\\'
+        printf '\nEXTRA_DATA      = $(pkgdata_DATA) \\\n'
+        echo "${edta}" | sort -u | columns -I4 --spread=1 --line=' \'
 
-    )"$'\\\n\\\nGENSCRIPTS      = \$(srcdir)/funcs.def \\\\\\\n'"$(
-        echo "${sfil}" | columns -I4 --spread=1 --line=' \\\'
-    )"
+        printf '\nGENSCRIPTS      = $(srcdir)/funcs.def \\\n'
+        echo "${sfil}" | columns -I4 --spread=1 --line=' \'
+        echo
 
-    rm -f *.3
-    sed -i "${sedcmd}" Makefile.am
+        sed -n '/^## begin/,/^## end/{
+		s/^##.*//
+		/^$/d
+		p
+	    }' gnulib.mk
+
+    } > Makefile.lists
+
+    sed '/^GENMAN /r Makefile.lists' Makefile.am > Makefile.tmp
+    mv -f Makefile.tmp Makefile.am
+
+    rm -f Makefile.lists gnulib.mk *.3
 }
 
 make_funcs_def()

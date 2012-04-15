@@ -509,7 +509,7 @@ string = { nm = INIT_SCM_ERRS_FMT;
 string = { nm = SCHEME_INIT_DEBUG_2_0;
    str = "system vm trace"; };
 
-string = { nm = SCHEME_INIT_DEBUG_1_8;
+string = { nm = SCHEME_INIT_DEBUG_1_6;
    str = "ice-9 debug"; };
 
 string = { nm = KR_STRING_NEWLINE;

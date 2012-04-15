@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2012-02-12 09:54:28 bkorb"
+## Time-stamp:      "2012-04-14 14:22:31 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,19 +36,19 @@ else
 PATHFIND_MAN    =
 endif
 
-GENMAN          = $(PATHFIND_MAN) \
-
 MAN_STAMP       = man3-stamp
 GENTEXI         = libopts.texi libopts.menu
 TEXI_STAMP      = texi-stamp
+EXTRA_DIST      =
+GENMAN          = $(PATHFIND_MAN) \
 
 GENHDRS         = autoopts/options.h autoopts/usage-txt.h genshell.h \
 		xat-attribute.h value-type.h ao-strs.h ag-char-map.h
-HDRS            = $(GENHDRS) autoopts.h parse-duration.h project.h proto.h
+HDRS            = $(GENHDRS) autoopts.h project.h proto.h
 GEN_SRC         = ao-strs.c value-type.c xat-attribute.c
 
-## The primary source (autoopts.c) must be listed first and on a separate
-## line.  'sed' does some magic here to get the list of source files for the
+## The primary source (autoopts.c) must be by itself on the first line after
+## "CSRC".  'sed' does some magic here to get the list of source files for the
 ## documentation.  Files without documentation are on the CSRC = line.
 ##
 CSRC            = parse-duration.c $(GEN_SRC) \
@@ -82,7 +82,7 @@ libopts_la_CFLAGS         = -DPKGDATADIR='"$(pkgdatadir)"'
 libopts_la_LDFLAGS        = -version-info $(LIBOPTS_VER)
 libopts_la_LIBADD         = $(top_builddir)/snprintfv/libsnprintfv.la
 
-EXTRA_DIST = $(SRC) $(EXTRA_DATA) $(man_MANS) $(DEF_FILES)
+EXTRA_DIST += $(SRC) $(EXTRA_DATA) $(man_MANS) $(DEF_FILES)
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
 INST_PKGCFG               = pkgconfig/autoopts.pc

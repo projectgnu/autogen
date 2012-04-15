@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-04-01 05:22:22 bkorb"
+# Time-stamp:        "2012-04-14 09:39:36 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -104,6 +104,24 @@ assemble_Makefile() {
     fi
 }
 
+assemble_fmemopen() {
+    fmemdir=~bkorb/tools/mine/lib/fmemopen
+    test -f ${fmemdir}/fmemopen.c || return
+
+    test -f agen5/fmemopen.c && rm -f agen5/fmemopen.c
+    {
+        echo '#if defined(ENABLE_FMEMOPEN)'
+        echo '#include <sys/ioctl.h>'
+        echo
+        sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
+        sed -e '/^#if defined(HAVE_FOPENCOOKIE)/p' \
+            -e '/=--subblock/,/^#if defined(HAVE_FOPENCOOKIE)/d' \
+            -e "s% @file .*% @file $(realpath ${fmemdir}/fmemopen.c)%" \
+            ${fmemdir}/fmemopen.c
+        echo '#endif /* ENABLE_FMEMOPEN */'
+    } > fmemopen.c
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #  M A I N
@@ -112,6 +130,7 @@ PS4='>bsag-${FUNCNAME}> '
 set_defaults ${1+"$@"}
 DEPDIR=
 . ${srcdir}/mk-stamps.sh $stamp_list
+assemble_fmemopen
 assemble_Makefile
 
 #  IF we symlinked in columns or getdefs,

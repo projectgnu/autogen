@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2012-04-07 09:34:35 bkorb"
+ *  Time-stamp:        "2012-04-14 08:08:58 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -253,11 +253,12 @@ do-first = <<-_EOF_
 	# AC_CHECK_HEADERS
 	# =================
 	AC_CHECK_HEADERS([ \
-	    dlfcn.h      errno.h       fcntl.h       libgen.h     \
-	    memory.h     netinet/in.h  setjmp.h      sys/mman.h   \
-	    sys/param.h  sys/poll.h    sys/procset.h sys/select.h \
-	    sys/socket.h sys/stropts.h sys/time.h    sys/un.h     \
-	    sys/wait.h   unistd.h      utime.h       sysexits.h ])
+	    sys/mman.h    sys/param.h   sys/poll.h    sys/procset.h \
+	    sys/select.h  sys/socket.h  sys/stropts.h sys/time.h \
+	    sys/un.h      sys/wait.h    dlfcn.h       errno.h \
+	    fcntl.h       libgen.h      memory.h      netinet/in.h \
+	    setjmp.h      stdbool.h     sysexits.h    unistd.h \
+	    utime.h])
 
 	AC_CHECK_HEADERS([stdarg.h     varargs.h],
 	    [lo_have_arg_hdr=true;break],

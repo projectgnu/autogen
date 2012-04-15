@@ -3,7 +3,7 @@
 #
 # doc.test      ---  test doc templates
 #
-# Time-stamp:        "2012-04-08 09:00:47 bkorb"
+# Time-stamp:        "2012-04-15 09:38:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -89,6 +89,28 @@ outfiles="${testname}-mdoc-base.1 ${testname}-mdoc-res.1"
 cmp -s ${outfiles} || \
     failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
 
+# # # # # # # # # # POT CHECK # # # # # # # # #
+${AGexe} ${agl_opts} -Tdef2pot ${testname}.def
+test -s ${testname}.pot || \
+    failure "${testname}.pot not built"
+
+{
+    sed -e '/^# *Copyright/s/).*/)/' \
+        -e '/^$/d' \
+        -e 's/>, 20[0-9][0-9]\./>./' \
+        -e '/POT-Creation-Date:/s/ 2[0-9].*/\\n"/' \
+        ${testname}.pot
+    echo
+} > ${testname}-res.pot
+
+sed "1,/^##* *BEGIN-POT/d
+    /^$/d
+    /^## END-POT/{;s/.*//;q;}" ${test_src} > ${testname}-base.pot
+
+outfiles="${testname}-base.pot ${testname}-res.pot"
+cmp -s ${outfiles} || \
+    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+
 # # # # # # # # # # # FINISH # # # # # # # # # # #
 
 cleanup
@@ -139,7 +161,7 @@ flag = {
     value     = d;
     arg-type  = number;
     arg-range = "0->9999";
-    descrip   = "Enable debugging";
+    descrip   = "Enable @code{debugging}";
     doc = 'really enable debugging';
 };
 
@@ -192,7 +214,7 @@ flag = {
 	use predefined sets of ciphersuites such as PERFORMANCE,
 	NORMAL, SECURE128, SECURE256.
 
-	Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+	Check the GnuTLS manual on section ``Priority strings'' for more
 	information on allowed keywords
 	_EODoc_;
 };
@@ -296,7 +318,7 @@ doc is unavailable - no -h
 @anchor{doc debug}
 @cindex doc-debug
 
-This is the ``enable debugging'' option.
+This is the ``enable @code{debugging}'' option.
 This option takes an argument number.
 really enable debugging
 @subsubheading mtu option.
@@ -341,7 +363,7 @@ TLS algorithms and protocols to enable. You can
 use predefined sets of ciphersuites such as PERFORMANCE,
 NORMAL, SECURE128, SECURE256.
 
-Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+Check the GnuTLS manual on section ``Priority strings'' for more
 information on allowed keywords
 @node doc exit status
 @subsection doc exit status
@@ -410,7 +432,7 @@ to the secured socket and vice versa.
 .SH "OPTIONS"
 .TP
 .BR \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
-Enable debugging.
+Enable \fBdebugging\fP.
 This option takes an integer number as its argument.
 The value of \fInumber\fP is constrained to being:
 .in +4
@@ -466,7 +488,7 @@ Priorities string.
 TLS algorithms and protocols to enable. You can
 use predefined sets of ciphersuites such as PERFORMANCE,
 NORMAL, SECURE128, SECURE256.
-Check  the  GnuTLS  manual  on  section  \\(lqPriority strings\\(rq for more
+Check the GnuTLS manual on section \(lqPriority strings\(rq for more
 information on allowed keywords
 .TP
 .BR \-h , " \-\-help"
@@ -565,7 +587,7 @@ to the secured socket and vice versa.
 .Sh "OPTIONS"
 .Bl -tag
 .It  \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
-Enable debugging.
+Enable \fBdebugging\fP.
 This option takes an integer number as its argument.
 The value of \fInumber\fP is constrained to being:
 .in +4
@@ -617,7 +639,7 @@ TLS algorithms and protocols to enable. You can
 use predefined sets of ciphersuites such as PERFORMANCE,
 NORMAL, SECURE128, SECURE256.
 .sp
-Check  the  GnuTLS  manual  on  section  \\(lqPriority strings\\(rq for more
+Check the GnuTLS manual on section \(lqPriority strings\(rq for more
 information on allowed keywords
 .It \-h , " \-\-help"
 Display usage information and exit.
@@ -683,6 +705,137 @@ This manual page was \fIAutoGen\fP-erated from the \fBdoc\fP
 option definitions.
 ## END-MDOC
 _End_Of_MdocPage_
+
+# # # # # # # # # # # POT PAGE
+
+cat <<_End_Of_PotPage_
+## BEGIN-POT
+# localization template (.pot) for doc.def of doc,
+# this file is used to generate localized manual for doc.
+# Copyright (C)
+# This file is distributed under the terms of the
+# the GNU General Public License, version 3 or later
+# The program owners may be reached via:
+#    Free Software Foundation <bug-gnutls@gnu.org>.
+#
+#, fuzzy
+msgid   ""
+msgstr  ""
+"Project-Id-Version: doc 3.0.12\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date:\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: doc.def:3
+msgid "GnuTLS client"
+msgstr ""
+
+#: doc.def:41
+msgid "Enable debugging"
+msgstr ""
+
+#: doc.def:42
+msgid "really enable debugging"
+msgstr ""
+
+#: doc.def:49
+msgid "Set MTU for datagram TLS"
+msgstr ""
+
+#: doc.def:50
+msgid "Really set MTU for datagram TLS"
+msgstr ""
+
+#: doc.def:55
+msgid "second group of options"
+msgstr ""
+
+#: doc.def:61
+msgid "Send CR LF instead of LF"
+msgstr ""
+
+#: doc.def:62
+msgid "Really send CR LF instead of LF"
+msgstr ""
+
+#: doc.def:67
+msgid "Use DER format for certificates to read from"
+msgstr ""
+
+#: doc.def:68
+msgid "Really use DER format for certificates to read from"
+msgstr ""
+
+#: doc.def:73
+msgid "third group of options"
+msgstr ""
+
+#: doc.def:81
+msgid "The maximum record size to advertize"
+msgstr ""
+
+#: doc.def:82
+msgid "Really the maximum record size to advertize"
+msgstr ""
+
+#: doc.def:88
+msgid "Priorities string"
+msgstr ""
+
+#: doc.def:90
+msgid "TLS algorithms and protocols to enable.  You can use predefined sets of\n"
+       "ciphersuites such as PERFORMANCE, NORMAL, SECURE128, SECURE256.\n\n"
+       "Check the GnuTLS manual on section ``Priority strings'' for more\n"
+       "information on allowed keywords"
+msgstr ""
+
+#: doc.def:104
+msgid "gnutls-cli-debug(1), gnutls-serv(1)"
+msgstr ""
+
+#: doc.def:111
+msgid "To connect to a server using PSK authentication, you need to enable the\n"
+       "choice of PSK by using a cipher priority parameter such as in the\n"
+       "example below.  @example $ ./gnutls-cli -p 5556 localhost --pskusername\n"
+       "psk_identity \\\\ --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\\\\n"
+       "--priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK Resolving\n"
+       "'localhost'...  Connecting to '127.0.0.1:5556'...  - PSK authentication.\n"
+       "- Version: TLS1.1 - Key Exchange: PSK - Cipher: AES-128-CBC - MAC: SHA1\n"
+       "- Compression: NULL - Handshake was completed\n\n"
+       "- Simple Client Mode: @end example By keeping the --pskusername\n"
+       "parameter and removing the --pskkey parameter, it will query only for\n"
+       "the password during the handshake.\n\n"
+       "To list the ciphersuites in a priority string: @example $ ./gnutls-cli\n"
+       "--priority SECURE192 -l Cipher suites for SECURE192\n"
+       "TLS_ECDHE_ECDSA_AES_256_CBC_SHA384 0xc0, 0x24 TLS1.2\n"
+       "TLS_ECDHE_ECDSA_AES_256_GCM_SHA384 0xc0, 0x2e TLS1.2\n"
+       "TLS_ECDHE_RSA_AES_256_GCM_SHA384 0xc0, 0x30 TLS1.2\n"
+       "TLS_DHE_RSA_AES_256_CBC_SHA256 0x00, 0x6b TLS1.2\n"
+       "TLS_DHE_DSS_AES_256_CBC_SHA256 0x00, 0x6a TLS1.2\n"
+       "TLS_RSA_AES_256_CBC_SHA256 0x00, 0x3d TLS1.2 @end example"
+msgstr ""
+
+#: doc.def:11
+msgid "Simple client program to set up a TLS connection to some other computer.\n"
+       "It sets up a TLS connection and forwards data from the standard input to\n"
+       "the secured socket and vice versa."
+msgstr ""
+
+#: 
+msgid "This program is released under the terms of the GNU General Public License, version 3 or later."
+msgstr ""
+
+#: doc.def:21
+msgid "[hostname]"
+msgstr ""
+## END-POT
+_End_Of_PotPage_
 
 ## Local Variables:
 ## mode: shell-script

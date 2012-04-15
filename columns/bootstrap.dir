@@ -3,7 +3,7 @@
 # columns/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2010-07-17 09:51:08 bkorb"
+# Time-stamp:        "2012-04-14 08:22:14 bkorb"
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
@@ -59,7 +59,10 @@ do
   esac
 done
 
-${free_trap} && trap '' 0
+${free_trap} && {
+    trap '' 0
+    rm -f ag-opts-*.log
+}
 
 # Local Variables:
 # mode:             shell-script
