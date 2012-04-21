@@ -67,5 +67,8 @@ cat > ${base_name}.map <<- _EOF_
 
 ./char-mapper ${base_name}.map
 bash ./${base_name}.h
+sed -i $'/%test/{\na\\\n%pthread\\\n%optimize\n\n}' ${base_name}.map
+./char-mapper ${base_name}.map
+bash ./${base_name}.h
 test "X${KEEP_TEST_RESULTS}" = Xtrue || \
     rm -f ${base_name}*

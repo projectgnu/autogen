@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-03-10 11:31:58 bkorb"
+ *  Time-stamp:        "2012-04-21 12:59:16 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,10 +77,12 @@ static char const * commentary  = " *  char-mapper Character Classifications\n";
 static char const * add_on_text = NULL;
 static char const * table_name  = NULL;
 static int          table_is_static = 0;
-static int const    table_size = TABLE_SIZE;
+static int const    table_size      = TABLE_SIZE;
 static char buffer[BUF_SIZE];
-static int          add_test_code = 0;
-static int          add_backup_code = 0;
+static bool         add_test_code   = false;
+static bool         add_backup_code = false;
+static bool         optimize_code   = false;
+static bool         pthread_code    = false;
 
 value_map_t    all_map      = { NULL, "total", 0, 0, { 0 }};
 value_map_t ** end_map      = &(all_map.next);
@@ -100,6 +103,7 @@ int  read_data(void);
 void emit_macros(int bit_count);
 void emit_table(int bit_count);
 void emit_functions(void);
+void emit_opt_functions(void);
 void parse_help(char const * pz);
 
 static void

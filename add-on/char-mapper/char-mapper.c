@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-03-10 11:31:00 bkorb"
+ *  Time-stamp:        "2012-04-21 13:57:28 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -48,8 +48,11 @@ main(int argc, char ** argv)
     emit_leader(argv[1]);
     emit_macros(bit_count);
     emit_table(bit_count);
-    emit_functions();
-    return 0;
+    if (optimize_code)
+        emit_opt_functions();
+    else
+        emit_functions();
+    return EXIT_SUCCESS;
 }
 
 void
@@ -94,6 +97,17 @@ emit_leader(char * input)
         sprintf(mask_fmt, mask_fmt_fmt, width);
         if (width > 8)
             strcat(mask_fmt, "ULL");
+    }
+
+    if (optimize_code) {
+        if (pthread_code)
+            fwrite(pthread_incl, pthread_incl_LEN, 1, stdout);
+        fwrite(class_enum, class_enum_LEN, 1, stdout);
+
+        for (value_map_t * map = all_map.next; map != NULL; map = map->next)
+            printf("    CLS_%s_%s,\n", base_ucase, map->vname);
+
+        printf(end_class_enum, base_ucase, base_fn_nm);
     }
 }
 
@@ -252,6 +266,7 @@ void
 emit_macros(int bit_count)
 {
     char fill[CLASS_NAME_LIMIT+3];
+    int  map_ix = 0;
 
     /*
      * The type to use for the mask depends on the number of bits
@@ -282,12 +297,16 @@ emit_macros(int bit_count)
     for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
 
         char * pz = fill + strlen(map->vname); // padding pointer
-        char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
+        char z[24], y[24]; // 24 >= ceil(log10(1 << 63)) + 1
         snprintf(z, sizeof(z), mask_fmt, map->mask);
+        if (optimize_code)
+            sprintf(y, "%u", map_ix++);
+        else
+            strcpy(y, z);
 
-        printf(macro_def_fmt, map->vname, pz, base_fn_nm, z);
+        printf(macro_def_fmt, map->vname, pz, base_fn_nm, z, y);
         if (add_backup_code)
-            printf(backup_def_fmt, map->vname, pz, base_fn_nm, z);
+            printf(backup_def_fmt, map->vname, pz, base_fn_nm, y);
     }
 
     putc('\n', stdout);
@@ -347,6 +366,27 @@ emit_functions(void)
 }
 
 void
+emit_opt_functions(void)
+{
+    if (! table_is_static)
+        printf(declare_opt_tbl, mask_name, base_fn_nm,
+               table_size, base_ucase);
+
+    printf(inline_opt_functions, base_fn_nm, mask_name, table_size);
+
+    if (add_backup_code)
+        printf(inline_opt_backup, base_fn_nm);
+
+    if (add_on_text != NULL)
+        printf(emit_text_fmt, add_on_text);
+
+    if (add_test_code)
+        emit_test_code();
+
+    printf(endif_fmt, file_guard);
+}
+
+void
 emit_table(int bit_count)
 {
     char const * type_pz;
@@ -385,12 +425,26 @@ emit_table(int bit_count)
             case '\f': fputs(" /* FF*/ ", stdout); break;
             case '\r': fputs(" /* CR*/ ", stdout); break;
             case 0x1B: fputs(" /*ESC*/ ", stdout); break;
-            default:  printf(" /*x%02X*/ ", ix);    break;
+            default:  printf(" /*x%02X*/ ", ix);   break;
             }
 
         printf(mask_fmt, all_map.values[ix++]);
     }
     fputs(end_table, stdout);
+
+    if (optimize_code) {
+        char const * locking = pthread_code ? pthread_locking : no_locking;
+        printf(optimize_fmt, table_is_static ? "static " : "",
+               base_fn_nm, base_ucase);
+        for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
+            char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
+            snprintf(z, sizeof(z), mask_fmt, map->mask);
+            printf("    %s,\n", z);
+        }
+        printf(pthread_code ? pthread_locking : no_locking, base_fn_nm);
+        printf(fill_opt_fmt, base_fn_nm);
+    }
+
     if (! table_is_static)
         printf(endif_fmt, data_guard);
 }
@@ -923,6 +977,42 @@ handle_table(char * scan)
 }
 
 /**
+ * handle optimize directive.
+ *
+ * specifies setting up optimization tables for span/break
+ * scanning operations on character classes.  A static array
+ * of pointers is defined and populated on the first use
+ * of a scan/break on each character classification.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_optimize(char * scan)
+{
+    optimize_code = true;
+    return scan + strlen(scan);
+}
+
+/**
+ * handle pthread directive.
+ *
+ * specifies pthread locking on allocation of optimization maps.
+ * This has no effect unless %optimize has been specified.
+ *
+ * @FIXME: It especially has no effect since this is not yet implemented.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_pthread(char * scan)
+{
+    pthread_code = true;
+    return scan + strlen(scan);
+}
+
+/**
  * handle guard directive.
  *
  * specifies the name of a '#ifdef' guard protecting the compilation of
@@ -960,7 +1050,7 @@ handle_guard(char * scan)
 char *
 handle_backup(char * scan)
 {
-    add_backup_code = 1;
+    add_backup_code = true;
     return scan + strlen(scan);
 }
 
@@ -978,7 +1068,7 @@ handle_backup(char * scan)
 char *
 handle_test(char * scan)
 {
-    add_test_code = 1;
+    add_test_code = true;
     return scan + strlen(scan);
 }
 

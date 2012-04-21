@@ -15,8 +15,7 @@
 include $(TOP)/MakeRules
 
 $(GENSRC)       : cm-opt.stamp
-char-mapper.o   : cm-opt.stamp
-$(OBJ)          : $(HEADER_LIST)
+$(OBJ)          : $(HEADER_LIST) cm-opt.stamp
 $(HEADER_LIST)  : cm-opt.stamp
 
 cm-opt.stamp    : mk-str2enum.sh mk-opt-table.sh map-text.def
