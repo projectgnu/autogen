@@ -4,7 +4,7 @@
 	* autoopts/test/doc.test: test pot template, too.
 	* autoopts/tpl/optcode.tlib: "no-xlate = anything" attribute
 	* autoopts/tpl/opthead.tlib: likewise
-	* agen5/opts.def: specify "no-nls-support".
+	* agen5/opts.def: specify "no-xlate = anything".
 
 2012-04-14  Bruce Korb  <bkorb@gnu.org>
 

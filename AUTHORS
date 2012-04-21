@@ -29,9 +29,6 @@ compat/compat.h; (posixstat.h, posixjmp.h)
 Fred Fish, Gary V. Vaughan and Bruce Korb:
 in the directory compat; strsignal.c
 
-Doug Gwyn, Richard Stallman:
-in the directory compat; ndir.h
-
 James R. Van Zandt:
 The Debianization of AutoGen
 

@@ -1,8 +1,8 @@
-#! /bin/echo AutoGen_Version_5.6,_but_this_should_be_sourced
+#! /bin/echo this_should_be_sourced
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2012-04-14 07:33:05 bkorb"
+# Time-stamp:        "2012-04-21 10:26:19 bkorb"
 
          MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 ##
@@ -25,7 +25,7 @@
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=16
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL="pre22"
+AG_PATCHLEVEL="pre26"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

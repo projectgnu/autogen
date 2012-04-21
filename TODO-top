@@ -1,9 +1,5 @@
 #  -*- Mode: Outline -*-
 
-* NEXT, BREAK and RETURN macros
-* When constructing callback procedures, insert any additional
-  text requested by users in controlled places.
-
 * It should be possible to adjust AutoGen to use xpath naming.
   http://www.w3.org/TR/xpath
   http://www.w3schools.com/xpath/xpath_syntax.asp
