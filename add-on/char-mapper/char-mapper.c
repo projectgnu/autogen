@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-21 13:57:28 bkorb"
+ *  Time-stamp:        "2012-04-22 11:47:06 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -97,17 +97,6 @@ emit_leader(char * input)
         sprintf(mask_fmt, mask_fmt_fmt, width);
         if (width > 8)
             strcat(mask_fmt, "ULL");
-    }
-
-    if (optimize_code) {
-        if (pthread_code)
-            fwrite(pthread_incl, pthread_incl_LEN, 1, stdout);
-        fwrite(class_enum, class_enum_LEN, 1, stdout);
-
-        for (value_map_t * map = all_map.next; map != NULL; map = map->next)
-            printf("    CLS_%s_%s,\n", base_ucase, map->vname);
-
-        printf(end_class_enum, base_ucase, base_fn_nm);
     }
 }
 
@@ -295,10 +284,12 @@ emit_macros(int bit_count)
     fill[max_name_len - 1] = NUL;
 
     for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
-
-        char * pz = fill + strlen(map->vname); // padding pointer
+        size_t ln = strlen(map->vname);
+        char * pz = fill + ln; // padding pointer
         char z[24], y[24]; // 24 >= ceil(log10(1 << 63)) + 1
         snprintf(z, sizeof(z), mask_fmt, map->mask);
+        total_mac_ct++;
+
         if (optimize_code)
             sprintf(y, "%u", map_ix++);
         else
@@ -370,7 +361,7 @@ emit_opt_functions(void)
 {
     if (! table_is_static)
         printf(declare_opt_tbl, mask_name, base_fn_nm,
-               table_size, base_ucase);
+               table_size, base_ucase, total_mac_ct);
 
     printf(inline_opt_functions, base_fn_nm, mask_name, table_size);
 
@@ -432,17 +423,23 @@ emit_table(int bit_count)
     }
     fputs(end_table, stdout);
 
+
     if (optimize_code) {
-        char const * locking = pthread_code ? pthread_locking : no_locking;
-        printf(optimize_fmt, table_is_static ? "static " : "",
-               base_fn_nm, base_ucase);
+        static char const fmtfmt[] = "    %%s, /* %%-%us*/\n";
+        char const * static_pfx  = table_is_static ? "static " : "";
+        char const * locking_fmt = pthread_code ? pthread_locking : no_locking;
+        char fmt[256];
+
+        printf(optimize_fmt, static_pfx, base_fn_nm, total_mac_ct);
+        snprintf(fmt, sizeof(fmt), fmtfmt, (unsigned int)max_name_len);
+
         for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
             char z[24]; // 24 >= ceil(log10(1 << 63)) + 1
             snprintf(z, sizeof(z), mask_fmt, map->mask);
-            printf("    %s,\n", z);
+            printf(fmt, z, map->vname);
         }
-        printf(pthread_code ? pthread_locking : no_locking, base_fn_nm);
-        printf(fill_opt_fmt, base_fn_nm);
+        printf(locking_fmt, base_fn_nm);
+        printf(fill_opt_fmt, base_fn_nm, static_pfx);
     }
 
     if (! table_is_static)
@@ -979,10 +976,9 @@ handle_table(char * scan)
 /**
  * handle optimize directive.
  *
- * specifies setting up optimization tables for span/break
- * scanning operations on character classes.  A static array
- * of pointers is defined and populated on the first use
- * of a scan/break on each character classification.
+ * specifies setting up optimization tables for span/break scanning operations
+ * on character classes.  A static array of pointers is defined and populated
+ * on the first use of a scan/break on each character classification.
  *
  * @param scan current scan point
  * @returns    end of guard scan
@@ -997,10 +993,10 @@ handle_optimize(char * scan)
 /**
  * handle pthread directive.
  *
- * specifies pthread locking on allocation of optimization maps.
- * This has no effect unless %optimize has been specified.
- *
- * @FIXME: It especially has no effect since this is not yet implemented.
+ * specifies pthread locking on allocation of optimization maps.  This has no
+ * effect unless %optimize has been specified.  Pthread-ed multi-threaded
+ * applications *must* specify this.  Spanning maps get allocated dynamically
+ * when first used.  only one thread should do the work.
  *
  * @param scan current scan point
  * @returns    end of guard scan
@@ -1043,6 +1039,11 @@ handle_guard(char * scan)
  * handle backup directive.
  *
  * specifies emitting code to backup over matching text at the end of a string.
+ * The macro takes two arguments:  a start point and an end point.
+ * The "end point" is returned after backing up over skipped characters,
+ * but it will be at or after the start pointer.  The second pointer may also
+ * be NULL or set to the start pointer.  In that case, it is advanced to the
+ * next NUL byte at or after where the start pointer points.
  *
  * @param scan current scan point
  * @returns    end of guard scan

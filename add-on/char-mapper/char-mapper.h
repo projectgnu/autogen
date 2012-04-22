@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-21 12:59:16 bkorb"
+ *  Time-stamp:        "2012-04-22 11:37:38 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -38,6 +38,9 @@
 
 #include "cm-opt.h"
 #include "map-text.h"
+
+#define _Str_(_s)   #_s
+#define STR(_s)     _Str_(_s)
 
 #ifndef NUL
 #  define NUL '\0'
@@ -83,6 +86,7 @@ static bool         add_test_code   = false;
 static bool         add_backup_code = false;
 static bool         optimize_code   = false;
 static bool         pthread_code    = false;
+static unsigned int total_mac_ct    = 0;
 
 value_map_t    all_map      = { NULL, "total", 0, 0, { 0 }};
 value_map_t ** end_map      = &(all_map.next);

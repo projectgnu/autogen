@@ -94,22 +94,10 @@ string = { nm = type_64bits;
 	_EOString_;
 };
 
-string = { nm = pthread_incl;
-  str  = "#include <pthread.h>\n";
-};
-
-string = { nm = class_enum;
-  str  = "#include <stdlib.h>\n#include <string.h>\ntypedef enum {\n";
-};
-
-string = { nm = end_class_enum;
-  str  = "    %s_COUNT\n} %s_classes_t;\n";
-};
-
 string = { nm = declare_opt_tbl;
   str = <<- _EOString_
 	extern %1$s const %2$s_table[%3$d];
-	extern unsigned char const * %2$s_spanners[%4$s_COUNT];
+	extern unsigned char const * %2$s_spanners[%5$u];
 
 	_EOString_;
 };
@@ -156,7 +144,7 @@ string = { nm = inline_opt_backup;
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s >= e) e = s + strlen(s);
-	    while ((e > s) && v[(unsigned)*e])  e--;
+	    while ((e > s) && v[(unsigned)e[-1]])  e--;
 	    return e;
 	}
 
@@ -167,7 +155,7 @@ string = { nm = inline_opt_backup;
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s == e) e += strlen(e);
-	    while ((e > s) && (! v[(unsigned)*e]))  e--;
+	    while ((e > s) && (! v[(unsigned)e[-1]]))  e--;
 	    return e;
 	}
 
@@ -238,14 +226,27 @@ string = { nm = start_table_fmt;
 };
 
 string = { nm = optimize_fmt;
-  str = "%1$sunsigned char const * %2$s_spanners[%3$s_COUNT];\n"
-        "static %2$s_mask_t const %2$s_masks[%3$s_COUNT] = {\n";
+  str = <<- _EOString_
+
+	#include <stdlib.h>
+	#include <string.h>
+
+	%1$sunsigned char const * %2$s_spanners[%3$u];
+	/**
+	 *  Character category masks.  Some categories may have multiple bits,
+	 *  if their definition incorporates other character categories.
+	 *  This mask array is only used by calc_%2$s_spanners().
+	 */
+	static %2$s_mask_t const %2$s_masks[%3$u] = {
+
+	_EOString_;
 };
 
 string = { nm = pthread_locking;
   str = <<- _EOString_
 	};
 
+	#include <pthread.h>
 	static pthread_mutex_t %1$s_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 	#define lock_%1$s_spanners() \
@@ -263,13 +264,14 @@ string = { nm = no_locking;
 
 	#define lock_%1$s_spanners()
 	#define unlock_%1$s_spanners()
+
 	_EOString_;
 };
 
 string = { nm = fill_opt_fmt;
   str = <<- _EOString_
 
-	unsigned char const *
+	%2$sunsigned char const *
 	calc_%1$s_spanners(unsigned int mask_ix)
 	{
 	    lock_%1$s_spanners();
@@ -286,6 +288,8 @@ string = { nm = fill_opt_fmt;
 	    unlock_%1$s_spanners();
 	    return %1$s_spanners[mask_ix];
 	}
+	#define %1$s_masks POISONED_%1$s_masks
+
 
 	_EOString_;
 };
