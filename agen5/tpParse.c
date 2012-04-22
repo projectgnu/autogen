@@ -2,7 +2,7 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2012-04-07 09:53:03 bkorb"
+ * Time-stamp:        "2012-04-22 10:05:41 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -336,13 +336,7 @@ parse_tpl(macro_t * mac, char const ** p_scan)
     #define DEBUG_DEC(l)
 #endif
 
-    for (;;) {
-        {
-            char const * mark = find_macro(tpl, &mac, &scan);
-            if (mark == NULL)
-                break;
-        }
-
+    while (find_macro(tpl, &mac, &scan) != NULL) {
         /*
          *  IF the called function returns a NULL next macro pointer,
          *  THEN some block has completed.  The returned scanning pointer

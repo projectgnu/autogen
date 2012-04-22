@@ -2,7 +2,7 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-04-07 09:20:48 bkorb"
+ *  Time-stamp:        "2012-04-22 09:16:15 bkorb"
  *
  *  This module implements text functions.
  *
@@ -380,19 +380,20 @@ mLoad_Comment(templ_t * tpl, macro_t * mac, char const ** p_scan)
 macro_t *
 mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
 {
-    char *        pzCopy = pT->td_scan;
-    char const *  scan;
-    char const *  start;
-    size_t        src_len = (size_t)pMac->md_res; /* macro len  */
+    char const * scan;
+    size_t       src_len = (size_t)pMac->md_res; /* macro len  */
     (void)unused;
 
     if (src_len <= 0)
         goto return_emtpy_expr;
 
-    start = scan = (char const*)pMac->md_txt_off; /* macro text */
+    scan = (char const*)pMac->md_txt_off; /* macro text */
 
     switch (*scan) {
     case ';':
+    {
+        char const * start = scan;
+
         /*
          *  Strip off scheme comments
          */
@@ -406,18 +407,19 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
         } while (*scan == ';');
         src_len -= scan - start;
         break;
+    }
 
     case '[':
     case '.':
     {
-        size_t remLen;
+        size_t rem_ln;
 
         /*
          *  We are going to recopy the definition name,
          *  this time as a canonical name (i.e. with '[', ']' and '.'
          *  characters and all blanks squeezed out)
          */
-        pzCopy = pT->td_text + pMac->md_name_off;
+        char * pzCopy = pT->td_text + pMac->md_name_off;
 
         /*
          *  Move back the source pointer.  We may have skipped blanks,
@@ -431,19 +433,19 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
                 src_len += l;
             }
         }
-        remLen   = strlen(pzCopy);
-        scan   -= remLen;
-        src_len += remLen;
+        rem_ln   = strlen(pzCopy);
+        scan    -= rem_ln;
+        src_len += rem_ln;
 
         /*
          *  Now copy over the full canonical name.  Check for errors.
          */
-        remLen = canonical_name(pzCopy, scan, (int)src_len);
-        if (remLen > src_len)
+        rem_ln = canonical_name(pzCopy, scan, (int)src_len);
+        if (rem_ln > src_len)
             AG_ABEND_IN(pT, pMac, LD_UNKNOWN_INVAL_DEF);
 
-        scan  += src_len - remLen;
-        src_len = remLen;
+        scan  += src_len - rem_ln;
+        src_len = rem_ln;
 
         pT->td_scan = pzCopy + strlen(pzCopy) + 1;
         if (src_len <= 0)
@@ -455,14 +457,16 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
     /*
      *  Copy the expression
      */
-    pzCopy       = pT->td_scan; /* next text dest   */
-    pMac->md_txt_off = (pzCopy - pT->td_text);
-    pMac->md_res = 0;
-    memcpy(pzCopy, scan, src_len);
-    pzCopy      += src_len;
-    *(pzCopy++)  = NUL;
-    *pzCopy      = NUL; /* double terminate */
-    pT->td_scan  = pzCopy;
+    {
+        char * pzCopy = pT->td_scan; /* next text dest   */
+        pMac->md_txt_off = (pzCopy - pT->td_text);
+        pMac->md_res = 0;
+        memcpy(pzCopy, scan, src_len);
+        pzCopy      += src_len;
+        *(pzCopy++)  = NUL;
+        *pzCopy      = NUL; /* double terminate */
+        pT->td_scan  = pzCopy;
+    }
 
     return pMac + 1;
 

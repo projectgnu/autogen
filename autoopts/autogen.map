@@ -2,6 +2,7 @@
 %guard
 %file           ag-char-map.h
 %backup
+%optimize
 
 %comment
   This file contains the character classifications

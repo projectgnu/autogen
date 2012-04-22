@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2012-04-07 09:41:36 bkorb"
+ *  Time-stamp:        "2012-04-22 10:05:43 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -1001,9 +1001,9 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
         "MATCH_NONEXISTENCE"
     };
 
-    macro_t*   pEnd = pT->td_macros + pMac->md_end_idx;
-    bool needFree;
-    char const * pzSampleText = eval_mac_expr(&needFree);
+    macro_t *    end_mac   = pT->td_macros + pMac->md_end_idx;
+    bool free_txt;
+    char const * samp_text = eval_mac_expr(&free_txt);
 
     /*
      *  Search through the selection clauses until we either
@@ -1012,9 +1012,9 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
     for (;;) {
         tSuccess mRes;
         pMac = pT->td_macros + pMac->md_sib_idx;
-        if (pMac >= pEnd) {
+        if (pMac >= end_mac) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-                fprintf(trace_fp, TRACE_CASE_FAIL, pzSampleText);
+                fprintf(trace_fp, TRACE_CASE_FAIL, samp_text);
 
                 if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
                     fprintf(trace_fp, TAB_FILE_LINE_FMT,
@@ -1029,7 +1029,7 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
          */
         cur_macro = pMac;
         mRes = (*(match_procs[pMac->md_code & 0x0F])
-               )(pzSampleText, pT->td_text + pMac->md_txt_off);
+               )(samp_text, pT->td_text + pMac->md_txt_off);
 
         /*
          *  IF match, THEN generate and stop looking for a match.
@@ -1037,7 +1037,7 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
         if (SUCCEEDED(mRes)) {
             if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
                 fprintf(trace_fp, TRACE_CASE_MATCHED,
-                        pzSampleText,
+                        samp_text,
                         match_names[pMac->md_code & 0x0F],
                         pT->td_text + pMac->md_txt_off);
 
@@ -1051,16 +1051,16 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
         }
         else if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
             fprintf(trace_fp, TRACE_CASE_NOMATCH,
-                    pzSampleText,
+                    samp_text,
                     match_names[pMac->md_code & 0x0F],
                     pT->td_text + pMac->md_txt_off);
         }
     }
 
-    if (needFree)
-        AGFREE((void*)pzSampleText);
+    if (free_txt)
+        AGFREE((void*)samp_text);
 
-    return pEnd;
+    return end_mac;
 }
 
 /*
