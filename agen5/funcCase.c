@@ -4,7 +4,7 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2012-04-22 10:05:43 bkorb"
+ *  Time-stamp:        "2012-04-28 08:04:06 bkorb"
  */
 /*
  *  This file is part of AutoGen.
@@ -122,6 +122,9 @@ Select_Match_Existence(char const * sample, char const * pattern);
 
 static tSuccess
 Select_Match_NonExistence(char const * sample, char const * pattern);
+
+static bool
+selection_type_complete(templ_t * tpl, macro_t * mac, char const ** psrc);
 
 static macro_t*
 mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan);
@@ -950,7 +953,7 @@ Select_Match_NonExistence(char const * sample, char const * pattern)
  *    This macro ends the @code{CASE} function template block.
  *    For a complete description, @xref{CASE}.
 =*/
-macro_t*
+macro_t *
 mFunc_Case(templ_t* pT, macro_t* pMac)
 {
     typedef tSuccess (t_match_proc)(char const *, char const *);
@@ -1069,7 +1072,7 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
  *  This function is called to set up (load) the macro
  *  when the template is first read in (before processing).
  */
-macro_t*
+macro_t *
 mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 {
     size_t         srcLen     = (size_t)pMac->md_res;   /* macro len  */
@@ -1161,6 +1164,118 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
     return pEsacMac;
 }
 
+/**
+ *  Figure out the selection type.  Return "true" (it is complete) if
+ *  no argument is required.  That is, if it is a "match anything" or
+ *  an existence/non-existence test.
+ *
+ *  @param[in]      tpl  The active template
+ *  @param[in,out]  mac  The selection macro structure
+ *  @param[out]     psrc The scan pointer for the selection argument
+ */
+static bool
+selection_type_complete(templ_t * tpl, macro_t * mac, char const ** psrc)
+{
+    char const * src = (char*)mac->md_txt_off;
+    mac_func_t fcode = FTYP_SELECT_COMPARE_FULL;
+
+    /*
+     *  IF the first character is an asterisk,
+     *  THEN the match can start anywhere in the string
+     */
+    if (*src == '*') {
+        src++;
+        if (IS_END_TOKEN_CHAR(*src)) {
+            mac->md_code = FTYP_SELECT_MATCH_ANYTHING;
+            goto leave_done;
+        }
+
+        fcode = (mac_func_t)(
+            (unsigned int)FTYP_SELECT_COMPARE_FULL |
+            (unsigned int)FTYP_SELECT_COMPARE_SKP_START);
+    }
+
+    /*
+     *  The next character must indicate whether we are
+     *  pattern matching ('~') or doing string compares ('=')
+     */
+    switch (*src++) {
+    case '~':
+        /*
+         *  Or in the pattern matching bit
+         */
+        fcode = (mac_func_t)(
+            (unsigned int)fcode | (unsigned int)FTYP_SELECT_MATCH_FULL);
+        mac->md_res = REG_EXTENDED;
+        /* FALLTHROUGH */
+
+    case '=':
+        /*
+         *  IF the '~' or '=' is doubled,
+         *  THEN it is a case sensitive match.  Skip over the char.
+         *  ELSE or in the case insensitive bit
+         */
+        if (src[0] == src[-1]) {
+            src++;
+        } else {
+            fcode = (mac_func_t)(
+                (unsigned int)fcode |
+                (unsigned int)FTYP_SELECT_EQUIVALENT_FULL);
+        }
+        break;
+
+    case '!':
+    case '+':
+        switch (*src) {
+        case 'e':
+        case 'E':
+            break;
+        default:
+            goto bad_sel;
+        }
+        if (! IS_END_TOKEN_CHAR(src[1]))
+            goto bad_sel;
+
+        mac->md_code = (src[-1] == '!')
+            ? FTYP_SELECT_MATCH_NONEXISTENCE
+            : FTYP_SELECT_MATCH_EXISTENCE;
+
+        goto leave_done;
+
+    default:
+    bad_sel:
+        AG_ABEND_IN(tpl, mac, LD_SEL_INVAL);
+    }
+
+    /*
+     *  IF the last character is an asterisk,
+     *  THEN the match may end before the test string ends.
+     *       OR in the "may end early" bit.
+     */
+    if (*src == '*') {
+        src++;
+        fcode = (mac_func_t)(
+            (unsigned int)fcode |
+            (unsigned int)FTYP_SELECT_COMPARE_SKP_END);
+    }
+
+    if (! IS_END_TOKEN_CHAR(*src))
+        AG_ABEND_IN(tpl, mac, LD_SEL_INVAL);
+
+    mac->md_code = fcode;
+    *psrc = SPN_WHITESPACE_CHARS(src);
+    return false;
+
+ leave_done:
+
+    /*
+     *  md_code has been set.  Zero out md_txt_off to indicate
+     *  no argument text.  NULL the selection argument pointer.
+     */
+    mac->md_txt_off = 0;
+    *psrc = NULL;
+    return true;
+}
 
 /*=macfunc SELECT
  *
@@ -1178,164 +1293,91 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
  *    Instead, you must use one of the 19 match operators described in
  *    the @code{CASE} macro description.
 =*/
-static macro_t*
-mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan)
+static macro_t *
+mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
 {
-    char const *  pzScan = *ppzScan;            /* text after macro */
-    char*         pzCopy = pT->td_scan;         /* next text dest   */
-    char const *  pzSrc  = (char*)pMac->md_txt_off; /* macro text */
-    long          srcLen = pMac->md_res;           /* macro len  */
-    int typ = (int)FTYP_SELECT_COMPARE_FULL;
+    char const *  sel_arg;
+    long          arg_len = mac->md_res; /* macro len  */
 
     /*
      *  Set the global macro loading mode
      */
     load_proc_table = apCaseLoad;
-    pMac->md_res   = 0;
-    if (srcLen == 0)
-        AG_ABEND_IN(pT, pMac, LD_SEL_EMPTY);
+    mac->md_res    = 0;
+    if (arg_len == 0)
+        AG_ABEND_IN(tpl, mac, LD_SEL_EMPTY);
 
-    /*
-     *  IF the first character is an asterisk,
-     *  THEN the match can start anywhere in the string
-     */
-    if (*pzSrc == '*') {
-        pzSrc++;
-        if (IS_WHITESPACE_CHAR(*pzSrc) || (*pzSrc == NUL)) {
-            typ    = (int)FTYP_SELECT_MATCH_ANYTHING;
-            srcLen = 0;
-            pMac->md_txt_off = 0;
-            goto selection_done;
-        }
-
-        typ |= (int)FTYP_SELECT_COMPARE_SKP_START;
-    }
-
-    /*
-     *  The next character must indicate whether we are
-     *  pattern matching ('~') or doing string compares ('=')
-     */
-    switch (*pzSrc++) {
-    case '~':
-        /*
-         *  Or in the pattern matching bit
-         */
-        typ |= (int)FTYP_SELECT_MATCH_FULL;
-        pMac->md_res = REG_EXTENDED;
-        /* FALLTHROUGH */
-
-    case '=':
-        /*
-         *  IF the '~' or '=' is doubled,
-         *  THEN it is a case sensitive match.  Skip over the char.
-         *  ELSE or in the case insensitive bit
-         */
-        if (pzSrc[0] == pzSrc[-1]) {
-            pzSrc++;
-        } else {
-            typ |= (int)FTYP_SELECT_EQUIVALENT_FULL;
-        }
-        break;
-
-    case '!':
-    case '+':
-        switch (*pzSrc) {
-        case 'e':
-        case 'E':
-            break;
-        default:
-            goto bad_sel;
-        }
-        if ((pzSrc[1] != NUL) && (! IS_WHITESPACE_CHAR(pzSrc[1])))
-            goto bad_sel;
-
-        typ = (int)((pzSrc[-1] == '!')
-            ? FTYP_SELECT_MATCH_NONEXISTENCE : FTYP_SELECT_MATCH_EXISTENCE);
-        srcLen = 0;
-        pMac->md_txt_off = 0;
+    if (selection_type_complete(tpl, mac, &sel_arg))
         goto selection_done;
 
-    default:
-    bad_sel:
-        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
-    }
-
-    /*
-     *  IF the last character is an asterisk,
-     *  THEN the match may end before the test string ends.
-     *       OR in the "may end early" bit.
-     */
-    if (*pzSrc == '*') {
-        pzSrc++;
-        typ |= (int)FTYP_SELECT_COMPARE_SKP_END;
-    }
-
-    if (! IS_WHITESPACE_CHAR(*pzSrc))
-        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
-
-    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
-    srcLen -= pzSrc - (char const *)pMac->md_txt_off;
-    if (srcLen <= 0)
-        AG_ABEND_IN(pT, pMac, LD_SEL_INVAL);
+    arg_len -= (intptr_t)sel_arg - mac->md_txt_off;
+    if (arg_len <= 0)
+        AG_ABEND_IN(tpl, mac, LD_SEL_INVAL);
 
     /*
      *  See if we are doing case insensitive regular expressions
+     *  Turn off the case comparison mode for regular expressions.
+     *  We don't have to worry about it.  It is done for us.
      */
-    if (  (typ & (int)FTYP_SELECT_EQV_MATCH_FULL)
+    if (  ((int)mac->md_code & (int)FTYP_SELECT_EQV_MATCH_FULL)
        == (int)FTYP_SELECT_EQV_MATCH_FULL) {
-        int  bitSet;
-        pMac->md_res = REG_EXTENDED | REG_ICASE;
+
+        static unsigned int const bits =
+            ~( unsigned int)FTYP_SELECT_EQUIVALENT_FULL
+            | (unsigned int)FTYP_SELECT_COMPARE_FULL;
+
+        mac->md_res  = REG_EXTENDED | REG_ICASE;
+        mac->md_code = (mac_func_t)((unsigned int)mac->md_code & bits);
+    }
+
+    /*
+     *  Copy the selection expression, double NUL terminate.
+     */
+    {
+        char *       dest   = tpl->td_scan;
+        char const * svdest = dest;
+        mac->md_txt_off = (dest - tpl->td_text);
+        if (mac->md_code == FTYP_SELECT_EQUIVALENT) {
+            do  {
+                *(dest++) = toupper((uint8_t)*(sel_arg++));
+            } while (--arg_len > 0);
+        } else {
+            memcpy(dest, sel_arg, arg_len);
+            dest += arg_len;
+        }
+        *(dest++) = NUL;
+        *(dest++) = NUL;
+        tpl->td_scan = dest;
 
         /*
-         *  Turn off the case comparison mode for regular expressions.
-         *  We don't have to worry about it.  It is done for us.
+         * If the value is a quoted string, strip the quotes and
+         * process the string (backslash fixup).
          */
-        bitSet  = ~(int)FTYP_SELECT_EQUIVALENT_FULL;
-        bitSet |= (int)FTYP_SELECT_COMPARE_FULL; /* dont turn this bit off! */
-        typ    &= bitSet;
+        if ((*svdest == '"') || (*svdest == '\''))
+            span_quote((void *)svdest);
     }
-
-    /*
-     *  Copy the expression
-     */
-    pzScan = pzCopy;
-    pMac->md_txt_off = (pzCopy - pT->td_text);
-    if (typ == (int)FTYP_SELECT_EQUIVALENT) {
-        do  {
-            *(pzCopy++) = toupper(*(pzSrc++));
-        } while (--srcLen > 0);
-    } else {
-        do  {
-            *(pzCopy++) = *(pzSrc++);
-        } while (--srcLen > 0);
-    }
-    *(pzCopy++) = NUL;
-    *(pzCopy++) = NUL;
-    pT->td_scan = pzCopy;
-
-    /*
-     * If the value is a quoted string, strip the quotes and
-     * process the string (backslash fixup).
-     */
-    if ((*pzScan == '"') || (*pzScan == '\''))
-        span_quote((void *)pzScan);
 
  selection_done:
-    pMac->md_code = (mac_func_t)typ;
+    /*
+     *  Link this selection macro to the list of selectors for CASE.
+     */
+    current_case.pSelect->md_sib_idx = (mac - tpl->td_macros);
+    current_case.pSelect = (macro_t*)mac;
 
-    current_case.pSelect->md_sib_idx = (pMac - pT->td_macros);
-    current_case.pSelect = (macro_t*)pMac;
-
-    return pMac + 1;
+    return mac + 1;
 }
 
+/**
+ * Free data for a selection macro.  Regular expression selections
+ * allocate the compiled re.
+ */
 void
-mUnload_Select(macro_t* pMac)
+mUnload_Select(macro_t * mac)
 {
-    if (pMac->md_pvt != NULL) {
-        regex_t* pRe = (regex_t*)pMac->md_pvt;
-        regfree(pRe);
-        AGFREE(pRe);
+    if (mac->md_pvt != NULL) {
+        regex_t * regexp = (regex_t*)mac->md_pvt;
+        regfree(regexp);
+        AGFREE(regexp);
     }
 }
 

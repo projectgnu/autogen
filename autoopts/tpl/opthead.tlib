@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-04-15 10:52:01 bkorb"
+# Time-stamp:      "2012-04-28 08:32:09 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,7 +32,7 @@
 [= (make-header-guard "autoopts")       =][=
 % config-header "\n#include \"%s\""     =]
 #include <autoopts/options.h>[=
-(if (exist? "usage-message")
+(if (or (exist? "usage-message") (exist? "die-code"))
     "\n#include <stdarg.h>") =]
 [= IF
 
@@ -543,7 +543,16 @@ static inline char* aoGetsText(char const* pz) {
 #   define _(_s)  _s
 # endif[=
 
-(if (not omit-nls-code) (emit "\n#endif  /* ENABLE_NLS */")) =]
+(if (not omit-nls-code) (emit "\n#endif  /* ENABLE_NLS */")) =][=
+
+IF (exist? "die-code")   =]
+
+extern void [=(. lc-prefix)=]vdie( int exit_code, char const * fmt, va_list);
+extern void [=(. lc-prefix)=]die(  int exit_code, char const * fmt, ...);
+extern void [=(. lc-prefix)
+=]fserr(int exit_code, char const * op, char const * fname);[=
+
+ENDIF die-code exists    =]
 
 #ifdef  __cplusplus
 }

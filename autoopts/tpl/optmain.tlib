@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-03-31 13:28:00 bkorb"
+# Time-stamp:      "2012-04-28 08:34:24 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -1115,14 +1115,15 @@ IF (exist? "usage-message")     =]
  * The USAGE exit macro is then invoked to print the error usage text
  * (somewhat abbreviated) and then exit.
  *
- * @param fmt the format string
- * @param ap  the var-arg list.
+ * @param[in] fmt the message format string
+ * @param[in] ap  the var-arg list.
+ * @noreturn
  */
 void
 [=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap)
 {
-    char const * er_fmt = _("%s usage error:\n");
-    fprintf(stderr, er_fmt, [=(. pname)=]Options.pzProgName);
+    char const * er_leader = _("[= prog-name =] usage error:\n");
+    fputs(er_leader, stderr);
     vfprintf(stderr, fmt, ap);
     [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
     /* NOTREACHED */
@@ -1132,8 +1133,9 @@ void
  * Print a usage message with a format and a variable argument list. 
  * [=(. lc-prefix)=]vusage_message() is called to do the work.
  *
- * @param fmt the format string
- * @param ap  the var-arg list.
+ * @param[in] fmt the message format string
+ * @param[in] ... the argument list for the message
+ * @noreturn
  */
 void
 [=(. lc-prefix)=]usage_message(char const * fmt, ...)
@@ -1145,8 +1147,72 @@ void
     va_end(ap);
 }
 [=
-ENDIF have usage-message
-=][=
+
+ENDIF have usage-message    =][=
+
+IF (exist? "die-code")
+
+=]
+/**
+ * Print a fatal error message and die
+ *
+ * @param[in] exit_code  the value to call exit(3) with
+ * @param[in] fmt        the death rattle message
+ * @param[in] ap         the argument list for the message
+ * @noreturn
+ */
+void
+[=(. lc-prefix)=]vdie(int exit_code, char const * fmt, va_list ap)
+{
+    char const * die_leader = _("[= prog-name =] fatal error:\n");[=
+  (set! tmp-text (get "die-code"))
+  (if (> (string-length tmp-text) 1)
+      (string-append "\n\n" tmp-text "\n"))
+ =]
+    fputs(die_leader, stderr);
+    vfprintf(stderr, fmt, ap);
+    fflush(stderr);
+    exit(exit_code);
+    /* NOTREACHED */
+}
+
+/**
+ * Print a fatal error message and die
+ *
+ * @param[in] exit_code  the value to call exit(3) with
+ * @param[in] fmt        the death rattle message
+ * @param[in] ...        the list of arguments for the message
+ * @noreturn
+ */
+void
+[=(. lc-prefix)=]die(int exit_code, char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vdie(exit_code, fmt, ap);
+    /* NOTREACHED */
+    va_end(ap);
+}
+
+/**
+ * Print a file system error fatal error message and die
+ *
+ * @param[in] exit_code  the value to call exit(3) with.
+ * @param[in] op         the operation that failed.
+ * @param[in] fname      the file name the operation was on.
+ * @noreturn
+ */
+void
+[=(. lc-prefix)=]fserr(int exit_code, char const * op, char const * fname)
+{
+    static char const * fserr_fmt =
+        _("fserr %d (%s) performing '%s' on %s\n");
+    die(exit_code, fserr_fmt, errno, strerror(errno), op, fname);
+    /* NOTREACHED */
+}
+[=
+
+ENDIF die-code              =][=
 
 ENDDEF emit-option-callbacks
 

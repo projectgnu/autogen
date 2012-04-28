@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-22 11:37:38 bkorb"
+ *  Time-stamp:        "2012-04-28 08:33:44 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -70,6 +70,7 @@ typedef enum {
 } quoted_val_action_t;
 
 static char mask_fmt[sizeof(mask_fmt_fmt) + 9];
+static char const * program     = NULL;
 static char const * data_guard  = NULL;
 static char const * mask_name   = NULL;
 static char const * base_fn_nm  = NULL;
@@ -79,22 +80,19 @@ static char const * file_guard  = char_map_gd;
 static char const * commentary  = " *  char-mapper Character Classifications\n";
 static char const * add_on_text = NULL;
 static char const * table_name  = NULL;
-static int          table_is_static = 0;
-static int const    table_size      = TABLE_SIZE;
+static bool         table_is_static = false;
 static char buffer[BUF_SIZE];
 static bool         add_test_code   = false;
 static bool         add_backup_code = false;
 static bool         optimize_code   = false;
 static bool         pthread_code    = false;
-static unsigned int total_mac_ct    = 0;
+static unsigned int total_map_ct    = 0;
 
 value_map_t    all_map      = { NULL, "total", 0, 0, { 0 }};
 value_map_t ** end_map      = &(all_map.next);
 size_t         max_name_len = 0;
 size_t         curr_name_len= 0;
-int            need_comma   = 0;
 unsigned int   bit_count    = 0;
-int            skip_comment = 0;
 
 void   die(char const *, ...);
 char * trim(char * buf);

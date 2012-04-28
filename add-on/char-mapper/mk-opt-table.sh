@@ -1,7 +1,7 @@
 #! /bin/bash
 #  mk-opt-table.sh
 #
-#  Time-stamp:        "2012-03-31 13:59:05 bkorb"
+#  Time-stamp:        "2012-04-28 08:46:45 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -101,7 +101,7 @@ assemble_usage() {
 	Otherwise, input lines that are blank or start with a hash ('#') are
 	ignored.  All other lines must conform to the following syntax:
 
-	    <name> { <literal-set> | <existing-name> } \
+	    <name> { <literal-set> | <existing-name> } \\
 	        [-]{<literal-set> | <existing-name>}...
 
 	<name> must begin with an alphabetic character and consist of

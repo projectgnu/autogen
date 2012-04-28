@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-22 11:47:06 bkorb"
+ *  Time-stamp:        "2012-04-28 08:35:46 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -27,6 +27,10 @@
 int
 main(int argc, char ** argv)
 {
+    program = strrchr(argv[0], '/');
+    if (program++ == NULL)
+        program = argv[0];
+
     if (argc > 1) {
         char * pz = argv[1];
         if (*pz == '-')
@@ -83,9 +87,9 @@ emit_leader(char * input)
                : ((bit_count <= 32) ? type_32bits
                   : type_64bits ));
 
-        strftime(buffer, BUF_SIZE, "%x %X", tmp);
-        printf(leader_fmt, bit_count, buffer,
-               commentary, file_guard, mask_type);
+        strftime(buffer, BUF_SIZE, "%x at %X", tmp);
+        printf(leader_fmt, bit_count, total_map_ct, buffer,
+               commentary, file_guard, mask_type, program);
     }
 
     if (fseek(stdin, 0, SEEK_SET) == 0)
@@ -103,10 +107,11 @@ emit_leader(char * input)
 static void
 init_names(void)
 {
-    static char const tbl[] = "_table";
-
     if (table_name == NULL) {
 
+        /*
+         * If the guard is unchanged from the initial default,
+         */
         if (file_guard == char_map_gd)
             table_name = "char_type_table";
 
@@ -116,21 +121,32 @@ init_names(void)
             char const * e = file_guard + strlen(file_guard)
                 - (sizeof(grd) - 1);
 
+            /*
+             * If the guard ends with "_GUARD", then set "e" back to the end.
+             * Otherwise, if it ends with "_H_GUARD", then trim the "_H" too.
+             */
             if (strcmp(e, grd) != 0)
                 e += sizeof(grd) - 1;
             else if ((e[-2] == '_') && (e[-1] == 'H'))
                 e -= 2;
 
+            /*
+             * Make the table name be the downcased, trimmed guard.
+             */
             size_t copy_len = e - file_guard;
-            table_name = p = malloc(copy_len + sizeof(tbl));
+            table_name = p = malloc(copy_len + table_sfx_LEN + 1);
             memcpy(p, file_guard, copy_len);
-            memcpy(p + copy_len, tbl, sizeof(tbl));
+            memcpy(p + copy_len, table_sfx, table_sfx_LEN + 1);
             for (; p < table_name + copy_len; p++)
                 *p = tolower((int)*p);
         }
     }
 
-    if (data_guard == NULL) {
+    /*
+     *  If "%guard" has not been specified (as either empty or with a name),
+     *  then create an ifdef name to guard the data tables.
+     */
+    if (! table_is_static && (data_guard == NULL)) {
         char * p = malloc(strlen(table_name) + define_fmt_LEN);
         sprintf(p, define_fmt, table_name);
         make_define_name(p);
@@ -139,24 +155,30 @@ init_names(void)
 
     {
         static char const msk[] = "_mask_t";
-        size_t tn_len = strlen(table_name);
-        if (strcmp(table_name + tn_len - (sizeof(tbl) - 1), tbl) == 0)
-            tn_len -= sizeof(tbl) - 1;
-        char * p = malloc(tn_len + sizeof(tbl));
-        memcpy(p, table_name, tn_len);
-        memcpy(p + tn_len, msk, sizeof(msk));
+        size_t base_name_len = strlen(table_name); ///< base name length
+
+        /*
+         * If the table name already has a "_table" suffix, don't count it in
+         * the base name length.  Otherwise, "table_name" is our base name.
+         */
+        if (strcmp(table_name + base_name_len - table_sfx_LEN, table_sfx) == 0)
+            base_name_len -= table_sfx_LEN;
+
+        char * p = malloc(base_name_len + table_sfx_LEN + 1);
+        memcpy(p, table_name, base_name_len);
+        memcpy(p + base_name_len, msk, sizeof(msk));
         mask_name = p;
 
-        p = malloc(tn_len + 1);
-        memcpy(p, table_name, tn_len);
-        p[tn_len]  = NUL;
-        base_fn_nm = p;
+        p = malloc(base_name_len + 1);
+        memcpy(p, table_name, base_name_len);
+        p[base_name_len]  = NUL;
+        base_fn_nm = p; // base name of most everything
 
-        p = malloc(tn_len + 1);
-        memcpy(p, table_name, tn_len);
-        p[tn_len]  = NUL;
+        p = malloc(base_name_len + 1);
+        memcpy(p, table_name, base_name_len);
+        p[base_name_len]  = NUL;
         make_define_name(p);
-        base_ucase = p;
+        base_ucase = p; // upper case flavor of our base name
     }
 }
 
@@ -169,15 +191,17 @@ init_names(void)
 static void
 copy_input_text(char const * name)
 {
+    bool skip_comment = false;
+
     printf(copy_input_start, name);
     while (fgets(buffer, BUF_SIZE, stdin) != NULL) {
         if (strstr(buffer, "%comment") != NULL) {
-            skip_comment = 1;
+            skip_comment = true;
             fputs("// %comment -- see above\n", stdout);
             continue;
         }
         if (strstr(buffer, "%emit") != NULL) {
-            skip_comment = 1;
+            skip_comment = true;
             fputs("// %emit code -- see below\n", stdout);
             continue;
         }
@@ -185,7 +209,7 @@ copy_input_text(char const * name)
             int bfix = 0;
             while (isspace(buffer[bfix]))  bfix++;
             if (buffer[bfix] != '%') continue;
-            skip_comment = 0;
+            skip_comment = false;
         }
         printf("// %s", buffer);
     }
@@ -288,7 +312,6 @@ emit_macros(int bit_count)
         char * pz = fill + ln; // padding pointer
         char z[24], y[24]; // 24 >= ceil(log10(1 << 63)) + 1
         snprintf(z, sizeof(z), mask_fmt, map->mask);
-        total_mac_ct++;
 
         if (optimize_code)
             sprintf(y, "%u", map_ix++);
@@ -339,10 +362,10 @@ void
 emit_functions(void)
 {
     if (! table_is_static)
-        printf(declare_tbl, mask_name, table_name, table_size);
+        printf(declare_tbl, mask_name, table_name, TABLE_SIZE);
 
     printf(inline_functions,
-           base_fn_nm, mask_name, table_size, table_name);
+           base_fn_nm, mask_name, TABLE_SIZE, table_name);
 
     if (add_backup_code)
         printf(inline_backup, base_fn_nm, mask_name);
@@ -361,9 +384,9 @@ emit_opt_functions(void)
 {
     if (! table_is_static)
         printf(declare_opt_tbl, mask_name, base_fn_nm,
-               table_size, base_ucase, total_mac_ct);
+               TABLE_SIZE, base_ucase, total_map_ct);
 
-    printf(inline_opt_functions, base_fn_nm, mask_name, table_size);
+    printf(inline_opt_functions, base_fn_nm, mask_name, TABLE_SIZE);
 
     if (add_backup_code)
         printf(inline_opt_backup, base_fn_nm);
@@ -383,29 +406,24 @@ emit_table(int bit_count)
     char const * type_pz;
     char * fmt;
 
-    int ix       = 0;
-    int need_cm  = 0;
-    int entry_ct = 0;
-    int init_ct  = (bit_count > 32) ? 2 : 4;
+    int  ix = 0;
+
+    /**
+     * How many entries can be initialized on one line?  We can do four
+     * uint8_t's, uint16_t's or even uint32_t's.  Only two uint64_t's tho.
+     */
+    int  init_ct  = (bit_count > 32) ? 2 : 4;
+    int  entry_ct = init_ct;
 
     if (table_is_static)
-        printf(start_static_table_fmt, mask_name, table_name, table_size);
+        printf(start_static_table_fmt, mask_name, table_name, TABLE_SIZE);
     else
-        printf(start_table_fmt, data_guard, mask_name, table_name, table_size);
+        printf(start_table_fmt, data_guard, mask_name, table_name, TABLE_SIZE);
 
-    while (ix < TABLE_SIZE) {
-
-        if (! need_cm)
-            need_cm = 1;
-        else putc(',', stdout);
-
-        if (--entry_ct <= 0) {
-            putc('\n', stdout);
-            putc(' ', stdout);
-            entry_ct = init_ct;
-        }
+    for (;;) {
         if (isprint(ix))
             printf(" /* %c */ ", (char)ix);
+
         else switch (ix) {
             case NUL:  fputs(" /*NUL*/ ", stdout); break;
             case '\a': fputs(" /*BEL*/ ", stdout); break;
@@ -419,10 +437,21 @@ emit_table(int bit_count)
             default:  printf(" /*x%02X*/ ", ix);   break;
             }
 
-        printf(mask_fmt, all_map.values[ix++]);
-    }
-    fputs(end_table, stdout);
+        printf(mask_fmt, all_map.values[ix]);
 
+        if (++ix >= TABLE_SIZE)
+            break;
+
+        putc(',', stdout);
+
+        if (--entry_ct <= 0) {
+            putc('\n', stdout);
+            putc(' ', stdout);
+            entry_ct = init_ct;
+        }
+    }
+
+    fputs(end_table, stdout);
 
     if (optimize_code) {
         static char const fmtfmt[] = "    %%s, /* %%-%us*/\n";
@@ -430,7 +459,7 @@ emit_table(int bit_count)
         char const * locking_fmt = pthread_code ? pthread_locking : no_locking;
         char fmt[256];
 
-        printf(optimize_fmt, static_pfx, base_fn_nm, total_mac_ct);
+        printf(optimize_fmt, static_pfx, base_fn_nm, total_map_ct);
         snprintf(fmt, sizeof(fmt), fmtfmt, (unsigned int)max_name_len);
 
         for (value_map_t * map = all_map.next; map != NULL; map = map->next) {
@@ -668,6 +697,7 @@ new_map(char * name)
     end_map  = &(map->next);
     strcpy(map->vname, name);
     map->bit_no = ~0;
+    total_map_ct++;
     return map;
 }
 
@@ -845,7 +875,7 @@ load_text(int pfx)
 /**
  * handle file directive.
  *
- * specifies the output file name.  The multi-inclusion guard is derived
+ * Specifies the output file name.  The multi-inclusion guard is derived
  * from this name.  If %file is not specified, that guard defaults to
  * CHAR_MAPPER_H_GUARD.  The default output is to stdout.
  *
@@ -881,7 +911,7 @@ handle_file(char * scan)
 /**
  * handle comment directive.
  *
- * specifies the text to insert in a comment block at the head of the output
+ * Specifies the text to insert in a comment block at the head of the output
  * file.  The comment text starts on the next line and ends with the first
  * input line with a percent ('%') in the first column.  The default is:
  * char-mapper Character Classifications
@@ -913,42 +943,11 @@ handle_emit(char * scan)
     *scan = NUL;
     return scan;
 }
-#if 0
-/**
- * handle map directive.
- *
- * Map a set of characters into another set.
- * There are three arguments to this directive:
- *
- * * the mapping name (e.g. "lower")
- * * the map-from list.  Specify a character class name.
- * * the map-to list. This may be a literal, a class name, or a mix.
- *
- * These three elements are separated by two commas (",").
- * If the "map-to" list is shorter than the map-from list, then the
- * last character is repeated until there are the same number of characters.
- * It is an error for it to be longer.  This will produce CPP macros
- * named TO_XXX_CHARS(), using the name above.  The input argument is also
- * the output argument.  It is an in-place replacement.
- *
- * @param scan current scan point
- * @returns    The '%' starting the next directive.
- */
-char *
-NO_handle_map(char * scan)
-{
-    while (isspace(*scan))   scan++;
-    if (*scan == NUL) die("%map requires a mapping specification");
-    // mapping_text = strdup(scan);
-    fprintf(stderr, "%map is not actually implemented yet.\n");
-    *scan = NUL;
-    return scan;
-}
-#endif
+
 /**
  * handle table directive.
  *
- * specifies the name of the output table.  If not specified, it defaults to
+ * Specifies the name of the output table.  If not specified, it defaults to
  * the base file name, suffixed with "_table" and "char_type_table" if %file
  * is not specified.  Normally, this table is "extern" in scope, but may be
  * made static by specifying an empty %guard.
@@ -976,7 +975,7 @@ handle_table(char * scan)
 /**
  * handle optimize directive.
  *
- * specifies setting up optimization tables for span/break scanning operations
+ * Specifies setting up optimization tables for span/break scanning operations
  * on character classes.  A static array of pointers is defined and populated
  * on the first use of a scan/break on each character classification.
  *
@@ -993,10 +992,11 @@ handle_optimize(char * scan)
 /**
  * handle pthread directive.
  *
- * specifies pthread locking on allocation of optimization maps.  This has no
+ * Specifies pthread locking on allocation of optimization maps.  This has no
  * effect unless %optimize has been specified.  Pthread-ed multi-threaded
- * applications *must* specify this.  Spanning maps get allocated dynamically
- * when first used.  only one thread should do the work.
+ * applications *must* specify this if optimization maps are emitted.
+ * Spanning maps get allocated dynamically when first used.  Only one thread
+ * should do the work.
  *
  * @param scan current scan point
  * @returns    end of guard scan
@@ -1011,7 +1011,7 @@ handle_pthread(char * scan)
 /**
  * handle guard directive.
  *
- * specifies the name of a '#ifdef' guard protecting the compilation of
+ * Specifies the name of a '#ifdef' guard protecting the compilation of
  * the bit mask table.  One compilation unit must '#define' this name.
  * The default is the table name surrounded by "DEFINE_" and "_TABLE".
  * If empty, the output table is unguarded and made static in scope.
@@ -1025,7 +1025,7 @@ handle_guard(char * scan)
     char * pz;
 
     if (! isspace(*scan)) {
-        table_is_static = 1;
+        table_is_static = true;
         return scan;
     }
 
@@ -1038,7 +1038,7 @@ handle_guard(char * scan)
 /**
  * handle backup directive.
  *
- * specifies emitting code to backup over matching text at the end of a string.
+ * Specifies emitting code to backup over matching text at the end of a string.
  * The macro takes two arguments:  a start point and an end point.
  * The "end point" is returned after backing up over skipped characters,
  * but it will be at or after the start pointer.  The second pointer may also
@@ -1058,7 +1058,7 @@ handle_backup(char * scan)
 /**
  * handle test directive.
  *
- * specifies that a main procedure is to be emitted under an ifdef guard.
+ * Specifies that a main procedure is to be emitted under an ifdef guard.
  * The first few lines of the output can also be processed by a Bourne
  * shell to compile and test that main procedure.  That shell script is
  * invisible to the C compiler.  It is under a "#if 0" guard.
@@ -1076,7 +1076,8 @@ handle_test(char * scan)
 /**
  * handle invalid directive.
  *
- * This function does not return.
+ * This function gets called when input is messed up.  This function does not
+ * return.
  *
  * @param scan current scan point
  * @returns    not

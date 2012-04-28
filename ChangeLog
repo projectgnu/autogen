@@ -1,3 +1,11 @@
+2012-04-28  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcCase.c (mLoad_Select): split function
+	(selection_type_complete): new function
+	* autoopts/tpl/optcode.tlib (optionAlias): remove duplicate def.
+	* autoopts/tpl/opthead.tlib (die): add prototypes for new functions
+	* autoopts/tpl/optmain.tlib (die): add code for die, vdie and fserr.
+
 2012-04-15  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/def2pot.tpl: clean up

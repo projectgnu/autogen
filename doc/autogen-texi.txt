@@ -1940,6 +1940,20 @@ extern void usage_message(char const * fmt, ...);
 These functions print the message to @file{stderr} and invoke the usage
 function with the exit code set to @code{1} (@code{EXIT_FAILURE}).
 
+@item die-code
+@vindex die-code
+This tells AutoOpts templates to emit code for @code{vdie}, @code{die} and
+@code{fserr} functions.  If the @code{die-code} is assigned a text value,
+then that code will be inserted in the @code{vdie} function immediately
+before it prints the death rattle message.
+
+The profiles for these functions are:
+@example
+extern void vdie( int exit_code, char const * fmt, va_list);
+extern void die(  int exit_code, char const * fmt, ...);
+extern void fserr(int exit_code, char const * op, char const * fname);
+@end example
+
 @item export
 @vindex export
 This string is inserted into the .h interface file.  Generally used for
