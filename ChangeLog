@@ -10,6 +10,8 @@
 	an archive file.  --disable-static will not produce such a file.
 	* configure.ac (ENABLE_STATIC): new substitution
 	* autoopts/aoconf.tpl: disable static_libs when disabled
+	* autoopts/test/defs.in: link against libopts*.${OBJEXT}. libopts.a
+	may not get built.
 
 2012-04-29  Bruce Korb  <bkorb@gnu.org>
 

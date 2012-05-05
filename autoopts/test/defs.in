@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-05-05 07:39:48 bkorb"
+# Time-stamp:     "2012-05-05 10:19:26 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -145,11 +145,11 @@ init_tests()
   exec 8>&2 1>${logfile} 2>&1
 
   TMPDIR=`pwd`/testdir/${testname}-tmpd
-  export TMPDIR
   mkdir ${TMPDIR}
 
   f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
   PATH=${f}:${PATH}
+  echo PATH is ${PATH} >&2
 
   set_exe AGexe
   AGexe=${AGexe:-`command -v autogen`}
@@ -162,8 +162,6 @@ init_tests()
   CFLAGS="${INCS} "`echo ${CFLAGS} | \
     ${SED} "s/-Werror[^ ${ht}]*//g;s/-Wextra//g"`
 
-  export PATH
-  echo PATH is ${PATH} >&2
   command -v columns >&2
   command -v autogen >&2
 
@@ -171,30 +169,33 @@ init_tests()
   test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
   test "X${LD_LIBRARY_PATH}" = X || LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}
   LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}${LD_LIBRARY_PATH}
-  LIB=`echo ${lo_dir}/libopts.a`
-  export LD_LIBRARY_PATH
 
-  if test ${GUILE_VERSION} -gt 107000
-  then
-    case ${AG_VERSION} in
-    *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
-    *     ) GUILE_WARN_DEPRECATED=no ;;
-    esac
-    export GUILE_WARN_DEPRECATED
-  fi
+  case ${AG_VERSION} in
+  *pre* ) GUILE_WARN_DEPRECATED=detailed ;;
+  *     ) GUILE_WARN_DEPRECATED=no ;;
+  esac
 
-  test -f /usr/lib/libgen.so && {
-    case "${LIB}" in
-    *-lgen* ) : ;;
-    * ) LIB="${LIB} -lgen" ;;
-    esac
-  }
+  case "$LIB" in
+  *-lgen* ) : ;;
+  * )
+    for f in /usr/lib*/libgen.so /lib*/libgen.so
+    do
+      test -f $f && {
+        LIB="${LIB} -lgen"
+        break
+      }
+    done
+    ;;
+  esac
+  lo_lib=`find ${lo_dir} -type f -name libopts*.${OBJEXT}`
+  LIB="${lo_lib} ${LIB}"
 
   AG_L=run_ag\ ao
   agl_opts="-L${top_builddir}/autoopts/tpl -L${top_srcdir}/autoopts/tpl"
 
-  export CC GUILE_VERSION LIBGUILE_PATH AG_VERSION AGexe AG_L GDexe CLexe \
-    agl_opts AG_L
+  export TMPDIR PATH AGexe GDexe CLexe INCS CFLAGS LD_LIBRARY_PATH \
+         GUILE_WARN_DEPRECATED LIB AG_L agl_opts \
+         CC GUILE_VERSION LIBGUILE AG_VERSION
 }
 
 be_silent()
