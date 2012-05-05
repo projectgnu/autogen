@@ -2,7 +2,7 @@
 
 ## texi2mdoc.sh -- script to convert texi-isms to mdoc-isms
 ##
-## Time-stamp:      "2012-02-28 19:49:10 bkorb"
+## Time-stamp:      "2012-05-05 08:10:30 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -152,15 +152,24 @@ do_line() {
 }
 
 
-bold='\(code\|command\|var\|samp\|option\|strong\)'
-bold="s;@${bold}"'{\([^}]*\)};\\fB\2\\fP;g'
-
-ital='\(i\|file\|emph\)'
-ital="s;@${ital}"'{\([^}]*\)};\\fI\2\\fP;g'
 nl='
 '
+sedcmd=
+bracket='{\([^}]*\)}'
+replB='%BACKSLASH%fB\1%BACKSLASH%fP'
+replI='%BACKSLASH%fI\1%BACKSLASH%fP'
 
-fixfont="${bold}${nl}${ital}"'
+for f in code command var env dvn samp option strong
+do
+    sedcmd="${sedcmd}s;@${f}${bracket};${replB};g${nl}"
+done
+
+for f in i file emph kbd key abbr acronym email
+do
+    sedcmd="${sedcmd}s;@${f}${bracket};${replI};g${nl}"
+done
+
+fixfont="${sedcmd}"'
 	s;@pxref{\([^}]*\)};see: \1;g
 	s;@xref{\([^}]*\)};see: \1;g
 	s/@\([{@}]\)/\1/g
@@ -169,7 +178,8 @@ fixfont="${bold}${nl}${ital}"'
 	s/``\([a-zA-Z0-9:~+=_ -]*\)'\'\''/\\(lq\1\\(rq/g
 	s/\([^\\]\)-/\1\\-/g
 	s/\([^\\]\)-/\1\\-/g
-	/^\.\(Bl\|Bd\|in\) /s/ \\-/ -/g'"
+	/^\.\(Bl\|Bd\|in\) /s/ \\-/ -/g
+	s#%BACKSLASH%#\\#g'"
 	s/^'/\\\\'/
 	/^\$/d"
 readonly fixfont

@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-03-31 13:50:03 bkorb"
+# Time-stamp:     "2012-05-05 07:39:48 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -64,6 +64,7 @@ cfg_vals()
   top_srcdir=`cd $top_srcdir >/dev/null && pwd`
   test -z "$top_builddir" && exit 1
   top_builddir=`cd $top_builddir >/dev/null && pwd`
+  OBJEXT='@OBJEXT@'
   GUILE_VERSION="@GUILE_VERSION@"
   LIBGUILE_PATH="@LIBGUILE_PATH@"
   AG_VERSION="@AG_VERSION@"

@@ -1795,6 +1795,26 @@ mumble (stumble) 1.0
 says that the ``@code{mumble}'' program is version 1.0 and is part of the
 ``@code{stumble}'' group of programs.
 
+@item usage
+@vindex usage
+If your program has some cleanup work that must be done before exiting
+on usage mode issues, or if you have to customize the usage message in
+some way, specify this procedure and it will be called instead of the
+default @code{optionUsage()} function.  For example, if a program is
+using the curses library and needs to invoke the usage display, then
+you must arrange to call @code{endwin()} before invoking the library
+function @code{optionUsage()}.  This can be handled by specifying your
+own usage function, thus:
+@example
+void
+my_usage(tOptions * opts, int ex)
+@{
+    if (curses_window_active)
+        endwin();
+    optionUsage(opts, ex);
+@}
+@end example
+
 @item version
 @vindex version
 Specifies the program version and activates the VERSION option,

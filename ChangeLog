@@ -1,3 +1,30 @@
+2012-05-05  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/handler.test: adjustment
+	* autoopts/tpl/optcode.tlib: doxygenate
+	* autoopts/tpl/optmain.tlib: fix doxygen comment
+	* autoopts/tpl/texi2man.sh: handle sed-s that do not do alternation
+	* autoopts/tpl/texi2mdoc.sh: likewise
+	* autoopts/test/defs.in: pass through OBJEXT
+	* autoopts/tpl/usage.tlib: use it to look for a .o file instead of
+	an archive file.  --disable-static will not produce such a file.
+	* configure.ac (ENABLE_STATIC): new substitution
+	* autoopts/aoconf.tpl: disable static_libs when disabled
+
+2012-04-29  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/getopt.tpl (optionUsage): do not declare optionUsage.
+	* autoopts/tpl/optcode.tlib (usage-proc): likewise
+	* autoopts/tpl/optmain.tlib (doUsageOpt): call usage proc directly,
+	whether it is optionUsage or user specified.
+	(vusage_message): likewise
+	* autoopts/test/handler.test: adjust
+	* doc/autogen-texi.txt (@item usage): doc it properly
+	* autoopts/tpl/cmd-doc.tlib (get-cvt): accept an alternate text arg
+	and use this capability for the exit-desc attribute.
+	* autoopts/tpl/texi2man.sh (bold): add new entries
+	* autoopts/tpl/texi2mdoc.sh: likewise
+
 2012-04-28  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcCase.c (mLoad_Select): split function

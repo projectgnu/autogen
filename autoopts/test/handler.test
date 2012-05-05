@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-03-31 13:58:52 bkorb"
+# Time-stamp:        "2012-05-05 08:17:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -115,15 +115,17 @@ echo creating ${testname}.sample
 cat > ${testname}.sample <<\_EOF_
  */
 /**
- * The callout function that invokes the USAGE() macro.
+ * The callout function that invokes the optionUsage function.
  *
  * @param pOptions the AutoOpts option description structure
  * @param pOptDesc the descriptor for the "help" (usage) option.
+ * @noreturn
  */
 static void
 doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 {
-    USAGE(HANDLER_EXIT_SUCCESS);
+    optionUsage(&handlerOptions, HANDLER_EXIT_SUCCESS);
+    /* NOTREACHED */
     (void)pOptDesc;
     (void)pOptions;
 }
@@ -232,6 +234,9 @@ doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
     optionSetMembers(pOptions, pOptDesc, azNames, 4);
 }
 
+/**
+ * The directory containing the data associated with handler.
+ */
 _EOF_
 
 cmp -s ${testname}.test ${testname}.sample || {

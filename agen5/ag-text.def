@@ -1284,7 +1284,7 @@ string = { nm = SHELL_INIT_STR;
 	        ;;
 
 	    * )
-	        exec 1>&2
+	        exec 1>&8
 	        echo "trapped on signal ${1}"
 	        test -d "${tmp_dir}" && \
 	            echo "temp directory has been retained:  ${tmp_dir}"
@@ -1299,12 +1299,13 @@ string = { nm = SHELL_INIT_STR;
 	}
 	( exec 1>&2 ; unalias cd ) && unalias cd
 	die() {
-	  echo "Killing AutoGen ${AG_pid}:  $*" >&8
+	  echo "Killing AutoGen ${AG_pid}"
+	  echo "FAILURE REASON:  $*"
 	  kill -15 ${AG_pid}
 	  kill -1  ${AG_pid}
 	  kill -2  ${AG_pid}
 	  exit 1
-	}
+	} >&8
 	test -z "${TMPDIR}" && TMPDIR=/tmp
 	tmp_dir=''
 	mk_tmp_dir() {

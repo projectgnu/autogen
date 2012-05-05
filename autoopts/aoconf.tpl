@@ -4,7 +4,7 @@ in=autoopts-config.in
 
 #!/bin/sh
 
-## Time-stamp:      "2011-06-13 16:47:07 bkorb"
+## Time-stamp:      "2012-05-05 08:48:11 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -49,9 +49,9 @@ FOR cfg  =][= (set! name-len (string-length (get "c-name")))
 ENDFOR   =][=
 
 (set! name-max   (+ 1 name-max))
-(define def-fmt  (sprintf "\n%%%ds=\"%%s\"" name-max))
+(define def-fmt  (sprintf "\n%%%ds=\"%%s\""   name-max))
 (define def-fmt@ (sprintf "\n%%%ds=\"@%%s@\"" name-max))
-(define ele-fmt  (sprintf "\n  %%-%ds)"   name-max))
+(define ele-fmt  (sprintf "\n  %%-%ds)"       name-max))
 (define cse-fmt  (sprintf "\n  %%-%ds) val=\"${val} ${%%-%ds ;;"
                          name-max (+ 2 name-max))) =][=
 
@@ -89,7 +89,7 @@ val=''
 for o in "$@" ; do
   o=`echo ${o} | sed 's,^-*,,;s/-/_/g'`
   case "$o" in
-  help | h | \? )    usage ;;
+  help | h | \? )   usage ;;
   *[!a-zA-Z0-9_]* ) usage "Invalid name:  ${o}" ;;
 [=
 
@@ -106,6 +106,7 @@ FOR cfg         =][=
      done
      exit 0
      ;;[=
+
   *             =][=
      (set! txt (get "c-name"))
      (sprintf cse-fmt txt (string-append txt "}\"")) =][=
@@ -245,15 +246,16 @@ DEFINE script-preamble
 [= (dne "## ") =]
 ##[=
 
-FOR cfg  =][=
+FOR cfg       =][=
   CASE c-val  =][=
   !E          =][= (sprintf def-fmt@ (get "c-name") (get "c-name")) =][=
   == ""       =][=
-  *           =][= (sprintf def-fmt  (get "c-name") (get "c-val")) =][=
+  *           =][= (sprintf def-fmt  (get "c-name") (get "c-val"))  =][=
   ESAC        =][=
 ENDFOR
 
 =]
+test 'X@ENABLE_STATIC@' = Xno && static_libs=''
 case "${libdir}" in
 /lib | /lib64 | /usr/lib | /usr/lib64 )
     ldopts=''

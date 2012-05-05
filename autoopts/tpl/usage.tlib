@@ -107,7 +107,7 @@ ENDFOR flag                 =][=
 \=]
     test -z "${top_builddir}" && ldflags='' || \
         ldflags=`exec 2>/dev/null
-            find ${top_builddir}/autoopts -name libopts.a | head -1`
+            find ${top_builddir}/autoopts -name "libopts*.${OBJEXT}" | head -1`
 
     test -f "${ldflags}" || {
         ldflags='[=(. lib-dir)=]/libopts.a'

@@ -2,7 +2,7 @@
 
 ## texi2man.sh -- script to convert texi-isms to man page isms
 ##
-## Time-stamp:      "2012-04-14 07:02:32 bkorb"
+## Time-stamp:      "2012-05-05 08:13:04 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -33,12 +33,25 @@
 ##
 ## And run the entire output through "sed" to convert texi-isms
 
-bold='\(code\|command\|var\|samp\|option\|strong\)'
-ital='\(i\|file\|emph\)'
+nl='
+'
+sedcmd=
+bracket='{\([^}]*\)}'
+replB='%BACKSLASH%fB\1%BACKSLASH%fP'
+replI='%BACKSLASH%fI\1%BACKSLASH%fP'
+
+for f in code command var env dvn samp option strong
+do
+    sedcmd="${sedcmd}s;@${f}${bracket};${replB};g${nl}"
+done
+
+for f in i file emph kbd key abbr acronym email
+do
+    sedcmd="${sedcmd}s;@${f}${bracket};${replI};g${nl}"
+done
 
 sed \
- -e "s;@${bold}{"'\([^}]*\)};%BACKSLASH%fB\2%BACKSLASH%fP;g' \
- -e "s;@${ital}{"'\([^}]*\)};%BACKSLASH%fI\2%BACKSLASH%fP;g' \
+ -e "${sedcmd}" \
  -e 's;@pxref{\([^}]*\)};see: \1;g' \
  -e 's;@xref{\([^}]*\)};see: \1;g' \
  -e 's/@\([{}]\)/\1/g' \

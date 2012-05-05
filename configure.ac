@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2012-03-31 13:03:23 bkorb"
+dnl Time-stamp:      "2012-05-05 08:08:20 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -170,7 +170,7 @@ AGexe=${ag_top_builddir}/agen5/${AGnam}
 GDexe=${ag_top_builddir}/getdefs/${GDnam}
 CLexe=${ag_top_builddir}/columns/${CLnam}
 M4_SRC=`cd $srcdir/config ; echo [a-z]*.m4`
-
+ENABLE_STATIC=${enable_static}
 config_end_time=`date +%s 2>/dev/null`
 time_delta=`expr ${config_end_time} - ${config_start_time} 2>/dev/null`
 
@@ -194,6 +194,7 @@ AC_SUBST(AG_TIMEOUT)
 AC_SUBST(ac_aux_dir)
 AC_SUBST(LIBS)
 AC_SUBST(DEBUG_ENABLED)
+AC_SUBST(ENABLE_STATIC)
 [
 if test "$ag_top_srcdir" = "$ag_top_builddir"
 then

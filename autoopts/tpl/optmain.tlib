@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-04-28 08:34:24 bkorb"
+# Time-stamp:      "2012-05-05 08:04:19 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -140,7 +140,7 @@ DEFINE for-each-main            =][=
 static char *
 trim_input_line(char * pz_s)
 {
-    char* pz_e = pz_s + strlen(pz_s); /*!< terminating NUL byte */
+    char* pz_e = pz_s + strlen(pz_s);
     while ((pz_e > pz_s) && isspace((unsigned int)pz_e[-1]))  pz_e--;
     *pz_e = '\0';
     while ((unsigned int)isspace(*pz_s))  pz_s++;
@@ -1071,10 +1071,12 @@ DEFINE emit-option-callbacks        =]
  *  Create the static procedure(s) declared above.
  */
 /**
- * The callout function that invokes the [= (. UP-prefix) =]USAGE() macro.
+ * The callout function that invokes the [= (. usage-proc)
+   =] function.
  *
  * @param pOptions the AutoOpts option description structure
  * @param pOptDesc the descriptor for the "help" (usage) option.
+ * @noreturn
  */
 static void
 doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
@@ -1086,10 +1088,12 @@ doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
   IF (exist? "usage-opt") =]
     int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
         ? [=(. succ-exit-code)=] : AO_EXIT_REQ_USAGE;
-    [= (. UP-prefix) =]USAGE(ex_code);[=
+    [= (string-append usage-proc "(&" pname "Options, ex_code);") =]
+    /* NOTREACHED */[=
 
   ELSE   =]
-    [= (. UP-prefix) =]USAGE([=(. succ-exit-code)=]);
+    [= (string-append usage-proc "(&" pname "Options, " succ-exit-code ");") =]
+    /* NOTREACHED */
     (void)pOptDesc;[=
   ENDIF  =]
     (void)pOptions;
@@ -1112,8 +1116,8 @@ ENDIF
 IF (exist? "usage-message")     =]
 /**
  * Print a usage message with a format and va_list argument.
- * The USAGE exit macro is then invoked to print the error usage text
- * (somewhat abbreviated) and then exit.
+ * The [= (. usage-proc) =] function is then invoked to print
+ * the error usage text (somewhat abbreviated) and then exit.
  *
  * @param[in] fmt the message format string
  * @param[in] ap  the var-arg list.
@@ -1125,7 +1129,7 @@ void
     char const * er_leader = _("[= prog-name =] usage error:\n");
     fputs(er_leader, stderr);
     vfprintf(stderr, fmt, ap);
-    [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
+    [= (string-append usage-proc "(&" pname "Options, " fail-exit-code ");") =]
     /* NOTREACHED */
 }
 
