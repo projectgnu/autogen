@@ -1,6 +1,6 @@
 [= AutoGen5 Template spec =]
 [= #
-   Time-stamp:        "2010-02-24 08:36:09 bkorb"
+   Time-stamp:        "2012-05-06 15:54:25 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -99,7 +99,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %files -f autogen-filelist
 %defattr(-,root,root)
 
-%doc AUTHORS TODO COPYING NEWS NOTES THANKS README VERSION
+%doc[=`
+for f in AUTHORS TODO COPYING NEWS NOTES THANKS README VERSION
+do test -f ${top_builddir}/$f -o -f ${top_srcdir}/$f && printf " $f" ; done
+`=]
 
 %changelog
 [=
