@@ -88,7 +88,7 @@ set_shell_prog() {
         st=`sed 1q $f`
 
         case "$st" in
-        */perl ) echo '#!' `which perl`
+        *perl ) echo '#!' `which perl`
                  sed 1d $f
                  ;;
 
