@@ -1,6 +1,6 @@
-#! @SHELL@
+#! /bin/sh
 
-# Time-stamp:        "2012-05-12 19:58:12 bkorb"
+# Time-stamp:        "2012-05-13 13:52:48 bkorb"
 #
 ##  This file is part of AutoGen.
 ##
@@ -39,9 +39,6 @@ die()
 set_config_values()
 {
   TMPDIR=`pwd`/ag-texi-$$.d
-  nl='
-' ht='	'
-
   rm -rf ag-texi-*.d
   mkdir ${TMPDIR} || die "cannot make ${TMPDIR} directory"
   export TMPDIR
@@ -52,23 +49,22 @@ set_config_values()
   *   ) trap "rm -rf ${TMPDIR}" EXIT
         VERBOSE=false ;;
   esac
+
   LOG_FILE=${TMPDIR}/texi.log
+
   exec 8>&2 2> ${LOG_FILE}
 
-  test -z "${CC}"     && CC="@CC@"
-  test -z "${CC}"     && `which cc`
-  test -z "${CFLAGS}" && CFLAGS="@CFLAGS@"
-  test -z "${LIBS}"   && LIBS="@LIBS@"
+  nl='
+' ht='	'
+  . ${top_builddir}/config/shdefs
+
   test -z "${MAKE}"   && MAKE=`which make`
 
-  top_srcdir=`cd @top_srcdir@/. > /dev/null && pwd`
-  top_builddir=`cd @top_builddir@/. > /dev/null && pwd`
-  export top_srcdir top_builddir
-
-  INCLUDES="@DEFS@ "`
+  srcdir=`cd ${srcdir} >/dev/null ; pwd`
+  INCLUDES="${DEFS} "`
 
     for d in ${top_srcdir} ${top_builddir} \
-             @top_builddir@/autoopts @top_srcdir@/autoopts
+             ${top_builddir}/autoopts ${top_srcdir}/autoopts
     do
       (\cd ${d} && pwd) 2>/dev/null
     done | \
@@ -83,12 +79,8 @@ set_config_values()
       && echo ${top_builddir}/autoopts/.libs \
       || echo ${top_builddir}/autoopts
     `" $LIBS"
-  # Give preference to configured SHELL
-  #
-  for SHELL in @CONFIG_SHELL@ @SHELL@ `which bash` \
-    /usr/xpg4/bin/sh `which sh` /bin/sh
-  do test -x ${SHELL} && break ; done
-  export CC CFLAGS LIBS MAKE SHELL LOG_FILE TMPDIR
+
+  export CC CFLAGS LIBS MAKE LOG_FILE TMPDIR
 }
 
 setup_exports()
@@ -97,24 +89,17 @@ setup_exports()
   #
   set -a
 
-  top_builddir=`cd @top_builddir@ ; pwd`
-  top_srcdir=`cd @top_srcdir@ ; pwd`
-  srcdir=`cd @srcdir@ ; pwd`
   PATH=${top_builddir}/columns:${PATH}
-  timer=`expr @AG_TIMEOUT@ '*' 5`
+  timer=`expr ${AG_TIMEOUT} '*' 5`
   d=`find ${top_builddir}/autoopts -type f -name libopts.a -print`
   test -f "$d" || die "Cannot locate libopts.a"
   LIBS="$d ${LIBS}"
 
-  eval `@EGREP@ '^AG_[A-Z_]*' ${top_srcdir}/VERSION`
+  eval `${EGREP} '^AG_[A-Z_]*' ${top_srcdir}/VERSION`
 
   AGsrc=${top_srcdir}/agen5
-  AGexe=@AGexe@
-  GDexe=@GDexe@
-  CLexe=@CLexe@
-
   OPTIONS_DEF=${AGsrc}/opts.def
-  GETDEF_SRC=`@FGREP@ -l '/*=' ${AGsrc}/*.[ch] ${AGsrc}/*.scm`
+  GETDEF_SRC=`${FGREP} -l '/*=' ${AGsrc}/*.[ch] ${AGsrc}/*.scm`
 
   AGEN_TEXI=${top_builddir}/agen5/invoke-autogen.texi
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt

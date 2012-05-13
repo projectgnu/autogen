@@ -3,7 +3,7 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-05-12 19:53:28 bkorb"
+# Time-stamp:     "2012-05-13 16:02:07 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -50,45 +50,21 @@ cfg_vals()
     ;;
   esac
 
+  script_name=$1
   set -a
-  SED="@SED@"
-  AG_TIMEOUT=@AG_TIMEOUT@
-
-  progname=`echo "$1" | ${SED} 's,^.*/,,'`
+  . ${top_builddir}/config/shdefs
+  progname=`echo "$script_name" | ${SED} 's,^.*/,,'`
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
   PS4=">${testname}-\${FUNCNAME}> "
   test -z "$srcdir"       && exit 1
   srcdir=`cd $srcdir >/dev/null && pwd`
-  test -z "$top_srcdir"   && exit 1
-  top_srcdir=`cd $top_srcdir >/dev/null && pwd`
-  test -z "$top_builddir" && exit 1
-  top_builddir=`cd $top_builddir >/dev/null && pwd`
-  OBJEXT='@OBJEXT@'
-  GUILE_VERSION="@GUILE_VERSION@"
-  LIBGUILE_PATH="@LIBGUILE_PATH@"
-  AG_VERSION="@AG_VERSION@"
-  GREP="@GREP@"
-  EGREP="@EGREP@"
-  FGREP="@FGREP@"
-  SHELL="@POSIX_SHELL@"
-  AGexe="@AGexe@"
-  CLexe="@CLexe@"
-  GDexe="@GDexe@"
-  INC="@LIBGUILE_CFLAGS@"
-  LIB='@AG_LDFLAGS@ @LDFLAGS@ @LIBGUILE_LIBS@'
-  DEBUG_ENABLED='@DEBUG_ENABLED@'
-  GREP='@GREP@'
-  EGREP='@EGREP@'
-  FGREP='@FGREP@'
   ( exec 2>/dev/null; ulimit -c unlimited ) && \
     ulimit -c unlimited
 
-  test -z "${CFLAGS}"     && CFLAGS='@DEFS@ @CFLAGS@'
-  test -z "${CPPFLAGS}"   && CPPFLAGS='@CPPFLAGS@'
-  test -z "${testsubdir}" && testsubdir='@testsubdir@'
-  test -z "${CC}"         && CC='@CC@'
-  test -z "${CC}"         && echo "No CC configured" && exit 1
+  test -z "${CFLAGS}"     && CFLAGS='@CFLAGS@'
+  CFLAGS="${CFLAGS} @DEFS@"
+  test -z "${testsubdir}" && testsubdir=testdir
   test -z "${PAGER}"      && PAGER=more
   nl='
 ' ht='	'
@@ -133,15 +109,6 @@ purge()
   fi
 }
 
-set_exe() {
-  eval f=\${${1}}
-  d=`dirname $f`
-  d=`cd $d >/dev/null && pwd`
-  PATH=${d}:${PATH}
-  f=`basename $f`
-  eval export ${1}=${d}/${f}
-}
-
 init_tests()
 {
   logfile=`pwd`/testdir/${testname}.log
@@ -154,19 +121,10 @@ init_tests()
   PATH=${f}:${PATH}
   echo PATH is ${PATH} >&2
 
-  set_exe AGexe
-  AGexe=${AGexe:-`command -v autogen`}
-  set_exe GDexe
-  set_exe CLexe
-
   builddir=`pwd`
   testsubdir=testdir
-  INCS="-I${top_builddir} -I${top_builddir}/autoopts"
-  CFLAGS="${INCS} "`echo ${CFLAGS} | \
+  CFLAGS=`echo ${CFLAGS} | \
     ${SED} "s/-Werror[^ ${ht}]*//g;s/-Wextra//g"`
-
-  command -v columns >&2
-  command -v autogen >&2
 
   lo_dir=${top_builddir}/autoopts
   test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
@@ -196,9 +154,9 @@ init_tests()
   AG_L=run_ag\ ao
   agl_opts="-L${top_builddir}/autoopts/tpl -L${top_srcdir}/autoopts/tpl"
 
-  export TMPDIR PATH AGexe GDexe CLexe INCS CFLAGS LD_LIBRARY_PATH \
+  export TMPDIR PATH LD_LIBRARY_PATH \
          GUILE_WARN_DEPRECATED LIB AG_L agl_opts \
-         CC GUILE_VERSION LIBGUILE AG_VERSION
+         CC LIBGUILE AG_VERSION
 }
 
 be_silent()
@@ -271,11 +229,13 @@ cfg_inc()
   do
     for d in . autoopts agen5
     do
-      (cd $f/$d && pwd)
-    done
+      cd $f/$d
+      pwd >&9
+      cd -
+    done 9>&1 1>/dev/null
   done | sort -u | ${SED} 's/^/-I/'`
 
-  INC=`echo ${dirs} ${CPPFLAGS} ${INC}`
+  INC=`echo ${dirs} ${CPPFLAGS}`
 
   : "=== Running $progname for ${testname} using ${SHELL} ==="
   chmod +w * > /dev/null 2>&1 || :

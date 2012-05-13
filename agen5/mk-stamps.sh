@@ -31,7 +31,7 @@
 if test -z "$mainpid"
 then
     . ${top_srcdir}/config/bootstrap.shlib
-    . ${top_builddir}/autoopts/test/defs
+    . ${top_builddir}/config/shdefs
 fi
 
 set_defaults()

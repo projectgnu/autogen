@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-04-15 11:18:40 bkorb"
+## Time-stamp:      "2012-05-13 14:05:42 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -29,18 +29,18 @@ INFO_DEPS       = autogen.info
 MIexe           = $(MAKEINFO) --no-split
 MAKEINFOFLAGS   = -I$(top_srcdir)/autoopts -I../autoopts
 passenv         = MAKE=$(MAKE) srcdir="$(srcdir)" SHELL="$(POSIX_SHELL)" \
-	top_srcdir="$(top_srcdir)"
+	top_builddir="$(top_builddir)"
 run_mktexi      = $(passenv) $(POSIX_SHELL) mk-agen-texi.sh
 all : $(INFO_DEPS)
 
 BUILT_SOURCES   = autogen.texi
 info_TEXINFOS   = $(BUILT_SOURCES)
-EXTRA_DIST	= autogen-texi.txt auto-opts.tpl autogen-intro.texi \
-    gendocs_template      \
-    agdoc.texi            autogen-intro.texi    \
-    fdl.texi              invoke-autogen.texi   invoke-columns.texi \
+EXTRA_DIST	= \
+    agdoc.texi            auto-opts.tpl         autogen-intro.texi \
+    autogen-intro.texi    autogen-texi.txt      fdl.texi \
+    gendocs_template      invoke-autogen.texi   invoke-columns.texi \
     invoke-getdefs.texi   invoke-snprintfv.texi invoke-xml2ag.texi \
-    libopts.texi          snprintfv.texi
+    libopts.texi          mk-agen-texi.sh       snprintfv.texi
 
 # MAINTAINERCLEANFILES  = MakeDep.inc
 TEXI2DVI_FLAGS  =  --texinfo='@pagesizes 9.5in,7.0in'

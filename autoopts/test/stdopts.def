@@ -1,6 +1,6 @@
 #! /bin/sh
 
-## Time-stamp:      "2011-02-02 11:54:36 bkorb"
+## Time-stamp:      "2012-05-13 12:44:49 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -39,9 +39,11 @@ echo test_main $test_main
 echo argument  $argument
 echo long_opts $long_opts
 
-test -n "${test_main}" && echo "test-main  = '${test_main}';" >&5
-test -n "${argument}"  && echo "argument   = '${argument}';" >&5
-test -n "${long_opts}" && echo "long-opts;" >&5
+{
+    test -n "${test_main}" && echo "test-main  = '${test_main}';"
+    test -n "${argument}"  && echo "argument   = '${argument}';"
+    test -n "${long_opts}" && echo "long-opts;"
+} >&5
 
 for flag
 do
@@ -96,6 +98,7 @@ do
 done >&5
 
 exec 5>&-
+ls -l ${testname}.def
 
 ## Local Variables:
 ## mode: shell-script

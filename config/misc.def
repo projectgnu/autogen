@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2012-04-14 07:23:47 bkorb"
+/*  Time-stamp:        "2012-05-13 11:58:00 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -316,7 +316,7 @@ test   = {
 	libs="${LIBS}"
 	LIBS="${LIBS} -Wl,-R/tmp"
 	if (eval $ac_link) > /dev/null 2>&1
-	then echo '-Wl,-R' ; rm -f conftest* ; exit 0 ; fi
+	then echo '-Wl,-R${libdir}' ; rm -f conftest* ; exit 0 ; fi
 	LIBS="${libs} -R/tmp"
 	if (eval $ac_link) > /dev/null 2>&1
 	then echo '-R' ; rm -f conftest* ; exit 0 ; fi

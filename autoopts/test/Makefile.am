@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2012-04-07 09:36:42 bkorb"
+## Time-stamp:      "2012-05-13 16:02:42 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -36,16 +36,7 @@ TESTS      = \
 
 testsubdir = ./testdir
 
-TESTS_ENVIRONMENT = set -a ; TERM='' \
-	CFLAGS='$(DEFS) $(CFLAGS)' \
-	CPPFLAGS='$(CPPFLAGS)' \
-	DEBUG_USAGE='$(DEBUG_USAGE)' \
-	INCS='$(INCS)' \
-	SHELL="$(POSIX_SHELL)" \
-	srcdir="$(srcdir)" \
-	testsubdir=$(testsubdir) \
-	top_builddir="$(top_builddir)" \
-	top_srcdir="$(top_srcdir)"
+TESTS_ENVIRONMENT = TERM='' top_builddir="$(top_builddir)"
 
 distclean-local:
 	-rm -rf $(testsubdir) FAILURES

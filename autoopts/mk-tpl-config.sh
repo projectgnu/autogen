@@ -24,9 +24,7 @@ init() {
         v=`cd $v >/dev/null && pwd`
         eval ${d}=${v}
     done
-    test -f ${builddir}/test/defs || \
-        die "autoopts/test directory not configured"
-    . ${builddir}/test/defs
+    . ${top_builddir}/config/shdefs
 }
 
 collect_src() {

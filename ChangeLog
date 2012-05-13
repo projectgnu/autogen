@@ -1,8 +1,10 @@
 2012-05-12  Bruce Korb  <bkorb@gnu.org>
 
-	* autoopts/test/defs.in: add configured defs for the grep progs
+	* config/mk-shdefs.in: new script to create a "config/shdefs" file
+	* autoopts/test/defs.in: use this file for configured values
+	* autoopts/test/Makefile.am: source config/shdefs file
 	* config/bootstrap.shlib: make default values
-	* agen5/mk-stamps.sh: use it
+	* agen5/mk-stamps.sh: use configured defs
 	* autoopts/mk-tpl-config.sh: likewise
 	* agen5/test/shell.test: likewise
 	* agen5/test/string.test: likewise
@@ -18,6 +20,11 @@
 	* doc/mk-agen-texi-in: likewise
 	* autoopts/tpl/tpl-config-tlib.in: use them to configure templates
 	* pkg/spec.tpl: don't package files we don't have.
+	* autoopts/tpl/texi2mdoc.sh: remove alternation from sed expr
+	* config/misc.def: include libdir with -Wl,-R output
+	* doc/mk-agen-texi.sh: new file renamed from *-in file.
+	It sources config/shdefs instead of being configured
+	* doc/Makefile.am: adjust what gets distributed
 
 2012-05-05  Bruce Korb  <bkorb@gnu.org>
 

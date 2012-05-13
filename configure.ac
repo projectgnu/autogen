@@ -1,7 +1,7 @@
 dnl --------------------------------------------------------------------
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
-dnl Time-stamp:      "2012-05-05 08:08:20 bkorb"
+dnl Time-stamp:      "2012-05-13 13:43:24 bkorb"
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
@@ -218,8 +218,6 @@ AM_CONFIG_HEADER(config.h:config-h.in)
 AH_TOP([#ifndef AUTOGEN_CONFIG_H])
 AH_TOP([#define AUTOGEN_CONFIG_H 1])
 AH_BOTTOM([#endif /* AUTOGEN_CONFIG_H */])
-AC_CONFIG_FILES([doc/mk-agen-texi.sh:doc/mk-agen-texi-in],
-                [chmod +x doc/mk-agen-texi.sh])
 AC_CONFIG_FILES([autoopts/mk-autoopts-pc],
                 [chmod +x autoopts/mk-autoopts-pc])
 AC_CONFIG_FILES([autoopts/autoopts-config],

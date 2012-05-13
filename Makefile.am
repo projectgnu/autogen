@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-05-05 10:04:15 bkorb"
+## Time-stamp:      "2012-05-13 10:09:41 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -60,6 +60,10 @@ gnudocs     :
 usage-txt.po: gettext
 gettext     :
 	cd autoopts && $(MAKE) usage-txt.po
+
+all         : config/shdefs
+config/shdefs: config/mk-shdefs
+	$(SHELL) $< $@
 
 if HAVE_XML_LIB
 release     : distcheck
