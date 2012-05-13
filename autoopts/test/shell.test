@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-03-31 13:59:13 bkorb"
+# Time-stamp:        "2012-05-12 19:56:00 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -423,7 +423,7 @@ rm -f ${testname}.sh
 ./${testname} -o ${testname}.sh
 
 sedcmd='2,9d'
-grep -F 'Packaged by '  ${testname}.sh >/dev/null && {
+${FGREP} 'Packaged by '  ${testname}.sh >/dev/null && {
     sedcmd=${sedcmd}${nl}'/^Packaged by /d
     /^Report .* bugs to /d
     /and the flag character\.$/s/$/'"'/"

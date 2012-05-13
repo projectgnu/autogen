@@ -24,6 +24,9 @@ init() {
         v=`cd $v >/dev/null && pwd`
         eval ${d}=${v}
     done
+    test -f ${builddir}/test/defs || \
+        die "autoopts/test directory not configured"
+    . ${builddir}/test/defs
 }
 
 collect_src() {
@@ -48,7 +51,7 @@ extension_defines() {
 
     test -f tpl-config.tlib || die "tpl-config.tlib not configured"
     test -f ${top_builddir}/config.h || die "config.h missing"
-    grep 'extension-defines' tpl-config.tlib >/dev/null && return
+    ${GREP} 'extension-defines' tpl-config.tlib >/dev/null && return
 
     txt=`sed -n '/POSIX.*SOURCE/,/does not conform to ANSI C/{
 	    /^#/p

@@ -3,7 +3,7 @@
 #
 # doc.test      ---  test doc templates
 #
-# Time-stamp:        "2012-04-15 09:38:38 bkorb"
+# Time-stamp:        "2012-05-12 19:54:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -78,7 +78,7 @@ test -f ${testname}.1 || \
     failure "${testname}.1 not built"
 
 {
-    grep -E -v '^\.(Dd |Os |\\")' ${testname}.1
+    ${EGREP} -v '^\.(Dd |Os |\\")' ${testname}.1
     echo
 } > ${testname}-mdoc-res.1
 

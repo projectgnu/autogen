@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # shell.test --- test functionality of switching shells
 #
-# Time-stamp:        "2011-12-15 13:26:27 bkorb"
+# Time-stamp:        "2012-05-12 19:56:39 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -31,7 +31,7 @@ exec 9>&2
 
 . ./defs
 
-grep -F '#define SHELL_ENABLED ' ${top_builddir}/config.h > /dev/null 2>&1
+${FGREP} '#define SHELL_ENABLED ' ${top_builddir}/config.h > /dev/null 2>&1
 test $? -eq 0 || exit 0
 
 # # # # # # # # # # TEMPLATE FILE # # # # # # # # #
@@ -130,7 +130,7 @@ cat > ${testname}.sample <<-  \_EOF_
 run_ag x --shell=$PWD/shell ${testname}.def || \
     failure "autogen ${testname}.def"
 
-grep -v '^AGexe=' ${testname}.test > ${testname}.XX
+${GREP} -v '^AGexe=' ${testname}.test > ${testname}.XX
 mv -f ${testname}.XX ${testname}.test
 if cmp -s ${testname}.test ${testname}.sample
 then cleanup

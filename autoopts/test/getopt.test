@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2012-01-29 13:29:54 bkorb"
+# Time-stamp:        "2012-05-12 19:54:26 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -645,7 +645,7 @@ go_init
 go_samples
 compile_getopt 1
 
-grep 'getopt_long' /usr/include/getopt.h >/dev/null && {
+${GREP} 'getopt_long' /usr/include/getopt.h >/dev/null && {
     CFLAGS="${CFLAGS} -D_GNU_SOURCE=1"
     ${SED} '/REMOVE/d;$a\
 long-opts;\

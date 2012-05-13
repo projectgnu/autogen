@@ -1,6 +1,6 @@
 [= AutoGen5 Template c -*- Mode: scheme -*-
 
-## Time-stamp:      "2012-02-12 15:50:33 bkorb"
+## Time-stamp:      "2012-05-12 20:54:54 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 
 ## Copyright (C) 2011-2012 Bruce Korb, all rights reserved.
@@ -34,7 +34,9 @@
 ## ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =]
-[= (define copy-years (shellf
+[= INCLUDE "tpl-config.tlib" =][=
+
+(define copy-years (shellf
    "year=`sed -n '/Time-stamp[:]/ {
       s/[^\"]*\"//
       s/-.*//
@@ -118,7 +120,7 @@ while read nm ln
 do
     test -z "$nm" && break
     ln='/\* *'${ln#*+}' \*/'
-    ln=`grep -E -n "$ln" [= (base-name) =].c`
+    ln=`[=(. egrep-prog)=] -n "$ln" [= (base-name) =].c`
     nm=`echo $nm | tr '[a-z]' '[A-Z]'`_LINENO
     printf '#define %-31s %s\n' ${nm} ${ln%%:*}
 done <<\_EOF_

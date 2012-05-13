@@ -1,4 +1,27 @@
+2012-05-12  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/defs.in: add configured defs for the grep progs
+	* config/bootstrap.shlib: make default values
+	* agen5/mk-stamps.sh: use it
+	* autoopts/mk-tpl-config.sh: likewise
+	* agen5/test/shell.test: likewise
+	* agen5/test/string.test: likewise
+	* autoopts/install-hook.sh: likewise
+	* autoopts/test/alias.test: likewise
+	* autoopts/test/argument.test: likewise
+	* autoopts/test/doc.test: likewise
+	* autoopts/test/getopt.test: likewise
+	* autoopts/test/shell.test: likewise
+	* autoopts/tpl/cmd-doc.tlib: likewise
+	* autoopts/tpl/optmain.tlib: likewise
+	* autoopts/tpl/strings.tpl: likewise
+	* doc/mk-agen-texi-in: likewise
+	* autoopts/tpl/tpl-config-tlib.in: use them to configure templates
+	* pkg/spec.tpl: don't package files we don't have.
+
 2012-05-05  Bruce Korb  <bkorb@gnu.org>
+
+	5.16 release
 
 	* autoopts/test/handler.test: adjustment
 	* autoopts/tpl/optcode.tlib: doxygenate

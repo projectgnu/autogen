@@ -28,8 +28,11 @@
 #  because some of the rules are complex and we don't want to
 #  deal with the dual update problem.
 
-test -z "$mainpid" && \
+if test -z "$mainpid"
+then
     . ${top_srcdir}/config/bootstrap.shlib
+    . ${top_builddir}/autoopts/test/defs
+fi
 
 set_defaults()
 {
@@ -70,7 +73,7 @@ set_defaults()
     #  Make sure we have a default for top build and source.
     #  Some of the templates need this information.
     #
-    local verdata=`egrep '^AG_' ${top_srcdir}/VERSION | \
+    local verdata=`${EGREP} '^AG_' ${top_srcdir}/VERSION | \
        sed 's,^\(AG[^=]*\)\(.*\),\1\2 export \1,'`
     eval "${verdata}"
 
@@ -146,7 +149,7 @@ make_exprini()
     echo ${GDexe} load=expr.cfg
     set +e
     ( SHELL=sh ${GDexe} load=expr.cfg ${files} 2>&1 ) | \
-      egrep -v 'no copies of pattern' >&2
+      ${EGREP} -v 'no copies of pattern' >&2
     set -e
     run_ag exprini expr.def
     rmlist=${rmlist}\ expr.cfg
@@ -210,7 +213,7 @@ make_man()
 #
 make_func()
 {
-    local files=`grep -F -l '/*=macfunc' *.c`
+    local files=`${GREP} -l '/\*=macfunc' *.c`
     local opts='srcfile linenum defs=macfunc listattr=alias'
 
     ${GDexe} output=functions.def template=functions.tpl ${opts} ${files}

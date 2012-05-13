@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # string.test --- test string formation rules
 #
-# Time-stamp:        "2011-11-24 09:12:38 bkorb"
+# Time-stamp:        "2012-05-12 19:56:52 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -83,7 +83,7 @@ CASE (suffix)  =][=
 _EOF_
 
 test -z "$LINENO" && LINENO=`
-    grep -n FIND-THIS-LINE-NUMBER $0 | sed 's/:.*//'` # close enough
+    ${GREP} -n FIND-THIS-LINE-NUMBER $0 | sed 's/:.*//'` # close enough
 printf '\nchar zTestFile[] = "%s";\n#line %s\n' \
     ${testname}.raw `expr $LINENO + 4` >&4
 

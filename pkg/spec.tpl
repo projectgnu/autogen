@@ -1,6 +1,6 @@
 [= AutoGen5 Template spec =]
 [= #
-   Time-stamp:        "2012-05-06 15:54:25 bkorb"
+   Time-stamp:        "2012-05-06 16:20:26 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -100,7 +100,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root)
 
 %doc[=`
-for f in AUTHORS TODO COPYING NEWS NOTES THANKS README VERSION
+for f in AUTHORS TODO COPYING NEWS THANKS README
 do test -f ${top_builddir}/$f -o -f ${top_srcdir}/$f && printf " $f" ; done
 `=]
 
@@ -131,6 +131,8 @@ echo \* ${date} ${name} \<${LOGNAME}@${domain}\> Regenerated
 (shell (out-pop #t))
 
 =]
+* Sun May  6 2012 Install only existing files to doc directory.
+- Omit NOTES and VERSION.
 * Fri Dec 31 2004 Bruce Korb <bkorb@gnu.org> Restored the file list
 * Wed Oct 27 2004 Ed Swierk <eswierk@users.sf.net> fixed up for Fedora
 * Tue Dec 16 2003 Richard Zidlicky <rz@linux-m68k.org> 5.5.7pre5-5

@@ -1,7 +1,7 @@
 [= Autogen5 Template configuration -*- Mode: scheme -*- =]
 [=
 
-# Time-stamp:      "2011-12-03 14:40:44 bkorb"
+# Time-stamp:      "2012-05-12 19:42:14 bkorb"
 
 # This file contains configure stuff used by various templates.
 
@@ -65,6 +65,18 @@
 (define data-dir
         (shell "datadir=\"@datadir@\"
                 echo \"${datadir}\""))
+
+(define grep-prog
+        (shell "GREP=\"@GREP@\"
+                echo \"${GREP}\""))
+
+(define egrep-prog
+        (shell "EGREP=\"@EGREP@\"
+                echo \"${EGREP}\""))
+
+(define fgrep-prog
+        (shell "FGREP=\"@FGREP@\"
+                echo \"${FGREP}\""))
 
 (define top-build-dir   (shell "\\cd .. >/dev/null ; pwd"))
 (define pkgdatadir      (shell "echo \"${datadir}/${package}\""))

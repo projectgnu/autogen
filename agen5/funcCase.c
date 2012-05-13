@@ -126,8 +126,8 @@ Select_Match_NonExistence(char const * sample, char const * pattern);
 static bool
 selection_type_complete(templ_t * tpl, macro_t * mac, char const ** psrc);
 
-static macro_t*
-mLoad_Select(templ_t * pT, macro_t* pMac, char const ** ppzScan);
+static macro_t *
+mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

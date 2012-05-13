@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-05-05 08:04:19 bkorb"
+# Time-stamp:      "2012-05-12 19:46:48 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -510,8 +510,9 @@ DEFINE decl-callbacks
 
       (emit (if is-extern "\nextern tOptProc\n" "\nstatic tOptProc\n"))
       (set! txt-var (shellf "
-        (grep -E -v '^%s$' | sed '/^$/d' | sort -u | \
+        (%s -v '^%s$' | sed '/^$/d' | sort -u | \
         sed 's@$@,@;$s@,$@;@' ) <<_EOProcs_\n%s_EOProcs_"
+            egrep-prog
             (if is-extern "NULL" "(NULL|optionStackArg|optionUnstackArg)")
             txt-var ))
 
@@ -975,9 +976,9 @@ ENDDEF   file-name-code
 (out-push-new) =]
 ck_flag_code() {
   addon_txt=''
-  txt1=`grep -w pOptDesc ${tmp_dir}/flag-code`
+  txt1=`[=(. grep-prog)=] -w pOptDesc ${tmp_dir}/flag-code`
   test -z "$txt1" && addon_txt='    (void)pOptDesc;\n'
-  txt2=`grep -w pOptions ${tmp_dir}/flag-code`
+  txt2=`[=(. grep-prog)=] -w pOptions ${tmp_dir}/flag-code`
   test -z "$txt2" && addon_txt=${addon_txt}'    (void)pOptions;\n'
   cat ${tmp_dir}/flag-code
   test -z "$addon_txt" || printf "\n$addon_txt"

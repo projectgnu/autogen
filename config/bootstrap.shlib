@@ -2,7 +2,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-03-31 16:32:43 bkorb"
+# Time-stamp:        "2012-05-12 20:07:23 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -135,6 +135,9 @@ test "X${CDPATH}" = X || {
 
 nl=$'\n'
 ht=$'\t'
+GREP=$(command -v grep)
+EGREP=${GREP}\ -E
+FGREP=${GREP}\ -F
 
 export setx dashx VERBOSE nl ht
 

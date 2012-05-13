@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2012-02-28 19:40:17 bkorb"
+# Time-stamp:        "2012-05-12 20:04:54 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -28,6 +28,8 @@ egrep '#undef +AUTOOPTS_ENABLED' ${top_builddir}/config.h >/dev/null && \
 srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 
+. ${top_builddir}/autoopts/test/devs
+
 test -z "${POSIX_SHELL}" && exit 1
 
 rm -f ${DESTdestdir}/options.h
@@ -37,15 +39,15 @@ cfgf=${top_builddir}/config.h
 {
     sed '/^#include <stdio/q' ${opthdrsrc}
 
-    if grep -E 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
+    if ${EGREP} 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
     then echo '#include <stdint.h>'
     else echo '#include <inttypes.h>' ; fi
 
-    if grep -E 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
+    if ${EGREP} 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
     then echo '#include <limits.h>'
     else echo '#include <sys/limits>' ; fi
 
-    if grep -E 'define +HAVE_STDBOOL_H' ${cfgf}
+    if ${EGREP} 'define +HAVE_STDBOOL_H' ${cfgf}
     then echo '#include <stdbool.h>'
     else cat <<- _EOF_
 	typedef enum { false = 0, true = 1 } _Bool;
@@ -55,14 +57,14 @@ cfgf=${top_builddir}/config.h
 	_EOF_
     fi
 
-    egrep 'define +NO_OPTIONAL_OPT_ARGS' ${cfgf}
+    ${EGREP} 'define +NO_OPTIONAL_OPT_ARGS' ${cfgf}
 
-    if egrep 'define +HAVE_INTPTR_T' ${cfgf} >/dev/null
+    if ${EGREP} 'define +HAVE_INTPTR_T' ${cfgf} >/dev/null
     then :
     else
-        sizeof_charp=`egrep 'define +SIZEOF_CHARP ' ${cfgf} | \
+        sizeof_charp=`${EGREP} 'define +SIZEOF_CHARP ' ${cfgf} | \
             sed 's/.*SIZEOF_CHARP *//'`
-        sizeof_long=` egrep 'define +SIZEOF_LONG '  ${cfgf} | \
+        sizeof_long=` ${EGREP} 'define +SIZEOF_LONG '  ${cfgf} | \
             sed 's/.*SIZEOF_LONG *//'`
         if test "X${sizeof_charp}" = "X${sizeof_long}"
         then ptrtype=long
@@ -80,7 +82,7 @@ cfgf=${top_builddir}/config.h
 
     sedcmd='1,/END-CONFIGURED-HEADERS/d'
 
-    if egrep 'define +HAVE_PATHFIND' ${cfgf} >/dev/null
+    if ${EGREP} 'define +HAVE_PATHFIND' ${cfgf} >/dev/null
     then nopathfind='/From:.*pathfind\.c/,/#endif.*HAVE_PATHFIND/d'
     else nopathfind='/HAVE_PATHFIND/d' ; fi
 

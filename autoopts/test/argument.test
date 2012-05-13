@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-02-25 12:54:32 bkorb"
+# Time-stamp:        "2012-05-12 19:54:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -134,7 +134,7 @@ cmp -s ${testname}2.hlp ${testname}2.help || \
 ./${testname}2 -o string -s 8K > ${testname}2-bad.out 2>&1 && \
   failure ${testname} did handle 8K
 
-grep 'error:.* value .* is out of range\.$' ${testname}2-bad.out || \
+${GREP} 'error:.* value .* is out of range\.$' ${testname}2-bad.out || \
   failure "missing 'is out of range' message"
 
 # # # # # # # # # # T E S T   3 # # # # # # # # # # #
