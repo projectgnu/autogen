@@ -9,20 +9,25 @@
   used by AutoGen and AutoOpts for identifying tokens.
   The table is static scope, so %guard is empty.
 
-  This file is part of AutoGen.
-  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
+  This file is part of AutoOpts, a companion to AutoGen.
+  AutoOpts is free software.
+  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 
-  AutoGen is free software: you can redistribute it and/or modify it under the
-  terms of the GNU General Public License as published by the Free Software
-  Foundation, either version 3 of the License, or (at your option) any later
-  version.
+  AutoOpts is available under any one of two licenses.  The license
+  in use must be one of these two and the choice is under the control
+  of the user of the license.
 
-  AutoGen is distributed in the hope that it will be useful, but WITHOUT ANY
-  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-  A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+   The GNU Lesser General Public License, version 3 or later
+      See the files "COPYING.lgplv3" and "COPYING.gplv3"
 
-  You should have received a copy of the GNU General Public License along
-  with this program.  If not, see <http://www.gnu.org/licenses/>.
+   The Modified Berkeley Software Distribution License
+      See the file "COPYING.mbsd"
+
+  These files have the following md5sums:
+
+  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
+  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
+  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 %
 
 newline         "\n"

@@ -1,7 +1,7 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-05-13 10:09:41 bkorb"
+## Time-stamp:      "2012-06-10 13:55:27 bkorb"
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -52,10 +52,14 @@ pkg         : package
 package     :
 	cd pkg && $(MAKE) $@ pkgtype="$(pkgtype)"
 
-docs        : gnudocs
+docs        : gnudocs doxydocs
 gnudoc      : gnudocs
 gnudocs     :
 	cd doc && $(MAKE) gnudocs
+
+doxydocs    :
+	test -f Doxyfile || cp ~/.Doxyfile ./Doxyfile ; \
+	doxygen
 
 usage-txt.po: gettext
 gettext     :

@@ -2,7 +2,7 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-04-22 09:16:15 bkorb"
+ *  Time-stamp:        "2012-06-10 11:24:45 bkorb"
  *
  *  This module implements text functions.
  *
@@ -152,11 +152,11 @@ gen_new_block(templ_t * tpl)
  * It is always defined, so it must check for itself whether the
  * context is correct or not.
  *
- * @param     tpl    ignored
- * @param[in] mac    base return value
- * @param     p_scan ignored
+ *  @param tpl     template being loaded
+ *  @param mac     the macro descriptor
+ *  @param p_scan  the input text scanning pointer
  *
- * @returns mac + 1
+ *  @returns the macro table entry after mac
  */
 LOCAL macro_t *
 mLoad_Leave(templ_t * tpl, macro_t * mac, char const ** p_scan)
@@ -165,7 +165,8 @@ mLoad_Leave(templ_t * tpl, macro_t * mac, char const ** p_scan)
 
     if (mac->md_code == FTYP_RETURN) {
         /*
-         * Check returns at load time.  "break" and "continue" at run time.
+         * Check returns at load time.  "break" and "continue" at
+         * instantiation time.
          */
         if (! defining_macro && (include_depth == 0))
             (void)mLoad_Bogus(tpl, mac, p_scan);
@@ -372,22 +373,30 @@ mLoad_Comment(templ_t * tpl, macro_t * mac, char const ** p_scan)
 }
 
 /**
- *  mLoad_Unknown  --  the default (unknown) load function
+ *  The default (unknown) load function.
  *
- *  Move any text into the text offset field.
- *  This is used as the default load mechanism.
+ *  Move any text into the text offset field.  This macro will change to
+ *  either INVOKE or an expression function, depending on whether or not a
+ *  DEFINE macro corresponds to the name.  This is determined at instantiation
+ *  time.  This is used as the default load mechanism.
+ *
+ *  @param tpl     template being loaded
+ *  @param mac     the macro descriptor
+ *  @param p_scan  the input text scanning pointer
+ *
+ *  @returns the macro table entry after mac
  */
 macro_t *
-mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
+mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
 {
     char const * scan;
-    size_t       src_len = (size_t)pMac->md_res; /* macro len  */
+    ssize_t      src_len = (size_t)mac->md_res; /* macro len  */
     (void)unused;
 
     if (src_len <= 0)
         goto return_emtpy_expr;
 
-    scan = (char const*)pMac->md_txt_off; /* macro text */
+    scan = (char const*)mac->md_txt_off; /* macro text */
 
     switch (*scan) {
     case ';':
@@ -412,42 +421,41 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
     case '[':
     case '.':
     {
-        size_t rem_ln;
-
         /*
-         *  We are going to recopy the definition name,
-         *  this time as a canonical name (i.e. with '[', ']' and '.'
-         *  characters and all blanks squeezed out)
+         *  We are going to recopy the definition name, this time as a
+         *  canonical name (i.e. including '[', ']' and '.'  characters,
+         *  but with all blanks squeezed out)
          */
-        char * pzCopy = pT->td_text + pMac->md_name_off;
+        char * cname     = tpl->td_text + mac->md_name_off;
+        size_t cname_len = strlen(cname);
 
         /*
          *  Move back the source pointer.  We may have skipped blanks,
          *  so skip over however many first, then back up over the name.
+         *  We have found a name, so we won't back up past the start.
          */
-        {
-            char * p = SPN_WHITESPACE_BACK(pzCopy, scan);
-            size_t l = scan - p;
-            if (l > 0) {
-                scan -= l;
-                src_len += l;
-            }
-        }
-        rem_ln   = strlen(pzCopy);
-        scan    -= rem_ln;
-        src_len += rem_ln;
+        while (IS_WHITESPACE_CHAR(scan[-1])) scan--, src_len++;
+        scan    -= cname_len;
+        src_len += cname_len;
 
         /*
          *  Now copy over the full canonical name.  Check for errors.
+         *  Advance the scan pointer to just past the name we've copied.
          */
-        rem_ln = canonical_name(pzCopy, scan, (int)src_len);
-        if (rem_ln > src_len)
-            AG_ABEND_IN(pT, pMac, LD_UNKNOWN_INVAL_DEF);
+        {
+            size_t rem_len = canonical_name(cname, scan, (int)src_len);
+            if (rem_len > src_len)
+                AG_ABEND_IN(tpl, mac, LD_UNKNOWN_INVAL_DEF);
 
-        scan  += src_len - rem_ln;
-        src_len = rem_ln;
+            scan   += src_len - rem_len;
+            src_len = rem_len;
+        }
 
-        pT->td_scan = pzCopy + strlen(pzCopy) + 1;
+        /*
+         *  Where we are stashing text ("td_scan") gets set to just past the
+         *  NUL byte terminating the name.  "cname" is now longer than before.
+         */
+        tpl->td_scan = cname + strlen(cname) + 1;
         if (src_len <= 0)
             goto return_emtpy_expr;
         break;
@@ -455,25 +463,25 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
     }
 
     /*
-     *  Copy the expression
+     *  Copy the expression (the remaining text)
      */
     {
-        char * pzCopy = pT->td_scan; /* next text dest   */
-        pMac->md_txt_off = (pzCopy - pT->td_text);
-        pMac->md_res = 0;
-        memcpy(pzCopy, scan, src_len);
-        pzCopy      += src_len;
-        *(pzCopy++)  = NUL;
-        *pzCopy      = NUL; /* double terminate */
-        pT->td_scan  = pzCopy;
+        char * dest = tpl->td_scan; /* next text dest   */
+        mac->md_txt_off = (dest - tpl->td_text);
+        mac->md_res = 0;
+        memcpy(dest, scan, src_len);
+        dest       += src_len;
+        *(dest++)   = NUL;
+        *dest       = NUL; /* double terminate */
+        tpl->td_scan = dest;
     }
 
-    return pMac + 1;
+    return mac + 1;
 
  return_emtpy_expr:
-    pMac->md_txt_off = 0;
-    pMac->md_res     = 0;
-    return pMac + 1;
+    mac->md_txt_off = 0;
+    mac->md_res     = 0;
+    return mac + 1;
 }
 
 
@@ -482,11 +490,17 @@ mLoad_Unknown(templ_t * pT, macro_t * pMac, char const ** unused)
  *  For example, ELIF, ELSE and ENDIF are all known to AutoGen.
  *  However, the load function pointer for those functions points
  *  here, until an "IF" function is encountered.
+ *
+ *  @param tpl     template being loaded
+ *  @param mac     the macro descriptor
+ *  @param p_scan  the input text scanning pointer
+ *
+ *  @returns the macro table entry after mac
  */
-macro_t*
-mLoad_Bogus(templ_t* pT, macro_t* pMac, char const ** p_scan)
+macro_t *
+mLoad_Bogus(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
-    char const * pzSrc = (char const*)pMac->md_txt_off; /* macro text */
+    char const * pzSrc = (char const*)mac->md_txt_off; /* macro text */
     char const * pzMac;
 
     char z[ 64 ];
@@ -503,16 +517,16 @@ mLoad_Bogus(templ_t* pT, macro_t* pMac, char const ** p_scan)
         pzSrc = zNil;
 
     {
-        int ix = pMac->md_code;
+        int ix = mac->md_code;
         if ((unsigned)ix >= FUNC_CT)
             ix = 0;
 
         pzMac = ag_fun_names[ ix ];
     }
 
-    pzSrc = aprf(LD_BOGUS_UNKNOWN, pT->td_file, pMac->md_line, pzMac, pzSrc);
+    pzSrc = aprf(LD_BOGUS_UNKNOWN, tpl->td_file, mac->md_line, pzMac, pzSrc);
 
-    AG_ABEND_IN(pT, pMac, pzSrc);
+    AG_ABEND_IN(tpl, mac, pzSrc);
     /* NOTREACHED */
     return NULL;
 }

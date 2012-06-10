@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-04-07 09:33:39 bkorb"
+ *  Time-stamp:        "2012-06-10 12:17:05 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -74,6 +74,7 @@ setup_signals(sighandler_proc_t * chldHandler,
 
 /**
  * main routine under Guile guidance
+ *
  * @param  closure Guile closure parameter.  Not used.
  * @param  argc    argument count
  * @param  argv    argument vector
@@ -113,6 +114,7 @@ inner_main(void * closure, int argc, char ** argv)
 
 /**
  * main() called from _start()
+ *
  * @param  argc    argument count
  * @param  argv    argument vector
  * @return nothing -- Guile never returns, but calls exit(2).
@@ -154,6 +156,7 @@ main(int argc, char ** argv)
 
 /**
  * This code must run regardless of which exit path is taken
+ *
  * @param [in] cl_wait Whether or not a child process should be waited for.
  */
 static void
@@ -210,6 +213,7 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
 /**
  *  A signal was caught, siglongjmp called and main() has called this.
  *  We do not deallocate stuff so it can be found in the core dump.
+ *
  *  @param[in] sig the signal number
  */
 static void
@@ -283,6 +287,7 @@ cleanup_and_abort(int sig)
  *  catch_sig_and_bail catches signals we abend on.  The "siglongjmp"
  *  goes back to the real "main()" procedure and it will call
  *  "cleanup_and_abort()", above.
+ *
  *  @param[in] sig the signal number
  */
 static void
@@ -308,6 +313,7 @@ catch_sig_and_bail(int sig)
  *  it will kill us.  If we set it to ignore, it will be inherited.
  *  Therefore, always in all programs set it to call a procedure.
  *  The "wait(3)" call will do magical things, but will not override SIGIGN.
+ *
  *  @param[in] sig the signal number
  */
 static void
