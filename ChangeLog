@@ -1,3 +1,8 @@
+2012-06-18  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/enums.test: warning patrol
+	* compat/windows-config.h: licensing fix
+
 2012-06-10  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.am: private rules for Doxygen documentation
