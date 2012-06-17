@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-04-14 14:37:59 bkorb"
+# Time-stamp:        "2012-06-17 15:22:31 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -131,6 +131,7 @@ config_versions()
     } > TODO
 
     cd ${srcdir}
+    set -x
 
     glopts='--local-dir=tmp --source-base=autoopts --lib=do_not_make_me
 	--import
@@ -138,7 +139,8 @@ config_versions()
 	--libtool
 	--no-changelog
 	--symlink
-	--m4-base=config'
+	--m4-base=config
+        --lgpl=2'
     glmods='parse-duration gendocs gettext-h'
 
     GNULIBTOOL=${GNULIBDIR:-~gnu/proj/gnulib}/gnulib-tool
