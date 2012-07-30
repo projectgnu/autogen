@@ -335,6 +335,10 @@ utxt = { ut-name = InvalOptDesc;
          ut-text = "AutoOpts ERROR:  invalid option descriptor for %s\n";
 };
 
+utxt = { ut-name = InvalOptName;
+         ut-text = "%s: invalid option name: %s\n";
+};
+
 utxt = { ut-name = LowerBits;
          ut-text = "  or an integer mask with any of the lower %d bits set\n";
 };

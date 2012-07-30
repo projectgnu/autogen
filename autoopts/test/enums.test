@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-06-13 13:38:48 bkorb"
+# Time-stamp:        "2012-07-30 07:31:49 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -158,7 +158,7 @@ cat > ${testname}.tpl <<- \__EOF
 	[=  (set! proc-list (string-append "do_print_undefined,\ndo_print_"
 	                    (join ",\ndo_print_" (stack "flag[0].keyword"))  ))
 	    (set! proc-list
-	         (shell (string-append "columns -I4 --spread=1 <<_EOF_\n"
+	         (shell (string-append "${CLexe} -I4 --spread=1 <<_EOF_\n"
 	            proc-list "\n_EOF_")) )
 	    proc-list =];
 	do_proc_t* do_proc[] = {

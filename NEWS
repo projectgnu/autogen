@@ -1,4 +1,9 @@
-New in __CURRENT_VERSION__ May 2012
+New in __CURRENT_VERSION__ July 2012
+
+* Coverity cleanups
+* evade Guile issue on BSD platform.
+
+New in 5.16 May 2012
 
 * AutoGen now supports the "-MP" option.  The "phony" rule generated
   in the make dependency file will remove all generated files, except
@@ -29,24 +34,3 @@ New in __CURRENT_VERSION__ May 2012
 * -Werror may be appended by "=warn-group".  That is accommodated now.
 
 * many warning fixes and CamelCase name removals
-
-New in 5.15 February 2012
-
-* aliasing options was only partially implemented.  Finished now.
-
-* Generated texi documentation missed the new doc-section stanzas.
-
-* compile issue on non-mmap platforms was fixed
-
-* bug in usage error display was fixed
-
-New in 5.14 January 2012
-
-* getopt support has been improved.  Developers using generated code
-  that called that function had to arrange for the autoopts/option.h
-  header to be available.  That text is now inserted into the code.
-
-New in 5.13 December 2011
-
-* AutoOpts now supports vendor-opt attribute to auto-implement the "-W"
-  option for POSIX specified utilities

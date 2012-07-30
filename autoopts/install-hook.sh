@@ -28,7 +28,7 @@ egrep '#undef +AUTOOPTS_ENABLED' ${top_builddir}/config.h >/dev/null && \
 srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 
-. ${top_builddir}/autoopts/test/devs
+. ${top_builddir}/autoopts/test/defs
 
 test -z "${POSIX_SHELL}" && exit 1
 
@@ -47,7 +47,7 @@ cfgf=${top_builddir}/config.h
     then echo '#include <limits.h>'
     else echo '#include <sys/limits>' ; fi
 
-    if ${EGREP} 'define +HAVE_STDBOOL_H' ${cfgf}
+    if ${EGREP} 'define +HAVE_STDBOOL_H' ${cfgf} >/dev/null
     then echo '#include <stdbool.h>'
     else cat <<- _EOF_
 	typedef enum { false = 0, true = 1 } _Bool;

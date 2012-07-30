@@ -2,7 +2,7 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2012-04-07 09:03:08 bkorb"
+ * Time-stamp:        "2012-07-02 14:55:46 bkorb"
  *
  *  This module will load a template and return a template structure.
  *
@@ -54,7 +54,10 @@ find_tpl(char const * pzTemplName)
 }
 
 /**
- * the name is a regular file with read access
+ * the name is a regular file with read access.
+ * @param[in] pzFName  file name to check
+ * @returns \a true when the named file exists and is a regular file
+ * @returns \a false otherwise.
  */
 static bool
 read_okay(char const * pzFName)
@@ -67,40 +70,83 @@ read_okay(char const * pzFName)
     return (access(pzFName, R_OK) == 0) ? true : false;
 }
 
+/**
+ * Expand a directory name that starts with '$'.
+ *
+ * @param[in,out] dir_pp pointer to pointer to directory name
+ * @returns the resulting pointer
+ */
+static char const *
+expand_dir(char const ** dir_pp, char * name_buf)
+{
+    char * res = (void *)*dir_pp;
+
+    if (res[1] == NUL)
+        AG_ABEND(aprf(LOAD_FILE_SHORT_NAME, res));
+
+    if (! optionMakePath(name_buf, (int)AG_PATH_MAX, res,
+                         autogenOptions.pzProgPath)) {
+        /*
+         * The name expanded to "empty", so substitute curdir.
+         */
+        strcpy(res, FIND_FILE_CURDIR);
+
+    } else {
+        free(res);
+        AGDUPSTR(res, name_buf, "find dir name");
+       *dir_pp = res; /* save computed name for later */
+    }
+
+    return res;
+}
 
 /**
- *  Starting with the current directory, search the directory
- *  list trying to find the base template file name.
+ *  Search for a file.
+ *
+ *  Starting with the current directory, search the directory list trying to
+ *  find the base template file name.  If there is a referring template (a
+ *  template with an "INCLUDE" macro), then try that, too, before giving up.
+ *
+ *  @param[in]  in_name    the file name we are looking for.
+ *  @param[out] res_name   where we stash the file name we found.
+ *  @param[in]  sfx_list   a list of suffixes to try, if \a in_name has none.
+ *  @param[in]  referring_tpl  file name of the template with a INCLUDE macro.
+ *
+ *  @returns  \a SUCCESS when \a res_name is valid
+ *  @returns  \a FAILURE when the file is not found.
  */
 LOCAL tSuccess
-find_file(char const * pzFName,
-          char * pzFullName,
-          char const * const * papSuffixList,
-          char const * pzReferrer)
+find_file(char const * in_name,
+          char *       res_name,
+          char const * const * sfx_list,
+          char const * referring_tpl)
 {
-    char * pzRoot;
-    char * pzSfx;
-    void * deallocAddr = NULL;
+    bool   no_suffix;
+    void * free_me = NULL;
+    tSuccess   res = SUCCESS;
 
-    tSuccess res = SUCCESS;
+    size_t nm_len = strlen(in_name);
+    if (nm_len >= AG_PATH_MAX - MAX_SUFFIX_LEN)
+        return FAILURE;
 
     /*
      *  Expand leading environment variables.
      *  We will not mess with embedded ones.
      */
-    if (*pzFName == '$') {
-        if (! optionMakePath(pzFullName, (int)AG_PATH_MAX, pzFName,
+    if (*in_name == '$') {
+        if (! optionMakePath(res_name, (int)AG_PATH_MAX, in_name,
                              autogenOptions.pzProgPath))
             return FAILURE;
 
-        AGDUPSTR(pzFName, pzFullName, "find file name");
-        deallocAddr = (void*)pzFName;
+        AGDUPSTR(in_name, res_name, "find file name");
+        free_me = (void*)in_name;
 
         /*
-         *  pzFName now points to the name the file system can use.
-         *  It must _not_ point to pzFullName because we will likely
+         *  in_name now points to the name the file system can use.
+         *  It must _not_ point to res_name because we will likely
          *  rewrite that value using this pointer!
          */
+        nm_len = strlen(in_name);
     }
 
     /*
@@ -108,133 +154,125 @@ find_file(char const * pzFName,
      *  a suffix for the file name, then append ".tpl".
      *  Check for immediate access once again.
      */
-    pzRoot = strrchr(pzFName, '/');
-    pzSfx  = (pzRoot != NULL)
-             ? strchr(++pzRoot, '.')
-             : strchr(pzFName,  '.');
+    {
+        char * bf = strrchr(in_name, '/');
+        bf = (bf != NULL) ? strchr(bf, '.') : strchr(in_name,  '.');
+        no_suffix = (bf == NULL);
+    }
 
     /*
      *  The referrer is useful only if it includes a directory name.
+     *  If not NULL, referring_tpl becomes an allocated directory name.
      */
-    if (pzReferrer != NULL) {
-        char * pz = strrchr(pzReferrer, '/');
+    if (referring_tpl != NULL) {
+        char * pz = strrchr(referring_tpl, '/');
         if (pz == NULL)
-            pzReferrer = NULL;
+            referring_tpl = NULL;
         else {
-            AGDUPSTR(pzReferrer, pzReferrer, "pzReferrer");
-            pz = strrchr(pzReferrer, '/');
+            AGDUPSTR(referring_tpl, referring_tpl, "referring_tpl");
+            pz = strrchr(referring_tpl, '/');
             *pz = NUL;
         }
     }
 
-    /*
-     *  IF the file name does not contain a directory separator,
-     *  then we will use the TEMPL_DIR search list to keep hunting.
-     */
     {
         /*
          *  Search each directory in our directory search list for the file.
          *  We always force two copies of this option, so we know it exists.
+         *  Later entries are more recently added and are searched first.
+         *  We start the "dirlist" pointing to the real last entry.
          */
         int  ct = STACKCT_OPT(TEMPL_DIRS);
-        char const ** ppzDir = STACKLST_OPT(TEMPL_DIRS) + ct - 1;
-        char const *  pzDir  = FIND_FILE_CURDIR;
+        char const ** dirlist = STACKLST_OPT(TEMPL_DIRS) + ct - 1;
+        char const *  c_dir   = FIND_FILE_CURDIR;
 
-        if (*pzFName == '/')
-            ct = 0;
+        /*
+         *  IF the file name starts with a directory separator,
+         *  then we only search once, looking for the exact file name.
+         */
+        if (*in_name == '/')
+            ct = -1;
 
-        do  {
+        for (;;) {
             char * pzEnd;
-            void * coerce;
 
             /*
-             *  IF one of our template paths starts with '$', then expand it.
+             *  c_dir is always FIND_FILE_CURDIR the first time through
+             *  and is never that value after that.
              */
-            if (*pzDir == '$') {
-                if (! optionMakePath(pzFullName, (int)AG_PATH_MAX, pzDir,
-                                     autogenOptions.pzProgPath)) {
-                    coerce = (void *)pzDir;
-                    strcpy(coerce, FIND_FILE_CURDIR);
+            if (c_dir == FIND_FILE_CURDIR) {
 
-                } else {
-                    AGDUPSTR(pzDir, pzFullName, "find directory name");
-                    coerce = (void *)ppzDir[1];
-                    free(coerce);
-                    ppzDir[1] = pzDir; /* save the computed name for later */
-                }
-            }
-
-            if ((*pzFName == '/') || (pzDir == FIND_FILE_CURDIR)) {
-                size_t nln = strlen(pzFName);
-                if (nln >= AG_PATH_MAX - MAX_SUFFIX_LEN)
-                    break;
-
-                memcpy(pzFullName, pzFName, nln);
-                pzEnd  = pzFullName + nln;
+                memcpy(res_name, in_name, nm_len);
+                pzEnd  = res_name + nm_len;
                 *pzEnd = NUL;
-            }
-            else {
-                pzEnd = pzFullName
-                    + snprintf(pzFullName, AG_PATH_MAX - MAX_SUFFIX_LEN,
-                               FIND_FILE_DIR_FMT, pzDir, pzFName);
+
+            } else {
+                int fmt_len;
+
+                /*
+                 *  IF one of our template paths starts with '$', then expand it
+                 *  and replace it now and forever (the rest of this run, anyway).
+                 */
+                if (*c_dir == '$')
+                    c_dir = expand_dir(dirlist+1, res_name);
+
+                fmt_len = snprintf(res_name, AG_PATH_MAX - MAX_SUFFIX_LEN,
+                                   FIND_FILE_DIR_FMT, c_dir, in_name);
+                if (fmt_len >= AG_PATH_MAX - MAX_SUFFIX_LEN)
+                    break; // fail-return
+                pzEnd = res_name + fmt_len;
             }
 
-            if (read_okay(pzFullName))
-                goto findFileReturn;
+            if (read_okay(res_name))
+                goto find_file_done;
 
             /*
              *  IF the file does not already have a suffix,
              *  THEN try the ones that are okay for this file.
              */
-            if ((pzSfx == NULL) && (papSuffixList != NULL)) {
-                char const * const * papSL = papSuffixList;
+            if (no_suffix && (sfx_list != NULL)) {
+                char const * const * sfxl = sfx_list;
                 *(pzEnd++) = '.';
 
                 do  {
-                    strcpy(pzEnd, *(papSL++)); /* must fit */
-                    if (read_okay(pzFullName))
-                        goto findFileReturn;
+                    strcpy(pzEnd, *(sfxl++)); /* must fit */
+                    if (read_okay(res_name))
+                        goto find_file_done;
 
-                } while (*papSL != NULL);
+                } while (*sfxl != NULL);
             }
-
-            if (*pzFName == '/')
-                break;
 
             /*
-             *  IF there is a referrer, use it before the rest of the
-             *  TEMPL_DIRS We detect first time through by *both* pzDir value
-             *  and ct value.  "ct" will have this same value next time
-             *  through and occasionally "pzDir" will be set to "curdir", but
-             *  never again when ct is STACKCT_OPT(TEMPL_DIRS)
+             *  IF we've exhausted the search list,
+             *  THEN see if we're done, else go through search dir list.
+             *
+             *  We try one more thing if there is a referrer.
+             *  If the searched-for file is a full path, "ct" will
+             *  start at -1 and we will leave the loop here and now.
              */
-            if (  (pzReferrer != NULL)
-               && (pzDir == FIND_FILE_CURDIR)
-               && (ct == STACKCT_OPT(TEMPL_DIRS))) {
-
-                pzDir = pzReferrer;
-                ct++;
+            if (--ct < 0) {
+                if ((referring_tpl == NULL) || (ct != -1))
+                    break;
+                c_dir = referring_tpl;
 
             } else {
-                pzDir = *(ppzDir--);
+                c_dir = *(dirlist--);
             }
-        } while (--ct >= 0);
+        }
     }
 
     res = FAILURE;
 
- findFileReturn:
-    AGFREE(deallocAddr);
-    AGFREE(pzReferrer);
+ find_file_done:
+    AGFREE(free_me);
+    AGFREE(referring_tpl);
     return res;
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Figure out how many macros there are in the template
- *  so that we can allocate the right number of pointers.
+ *  Count the macros in a template.
+ *  We need to allocate the right number of pointers.
  */
 static size_t
 cnt_macros(char const * pz)

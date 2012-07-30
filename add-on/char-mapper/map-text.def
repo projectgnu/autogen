@@ -117,23 +117,23 @@ string = { nm = inline_opt_functions;
 	}
 
 	static inline char *
-	spn_%1$s_chars(char * p, unsigned int mask_ix)
+	spn_%1$s_chars(char const * p, unsigned int mask_ix)
 	{
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    while (v[(unsigned)*p])  p++;
-	    return p;
+	    return (char *)(uintptr_t)p;
 	}
 
 	static inline char *
-	brk_%1$s_chars(char * p, unsigned int mask_ix)
+	brk_%1$s_chars(char const * p, unsigned int mask_ix)
 	{
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    while ((*p != '\0') && (! v[(unsigned)*p]))  p++;
-	    return p;
+	    return (char *)(uintptr_t)p;
 	}
 
 	_EOString_;
@@ -143,25 +143,25 @@ string = { nm = inline_opt_backup;
   str = <<- _EOString_
 
 	static inline char *
-	spn_%1$s_back(char * s, char * e, unsigned int mask_ix)
+	spn_%1$s_back(char const * s, char const * e, unsigned int mask_ix)
 	{
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s >= e) e = s + strlen(s);
 	    while ((e > s) && v[(unsigned)e[-1]])  e--;
-	    return e;
+	    return (char *)(uintptr_t)e;
 	}
 
 	static inline char *
-	brk_%1$s_back(char * s, char * e, unsigned int mask_ix)
+	brk_%1$s_back(char const * s, char const * e, unsigned int mask_ix)
 	{
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s == e) e += strlen(e);
 	    while ((e > s) && (! v[(unsigned)e[-1]]))  e--;
-	    return e;
+	    return (char *)(uintptr_t)e;
 	}
 
 	_EOString_;
@@ -177,17 +177,17 @@ string = { nm = inline_functions;
 	}
 
 	static inline char *
-	spn_%1$s_chars(char * p, %2$s mask)
+	spn_%1$s_chars(char const * p, %2$s mask)
 	{
 	    while ((*p != '\0') && is_%1$s_char(*p, mask))  p++;
-	    return p;
+	    return (char *)(uintptr_t)p;
 	}
 
 	static inline char *
-	brk_%1$s_chars(char * p, %2$s mask)
+	brk_%1$s_chars(char const * p, %2$s mask)
 	{
 	    while ((*p != '\0') && (! is_%1$s_char(*p, mask)))  p++;
-	    return p;
+	    return (char *)(uintptr_t)p;
 	}
 
 	_EOString_;
@@ -197,19 +197,19 @@ string = { nm = inline_backup;
   str = <<- _EOString_
 
 	static inline char *
-	spn_%1$s_back(char * s, char * e, %2$s mask)
+	spn_%1$s_back(char const * s, char const * e, %2$s mask)
 	{
 	    if (s >= e) e = s + strlen(s);
 	    while ((e > s) && is_%1$s_char(e[-1], mask))  e--;
-	    return e;
+	    return (char *)(uintptr_t)e;
 	}
 
 	static inline char *
-	brk_%1$s_back(char * s, char * e, %2$s mask)
+	brk_%1$s_back(char const * s, char const * e, %2$s mask)
 	{
 	    if (s == e) e += strlen(e);
 	    while ((e > s) && (! is_%1$s_char(e[-1], mask)))  e--;
-	    return e;
+	    return (char *)(uintptr_t)e;
 	}
 
 	_EOString_;
@@ -233,8 +233,13 @@ string = { nm = start_table_fmt;
 string = { nm = optimize_fmt;
   str = <<- _EOString_
 
+	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+
+	#ifndef _
+	# define _(_s) _s
+	#endif
 
 	%1$sunsigned char const * %2$s_spanners[%3$u];
 	/**
@@ -253,12 +258,7 @@ string = { nm = pthread_locking;
 
 	#include <pthread.h>
 	static pthread_mutex_t %1$s_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-	#define lock_%1$s_spanners() \
-	    pthread_mutex_lock(&%1$s_mutex)
-
-	#define unlock_%1$s_spanners() \
-	    pthread_mutex_unlock(&%1$s_mutex)
+	#define LOCK_SPANNER_TABLES 1
 
 	_EOString_;
 };
@@ -267,8 +267,7 @@ string = { nm = no_locking;
   str = <<- _EOString_
 	};
 
-	#define lock_%1$s_spanners()
-	#define unlock_%1$s_spanners()
+	#undef  LOCK_SPANNER_TABLES
 
 	_EOString_;
 };
@@ -279,18 +278,31 @@ string = { nm = fill_opt_fmt;
 	%2$sunsigned char const *
 	calc_%1$s_spanners(unsigned int mask_ix)
 	{
-	    lock_%1$s_spanners();
-	    if (%1$s_spanners[mask_ix] == NULL) {
+	#ifdef LOCK_SPANNER_TABLES
+	    if (%1$s_spanners[mask_ix] != NULL)
+	        return %1$s_spanners[mask_ix];
+
+	    pthread_mutex_lock(&%1$s_mutex);
+	    if (%1$s_spanners[mask_ix] == NULL)
+	#endif
+	    {
 	        int ix = 1;
 	        %1$s_mask_t mask = %1$s_masks[mask_ix];
 	        unsigned char * res = malloc(256 /* 1 << NBBY */);
+	        if (res == NULL) {
+	            fputs(_("no memory for char-mapper span map\n"), stderr);
+	            exit(EXIT_FAILURE);
+	        }
+
 	        memset(res, 0, 256);
 	        for (; ix < 128; ix++)
 	            if (%1$s_table[ix] & mask)
 	                res[ix] = 1;
 	        %1$s_spanners[mask_ix] = res;
 	    }
-	    unlock_%1$s_spanners();
+	#ifdef LOCK_SPANNER_TABLES
+	    pthread_mutex_unlock(&%1$s_mutex);
+	#endif
 	    return %1$s_spanners[mask_ix];
 	}
 	#define %1$s_masks POISONED_%1$s_masks
@@ -311,16 +323,14 @@ string = { nm = copy_input_end;
 };
 
 string = { nm = macro_def_fmt;
-  str = "#define  IS_%1$s_CHAR( _c)%2$s  is_%3$s_char((char)( _c), %4$s)\n"
-        "#define SPN_%1$s_CHARS(_s)%2$s spn_%3$s_chars((char *)_s, %5$s)\n"
-        "#define BRK_%1$s_CHARS(_s)%2$s brk_%3$s_chars((char *)_s, %5$s)\n";
+  str = "#define  IS_%1$s_CHAR( _c)%2$s  is_%3$s_char((char)(_c), %4$s)\n"
+        "#define SPN_%1$s_CHARS(_s)%2$s spn_%3$s_chars(_s, %5$s)\n"
+        "#define BRK_%1$s_CHARS(_s)%2$s brk_%3$s_chars(_s, %5$s)\n";
 };
 
 string = { nm = backup_def_fmt;
-  str = "#define SPN_%1$s_BACK(s,e)%2$s "
-                "spn_%3$s_back((char *)s, (char *)e, %4$s)\n"
-        "#define BRK_%1$s_BACK(s,e)%2$s "
-                "brk_%3$s_back((char *)s, (char *)e, %4$s)\n";
+  str = "#define SPN_%1$s_BACK(s,e)%2$s spn_%3$s_back(s, e, %4$s)\n"
+        "#define BRK_%1$s_BACK(s,e)%2$s brk_%3$s_back(s, e, %4$s)\n";
 };
 
 string = { nm = mask_fmt_fmt;
@@ -404,7 +414,6 @@ string = { nm = test_script_fmt;
 		#define TEST_%2$s         1
 		#define DEFINE_%2$s_TABLE 1
 		#define _GNU_SOURCE 1
-		#include <stdio.h>
 		#include "%3$s"
 		_EOCode_
 

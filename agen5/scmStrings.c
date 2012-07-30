@@ -162,7 +162,7 @@ ag_scm2zchars(SCM s, const char * type)
 #if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
 
     if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(zNotStr, type));
+        AG_ABEND(aprf(NOT_STR_FMT, type));
 
     if (SCM_SUBSTRP(s))
         s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);

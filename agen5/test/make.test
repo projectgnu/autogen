@@ -45,9 +45,7 @@ make macros: $(MAKE) $* $@ $< $% $?
 shell vars:  ${MAKE} $# $F ${?} ${*} $$
 [=
 (define txt (out-pop #t))
-(set! txt (string-append txt "\n== converts to:\n\n"
-          (makefile-script txt)))
-txt
+(string-append txt "\n== converts to:\n\n" (makefile-script txt))
 =]
 _EOF_
 

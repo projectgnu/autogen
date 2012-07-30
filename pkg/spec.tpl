@@ -1,6 +1,6 @@
 [= AutoGen5 Template spec =]
 [= #
-   Time-stamp:        "2012-05-06 16:20:26 bkorb"
+   Time-stamp:        "2012-07-30 07:29:25 bkorb"
 
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -53,14 +53,15 @@ chmod -R +rw *
 %configure
 make CFLAGS="$RPM_OPT_FLAGS"
 
-if [ `id -u` -eq 0 ] && egrep -q ^nobody /etc/passwd
+if [ `id -u` -eq 0 ] && grep -E -q '^nobody:' /etc/passwd
 then
     echo "switching to user nobody to run 'make check'"
-    chown -R nobody . ; su -c "umask 002; make check || touch FAIL" nobody
+    chown -R nobody .
+    su -s /bin/bash -c "umask 002; make check || touch FAIL" nobody
+    test -f FAIL && exit 1 || :
 else
     make check
 fi
-[ -f FAIL ] && exit 1
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
@@ -70,9 +71,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 # IF we have a valid file list OR the build root is _the_ root,
 # THEN skip the file list generation.
 #
-if test \( -f autogen-filelist \
-        -a -s autogen-filelist \) \
-        -o ${#RPM_BUILD_ROOT} -le 1
+if test -s autogen-filelist -o ${#RPM_BUILD_ROOT} -le 1
 then : ; else
   ( cd ${RPM_BUILD_ROOT}
     rm -f usr/share/info/dir

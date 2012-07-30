@@ -1,6 +1,6 @@
 [= autogen5 template
 
-# Time-stamp:      "2012-05-05 08:13:32 bkorb"
+# Time-stamp:      "2012-07-30 07:31:28 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -377,7 +377,7 @@ static optArgBucket_t const original_[=(. pname-down)=]_defaults[ [=
 static void * const original_[=(. pname-down)=]_cookies[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [=
- (shell (string-append "columns -I4 -S, <<\\_EOF_\n" default-cookie "_EOF_"))
+ (shell (string-append "${CLexe} -I4 -S, <<\\_EOF_\n" default-cookie "_EOF_"))
 =]
 };
 [= ENDIF resettable=]

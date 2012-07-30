@@ -1,0 +1,107 @@
+2011-12-29  Bruce Korb  <bkorb@gnu.org>
+
+	5.14 release
+
+	* agen5/agDep.c (wrap_up_depends): make really sure we don't specify
+	temporary files in dependencies.
+	* agen5/expOutput.c (ag_scm_make_tmp_dir): make really sure there is
+	lots of space for our make-a-temp-directory command
+	* agen5/opts.def (include): Use the option string tables for our
+	message strings
+	* columns/opts.def: likewise
+	* autoopts/tpl/opthead.tlib: put the "join export" code into a
+	join-or-expand macro.  Use expand-a-template logic if the first
+	line of the text contains a template pseudo macro.
+	* autoopts/tpl/optcode.tlib: use join-or-expand for "join include"
+	* configure.ac (CFLAGS): add -Wno-format-contains-nul for GCC
+
+2011-12-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expMake.c (handle_eol): break out as separate function.
+	exempt lines ending with "then", "else" and "in" from semi-colon
+	statement separations.
+	* agen5/expFormat.c: fix licensing code (missing prefix)
+	* agen5/expString.c (do_substitution): length needs to be signed,
+	ripples through rest of file.
+	(ag_scm_shell): move to agShell.c module
+	(ag_scm_shellf): likewise
+	* autoopts/install-hook.sh (rmbuild): remove build-isms from various
+	installed templates.
+	* autoopts/tpl/aginfo.tpl (CLexe): setting depends on build or install
+	* autoopts/tpl/agman1.tpl (CLexe): likewise
+	* autoopts/tpl/agtexi-cmd.tpl (CLexe): likewise
+	* autoopts/tpl/cmd-doc.tlib (CLexe): likewise
+	* autoopts/tpl/optlib.tlib (CLexe): likewise
+	* autoopts/tpl/usage-txt.tpl (CLexe): likewise
+	* agen5/agShell.c (ag_scm_shell): moved from expString.c
+	(ag_scm_shellf): likewise
+
+2011-12-17  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am (agDep.c): new module
+	(agShell.c): now part of EXPRLIST
+	* agen5/tpLoad.c: remove dependency file handling code
+	* agen5/agUtils.c: remove dependency file handling code.
+	Add PID to startup trace message
+	* agen5/agDep.c: new file.  Extract dependency functions to here.
+	Change them to enable easy removal of "moved" output files.
+	Defer target file output to the end.
+	* agen5/expExtract.c: add extraction files to source dependencies
+	* agen5/expFormat.c: add license files to source dependencies
+	* agen5/expOutput.c (ag_scm_out_move): remove old file from deps
+	* agen5/directive.tpl: fix up initialization format
+	* agen5/autogen.c (exit_cleanup): add pid to wrapup message
+	* agen5/expState.c (ag_scm_chdir): move function to agShell.c
+	* agen5/agShell.c (ag_scm_chdir): ... and make pCurDir static
+	(server_setup): too large.  Break it up.  Emit AGexe=... to init
+	* agen5/autogen.h (pCurDir): removed
+	* agen5/schemedef.scm (emit-string-table): trim last NUL byte
+	because some compilers insist upon supplying their own.
+	* agen5/bootstrap.dir (agShell.c): extract Guile function
+
+	* autoopts/configfile.c (validate_struct): search for the full
+	path name of the exe, if not provided with argv[0].
+	* autoopts/install-hook.sh: trim build directory accommodations from
+	installed templates
+	* autoopts/tpl/optlib.tlib: mark build tree accommodations
+	* autoopts/tpl/usage.tlib: likewise
+	* autoopts/tpl/getopt.tpl (== h): Build option handling code
+	opt-def.c and opt-def.h files, then extract out the option
+	definitions and structures from options.h into the getopt-prog.h
+	header.  Edit the opt-def.h header to include this header
+	instead of autoopts/options.h.  Make sure the autogen and
+	autoopts-config programs used come from the same distribution.
+	mark build tree accommodations
+
+	* agen5/test/expr.test (agShell.c): copy to staging directory
+	* agen5/test/shell.test: strip AGexe= from test output text
+	* agen5/test/debug.test: adjust test for pid in start/end of trace
+	* agen5/test/strtable.test: adjust for changed last lines
+	* agen5/test/snarf.test: likewise
+	* autoopts/test/getopt.test: Change primary template to getopt.
+
+	* doc/autogen-texi.txt: doc this stuff
+
+2011-12-10  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/opts.def (make-dep): fix up usage information.
+	* autoopts/install-hook.sh: renamed from install-option-h
+	(usage.tlib): remove references to build directories and get
+	install information from autoopts-config.
+	(optlib.tlib): remove references to build directories.
+	* autoopts/tpl/optlib.tlib: make it sedable by install hook.
+	* autoopts/tpl/usage.tlib: likewise, but also redirect stdout to
+	stderr while constructing the emit-help-text program.
+	* agen5/agShell.c (load_data): NUL terminate string before printing
+	* autoopts/autoopts.m4 (min_opts_version): this is a test to verify
+	that the autoopts library is more recent than 2001.  Not important.
+	(changequote): disparaged M4 feature.  Use shell's IFS & set.
+	Clean up code based on these two changes.
+	* autoopts/options_h.tpl (OPTIONS_VER_TO_NUM): new macro to facilitate
+	the m4 code above.
+	* doc/autogen-texi.txt (getopt_long): clarify description of what you
+	need to do to get it working.
+
+2011-12-04  Bruce Korb  <bkorb@gnu.org>
+
+	5.13 release

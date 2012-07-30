@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-05-05 12:14:40 bkorb"
+# Time-stamp:        "2012-06-29 15:40:46 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -776,6 +776,7 @@ DEFINE initialization                   =][=
   (define program-name      (get "prog-name"))
   (define down-prog-name    (string-downcase program-name))
   (define UP-PROG-NAME      (string-upcase   program-name))
+  (shellf "export AG_DEF_PROG_NAME=%s" program-name)
   (define doc-level         (getenv "LEVEL"))
   (if (not (string? doc-level))
       (set! doc-level "section"))

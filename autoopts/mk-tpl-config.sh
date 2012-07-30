@@ -118,12 +118,14 @@ set_cat_prog() {
         die "cannot locate 'cat' command"
     done
 
-    for f in man mdoc texi
+    formats='man mdoc texi'
+    for f in $formats
     do
-        for g in man mdoc texi
+        for g in $formats
         do
             test -f ${f}2${g} || {
-                echo '#!' ${POSIX_CAT} > ${f}2${g}
+                printf "#! ${POSIX_SHELL}\nexec ${POSIX_CAT} "'${1+"$@"}\n' \
+                    > ${f}2${g}
                 chmod 755 ${f}2${g}
             }
         done

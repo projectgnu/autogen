@@ -614,6 +614,9 @@ string = { nm = LOAD_MACS_BAD_PARSE;
 string = { nm = LOAD_SCM_ENDLESS;
    str = "end of Guile/scheme expression not found"; };
 
+string = { nm = LOAD_FILE_SHORT_NAME;
+   str = "Cannot expand directory name:  '%s'"; };
+
 string = { nm = LOAD_TPL_CANNOT_MAP;
    str = "map data file"; };
 

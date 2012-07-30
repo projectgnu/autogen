@@ -2,7 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # include.test --- test include functionality
 #
-# Time-stamp:        "2010-06-26 16:05:21 bkorb"
+# Time-stamp:        "2012-07-02 15:03:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -45,13 +45,12 @@ test =]
 [= Include "${testname}.in" =]
 _EOF_
 
-mkdir ${testname}.d ${testname}.d/bad ${testname}.d/bad/good ${testname}.d/good
+mkdir ${testname}.d ${testname}.d/good
 cat > ${testname}.d/${testname}.def <<- _EOF_
 	AutoGen Definitions ${testname}.tpl;
 	#include good/${testname}-aux.def
 	_EOF_
 
-echo "v-name = BOGUS;"  > ${testname}.d/bad/good/${testname}-aux.def
 echo "v-name = Verify;" > ${testname}.d/good/${testname}-aux.def
 
 # # # # # # # # # # EXPECTED OUTPUT FILE # # # # # # #
@@ -67,8 +66,8 @@ AGCMD="-L ${testname}.d/bad -L ${testname}.d/bad/good"
 run_ag x ${AGCMD} ${testname}.d/${testname}.def || \
     failure ${AGCMD} failed
 cmp -s ${testname}.test ${testname}.ok || \
-    failure "`echo unexpected output
-            diff -u ${testname}.test ${testname}.ok `"
+    failure "unexpected output
+            `diff -u ${testname}.test ${testname}.ok `"
 cleanup
 
 ## Local Variables:
