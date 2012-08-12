@@ -39,6 +39,7 @@ colon           ":"
 underscore      "_"
 plus            "+"
 dollar          "$"
+option-marker   "-"
 
 horiz-white     "\t "
 alt-white       "\v\f\r\b"
@@ -77,3 +78,4 @@ end-list-entry  +comma        +end-token
 set-separator   "|+"          +end-list-entry
 signed-number   +inversion    +dec-digit
 make-script     +dollar       +newline
+load-line-skip  +horiz-white  +option-marker

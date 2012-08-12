@@ -2,7 +2,7 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2012-02-25 12:54:32 bkorb"
+## Time-stamp:        "2012-08-11 08:38:53 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##
@@ -603,9 +603,9 @@ DEFINE  try-withlib             =][=
   ==   run                      =]
   AC_MSG_CHECKING([whether [=(. lib-name)=] functions properly])[=
   set-language                  =]
-  AC_TRY_RUN([[=(protect-text c-text)=]],
+  AC_RUN_IFELSE([[=(protect-text c-text)=]],
     [[=(. cv-name)=]=yes], [[=(. cv-name)=]=no],
-    [[=(. cv-name)=]=no]) # end of AC_TRY_RUN [=
+    [[=(. cv-name)=]=no]) # end of AC_RUN_IFELSE [=
 
   ESAC                          =][=
 
@@ -636,10 +636,10 @@ DEFINE  try-run                 =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_RUN([[=(protect-text c-text)=]],
+  AC_RUN_IFELSE([[=(protect-text c-text)=]],
     [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no],[[=
         (. cv-name)=]=no]
-  ) # end of TRY_RUN[=
+  ) # end of RUN_IFELSE[=
   end-feat-test                 =][=
 
 ENDDEF  try-run                 =][=

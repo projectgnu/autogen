@@ -72,7 +72,6 @@ string = { nm = START_MARK;
 	# # # # # # # # # # -- do not modify this marker --
 	#
 	#  DO NOT EDIT THIS SECTION
-
 	_EOStr_;
 };
 

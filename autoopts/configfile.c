@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-07-18 10:37:30 bkorb"
+ *  Time-stamp:      "2012-08-11 08:34:55 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1128,6 +1128,9 @@ void
 optionLoadOpt(tOptions * pOpts, tOptDesc * pOptDesc)
 {
     struct stat sb;
+
+    if (pOpts <= OPTPROC_EMIT_LIMIT)
+        return;
 
     /*
      *  IF the option is not being disabled, THEN load the file.  There must

@@ -1,6 +1,6 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-04-15 10:50:28 bkorb"
+# Time-stamp:      "2012-08-11 08:14:10 bkorb"
 #
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
@@ -253,7 +253,6 @@ FOR flag                                =][=
 
     (set! tmp-val
            (+ (if (exist? "call-proc")    1 0)
-              (if (exist? "flag-code")    1 0)
               (if (exist? "extract-code") 1 0)
               (if (exist? "flag-proc")    1 0)
               (if (exist? "unstack-arg")  1 0)

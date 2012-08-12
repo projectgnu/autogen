@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2012-07-18 09:51:32 bkorb"
+ * Time-stamp:      "2012-08-11 08:51:32 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -63,8 +63,11 @@ emit_match_expr(char const * pzMatchName, tOptDesc* pCurOpt, tOptions* pOpts);
 static void
 emit_long(tOptions * pOpts);
 
+static char *
+load_old_output(char const * fname);
+
 static void
-open_out(char const * pzFile);
+open_out(char const * fname);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionParseShell

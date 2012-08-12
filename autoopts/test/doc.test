@@ -3,7 +3,7 @@
 #
 # doc.test      ---  test doc templates
 #
-# Time-stamp:        "2012-05-12 19:54:42 bkorb"
+# Time-stamp:        "2012-08-11 08:54:27 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -286,7 +286,7 @@ using the @code{agtexi-cmd} template and the option descriptions for the @code{d
 This software is released under the GNU General Public License, version 3 or later.
 
 @menu
-* doc usage::                  doc help/usage (-h)
+* doc usage::                  doc help/usage (@option{--help})
 * doc base-options::           Base options
 * doc group-2::                group-2 options
 * doc group-3::                group-3 options
@@ -295,11 +295,13 @@ This software is released under the GNU General Public License, version 3 or lat
 @end menu
 
 @node doc usage
-@subsection doc help/usage (-h)
+@subsection doc help/usage (@option{--help})
 @cindex doc help
 
 This is the automatically generated usage text for doc.
-The text printed is the same whether for the @code{help} option (-h) or the @code{more-help} option (-M).  @code{more-help} will print
+
+The text printed is the same whether selected with the @code{help} option
+(@option{--help}) or the @code{more-help} option (@option{--more-help}).  @code{more-help} will print
 the usage text by passing it through a pager program.
 @code{more-help} is disabled on platforms without a working
 @code{fork(2)} function.  The @code{PAGER} environment variable is
@@ -308,7 +310,7 @@ with a status code of 0.
 
 @exampleindent 0
 @example
-doc is unavailable - no -h
+doc is unavailable - no --help
 @end example
 @exampleindent 4
 

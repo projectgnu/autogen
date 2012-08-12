@@ -1,7 +1,8 @@
-New in __CURRENT_VERSION__ July 2012
+New in __CURRENT_VERSION__ August 2012
 
 * Coverity cleanups
 * evade Guile issue on BSD platform.
+* avoid emitting non-error messages to stderr
 
 New in 5.16 May 2012
 

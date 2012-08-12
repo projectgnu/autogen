@@ -2,7 +2,7 @@
 # -*- Mode: sh -*-
 # VERSION --- Set version info for GNU-ish tool use
 #
-# Time-stamp:        "2012-06-17 14:24:11 bkorb"
+# Time-stamp:        "2012-08-11 08:31:30 bkorb"
 
 MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 
@@ -25,7 +25,7 @@ MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=16
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".2pre6"
+AG_PATCHLEVEL=".2"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:
@@ -42,7 +42,7 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #
 AO_LIBRARY=libopts.la
 AO_CURRENT=36
-AO_REVISION=4
+AO_REVISION=5
 AO_AGE=11
 
 # For automake

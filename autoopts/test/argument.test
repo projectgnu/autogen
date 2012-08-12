@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-05-12 19:54:16 bkorb"
+# Time-stamp:        "2012-08-11 08:12:41 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,6 +80,8 @@ cat >&3 <<- _EOF_
 	    arg-range = "3->021";
 	    arg-range = "040->0x1FFF";
 	    scaled;
+	    flag-code[0] = '    /* no-op zero */;';
+	    flag-code[1] = '    /* no-op one  */;';
 	};
 	include = '#include <stdlib.h>';
 	_EOF_

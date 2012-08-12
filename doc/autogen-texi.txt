@@ -1709,6 +1709,12 @@ open bracket (@code{[}), then there is no requirement on the presence or
 absence of command line arguments following the options.  Lastly, if it
 is supplied and does not start with an open bracket, then option
 processing must @strong{not} consume all of the command line arguments.
+
+@item config-header
+@vindex config-header
+If your build has a configuration header, it must be included before
+anything else.  Specifying the configuration header file name with this
+attribute will cause that to happen.
 @end table
 
 @menu
@@ -3087,7 +3093,7 @@ determine which command line option is the first one that pertains to the
 library.
 
 @vindex documentation
-If the ``@code{documentation}'' attribute is present, then all other
+If the @samp{documentation} attribute is present, then all other
 attributes are disabled except @code{settable}, @code{call-proc} and
 @code{flag-code}.  @code{settable} must be and is only specified if
 @code{call-proc}, @code{extract-code} or @code{flag-code} has been specified.
@@ -3480,7 +3486,7 @@ that are not specialized are plain string arguments and no argument at all.
 For options that fall into one of those two categories, you may specify your
 own callback function, as specified below.  If you do this and if you
 specify that options are resettable (@pxref{automatic options}), then your
-option handling code @strong{must} look for the @code{OPTST_RESET} bit in
+option handling code @strong{must} look for the @samp{OPTST_RESET} bit in
 the @code{fOptState} field of the option descriptor.
 
 If the option takes a string argument, then you may specify that the option
@@ -3488,32 +3494,46 @@ is to be handled by the @code{libopts} library procedures
 @code{stackOptArg()} or @code{unstackOptArg()} (see below).  In this case,
 you may not provide option handling code.
 
-Finally, @code{documentation} options (@pxref{opt-attr documentation}) may
-also be marked as @code{settable} (@pxref{opt-attr settable}) and have special
-callback functions (either @code{flag-code}, @code{extract-code}, or
-@code{call-proc}).
+Finally, @samp{documentation} options (@pxref{opt-attr documentation}) may
+also be marked as @option{settable} (@pxref{opt-attr settable}) and have
+special callback functions (either @samp{flag-code}, @samp{extract-code},
+or @samp{call-proc}).
 
 @table @samp
 @item flag-code
 @vindex flag-code
-statements to execute when the option is encountered.
-The generated procedure will look like this:
+statements to execute when the option is encountered.  This may be used in
+conjunction with option argument types that cause AutoOpts to emit handler
+code.  If you do this, the @samp{flag-code} with index zero (0) is emitted
+into the handler code @emph{before} the argument is handled, and the entry
+with index one (1) is handled afterward.
+
+The generated procedure will be laid out something like this:
 
 @example
 static void
-doOpt<name>( tOptions* pOptions, tOptDesc* pOptDesc )
+doOpt<name>(tOptions* pOptions, tOptDesc* pOptDesc)
 @{
-<flag-code>
+<flag-code[0]>
+<AutoOpts defined handler code>
+<flag-code[1]>
 @}
 @end example
 
 Only certain fields within the @code{tOptions} and @code{tOptDesc}
-structures may be accessed.  @xref{Option Processing Data}.
+structures may be accessed.  @xref{Option Processing Data}.  When writing
+this code, you must be very careful with the @code{pOptions} pointer.  The
+handler code is called with this pointer set to special values for handling
+special situations.  Your code must handle them.  As an example,
+look at @code{optionEnumerationVal} in @file{enum.c}.
 
 @item extract-code
 @vindex extract-code
 This is effectively identical to @code{flag-code}, except that the
-source is kept in the output file instead of the definitions file.
+source is kept in the output file instead of the definitions file
+and you cannot use this in conjunction with options with arguments,
+other than string arguments.
+
 A long comment is used to demarcate the code.  You must not modify
 that marker.  @i{Before} regenerating the option code file,
 the old file is renamed from MUMBLE.c to MUMBLE.c.save.  The template

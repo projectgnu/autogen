@@ -1,3 +1,25 @@
+2012-08-11  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/agtexi-cmd.tpl: Fix up "help" option name in texi doc.
+	* autoopts/ao-strs.def: remove stray newline
+	* autoopts/autogen.map: add lead option line skip characters
+	* autoopts/load.c (loadOptionLine): use it
+	* autoopts/test/shell.test: adjust
+	* autoopts/tpl/opthead.tlib (gettext): ensure it is declared
+	* autoopts/tpl/optmain.tlib (fserr_fmt): not always static.
+	* autoopts/tpl/strings.tpl: justify and sort the define list
+	* compat/compat.h (strsignal) check that HAVE_RAW_DECL_STRSIGNAL
+	is also not declared before declaring strsignal.
+	* config/confmacs.tlib: AC_TRY_RUN is obsolete
+	* config/libopts.def: AC_ERROR is obsolete
+	* doc/autogen-texi.txt (config-header): doc it
+
+2012-08-04  Bruce Korb  <bkorb@gnu.org>
+	Leo Davis  <ldavis@speechfxinc.com>
+
+	* autoopts/tpl/usage.tlib: capture both stdout and stderr while
+	building the sample program.  Print on error, discard on success.
+
 2012-07-27  Leo Davis  <ldavis@speechfxinc.com>
 
 	* autoopts/install-hook.sh: correct spelling of "defs" file and

@@ -93,76 +93,86 @@ ENDFOR flag                 =][=
 
 (out-pop)
 (out-push-new)             \=]
-{
-    # redirect stdout for safty's sake
-    inc_list="-I${PWD} -I[=(. inc-dir)=]"
-    cfg_ldflags="[=(. libs)=]"
-    cfg_cflags=${CFLAGS}
-    exe=${tmp_dir}/[= prog-name =]
+# redirect stdout.  We see this IFF there is a problem
+#
+redirect_log=${tmp_dir}/redirected.log
+exec 8>&1 9>&2 1> ${redirect_log} 2>&1
+redirect_die() {
+    exec 2>&9 1>&9 9>&- 8>&-
+    cat ${redirect_log}
+    die "$@"
+}
+
+inc_list="-I${PWD} -I[=(. inc-dir)=]"
+cfg_ldflags="[=(. libs)=]"
+cfg_cflags=${CFLAGS}
+exe=${tmp_dir}/[= prog-name =]
 [= # START-BUILDTREE-ISMS:
 
 #  The following code is sedded away in install-hook.sh.
 #  The goal is to remove build tree-isms when installing this file.
 
 \=]
-    test -z "${top_builddir}" && ldflags='' || \
-        ldflags=`exec 2>/dev/null
-            find ${top_builddir}/autoopts -name "libopts*.${OBJEXT}" | head -1`
+test -z "${top_builddir}" && ldflags='' || \
+    ldflags=`exec 2>/dev/null
+        find ${top_builddir}/autoopts -name "libopts*.${OBJEXT}" | head -1`
 
-    test -f "${ldflags}" || {
-        ldflags='[=(. lib-dir)=]/libopts.a'
-        test -f "${ldflags}" || die "Cannot locate libopts.a"
-    }
-    ldflags="$ldflags ${cfg_ldflags}"
-    test -d "${top_builddir}" && \
-        inc_list="-I${top_builddir} -I${top_builddir}/autoopts ${inc_list}"
-    test -d "${top_srcdir}" && \
-        inc_list="-I${top_srcdir}/autoopts ${inc_list}"
+test -f "${ldflags}" || {
+    ldflags='[=(. lib-dir)=]/libopts.a'
+    test -f "${ldflags}" || redirect_die "Cannot locate libopts.a"
+}
+ldflags="$ldflags ${cfg_ldflags}"
+test -d "${top_builddir}" && \
+    inc_list="-I${top_builddir} -I${top_builddir}/autoopts ${inc_list}"
+test -d "${top_srcdir}" && \
+    inc_list="-I${top_srcdir}/autoopts ${inc_list}"
 
 [= # END-BUILDTREE-ISMS the following code is for installed version:
 
-    test -x "${AGexe}" || die "AGexe is invalid:  ${AGexe}"
-    aocfg=`dirname ${AGexe}`/autoopts-config
-    test -x "$aocfg" || die "missing $ag"
-    ldflags="${cfg_ldflags} `${aocfg} ldflags`"
-    cfg_cflags="${cfg_cflags} `${aocfg} cflags`"
+test -x "${AGexe}" || redirect_die "AGexe is invalid:  ${AGexe}"
+aocfg=`dirname ${AGexe}`/autoopts-config
+test -x "$aocfg" || redirect_die "missing $ag"
+ldflags="${cfg_ldflags} `${aocfg} ldflags`"
+cfg_cflags="${cfg_cflags} `${aocfg} cflags`"
 
 # END-INSTALL-ONLY-CODE \=]
 [= IF (exist? "config-header") \=]
-    inc_list="-I${tmp_dir} ${inc_list}"
+inc_list="-I${tmp_dir} ${inc_list}"
+while :
+do
+    h='[= config-header =]'
+    test -f "$h" && break
+    hdr=$h
+    h=`basename "${hdr}"`
+    test -f "$h" && break
+    g=$h
+    d=`pwd`
+
     while :
     do
-        h='[= config-header =]'
+        d=`dirname $d`
+        test "X$d" = X/ && \
+            redirect_die "cannot locate [= config-header =]"
+        h="$d/$g"
         test -f "$h" && break
-        hdr=$h
-        h=`basename "${hdr}"`
+        h="$d/$hdr"
         test -f "$h" && break
-        g=$h
-        d=`pwd`
-
-        while :
-        do
-            d=`dirname $d`
-            test "X$d" = X/ && die "cannot locate [= config-header =]"
-            h="$d/$g"
-            test -f "$h" && break
-            h="$d/$hdr"
-            test -f "$h" && break
-        done
-        break
     done
-    cp "${h}" ${exe}-config.h
+    break
+done
+cp "${h}" ${exe}-config.h
 [= ENDIF \=]
-    flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
-        =]_OPTS=1 ${inc_list} ${cfg_cflags}"
-    cd ${tmp_dir}
-    ${AGexe} -Toptions.tpl [= prog-name =].def || \
-        die "Cannot gen [= prog-name =]"
-    cd -
-    ${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \
-        die cannot compile ${exe}.c
-    mv -f TMPexe$$ ${exe}
-} 1>&2
+flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
+    =]_OPTS=1 ${inc_list} ${cfg_cflags}"
+cd ${tmp_dir}
+${AGexe} -Toptions.tpl [= prog-name =].def || \
+    redirect_die "Cannot gen [= prog-name =]"
+cd -
+${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \
+    redirect_die cannot compile ${exe}.c
+mv -f TMPexe$$ ${exe}
+exec 1>&8 2>&9 9>&- 8>&-
+
 ${exe} [=
 
   (if (== (get "usage-type") "short")

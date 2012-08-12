@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 author =           "Bruce Korb <bkorb@gnu.org>";
 /*
- *  Time-stamp:        "2012-04-14 08:08:58 bkorb"
+ *  Time-stamp:        "2012-08-11 08:37:08 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -294,22 +294,22 @@ do-first = <<-_EOF_
 	         string errno stdlib memory setjmp
 	do eval as_ac_var=\${ac_cv_header_${f}_h+set}
 	   test "${as_ac_var}" = set || {
-	     ]AC_MSG_ERROR([You must have ${f}.h on your system])[
+	     ]AC_MSG_ERROR([you must have ${f}.h on your system])[
 	   }
 	done
 
 	${lo_have_arg_hdr} || \
-	  ]AC_MSG_ERROR([You must have stdarg.h or varargs.h on your system])[
+	  ]AC_MSG_ERROR([you must have stdarg.h or varargs.h on your system])[
 
 	${lo_have_str_hdr} || \
-	  ]AC_MSG_ERROR([You must have string.h or strings.h on your system])[
+	  ]AC_MSG_ERROR([you must have string.h or strings.h on your system])[
 
 	${lo_have_lim_hdr} || \
 	  ]AC_MSG_ERROR(
-	    [You must have one of limits.h, sys/limits.h or values.h])[
+	    [you must have one of limits.h, sys/limits.h or values.h])[
 
 	${lo_have_typ_hdr} || \
-	  ]AC_MSG_ERROR([You must have inttypes.h or stdint.h on your system])
+	  ]AC_MSG_ERROR([you must have inttypes.h or stdint.h on your system])
 
 	# ----------------------------------------------------------------------
 	# Checks for typedefs
@@ -353,7 +353,7 @@ do-first = <<-_EOF_
 	        if ! true ; then exit 1 ; fi
 	        echo /bin/sh'`
 	    test -x "$POSIX_SHELL" && break
-	    ]AC_ERROR([Cannot locate a working POSIX shell])[
+	    ]AC_MSG_ERROR([cannot locate a working POSIX shell])[
 	done]
 	AC_DEFINE_UNQUOTED([POSIX_SHELL], ["${POSIX_SHELL}"],
 	         [define to a working POSIX compliant shell])

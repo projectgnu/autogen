@@ -1,6 +1,6 @@
 [= AutoGen5 Template c -*- Mode: scheme -*-
 
-## Time-stamp:      "2012-05-12 20:54:54 bkorb"
+## Time-stamp:      "2012-08-11 08:20:07 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 
 ## Copyright (C) 2011-2012 Bruce Korb, all rights reserved.
@@ -58,21 +58,37 @@
 #include "[= (. header-file) =]"
 [=
 
-(define def-fmt "#define %-27s     (%s)\n#define %-31s %d\n")
 (define str-nm  "")
 (define str-val "")
 (define str-ct   0)
+(define name-ln  0)
 (define find-ln "")
+(define def-fmt "#define %%-%us     (%%s)\n#define %%-%us %%d\n")
 (out-push-new) ;; temp file for #defines
+=][=
+FOR string                      =][=
+   (set! find-ln  (string-length (get "nm" "")))
+   (if (> find-ln name-ln)
+       (set! name-ln find-ln))  =][=
+ENDFOR string                   =][=
 
 (if (exist? "file-name-string") (begin
-    (set! str-nm     (string-upcase (string-append string-name "_file")))
-    (set! str-ct     1)
-    (set! str-val    (string-append (base-name) ".c"))
-    (set! tmp-str    (string-table-add-ref string-name str-val))
-    (sprintf def-fmt str-nm tmp-str
-                     (string-append str-nm "_LEN") (string-length str-val))
-)   )                           =][=
+      (set! str-nm     (string-upcase (string-append string-name "_file")))
+      (set! find-ln    (string-length str-nm))
+      (if (> find-ln name-ln)
+          (set! name-ln find-ln))
+      (set! def-fmt (sprintf def-fmt (+ 1 name-ln) (+ 5 name-ln)))
+      (set! str-ct     1)
+      (set! str-val    (string-append (base-name) ".c"))
+      (set! tmp-str    (string-table-add-ref string-name str-val))
+      (ag-fprintf 0 def-fmt str-nm tmp-str
+                       (string-append str-nm "_LEN") (string-length str-val))
+    )
+
+    (set! def-fmt (sprintf def-fmt (+ 1 name-ln) (+ 5 name-ln)))
+)
+
+(set! find-ln "")               =][=
 
 FOR string                      =][=
    (set! str-nm  (get "nm"))
@@ -90,7 +106,8 @@ ENDFOR string                   =][=
 (ag-fprintf 0
     "/*\n * %d strings in %s string table\n */\n" str-ct string-name)
 (out-resume  "defines")
-(emit (out-pop #t))     ;; #defines now in real header file
+(emit (shell (string-append "sort <<\\_EOF_\n"
+             (out-pop #t) "_EOF_"))) ;; #defines now in real header file
 (emit "\n")
 (out-push-new)
 (emit-string-table string-name)

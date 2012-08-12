@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2012-05-12 20:04:54 bkorb"
+# Time-stamp:        "2012-08-11 08:13:30 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -45,7 +45,7 @@ cfgf=${top_builddir}/config.h
 
     if ${EGREP} 'define +HAVE_LIMITS_H' ${cfgf} >/dev/null
     then echo '#include <limits.h>'
-    else echo '#include <sys/limits>' ; fi
+    else echo '#include <sys/limits.h>' ; fi
 
     if ${EGREP} 'define +HAVE_STDBOOL_H' ${cfgf} >/dev/null
     then echo '#include <stdbool.h>'

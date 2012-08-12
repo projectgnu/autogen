@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-06-29 15:40:46 bkorb"
+# Time-stamp:        "2012-08-11 08:33:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -682,15 +682,16 @@ ENDDEF header
 DEFINE emit-usage-opt                   =][=
 
   (define label-str (string-append
-          program-name " help/usage (" help-opt ")"))
+          program-name " help/usage (@option{" help-opt "})"))
   (ag-fprintf "menu" menu-entry-fmt "usage::" label-str)
   (sprintf node-fmt "usage" label-str) =]
 @cindex [=(. down-prog-name)=] help
 
 This is the automatically generated usage text for [= prog-name =].
-The text printed is the same whether for the @code{help} option[=
-(flag-string "help-value" "?") =] or the @code{more-help} option[=
-(flag-string "more-help-value" "!") =].  @code{more-help} will print
+
+The text printed is the same whether selected with the @code{help} option
+(@option{[= (. help-opt) =]}) or the @code{more-help} option (@option{[=
+(. more-help-opt) =]}).  @code{more-help} will print
 the usage text by passing it through a pager program.
 @code{more-help} is disabled on platforms without a working
 @code{fork(2)} function.  The @code{PAGER} environment variable is
@@ -800,11 +801,36 @@ DEFINE initialization                   =][=
         (if (exist? v-nm) (get v-nm) v-df)
         ")")  )))
 
-  (define help-opt
-         (if (exist? "help-value")     (string-append "-" (get "help-value"))
-         (if (exist? "flag.value")     "-?"
-         (if (exist? "long-opts")      "--help"
-                                       "help" ))) )
+  (define help-opt "")
+  (if (exist? "long-opts")
+      (set! help-opt "--help")
+  (if (not (exist? "flag.value"))
+      (set! help-opt "help")
+  (if (not (exist? "help-value"))
+      (set! help-opt "-?")
+      (begin
+         (set! tmp-str (get "help-value"))
+         (if (> (string-length tmp-str) 0)
+             (set! help-opt (string-append "-" tmp-str))
+             (set! help-opt "--help")
+      )  )
+  )))
+
+  (define more-help-opt "")
+  (if (exist? "long-opts")
+      (set! more-help-opt "--more-help")
+  (if (not (exist? "flag.value"))
+      (set! more-help-opt "more-help")
+  (if (not (exist? "more-help-value"))
+      (set! more-help-opt "-!")
+      (begin
+         (set! tmp-str (get "more-help-value"))
+         (if (> (string-length tmp-str) 0)
+             (set! help-opt (string-append "-" tmp-str))
+             (set! help-opt "--more-help")
+      )  )
+  )))
+
   =][=
 
   CASE (. doc-level)    =][=

@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-04-28 08:32:09 bkorb"
+# Time-stamp:      "2012-08-11 08:56:26 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -514,6 +514,12 @@ extern tOptions [=(. pname)=]Options;[=
 #if defined(ENABLE_NLS)
 # ifndef _
 #   include <stdio.h>
+#   ifndef HAVE_GETTEXT
+      extern char * gettext(char const *);
+#   else
+#     include <libintl.h>
+#   endif
+
 static inline char* aoGetsText(char const* pz) {
     if (pz == NULL) return NULL;
     return (char*)gettext(pz);

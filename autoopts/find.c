@@ -3,7 +3,7 @@
  *
  * @brief Hunt for options in the option descriptor list
  *
- *  Time-stamp:      "2012-07-18 09:49:26 bkorb"
+ *  Time-stamp:      "2012-08-11 08:36:11 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -283,6 +283,12 @@ optionVendorOption(tOptions * pOpts, tOptDesc * pOD)
 {
     tOptState     opt_st   = OPTSTATE_INITIALIZER(PRESET);
     char const *  vopt_str = pOD->optArg.argString;
+
+    if (pOpts <= OPTPROC_EMIT_LIMIT)
+        return;
+
+    if ((pOD->fOptState & OPTST_RESET) != 0)
+        return;
 
     if ((pOD->fOptState & OPTPROC_IMMEDIATE) == 0)
         opt_st.flags = OPTST_DEFINED;

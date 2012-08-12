@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-05-05 08:17:39 bkorb"
+# Time-stamp:        "2012-08-11 08:14:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -170,7 +170,6 @@ doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
 
     pOptDesc->optArg.argEnum =
         optionEnumerationVal(pOptions, pOptDesc, azNames, 5);
-
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -214,7 +213,6 @@ doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
     else
         pOptDesc->optArg.argEnum =
             optionEnumerationVal(pOptions, pOptDesc, azNames, 4);
-
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -231,6 +229,9 @@ doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
     static char const * const azNames[4] = {
         "alpha",  "beta",   "gamma",  "omega"
     };
+    /*
+     * This function handles special invalid values for "pOptions"
+     */
     optionSetMembers(pOptions, pOptDesc, azNames, 4);
 }
 

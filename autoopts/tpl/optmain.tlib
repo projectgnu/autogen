@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-05-12 19:46:48 bkorb"
+# Time-stamp:      "2012-08-11 08:13:56 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -23,6 +23,19 @@
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =][=
+
+(out-push-new) =]
+ck_flag_code() {
+  addon_txt=''
+  txt1=`[=(. grep-prog)=] -w pOptDesc ${tmp_dir}/flag-code`
+  test -z "$txt1" && addon_txt='    (void)pOptDesc;\n'
+  txt2=`[=(. grep-prog)=] -w pOptions ${tmp_dir}/flag-code`
+  test -z "$txt2" && addon_txt=${addon_txt}'    (void)pOptions;\n'
+  cat ${tmp_dir}/flag-code
+  test -z "$addon_txt" || printf "\n$addon_txt"
+  rm -f ${tmp_dir}/flag-code
+}[=
+(shell (out-pop #t)) =][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -731,6 +744,21 @@ ENDDEF   callback-proc-header
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
+DEFINE reset-clause =][=
+
+  (if (exist? "flag-code[0]")
+      (emit (string-append "\n" (get "flag-code[0]"))))
+
+  (if (exist? "resettable") (emit (string-append
+      "\n    if ((pOptDesc->fOptState & OPTST_RESET) != 0)"
+      "\n        return;" )) )
+
+  =][=
+
+ENDDEF reset-clause
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
 DEFINE range-option-code
 
 =][=
@@ -769,15 +797,22 @@ DEFINE range-option-code
     if (pOptions <= OPTPROC_EMIT_LIMIT)
         goto emit_ranges;[=
 
-  IF (exist? "resettable")
+  INVOKE reset-clause =][=
 
-=]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;[=
+  CASE (define leave-ok-code "") (define ok-return-code "")
+    (if (exist? "flag-code[1]")
+        (begin
+           (set! leave-ok-code "goto return_okay")
+           (set! ok-return-code (string-append
+                 "\n    return;\n\nreturn_okay:\n"
+                 (get "flag-code[1]") ))
+        )
+        (begin
+           (set! leave-ok-code  "return")
+           (set! ok-return-code "")
+    )   )
 
-  ENDIF                 =][=
-
-  CASE (. option-arg-type) =][=
+    option-arg-type     =][=
 
   =*  num               =]
     optionNumericVal(pOptions, pOptDesc);[=
@@ -803,18 +838,19 @@ DEFINE range-option-code
         if (pOptDesc->optArg.argInt < rng[ix].rmin)
             continue;  /* ranges need not be ordered. */
         if (pOptDesc->optArg.argInt == rng[ix].rmin)
-            return;
+            [= (. leave-ok-code) =];
         if (rng[ix].rmax == LONG_MIN)
             continue;
         if (pOptDesc->optArg.argInt <= rng[ix].rmax)
-            return;
+            [= (. leave-ok-code) =];
     }
 
     option_usage_fp = stderr;
 
 emit_ranges:
-
     optionShowRange(pOptions, pOptDesc, (void *)rng, [= (. range-count) =]);[=
+
+(. ok-return-code)  =][=
 
 ENDDEF   range-option-code
 
@@ -856,15 +892,7 @@ DEFINE   keyword-code           =][=
         return; /* protect AutoOpts client code from internal callbacks */
     }[=
 
-  IF (exist? "resettable")
-
-=]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;[=
-
-  ENDIF
-
-=][=
+  INVOKE reset-clause =][=
 
   IF (exist? "arg-optional")
 
@@ -878,25 +906,21 @@ DEFINE   keyword-code           =][=
                 "UNDEFINED"  ))) =];
     else
         pOptDesc->optArg.argEnum =
-            optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
-[=
+            optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);[=
 
   ELSE
 
 =]
 
     pOptDesc->optArg.argEnum =
-        optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);
-[=
+        optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);[=
 
   ENDIF                         =][=
 
-  IF (exist? "extra-code")
+  (if (exist? "flag-code[1]")
+      (emit (string-append "\n" (get "flag-code[1]"))))
 
-=]
-[= extra-code                   =][=
-
-  ENDIF                         =][=
+  =][=
 
 ENDDEF   keyword-code
 
@@ -919,16 +943,16 @@ DEFINE   set-membership-code
   "\n_EOF_\n" )) =]
     };[=
 
-  IF (exist? "resettable")
-
-=]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;[=
-
-  ENDIF
-
-=]
+  INVOKE reset-clause =]
+    /*
+     * This function handles special invalid values for "pOptions"
+     */
     optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);[=
+
+  (if (exist? "flag-code[1]")
+      (emit (string-append "\n" (get "flag-code[1]"))))
+
+  =][=
 
 ENDDEF   set-membership-code
 
@@ -966,25 +990,56 @@ DEFINE   file-name-code
 #  define FOPEN_BINARY_FLAG
 #endif
     mode.file_mode = [= (c-string (get "file-mode")) =] FOPEN_BINARY_FLAG;
-[= ENDIF =]
+[= ENDIF =][=
+
+  INVOKE reset-clause =]
+    /*
+     * This function handles special invalid values for "pOptions"
+     */
     optionFileCheck(pOptions, pOptDesc, type, mode);[=
+
+  (if (exist? "flag-code[1]")
+      (emit (string-append "\n" (get "flag-code[1]"))))
+
+  =][=
 
 ENDDEF   file-name-code
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-(out-push-new) =]
-ck_flag_code() {
-  addon_txt=''
-  txt1=`[=(. grep-prog)=] -w pOptDesc ${tmp_dir}/flag-code`
-  test -z "$txt1" && addon_txt='    (void)pOptDesc;\n'
-  txt2=`[=(. grep-prog)=] -w pOptions ${tmp_dir}/flag-code`
-  test -z "$txt2" && addon_txt=${addon_txt}'    (void)pOptions;\n'
-  cat ${tmp_dir}/flag-code
-  test -z "$addon_txt" || printf "\n$addon_txt"
-  rm -f ${tmp_dir}/flag-code
-}[=
-(shell (out-pop #t)) =][=
+DEFINE   requested-code             =][=
+
+IF (not (or (exist? "extract-code") (exist? "flag-code")))
+   =][=  RETURN                     =][=
+ENDIF                               =][=
+
+(if make-test-main
+    (begin
+      (set! endif-test-main
+            (sprintf "\n#endif /* defined(%s) */" main-guard))
+      (sprintf "\n\n#if ! defined(%s)" main-guard)
+)   )                               =][=
+
+INVOKE callback-proc-header         =][=
+
+IF (out-push-new (string-append tmp-dir "/flag-code"))
+   (exist? "flag-code")             =][=
+   (def-file-line "flag-code" "    /* extracted from %s, line %d */\n")
+   =][=
+  (join "\n" (stack "flag-code"))   =][=
+
+ELSE                                =][=
+
+   (extract (string-append (base-name) ".c.save") (string-append
+            "/*  %s =-= " cap-name " Opt Code =-= %s */"))
+                                    =][=
+ENDIF                               =][=
+(out-pop)
+(shell "ck_flag_code")              =][=
+
+ENDDEF   requested-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE define-option-callbacks      =][=
 
@@ -995,35 +1050,7 @@ DEFINE define-option-callbacks      =][=
 
 # # # # # # # # # # # # # # # # # # =][=
 
-    IF (or (exist? "extract-code")
-           (exist? "flag-code") )   =][=
-
-      (if make-test-main
-          (begin
-            (set! endif-test-main
-                  (sprintf "\n#endif /* defined(%s) */" main-guard))
-            (sprintf "\n\n#if ! defined(%s)" main-guard)
-      )   ) =][=
-
-      INVOKE callback-proc-header   =][=
-
-      IF (out-push-new (string-append tmp-dir "/flag-code"))
-         (exist? "flag-code")       =][=
-         (def-file-line "flag-code" "    /* extracted from %s, line %d */\n")
-         =][=  flag-code            =][=
-
-      ELSE                          =][=
-
-         (extract (string-append (base-name) ".c.save") (string-append
-                  "/*  %s =-= " cap-name " Opt Code =-= %s */"))
-                                    =][=
-      ENDIF                         =][=
-      (out-pop)
-      (shell "ck_flag_code")        =][=
-
-# # # # # # # # # # # # # # # # # # =][=
-
-    ELIF (exist? "arg-range")       =][=
+    IF (exist? "arg-range")         =][=
 
       INVOKE callback-proc-header   =][=
       INVOKE range-option-code      =][=
@@ -1055,6 +1082,11 @@ DEFINE define-option-callbacks      =][=
       =* fil                        =][=
       INVOKE callback-proc-header   =][=
       INVOKE file-name-code         =][=
+
+# # # # # # # # # # # # # # # # # # =][=
+
+      *                             =][=
+      INVOKE requested-code         =][=
 
       ESAC                          =][=
     ENDIF                           =][=
@@ -1210,8 +1242,7 @@ void
 void
 [=(. lc-prefix)=]fserr(int exit_code, char const * op, char const * fname)
 {
-    static char const * fserr_fmt =
-        _("fserr %d (%s) performing '%s' on %s\n");
+    char const * fserr_fmt = _("fserr %d (%s) performing '%s' on %s\n");
     die(exit_code, fserr_fmt, errno, strerror(errno), op, fname);
     /* NOTREACHED */
 }

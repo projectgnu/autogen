@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-05-12 19:56:00 bkorb"
+# Time-stamp:        "2012-08-11 08:51:08 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -422,21 +422,19 @@ exec 3>&-
 rm -f ${testname}.sh
 ./${testname} -o ${testname}.sh
 
-sedcmd='2,9d'
+sedcmd='2,/From the.*option def/d'
 ${FGREP} 'Packaged by '  ${testname}.sh >/dev/null && {
     sedcmd=${sedcmd}${nl}'/^Packaged by /d
     /^Report .* bugs to /d
     /and the flag character\.$/s/$/'"'/"
 }
 
-${SED} "$sedcmd"  ${testname}.sh > XXX
-mv -f XXX ${testname}.sh
-cmp -s ${testname}.sh* || \
-  failure "`diff ${testname}.sh ${testname}.sht`"
+${SED} "$sedcmd"  ${testname}.sh > ${testname}.shx
+cmp -s ${testname}.sh[tx] || \
+  failure "`diff ${testname}.sh[tx]`"
 
 # # # # # # # # # # SCRIPT PROCESSING TEST # # # # # # # # #
 
-chmod +x ${testname}.sh
 ./${testname}.sh  --opt opt-arg -s a1 a2 | sort > ${testname}.test || \
   failure ${testname} did not handle its options
 
