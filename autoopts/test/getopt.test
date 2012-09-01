@@ -3,7 +3,7 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2012-05-12 19:54:26 bkorb"
+# Time-stamp:        "2012-09-01 09:48:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -114,72 +114,72 @@ go_samples() {
 
 echo "creating ${testname}.def in `pwd`"
 
-cat >> ${testname}.def <<_EOF_
-AutoGen definitions getopt;
+${SED} 's/^	//' >> ${testname}.def <<_EOF_
+	AutoGen definitions getopt;
 
-prog-name  = "test_${testname}";
-prog-title = "Test AutoOpts for ${testname}";
-test-main  = 'yes';
-config-header = 'config.h';
+	prog-name  = "test_${testname}";
+	prog-title = "Test AutoOpts for ${testname}";
+	test-main  = 'yes';
+	config-header = 'config.h';
 
-settable;
-version = '1.2.3';
-help-value = 'h';
-gnu-usage;
-no-libopts;
+	settable;
+	version = '1.2.3';
+	help-value = 'h';
+	gnu-usage;
+	no-libopts;
 
-copyright = {
-    date  = "2003-2012";
-    owner = "Odyssey Computing Concepts, Inc.";
-    author= "Bruce Korb";
-    eaddr = "bkorb@gnu.org";
-    type  = lgpl;
-};
+	copyright = {
+	    date  = "2003-2012";
+	    owner = "Odyssey Computing Concepts, Inc.";
+	    author= "Bruce Korb";
+	    eaddr = "bkorb@gnu.org";
+	    type  = lgpl;
+	};
 
-flag = {
-    name = "option";
-    descrip = "The option option descrip";
-    value = 'o';
-    arg_type = string; arg_default = 'opt init';
-};
+	flag = {
+	    name = "option";
+	    descrip = "The option option descrip";
+	    value = 'o';
+	    arg_type = string; arg_default = 'opt init';
+	};
 
-flag = {
-    name = "second";
-    descrip = "The second option descrip";
-    value = 's';
-    arg_type = string; arg_default = '020';
-};
+	flag = {
+	    name = "second";
+	    descrip = "The second option descrip";
+	    value = 's';
+	    arg_type = string; arg_default = '020';
+	};
 
-flag = {
-   name    = no_val;
-   descrip = 'option with no flag';
-   value   = 'F'; /* REMOVE */
-   flags-must = max_val;
-};
+	flag = {
+	   name    = no_val;
+	   descrip = 'option with no flag';
+	   value   = 'F'; /* REMOVE */
+	   flags-must = max_val;
+	};
 
-flag = {
-   name    = max_val;
-   descrip = 'option with max ct';
-   value   = 'X'; /* REMOVE */
-   max     = '5';
-};
+	flag = {
+	   name    = max_val;
+	   descrip = 'option with max ct';
+	   value   = 'X'; /* REMOVE */
+	   max     = '5';
+	};
 
-flag = {
-   name    = min2_val;
-   descrip = 'option with min ct';
-   value   = 'M'; /* REMOVE */
-   max     = '50';
-   flags-cant = max_val;
-   min     = '5';
-};
+	flag = {
+	   name    = min2_val;
+	   descrip = 'option with min ct';
+	   value   = 'M'; /* REMOVE */
+	   max     = '50';
+	   flags-cant = max_val;
+	   min     = '5';
+	};
 
-flag = {
-   name    = min_val;
-   descrip = 'option with min ct';
-   value   = '2'; /* REMOVE */
-   max     = '50';
-   min     = '5';
-};
+	flag = {
+	   name    = min_val;
+	   descrip = 'option with min ct';
+	   value   = '2'; /* REMOVE */
+	   max     = '50';
+	   min     = '5';
+	};
 _EOF_
 
 # # # # # # # # # # BASE-1 OUTPUT FILE # # # # # # # # #
