@@ -2,7 +2,7 @@
 ##  -*- Mode: shell-script -*-
 ## mklibsrc.sh --   make the libopts tear-off library source tarball
 ##
-## Time-stamp:      "2011-03-06 15:24:16 bkorb"
+## Time-stamp:      "2012-09-01 09:55:40 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -33,7 +33,7 @@ tag=libopts-${ao_rev}
 
 cd ${top_builddir}/pkg
 [ ! -d ${tag} ] || rm -rf ${tag}
-mkdir ${tag} ${tag}/compat ${tag}/autoopts ${tag}/m4
+mkdir ${tag} ${tag}/compat ${tag}/autoopts ${tag}/po ${tag}/m4
 tagd=`pwd`/${tag}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -75,6 +75,8 @@ cd ${tagd}
 cp ${top_srcdir}/config/libopts*.m4 m4/.
 chmod u+w m4/libopts.m4
 cat ${top_srcdir}/pkg/libopts/libopts-add.m4 >> m4/libopts.m4
+cp ${top_srcdir}/autoopts/po/usage-txt.pot po/.
+chmod 444 po/usage-txt.pot
 test ! -f Makefile.am || rm -f Makefile.am
 
 sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
