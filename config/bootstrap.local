@@ -117,6 +117,11 @@ config_versions()
     ${AGexe} -L. misc.def    || exit 1
     cd ..
     cp snprintfv/snprintfv.m4 config/.
+    for f in /usr/local/share/aclocal/guile.m4 /usr/share/aclocal/guile.m4
+    do  test -f "$f" || continue
+        cp $f config/.
+        break
+    done
 
     marker='=== Component Todo:'
     rm -f TODO

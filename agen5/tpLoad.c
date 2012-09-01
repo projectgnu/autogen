@@ -27,6 +27,9 @@
 static bool
 read_okay(char const * pzFName);
 
+static char const *
+expand_dir(char const ** dir_pp, char * name_buf);
+
 static size_t
 cnt_macros(char const * pz);
 

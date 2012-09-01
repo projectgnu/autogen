@@ -4,7 +4,7 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2012-05-13 11:58:00 bkorb"
+/*  Time-stamp:        "2012-08-19 16:57:36 bkorb"
  *
  *  This file is part of AutoGen.
  *
@@ -385,19 +385,13 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
-	AC_CHECK_HEADERS([libio.h ctype.h assert.h sys/resource.h])
 	INVOKE_LIBOPTS_MACROS
-	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
-	AC_DECL_SYS_SIGLIST
-	AC_CHECK_FUNCS([putenv getdate_r utimes futimes])
 	AC_CHECK_FUNCS([fopencookie funopen], [break])
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
 	*yes* )
 	   AC_DEFINE([ENABLE_FMEMOPEN], 1, "Define if we can use it")
 	   ;;
 	esac
-	AC_C_INLINE
-	AC_TYPE_LONG_LONG_INT
 
 	# Note that BSD does not typedef these in its headers, but instead
 	# calls for them to be identical in signature to read(2), write(2),
@@ -443,9 +437,23 @@ do-always = <<- _END_ALWAYS_
 		    ftp://ftp.gnu.org/gnu/rx/" >&2]
 	  AC_MSG_ERROR([Cannot find working POSIX regex library])
 	[fi]
+	_END_ALWAYS_;
+
+/*
+ *  Verify this stuff before mucking around with specific-to-autogen stuff.
+ */
+do-first = <<- _END_FIRST_
+	AC_CHECK_HEADERS([libio.h ctype.h assert.h sys/resource.h])
+	AC_CHECK_DECLS([sigsetjmp],,, [#include <setjmp.h>])
+	AC_DECL_SYS_SIGLIST
+	AC_CHECK_FUNCS([putenv getdate_r utimes futimes])
+
+	AC_C_INLINE
+	AC_TYPE_LONG_LONG_INT
+
 	AC_PROG_GREP
 	AC_PROG_EGREP
 	AC_PROG_FGREP
-	_END_ALWAYS_;
+	_END_FIRST_;
 
 /* misc.def ends here */

@@ -1,3 +1,18 @@
+2012-09-01  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/test/Makefile.am: getopt.test won't work unless the
+	library source has been built.
+	* autoopts/test/argument.test: augment test by ensuring that stuff
+	still works with "arg-range" attribute removed.
+	* autoopts/tpl/optmain.tlib: allow user supplied code for functions
+	where the template needs its own code inserted.  This includes adding
+	a comment about coding requirements.
+	* autoopts/test/handler.test: adjust for comment in template
+	* config/bootstrap.local: incorporate the guile.m4 into our config dir.
+	* config/misc.def: move some tests from "do-always" to "do-first".
+	* configure.ac: specify the macro directory as "config", not "m4".
+	* pkg/libopts/mklibsrc.sh: distribute the usage-txt.pot file, too.
+
 2012-08-11  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/agtexi-cmd.tpl: Fix up "help" option name in texi doc.
