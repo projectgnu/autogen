@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-08-11 08:13:56 bkorb"
+# Time-stamp:      "2012-08-13 09:19:35 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -26,14 +26,14 @@
 
 (out-push-new) =]
 ck_flag_code() {
-  addon_txt=''
-  txt1=`[=(. grep-prog)=] -w pOptDesc ${tmp_dir}/flag-code`
-  test -z "$txt1" && addon_txt='    (void)pOptDesc;\n'
-  txt2=`[=(. grep-prog)=] -w pOptions ${tmp_dir}/flag-code`
-  test -z "$txt2" && addon_txt=${addon_txt}'    (void)pOptions;\n'
-  cat ${tmp_dir}/flag-code
-  test -z "$addon_txt" || printf "\n$addon_txt"
-  rm -f ${tmp_dir}/flag-code
+    addon_txt=''
+    txt1=`[=(. grep-prog)=] -w pOptDesc ${tmp_dir}/flag-code`
+    test -z "$txt1" && addon_txt='    (void)pOptDesc;\n'
+    txt2=`[=(. grep-prog)=] -w pOptions ${tmp_dir}/flag-code`
+    test -z "$txt2" && addon_txt=${addon_txt}'    (void)pOptions;\n'
+    cat ${tmp_dir}/flag-code
+    test -z "$addon_txt" || printf "\n$addon_txt"
+    rm -f ${tmp_dir}/flag-code
 }[=
 (shell (out-pop #t)) =][=
 
@@ -1024,9 +1024,34 @@ INVOKE callback-proc-header         =][=
 
 IF (out-push-new (string-append tmp-dir "/flag-code"))
    (exist? "flag-code")             =][=
-   (def-file-line "flag-code" "    /* extracted from %s, line %d */\n")
-   =][=
-  (join "\n" (stack "flag-code"))   =][=
+
+   IF (exist? "flag-code[0]")      \=]
+    /*
+     * Be sure the flag-code[0] handles special values for the options pointer
+     * viz. (poptions <= OPTPROC_EMIT_LIMIT) *and also* the special flag bit
+     * ((poptdesc->fOptState & OPTST_RESET) != 0) telling the option to
+     * reset its state.
+     */[=
+      (def-file-line "flag-code[0]" "\n    /* extracted from %s, line %d */\n")
+      =][=  flag-code[0]            =][=
+    ENDIF                           =][=
+
+    CASE arg-type                   =][=
+    =*   bool                       =]
+    optionBooleanVal(pOptions, pOptDesc);[=
+    =*   num                        =]
+    optionNumericVal(pOptions, pOptDesc);[=
+    =    time-date                  =]
+    optionTimeDate(pOptions, pOptDesc);[=
+    =*   time                       =]
+    optionTimeVal(pOptions, pOptDesc);[=
+    ~*   hier|nest                  =]
+    optionNestedVal(pOptions, pOptDesc);[=
+    ESAC                            =][=
+
+    IF (exist? "flag-code[1]")      =]
+[=     flag-code[1]                 =][=
+    ENDIF                           =][=
 
 ELSE                                =][=
 

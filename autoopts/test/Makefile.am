@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Time-stamp:      "2012-05-13 16:02:42 bkorb"
+## Time-stamp:      "2012-09-01 09:53:52 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -25,6 +25,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 
+libsrc     = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 EXTRA_DIST = defs.in stdopts.def $(TESTS)
 TESTS      = \
     alias.test   argument.test cfg-edit.test  cond.test      \
@@ -33,6 +34,10 @@ TESTS      = \
     keyword.test library.test  main.test      nested.test    \
     nls.test     rc.test       shell.test     stdopts.test   \
     time.test    usage.test    vendor.test    vers.test
+
+getopt.test : ../$(libsrc)
+../$(libsrc):
+	cd .. ; $(MAKE) $(libsrc)
 
 testsubdir = ./testdir
 

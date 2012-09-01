@@ -5,7 +5,7 @@
 #                    make sure that when it is not specified
 #                    then option processing consumes all args.
 #
-# Time-stamp:        "2012-08-11 08:12:41 bkorb"
+# Time-stamp:        "2012-08-13 08:56:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -80,8 +80,8 @@ cat >&3 <<- _EOF_
 	    arg-range = "3->021";
 	    arg-range = "040->0x1FFF";
 	    scaled;
-	    flag-code[0] = '    /* no-op zero */;';
 	    flag-code[1] = '    /* no-op one  */;';
+	    flag-code[0] = '    /* no-op zero */;';
 	};
 	include = '#include <stdlib.h>';
 	_EOF_
@@ -196,6 +196,35 @@ cmp -s ${testname}3.hlp ${testname}3.help || \
 
 cmp -s ${testname}3.hlp ${testname}3-a.hlp || \
   failure "`diff ${testname}3.hlp ${testname}3-a.hlp`"
+# # # # # # # # # # T E S T   4 # # # # # # # # # # #
+
+${SED} /arg-range/d ${testname}2.def > ${testname}4.def
+
+${AG_L} ${testname}4.def || \
+  failure AutoGen could not process
+${SED} -n '/^doOptSecond/,/^}/p' ${testname}4.c > ${testname}4.res
+Csrc=${testname}4
+compile '-?'
+
+cat > ${testname}4.base <<- _EOF_
+	doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
+	{
+	    /*
+	     * Be sure the flag-code[0] handles special values for the options pointer
+	     * viz. (poptions <= OPTPROC_EMIT_LIMIT) *and also* the special flag bit
+	     * ((poptdesc->fOptState & OPTST_RESET) != 0) telling the option to
+	     * reset its state.
+	     */
+	    /* extracted from argument4.def, line 22 */
+	    /* no-op zero */;
+	    optionNumericVal(pOptions, pOptDesc);
+	    /* no-op one  */;
+	}
+	_EOF_
+
+cmp -s ${testname}4.base ${testname}4.res || \
+  failure "`diff ${testname}4.base ${testname}4.res`"
+
 # # # # # # # # # # T E S T   E N D # # # # # # # # # #
 
 cleanup
