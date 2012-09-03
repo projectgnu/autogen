@@ -1,8 +1,8 @@
 [= AutoGen5 Template
 
-  h  pot
+  h
 
-(define time-stamp "2012-02-18 10:10:47")
+(define time-stamp "2012-09-03 11:31:52")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -24,10 +24,9 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
-=][=  CASE (suffix) =][=
+=][=
 
-==  h               =][=
-
+(make-tmp-dir)
 (define ref-list "")
 (define cch-ct   0)
 (dne " *  " "/*  ") =]
@@ -56,13 +55,13 @@ typedef struct {
   int       field_ct;[=
 FOR utxt        =][=
   (if (exist? "ut-type")
-      (emit (sprintf "\n  %-9s utpz_%s;"
-                     (string-append (get "ut-type") "*")
+      (emit (sprintf "\n  %-12s utpz_%s;"
+                     (string-append (get "ut-type") " *")
                      (get "ut-name")  ))
       (set! cch-ct (+ cch-ct 1))  ) =][=
 
 ENDFOR  utxt    =]
-  cch_t*    apz_str[ [= (. cch-ct) =] ];
+  char const * apz_str[ [= (. cch-ct) =] ];
 } usage_text_t;
 
 /*
@@ -104,7 +103,7 @@ ENDFOR =]
 [=
 FOR utxt  =][=
   (if (exist? "ut-type")
-      (sprintf "\n  static %-7s eng_z%s[] = %s;"
+      (sprintf "\nstatic %-10s eng_z%s[] = %s;"
               (get "ut-type") (get "ut-name") (kr-string (get "ut-text"))
       )
 
@@ -125,35 +124,40 @@ ENDFOR  utxt        =][=
    *  the pointers to all these strings.
    *  Aren't you glad you don't maintain this by hand?
    */
-  usage_text_t option_usage_text = {
-    [= (count "utxt") =],
+usage_text_t option_usage_text = {
+  [= (count "utxt") =],
 [= (shell (string-append
   "CLexe=${AGexe%/agen5/*}/columns/columns
   test -x \"${CLexe}\" || {
     CLexe=${AGexe%/autogen}/columns
     test -x \"${CLexe}\" || die 'columns program is not findable'
   }
-  ${CLexe} -W84 -I4 --spread=1 -f'eng_z%s,' <<_EOF_" typed-list
+  ${CLexe} -W84 -I2 --spread=1 -f'eng_z%s,' <<_EOF_" typed-list
   "\n_EOF_
   echo '    {'
-  ${CLexe} -W84 -I6 --spread=1 -S, <<_EOF_\n" const-list
+  ${CLexe} -W84 -I4 --spread=1 -S, <<_EOF_\n" const-list
   "_EOF_" )) =]
     }
   };
-
 #endif /* DO_TRANSLATIONS */
-#endif /* [= (. header-guard) =] */
+#ifdef XGETTEXT_SCAN
+/* TRANSLATORS: The following dummy function was crated solely so that
+ * xgettext can extract the correct strings.  These strings are actually
+ * referenced where the preceding "#line" directive states, though you
+ * will not see the literal string there.  The literal string is defined
+ * above and referenced via a #define name that redirects into the
+ * "option_usage_text" structure above.
+ */
+static void dummy_func(void) {
 [=
 
-
-==  pot
-
+(out-push-new (string-append (base-name) ".pot"))
 
 \=]
 # Automated Option parsing usage text.
 # copyright (c) [=`date +1999-%Y`=] by Bruce Korb - all rights reserved
-# This file is distributed under the same license as the AutoOpts package.
-# Bruce Korb <bkorb@gnu.org> [=`date +%Y`=]
+# This file is distributed under the same licenses as the AutoOpts package.
+# Bruce Korb <bkorb@gnu.org>
 #
 #, fuzzy
 msgid ""
@@ -169,25 +173,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 [=
 
-FOR utxt
+(out-suspend "pot")
+(out-push-new)
+(shell "exec 4>${tmp_dir}/pot")
+
+\=]
+sym=z%s
+str=$(cat <<\_EOF_
+%s
+_EOF_
+)
+
+puts="  puts(_($str));"
+
+f=$(grep -n -w $sym *.c [agpo]*.h | \
+        sed 's@\([^:]*:[^:]*\):.*@../\1@')
+test -z "$f" && die "$sym not found in AutoOpts sources"
+sym="$f"
+printf "\n#: $(echo $sym)\nmsgid %%s\n" "$str" >&4
+
+echo "$sym" | while IFS=: read f l
+do
+  printf '\n#line %%d "%%s"\n' $l $f
+  echo "$puts"
+done
+[= (define puts-fmt (out-pop #t)) =][=
+
+FOR utxt  =][=
+  (if (not (exist? "ut-noi18n"))
+      (shellf puts-fmt (get "ut-name") (c-string (get "ut-text"))) )
   =][=
-  (set! ref-list (shellf
-     "list=`grep -n -w z%s *.c [agpo]*.h tpl/opt*.t* | \\
-         sed -n 's/\\([^:]*:[^:]*\\):.*/\\1/p'`
-     echo ${list}" (get "ut-name")))
 
-  (if (< (string-length ref-list) 2)
-      (error (sprintf "No references to z%s string" (get "ut-name")))  )
-
-  (sprintf "\n#: %s\nmsgid %s\n" ref-list (c-string (get "ut-text")))
-
-  =][=
 ENDFOR utxt
 
 =]
-[=
-
-ESAC
+}
+#endif /* XGETTEXT_SCAN */
+#endif /* [= (. header-guard) =] */
+[= (out-resume "pot")
+   (emit (shell "exec 4>&- ; cat ${tmp_dir}/pot") "\n")
+   (out-pop) =][=
 
 # Local Variables:
 # Mode: text

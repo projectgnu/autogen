@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-08-19 16:27:21 bkorb"
+ *  Time-stamp:      "2012-09-01 10:48:55 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -34,7 +34,7 @@ static char *
 handle_comment(char* txt);
 
 static char *
-handle_cfg(tOptions * opts, tOptState * pOS, char * txt, int dir);
+handle_cfg(tOptions * opts, tOptState * ost, char * txt, int dir);
 
 static char *
 handle_directive(tOptions * opts, char * txt);
@@ -58,7 +58,7 @@ static void
 cook_xml_text(char * pzData);
 
 static char *
-handle_struct(tOptions * opts, tOptState * pOS, char * txt, int dir);
+handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir);
 
 static char *
 parse_keyword(tOptions * opts, char * txt, tOptionValue * typ);
@@ -502,7 +502,7 @@ handle_comment(char* txt)
  *  in "cooked" mode.
  */
 static char *
-handle_cfg(tOptions * opts, tOptState * pOS, char * txt, int dir)
+handle_cfg(tOptions * opts, tOptState * ost, char * txt, int dir)
 {
     char* pzName = txt++;
     char* pzEnd  = strchr(txt, NL);
@@ -515,7 +515,7 @@ handle_cfg(tOptions * opts, tOptState * pOS, char * txt, int dir)
     if (txt > pzEnd) {
     name_only:
         *pzEnd++ = NUL;
-        loadOptionLine(opts, pOS, pzName, dir, OPTION_LOAD_UNCOOKED);
+        loadOptionLine(opts, ost, pzName, dir, OPTION_LOAD_UNCOOKED);
         return pzEnd;
     }
 
@@ -571,7 +571,7 @@ handle_cfg(tOptions * opts, tOptState * pOS, char * txt, int dir)
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine(opts, pOS, pzName, dir, OPTION_LOAD_UNCOOKED);
+    loadOptionLine(opts, ost, pzName, dir, OPTION_LOAD_UNCOOKED);
 
     return pzEnd;
 }
@@ -887,7 +887,7 @@ cook_xml_text(char * pzData)
  *  "</name>" string.
  */
 static char *
-handle_struct(tOptions * opts, tOptState * pOS, char * txt, int dir)
+handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir)
 {
     tOptionLoadMode mode = option_load_mode;
     tOptionValue    valu;
@@ -915,7 +915,7 @@ handle_struct(tOptions * opts, tOptState * pOS, char * txt, int dir)
             return NULL;
         *txt = NUL;
         txt += 2;
-        loadOptionLine(opts, pOS, pzName, dir, mode);
+        loadOptionLine(opts, ost, pzName, dir, mode);
         return txt;
 
     case '>':
@@ -956,7 +956,7 @@ handle_struct(tOptions * opts, tOptState * pOS, char * txt, int dir)
      *  "pzName" points to what looks like text for one option/configurable.
      *  It is NUL terminated.  Process it.
      */
-    loadOptionLine(opts, pOS, pzName, dir, mode);
+    loadOptionLine(opts, ost, pzName, dir, mode);
 
     return txt;
 }
