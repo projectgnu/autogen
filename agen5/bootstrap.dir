@@ -4,7 +4,7 @@
 # agen5/bootstrap.dir --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-04-14 09:39:36 bkorb"
+# Time-stamp:        "2012-09-20 14:35:13 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -116,7 +116,7 @@ assemble_fmemopen() {
         sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
         sed -e '/^#if defined(HAVE_FOPENCOOKIE)/p' \
             -e '/=--subblock/,/^#if defined(HAVE_FOPENCOOKIE)/d' \
-            -e "s% @file .*% @file $(realpath ${fmemdir}/fmemopen.c)%" \
+            -e "s% @file .*% @file fmemopen.c%" \
             ${fmemdir}/fmemopen.c
         echo '#endif /* ENABLE_FMEMOPEN */'
     } > fmemopen.c

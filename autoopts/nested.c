@@ -2,7 +2,7 @@
 /**
  * \file nested.c
  *
- *  Time-stamp:      "2012-03-04 13:30:07 bkorb"
+ *  Time-stamp:      "2012-09-04 12:06:27 bkorb"
  *
  *   Automated Options Nested Values module.
  *
@@ -504,7 +504,7 @@ scan_xml(char const* pzName, tOptionValue* pRes)
 
         if (option_load_mode == OPTION_LOAD_KEEP)
             break;
-        mungeString(pNewVal->v.strVal, option_load_mode);
+        munge_str(pNewVal->v.strVal, option_load_mode);
         break;
 
     case OPARG_TYPE_BOOLEAN:

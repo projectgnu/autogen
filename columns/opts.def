@@ -3,7 +3,7 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-04-07 09:30:18 bkorb"
+ *  Time-stamp:        "2012-09-04 11:27:58 bkorb"
  *
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
@@ -34,6 +34,8 @@ package        = 'GNU AutoGen';
 homerc         = '.', '$HOME';
 environrc;
 long-opts;
+no-xlate       = anything;
+omit-nls-code;
 
 version = "1.2";
 

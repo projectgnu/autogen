@@ -23,7 +23,7 @@ typedef struct {
     _IOWR('m', FMEMC_GET_BUF_ADDR, fmemc_get_buf_addr_t)
 
 /**
- * @file /old-home/bkorb/tools/mine/lib/fmemopen/fmemopen.c
+ * @file fmemopen.c
  *
  * Copyright (c) 2004-2012 by Bruce Korb.  All rights reserved.
  *

@@ -2,7 +2,7 @@
 /**
  * \file makeshell.c
  *
- * Time-stamp:      "2012-08-11 08:51:32 bkorb"
+ * Time-stamp:      "2012-09-04 12:34:00 bkorb"
  *
  *  This module will interpret the options set in the tOptions
  *  structure and create a Bourne shell script capable of parsing them.
@@ -225,7 +225,7 @@ emit_var_text(char const * prog, char const * var, int fdin)
 
     fclose(fp);
 
-skip_text:
+ skip_text:
 
     fputs(END_SET_TEXT, stdout);
 }

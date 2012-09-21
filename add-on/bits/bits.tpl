@@ -86,7 +86,6 @@ CASE (suffix)       =][=
 
 =]
 [=
- (shell "sedcmd='s/$/_val} +/;s/^/${/'")
  (make-header-guard "bit_mask") =]
 #include [= (if (exist? "stdint-hdr")
                 (string-append "\"" (get "stdint-hdr") "\"")
@@ -598,41 +597,33 @@ DEFINE  emit-bit-list       =][=
     (if (exist? "b-name")
         (set! bit-list (string-append (join "\n" (stack "b-name")) "\n"))
         (set! bit-list "")
-    )   =][=
+    )               =][=
 
-    FOR m-inc   =][=
+    FOR m-inc       =][=
        (set! tmp (string->c-name! (get "m-inc")))
        (set! bit-list (string-append bit-list
                       (shellf "echo \"${%s}\"" tmp) "\n"))
-                =][=
-    ENDFOR m-inc=][=
+                    =][=
+    ENDFOR m-inc    =][=
 
     (set! bit-list (string->c-name! bit-list))
-    (shellf "%s='%s'" (string->c-name! (get "m-name")) bit-list)
 
-    (emit (shell (string-append
+    (out-push-new)  \=]
+%1$s=$(echo '%2$s' | sort -u | egrep -v $'^[ \t]*$')
+echo "${%1$s}" | \
+  tr a-z A-Z | {
+    fmt="--format=[=(. prefix)=]_%%s_BIT"
+    columns -I8 --spread=1 -S' |' $fmt --line=" \\" --end=" \\"
+}
 
-       "(sort -u | columns -I8 --spread=1 -S' |' --format=" prefix "_%s_BIT "
-                "--line=' \\'\n) <<\\_EOF_\n"
-       (string-upcase bit-list)
-       "_EOF_"
+sum=$(echo "${%1$s}" | \
+      sed -e 's/$/_val} +/;s/^/${/')
+sum=$(eval calc $sum 0)
+printf '        /* 0x%%[= (. mask-fmt) =] */\n' $sum
+[=
 
-    )))
+ (shellf (out-pop #t) (string->c-name! (get "m-name")) bit-list)
 
-    (shell (string-append
-     "sum=`(sort -u | \
-	sed -e \"${sedcmd}\"\n) <<\\_EOF_\n"
-     bit-list
-     "_EOF_\n`\n"
-     "sum=`eval calc ${sum} 0`\n"
-     "printf "
-            (if (>= (high-lim "bit") 32)
-                "' \\\\\\n        /* 0x%016XULL */\\n'"
-            (if (>= (high-lim "bit") 16)
-                "' \\\\\\n        /* 0x%08XU */\\n'"
-                "' \\\\\\n        /* 0x%04XU */\\n'" ))
-        " ${sum}"
-    ))
 =][=
 
 ENDDEF  emit-bit-list
@@ -641,8 +632,12 @@ ENDDEF  emit-bit-list
 
 DEFINE  emit-word-macro     =][=
 
+  (define mask-fmt (if (>= (high-lim "bit") 32) "016XULL"
+        (if (>= (high-lim "bit") 16) "08XU" "04XU") ) )
+
   (set! tmp-name (string-upcase! (string-append prefix "_"
         (if (exist? "zero-name") (get "zero-name") "NO_BITS") )))
+
   (sprintf def-fmt tmp-name) =]0[= one =][=
 
   FOR bit       =][=

@@ -1,7 +1,7 @@
 
 /**
  *  \file load.c
- *  Time-stamp:      "2012-08-11 08:20:09 bkorb"
+ *  Time-stamp:      "2012-09-04 12:06:25 bkorb"
  *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
@@ -271,8 +271,16 @@ add_env_val(char * buf, int buf_sz, char const * name)
     return true;
 }
 
+/**
+ * Trim leading and trailing white space.
+ * If we are cooking the text and the text is quoted, then "cook"
+ * the string.  To cook, the string must be quoted.
+ *
+ * @param[in,out] txt  the input and output string
+ * @param[in]     mode the handling mode (cooking method)
+ */
 LOCAL void
-mungeString(char * txt, tOptionLoadMode mode)
+munge_str(char * txt, tOptionLoadMode mode)
 {
     char * pzE;
 

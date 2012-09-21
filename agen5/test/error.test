@@ -4,7 +4,7 @@
 # error.test --- test error functionality
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-12-30 16:40:11 bkorb"
+# Time-stamp:        "2012-09-15 10:42:44 bkorb"
 #
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -94,7 +94,9 @@ ag_err 1 ${testname}.def
 test -f  ${testname}-task1-OK \
   && failure unexpected success for test-1
 
-${SED} '/Giving up in/d;/Failing Guile command:/,$d' ${testname}.err1 \
+${SED} '/Giving up in/d
+        /erasing the .* environment variable/d
+        /Failing Guile command:/,$d' ${testname}.err1 \
   > ${testname}.err
 cmp -s ${testname}.err ${testname}.base1 || \
   failure "expected->actual${nl}`diff -c ${testname}.base1 ${testname}.err`"
@@ -130,10 +132,12 @@ verb_ok=true
 
 if test ${GUILE_VERSION} -gt 107000
 then
-  ${EGREP} -v 'Giving up in | is deprecated\.' ${testname}.err2
+  omit_pat='Giving up in | is deprecated\.|erasing the .* environment variable'
 else
-  ${EGREP} -v 'Giving up in ' ${testname}.err2
-fi > ${testname}.res2
+  omit_pat='Giving up in '
+fi
+
+${EGREP} -v "$omit_pat" ${testname}.err2 > ${testname}.res2
 
 cmp -s ${testname}.base2 ${testname}.res2 || \
   failure "expected->actual${nl}`diff -c ${testname}.base2 ${testname}.res2`"
@@ -166,7 +170,7 @@ ag_err 4 ${testname}2.def
 test -f ${testname}-task4-OK \
   && failure unexpected success for test-4
 
-${GREP} -v 'Giving up in' ${testname}.err4 > ${testname}.res4
+${EGREP} -v "$omit_pat" ${testname}.err4 > ${testname}.res4
 cmp -s  ${testname}.res4 ${testname}.base4 \
   || failure "expected->actual${nl}`diff -c ${testname}.base4 ${testname}.res4`"
 
@@ -183,7 +187,7 @@ ag_err 5 -T ${testname}.tpl5 ${agopts}5 > /dev/null
 test -f ${testname}-task5-OK \
   && failure unexpected success for test-5
 
-${EGREP} -v 'Giving up in .*functions\.c' ${testname}.err5 > ${testname}.res5
+${EGREP} -v "$omit_pat" ${testname}.err5 > ${testname}.res5
 cat > ${testname}.base5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:

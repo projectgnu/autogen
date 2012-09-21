@@ -2,7 +2,7 @@
 /**
  * \file time.c
  *
- *  Time-stamp:      "2012-08-11 08:34:17 bkorb"
+ *  Time-stamp:      "2012-09-04 12:33:56 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -127,7 +127,7 @@ optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
     }
     return;
 
-default_action:
+ default_action:
 
 #endif
     optionTimeVal(pOpts, pOD);

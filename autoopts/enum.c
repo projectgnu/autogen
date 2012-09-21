@@ -2,7 +2,7 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2012-08-11 08:12:58 bkorb"
+ * Time-stamp:      "2012-09-21 06:46:01 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -225,7 +225,7 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
     if (res < name_ct)
         return res; /* partial match */
 
-oops:
+ oops:
 
     pz_enum_err_fmt = (res == name_ct) ? zNoKey : zAmbigKey;
     option_usage_fp = stderr;
@@ -249,8 +249,8 @@ oops:
 char const *
 optionKeywordName(tOptDesc * pOD, unsigned int enum_val)
 {
-    tOptDesc od = {
-        .optArg.argEnum = enum_val };
+    tOptDesc od = { 0 };
+    od.optArg.argEnum = enum_val;
 
     (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, &od );
     return od.optArg.argString;

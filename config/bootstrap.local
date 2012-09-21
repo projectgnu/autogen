@@ -3,7 +3,7 @@
 # config/bootstrap.local --- maintainer's bootstrap script
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-07-02 14:38:04 bkorb"
+# Time-stamp:        "2012-09-04 08:50:25 bkorb"
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -134,7 +134,6 @@ config_versions()
             cat ${f}
         done
     } > TODO
-
     cd ${srcdir}
 
     glopts='--local-dir=tmp --source-base=autoopts --lib=do_not_make_me
@@ -146,11 +145,15 @@ config_versions()
 	--m4-base=config
         --lgpl=2'
     glmods='parse-duration gendocs gettext-h'
-
-    GNULIBTOOL=${GNULIBDIR:-~gnu/proj/gnulib}/gnulib-tool
+    GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
+    GNULIBTOOL=${GNULIBDIR}/gnulib-tool
+    for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath
+    do test -s ${GNULIBDIR}/$f || die "not found: ${GNULIBDIR}/$f"
+    done
     ${GNULIBTOOL} $glopts $glmods
     sed -i 's/do_not_make_me_.*_SOURCES/EXTRA_DIST/;/do_not_make_me/d' \
         autoopts/gnulib.mk
+    cp ${GNULIBDIR}/build-aux/config.rpath ${GNULIBDIR}/m4/lib-link.m4 config/.
 }
 
 check_tools()
@@ -178,13 +181,13 @@ tweak_Makefile_am()
             s/.*/misc_extra     = \\/
             q
         }' Makefile.am
-        find VERSION NOTES config/bootstrap* config/*.m4 \
+        find VERSION NOTES config/bootstrap* config/*.m4 config/config.rpath \
                autoopts/parse-duration.[ch] doc/gendocs* \
             -type f | \
             columns --spread=1 -I4 --line=' \'
 
         sed -n '/^EXTRA_DIST /,$p' Makefile.am
-    } > XXX$$
+    } > XXX$$ 2>/dev/null
     mv -f XXX$$ Makefile.am
 
     cd pkg

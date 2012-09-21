@@ -2,7 +2,7 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-06-10 12:17:05 bkorb"
+ *  Time-stamp:        "2012-09-21 07:26:54 bkorb"
  *
  *  This is the main routine for autogen.
  *
@@ -84,6 +84,23 @@ inner_main(void * closure, int argc, char ** argv)
 {
     atexit(done_check);
     initialize(argc, argv);
+
+#if (GUILE_VERSION > 200000) && (GUILE_VERSION < 200008)
+    /*
+     * Guile 2.0.1 through 2.0.7 mistakenly corrupt the library search path.
+     * Rather than fall over, remove the environment variable.
+     */
+    {
+        static char ldpath[] = "LD_LIBRARY_PATH=";
+        char * p = ldpath + sizeof(ldpath) - 2;
+        *p = NUL;
+        if (getenv(ldpath) != NULL) {
+            fprintf(stderr, "erasing the %s environment variable\n", ldpath);
+            *p = '=';
+            putenv(ldpath);
+        }
+    }
+#endif
 
     processing_state = PROC_STATE_LOAD_DEFS;
     read_defs();

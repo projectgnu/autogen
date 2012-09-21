@@ -44,6 +44,7 @@ usage-message;
 resettable;
 config-header  = config.h;
 no-xlate       = anything;
+omit-nls-code;
 
 #else
 prog-name      = xml2ag;

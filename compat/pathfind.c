@@ -4,18 +4,23 @@
 
 /*
  * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
- * Time-stamp:       "2012-07-18 10:19:39 bkorb"
+ * Time-stamp:       "2012-09-04 13:06:05 bkorb"
  */
 
 /* Code: */
 
+static char *
+pathfind( char const * path,
+          char const * fileName,
+          char const * mode );
+
 #include "compat.h"
 #ifndef HAVE_PATHFIND
 #if defined(__windows__) && !defined(__CYGWIN__)
-char*
-pathfind( char const*  path,
-          char const*  fileName,
-          char const*  mode )
+static char *
+pathfind( char const * path,
+          char const * fileName,
+          char const * mode )
 {
     return NULL;
 }
@@ -80,10 +85,10 @@ static char* extract_colon_unit( char* dir, char const *string, int *p_index );
  *
  * err:  returns NULL if the file is not found.
 =*/
-char*
-pathfind( char const*  path,
-          char const*  fileName,
-          char const*  mode )
+static char *
+pathfind( char const * path,
+          char const * fileName,
+          char const * mode )
 {
     int   p_index   = 0;
     int   mode_bits = 0;

@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-08-13 09:19:35 bkorb"
+# Time-stamp:      "2012-09-04 12:32:20 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -847,7 +847,7 @@ DEFINE range-option-code
 
     option_usage_fp = stderr;
 
-emit_ranges:
+ emit_ranges:
     optionShowRange(pOptions, pOptDesc, (void *)rng, [= (. range-count) =]);[=
 
 (. ok-return-code)  =][=

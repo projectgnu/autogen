@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-09-01 10:48:55 bkorb"
+ *  Time-stamp:      "2012-09-04 13:49:29 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -310,17 +310,17 @@ optionFindNextValue(const tOptDesc * odesc, const tOptionValue * pPrevVal,
  *  @code{ENOENT} - no entry matched the given name.
  *  @end itemize
 =*/
-const tOptionValue*
-optionGetValue(tOptionValue const * pOld, char const * vname)
+tOptionValue const *
+optionGetValue(tOptionValue const * oov, char const * vname)
 {
     tArgList *     arg_list;
     tOptionValue * res = NULL;
 
-    if ((pOld == NULL) || (pOld->valType != OPARG_TYPE_HIERARCHY)) {
+    if ((oov == NULL) || (oov->valType != OPARG_TYPE_HIERARCHY)) {
         errno = EINVAL;
         return res;
     }
-    arg_list = pOld->v.nestVal;
+    arg_list = oov->v.nestVal;
 
     if (arg_list->useCt > 0) {
         int     ct     = arg_list->useCt;
@@ -370,30 +370,30 @@ optionGetValue(tOptionValue const * pOld, char const * vname)
  *  @end itemize
 =*/
 tOptionValue const *
-optionNextValue(tOptionValue const * pOVList,tOptionValue const * pOldOV )
+optionNextValue(tOptionValue const * ov_list,tOptionValue const * oov )
 {
-    tArgList*     arg_list;
-    tOptionValue* res = NULL;
-    int           err = EINVAL;
+    tArgList *     arg_list;
+    tOptionValue * res = NULL;
+    int            err = EINVAL;
 
-    if ((pOVList == NULL) || (pOVList->valType != OPARG_TYPE_HIERARCHY)) {
+    if ((ov_list == NULL) || (ov_list->valType != OPARG_TYPE_HIERARCHY)) {
         errno = EINVAL;
         return NULL;
     }
-    arg_list = pOVList->v.nestVal;
+    arg_list = ov_list->v.nestVal;
     {
-        int    ct    = arg_list->useCt;
-        void** papNV = (void**)(arg_list->apzArgs);
+        int     ct    = arg_list->useCt;
+        void ** o_list = (void**)(arg_list->apzArgs);
 
         while (ct-- > 0) {
-            tOptionValue* pNV = *(papNV++);
-            if (pNV == pOldOV) {
+            tOptionValue * nov = *(o_list++);
+            if (nov == oov) {
                 if (ct == 0) {
                     err = ENOENT;
 
                 } else {
-                    err  = 0;
-                    res = (tOptionValue*)*papNV;
+                    err = 0;
+                    res = (tOptionValue*)*o_list;
                 }
                 break;
             }
@@ -477,7 +477,7 @@ file_preset(tOptions * opts, char const * fname, int dir)
         }
     } while (ftext != NULL);
 
-all_done:
+ all_done:
     text_munmap(&cfgfile);
 }
 
@@ -580,6 +580,10 @@ handle_cfg(tOptions * opts, tOptState * ost, char * txt, int dir)
  *  "txt" points to a "<?" sequence.
  *  We handle "<?program" and "<?auto-options" directives.
  *  All others are treated as comments.
+ *
+ *  @param[in,out] opts  program option descriptor
+ *  @param[in]     txt   scanning pointer
+ *  @returns       the next character to look at
  */
 static char *
 handle_directive(tOptions * opts, char * txt)
@@ -623,10 +627,15 @@ handle_directive(tOptions * opts, char * txt)
     if (txt != NULL)
         txt++;
     return txt;
+#   undef DIRECTIVE_TABLE
 }
 
 /**
- *  handle AutoOpts mode flags
+ *  handle AutoOpts mode flags.
+ *
+ *  @param[in,out] opts  program option descriptor
+ *  @param[in]     txt   scanning pointer
+ *  @returns       the next character to look at
  */
 static char *
 aoflags_directive(tOptions * opts, char * txt)
@@ -653,6 +662,10 @@ aoflags_directive(tOptions * opts, char * txt)
 
 /**
  * handle program segmentation of config file.
+ *
+ *  @param[in,out] opts  program option descriptor
+ *  @param[in]     txt   scanning pointer
+ *  @returns       the next character to look at
  */
 static char *
 program_directive(tOptions * opts, char * txt)
@@ -695,6 +708,10 @@ program_directive(tOptions * opts, char * txt)
  *  "txt" points to a '[' character.
  *  The "traditional" [PROG_NAME] segmentation of the config file.
  *  Do not ever mix with the "<?program prog-name>" variation.
+ *
+ *  @param[in,out] opts  program option descriptor
+ *  @param[in]     txt   scanning pointer
+ *  @returns       the next character to look at
  */
 static char *
 handle_section(tOptions * opts, char * txt)
@@ -1189,7 +1206,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
         txt = SPN_WHITESPACE_CHARS(txt+1);
         len = SPN_LOWER_CASE_CHARS(txt) - txt;
 
-        switch (find_xat_attribute_id(txt, len)) {
+        switch (find_option_xat_attribute_id(txt, len)) {
         case XAT_KWD_TYPE:
             txt = parse_value(txt+len, pType);
             break;
@@ -1275,7 +1292,12 @@ parse_set_mem(tOptions * opts, char * txt, tOptionValue * typ)
 }
 
 /**
- *  "txt" points to the character after "type="
+ *  parse the type.  The keyword "type" was found, now figure out
+ *  the type that follows the type.
+ *
+ *  @param[in]  txt  points to the '=' character after the "type" keyword.
+ *  @param[out] typ  where to store the type found
+ *  @returns    the next byte after the type name
  */
 static char *
 parse_value(char * txt, tOptionValue * typ)
@@ -1293,7 +1315,7 @@ parse_value(char * txt, tOptionValue * typ)
         return skip_unkn(txt + len);
     }
 
-    switch (find_value_type_id(txt, len)) {
+    switch (find_option_value_type_id(txt, len)) {
     default:
     case VTP_KWD_INVALID: goto woops;
 
@@ -1327,97 +1349,7 @@ parse_value(char * txt, tOptionValue * typ)
     return txt + len;
 }
 
-/**
- *  Make sure the option descriptor is there and that we understand it.
- *  This should be called from any user entry point where one needs to
- *  worry about validity.  (Some entry points are free to assume that
- *  the call is not the first to the library and, thus, that this has
- *  already been called.)
- *
- *  Upon successful completion, pzProgName and pzProgPath are set.
- *
- *  @param[in,out] opts   program options descriptor
- *  @param[in]     pname  name of program, from argv[]
- *  @returns SUCCESS or FAILURE
- */
-LOCAL tSuccess
-validate_struct(tOptions * opts, char const * pname)
-{
-    if (opts == NULL) {
-        fputs(zAO_Bad, stderr);
-        return FAILURE;
-    }
-
-    /*
-     *  IF the client has enabled translation and the translation procedure
-     *  is available, then go do it.
-     */
-    if (  ((opts->fOptSet & OPTPROC_TRANSLATE) != 0)
-       && (opts->pTransProc != NULL) ) {
-        /*
-         *  If option names are not to be translated at all, then do not do
-         *  it for configuration parsing either.  (That is the bit that really
-         *  gets tested anyway.)
-         */
-        if ((opts->fOptSet & OPTPROC_NO_XLAT_MASK) == OPTPROC_NXLAT_OPT)
-            opts->fOptSet |= OPTPROC_NXLAT_OPT_CFG;
-        (*opts->pTransProc)();
-        opts->fOptSet &= ~OPTPROC_TRANSLATE;
-    }
-
-    /*
-     *  IF the struct version is not the current, and also
-     *     either too large (?!) or too small,
-     *  THEN emit error message and fail-exit
-     */
-    if (  ( opts->structVersion  != OPTIONS_STRUCT_VERSION  )
-       && (  (opts->structVersion > OPTIONS_STRUCT_VERSION  )
-          || (opts->structVersion < OPTIONS_MINIMUM_VERSION )
-       )  )  {
-        static char const aover[] =
-            STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
-
-        fprintf(stderr, zAO_Err, pname, NUM_TO_VER(opts->structVersion));
-        if (opts->structVersion > OPTIONS_STRUCT_VERSION )
-            fputs(zAO_Big, stderr);
-        else
-            fputs(zAO_Sml, stderr);
-
-        fwrite(aover, sizeof(aover) - 1, 1, stderr);
-        return FAILURE;
-    }
-
-    /*
-     *  If the program name hasn't been set, then set the name and the path
-     *  and the set of equivalent characters.
-     */
-    if (opts->pzProgName == NULL) {
-        char const *  pz = strrchr(pname, DIRCH);
-        char const ** pp =
-            (char const **)(void **)&(opts->pzProgName);
-
-        if (pz != NULL) {
-            *pp = pz+1;
-        } else {
-            *pp = pname;
-            pz = pathfind(getenv("PATH"), (char *)pname, "rx");
-            if (pz != NULL)
-                pname = (void *)pz;
-        }
-
-        pp  = (char const **)(void **)&(opts->pzProgPath);
-        *pp = pname;
-
-        /*
-         *  when comparing long names, these are equivalent
-         */
-        strequate(zSepChars);
-    }
-
-    return SUCCESS;
-}
-
-/**
+/*
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

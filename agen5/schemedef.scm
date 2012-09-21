@@ -1,5 +1,5 @@
 
-;;; Time-stamp:        "2012-04-08 08:39:41 bkorb"
+;;; Time-stamp:        "2012-09-05 08:09:21 bkorb"
 ;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -127,6 +127,19 @@
 (define stt-curr    stt-table)
 (define stt-idx-tbl stt-table)
 (define stt-idx     0)
+
+;;; /*=gfunc   insert_suspended
+;;;  *
+;;;  * what:   insert a named suspension in current output
+;;;  *
+;;;  * exparg: susp-name , the name of the suspended output
+;;;  *
+;;;  * doc:    Emit into the current output the output suspended under a
+;;;  *         given diversion name.
+;;; =*/
+;;;
+(define insert-suspended (lambda (susp-name) (begin
+   (out-resume susp-name) (out-pop #t) )))
 
 ;;; /*=gfunc   string_table_new
 ;;;  *

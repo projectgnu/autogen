@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2012-04-14 14:12:20 bkorb"
+# Time-stamp:      "2012-09-04 13:28:47 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -127,13 +127,13 @@ make_funcs_def()
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
     ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
 
-    ${s2enum} --base-name=xat-attribute -n \
+    ${s2enum} --base-name=option-xat-attribute --prefix=xat -n \
         type words members cooked uncooked keep || \
-        die "FAILED: ${s2enum} --base-name=xat-attribute"
+        die "FAILED: ${s2enum} --base-name=option-xat-attribute"
 
-    ${s2enum} --base-name=value-type --prefix=vtp -n string integer \
+    ${s2enum} --base-name=option-value-type --prefix=vtp -n string integer \
         boolean bool keyword set set-membership nested hierarchy || \
-        die "FAILED: ${s2enum} --base-name=value-type"
+        die "FAILED: ${s2enum} --base-name=option-value-type"
     burn_aover
 
     test -d autoopts || mkdir autoopts
@@ -147,7 +147,7 @@ make_funcs_def()
 
     files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
         sed '/^CSRC/d;s/[=\\]//'
-        echo  ../compat/pathfind.c)
+    )
     getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
     vers_min=$( expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)

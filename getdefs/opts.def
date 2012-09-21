@@ -38,6 +38,8 @@ explain       = <<- EndExplanation
 	read from @code{stdin}.
 	EndExplanation;
 guard-option-names;
+no-xlate       = anything;
+omit-nls-code;
 
 flag = {
     name        = def-selection;

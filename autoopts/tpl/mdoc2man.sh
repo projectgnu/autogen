@@ -2,7 +2,7 @@
 
 ## mdoc2man.sh -- script to convert mdoc-isms to man-isms
 ##
-## Time-stamp:      "2013-03-10 07:07:10 bkorb"
+## Time-stamp:      "2012-09-04 15:16:24 bkorb"
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -199,25 +199,38 @@ do_optional() {
     local text='['
     while test $# -gt 0
     do
-	m1="$1"
+        # Ns may be fun...
+        m1="$1"
         case "X$1" in
-	'X...' | 'X\*' )
-            text=${text}' "\fI'${1}'\fR"'
-            shift
+        X\\\& )
+            # The general escape sequence is: \&
+            text="${text} ${1}"
             ;;
+
+        X[!0-9a-zA-Z]* )
+            # This one should be a generic punctuation check
+            # Punctuation is any of the 10 chars: .,:;()[]?!  (but
+            # more are actually used and accepted) and is output in
+            # the default font.
+            #
+            text="${text} ${1}"
+            ;;
+
         XAr | XCm )
             text=${text}' "\fI'${2}'\fR"'
-            shift 2 || had_no_arg "$m1"
+            shift
             ;;
+
         XFl )
             text=${text}' \fB-'${2}'\fR'
-            shift 2 || had_no_arg "$m1"
+            shift
             ;;
-        * ) text="${text} \"$2\""
-	    m1="$1"
-            shift 2 || had_no_arg "$m1"
+
+        * ) # Grab subsequent non-keywords and punctuation, too
+            text="${text} $1"
             ;;
         esac
+        shift || die "shift failed after $m1"
     done
     echo "${text} ]"
 }
@@ -248,11 +261,11 @@ do_NmName() {
 
     if test $# -gt 0
     then case "$1" in
-	[A-Za-z]* )
-	    NmName=$1
-	    shift
-	    ;;
-	esac
+        [A-Za-z]* )
+            NmName=$1
+            shift
+            ;;
+        esac
 
         test $# -gt 0 && NmNameSfx=" $*"
     fi
@@ -268,8 +281,8 @@ do_line() {
     .Op' '* )        do_optional  ;;
     .Fl' '* )        do_flag      ;;
     .Ar' '* )        do_arg       ;;
-    .Nm' '* )	     do_NmName	  ;;
-    .Nm     )	     do_NmName	  ;;
+    .Nm' '* )        do_NmName    ;;
+    .Nm     )        do_NmName    ;;
     * )              echo "$line" ;;
     esac
     return 0

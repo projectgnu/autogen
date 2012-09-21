@@ -2,7 +2,7 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2012-03-31 13:00:08 bkorb"
+ *  Time-stamp:        "2012-09-04 12:34:07 bkorb"
  *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
@@ -330,13 +330,13 @@ scanAgain:
 
     return token_code;
 
-NUL_error:
+ NUL_error:
 
     AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, YYLEX_UNENDING_QUOTE,
                   cctx->scx_fname, cctx->scx_line));
     return DP_EV_INVALID;
 
-lex_done:
+ lex_done:
     /*
      *  First time through, return the DP_EV_END token.
      *  Second time through, we really finish.

@@ -4,7 +4,7 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-08-11 08:33:08 bkorb"
+# Time-stamp:        "2012-09-04 15:01:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
@@ -51,9 +51,14 @@ IF (match-value? == "doc-section.ds-type" "DESCRIPTION") =][=
     IF (== (get "ds-type") "DESCRIPTION") =][=
        (define cvt-fn (get "ds-format" "texi"))
        (if (not (== cvt-fn "texi"))
-           (divert-convert cvt-fn) ) =][=
-       (emit (string-append "\n" (get "ds-text") "\n"))
-       (convert-divert) =][=
+           (begin
+              (divert-convert cvt-fn)
+              (emit "\n" (get "ds-text") "\n")
+              (convert-divert)
+           )
+
+           (emit "\n" (get "ds-text") "\n")
+       )            =][=
        BREAK        =][=
 
     ENDIF           =][=

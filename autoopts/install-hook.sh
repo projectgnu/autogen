@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Time-stamp:        "2012-08-11 08:13:30 bkorb"
+# Time-stamp:        "2012-09-05 09:28:36 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -32,8 +32,9 @@ srcdir=`cd ${srcdir} ; pwd`
 
 test -z "${POSIX_SHELL}" && exit 1
 
-rm -f ${DESTdestdir}/options.h
+rm -f ${DESTdestdir}/options.h ${DESTdestdir}/usage-txt.h
 opthdrsrc=${srcdir}/autoopts/options.h
+usehdrsrc=${srcdir}/autoopts/usage-txt.h
 cfgf=${top_builddir}/config.h
 
 {
@@ -88,6 +89,9 @@ cfgf=${top_builddir}/config.h
 
     sed "${sedcmd};${nopathfind}" ${opthdrsrc}
 } > ${DESTdestdir}/options.h
+
+sed '/#if.*AUTOOPTS_INTERNAL/,/#endif.*XGETTEXT_SCAN/d' \
+  ${usehdrsrc} > ${DESTdestdir}/usage-txt.h
 
 test -d "${DESTpkgdatadir}" && {
     rmbuild='/# *START-BUILDTREE-ISMS/,/# *END-BUILDTREE-ISMS/d

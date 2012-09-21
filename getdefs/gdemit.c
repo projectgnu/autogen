@@ -4,7 +4,7 @@
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
- *  Time-stamp:        "2012-03-31 13:39:34 bkorb"
+ *  Time-stamp:        "2012-09-04 12:33:52 bkorb"
  *
  *  This file is part of AutoGen.
  *  AutoGen copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -76,7 +76,7 @@ compress_def(char * pz)
      */
     nlCt =  0;
 
-skip_leading_space:
+ skip_leading_space:
     while (isspace( *pzSrc )) {
         if (*(pzSrc++) == '\n') {
             nlCt++;
@@ -416,7 +416,7 @@ emit_attribute(char const ** def_pp, char ** out_pp)
         }
     }
 
-leave_emit_attribute:
+ leave_emit_attribute:
 
     *out++  = ';';
     *out_pp = out;

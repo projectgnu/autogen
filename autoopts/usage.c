@@ -2,7 +2,7 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2012-03-31 19:19:26 bkorb"
+ * Time-stamp:      "2012-09-04 12:33:54 bkorb"
  *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
@@ -482,7 +482,7 @@ prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
 
     return;
 
-bogus_desc:
+ bogus_desc:
     fprintf(stderr, zInvalOptDesc, pOD->pz_Name);
     exit(EX_SOFTWARE);
 }
@@ -796,7 +796,7 @@ prt_one_usage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT)
 
     return;
 
-bogus_desc:
+ bogus_desc:
     fprintf(stderr, zInvalOptDesc, pOD->pz_Name);
     exit(EX_SOFTWARE);
 }

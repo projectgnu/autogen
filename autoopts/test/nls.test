@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # nls.test      ---  test NLS, sort-of
 #
-# Time-stamp:        "2011-08-07 17:36:29 bkorb"
+# Time-stamp:        "2012-09-05 09:25:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -100,10 +100,10 @@ clean_help > ${testname}-1.hlp <<'_EOF_'
 test_nls - Test AutoOpts for nls
 USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 noitpircseD    emaN-noitpO grA glF
-   -o rtS noitpo         pircsed noitpo noitpo ehT
-   -s muN dnoces         pircsed noitpo dnoces ehT
-   -?  on pleh           tixe dna noitamrofni egasu dednetxe yalpsiD
-   -!  on pleh-erom      regap urht dessap noitamrofni egasu dednetxE
+   -o Str noitpo         pircsed noitpo noitpo ehT
+   -s Num dnoces         pircsed noitpo dnoces ehT
+   -? no  pleh           tixe dna noitamrofni egasu dednetxe yalpsiD
+   -! no  pleh-erom      regap urht dessap noitamrofni egasu dednetxE
 
 .retcarahc galf eht dna nehpyh
 elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO

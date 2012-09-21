@@ -2,7 +2,7 @@
 ## ---------------------------------------------------------------------
 ## autoopts/Makefile.am
 ##
-## Time-stamp:      "2012-04-14 14:22:31 bkorb"
+## Time-stamp:      "2012-09-04 13:26:33 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -43,9 +43,10 @@ EXTRA_DIST      =
 GENMAN          = $(PATHFIND_MAN) \
 
 GENHDRS         = autoopts/options.h autoopts/usage-txt.h genshell.h \
-		xat-attribute.h value-type.h ao-strs.h ag-char-map.h
+		option-xat-attribute.h option-value-type.h ao-strs.h \
+		ag-char-map.h
 HDRS            = $(GENHDRS) autoopts.h project.h proto.h
-GEN_SRC         = ao-strs.c value-type.c xat-attribute.c
+GEN_SRC         = ao-strs.c option-value-type.c option-xat-attribute.c
 
 ## The primary source (autoopts.c) must be by itself on the first line after
 ## "CSRC".  'sed' does some magic here to get the list of source files for the
@@ -58,7 +59,7 @@ CSRC            = parse-duration.c $(GEN_SRC) \
     load.c     makeshell.c nested.c    numeric.c    pgusage.c \
     putshell.c reset.c     restore.c   save.c       sort.c \
     stack.c    streqvcmp.c text_mmap.c time.c       tokenize.c \
-    usage.c    version.c
+    usage.c    version.c   init.c
 
 
 SRC             = $(HDRS) $(CSRC) $(GENSRC)
