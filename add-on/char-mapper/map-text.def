@@ -103,6 +103,9 @@ string = { nm = declare_opt_tbl;
   str = <<- _EOString_
 	extern %1$s const %2$s_table[%3$d];
 	extern unsigned char const * %2$s_spanners[%5$u];
+	extern unsigned char const *
+	calc_%2$s_spanners(unsigned int mask_ix);
+
 
 	_EOString_;
 };

@@ -1,6 +1,6 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-08-11 08:56:26 bkorb"
+# Time-stamp:      "2012-09-25 17:01:59 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -192,15 +192,18 @@ typedef enum {[=
   =][= ;;  */
   (set! tmp-val "")
   (define need-ex-noinput  (exist? "homerc"))
+  (define noinput-err-name "")
   (define need-ex-software #t)
+  (define need-ex-usage    #t)
+  (define usage-err-name   "")
+  (define exit-code-fmt    "\n    %-31s = %d")
 
   (define succ-exit-code (string-append pname-up "_EXIT_SUCCESS"))
   (if (exist? "exit-name[0]")
       (set! succ-exit-code (string-append
             pname-up "_EXIT_" (get-up-name "exit-name[0]") ))
 
-      (set! tmp-val (string-append
-            "\n    " pname-up "_EXIT_SUCCESS = 0" ))
+      (set! tmp-val (sprintf exit-code-fmt succ-exit-code 0))
   )
 
   (define fail-exit-code (string-append pname-up "_EXIT_FAILURE"))
@@ -210,7 +213,7 @@ typedef enum {[=
 
       (set! tmp-val (string-append tmp-val
             (if (> (string-length tmp-val) 1) "," "")
-            "\n    " pname-up "_EXIT_FAILURE = 1" ))
+            (sprintf exit-code-fmt fail-exit-code 1) ))
   )
 
   (define nomem-exit-code
@@ -218,30 +221,42 @@ typedef enum {[=
          (string-append pname-up "_EXIT_" (get-up-name "nomem-fail-code"))
          fail-exit-code))
 
+  tmp-val                             =][=
+
+  FOR exit-name                       =],[=
+    (define err-name (string-append
+            pname-up "_EXIT_" (get-up-name "exit-name")))
+
+    (sprintf exit-code-fmt err-name (for-index))
+    =][=
+    CASE (for-index)                            =][=
+    == 64 =][= (set! need-ex-usage    #f)
+               (set! usage-err-name   err-name) =][=
+    == 66 =][= (set! need-ex-noinput  #f)
+               (set! noinput-err-name err-name) =][=
+    == 70 =][= (set! need-ex-software #f)       =][=
+    ESAC (for-index)                            =][=
+  ENDFOR                                        =][=
+  (set! exit-code-fmt (string-append "," exit-code-fmt))
+
+  (if need-ex-usage (begin
+   (set! usage-err-name (string-append pname-up "_EXIT_USAGE_ERROR"))
+   (ag-fprintf 0 exit-code-fmt usage-err-name 64) ))
+
+  (if need-ex-noinput (begin
+   (set! tmp-val (string-append pname-up "_EXIT_NO_CONFIG_INPUT"))
+   (ag-fprintf 0 exit-code-fmt tmp-val 66)))
+
   (define file-fail-exit-code
      (if (exist? "file-fail-code")
          (string-append pname-up "_EXIT_" (get-up-name "file-fail-code"))
-         fail-exit-code))
+     (if need-ex-noinput
+         (string-append pname-up "_EXIT_NO_CONFIG_INPUT")
+         fail-exit-code )))
 
-  (if (and (exist? "exit-name") (> (string-length tmp-val) 1))
-      (set! tmp-val (string-append tmp-val ",")) )
-
-  tmp-val                             =][=
-
-  FOR exit-name ","                   =]
-    [=
-    (if (= (for-index) 66)
-        (set! need-ex-noinput  #f)
-        (if (= (for-index) 70)
-            (set! need-ex-software #f) ))
-
-    pname-up =]_EXIT_[= (get-up-name "exit-name")
-       =] = [= (for-index)            =][=
-  ENDFOR                              =][=
-  (if need-ex-noinput
-   (ag-fprintf 0 ",\n    %s_EXIT_NO_CONFIG_INPUT = 66" pname-up))
-  (if need-ex-software
-   (ag-fprintf 0 ",\n    %s_EXIT_LIBOPTS_FAILURE = 70" pname-up))
+  (if need-ex-software (begin
+   (set! need-ex-software (string-append pname-up "_EXIT_LIBOPTS_FAILURE"))
+   (ag-fprintf 0 exit-code-fmt need-ex-software  70)))
 =]
 } [= (. pname-down) =]_exit_code_t;[=
 

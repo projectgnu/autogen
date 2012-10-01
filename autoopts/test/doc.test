@@ -3,7 +3,7 @@
 #
 # doc.test      ---  test doc templates
 #
-# Time-stamp:        "2012-08-11 08:54:27 bkorb"
+# Time-stamp:        "2012-09-30 06:16:43 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -424,7 +424,7 @@ cat <<_End_Of_ManPage_
 doc \- GnuTLS client
 .SH SYNOPSIS
 .B doc
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP " [[=| ]\fIvalue\fP]]..." [hostname]
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP "[[=| ]\fIvalue\fP]]..." " " "[hostname]"
 .PP
 Operands and options may be intermixed.  They will be reordered.
 .SH "DESCRIPTION"

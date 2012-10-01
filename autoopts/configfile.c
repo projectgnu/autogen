@@ -1244,7 +1244,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
             break;
 
         default:
-        case XAT_KWD_INVALID:
+        case XAT_INVALID_KWD:
         invalid_kwd:
             pType->valType = OPARG_TYPE_NONE;
             return skip_unkn(txt);
@@ -1317,7 +1317,7 @@ parse_value(char * txt, tOptionValue * typ)
 
     switch (find_option_value_type_id(txt, len)) {
     default:
-    case VTP_KWD_INVALID: goto woops;
+    case VTP_INVALID_KWD: goto woops;
 
     case VTP_KWD_STRING:
         typ->valType = OPARG_TYPE_STRING;

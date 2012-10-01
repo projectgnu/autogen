@@ -2,7 +2,7 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-28 08:35:46 bkorb"
+ *  Time-stamp:        "2012-09-30 06:44:48 bkorb"
  *
  *  This is the main routine for char-mapper.
  *
@@ -766,26 +766,13 @@ make_define_name(char * ptr)
 char *
 parse_directive(char * scan)
 {
-    size_t len = 0;
-
     while (isspace(*++scan))
         /* skip leading '%' and white space */;
 
     if (! isalpha(*scan))
         die("directives must begin with an alphabetic character:  %s\n", scan);
 
-    for (;;) {
-        char ch = scan[++len];
-        switch (ch) {
-        case ' ': case '\t':
-        case NUL: goto have_name;
-        case '-': scan[len] = '_'; break;
-        case 'A' ... 'Z':
-            scan[len] = _tolower((unsigned int)ch); break;
-        }
-    } have_name:;
-
-    return disp_cm_opt(scan, len, scan + len);
+    return disp_cm_opt(scan);
 }
 
 static char *
@@ -883,8 +870,9 @@ load_text(int pfx)
  * @returns    end of guard scan
  */
 char *
-handle_file(char * scan)
+handle_file(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     char * pz;
     size_t fname_len;
 
@@ -920,8 +908,9 @@ handle_file(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_comment(char * scan)
+handle_comment(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     commentary = load_text(1);
     *scan = NUL;
     return scan;
@@ -937,8 +926,9 @@ handle_comment(char * scan)
  * @returns    The '%' starting the next directive.
  */
 char *
-handle_emit(char * scan)
+handle_emit(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     add_on_text = load_text(0);
     *scan = NUL;
     return scan;
@@ -956,8 +946,9 @@ handle_emit(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_table(char * scan)
+handle_table(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     char * pz;
 
     if (! isspace(*scan)) die(bad_directive, scan-5);
@@ -983,8 +974,9 @@ handle_table(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_optimize(char * scan)
+handle_optimize(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     optimize_code = true;
     return scan + strlen(scan);
 }
@@ -1002,8 +994,9 @@ handle_optimize(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_pthread(char * scan)
+handle_pthread(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     pthread_code = true;
     return scan + strlen(scan);
 }
@@ -1020,8 +1013,9 @@ handle_pthread(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_guard(char * scan)
+handle_guard(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     char * pz;
 
     if (! isspace(*scan)) {
@@ -1049,8 +1043,9 @@ handle_guard(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_backup(char * scan)
+handle_backup(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     add_backup_code = true;
     return scan + strlen(scan);
 }
@@ -1067,8 +1062,9 @@ handle_backup(char * scan)
  * @returns    end of guard scan
  */
 char *
-handle_test(char * scan)
+handle_test(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     add_test_code = true;
     return scan + strlen(scan);
 }
@@ -1083,8 +1079,9 @@ handle_test(char * scan)
  * @returns    not
  */
 char *
-handle_invalid(char * scan)
+handle_invalid(cm_opt_enum_t id, char const * txt)
 {
+    char * scan = (char *)(unsigned long)txt;
     die(bad_directive, scan);
 }
 /*

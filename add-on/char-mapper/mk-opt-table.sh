@@ -1,7 +1,7 @@
 #! /bin/bash
 #  mk-opt-table.sh
 #
-#  Time-stamp:        "2012-04-28 08:46:45 bkorb"
+#  Time-stamp:        "2012-09-30 06:51:24 bkorb"
 #
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -30,8 +30,8 @@ die() {
 } >&2
 
 init() {
-    declare -g base_name=${1%%.*}
-    declare -g exe_name=char-mapper
+    base_name=${1%%.*}
+    exe_name=char-mapper
     set -e
 
     declare -g hdl_list=$(
@@ -59,18 +59,18 @@ is_up_to_date() {
 }
 
 mk_enum() {
-    is_up_to_date ${base_name} ${progdir}/mk-str2enum.sh && return 0
+    autogen -b ${base_name} -L ../../autoopts/tpl <<- _EOF_
+	AutoGen Definitions str2enum;
 
-    echo "updating ${base_name}.[ch]"
-    declare opts=--base-name=${base_name}
-    declare dashx=
-    [[ X$- =~ .*x.* ]] && dashx=-x
-    declare dispfmt=--dispatch="char * handle_%s(char * scan)"
-    declare -x BOILERPLATE=$'/*\n'$(
-        sed '1d;/^$/,$d;s/^#/ */' $program)$'\n */\n'
-
-    PS4='>mt> ' bash ${dashx} -e \
-        ${progdir}/mk-str2enum.sh "${dispfmt}" ${opts} ${hdl_list}
+	base-name = ${base_name};
+	no-length; no-case;
+	dispatch = {
+	    d-ret = 'char *';
+	    d-nam = 'handle_%s';
+	};
+	equate    = '_-^';
+	keyword   = $(echo $hdl_list | sed 's/ /, /g');
+	_EOF_
 }
 
 assemble_usage() {

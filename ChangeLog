@@ -1,3 +1,14 @@
+2012-09-30  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/str2enum.tpl: new template
+	* autoopts/bootstrap.dir: use str2enum template and pitch shell script.
+	* autoopts/configfile.c: respell "invalid" due to this
+	* autoopts/tpl/agman-cmd.tpl: fix up synopsis line
+	* autoopts/test/doc.test: adjust synopsis line sample result
+	* autoopts/test/keyword.test: likewise
+	* autoopts/tpl/stdoptions.def: add std exit codes
+	* autoopts/tpl/*.tpl: use them
+
 2012-09-08  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (inner_main): Some versions of Guile provide the

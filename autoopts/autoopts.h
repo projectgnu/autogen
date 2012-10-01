@@ -2,7 +2,7 @@
 /*
  *  \file autoopts.h
  *
- *  Time-stamp:      "2012-03-04 19:05:01 bkorb"
+ *  Time-stamp:      "2012-09-25 17:35:13 bkorb"
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.
@@ -56,7 +56,18 @@
 # define DIRCH                  '/'
 #endif
 
-#define AO_EXIT_REQ_USAGE       64
+#ifndef EX_USAGE
+   /**
+    *  Command line usage problem
+    */
+#  define EX_USAGE              64
+#endif
+#ifndef EX_DATAERR
+   /**
+    *  The input data was incorrect in some way.
+    */
+#  define EX_DATAERR            64
+#endif
 #ifndef EX_NOINPUT
    /**
     *  option state was requested from a file that cannot be loaded.
@@ -68,6 +79,12 @@
     *  AutoOpts Software failure.
     */
 #  define EX_SOFTWARE           70
+#endif
+#ifndef EX_OSERR
+   /**
+    *  Command line usage problem
+    */
+#  define EX_OSERR              71
 #endif
 
 #define NL '\n'

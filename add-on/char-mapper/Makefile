@@ -18,7 +18,7 @@ $(GENSRC)       : cm-opt.stamp
 $(OBJ)          : $(HEADER_LIST) cm-opt.stamp
 $(HEADER_LIST)  : cm-opt.stamp
 
-cm-opt.stamp    : mk-str2enum.sh mk-opt-table.sh map-text.def
+cm-opt.stamp    : mk-opt-table.sh map-text.def
 	bash ./mk-opt-table.sh $@
 
 lcl-clobber     : clean

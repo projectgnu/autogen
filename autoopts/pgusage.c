@@ -2,7 +2,7 @@
 /**
  * \file pgusage.c
  *
- * Time-stamp:      "2012-02-28 19:49:32 bkorb"
+ * Time-stamp:      "2012-09-25 17:14:13 bkorb"
  *
  *   Automated Options Paged Usage module.
  *
@@ -52,7 +52,7 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
     (*pOptions->pUsageProc)(pOptions, EXIT_SUCCESS);
 #else
     static pid_t     my_pid;
-    char zPageUsage[ 1024 ];
+    char fil_name[1024];
 
     /*
      *  IF we are being called after the usage proc is done
@@ -66,13 +66,13 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
             return;
 
         my_pid  = getpid();
-        snprintf(zPageUsage, sizeof(zPageUsage), TMP_USAGE_FMT, (tAoUL)my_pid);
-        unlink(zPageUsage);
+        snprintf(fil_name, sizeof(fil_name), TMP_USAGE_FMT, (tAoUL)my_pid);
+        unlink(fil_name);
 
         /*
          *  Set usage output to this temporary file
          */
-        option_usage_fp = fopen(zPageUsage, "w" FOPEN_BINARY_FLAG);
+        option_usage_fp = fopen(fil_name, "w" FOPEN_BINARY_FLAG);
         if (option_usage_fp == NULL)
             _exit(EXIT_FAILURE);
 
@@ -106,12 +106,12 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
         /*
          *  Page the file and remove it when done.
          */
-        snprintf(zPageUsage, sizeof(zPageUsage), PAGE_USAGE_FMT, pzPager,
+        snprintf(fil_name, sizeof(fil_name), PAGE_USAGE_FMT, pzPager,
                  (tAoUL)my_pid);
         fclose(stderr);
         dup2(STDOUT_FILENO, STDERR_FILENO);
 
-        (void)system(zPageUsage);
+        (void)system(fil_name);
     }
 
     case PAGER_STATE_CHILD:

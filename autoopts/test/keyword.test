@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------
 # keyword.test ---  keyword option processing
 #
-# Time-stamp:        "2012-02-28 19:42:00 bkorb"
+# Time-stamp:        "2012-09-30 06:17:16 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -179,7 +179,7 @@ test_keyword \- Test AutoOpts for keyword
 .SH SYNOPSIS
 .B test_keyword
 .\" Mixture of short (flag) options and long options
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP " [[=| ]\fIvalue\fP]]..."
+.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP "[[=| ]\fIvalue\fP]]..."
 .PP
 All arguments must be options.
 .SH "DESCRIPTION"

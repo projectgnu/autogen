@@ -1,7 +1,7 @@
 
 /* -*- Mode: Text -*-
  *
- * Time-stamp:      "2013-03-10 07:50:01 bkorb"
+ * Time-stamp:      "2012-09-25 13:10:45 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -64,6 +64,90 @@ flag = {
 #define SILENT_FLAG
 #define VERBOSE_FLAG
 #define WARN_FLAG
+#endif
+
+#ifdef STD_EXITS
+exit-name[64]   = usage;
+exit-desc[64]   =<<-  _EOExit_
+	The command was used incorrectly, e.g., with the wrong number of
+	arguments, a bad flag, a bad syntax in a parameter.
+	_EOExit_;
+
+exit-name[65]   = dataerr;
+exit-desc[65]   =<<-  _EOExit_
+	The input data was incorrect in some way.
+	_EOExit_;
+
+exit-name[66]   = noinput;
+exit-desc[66]   =<<-  _EOExit_
+	An input file (not a system file) did not exist or was not readable.
+	_EOExit_;
+
+exit-name[67]   = nouser;
+exit-desc[67]   =<<-  _EOExit_
+	The user specified did not exist.
+	_EOExit_;
+
+exit-name[68]   = nohost;
+exit-desc[68]   =<<-  _EOExit_
+	The host specified did not exist.
+	_EOExit_;
+
+exit-name[69]   = unavailable;
+exit-desc[69]   =<<-  _EOExit_
+	A service is unavailable.  This can occur if a support program or
+	file does not exist.  This can also be a catchall message when
+	something doesn't work, and the cause cannot be determined.
+	_EOExit_;
+
+exit-name[70]   = software;
+exit-desc[70]   =<<-  _EOExit_
+	An internal software error has been detected.
+	_EOExit_;
+
+exit-name[71]   = oserr;
+exit-desc[71]   =<<-  _EOExit_
+	An operating system error has been detected.  This is used for such
+	things as "cannot fork", "cannot create pipe", or the similar.
+	_EOExit_;
+
+exit-name[72]   = osfile;
+exit-desc[72]   =<<-  _EOExit_
+	Some system file (e.g., /etc/passwd, /etc/utmp, etc.) does not
+	exist, cannot be opened, or has some sort of error.
+	_EOExit_;
+
+exit-name[73]   = cantcreat;
+exit-desc[73]   =<<-  _EOExit_
+	A (user specified) output file cannot be created.
+	_EOExit_;
+
+exit-name[74]   = ioerr;
+exit-desc[74]   =<<-  _EOExit_
+	An error occurred while doing I/O on somefile.
+	_EOExit_;
+
+exit-name[75]   = tempfail;
+exit-desc[75]   =<<-  _EOExit_
+	A temporary failure, indicating something that is not really an
+	error.  The request should be reattempted later.
+	_EOExit_;
+
+exit-name[76]   = protocol;
+exit-desc[76]   =<<-  _EOExit_
+	the remote system returned something that was "not possible" during
+	a protocol exchange.
+	_EOExit_;
+
+exit-name[77]   = noperm;
+exit-desc[77]   =<<-  _EOExit_
+	You did not have sufficient permission to perform the operation.
+	This is not intended for file system problems, which should use
+	NOINPUT or CANTCREAT, but rather for higher level permissions.
+	_EOExit_;
+
+exit-name[78]   = config;
+exit-desc[78]   = 'configuration error';
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

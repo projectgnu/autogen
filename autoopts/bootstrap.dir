@@ -1,5 +1,5 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2012-09-04 13:28:47 bkorb"
+# Time-stamp:      "2012-09-30 06:14:36 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -120,19 +120,29 @@ add_files_to_mf() {
 make_funcs_def()
 {
     $noag && exit 1
-    s2enum=`which mk-str2enum` 2>/dev/null || :
-    test -x "${s2enum}" || \
-        s2enum="bash ${top_srcdir}/add-on/char-mapper/mk-str2enum.sh"
 
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
     ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
 
-    ${s2enum} --base-name=option-xat-attribute --prefix=xat -n \
-        type words members cooked uncooked keep || \
-        die "FAILED: ${s2enum} --base-name=option-xat-attribute"
+    ${AGexe} -Ltpl -boption-xat-attribute <<- _EOF_
+	AutoGen Definitions str2enum;
+	base-name = option-xat-attribute;
+	prefix    = xat;
+	no-name;
+	keyword = type, words, members, cooked, uncooked, keep;
+	_EOF_
+    test $? -eq 0 || \
+        die "FAILED: option-xat-attribute enumeration"
 
-    ${s2enum} --base-name=option-value-type --prefix=vtp -n string integer \
-        boolean bool keyword set set-membership nested hierarchy || \
+    ${AGexe} -Ltpl -boption-value-type <<- _EOF_
+	AutoGen Definitions str2enum;
+	base-name = option-value-type;
+	prefix    = vtp;
+	no-name;
+	keyword = string, integer, boolean, bool, keyword,
+	          set, set-membership, nested, hierarchy;
+	_EOF_
+    test $? -eq 0 || \
         die "FAILED: ${s2enum} --base-name=option-value-type"
     burn_aover
 
@@ -150,7 +160,7 @@ make_funcs_def()
     )
     getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
-    vers_min=$( expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
+    vers_min=$(expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
     cat >> funcs.def <<-  _END_VERS_INFO_
 	vers-curr       = "${vers_curr}";
 	vers-min        = "${vers_min}";

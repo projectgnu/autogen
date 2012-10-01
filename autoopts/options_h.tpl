@@ -2,7 +2,7 @@
 
 h=options.h
 
-# Time-stamp:      "2012-02-28 19:42:04 bkorb"
+# Time-stamp:      "2012-09-25 17:21:57 bkorb"
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -80,7 +80,7 @@ h=options.h
  * was requested.  It is used to distinguish a --usage from a --help request.
  * --usage is abbreviated and --help gives as much help as possible.
  */
-#define AO_EXIT_REQ_USAGE 64
+#define AO_EXIT_REQ_USAGE 10064
 
 /*
  *  PUBLIC DEFINES

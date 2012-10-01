@@ -1,6 +1,6 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-09-04 12:32:20 bkorb"
+# Time-stamp:      "2012-09-25 16:34:14 bkorb"
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -860,7 +860,7 @@ DEFINE alias-option-code       \=]
     int res = optionAlias(pOptions, pOptDesc, [=
         (string-append INDEX-pfx (get-up-name "aliases")) =]);
     if ((res != 0) && ((pOptions->fOptSet & OPTPROC_ERRSTOP) != 0))
-        [= (. UP-prefix) =]USAGE([=(. fail-exit-code)=]);
+        [= (. UP-prefix) =]USAGE([=(. usage-err-name)=]);
 [=
 
 ENDDEF   alias-option-code
@@ -1187,7 +1187,7 @@ void
     char const * er_leader = _("[= prog-name =] usage error:\n");
     fputs(er_leader, stderr);
     vfprintf(stderr, fmt, ap);
-    [= (string-append usage-proc "(&" pname "Options, " fail-exit-code ");") =]
+    [= (string-append usage-proc "(&" pname "Options, " usage-err-name ");") =]
     /* NOTREACHED */
 }
 
