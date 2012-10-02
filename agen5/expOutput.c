@@ -2,8 +2,6 @@
 /**
  * @file expOutput.c
  *
- *  Time-stamp:        "2012-04-07 09:20:37 bkorb"
- *
  *  This module implements the output file manipulation function
  *
  *  This file is part of AutoGen.
@@ -372,7 +370,7 @@ ag_scm_out_suspend(SCM susp_nm)
                 AGALOC(suspAllocCt * sizeof(tSuspendName), "susp file list");
         else
             pSuspended = (tSuspendName*)
-                AGREALOC((void*)pSuspended,
+                AGREALOC((void *)pSuspended,
                          suspAllocCt * sizeof(tSuspendName), "add to susp f");
     }
 

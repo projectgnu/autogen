@@ -4,9 +4,6 @@
  *
  *  This module implements the CASE text function.
  *
- *  Time-stamp:        "2012-04-28 08:04:06 bkorb"
- */
-/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

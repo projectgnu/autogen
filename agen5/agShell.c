@@ -1,8 +1,6 @@
 /**
  * @file agShell.c
  *
- *  Time-stamp:        "2012-03-04 19:08:09 bkorb"
- *
  *  Manage a server shell process
  *
  *  This file is part of AutoGen.

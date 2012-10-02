@@ -1,11 +1,6 @@
 [= AutoGen5 Template -*- Mode: html -*-
 
-html =][= `
-timestamp=\`sed 's@[^"]*"@@;s@".*@@' <<- \\_EOF_
- Time-stamp: "2011-02-18 11:22:27 bkorb"
-_EOF_
-\` ` =][=
-
+html =][=
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##
@@ -139,7 +134,7 @@ permitted in any medium, provided this notice is preserved.
 
 <p>
 Updated:
-[=`echo ${timestamp}`=]
+[=`date`=]
 </p>
 </div>
 

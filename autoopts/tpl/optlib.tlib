@@ -1,7 +1,5 @@
 [= AutoGen5 Template Library -*- Mode: scheme -*-
 
-# Time-stamp:      "2012-08-11 08:14:10 bkorb"
-#
 # This file is part of AutoOpts, a companion to AutoGen.
 # AutoOpts is free software.
 # AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -105,7 +103,7 @@ DEFINE init-and-validate                =][=
     ;; at least one 'flag.value'
     ;;
     (if (or (exist? "long-opts") (not (exist? "flag.value")))
-        (error "'vendor-opt' conflicts with 'long-opts' and requires flag values")
+        (error "'vendor-opt' and 'long-opts' conflict.  flag values required")
         (set! flag-options-only #f))
     (if (exist? "library")
         (error "'vendor-opt' conflicts with 'library'"))
@@ -585,7 +583,7 @@ Emit usage text                         =][=
 DEFINE usage-text                       =]
 #define [=
   (set! tmp-val (string-append (get "usage-type") "-usage"))
-  (define usage-text-name 
+  (define usage-text-name
          (string->c-name! (string-append pname "_" tmp-val)) )
   usage-text-name
 
@@ -786,7 +784,7 @@ DEFINE option-defines             =]
 #if[=ifndef "n"=]def [= ifdef =][= ifndef \=]
 [= (. tmp-val)  =]
 #endif /* [= ifdef =][= ifndef =] */[=
-    
+
     ELSE        =]
 [= (. tmp-val)  =][=
     ENDIF       =][=
@@ -1109,7 +1107,7 @@ DEFINE help-strs
     (string-table-add-ref opt-strs "Reset an option's state")=])
 #define RESET_name      ([=
     (string-table-add-ref opt-strs "reset-option")=])
-#define RESET_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING) | OPTST_NO_INIT)[=
+#define RESET_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)|OPTST_NO_INIT)[=
 
   ENDIF (exist? "resettable")           =][=
 

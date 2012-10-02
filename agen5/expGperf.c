@@ -1,8 +1,6 @@
 /**
  * @file expGperf.c
  *
- *  Time-stamp:        "2012-01-15 08:38:23 bkorb"
- *
  *  Create a perfect hash function program and use it to compute
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.

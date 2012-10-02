@@ -2,8 +2,6 @@
 
 lsm=autogen.lsm
 
-# Time-stamp:        "2010-02-24 08:37:18 bkorb"
-
 ##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

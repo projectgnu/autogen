@@ -1,7 +1,5 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-#  Time-stamp:        "2012-04-07 09:06:13 bkorb"
-
 ##
 ## This file is part of AutoGen.
 ## Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -100,8 +98,7 @@ ENDFOR macfunc =]
  */
 typedef enum {[=
 
-FOR macfunc                             
-=][=
+FOR macfunc                             =][=
 
    (define func-name (string-capitalize! (get "name")))
 

@@ -2,8 +2,6 @@
 /**
  * \file environment.c
  *
- * Time-stamp:      "2012-07-18 10:18:25 bkorb"
- *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
  *  routines are in separately compiled modules so that they will not
@@ -246,7 +244,7 @@ env_presets(tOptions * pOpts, teEnvPresetType type)
             return;
 
         nln = strlen(st.pOD->pz_NAME) + 1;
-            
+
         if (nln > spaceLeft)
             return;
 

@@ -1,7 +1,5 @@
 
 /*
- * Time-stamp:      "2012-08-11 08:41:53 bkorb"
- *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  */

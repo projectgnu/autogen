@@ -2,10 +2,7 @@
 
 /* pathfind.c --- find a FILE  MODE along PATH */
 
-/*
- * Author:           Gary V Vaughan <gvaughan@oranda.demon.co.uk>
- * Time-stamp:       "2012-09-04 13:06:05 bkorb"
- */
+/* Author: Gary V Vaughan <gvaughan@oranda.demon.co.uk> */
 
 /* Code: */
 

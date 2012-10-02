@@ -2,8 +2,6 @@
 /**
  * @file expPrint.c
  *
- *  Time-stamp:        "2012-03-04 19:45:59 bkorb"
- *
  *  The following code is necessary because the user can give us
  *  a printf format requiring a string pointer yet fail to provide
  *  a valid pointer, thus it will fault.  This code protects

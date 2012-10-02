@@ -1,7 +1,5 @@
 [= autogen5 template -*- Mode: C -*-
 
-# Time-stamp:      "2012-09-25 17:01:59 bkorb"
-#
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -454,7 +452,7 @@ IF (and (exist? "homerc") (not (exist? "disable-save")))
 #define SET_[=(. OPT-pfx)=]SAVE_OPTS(a)   STMTS( \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState &= OPTST_PERSISTENT_MASK; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
-        [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a) )[=
+        [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a))[=
 ENDIF
 =][=
 

@@ -1,6 +1,6 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
-[= # Time-stamp:        "2012-04-07 09:56:01 bkorb"
-
+[= #
+ *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

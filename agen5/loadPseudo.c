@@ -5,8 +5,6 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  Time-stamp:        "2012-03-31 13:03:19 bkorb"
- *
  *  This module processes the "pseudo" macro
  *
  *  This file is part of AutoGen.

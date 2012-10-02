@@ -2,8 +2,6 @@
 
 ## man2texi.sh -- script to convert man page isms to texi-isms
 ##
-## Time-stamp:      "2012-02-12 09:25:29 bkorb"
-##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

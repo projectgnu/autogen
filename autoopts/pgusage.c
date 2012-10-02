@@ -2,8 +2,6 @@
 /**
  * \file pgusage.c
  *
- * Time-stamp:      "2012-09-25 17:14:13 bkorb"
- *
  *   Automated Options Paged Usage module.
  *
  *  This routine will run run-on options through a pager so the

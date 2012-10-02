@@ -4,8 +4,6 @@
 
 ## agman-cmd.tpl -- Template for command line man pages
 ##
-## Time-stamp:      "2012-09-26 10:10:49 bkorb"
-##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -83,9 +81,9 @@ DEFINE mk-synopsis                          :+][+:
     ELSE no long options:                   :+]
 .\" Short (flag) options only
 .RB [ \-\fIflag\fP " [\fIvalue\fP]]..."[+:
-    ENDIF                                               
+    ENDIF
                                             :+][+:
-  ELIF (exist? "long-opts")                             
+  ELIF (exist? "long-opts")
                                             :+]
 .\" Long options only
 .RB [ \-\-\fIopt\-name\fP [ = "| ] \fIvalue\fP]]..."[+:
@@ -104,7 +102,7 @@ All arguments are named options.[+:
 Operands and options may be intermixed.  They will be reordered.
 [+: ENDIF                                   :+][+:
 
-  ELIF (or (exist? "long-opts") use-flags) 
+  ELIF (or (exist? "long-opts") use-flags)
 
 :+]
 .PP

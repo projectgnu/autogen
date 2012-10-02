@@ -2,8 +2,6 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-04-28 08:33:44 bkorb"
- *
  *  This is the main routine for char-mapper.
  *
  *  This file is part of char-mapper.

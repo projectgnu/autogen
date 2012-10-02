@@ -2,8 +2,6 @@
 /**
  * @file defLoad.c
  *
- *  Time-stamp:        "2012-03-04 11:02:51 bkorb"
- *
  *  This module loads the definitions, calls yyparse to decipher them,
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
@@ -59,9 +57,9 @@ new_def_ent(void)
         int   ct = ENTRY_ALLOC_CT-1;
         void* p  = AGALOC(ENTRY_ALLOC_SIZE, "def headers");
 
-        *((void**)p) = pAllocList;
-        pAllocList   = p;
-        pRes = pFreeEntryList = (def_ent_t*)((void**)p + 1);
+        *((void **)p) = pAllocList;
+        pAllocList    = p;
+        pRes = pFreeEntryList = (def_ent_t *)((void **)p + 1);
 
         /*
          *  This is a post-loop test loop.  It will cycle one fewer times
@@ -86,7 +84,7 @@ new_def_ent(void)
         pRes[-1].de_next = NULL;
     }
 
-    memset((void*)pRes, 0, sizeof(*pRes));
+    memset((void *)pRes, 0, sizeof(*pRes));
     return pRes;
 }
 
@@ -278,7 +276,7 @@ ready_def_input(char const ** ppzfile, size_t * psz)
 
     if (! ENABLED_OPT(DEFINITIONS)) {
         base_ctx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t), "scan context");
-        memset((void*)base_ctx, 0, sizeof(scan_ctx_t));
+        memset((void *)base_ctx, 0, sizeof(scan_ctx_t));
         base_ctx->scx_line  = 1;
         base_ctx->scx_fname = READY_INPUT_NODEF;
 
@@ -362,7 +360,7 @@ read_defs(void)
      */
     sizeLeft = dataSize+4+sizeof(*base_ctx);
     base_ctx = (scan_ctx_t*)AGALOC(sizeLeft, "file buf");
-    memset((void*)base_ctx, 0, sizeLeft);
+    memset((void *)base_ctx, 0, sizeLeft);
     base_ctx->scx_line = 1;
     sizeLeft = dataSize;
 
@@ -374,7 +372,7 @@ read_defs(void)
      */
     pzData =
         base_ctx->scx_scan =
-        base_ctx->scx_data = (char*)(base_ctx+1);
+        base_ctx->scx_data = (char *)(base_ctx + 1);
     base_ctx->scx_next     = NULL;
 
     /*
@@ -396,7 +394,7 @@ read_defs(void)
      *  Read until done...
      */
     for (;;) {
-        size_t rdct = fread((void*)pzData, (size_t)1, sizeLeft, fp);
+        size_t rdct = fread((void *)pzData, (size_t)1, sizeLeft, fp);
 
         /*
          *  IF we are done,
@@ -437,7 +435,7 @@ read_defs(void)
              */
             dataSize += (sizeLeft = 0x1000);
             dataOff = pzData - base_ctx->scx_data;
-            p = AGREALOC((void*)base_ctx, dataSize+4+sizeof(*base_ctx),
+            p = AGREALOC((void *)base_ctx, dataSize + 4 + sizeof(*base_ctx),
                          "expand f buf");
 
             /*
@@ -447,7 +445,7 @@ read_defs(void)
              */
             if (p != base_ctx) {
                 p->scx_scan = \
-                    p->scx_data = (char*)(p+1);
+                    p->scx_data = (char *)(p + 1);
                 pzData = p->scx_data + dataOff;
                 base_ctx = p;
             }

@@ -3,8 +3,6 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-04-15 11:12:30 bkorb"
- *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *

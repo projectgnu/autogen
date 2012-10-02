@@ -3,8 +3,6 @@
  *
  * Various utilities for AutoGen.
  *
- *  Time-stamp:        "2012-03-10 13:11:54 bkorb"
- *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *

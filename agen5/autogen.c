@@ -2,8 +2,6 @@
 /**
  *  @file autogen.c
  *
- *  Time-stamp:        "2012-09-21 07:26:54 bkorb"
- *
  *  This is the main routine for autogen.
  *
  *  This file is part of AutoGen.
@@ -85,23 +83,6 @@ inner_main(void * closure, int argc, char ** argv)
     atexit(done_check);
     initialize(argc, argv);
 
-#if (GUILE_VERSION > 200000) && (GUILE_VERSION < 200008)
-    /*
-     * Guile 2.0.1 through 2.0.7 mistakenly corrupt the library search path.
-     * Rather than fall over, remove the environment variable.
-     */
-    {
-        static char ldpath[] = "LD_LIBRARY_PATH=";
-        char * p = ldpath + sizeof(ldpath) - 2;
-        *p = NUL;
-        if (getenv(ldpath) != NULL) {
-            fprintf(stderr, "erasing the %s environment variable\n", ldpath);
-            *p = '=';
-            putenv(ldpath);
-        }
-    }
-#endif
-
     processing_state = PROC_STATE_LOAD_DEFS;
     read_defs();
 
@@ -139,6 +120,8 @@ inner_main(void * closure, int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
+    putenv(C(char *, "GUILE_SYSTEM_EXTENSIONS_PATH="));
+
     /*
      *  IF we've been kicked with a signal,
      *  THEN abort, passing the signal that whacked us.
@@ -155,7 +138,7 @@ main(int argc, char ** argv)
      *  Coerce the environment into being POSIX ASCII strings so it keeps
      *  its bloody stinking nose out of our data.
      */
-    putenv((char*)(void*)LC_ALL_IS_C);
+    putenv(C(char *, LC_ALL_IS_C));
 
     /*
      *  If GUILE_WARN_DEPRECATED has not been defined, then likely we are
@@ -163,7 +146,7 @@ main(int argc, char ** argv)
      *  our users any angst.
      */
     if (getenv(GUILE_WARN_DEP_STR) == NULL)
-        putenv((char*)(void*)GUILE_WARN_NO_ENV);
+        putenv(C(char *, GUILE_WARN_NO_ENV));
 
     AG_SCM_BOOT_GUILE(argc, argv, inner_main);
 

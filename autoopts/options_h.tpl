@@ -2,8 +2,6 @@
 
 h=options.h
 
-# Time-stamp:      "2012-09-25 17:21:57 bkorb"
-#
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -103,7 +101,7 @@ h=options.h
 #define OPTIONS_MINIMUM_VERSION     [=  vers-min     =]
 #define OPTIONS_MIN_VER_STRING      "[= vers-min-str =]"
 #define OPTIONS_VER_TO_NUM(_v, _r)  (((_v) * 4096) + (_r))
-	
+
 typedef enum {
     OPARG_TYPE_NONE             =  0,
     OPARG_TYPE_STRING           =  1,    /* default type/ vanilla string      */

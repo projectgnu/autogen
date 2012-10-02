@@ -2,8 +2,6 @@
 /**
  * @file tpDep.c
  *
- * Time-stamp:        "2012-04-07 09:01:06 bkorb"
- *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.

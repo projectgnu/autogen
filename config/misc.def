@@ -4,9 +4,8 @@ autogen definitions conftest.tpl;
 
 /*
  */ author =           "Bruce Korb <bkorb@gnu.org>";
-/*  Time-stamp:        "2012-08-19 16:57:36 bkorb"
- *
- *  This file is part of AutoGen.
+
+/*  This file is part of AutoGen.
  *
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

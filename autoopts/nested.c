@@ -2,8 +2,6 @@
 /**
  * \file nested.c
  *
- *  Time-stamp:      "2012-09-04 12:06:27 bkorb"
- *
  *   Automated Options Nested Values module.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.

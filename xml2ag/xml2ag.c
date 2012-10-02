@@ -2,8 +2,6 @@
 /**
  * \file xml2ag.c
  *
- *  Time-stamp:         "2010-08-04 20:49:34 bkorb"
- *
  *  This is the main routine for xml2ag.
  *  xml2ag Copyright (c) 2002-2012 by Bruce Korb - all rights reserved
  *

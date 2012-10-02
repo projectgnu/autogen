@@ -2,9 +2,6 @@
 
 in=autoopts-config.in
 
-#!/bin/sh
-
-## Time-stamp:      "2012-05-05 08:48:11 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

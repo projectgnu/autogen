@@ -4,8 +4,6 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2012-04-29 08:54:45 bkorb"
-_EOF_
 \` `            +][+
 
 ;;  This file is part of AutoOpts, a companion to AutoGen.
@@ -412,7 +410,7 @@ ENDIF +]) {
     case VALUE_OPT_[+ (. OPT-NAME) +]:[+
 
       IF (not (exist? "max")) +]
-      if (HAVE_OPT( [+(. OPT-NAME)+] ))
+      if (HAVE_OPT([+(. OPT-NAME)+]))
         usage_too_many (&DESC([+(. OPT-NAME) +]));[+
 
       ELIF (not (= (get "max") "nolimit"))  +]
@@ -444,16 +442,16 @@ FOR flag +][+
      (define check-have-opt (or (exist? "flags-cant") (exist? "flags-must")))
      check-have-opt
 +]
-  if (HAVE_OPT( [+ (. OPT-NAME) +] )) {[+
+  if (HAVE_OPT([+ (. OPT-NAME) +])) {[+
 
     FOR flags-cant      +]
-    if (HAVE_OPT( [+ (string-upcase! (string->c-name! (get "flags-cant"))) +] ))
+    if (HAVE_OPT([+ (string-upcase! (string->c-name! (get "flags-cant"))) +]))
       usage_cannot (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
         (string-upcase! (string->c-name! (get "flags-cant"))) +]).pz_Name);[+
     ENDFOR cant         +][+
 
     FOR flags-must      +]
-    if (! HAVE_OPT( [+(string-upcase! (string->c-name! (get "flags-must")))+] ))
+    if (! HAVE_OPT([+(string-upcase! (string->c-name! (get "flags-must")))+]))
       usage_must (DESC([+ (. OPT-NAME) +]).pz_Name, DESC([+
         (string-upcase! (string->c-name! (get "flags-must"))) +]).pz_Name);[+
     ENDFOR must         +][+
@@ -487,7 +485,7 @@ FOR flag +][+
        have kept the occurrence count.  Check that against the limit. +][+
 
       IF (not (exist? "max"))
-        +]! HAVE_OPT( [+ (. OPT-NAME) +] )[+
+        +]! HAVE_OPT([+ (. OPT-NAME) +])[+
       ELSE  max ct exists
         +]DESC([+(. OPT-NAME)+]).optOccCt < DESC([+(. OPT-NAME)+]).optMinCt[+
       ENDIF +])[+

@@ -2,8 +2,6 @@
 /**
  * \file enumeration.c
  *
- * Time-stamp:      "2012-09-21 06:46:01 bkorb"
- *
  *   Automated Options Paged Usage module.
  *
  *  This routine will run run-on options through a pager so the

@@ -1,8 +1,6 @@
 /**
  * @file expExtract.c
  *
- *  Time-stamp:        "2012-03-04 09:16:59 bkorb"
- *
  *  This module implements a file extraction function.
  *
  *  This file is part of AutoGen.

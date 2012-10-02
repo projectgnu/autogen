@@ -1,8 +1,7 @@
 [= AutoGen5 Template c -*- Mode: scheme -*-
 
-## Time-stamp:      "2012-08-11 08:20:07 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
-
+##
 ## Copyright (C) 2011-2012 Bruce Korb, all rights reserved.
 ## This is free software. It is licensed for use, modification and
 ## redistribution under the terms of the

@@ -2,8 +2,6 @@
 /*
  * \file sort.c
  *
- * Time-stamp:      "2011-05-24 18:07:14 bkorb"
- *
  *  This module implements argument sorting.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.

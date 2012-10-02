@@ -2,8 +2,6 @@
 /**
  * @file expGuile.c
  *
- *  Time-stamp:        "2012-03-04 19:06:37 bkorb"
- *
  *  This module implements the expression functions that should
  *  be part of Guile.
  *
@@ -265,9 +263,7 @@ ag_scm_string_to_c_name_x(SCM str)
     if (! AG_SCM_STRING_P(str))
         scm_wrong_type_arg(STR_TO_C_NAME, 1, str);
 
-    
-    
-    for (pz = (char*)(void*)AG_SCM_CHARS(str), len = AG_SCM_STRLEN(str);
+    for (pz = C(char *, AG_SCM_CHARS(str)), len = AG_SCM_STRLEN(str);
          --len >= 0;
          pz++) {
 
@@ -304,7 +300,7 @@ ag_scm_string_upcase_x(SCM str)
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN(str);
-    pz  = (char*)(void*)AG_SCM_CHARS(str);
+    pz  = C(char *, AG_SCM_CHARS(str));
     while (--len >= 0) {
          char ch = *pz;
         if (IS_LOWER_CASE_CHAR(ch))
@@ -359,7 +355,7 @@ ag_scm_string_capitalize_x(SCM str)
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN(str);
-    pz  = (char*)(void*)AG_SCM_CHARS(str);
+    pz  = C(char *, AG_SCM_CHARS(str));
 
     while (--len >= 0) {
         char ch = *pz;
@@ -425,7 +421,7 @@ ag_scm_string_downcase_x(SCM str)
         return SCM_UNDEFINED;
 
     len = AG_SCM_STRLEN(str);
-    pz  = (char*)(void*)AG_SCM_CHARS(str);
+    pz  = C(char *, AG_SCM_CHARS(str));
     while (--len >= 0) {
         char ch = *pz;
         if (IS_UPPER_CASE_CHAR(ch))
@@ -484,7 +480,7 @@ ag_scm_string_to_camelcase(SCM str)
 
     len = AG_SCM_STRLEN(str);
     res = pzd = ag_scribble(len + 1);
-    pzs = (char*)(void*)AG_SCM_CHARS(str);
+    pzs = C(char *, AG_SCM_CHARS(str));
 
     while (--len >= 0) {
         unsigned int ch = *(pzs++);

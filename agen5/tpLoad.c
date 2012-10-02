@@ -2,8 +2,6 @@
 /**
  * @file tpLoad.c
  *
- * Time-stamp:        "2012-07-02 14:55:46 bkorb"
- *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.
@@ -51,7 +49,7 @@ find_tpl(char const * pzTemplName)
     while (pT != NULL) {
         if (streqvcmp(pzTemplName, pT->td_name) == 0)
             break;
-        pT = (templ_t*)(void*)(pT->td_scan);
+        pT = C(templ_t *, (pT->td_scan));
     }
     return pT;
 }
@@ -303,10 +301,10 @@ static void
 load_macs(templ_t * pT, char const * pzF, char const * pzN,
           char const * pzData)
 {
-    macro_t* pMac   = pT->td_macros;
+    macro_t * pMac = pT->td_macros;
 
     {
-        char*   pzText = (char*)(pMac + pT->td_mac_ct);
+        char *  pzText = (char *)(pMac + pT->td_mac_ct);
         size_t  len;
 
         AGDUPSTR(pT->td_file, pzF, "templ file");
@@ -341,7 +339,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
             int     delta = sizeof(macro_t) * (pT->td_mac_ct - ct);
             void*   data  =
                 (pT->td_name == NULL) ? pT->td_text : pT->td_name;
-            size_t  size  = pT->td_scan - (char*)data;
+            size_t  size  = pT->td_scan - (char *)data;
             memmove((void*)pMacEnd, data, size);
 
             pT->td_text  -= delta;
@@ -351,7 +349,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
         }
     }
 
-    pT->td_size = pT->td_scan - (char*)pT;
+    pT->td_size = pT->td_scan - (char *)pT;
     pT->td_scan = NULL;
 
     /*
@@ -544,7 +542,7 @@ cleanup(templ_t * tpl)
         tpl = named_tpls;
         if (tpl == NULL)
             break;
-        named_tpls = (templ_t*)(void*)(tpl->td_scan);
+        named_tpls = C(templ_t *, (tpl->td_scan));
     }
 
     free_for_context(true);

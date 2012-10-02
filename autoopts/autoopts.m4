@@ -3,8 +3,6 @@ dnl --------------------------------------------------------------------
 dnl autoopts.m4 --- Configure paths for autoopts
 dnl
 dnl Author:            Gary V. Vaughan <gvaughan@localhost>
-dnl Time-stamp:        "2011-12-13 09:45:03 bkorb"
-dnl
 dnl  This file is part of AutoOpts, a companion to AutoGen.
 dnl  AutoOpts is free software.
 dnl  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

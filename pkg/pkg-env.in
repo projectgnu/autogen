@@ -1,8 +1,6 @@
 #! /bin/echo this_file_must_be_sourced,_not_executed
 
 ## pkg-env.in --    create a native package
-## Time-stamp:      "2010-07-16 15:21:11 bkorb"
-##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

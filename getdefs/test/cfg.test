@@ -2,8 +2,7 @@
 #  -*- Mode: Shell-script -*-
 # cfg.test --- test config file processing
 #
-## Time-stamp:      "2011-02-02 12:03:18 bkorb"
-## Author:          Bruce Korb <bkorb@gnu.org>
+# Author:          Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

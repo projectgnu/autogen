@@ -1,8 +1,6 @@
 #!/bin/ksh
 # -*- Mode: shell-script -*-
 #
-# Time-stamp:        "2012-02-28 19:49:39 bkorb"
-##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

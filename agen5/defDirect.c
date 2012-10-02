@@ -1,8 +1,6 @@
 /**
  * @file defDirect.c
  *
- *  Time-stamp:        "2012-03-31 13:59:07 bkorb"
- *
  *  This module processes definition file directives.
  *
  *  blocksort spacing=2 \
@@ -786,7 +784,7 @@ doDir_include(char* pzArg, char* pzScan)
 
     pCtx->scx_scan  =
     pCtx->scx_data  =
-    pzScan          = (char*)(pCtx + 1);
+    pzScan          = (char *)(pCtx + 1);
 
     /*
      *  Read all the data.  Usually in a single read, but loop
@@ -1013,7 +1011,7 @@ doDir_shell(char * arg, char * pzScan)
      */
     AGDUPSTR(pCtx->scx_fname, DIRECT_SHELL_COMP_DEFS, DIRECT_SHELL_COMP_DEFS);
     pCtx->scx_scan  =
-    pCtx->scx_data  = (char*)(pCtx+1);
+    pCtx->scx_data  = (char *)(pCtx + 1);
     pCtx->scx_line  = 0;
     strcpy(pCtx->scx_scan, pzText);
     AGFREE(pzText);

@@ -2,8 +2,6 @@
 /**
  * @file expFormat.c
  *
- *  Time-stamp:        "2012-03-04 13:54:56 bkorb"
- *
  *  This module implements formatting expression functions.
  *
  *  This file is part of AutoGen.

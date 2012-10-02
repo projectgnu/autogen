@@ -2,8 +2,6 @@
 /*
  *  \file columns.c
  *
- *  Time-stamp:        "2012-03-31 13:37:39 bkorb"
- *
  *  Columns Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *  Columns is free software.
  *  This file is part of AutoGen.
@@ -204,7 +202,7 @@ pad_indentation(char const * pzIndentArg, char const ** pfx)
     /*
      *  IF the indent argument is a number
      */
-    if ((*pz == NUL) && (errno == 0) && (cct < OPT_VALUE_WIDTH)) {        
+    if ((*pz == NUL) && (errno == 0) && (cct < OPT_VALUE_WIDTH)) {
         char * p;
 
         /*

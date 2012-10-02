@@ -2,8 +2,6 @@
 /**
  * \file file.c
  *
- *  Time-stamp:      "2011-08-06 08:49:35 bkorb"
- *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

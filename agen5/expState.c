@@ -5,8 +5,6 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
- *  Time-stamp:        "2012-04-07 09:50:32 bkorb"
- *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
@@ -220,7 +218,7 @@ find_entry_value(SCM op, SCM obj, SCM test)
 SCM
 ag_scm_base_name(void)
 {
-    return AG_SCM_STR02SCM((char*)(void*)OPT_ARG(BASE_NAME));
+    return AG_SCM_STR02SCM(C(char *, OPT_ARG(BASE_NAME)));
 }
 
 /*=gfunc version_compare
@@ -337,7 +335,7 @@ ag_scm_count(SCM obj)
 SCM
 ag_scm_def_file(void)
 {
-    return AG_SCM_STR02SCM((char*)(void*)base_ctx->scx_fname);
+    return AG_SCM_STR02SCM(C(char *, (base_ctx->scx_fname)));
 }
 
 
@@ -672,7 +670,7 @@ ag_scm_tpl_file(SCM full)
             return AG_SCM_STR02SCM(z);
     }
 
-    return AG_SCM_STR02SCM((char*)(void*)tpl_fname);
+    return AG_SCM_STR02SCM(C(char *, tpl_fname));
 }
 
 /**
@@ -682,8 +680,8 @@ static SCM
 do_tpl_file_line(int line_delta, char const * fmt)
 {
     void * args[2] = {
-        [0] = (void*)current_tpl->td_file,
-        [1] = (void*)((long)cur_macro->md_line + line_delta)
+        [0] = (void *)current_tpl->td_file,
+        [1] = (void *)((uintptr_t)cur_macro->md_line + line_delta)
     };
     char * buf = strrchr(args[0], DIRCH);
     if (buf != NULL)
@@ -794,8 +792,8 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
 
     {
         void * args[2] = {
-            (void*)pE->de_file,
-            (void*)(long)pE->de_line
+            (void *)pE->de_file,
+            (void *)(uintptr_t)pE->de_line
         };
         size_t maxlen;
 

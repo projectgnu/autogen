@@ -1,8 +1,6 @@
 ##  -*- Mode: Makefile -*-
 ## Makefile.am --- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2011-06-11 12:02:49 bkorb"
-##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

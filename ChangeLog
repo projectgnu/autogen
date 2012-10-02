@@ -1,3 +1,7 @@
+2012-10-06  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: whitespace/useless comment cleanup
+
 2012-09-30  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/str2enum.tpl: new template

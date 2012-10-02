@@ -2,8 +2,6 @@
 /**
  * \file streqvcmp.c
  *
- * Time-stamp:      "2012-03-31 13:17:39 bkorb"
- *
  *  String Equivalence Comparison
  *
  *  These routines allow any character to be mapped to any other

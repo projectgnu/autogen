@@ -1,6 +1,4 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
-# Time-stamp:      "2012-09-30 06:14:36 bkorb"
-#
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -124,23 +122,23 @@ make_funcs_def()
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
     ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
 
-    ${AGexe} -Ltpl -boption-xat-attribute <<- _EOF_
+    ${AGexe} -Ltpl <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-xat-attribute;
 	prefix    = xat;
 	no-name;
-	keyword = type, words, members, cooked, uncooked, keep;
+	cmd = type, words, members, cooked, uncooked, keep;
 	_EOF_
     test $? -eq 0 || \
         die "FAILED: option-xat-attribute enumeration"
 
-    ${AGexe} -Ltpl -boption-value-type <<- _EOF_
+    ${AGexe} -Ltpl <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-value-type;
 	prefix    = vtp;
 	no-name;
-	keyword = string, integer, boolean, bool, keyword,
-	          set, set-membership, nested, hierarchy;
+	cmd = string, integer, boolean, bool, keyword,
+	      set, set-membership, nested, hierarchy;
 	_EOF_
     test $? -eq 0 || \
         die "FAILED: ${s2enum} --base-name=option-value-type"

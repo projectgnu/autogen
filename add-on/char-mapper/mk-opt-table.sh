@@ -1,8 +1,6 @@
 #! /bin/bash
 #  mk-opt-table.sh
 #
-#  Time-stamp:        "2012-09-30 06:51:24 bkorb"
-#
 #  This file is part of char-mapper.
 #  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 #
@@ -59,7 +57,7 @@ is_up_to_date() {
 }
 
 mk_enum() {
-    autogen -b ${base_name} -L ../../autoopts/tpl <<- _EOF_
+    cat > XX.def <<- _EOF_
 	AutoGen Definitions str2enum;
 
 	base-name = ${base_name};
@@ -68,9 +66,11 @@ mk_enum() {
 	    d-ret = 'char *';
 	    d-nam = 'handle_%s';
 	};
-	equate    = '_-^';
-	keyword   = $(echo $hdl_list | sed 's/ /, /g');
+	alias  = '# ignore';
+	equate = '_-^';
+	cmd    = $(echo $hdl_list | sed 's/ /, /g');
 	_EOF_
+    autogen -L ../../autoopts/tpl < XX.def
 }
 
 assemble_usage() {

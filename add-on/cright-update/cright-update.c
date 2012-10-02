@@ -2,8 +2,6 @@
 /**
  *  \file cright-update.c
  *
- *  Time-stamp:        "2011-01-28 08:47:42 bkorb"
- *
  *  cright-update Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  * cright-update is free software: you can redistribute it and/or modify it

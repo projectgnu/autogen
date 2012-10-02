@@ -1,6 +1,6 @@
 
 AutoGen Definitions fsm;
-	
+
 #if 0
 Here is a simple example. It decides whether or not the input properly
 represents a list of value ranges. The input syntax is approximately:

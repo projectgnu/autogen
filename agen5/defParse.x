@@ -4,8 +4,6 @@
  *
  * Definition parser functions.
  *
- *  Time-stamp:        "2012-03-31 13:30:28 bkorb"
- *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

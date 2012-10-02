@@ -1,8 +1,6 @@
 /**
  * @file defFind.c
  *
- *  Time-stamp:        "2012-04-07 09:12:06 bkorb"
- *
  *  This module locates definitions.
  *
  *  This file is part of AutoGen.
@@ -722,7 +720,7 @@ print_used_defines(void)
 
     {
         int ix = 0;
-        
+
         FILE * fp = popen(USED_DEFINES_FMT, "w");
         if (fp == NULL) return;
 

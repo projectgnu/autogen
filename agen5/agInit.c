@@ -5,8 +5,6 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
- *  Time-stamp:      "2012-09-15 10:30:31 bkorb"
- *
  *  This file is part of AutoGen.
  *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
  *
@@ -160,7 +158,7 @@ make_quote_str(char const * str)
 /**
  * Error in dependency specification
  *
- * @param fmt the error message format 
+ * @param fmt the error message format
  */
 static void
 dep_usage(char const * fmt, ...)

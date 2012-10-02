@@ -2,8 +2,6 @@
 
 ## mdoc2man.sh -- script to convert mdoc-isms to man-isms
 ##
-## Time-stamp:      "2012-09-04 15:16:24 bkorb"
-##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 Bruce Korb - all rights reserved

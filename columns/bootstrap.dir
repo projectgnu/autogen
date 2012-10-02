@@ -2,8 +2,8 @@
 #
 # columns/bootstrap.dir --- maintainer's bootstrap script
 #
-# Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2012-04-14 08:22:14 bkorb"
+## Author:            Bruce Korb <bkorb@gnu.org>
+##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

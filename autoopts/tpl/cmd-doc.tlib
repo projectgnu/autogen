@@ -4,8 +4,6 @@
 
 # cmd-doc.tlib -- Template for command line man/mdoc pages
 #
-# Time-stamp:      "2012-05-12 20:52:33 bkorb"
-#
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
 #  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -274,7 +272,7 @@ ENDDEF ao-sections
 
 DEFINE cond-section                     :+][+:
 
-  IF 
+  IF
      (set! sect-name   (string-upcase! (string-substitute
                        (get "sec") "-" " " )))
      (set! macro-name  (string-downcase! (string-substitute
@@ -526,7 +524,7 @@ by loading values from [+:
   ENDIF                               :+][+:
   IF (. environ-init) :+]environment variables named:
 .nf
-  \fB[+: (. UP-PROG-NAME) :+]_<option-name>\fP or \fB[+: (. UP-PROG-NAME) :+]\fP
+  \fB[+:(. UP-PROG-NAME):+]_<option-name>\fP or \fB[+:(. UP-PROG-NAME):+]\fP
 .fi
 .ad[+:
     IF (. home-rc-files)              :+]

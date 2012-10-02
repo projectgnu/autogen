@@ -1,8 +1,6 @@
 
 /**
  *  \file load.c
- *  Time-stamp:      "2012-09-04 12:06:25 bkorb"
- *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
  *  rc/ini file.

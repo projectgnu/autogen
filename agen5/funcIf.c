@@ -2,8 +2,6 @@
 /**
  * @file funcIf.c
  *
- *  Time-stamp:        "2012-04-07 09:59:54 bkorb"
- *
  *  This module implements the _IF text function.
  *
  *  This file is part of AutoGen.

@@ -3,7 +3,6 @@
 #
 # getopt.test ---  test getopt_long argument processing
 #
-# Time-stamp:        "2012-09-01 09:48:07 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -332,19 +331,19 @@ process_test_getopt_opts (int argc, char** argv)
     case   0: break;
 
     case VALUE_OPT_OPTION:
-      if (HAVE_OPT( OPTION ))
+      if (HAVE_OPT(OPTION))
         usage_too_many (&DESC(OPTION));
       SET_OPT_OPTION(optarg);
       break;
 
     case VALUE_OPT_SECOND:
-      if (HAVE_OPT( SECOND ))
+      if (HAVE_OPT(SECOND))
         usage_too_many (&DESC(SECOND));
       SET_OPT_SECOND(optarg);
       break;
 
     case VALUE_OPT_NO_VAL:
-      if (HAVE_OPT( NO_VAL ))
+      if (HAVE_OPT(NO_VAL))
         usage_too_many (&DESC(NO_VAL));
       SET_OPT_NO_VAL;
       break;
@@ -380,13 +379,13 @@ process_test_getopt_opts (int argc, char** argv)
     }
   } leave_processing:;
 
-  if (HAVE_OPT( NO_VAL )) {
-    if (! HAVE_OPT( MAX_VAL ))
+  if (HAVE_OPT(NO_VAL)) {
+    if (! HAVE_OPT(MAX_VAL))
       usage_must (DESC(NO_VAL).pz_Name, DESC(MAX_VAL).pz_Name);
   }
 
-  if (HAVE_OPT( MIN2_VAL )) {
-    if (HAVE_OPT( MAX_VAL ))
+  if (HAVE_OPT(MIN2_VAL)) {
+    if (HAVE_OPT(MAX_VAL))
       usage_cannot (DESC(MIN2_VAL).pz_Name, DESC(MAX_VAL).pz_Name);
     if (DESC(MIN2_VAL).optOccCt < DESC(MIN2_VAL).optMinCt)
       usage_too_few (&DESC(MIN2_VAL));
@@ -569,19 +568,19 @@ process_test_getopt_opts (int argc, char** argv)
     case   0: break;
 
     case VALUE_OPT_OPTION:
-      if (HAVE_OPT( OPTION ))
+      if (HAVE_OPT(OPTION))
         usage_too_many (&DESC(OPTION));
       SET_OPT_OPTION(optarg);
       break;
 
     case VALUE_OPT_SECOND:
-      if (HAVE_OPT( SECOND ))
+      if (HAVE_OPT(SECOND))
         usage_too_many (&DESC(SECOND));
       SET_OPT_SECOND(optarg);
       break;
 
     case VALUE_OPT_NO_VAL:
-      if (HAVE_OPT( NO_VAL ))
+      if (HAVE_OPT(NO_VAL))
         usage_too_many (&DESC(NO_VAL));
       SET_OPT_NO_VAL;
       break;
@@ -617,13 +616,13 @@ process_test_getopt_opts (int argc, char** argv)
     }
   } leave_processing:;
 
-  if (HAVE_OPT( NO_VAL )) {
-    if (! HAVE_OPT( MAX_VAL ))
+  if (HAVE_OPT(NO_VAL)) {
+    if (! HAVE_OPT(MAX_VAL))
       usage_must (DESC(NO_VAL).pz_Name, DESC(MAX_VAL).pz_Name);
   }
 
-  if (HAVE_OPT( MIN2_VAL )) {
-    if (HAVE_OPT( MAX_VAL ))
+  if (HAVE_OPT(MIN2_VAL)) {
+    if (HAVE_OPT(MAX_VAL))
       usage_cannot (DESC(MIN2_VAL).pz_Name, DESC(MAX_VAL).pz_Name);
     if (DESC(MIN2_VAL).optOccCt < DESC(MIN2_VAL).optMinCt)
       usage_too_few (&DESC(MIN2_VAL));

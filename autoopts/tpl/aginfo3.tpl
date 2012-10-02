@@ -2,10 +2,8 @@
 
 texi
 
-## ---------------------------------------------------------------------
 ## aginfo3.tpl -- Template for function texi doc
 ##
-## Time-stamp:      "2011-02-01 06:38:27 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

@@ -2,8 +2,6 @@
 
 AutoGen5 Template
 
-## Time-stamp:        "2012-08-11 08:38:53 bkorb"
-##
 ##  This file is part of AutoGen.
 ##
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -73,14 +71,14 @@ DEFINE  emit-macro                              =][=
   ~~  with|without|with-group                   =][=
       (define bad-define-name   "WITHOUT_%s")
       (define good-define-name  "WITH_%s")      =][=
-     
+
   ~~  withlib|withconf                          =][=
       (define lib-name          (string-append "lib" down-name))
       (define bad-define-name   "WITHOUT_LIB%s")
       (define good-define-name  "WITH_LIB%s")   =][=
 
   * =][= (error (string-append "unknown macro type: " (get "type"))) =][=
-      
+
   ESAC                                          =][=
 
   IF  (. separate-macros)                       =][=

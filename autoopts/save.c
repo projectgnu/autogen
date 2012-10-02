@@ -2,8 +2,6 @@
 /*
  * \file save.c
  *
- * Time-stamp:      "2012-03-31 13:15:19 bkorb"
- *
  *  This module's routines will take the currently set options and
  *  store them into an ".rc" file for re-interpretation the next
  *  time the invoking program is run.

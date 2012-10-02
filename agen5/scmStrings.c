@@ -4,8 +4,6 @@
  *
  *  Temporary SCM strings.
  *
- * Time-stamp:        "2012-03-04 19:29:47 bkorb"
- *
  * This file is part of AutoGen.
  * AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

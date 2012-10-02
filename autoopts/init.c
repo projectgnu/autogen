@@ -1,8 +1,6 @@
 /**
  * \file initialize.c
  *
- *  Time-stamp:      "2012-09-04 12:41:53 bkorb"
- *
  *  initialize the libopts data structures.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.

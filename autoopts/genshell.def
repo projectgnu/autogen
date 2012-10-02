@@ -4,8 +4,6 @@ autogen definitions options;
 /**
  * \file genshell.def
  *
- * Time-stamp:      "2012-01-29 13:32:43 bkorb"
- *
  *  This module generates shell scripts with AutoOpts supported command line
  *  option processing.  This program is licensed separately from the AutoOpts
  *  library and is _only_ available under the terms of the GNU General

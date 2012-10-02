@@ -1,11 +1,7 @@
 [= AutoGen5 Template -*- Mode: C -*-
 
-h
-c
+h c
 
-#!/bin/sh
-
-## Time-stamp:      "2011-12-30 08:28:20 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
@@ -195,7 +191,7 @@ FOR bit (for-from 0) (for-by 1) =][=
          (set! ix          (string-table-add "nm" tmp))
          (set! offset-list (string-append offset-list (sprintf "%d\n" ix)))
          (set! sorted-off  (string-append sorted-off
-                           (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
+               (sprintf "%-40s { %3d, %3d }\n" tmp ix (for-index))))
       )
 
       (set! offset-list (string-append offset-list "0\n" ))
@@ -542,7 +538,7 @@ ESAC                =]
 /* end of [= (out-name) =] */
 [=#
 
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE  preamble    =][=
 
@@ -569,7 +565,7 @@ _EOF_
 
 ENDDEF  preamble
 
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE  emit-bit-list       =][=
 
@@ -671,7 +667,7 @@ DEFINE  emit-word-macro     =][=
 [= ENDIF omit-test-n-set =][=
 ENDDEF  emit-word-macro
 
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE  emit-loop-macro
 

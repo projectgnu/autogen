@@ -3,7 +3,7 @@
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
 ## Author:          Bruce Korb <bkorb@gnu.org>
-## Time-stamp:      "2010-07-18 09:05:44 bkorb"
+##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

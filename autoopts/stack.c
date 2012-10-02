@@ -2,8 +2,6 @@
 /**
  * \file stack.c
  *
- *  Time-stamp:      "2012-08-11 08:35:28 bkorb"
- *
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  *

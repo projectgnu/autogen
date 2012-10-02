@@ -1,7 +1,5 @@
 [= AutoGen5 Template -*- Mode: text -*-
 
-# Time-stamp:      "2012-09-25 16:34:14 bkorb"
-
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -371,7 +369,7 @@ ENDIF handler-type exists  =][=
 
 =]
 /**
- * Generated main procedure.  This will call the [= (. handler-proc) =] procedure
+ * Generated main procedure.  This will call the [=(. handler-proc)=] procedure
  * for every operand on the command line.  If there are no operands, then stdin
  * is read for a list of file names to process.  stdin must not be a terminal.
  * It must be a pipe or a file.
@@ -876,7 +874,7 @@ DEFINE   keyword-code           =][=
          (set! tmp-ct (+ 1 tmp-ct))
          (emit "    static char const zDef[2] = { 0x7F, 0 };\n")
    )   )                        \=]
-    static char const * const azNames[[= (. tmp-ct) =]] = {[=
+    static char const * const names[[= (. tmp-ct) =]] = {[=
         (emit (if (not (exist? "arg-default")) " zDef,\n" "\n"))
         (out-push-new) =][=
   FOR keyword =][=
@@ -887,7 +885,7 @@ DEFINE   keyword-code           =][=
 =] };
 
     if (pOptions <= OPTPROC_EMIT_LIMIT) {
-        (void) optionEnumerationVal(pOptions, pOptDesc, azNames, [=
+        (void) optionEnumerationVal(pOptions, pOptDesc, names, [=
            (. tmp-ct)=]);
         return; /* protect AutoOpts client code from internal callbacks */
     }[=
@@ -906,14 +904,14 @@ DEFINE   keyword-code           =][=
                 "UNDEFINED"  ))) =];
     else
         pOptDesc->optArg.argEnum =
-            optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);[=
+            optionEnumerationVal(pOptions, pOptDesc, names, [=(. tmp-ct)=]);[=
 
   ELSE
 
 =]
 
     pOptDesc->optArg.argEnum =
-        optionEnumerationVal(pOptions, pOptDesc, azNames, [=(. tmp-ct)=]);[=
+        optionEnumerationVal(pOptions, pOptDesc, names, [=(. tmp-ct)=]);[=
 
   ENDIF                         =][=
 
@@ -934,7 +932,7 @@ DEFINE   set-membership-code
     (error "set membership requires keywords"))
 (set! tmp-ct (count "keyword"))
 (emit (tpl-file-line extract-fmt))
-(ag-fprintf 0 "    static char const * const azNames[%d] = {\n" tmp-ct)
+(ag-fprintf 0 "    static char const * const names[%d] = {\n" tmp-ct)
 
 (shell (string-append
 
@@ -947,7 +945,7 @@ DEFINE   set-membership-code
     /*
      * This function handles special invalid values for "pOptions"
      */
-    optionSetMembers(pOptions, pOptDesc, azNames, [= (. tmp-ct) =]);[=
+    optionSetMembers(pOptions, pOptDesc, names, [= (. tmp-ct) =]);[=
 
   (if (exist? "flag-code[1]")
       (emit (string-append "\n" (get "flag-code[1]"))))
@@ -1192,7 +1190,7 @@ void
 }
 
 /**
- * Print a usage message with a format and a variable argument list. 
+ * Print a usage message with a format and a variable argument list.
  * [=(. lc-prefix)=]vusage_message() is called to do the work.
  *
  * @param[in] fmt the message format string

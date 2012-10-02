@@ -3,8 +3,6 @@
  *
  * @brief Hunt for options in the option descriptor list
  *
- *  Time-stamp:      "2012-09-04 12:34:01 bkorb"
- *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
  *
@@ -702,7 +700,7 @@ find_opt(tOptions * opts, tOptState * o_st)
     if (NAMED_OPTS(opts)) {
         char *   pz  = opts->pzCurOpt;
         int      def;
-        tSuccess res; 
+        tSuccess res;
         tAoUS *  def_opt;
 
         opts->curOptIdx++;

@@ -1,8 +1,6 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-09-04 13:49:29 bkorb"
- *
  *  configuration/rc/ini file handling.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.

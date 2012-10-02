@@ -2,8 +2,6 @@
 /**
  * @file expMake.c
  *
- *  Time-stamp:        "2012-03-04 13:54:13 bkorb"
- *
  *  This module implements Makefile construction functions.
  *
  *  This file is part of AutoGen.

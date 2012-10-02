@@ -3,8 +3,6 @@
 autogen definitions options;
 
 /*
- *  Time-stamp:        "2012-09-04 11:27:58 bkorb"
- *
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it

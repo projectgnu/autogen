@@ -1,7 +1,5 @@
 [= AutoGen5 Template rc
 
-# Time-stamp:      "2011-11-21 04:52:41 bkorb"
-
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -23,7 +21,8 @@
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
 =]
-# [= (define prog-name (get "prog-name")) prog-name =] sample configuration file
+# [= (define prog-name (get "prog-name"))
+     prog-name =] sample configuration file
 #[=
 
 IF (if (not (exist? "homerc"))
@@ -75,7 +74,7 @@ FOR flag                                =][=
 
 ENDFOR flag
 
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE emit-description =][=
 (out-push-new)          =][=

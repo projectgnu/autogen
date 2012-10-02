@@ -4,8 +4,6 @@
  *
  *  This module evaluates macro expressions.
  *
- *  Time-stamp:        "2012-04-07 09:41:46 bkorb"
- *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
@@ -362,7 +360,7 @@ ag_scm_emit(SCM val)
     case 0:
         fp = cur_fpstack->stk_fp; // initialize the first time through
         break;
-    } 
+    }
 
     depth++;
     for (;;) {

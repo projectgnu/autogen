@@ -2,8 +2,6 @@
 /**
  * \file reset.c
  *
- *  Time-stamp:      "2012-08-11 08:35:11 bkorb"
- *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

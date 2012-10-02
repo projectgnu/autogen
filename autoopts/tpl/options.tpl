@@ -3,8 +3,6 @@
 h
 c
 
-# Time-stamp:      "2011-01-28 10:30:50 bkorb"
-
 # This file contains the templates used to generate the
 # option descriptions for client programs, and it declares
 # the macros used in the templates.

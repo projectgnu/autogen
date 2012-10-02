@@ -2,8 +2,6 @@
 
 null
 
-##  Time-stamp:        "2012-01-02 20:00:21 bkorb"
-##
 ##  This file is part of AutoGen.
 ##
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

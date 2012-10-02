@@ -2,8 +2,6 @@
 /**
  * @file defLex.c
  *
- *  Time-stamp:        "2012-09-04 12:34:07 bkorb"
- *
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  *
@@ -255,7 +253,7 @@ scanAgain:
 
     case '#':
     {
-        extern char * processDirective(char*);
+        extern char * processDirective(char *);
         char * pz = processDirective(cctx->scx_scan+1);
         /*
          *  Ensure that the compiler doesn't try to save a copy of
@@ -348,7 +346,7 @@ scanAgain:
         return DP_EV_INVALID;
     }
 
-    cctx->scx_scan = (char*)zNil;
+    cctx->scx_scan = (char *)zNil;
     return DP_EV_END;
 #undef SET_LIT_TKN
 }
@@ -385,7 +383,7 @@ static void
 loadScheme(void)
 {
     char*    pzText    = cctx->scx_scan;
-    char*    pzEnd     = (char*)skip_scheme(pzText, pzText + strlen(pzText));
+    char*    pzEnd     = (char *)skip_scheme(pzText, pzText + strlen(pzText));
     char     endCh     = *pzEnd;
     int      schemeLen = (pzEnd - pzText);
     int      next_ln;
@@ -409,7 +407,7 @@ loadScheme(void)
     *pzEnd = endCh;
 
     cctx->scx_scan = pzEnd;
-    pzEnd = (char*)scm2display(res); /* ignore const-ness */
+    pzEnd = (char *)scm2display(res); /* ignore const-ness */
     cctx->scx_line = next_ln;
 
     if ((int)strlen(pzEnd) >= schemeLen) {
@@ -437,7 +435,7 @@ static void
 alist_to_autogen_def(void)
 {
     char*  pzText  = ++(cctx->scx_scan);
-    char*  pzEnd   = (char*)skip_scheme(pzText, pzText + strlen(pzText));
+    char*  pzEnd   = (char *)skip_scheme(pzText, pzText + strlen(pzText));
 
     SCM    res;
     size_t res_len;
@@ -484,9 +482,9 @@ alist_to_autogen_def(void)
      */
     AGDUPSTR(pCtx->scx_fname, ALIST_TO_AG_TEXT, "scheme text");
     pCtx->scx_scan = \
-    pCtx->scx_data = (char*)(pCtx+1);
+    pCtx->scx_data = (char *)(pCtx + 1);
     pCtx->scx_line = 0;
-    memcpy((void*)(pCtx->scx_scan), (void*)AG_SCM_CHARS(res), res_len);
+    memcpy((void *)(pCtx->scx_scan), (void *)AG_SCM_CHARS(res), res_len);
     pCtx->scx_scan[ res_len ] = NUL;
 
     /*

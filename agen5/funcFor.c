@@ -2,8 +2,6 @@
 /**
  * @file funcFor.c
  *
- *  Time-stamp:        "2012-04-07 09:13:53 bkorb"
- *
  *  This module implements the FOR text macro.
  *
  *  This file is part of AutoGen.

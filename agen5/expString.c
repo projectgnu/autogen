@@ -2,8 +2,6 @@
 /**
  * @file expString.c
  *
- *  Time-stamp:        "2012-03-31 13:33:55 bkorb"
- *
  *  This module implements expression functions that
  *  manipulate string values.
  *
@@ -1022,7 +1020,7 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
         }
     } mapDone:;
 
-    pzTo = (char*)(void*)AG_SCM_CHARS(str);
+    pzTo = C(char *, AG_SCM_CHARS(str));
     i    = AG_SCM_STRLEN(str);
     while (i-- > 0) {
         *pzTo = ch_map[ (int)*pzTo ];
@@ -1119,7 +1117,7 @@ ag_scm_time_string_to_number(SCM time_spec)
 
     pz = AG_SCM_CHARS(time_spec);
     time_period = parse_duration(pz);
-    
+
     return AG_SCM_INT2SCM((int)time_period);
 }
 

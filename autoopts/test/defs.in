@@ -3,9 +3,8 @@
 #
 # defs --- define the environment for autogen tests.
 #
-# Time-stamp:     "2012-05-13 16:02:07 bkorb"
 # Author:         Bruce Korb <bkorb@gnu.org>
-##
+#
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

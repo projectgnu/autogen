@@ -1,7 +1,5 @@
 #! /bin/sh
 
-# Time-stamp:        "2012-05-13 13:52:48 bkorb"
-#
 ##  This file is part of AutoGen.
 ##
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

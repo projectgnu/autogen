@@ -2,8 +2,6 @@
 /*
  * \file usage.c
  *
- * Time-stamp:      "2012-09-04 12:33:54 bkorb"
- *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  *

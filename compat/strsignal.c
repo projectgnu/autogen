@@ -2,8 +2,6 @@
 /**
  * \file strsignal.c
  *
- * Time-stamp:        "2010-07-16 15:12:27 bkorb"
- *
  *  This file is part of AutoGen.
  *
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

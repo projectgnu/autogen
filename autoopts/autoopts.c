@@ -2,8 +2,6 @@
 /**
  * \file autoopts.c
  *
- *  Time-stamp:      "2012-09-04 13:11:09 bkorb"
- *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
  *  routines are in separately compiled modules so that they will not
@@ -85,7 +83,7 @@ ao_strdup(char const *str)
 #define strdup(_p)        ao_strdup(_p)
 
 #ifndef HAVE_PATHFIND
-#  define  pathfind(_p, _n, _m) option_pathfind(_p, _n, _m) 
+#  define  pathfind(_p, _n, _m) option_pathfind(_p, _n, _m)
 #  include "compat/pathfind.c"
 #endif
 

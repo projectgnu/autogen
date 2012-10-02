@@ -2,8 +2,6 @@
 ## ---------------------------------------------------------------------
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-04-07 09:55:51 bkorb"
-## Last Modified:   Thu Jul 29 13:42:18 1999
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

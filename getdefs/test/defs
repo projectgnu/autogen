@@ -4,8 +4,6 @@
 # defs --- define the environment for autogen tests.
 #
 # Author:            Bruce Korb <bkorb@gnu.org>
-# Time-stamp:        "2011-02-02 12:04:19 bkorb"
-##
 ##  This file is part of AutoGen.
 ##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ##

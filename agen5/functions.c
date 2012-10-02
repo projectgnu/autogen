@@ -2,8 +2,6 @@
 /**
  * @file functions.c
  *
- *  Time-stamp:        "2012-06-10 11:24:45 bkorb"
- *
  *  This module implements text functions.
  *
  *  This file is part of AutoGen.

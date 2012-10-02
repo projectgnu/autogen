@@ -1,8 +1,6 @@
 [= Autogen5 Template configuration -*- Mode: scheme -*- =]
 [=
 
-# Time-stamp:      "2012-05-12 19:42:14 bkorb"
-
 # This file contains configure stuff used by various templates.
 
 ##  This file is part of AutoOpts, a companion to AutoGen.

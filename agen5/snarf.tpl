@@ -1,7 +1,5 @@
 [= AutoGen5 template  -*- Mode: Text -*-
 
-# Time-stamp:        "2011-01-31 14:16:48 bkorb"
-
 ##
 ## This file is part of AutoGen.
 ## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

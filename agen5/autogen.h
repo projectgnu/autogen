@@ -2,8 +2,6 @@
 /**
  * @file autogen.h
  *
- *  Time-stamp:        "2012-04-07 09:45:02 bkorb"
- *
  *  Global header file for AutoGen
  *
  *  This file is part of AutoGen.
@@ -62,6 +60,12 @@
 #define YYSTYPE t_word
 
 #define ag_offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE *)0)->MEMBER)
+
+/**
+ *  Coercive cast.  Compel an address to be interpreted as the type
+ *  of the first argument.  No complaints, just do it.
+ */
+#define C(_t, _p)  ((_t)(void *)_p)
 
 /*
  *  Dual pipe opening of a child process

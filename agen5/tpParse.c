@@ -2,8 +2,6 @@
 /**
  * @file tpParse.c
  *
- * Time-stamp:        "2012-04-22 10:05:41 bkorb"
- *
  *  This module will load a template and return a template structure.
  *
  * This file is part of AutoGen.

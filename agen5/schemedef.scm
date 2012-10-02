@@ -1,6 +1,4 @@
 
-;;; Time-stamp:        "2012-09-05 08:09:21 bkorb"
-;;;
 ;;; This file is part of AutoGen.
 ;;; AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
 ;;;

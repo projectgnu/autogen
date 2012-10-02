@@ -1,7 +1,5 @@
 [= AutoGen5 Template spec =]
 [= #
-   Time-stamp:        "2012-07-30 07:29:25 bkorb"
-
  *  This file is part of AutoGen.
  *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *

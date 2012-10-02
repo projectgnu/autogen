@@ -4,8 +4,6 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-09-04 15:01:34 bkorb"
-# Author:            Bruce Korb <bkorb@gnu.org>
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
@@ -496,7 +494,7 @@ DEFINE emit-rc-file-info                =]
        (> rc-count 1)           =][=
 
        INVOKE emit-multiple-rc  =][=
-    
+
     ELSE                        =][=
        INVOKE emit-one-rc-dir   =][=
     ENDIF (> rc-count 1)
@@ -586,9 +584,11 @@ IF (exist? "version")                   =]
 Print the program version to standard out, optionally with licensing
 information, then exit 0.  The optional argument specifies how much licensing
 detail to provide.  The default is to print [=
-(if (exist? "gnu-usage") "the license name with the version" "just the version")
-=].  The licensing infomation may be selected with an option argument.  Only the
-first letter of the argument is examined:
+(if (exist? "gnu-usage")
+    "the license name with the version"
+    "just the version")
+=].  The licensing infomation may be selected with an option argument.
+Only the first letter of the argument is examined:
 
 @table @samp
 @item version
@@ -758,7 +758,7 @@ DEFINE initialization                   =][=
          (set! cvt-script
                (find-file (string-append diversion-type "2texi")))
          (if (not (defined? 'cvt-script))
-             (error (sprintf "unknown source format type: %s" diversion-type)) )
+             (error (sprintf "unknown source format type: %s" diversion-type)))
          (out-push-new) ))  )))
 
   (define heredoc-marker "_Unlikely_Here_Doc_Marker_\n")
