@@ -237,25 +237,31 @@ SCM
 ag_scm_out_move(SCM new_file)
 {
     size_t sz = AG_SCM_STRLEN(new_file);
-    char*  pz = (char*)AGALOC(sz + 1, "new file name string");
+    char * pz = (char*)AGALOC(sz + 1, "file name");
     memcpy(pz, AG_SCM_CHARS(new_file), sz);
-    pz[ sz ] = NUL;
+    pz[sz] = NUL;
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
         fprintf(trace_fp, TRACE_MOVE_FMT, __func__,
                 cur_fpstack->stk_fname, pz);
-    rename(cur_fpstack->stk_fname, pz);
 
-    if (dep_fp != NULL) {
-        rm_target_file(cur_fpstack->stk_fname);
-        add_target_file(pz);
+    if (strcmp(pz, cur_fpstack->stk_fname) != 0) {
+
+        rename(cur_fpstack->stk_fname, pz);
+
+        if (dep_fp != NULL) {
+            rm_target_file(cur_fpstack->stk_fname);
+            add_target_file(pz);
+        }
+
+        if ((cur_fpstack->stk_flags & FPF_STATIC_NM) == 0) {
+            AGFREE((void*)cur_fpstack->stk_fname);
+            cur_fpstack->stk_flags &= ~FPF_STATIC_NM;
+        }
+
+        AGDUPSTR(cur_fpstack->stk_fname, pz, "file name");
     }
 
-    if ((cur_fpstack->stk_flags & FPF_STATIC_NM) == 0)
-        AGFREE((void*)cur_fpstack->stk_fname);
-
-    AGDUPSTR(cur_fpstack->stk_fname, pz, "file name");
-    cur_fpstack->stk_flags &= ~FPF_STATIC_NM;
     return SCM_UNDEFINED;
 }
 

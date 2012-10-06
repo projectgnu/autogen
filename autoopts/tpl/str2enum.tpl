@@ -40,6 +40,8 @@
 ;;   prefix       By default, the enumeration value uses the first segment
 ;;                of the base name as the prefix for each name.  This
 ;;                overrides that.
+;;   type         After the prefix, each enum value has a "type" segment.
+;;                By default, this is "cmd", but may be changed.
 ;;   alias        A special character can be used to represent a command. e.g.
 ;;                   alias = "< source"; alias = "# comment"; alias = "? help";
 ;;                will cause a '<' character to represent "source",
@@ -93,19 +95,19 @@ CASE (suffix)            =][= #
 INVOKE init-header       =]
 
 typedef enum {
-    [= (define invalid-cmd (string-append PFX-STR "_INVALID_CMD"))
+    [= (define invalid-cmd (string-append PFX-STR "_INVALID_" ENUM-TYPE))
        invalid-cmd =][=
     (shell (string-append "mk_enum_list '" (string-upcase cmd-list) "'")) =],
-    [= (define cmd-count (string-append PFX-STR "_COUNT_CMD"))
+    [= (define cmd-count (string-append PFX-STR "_COUNT_" ENUM-TYPE))
        cmd-count =]
 } [= (. enum-name) =];
 
 extern [= (. enum-name)         =]
-find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=]);[=
+find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=]);[=
 
   IF (exist? "dispatch")        =]
 
-typedef [= dispatch.d-ret =]([=(. base-enum-name)=]_handler_t)(
+typedef [= dispatch.d-ret =]([=(. base-type-name)=]_handler_t)(
     [=
     (define disp-arg-list (string-append enum-name " id, char const * str"))
     (if (exist? "dispatch.d-arg")
@@ -113,7 +115,7 @@ typedef [= dispatch.d-ret =]([=(. base-enum-name)=]_handler_t)(
                             (get "dispatch.d-arg") )) )
     disp-arg-list =]);
 
-[=(. base-enum-name)=]_handler_t
+[=(. base-type-name)=]_handler_t
 [=
 (if (not (exist? "dispatch.d-nam"))
     (error "dispatch needs callout procedure name format ('d-nam')"))
@@ -124,7 +126,7 @@ typedef [= dispatch.d-ret =]([=(. base-enum-name)=]_handler_t)(
 proc-list =];
 
 extern [= dispatch.d-ret =]
-disp_[=(. base-enum-name)=](char * str[=
+disp_[=(. base-type-name)=](char * str[=
      (if (exist? "dispatch.d-arg")
          (string-append len-arg ", " (get "dispatch.d-arg"))
          len-arg) =]);[=
@@ -134,7 +136,7 @@ disp_[=(. base-enum-name)=](char * str[=
   IF (not (exist? "no-name"))   =]
 
 extern char const *
-[=(. base-enum-name)=]_name([= (. enum-name) =] id);[=
+[=(. base-type-name)=]_name([= (. enum-name) =] id);[=
 
   ENDIF dispatch
 
@@ -183,34 +185,13 @@ ESAC  suffix c/h
 ;;;
 ;;;=][=
 
-DEFINE init-header   =][=
+DEFINE init-header      =][=
 
-(define base-file-name (base-name))
-(define move-output-file #f)
-(if (exist? "base-name") (begin
-    (set! base-file-name (get "base-name"))
-    (out-move (string-append base-file-name ".h"))
-    (set! move-output-file #t)
-))
-(define base-enum-name (string->c-name! (string-downcase base-file-name)))
-(make-tmp-dir)
+INCLUDE "str2init.tlib" =][=
 
-(define pfx-str    "")
 (define idx         0)
-(define tmp-str    "")
-
-(if (exist? "prefix")
-    (set! pfx-str (get "prefix"))
-    (begin
-       (set! idx (string-index base-enum-name (string->char-set "_-^")))
-       (if (number? idx)
-           (set! pfx-str (substring/copy base-enum-name 0 idx))
-           (set! pfx-str base-enum-name)
-)   )  )
-(define PFX-STR (string-upcase pfx-str))
-(define enum-name (string-append base-enum-name "_enum_t"))
-(define len-arg   (if (exist? "no-length") ""
-                  ", unsigned int len"))
+(define len-arg     (if (exist? "no-length") ""
+                        ", unsigned int len"))
 (out-push-new)
 \=]
 mk_char_list() {
@@ -222,7 +203,7 @@ mk_enum_list() {
     declare nm='' cmd_list="$*"
     for nm in ${cmd_list}
     do
-        printf ',\n    [=(. PFX-STR)=]_CMD_%s' $nm
+        printf ',\n    [=(string-append PFX-STR "_" ENUM-TYPE)=]_%s' $nm
     done
 }[= IF (exist? "alias") =]
 mk_all_cmds() {
@@ -317,7 +298,7 @@ DEFINE mk-finder                =][=
  * If not found, that value is [=(. invalid-cmd)=].
  */
 [= (. enum-name) =]
-find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=])
+find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=])
 {[=
   IF (exist? "alias")           =]
   switch (*str) {[=
@@ -325,7 +306,7 @@ find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=])
   case '[= (define cmd (get "alias"))
            (substring cmd 0 1)=]': return [=
            (set! cmd (shellf "echo %s" (substring cmd 1)))
-           (string-append PFX-STR "_CMD_"
+           (string-append PFX-STR "_" ENUM-TYPE "_"
                    (string->c-name! (string-upcase! cmd))) =];[=
     ENDFOR alias                =]
   default:
@@ -344,12 +325,12 @@ find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=])
   ENDIF no-length
 
 =]
-    [= (. base-enum-name) =]_map_t const * map;[=
+    [= (. base-type-name) =]_map_t const * map;[=
   IF (or (exist? "no-case") (exist? "equate"))   =][=
     INVOKE cvt-chars            =][=
 
   ENDIF                         =]
-    map = find_[=(. base-enum-name)=]_name(str, len);[=
+    map = find_[=(. base-type-name)=]_name(str, len);[=
   IF (not (exist? "partial")) =]
     return (map == NULL) ? [=(. invalid-cmd)=] : map->[=(. pfx-str)=]_id;[=
   ELSE  =]
@@ -432,7 +413,7 @@ DEFINE mk-dispatch
 
 =]
 /**
- * Dispatch a [=(. base-enum-name)=] function, based on the keyword.
+ * Dispatch a [=(. base-type-name)=] function, based on the keyword.
  *
  * @param[in] str  a string that should start with a known key word.[=
    IF (not (exist? "no-length"))=]
@@ -441,7 +422,7 @@ DEFINE mk-dispatch
  * @returns [= dispatch.d-ret =], returned by the dispatched function.
  */
 [= dispatch.d-ret =]
-disp_[=(. base-enum-name)=](char * str[=
+disp_[=(. base-type-name)=](char * str[=
     (if (not (exist? "dispatch.d-ret"))
         (error "dispatch needs callout procedure return type ('d-ret')"))
 
@@ -449,9 +430,9 @@ disp_[=(. base-enum-name)=](char * str[=
         (string-append len-arg ", " (get "dispatch.d-arg"))
         len-arg) =])
 {
-    static [=(. base-enum-name)=]_handler_t * const dispatch[] = {
+    static [=(. base-type-name)=]_handler_t * const dispatch[] = {
 [= (. proc-list) =] };
-    [= (. enum-name) =] id = find_[=(. base-enum-name)=]_id(str[=
+    [= (. enum-name) =] id = find_[=(. base-type-name)=]_id(str[=
         (if (exist? "no-length") "" ", len") =]);
     static unsigned int keywd_len[] = {
 [= (shell (string-append
@@ -503,7 +484,7 @@ DEFINE mk-enum2name
  * is out of range.
  */
 char const *
-[=(. base-enum-name)=]_name([= (. enum-name) =] id)
+[=(. base-type-name)=]_name([= (. enum-name) =] id)
 {
     if (id >= [=(. cmd-count)=]) id = [=(. invalid-cmd)=];
     return [=(. pfx-str)=]_name_table[id];
@@ -517,7 +498,7 @@ ENDDEF mk-enum2name
 ;;;=][=
 DEFINE run-gperf     =]
 [=
-(define base-out-name (string-substitute base-enum-name "_" "-"))
+(define base-out-name (string-substitute base-type-name "_" "-"))
 
 (define table-fmt (shell (string-append
     "list='" cmd-list "' ; min_cmd_len=99999 max_cmd_len=0
@@ -527,7 +508,8 @@ DEFINE run-gperf     =]
     done
     expr $max_cmd_len + 1" )))
 
-(set!   table-fmt (string-append "%-" table-fmt "s " PFX-STR "_CMD_%s\n"))
+(set! table-fmt (string-append
+                "%-" table-fmt "s " PFX-STR "_" ENUM-TYPE "_%s\n" ))
 (out-push-new)
 
 =][= #
@@ -546,9 +528,9 @@ DEFINE run-gperf     =]
 %compare-strncmp
 
 %define slot-name               [= (. pfx-str) =]_name
-%define hash-function-name      [=(. base-enum-name)=]_hash
-%define lookup-function-name    find_[=(. base-enum-name)=]_name
-%define word-array-name         [=(. base-enum-name)=]_table
+%define hash-function-name      [=(. base-type-name)=]_hash
+%define lookup-function-name    find_[=(. base-type-name)=]_name
+%define word-array-name         [=(. base-type-name)=]_table
 %define initializer-suffix      ,[=(. cmd-count)=]
 [=
 
@@ -571,12 +553,12 @@ DEFINE run-gperf     =]
 typedef struct {
     char const *    [= (. pfx-str) =]_name;
     [= (. enum-name) =] [= (. pfx-str) =]_id;
-} [=(. base-enum-name)=]_map_t;
+} [=(. base-type-name)=]_map_t;
 %}
 
 [= (. gperf-opts) =]
 
-[=(. base-enum-name)=]_map_t;
+[=(. base-type-name)=]_map_t;
 %%
 [=
 FOR cmd =][=
@@ -614,7 +596,7 @@ gperf [= (. base-out-name) =].gp | \
         -e '/__attribute__.*inline/d' \
         -e '/^#if.*== *32/,/^#endif/d' \
         -e '/^#\(ifdef\|else\|endif$\)/d' \
-        -e 's/^\(const [=(. base-enum-name)=]_map_t\)/static inline \1/' \
+        -e 's/^\(const [=(. base-type-name)=]_map_t\)/static inline \1/' \
     > baseline
 
 sedcmd=`

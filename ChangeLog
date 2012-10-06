@@ -1,5 +1,7 @@
 2012-10-06  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/expOutput.c (ag_scm_out_move): short circuit process if
+	name is unchanged.
 	* everywhere: whitespace/useless comment cleanup
 	* agen5/agShell.c (as_scm_shell): allow the argument to be a list
 	so a series of strings are automatically concatenated.
@@ -12,6 +14,7 @@
 	* autoopts/configfile.c: adjust, based on those templates
 	* autoopts/tpl/str2enum.tpl: Replacement for crufty shell script
 	* autoopts/tpl/str2mask.tpl: enhances str2enum to handle bit masks
+	* autoopts/tpl/str2init.tlib: new - common stuff for above two.
 
 2012-09-30  Bruce Korb  <bkorb@gnu.org>
 

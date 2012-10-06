@@ -38,6 +38,8 @@ echo
 
 sfx=U
 bits=[= (+ (count "cmd") (count "alias")) =]
+hex_width=$(( (bits + 3) / 4 ))
+hex_fmt=0x%0${hex_width}X
 
 if (( bits <= 8 ))
 then mask_type='uint8_t'
@@ -86,10 +88,10 @@ cat <<- _EOF_
 	typedef $mask_type ${mask_typ};
 
 	extern ${mask_typ}
-	[=(. base-mask-name) =]_str2mask(char const * str, ${mask_typ} old);
+	[=(. base-type-name) =]_str2mask(char const * str, ${mask_typ} old);
 [=IF (not (exist? "no-name"))   =]
 	extern size_t
-	[=(. base-mask-name)=]_mask2str([=(. mask-name)
+	[=(. base-type-name)=]_mask2str([=(. mask-name)
 	=] mask, char * buf, size_t len);
 [=ENDIF dispatch=]
 	_EOF_
@@ -133,7 +135,7 @@ mv -f [=(. base-file-name)=].c ${tmp_dir}/TMP-C
  *
  * @returns an unsigned integer with the bits set.
  */
-[= (string-append mask-name "\n" base-mask-name)
+[= (string-append mask-name "\n" base-type-name)
 =]_str2mask(char const * str, [=(. mask-name)=] old)
 {
     static char const white[] = " \t\f";
@@ -169,7 +171,7 @@ mv -f [=(. base-file-name)=].c ${tmp_dir}/TMP-C
         val_len = strspn(str, name_chars);
         if (val_len == 0)
             return 0;
-        val = find_[=(. base-mask-name)=]_id(str, val_len);
+        val = find_[=(. base-type-name)=]_id(str, val_len);
         if (val-- == [=(string-append PFX-STR "_INVALID_CMD")=])
             return 0;
         if (invert)
@@ -195,7 +197,7 @@ IF (not (exist? "no-name"))   =]
  * exceed [=(. PFX-STR)=]_MAX_MASK_NAME_SIZE.
  */
 size_t
-[=(. base-mask-name)=]_mask2str([=(. mask-name)=] mask, char * buf, size_t len)
+[=(. base-type-name)=]_mask2str([=(. mask-name)=] mask, char * buf, size_t len)
 {
     [=(. enum-name)=] val = ([=(. enum-name)=])0;
     size_t res = 0;
@@ -211,7 +213,7 @@ size_t
         if ((mask & 1) == 0)
             continue;
 
-        p = [=(. base-mask-name)=]_name(val);
+        p = [=(. base-type-name)=]_name(val);
         if (*p == '*')
             continue; /* ignore invalid bits */
 
@@ -237,10 +239,10 @@ ESAC  suffix c/h
 ;;; Create the function that converts the name into an mask value.
 ;;;
 ;;;=]
-/* end of [= (out-name)  =] */
+/* end of [= (out-name) =] */
 [=
 
-DEFINE init-header   =][=
+DEFINE init-header                  =][=
 
 (if (exist? "dispatch")
     (error "bit masks do not have dispatching available"))
@@ -248,28 +250,12 @@ DEFINE init-header   =][=
 (if (exist? "alias")
     (error "bit name aliases are not allowed"))
 
-(make-tmp-dir)
+=][=
+
+INCLUDE "str2init.tlib"             =][=
+
 (out-move ".STR2MASK-SET-ASIDE")
-
-(define base-file-name (if (exist? "base-name") (get "base-name") (base-name)))
-(define base-mask-name (string->c-name! (string-downcase base-file-name)))
-(define pfx-str    "")
-(define idx         0)
-(define tmp-str    "")
-
 (shell "${AGexe} -L `dirname " (tpl-file #t) "` -Tstr2enum " (def-file))
-
-(if (exist? "prefix")
-    (set! pfx-str (string->c-name! (get "prefix")))
-    (begin
-       (set! idx (string-index base-mask-name (string->char-set "_-^")))
-       (if (number? idx)
-           (set! pfx-str (substring/copy base-mask-name 0 idx))
-           (set! pfx-str base-mask-name)
-)   )  )
-(define PFX-STR (string-upcase pfx-str))
-(define mask-name (string-append base-mask-name "_mask_t"))
-(define enum-name (string-append base-mask-name "_enum_t"))
 
 =][=
 

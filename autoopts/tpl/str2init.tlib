@@ -1,0 +1,32 @@
+[= AutoGen5 Template null   -*- Mode: Scheme -*-   =]
+[=
+(make-tmp-dir)
+
+(define move-output-file (exist? "base-name"))
+(define base-file-name  (if move-output-file (get "base-name") (base-name)))
+(define base-type-name  (string->c-name! (string-downcase base-file-name)))
+(define pfx-str         "")
+(define tmp-str         "")
+(define idx             0)
+
+(if move-output-file
+    (out-move (string-append base-file-name "." (suffix))) )
+
+(if (exist? "prefix")
+    (set! pfx-str (string->c-name! (get "prefix")))
+    (begin
+       (set! idx (string-index base-type-name (string->char-set "_-^")))
+       (if (number? idx)
+           (set! pfx-str (substring/copy base-type-name 0 idx))
+           (set! pfx-str base-type-name)
+)   )  )
+(define PFX-STR         (string-upcase pfx-str))
+(define mask-name       (string-append base-type-name "_mask_t"))
+(define enum-name       (string-append base-type-name "_enum_t"))
+
+(define enum-type       "cmd")
+(if (exist? "type")     (set! enum-type (string->c-name! (get "type"))))
+(define ENUM-TYPE       (string-upcase   enum-type))
+(set!   enum-type       (string-downcase enum-type))
+
+\=]

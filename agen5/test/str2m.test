@@ -35,7 +35,7 @@ _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILES # # # # # # #
 
-echo creating $testname.out
+echo creating $testname-h.base
 # this is the output we should expect to see
 cat > $testname-h.base <<- _EOF_
 	typedef enum {
@@ -99,7 +99,8 @@ cat > $testname-c.base <<- _EOF_
 
 # # # # # # # # # # RUN THE TEST # # # # # # #
 
-AGCMD="-L ${srcdir}/.."
+AGCMD="-L ${srcdir}/.. -L ${top_srcdir}/autoopts/tpl"
+echo run_ag x ${AGCMD} $testname.def
 run_ag x ${AGCMD} $testname.def || \
     failure ${AGCMD} failed
 
@@ -107,7 +108,7 @@ get_h_text="/^typedef enum/,/#endif.*GUARD/p"
 ${SED} -n "${get_h_text}" $testname.h > $testname-h.res
 fpair="$testname-h.base $testname-h.res"
 cmp -s $fpair || \
-    failure "$testname failed`echo
+    failure "$testname $fpair failed`echo
         diff $fpair`"
 
 get_c_text="/^static char const ${testname}_names/,/end of $testname.c/p"
@@ -115,11 +116,12 @@ ${SED} -n "${get_c_text}" $testname.c > $testname-c.res
 
 fpair="$testname-c.base $testname-c.res"
 cmp -s $fpair || \
-    failure "$testname failed`echo
+    failure "$testname $fpair failed`echo
         diff $fpair`"
 
 # # # # # # # # # # OUTPUT FILES PART 2 # # # # # # #
 
+echo creating $testname-h2.base
 TNAME=`echo $testname | tr a-z A-Z`
 rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 {
@@ -272,6 +274,7 @@ rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 
 # # # # # # # # # # RUN THE TEST PART 2 # # # # # # #
 
+echo run_ag x ${AGCMD} -T str2mask $testname.def
 echo "base-name = '$testname-2'; prefix = '${testname}_2';" >> $testname.def
 run_ag x ${AGCMD} -T str2mask $testname.def || \
     failure ${AGCMD} failed
@@ -281,16 +284,17 @@ ${SED} -n "/_names+/d;${get_c_text}" $testname-2.c > $testname-c2.res
 
 fpair="$testname-h2.base $testname-h2.res"
 cmp -s $fpair || \
-    failure "$testname failed`echo
+    failure "$testname-2 $fpair failed`echo
         diff $fpair`"
 
 fpair="$testname-c2.base $testname-c2.res"
 cmp -s $fpair || \
-    failure "$testname-2 failed`echo
+    failure "$testname-2 $fpair failed`echo
         diff $fpair`"
 
 # # # # # # # # # # RUN THE TEST PART 3 # # # # # # #
 
+echo running $testname-2.c program
 chmod 666 $testname-2.c
 cat >> $testname-2.c <<- _EOF_
 	#include <stdio.h>
@@ -323,7 +327,7 @@ ${CC:-cc} -o ${testname} $testname-2.c || \
 echo "0x0007 --> 15 bytes: 'one two_3 four'" > ${testname}-bbase
 fpair="${testname}-bbase ${testname}-btest"
 cmp -s $fpair || \
-    failure "$testname run failed`echo
+    failure "$testname $fpair run failed`echo
         diff $fpair`"
 
 cleanup
