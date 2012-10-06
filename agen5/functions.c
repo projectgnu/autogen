@@ -394,7 +394,7 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
     if (src_len <= 0)
         goto return_emtpy_expr;
 
-    scan = (char const*)mac->md_txt_off; /* macro text */
+    scan = (char const *)mac->md_txt_off; /* macro text */
 
     switch (*scan) {
     case ';':
@@ -408,11 +408,17 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
             scan = strchr(scan, NL);
             if (scan == NULL)
                 goto return_emtpy_expr;
+
             scan = SPN_WHITESPACE_CHARS(scan);
             if (*scan == NUL)
                 goto return_emtpy_expr;
+
+            src_len -= scan - start;
+            if (src_len <= 0)
+                goto return_emtpy_expr;
+
+            start = scan;
         } while (*scan == ';');
-        src_len -= scan - start;
         break;
     }
 

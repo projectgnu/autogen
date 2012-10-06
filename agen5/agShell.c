@@ -57,7 +57,8 @@ ag_scm_chdir(SCM dir)
  * what:  invoke a shell script
  * general_use:
  *
- * exparg: command, shell command - the result value is the stdout output.
+ * exparg: command, shell command - the result is from stdout, , list
+ * This may be a list of strings and they will all be concatenated.
  *
  * doc:
  *  Generate a string by writing the value to a server shell and reading the
@@ -80,8 +81,16 @@ ag_scm_shell(SCM cmd)
 #ifndef SHELL_ENABLED
     return cmd;
 #else
-    if (! AG_SCM_STRING_P(cmd))
-        return SCM_UNDEFINED;
+    if (! AG_SCM_STRING_P(cmd)) {
+        static SCM joiner = SCM_UNDEFINED;
+        if (joiner == SCM_UNDEFINED)
+            joiner = scm_gc_protect_object(AG_SCM_STR02SCM(""));
+
+        cmd = ag_scm_join(joiner, cmd);
+        if (! AG_SCM_STRING_P(cmd))
+            return SCM_UNDEFINED;
+    }
+
     {
         char* pz = shell_cmd(ag_scm2zchars(cmd, "command"));
         cmd   = AG_SCM_STR02SCM(pz);

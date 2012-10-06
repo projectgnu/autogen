@@ -29,7 +29,7 @@ static char const zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 
 /* = = = START-STATIC-FORWARD = = = */
 static mac_func_t
-func_code(char const ** ppzScan);
+func_code(char const ** pscan);
 
 static char const *
 find_mac_end(char const ** ppzMark);
@@ -38,7 +38,7 @@ static char const *
 find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl);
 
 static char const *
-find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan);
+find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*
@@ -46,10 +46,10 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan);
  *  to a name pointed to by the input argument.
  */
 static mac_func_t
-func_code(char const ** ppzScan)
+func_code(char const ** pscan)
 {
     fn_name_type_t const * pNT;
-    char const *      pzFuncName = *ppzScan;
+    char const *      pzFuncName = *pscan;
     int               hi, lo, av;
     int               cmp;
 
@@ -101,7 +101,7 @@ func_code(char const ** ppzScan)
              *  Advance the scanner past the macro name.
              *  The name is encoded in the "fType".
              */
-            *ppzScan = pzFuncName + pNT->cmpLen;
+            *pscan = pzFuncName + pNT->cmpLen;
             return pNT->fType;
         }
         if (cmp > 0)
@@ -128,7 +128,7 @@ func_code(char const ** ppzScan)
             pzCopy--, pzFuncName--;
 
         *(pzCopy++) = NUL;
-        *ppzScan = pzFuncName;
+        *pscan = pzFuncName;
         current_tpl->td_scan = pzCopy;
     }
 
@@ -241,12 +241,12 @@ find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
 }
 
 static char const *
-find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan)
+find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan)
 {
-    char const * pzScan = *ppzScan;
+    char const * scan = *pscan;
     char const * pzMark;
 
-    pzMark = find_mac_start(pzScan, ppM, pTpl);
+    pzMark = find_mac_start(scan, ppM, pTpl);
 
     /*
      *  IF no more macro marks are found, THEN we are done...
@@ -258,14 +258,14 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan)
      *  Find the macro code and the end of the macro invocation
      */
     cur_macro = *ppM;
-    pzScan    = find_mac_end(&pzMark);
+    scan    = find_mac_end(&pzMark);
 
     /*
      *  Count the lines in the macro text and advance the
      *  text pointer to after the marker.
      */
     {
-        char const *  pzMacEnd = pzScan;
+        char const *  pzMacEnd = scan;
         char const *  pz       = pzMark;
 
         for (;;pz++) {
@@ -291,23 +291,28 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** ppzScan)
      *  IF the end macro mark was preceded by a backslash, then we remove
      *  trailing white space from there to the end of the line.
      */
-    if ((*pzScan != '\\') || (strncmp(end_mac_mark, pzScan, end_mac_len) == 0))
-        pzScan += end_mac_len;
+    if ((*scan != '\\') || (strncmp(end_mac_mark, scan, end_mac_len) == 0))
+        scan += end_mac_len;
 
     else {
         char const * pz;
-        pzScan += end_mac_len + 1;
-        pz = SPN_NON_NL_WHITE_CHARS(pzScan);
+        scan += end_mac_len + 1;
+        pz = SPN_NON_NL_WHITE_CHARS(scan);
         if (*pz == NL) {
-            pzScan = pz + 1;
+            scan = pz + 1;
             tpl_line++;
         }
     }
 
-    *ppzScan = pzScan;
+    *pscan = scan;
     return pzMark;
 }
 
+/**
+ * Parse the template.
+ * @param[out]    mac     array of macro descriptors to fill in
+ * @param[in,out] p_scan  pointer to string scanning address
+ */
 LOCAL macro_t *
 parse_tpl(macro_t * mac, char const ** p_scan)
 {
@@ -322,13 +327,13 @@ parse_tpl(macro_t * mac, char const ** p_scan)
     if (  ((tplNestLevel++) > 0)
        && HAVE_OPT(SHOW_DEFS)) {
         int ct = tplNestLevel;
-        macro_t* pPm = mac-1;
+        macro_t * m = mac-1;
 
-        fprintf(trace_fp, "%3u ", (unsigned int)(pPm - tpl->td_macros));
+        fprintf(trace_fp, "%3u ", (unsigned int)(m - tpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
-        fprintf(trace_fp, zTUndef, ag_fun_names[ pPm->md_code ],
-                pPm->md_code, pPm->md_line);
+        fprintf(trace_fp, zTUndef, ag_fun_names[m->md_code],
+                m->md_code, m->md_line);
     }
 #else
     #define DEBUG_DEC(l)

@@ -33,7 +33,7 @@
 ;;   You may optionally supply any of the following:
 
 ;;   copyright    See the AutoOpts documentation for its usage.
-;;   partial      Accept partial matches, if unique.
+;;   partial      Accept unique partial matches of at least two characters.
 ;;   base-name    The base name is normally derived from the definitions
 ;;                file name.  This will override that and cause the
 ;;                output files to have this "base name".
@@ -69,17 +69,14 @@
 ;; THE TEMPLATE PRODUCES:
 
 ;;   <basename>.h The enumeration of the commands in the form:
-;;                <PREFIX>_KWD_<COMMAND> of type <base_name>_enum_t
-;;                plus two extra entries: <PREFIX>_INVALID_KWD, and
-;;                <PREFIX>_COUNT_KWD.
+;;                <PREFIX>_CMD_<COMMAND> of type <base_name>_enum_t
+;;                plus two extra entries: <PREFIX>_INVALID_CMD, and
+;;                <PREFIX>_COUNT_CMD.
 
 ;;                External declarations of the  generated
 ;;                procedure(s).
 
 ;;   <basename>.c The implementing code
-
-;;   If your commands include one named, "null", then an empty or all spaces
-;;   input string will match the null command.
 
 ;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -93,92 +90,21 @@ CASE (suffix)            =][= #
 ;;;
 ;;;=][=
 == h                     =][=
-   (define base-file-name (base-name))
-   (define move-output-file #f)
-   (if (exist? "base-name") (begin
-       (set! base-file-name (get "base-name"))
-       (out-move (string-append base-file-name ".h"))
-       (set! move-output-file #t)
-   ))
-   (define base-enum-name (string->c-name! (string-downcase base-file-name)))
-   (make-tmp-dir)        =]
- *
- * Command/Keyword Dispatcher
- *
-[=(out-push-new)\=]
-mk_char_list() {
-    echo "$1" | sed 's/\(.\)/\1\
-/g'
-}
-[=
-
-(shell (out-pop #t))
-
-(define pfx-str    "")
-(define idx         0)
-(define tmp-str    "")
-
-(if (exist? "prefix")
-    (set! pfx-str (get "prefix"))
-    (begin
-       (set! idx (string-index base-enum-name (string->char-set "_-^")))
-       (if (number? idx)
-           (set! pfx-str (substring/copy base-enum-name 0 idx))
-           (set! pfx-str base-enum-name)
-)   )  )
-(define PFX-STR (string-upcase pfx-str))
-(define enum-name (string-append base-enum-name "_enum_t"))
-(define len-arg   (if (exist? "no-length") ""
-                  ", unsigned int len"))
-
-(define cmd-chars (shell (string-append
-  "mk_char_list '" (join "" (stack "cmd")) "'"
-)))
-
-(if (exist? "no-case")
-    (set! cmd-chars (string-append
-          (string-downcase cmd-chars) "\n"
-          (string-upcase cmd-chars) )) )
-(set! cmd-chars (shell (string-append
-    "echo '" cmd-chars "' | sort -u | tr -d '\n\t '" )))
-
-(if (exist? "equate")
-    (set! cmd-chars (string-append cmd-chars (get "equate")))
-)
-
-(define kwd-list (string->c-name! (join "\n" (stack "cmd"))))
-
-(if (exist? "alias")
-    (set! kwd-list (string->c-name! (shell (string-append
-        "echo '" kwd-list "' > $tmp_dir/commands\n"
-        "echo '" (join "\n" (stack "alias")) "' | "
-        "while IFS='' read line ; do "
-            "line=`echo \"$line\" | sed 's/. *//'`\n"
-            "grep -E \"^${line}\\$\" $tmp_dir/commands >/dev/null || {\n"
-                "echo \"$line\" >> $tmp_dir/commands\n}\n"
-        "done\nsort -u $tmp_dir/commands"
-)))))
-
-(emit "\n */\n")
-(make-header-guard "str2enum")=]
+INVOKE init-header       =]
 
 typedef enum {
-    [= (define invalid-kwd (string-append PFX-STR "_INVALID_KWD"))
-       invalid-kwd =][=
-   (string-upcase! (shell (string-append
-     "while read nm ; do printf ',\n    " PFX-STR
-            "_KWD_%s' $nm ; done <<_EOF_\n"
-     kwd-list
-     "\n_EOF_" )))  =],
-    [= (define cmd-count (string-append PFX-STR "_COUNT_KWD"))
+    [= (define invalid-cmd (string-append PFX-STR "_INVALID_CMD"))
+       invalid-cmd =][=
+    (shell (string-append "mk_enum_list '" (string-upcase cmd-list) "'")) =],
+    [= (define cmd-count (string-append PFX-STR "_COUNT_CMD"))
        cmd-count =]
 } [= (. enum-name) =];
 
 extern [= (. enum-name)         =]
-find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=]);
-[=
+find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=]);[=
 
   IF (exist? "dispatch")        =]
+
 typedef [= dispatch.d-ret =]([=(. base-enum-name)=]_handler_t)(
     [=
     (define disp-arg-list (string-append enum-name " id, char const * str"))
@@ -193,11 +119,7 @@ typedef [= dispatch.d-ret =]([=(. base-enum-name)=]_handler_t)(
     (error "dispatch needs callout procedure name format ('d-nam')"))
 
 (define proc-list (shell (string-append
-   "columns -f '" (get "dispatch.d-nam") "' -I8 --spread=1 -S,<<_EOF_\n"
-   "invalid\n"
-   kwd-list
-   "\n_EOF_"
-)))
+   "mk_proc_list '" cmd-list "'" )))
 
 proc-list =];
 
@@ -206,15 +128,18 @@ disp_[=(. base-enum-name)=](char * str[=
      (if (exist? "dispatch.d-arg")
          (string-append len-arg ", " (get "dispatch.d-arg"))
          len-arg) =]);[=
-  ENDIF                         =][=
+
+  ENDIF  dispatch exists        =][=
 
   IF (not (exist? "no-name"))   =]
+
 extern char const *
 [=(. base-enum-name)=]_name([= (. enum-name) =] id);[=
 
   ENDIF dispatch
 
 =]
+
 #endif /* [=(. header-guard)    =] */
 [= #
 
@@ -254,9 +179,124 @@ ESAC  suffix c/h
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;;;
+;;; Create the function that converts the name into an enum value.
+;;;
 ;;;=][=
 
-DEFINE mk-finder   =]
+DEFINE init-header   =][=
+
+(define base-file-name (base-name))
+(define move-output-file #f)
+(if (exist? "base-name") (begin
+    (set! base-file-name (get "base-name"))
+    (out-move (string-append base-file-name ".h"))
+    (set! move-output-file #t)
+))
+(define base-enum-name (string->c-name! (string-downcase base-file-name)))
+(make-tmp-dir)
+
+(define pfx-str    "")
+(define idx         0)
+(define tmp-str    "")
+
+(if (exist? "prefix")
+    (set! pfx-str (get "prefix"))
+    (begin
+       (set! idx (string-index base-enum-name (string->char-set "_-^")))
+       (if (number? idx)
+           (set! pfx-str (substring/copy base-enum-name 0 idx))
+           (set! pfx-str base-enum-name)
+)   )  )
+(define PFX-STR (string-upcase pfx-str))
+(define enum-name (string-append base-enum-name "_enum_t"))
+(define len-arg   (if (exist? "no-length") ""
+                  ", unsigned int len"))
+(out-push-new)
+\=]
+mk_char_list() {
+    echo "$1" | sed 's/\(.\)/\1\
+/g' | sort -u | tr -d '\n\t '
+}
+
+mk_enum_list() {
+    declare nm='' cmd_list="$*"
+    for nm in ${cmd_list}
+    do
+        printf ',\n    [=(. PFX-STR)=]_CMD_%s' $nm
+    done
+}[= IF (exist? "alias") =]
+mk_all_cmds() {
+    echo "$1" | while IFS='' read a
+    do
+        echo ${a#?}
+    done | sed 's/[^a-zA-Z0-9]/_/g' >> ${tmp_dir}/commands
+    sort -u -o ${tmp_dir}/commands ${tmp_dir}/commands
+    cat ${tmp_dir}/commands
+}[= ENDIF =]
+mk_proc_list() {
+    printf "invalid\n$1" | \
+        columns -f '[= dispatch.d-nam =]' -I8 --spread=1 -S,
+}[=
+
+(shell (out-pop #t))
+
+(define cmd-chars (join "" (stack "cmd")))
+
+(if (exist? "no-case")
+    (set! cmd-chars (string-append
+          (string-downcase cmd-chars) (string-upcase cmd-chars) )) )
+
+(if (exist? "equate")
+    (set! cmd-chars (string-append cmd-chars (get "equate")))
+)
+
+(set! cmd-chars (shell (string-append
+    "mk_char_list '" cmd-chars "'" )))
+
+(define cmd-list (string->c-name! (join "\n" (stack "cmd"))))
+(out-push-new (string-append tmp-dir "/commands"))
+(emit cmd-list)
+(out-pop)
+
+(if (exist? "alias")
+    (set! cmd-list (shell (string-append
+          "mk_all_cmds '" (join "\n" (stack "alias")) "'"
+))) )
+
+(emit "\n *\n * Command/Keyword Dispatcher\n */\n")
+(make-header-guard "str2enum")
+
+=][=
+
+ENDDEF init-header
+
+;;; = = = = = = = = = = = = = = = = = = =
+;;;
+;;; Create the function that converts the name into an enum value.
+;;;
+;;;=][=
+
+DEFINE mk-finder                =][=
+
+  IF (or (exist? "partial") (not (exist? "no-name"))) =]
+[=
+    (define str-table-name (string-append pfx-str "_names"))
+    (string-table-new str-table-name) (out-push-new)
+    (emit (string-table-add-ref str-table-name "* UNDEFINED *"))
+
+    (shell (string-append
+    "cmd_list='" cmd-list "' ; set -- $cmd_list" )) =][=
+
+    WHILE `echo $#`             =]
+[=     (string-table-add-ref str-table-name (shell "echo $1 ; shift")) =][=
+    ENDWHILE                    =][=
+    (out-suspend "main")
+    (emit-string-table str-table-name)
+    (emit "\nstatic char const * " pfx-str "_name_table[] = {\n")
+    (out-resume "main")
+    (shell (string-append "columns -I8 -S, --spread=1 --end=' };' <<_EOF_\n"
+        (out-pop #t) "\n_EOF_" )) =][=
+  ENDIF  partial or ! no-name   =]
 
 /**
  * Convert a command (keyword) to a [= (. enum-name) =] enumeration value.[=
@@ -274,11 +314,28 @@ DEFINE mk-finder   =]
  * @param[in] len  the length of the keyword at \a str.[=
    ENDIF                        =]
  * @returns the enumeration value.
- * If not found, that value is [=(. invalid-kwd)=].
+ * If not found, that value is [=(. invalid-cmd)=].
  */
 [= (. enum-name) =]
 find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=])
 {[=
+  IF (exist? "alias")           =]
+  switch (*str) {[=
+    FOR alias                   =]
+  case '[= (define cmd (get "alias"))
+           (substring cmd 0 1)=]': return [=
+           (set! cmd (shellf "echo %s" (substring cmd 1)))
+           (string-append PFX-STR "_CMD_"
+                   (string->c-name! (string-upcase! cmd))) =];[=
+    ENDFOR alias                =]
+  default:
+    if (! isalpha((unsigned)*str))
+      return [=(. invalid-cmd)=];
+    break;
+  }
+
+  {[=
+  ENDIF   alias                 =][=
 
   IF (exist? "no-length")       =]
     static char const accept[] =
@@ -291,21 +348,30 @@ find_[=(. base-enum-name)=]_id(char const * str[=(. len-arg)=])
   IF (or (exist? "no-case") (exist? "equate"))   =][=
     INVOKE cvt-chars            =][=
 
-  ENDIF                         =][=
-  IF (exist? "alias")           =]
-    switch (*str) {[=
-    FOR alias                   =]
-    case '[= (define kwd (get "alias"))
-             (substring kwd 0 1)=]': return [=
-             (set! kwd (shellf "echo '%s' | sed 's/. *//'" kwd))
-             (string-append PFX-STR "_KWD_"
-                   (string->c-name! (string-upcase! kwd))) =];[=
-    ENDFOR alias                =]
-    default: break;
+  ENDIF                         =]
+    map = find_[=(. base-enum-name)=]_name(str, len);[=
+  IF (not (exist? "partial")) =]
+    return (map == NULL) ? [=(. invalid-cmd)=] : map->[=(. pfx-str)=]_id;[=
+  ELSE  =]
+    if (map != NULL)
+        return map->[=(. pfx-str)=]_id;
+    if (len < 2)
+        return [=(. invalid-cmd)=];
+    {
+        [= (. enum-name) =] res = [=(. invalid-cmd)=];
+        int ix = 0;
+
+        while (++ix < [=(. cmd-count)=]) {
+            if (strncmp([=(. pfx-str)=]_name_table[ix], str, len) == 0) {
+                if (res != [=(. invalid-cmd)=])
+                    return [=(. invalid-cmd)=];
+                res = ([= (. enum-name) =])ix;
+            }
+        }
+        return res;
     }[=
-  ENDIF   alias                 =]
-    map = find_[=(. base-enum-name)=]_name(str, len);
-    return (map == NULL) ? [=(. invalid-kwd)=] : map->[=(. pfx-str)=]_id;
+  ENDIF =][=
+  (if (exist? "alias") (emit "\n  }")) =]
 }
 [=
 
@@ -327,7 +393,7 @@ DEFINE cvt-chars
     if (  (len < [=(shell "echo $min_cmd_len")=])
        || (len > sizeof(name_buf))
        || isalnum((unsigned)str[len]))
-        return [=(. invalid-kwd)=];
+        return [=(. invalid-cmd)=];
 
     for (ix = 0; ix < len; ix++) {
         int ch = (unsigned char)str[ix];[=
@@ -389,7 +455,7 @@ disp_[=(. base-enum-name)=](char * str[=
         (if (exist? "no-length") "" ", len") =]);
     static unsigned int keywd_len[] = {
 [= (shell (string-append
-   "{ echo 0 ; g='" kwd-list "' ; for f in $g ; do echo ${#f} ; done } | "
+   "{ echo 0 ; g='" cmd-list "' ; for f in $g ; do echo ${#f} ; done } | "
       "columns -I8 -S, --end=' };'"
    )) =]
     unsigned int len = [=
@@ -439,16 +505,8 @@ DEFINE mk-enum2name
 char const *
 [=(. base-enum-name)=]_name([= (. enum-name) =] id)
 {
-    [=(. base-enum-name)=]_map_t const * tbl = [=(. base-enum-name)=]_table;
-
-    if (id >= [=(. cmd-count)=])
-        return "* UNDEFINED *";
-
-    for (;;) {
-        if (tbl->[= (. pfx-str) =]_id == id)
-            return tbl->[= (. pfx-str) =]_name;
-        tbl++;
-    }
+    if (id >= [=(. cmd-count)=]) id = [=(. invalid-cmd)=];
+    return [=(. pfx-str)=]_name_table[id];
 }
 [=
 
@@ -462,14 +520,14 @@ DEFINE run-gperf     =]
 (define base-out-name (string-substitute base-enum-name "_" "-"))
 
 (define table-fmt (shell (string-append
-    "list='" kwd-list "' ; min_cmd_len=99999 max_cmd_len=0
+    "list='" cmd-list "' ; min_cmd_len=99999 max_cmd_len=0
     for f in $list
     do test ${#f} -gt $max_cmd_len && max_cmd_len=${#f}
        test ${#f} -lt $min_cmd_len && min_cmd_len=${#f}
     done
     expr $max_cmd_len + 1" )))
 
-(set!   table-fmt (string-append "%-" table-fmt "s " PFX-STR "_KWD_%s\n"))
+(set!   table-fmt (string-append "%-" table-fmt "s " PFX-STR "_CMD_%s\n"))
 (out-push-new)
 
 =][= #
@@ -522,10 +580,10 @@ typedef struct {
 %%
 [=
 FOR cmd =][=
- (define kwd (get "cmd"))
+ (define cmd (get "cmd"))
  (define tmp-val (string-append
-                 (if (exist? "no-case") (string-downcase kwd) kwd) "," ))
- (sprintf table-fmt tmp-val (string-upcase! (string->c-name! kwd))) =][=
+                 (if (exist? "no-case") (string-downcase cmd) cmd) "," ))
+ (sprintf table-fmt tmp-val (string-upcase! (string->c-name! cmd))) =][=
 ENDFOR \=]
 %%
 [=

@@ -1205,19 +1205,19 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
         len = SPN_LOWER_CASE_CHARS(txt) - txt;
 
         switch (find_option_xat_attribute_id(txt, len)) {
-        case XAT_KWD_TYPE:
+        case XAT_CMD_TYPE:
             txt = parse_value(txt+len, pType);
             break;
 
-        case XAT_KWD_WORDS:
+        case XAT_CMD_WORDS:
             txt = parse_keyword(opts, txt+len, pType);
             break;
 
-        case XAT_KWD_MEMBERS:
+        case XAT_CMD_MEMBERS:
             txt = parse_set_mem(opts, txt+len, pType);
             break;
 
-        case XAT_KWD_COOKED:
+        case XAT_CMD_COOKED:
             txt += len;
             if (! IS_END_XML_TOKEN_CHAR(*txt))
                 goto invalid_kwd;
@@ -1225,7 +1225,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
             *pMode = OPTION_LOAD_COOKED;
             break;
 
-        case XAT_KWD_UNCOOKED:
+        case XAT_CMD_UNCOOKED:
             txt += len;
             if (! IS_END_XML_TOKEN_CHAR(*txt))
                 goto invalid_kwd;
@@ -1233,7 +1233,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
             *pMode = OPTION_LOAD_UNCOOKED;
             break;
 
-        case XAT_KWD_KEEP:
+        case XAT_CMD_KEEP:
             txt += len;
             if (! IS_END_XML_TOKEN_CHAR(*txt))
                 goto invalid_kwd;
@@ -1242,7 +1242,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
             break;
 
         default:
-        case XAT_INVALID_KWD:
+        case XAT_INVALID_CMD:
         invalid_kwd:
             pType->valType = OPARG_TYPE_NONE;
             return skip_unkn(txt);
@@ -1315,32 +1315,32 @@ parse_value(char * txt, tOptionValue * typ)
 
     switch (find_option_value_type_id(txt, len)) {
     default:
-    case VTP_INVALID_KWD: goto woops;
+    case VTP_INVALID_CMD: goto woops;
 
-    case VTP_KWD_STRING:
+    case VTP_CMD_STRING:
         typ->valType = OPARG_TYPE_STRING;
         break;
 
-    case VTP_KWD_INTEGER:
+    case VTP_CMD_INTEGER:
         typ->valType = OPARG_TYPE_NUMERIC;
         break;
 
-    case VTP_KWD_BOOL:
-    case VTP_KWD_BOOLEAN:
+    case VTP_CMD_BOOL:
+    case VTP_CMD_BOOLEAN:
         typ->valType = OPARG_TYPE_BOOLEAN;
         break;
 
-    case VTP_KWD_KEYWORD:
+    case VTP_CMD_KEYWORD:
         typ->valType = OPARG_TYPE_ENUMERATION;
         break;
 
-    case VTP_KWD_SET:
-    case VTP_KWD_SET_MEMBERSHIP:
+    case VTP_CMD_SET:
+    case VTP_CMD_SET_MEMBERSHIP:
         typ->valType = OPARG_TYPE_MEMBERSHIP;
         break;
 
-    case VTP_KWD_NESTED:
-    case VTP_KWD_HIERARCHY:
+    case VTP_CMD_NESTED:
+    case VTP_CMD_HIERARCHY:
         typ->valType = OPARG_TYPE_HIERARCHY;
     }
 

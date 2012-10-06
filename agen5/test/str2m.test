@@ -1,0 +1,338 @@
+#! /bin/sh
+#  -*- Mode: Shell-script -*-
+# str2m.test --- test str2enum and str2mask functionality
+#
+# Author:            Bruce Korb <bkorb@gnu.org>
+##
+## This file is part of AutoGen.
+## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+##
+## AutoGen is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the
+## Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## AutoGen is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+#
+# ----------------------------------------------------------------------
+
+. ./defs
+
+# # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
+
+echo creating $testname.def
+cat > $testname.def <<'_EOF_'
+AutoGen Definitions str2enum;
+cmd = one, two_3, four;
+_EOF_
+
+# # # # # # # # # # EXPECTED OUTPUT FILES # # # # # # #
+
+echo creating $testname.out
+# this is the output we should expect to see
+cat > $testname-h.base <<- _EOF_
+	typedef enum {
+	    STR2M_INVALID_CMD,
+	    STR2M_CMD_ONE,
+	    STR2M_CMD_TWO_3,
+	    STR2M_CMD_FOUR,
+	    STR2M_COUNT_CMD
+	} str2m_enum_t;
+
+	extern str2m_enum_t
+	find_str2m_id(char const * str, unsigned int len);
+
+	extern char const *
+	str2m_name(str2m_enum_t id);
+
+	#endif /* STR2ENUM_STR2M_H_GUARD */
+	_EOF_
+
+cat > $testname-c.base <<- _EOF_
+	static char const str2m_names[29] =
+	/*     0 */ "* UNDEFINED *\0"
+	/*    14 */ "one\0"
+	/*    18 */ "two_3\0"
+	/*    24 */ "four";
+
+	static char const * str2m_name_table[] = {
+	        str2m_names+0,  str2m_names+14, str2m_names+18, str2m_names+24 };
+
+	/**
+	 * Convert a command (keyword) to a str2m_enum_t enumeration value.
+	 *
+	 * @param[in] str  a string that should start with a known key word.
+	 * @param[in] len  the length of the keyword at \a str.
+	 * @returns the enumeration value.
+	 * If not found, that value is STR2M_INVALID_CMD.
+	 */
+	str2m_enum_t
+	find_str2m_id(char const * str, unsigned int len)
+	{
+	    str2m_map_t const * map;
+	    map = find_str2m_name(str, len);
+	    return (map == NULL) ? STR2M_INVALID_CMD : map->str2m_id;
+	}
+
+	/**
+	 * Convert an str2m_enum_t value into a string.
+	 *
+	 * @param[in] id  the enumeration value
+	 * @returns the associated string, or "* UNDEFINED *" if \a id
+	 * is out of range.
+	 */
+	char const *
+	str2m_name(str2m_enum_t id)
+	{
+	    if (id >= STR2M_COUNT_CMD) id = STR2M_INVALID_CMD;
+	    return str2m_name_table[id];
+	}
+	/* end of str2m.c */
+	_EOF_
+
+# # # # # # # # # # RUN THE TEST # # # # # # #
+
+AGCMD="-L ${srcdir}/.."
+run_ag x ${AGCMD} $testname.def || \
+    failure ${AGCMD} failed
+
+get_h_text="/^typedef enum/,/#endif.*GUARD/p"
+${SED} -n "${get_h_text}" $testname.h > $testname-h.res
+fpair="$testname-h.base $testname-h.res"
+cmp -s $fpair || \
+    failure "$testname failed`echo
+        diff $fpair`"
+
+get_c_text="/^static char const ${testname}_names/,/end of $testname.c/p"
+${SED} -n "${get_c_text}" $testname.c > $testname-c.res
+
+fpair="$testname-c.base $testname-c.res"
+cmp -s $fpair || \
+    failure "$testname failed`echo
+        diff $fpair`"
+
+# # # # # # # # # # OUTPUT FILES PART 2 # # # # # # #
+
+TNAME=`echo $testname | tr a-z A-Z`
+rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
+{
+    ${SED} "$rep_name;/_enum_t;/q" $testname-h.base
+    cat <<- _EOF_
+
+	#define STR2M_2_BIT_ONE   (1U << 0)
+	#define STR2M_2_BIT_TWO_3 (1U << 1)
+	#define STR2M_2_BIT_FOUR  (1U << 2)
+	_EOF_
+
+    ${SED} "1,/_enum_t;/d;/^#endif .*GUARD/,\$d;$rep_name" $testname-h.base
+    cat <<- _EOF_
+
+	#define STR2M_2_MAX_MASK_NAME_SIZE 15
+	typedef uint8_t str2m_2_mask_t;
+
+	extern str2m_2_mask_t
+	str2m_2_str2mask(char const * str, str2m_2_mask_t old);
+
+	extern size_t
+	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len);
+
+	#endif /* STR2ENUM_${TNAME}_2_H_GUARD */
+	_EOF_
+
+} > $testname-h2.base
+
+{
+    ${SED} "/_names+/d
+	/ end of .*\.c /d
+	$rep_name" $testname-c.base
+    cat <<- _EOF_
+
+	#include <sys/types.h>
+	#include <string.h>
+	#ifndef NUL
+	#define NUL '\0'
+	#endif
+
+	/**
+	 * Convert a string to a str2m_2_mask_t mask.
+	 * Bit names prefixed with a hyphen have the bit removed from the mask.
+	 * If the string starts with a '-', '+' or '|' character, then
+	 * the old value is used as a base, otherwise the result mask
+	 * is initialized to zero.  Separating bit names with '+' or '|'
+	 * characters is optional.  By default, the bits are "or"-ed into the
+	 * result.
+	 *
+	 * @param[in] str string with a list of bit names
+	 * @param[in] old previous value, used if \a str starts with a '+' or '-'.
+	 *
+	 * @returns an unsigned integer with the bits set.
+	 */
+	str2m_2_mask_t
+	str2m_2_str2mask(char const * str, str2m_2_mask_t old)
+	{
+	    static char const white[] = " \t\f";
+	    static char const name_chars[] =
+	        "abcdefghijklmnopqrstuvwxyz"
+	        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	        "0123456789_";
+
+	    str2m_2_mask_t res = 0;
+	    int have_data = 0;
+
+	    for (;;) {
+	        str2m_2_enum_t val;
+	        unsigned int val_len;
+	        unsigned int invert = 0;
+	
+	        str += strspn(str, white);
+	        switch (*str) {
+	        case NUL: return res;
+	        case '-':
+	            invert = 1;
+	            /* FALLTHROUGH */
+
+	        case '+': case '|':
+	            if (have_data == 0)
+	                res = old;
+
+	            str += 1 + strspn(str + 1, white);
+	            if (*str == NUL)
+	                return 0;
+	        }
+
+	        val_len = strspn(str, name_chars);
+	        if (val_len == 0)
+	            return 0;
+	        val = find_str2m_2_id(str, val_len);
+	        if (val-- == STR2M_2_INVALID_CMD)
+	            return 0;
+	        if (invert)
+	            res &= ~((str2m_2_mask_t)1 << val);
+	        else
+	            res |= (str2m_2_mask_t)1 << val;
+	        have_data = 1;
+	        str += val_len;
+	    }
+	}
+
+	/**
+	 * Convert a str2m_2_mask_t mask to a string.
+	 *
+	 * @param[in]  mask  the mask with the bits to be named
+	 * @param[out] buf   where to store the result.  This may be NULL.
+	 * @param[in]  len   size of the output buffer
+	 * @results    The full length of the space needed for the result,
+	 * including the terminating NUL byte.  The actual result will not
+	 * overwrite \a len bytes at \a buf.  This value will also never
+	 * exceed STR2M_2_MAX_MASK_NAME_SIZE.
+	 */
+	size_t
+	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len)
+	{
+	    str2m_2_enum_t val = (str2m_2_enum_t)0;
+	    size_t res = 0;
+	    if (buf == NULL) len = 0;
+
+	    for (; mask != 0; mask >>= 1) {
+	        char const * p;
+	        size_t l;
+
+	        if (++val >= STR2M_2_COUNT_CMD)
+	            break;
+
+	        if ((mask & 1) == 0)
+	            continue;
+
+	        p = str2m_2_name(val);
+	        if (*p == '*')
+	            continue; /* ignore invalid bits */
+
+	        l = strlen(p) + 1; /* includes NUL byte or spacer byte */
+	        if (l <= len) {
+	            if (res > 0)
+	                *(buf++) = ' ';
+	            memcpy(buf, p, l);
+	            buf += l - 1;
+	            len -= l;
+	        }
+	        res += l;
+	    }
+	    return (res == 0) ? 1 : res;
+	}
+	/* end of str2m-2.c */
+	_EOF_
+} > $testname-c2.base
+
+# # # # # # # # # # RUN THE TEST PART 2 # # # # # # #
+
+echo "base-name = '$testname-2'; prefix = '${testname}_2';" >> $testname.def
+run_ag x ${AGCMD} -T str2mask $testname.def || \
+    failure ${AGCMD} failed
+${SED} -n "${get_h_text}" $testname-2.h > $testname-h2.res
+get_c_text=`echo "$get_c_text" | ${SED} "$rep_name"`
+${SED} -n "/_names+/d;${get_c_text}" $testname-2.c > $testname-c2.res
+
+fpair="$testname-h2.base $testname-h2.res"
+cmp -s $fpair || \
+    failure "$testname failed`echo
+        diff $fpair`"
+
+fpair="$testname-c2.base $testname-c2.res"
+cmp -s $fpair || \
+    failure "$testname-2 failed`echo
+        diff $fpair`"
+
+# # # # # # # # # # RUN THE TEST PART 3 # # # # # # #
+
+chmod 666 $testname-2.c
+cat >> $testname-2.c <<- _EOF_
+	#include <stdio.h>
+	int main(int argc, char ** argv) {
+	    str2m_2_mask_t mask =
+	        str2m_2_str2mask("one + two_3 | four", 0);
+	    char buf[STR2M_2_MAX_MASK_NAME_SIZE];
+	    size_t l = str2m_2_mask2str(mask, buf, STR2M_2_MAX_MASK_NAME_SIZE);
+
+	    printf("0x%04X --> %u bytes: '%s'\n",
+	           (unsigned int)mask, (unsigned int)l, buf);
+	    if (l != STR2M_2_MAX_MASK_NAME_SIZE) {
+	        fprintf(stderr, "expected len:  %u, actual:  %u\n",
+	                STR2M_2_MAX_MASK_NAME_SIZE, (unsigned int)l);
+	        return 1;
+	    }
+	    mask = str2m_2_str2mask("- one", mask);
+	    if (mask != (STR2M_2_BIT_TWO_3 | STR2M_2_BIT_FOUR)) {
+	        fprintf(stderr, "0x%04X != 0x%04X\n", mask,
+	                (STR2M_2_BIT_TWO_3 | STR2M_2_BIT_FOUR));
+	        return 1;
+	    }
+	    return 0;
+	}
+	_EOF_
+
+${CC:-cc} -o ${testname} $testname-2.c || \
+    failure "cannot compile $testname-2.c"
+./${testname} > ${testname}-btest
+echo "0x0007 --> 15 bytes: 'one two_3 four'" > ${testname}-bbase
+fpair="${testname}-bbase ${testname}-btest"
+cmp -s $fpair || \
+    failure "$testname run failed`echo
+        diff $fpair`"
+
+cleanup
+
+## Local Variables:
+## mode: shell-script
+## indent-tabs-mode: nil
+## sh-indentation: 4
+## sh-basic-offset: 4
+## End:
+
+# end of str2m.test

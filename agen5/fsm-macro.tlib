@@ -108,8 +108,8 @@ static int [=(. pfx)=]_invalid_transition( te_[=(. pfx)=]_state st, te_[=
 [=
 
   IF (not (exist? "handler-file")) =]
-/* * * * * * * * * THE CODE STARTS HERE * * * * * * * *
- *
+/* * * * * * * * * THE CODE STARTS HERE * * * * * * * */
+/**
  *  Print out an invalid transition message and return EXIT_FAILURE
  */
 static int
@@ -148,10 +148,10 @@ DEFINE build-callback     =][=
   =  noop      =][=
   *            =]
 static te_[=(. pfx)=]_state
-[=cb_prefix=]_[=cb_name=]([= emit-cookie-args =]
+[=cb_prefix=]_[=cb_name=]([= INVOKE emit-cookie-args =]
     te_[=(. pfx)=]_state initial,
     te_[=(. pfx)=]_state maybe_next,
-    te_[=(. pfx)=]_event trans_evt )
+    te_[=(. pfx)=]_event trans_evt)
 {
 [= (extract fsm-source (string-append
 "/*  %s == " (string-tr! (get "cb_name") "a-z_-" "A-Z  ") " == %s  */" )
@@ -229,7 +229,7 @@ DEFINE run-switch         =][=
 
   WHILE `echo $#`         =][=
 
-    invoke build-switch
+    INVOKE build-switch
       cb_prefix = (string-append PFX "_TR")
       cb_name   = (shell "echo $1 ; shift") =][=
 

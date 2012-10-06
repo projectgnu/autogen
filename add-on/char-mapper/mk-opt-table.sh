@@ -57,20 +57,17 @@ is_up_to_date() {
 }
 
 mk_enum() {
-    cat > XX.def <<- _EOF_
+    autogen -L ../../autoopts/tpl <<- _EOF_
 	AutoGen Definitions str2enum;
 
 	base-name = ${base_name};
-	no-length; no-case;
+	no-length; no-case; no-name;
 	dispatch = {
 	    d-ret = 'char *';
 	    d-nam = 'handle_%s';
 	};
-	alias  = '# ignore';
-	equate = '_-^';
 	cmd    = $(echo $hdl_list | sed 's/ /, /g');
 	_EOF_
-    autogen -L ../../autoopts/tpl < XX.def
 }
 
 assemble_usage() {

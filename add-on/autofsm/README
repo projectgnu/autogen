@@ -1,9 +1,4 @@
 
-This directory contains three templates that can be used with AutoGen
-to construct finite state machines.  The make file is fairly simple
-and when invoked without arguments, it will attempt to validate the
-proper functioning of AutoGen and the templates.
-
 DESCRIPTION:
 Produce Finite State Machine Code
 The machine is derived from a list of states and transitions.
@@ -44,13 +39,11 @@ PURPOSE:
        the dispatch table to be created.  The implementation code is omitted.
        The "type" attribute is then ignored.
 
-YOU SUPPLY:
+YOU SUPPLY      a "method" and a "type" as above, plus:
    "state"      The list of valid state names.  The "init" and "done" states
                 are automatically added to this.  If there are other terminal
                 states, they must set "nxtSt" to "done".
    "event"      The list of valid transition types.
-   "type"       The machine structure type:  looping, stepping or reentrant
-   "method"     The implementation type: callout table, case statement or none.
    "prefix"     A prefix to glue onto the front of created names
    "cookie"     zero, one or more of these each containing a C type and name
                 suitable for use in a procedure header.  It is used to pass

@@ -55,7 +55,7 @@ ENDDEF state-table
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE  enumerate-transitions   =]
-/*
+/**
  *  Enumeration of the valid transition types
  *  Some transition types may be common to several transitions.
  */
@@ -192,7 +192,7 @@ DEFINE machine-step  =][=
 [= IF (exist? "debug-flag") \=]
 #ifdef [= (get "debug-flag") =]
         firstNext = /* next line */
-#endif /* [= "debug-flag =] */
+#endif /* [= debug-flag =] */
 [= ENDIF \=]
         nxtSt = pTT->next_state;
         [=(. trans-name)=] = pTT->[=(. trans-field)=];
@@ -203,7 +203,7 @@ DEFINE machine-step  =][=
             [=(. PFX)=]_STATE_NAME( [=(. pfx)=]_state ), [=(. pfx)=]_state,
             [=(. PFX)=]_EVT_NAME( trans_evt ), trans_evt,
             [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
-#endif /* [= "debug-flag =] */
+#endif /* [= debug-flag =] */
 [= ENDIF \=][=
 
   IF (not (=* (get "method") "case"))  =][=
@@ -222,7 +222,7 @@ DEFINE machine-step  =][=
     if (nxtSt != firstNext)
         printf( "transition code changed destination state to %s(%d)\n",
                 [=(. PFX)=]_STATE_NAME( nxtSt ), nxtSt );
-#endif /* [= "debug-flag =] */
+#endif /* [= debug-flag =] */
 [= ENDIF \=][=
 
   IF (not (=* (get "type") "reent")) =]
@@ -270,7 +270,7 @@ ENDDEF make-loop-proc
 
 DEFINE looping-machine
 
-  =][= make-loop-proc mode = "" =]
+  =][= INVOKE make-loop-proc mode = "" =]
 {
     te_[=(. pfx)=]_state [=(. pfx)=]_state = [=(. PFX)=]_ST_INIT;
     te_[=(. pfx)=]_event trans_evt;[=

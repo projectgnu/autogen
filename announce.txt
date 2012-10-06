@@ -63,7 +63,24 @@ cat > ${tfile} <<- _EOF_
 	The self-referential example:
 	http://www.gnu.org/software/${project}/man1-autogen.html
 
-	NOTE: sometime "pretty soon", tar.gz files will not be distributed.
+	Subprojects:  AutoGen contains several "subprojects" since it relys
+	on them and arranging for their distribution ahead of time is painful.
+	There are basically two:
+
+	FSM - A finite state machine generator.  It allows you to specify an
+	fsm by specifying the states, the valid transitions and the actions
+	to take for the valid transitions.  The actions may be either function
+	calls or switch/case elements.  The processing may be step-and-return,
+	process-until-done or reentrant.
+
+	str2enum - string to enumeration.  Take a list of names and produce
+	both an enumeration of those names and a function to convert strings
+	into those enumeration values.  Optionally, it may produce functions
+	to convert the integer values into the string name and/or dispatch
+	a function with a name derived from each of the names.
+
+	Further details can be seen in the leading comments of fsm.tpl and
+	str2enum.tpl.
 
 	New in ${AG_VERSION} - $(date '+%B, %Y')
 	NEWS entries since the last release:
@@ -72,7 +89,7 @@ cat > ${tfile} <<- _EOF_
 
 	AutoGen home:    http://www.gnu.org/software/${project}/
 	primary ftp:     ${ftpurl}/
-	.tar.gz:         ${ftpurl}/${project}-${AG_VERSION}.tar.gz (deprecated)
+	.tar.gz:         ${ftpurl}/${project}-${AG_VERSION}.tar.gz
 	.tar.xz:         ${ftpurl}/${project}-${AG_VERSION}.tar.xz
 	bug reports:     autogen-users at the lists dot SourceForge net domain
 	bug archive:     http://sourceforge.net/mailarchive/forum.php?$forum

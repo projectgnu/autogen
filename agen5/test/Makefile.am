@@ -2,7 +2,6 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Time-stamp:      "2012-04-07 09:22:01 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
@@ -30,7 +29,8 @@ NOSHELL_TESTS = \
     format.test get.test    gperf.test    heredef.test  html.test   \
     in.test     leave.test  license.test  line.test     loop.test   \
     make.test   match.test  pseudo.test   reorder.test  stack.test  \
-    stress.test string.test strtable.test strxform.test time.test
+    stress.test string.test strtable.test strxform.test time.test   \
+    str2m.test
 
 UNREADY_TESTS   = daemon.test
 TESTS       	= @AGEN5_TESTS@
