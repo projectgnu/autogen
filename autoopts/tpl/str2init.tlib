@@ -1,7 +1,5 @@
 [= AutoGen5 Template null   -*- Mode: Scheme -*-   =]
 [=
-(make-tmp-dir)
-
 (define move-output-file (exist? "base-name"))
 (define base-file-name  (if move-output-file (get "base-name") (base-name)))
 (define base-type-name  (string->c-name! (string-downcase base-file-name)))
@@ -24,9 +22,56 @@
 (define mask-name       (string-append base-type-name "_mask_t"))
 (define enum-name       (string-append base-type-name "_enum_t"))
 
-(define enum-type       "cmd")
 (if (exist? "type")     (set! enum-type (string->c-name! (get "type"))))
 (define ENUM-TYPE       (string-upcase   enum-type))
 (set!   enum-type       (string-downcase enum-type))
+(define cmd-count       (string-append PFX-STR "_COUNT_" ENUM-TYPE))
+(define enum-val-offset (if (exist? "cmd[0]") 1 0))
+(define invalid-name    (if (exist? "invalid-name")
+                            (string->c-name! (get "invalid-name"))
+                            "invalid"))
+(define INVALID-NAME    (string-upcase invalid-name))
+(define max-cmd-width 0)
+(define min-cmd-width 99999)
 
+(make-tmp-dir)
+(out-push-new (string-append tmp-dir "/commands"))
+
+=][=
+
+FOR cmd         =][=
+
+  (set! tmp-str (string-downcase! (string->c-name! (get "cmd"))))
+  (set! idx (string-length tmp-str))
+  (if (> idx max-cmd-width) (set! max-cmd-width idx))
+  (if (< idx min-cmd-width) (set! min-cmd-width idx))
+  (sprintf "%5u %s\n" (for-index) tmp-str) =][=
+
+ENDFOR cmd      =][=
+
+(out-pop)
+(if (< max-cmd-width 8) (set! max-cmd-width 8))
+
+=][=
+CASE invalid-val =][=
+!E               =][=
+  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
+  =][=
+
+== "~0"          =][=
+  (set! enum-val-offset 0)
+  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
+  =][=
+
+== ""            =][=
+  (set! enum-val-offset 0)
+  (define invalid-cmd cmd-count)
+  =][=
+
+*                =][=
+  (error "if invalid-val exists, it is constrained to:
+	'' (empty) or '~0'.")
+  =][=
+
+ESAC
 \=]

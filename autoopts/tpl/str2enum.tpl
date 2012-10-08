@@ -41,14 +41,17 @@
 ;;                of the base name as the prefix for each name.  This
 ;;                overrides that.
 ;;   type         After the prefix, each enum value has a "type" segment.
-;;                By default, this is "cmd", but may be changed.
+;;                By default, this is "cmd", but may be specified with this.
+;;   invalid-val  Invalid enumeration value.  By default, 0 (zero).
+;;                Alternatively, you may select "~0" to be the invalid value
+;;                or specify it to be empty.  Then there is no specific
+;;                invalid value, but the count value may be used.
+;;   invalid-name By default, "invalid", but you may also select "unused" or
+;;                any other string that suits your fancy.
 ;;   alias        A special character can be used to represent a command. e.g.
 ;;                   alias = "< source"; alias = "# comment"; alias = "? help";
 ;;                will cause a '<' character to represent "source",
 ;;                a '#' to represent comment, and '?' for help.
-;;                If a command is aliased to but not in the "cmd" list,
-;;                then you must still provide a handler procedure, but it
-;;                will only be accessible via its alias.
 ;;
 ;;   dispatch     describes the format of handler functions:
 ;;      d-nam     printf format string for constructing the command name.
@@ -84,22 +87,23 @@
 
 ;; =][=
 
-CASE (suffix)            =][= #
+CASE (suffix)                   =][= #
 
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;;;
 ;;;  H CODE
 ;;;
 ;;;=][=
-== h                     =][=
-INVOKE init-header       =]
+== h                            =][=
+INVOKE init-header              =]
 
-typedef enum {
-    [= (define invalid-cmd (string-append PFX-STR "_INVALID_" ENUM-TYPE))
-       invalid-cmd =][=
-    (shell (string-append "mk_enum_list '" (string-upcase cmd-list) "'")) =],
-    [= (define cmd-count (string-append PFX-STR "_COUNT_" ENUM-TYPE))
-       cmd-count =]
+typedef enum {[=
+    (if (not (exist? "invalid-val"))
+        (string-append "\n    " invalid-cmd " = 0,") ) =][=
+    (shellf "mk_enum_list %d" enum-val-offset) =]
+    [= (. cmd-count) =][=
+    (if (= (get "invalid-val") "~0")
+        (string-append ",\n    " invalid-cmd " = ~0") ) =]
 } [= (. enum-name) =];
 
 extern [= (. enum-name)         =]
@@ -120,8 +124,7 @@ typedef [= dispatch.d-ret =]([=(. base-type-name)=]_handler_t)(
 (if (not (exist? "dispatch.d-nam"))
     (error "dispatch needs callout procedure name format ('d-nam')"))
 
-(define proc-list (shell (string-append
-   "mk_proc_list '" cmd-list "'" )))
+(define proc-list (shell "mk_proc_list"))
 
 proc-list =];
 
@@ -187,37 +190,88 @@ ESAC  suffix c/h
 
 DEFINE init-header      =][=
 
+(define enum-type "cmd")=][=
 INCLUDE "str2init.tlib" =][=
 
-(define idx         0)
+(define tmp-str     "")
 (define len-arg     (if (exist? "no-length") ""
                         ", unsigned int len"))
+
 (out-push-new)
-\=]
+
+=]
 mk_char_list() {
     echo "$1" | sed 's/\(.\)/\1\
 /g' | sort -u | tr -d '\n\t '
 }
 
+chmod a+w ${tmp_dir}/commands
+readonly max_cmd_width=[=(. max-cmd-width)=]
+readonly min_cmd_width=[=(. min-cmd-width)=]
+
 mk_enum_list() {
-    declare nm='' cmd_list="$*"
-    for nm in ${cmd_list}
+    chmod a+w ${tmp_dir}/commands
+    sort -o ${tmp_dir}/commands ${tmp_dir}/commands
+    exec 3< ${tmp_dir}/commands
+    declare n
+    declare -u c
+    declare fmt='\n    [=(string-append PFX-STR "_" ENUM-TYPE)
+                =]_'"%-${max_cmd_width}s = %s,"
+    while read -u3 n c
     do
-        printf ',\n    [=(string-append PFX-STR "_" ENUM-TYPE)=]_%s' $nm
+        printf "$fmt" $c `expr $n + $1`
     done
-}[= IF (exist? "alias") =]
+    exec 3<&-
+}[=
+
+IF (exist? "alias")
+
+=]
 mk_all_cmds() {
+    chmod a+w ${tmp_dir}/commands
     echo "$1" | while IFS='' read a
     do
         echo ${a#?}
     done | sed 's/[^a-zA-Z0-9]/_/g' >> ${tmp_dir}/commands
     sort -u -o ${tmp_dir}/commands ${tmp_dir}/commands
     cat ${tmp_dir}/commands
-}[= ENDIF =]
-mk_proc_list() {
-    printf "invalid\n$1" | \
-        columns -f '[= dispatch.d-nam =]' -I8 --spread=1 -S,
 }[=
+
+ENDIF alias exists =][=
+
+IF (exist? "dispatch")
+
+=]
+mk_proc_list() {
+    exec 3< ${tmp_dir}/commands
+    declare n
+    declare -l c
+    {
+        echo invalid
+        while read -u3 n c
+        do
+            echo $c
+        done
+    } | columns -f '[= dispatch.d-nam =]' -I8 --spread=1 -S,
+    exec 3<&-
+}
+mk_lengths() {
+    exec 3< ${tmp_dir}/commands
+    declare n=`expr ${max_cmd_width} + 1`
+    declare -u c
+    declare fmt="[[=(string-append PFX-STR "_" ENUM-TYPE)
+                =]_%-${n}s ="
+    while read -u3 n c
+    do
+        printf ',\n    '"$fmt = ${#c}" "$c]"
+    done | columns -I8 -S, --end=' };'
+
+    exec 3<&-
+}[=
+
+ENDIF dispatch exists
+
+=][=
 
 (shell (out-pop #t))
 
@@ -231,19 +285,7 @@ mk_proc_list() {
     (set! cmd-chars (string-append cmd-chars (get "equate")))
 )
 
-(set! cmd-chars (shell (string-append
-    "mk_char_list '" cmd-chars "'" )))
-
-(define cmd-list (string->c-name! (join "\n" (stack "cmd"))))
-(out-push-new (string-append tmp-dir "/commands"))
-(emit cmd-list)
-(out-pop)
-
-(if (exist? "alias")
-    (set! cmd-list (shell (string-append
-          "mk_all_cmds '" (join "\n" (stack "alias")) "'"
-))) )
-
+(set! cmd-chars (shell "mk_char_list '" cmd-chars "'" ))
 (emit "\n *\n * Command/Keyword Dispatcher\n */\n")
 (make-header-guard "str2enum")
 
@@ -263,20 +305,19 @@ DEFINE mk-finder                =][=
 [=
     (define str-table-name (string-append pfx-str "_names"))
     (string-table-new str-table-name) (out-push-new)
-    (emit (string-table-add-ref str-table-name "* UNDEFINED *"))
+    (if (not (exist? "invalid-val"))
+        (emit (string-table-add-ref str-table-name "* UNDEFINED *") "\n") )
 
-    (shell (string-append
-    "cmd_list='" cmd-list "' ; set -- $cmd_list" )) =][=
-
-    WHILE `echo $#`             =]
-[=     (string-table-add-ref str-table-name (shell "echo $1 ; shift")) =][=
-    ENDWHILE                    =][=
+    =][=
+    FOR cmd (for-from 0) (for-by 1) (for-sep "\n")=][=
+        (string-table-add-ref str-table-name (get "cmd" "* UNDEFINED *")) =][=
+    ENDFOR                      =][=
     (out-suspend "main")
     (emit-string-table str-table-name)
     (emit "\nstatic char const * " pfx-str "_name_table[] = {\n")
     (out-resume "main")
-    (shell (string-append "columns -I8 -S, --spread=1 --end=' };' <<_EOF_\n"
-        (out-pop #t) "\n_EOF_" )) =][=
+    (shell "columns -I8 -S, --spread=1 --end=' };' <<_EOF_\n"
+        (out-pop #t) "\n_EOF_" )=][=
   ENDIF  partial or ! no-name   =]
 
 /**
@@ -434,11 +475,8 @@ disp_[=(. base-type-name)=](char * str[=
 [= (. proc-list) =] };
     [= (. enum-name) =] id = find_[=(. base-type-name)=]_id(str[=
         (if (exist? "no-length") "" ", len") =]);
-    static unsigned int keywd_len[] = {
-[= (shell (string-append
-   "{ echo 0 ; g='" cmd-list "' ; for f in $g ; do echo ${#f} ; done } | "
-      "columns -I8 -S, --end=' };'"
-   )) =]
+    static unsigned int keywd_len[] = { [0] = 0,[=
+        (shell "mk_lengths") =]
     unsigned int len = [=
   IF (exist? "alias") =](! isalnum((unsigned)*str)) ? 1 : [=
   ENDIF  =]keywd_len[id];
@@ -498,18 +536,9 @@ ENDDEF mk-enum2name
 ;;;=][=
 DEFINE run-gperf     =]
 [=
-(define base-out-name (string-substitute base-type-name "_" "-"))
-
-(define table-fmt (shell (string-append
-    "list='" cmd-list "' ; min_cmd_len=99999 max_cmd_len=0
-    for f in $list
-    do test ${#f} -gt $max_cmd_len && max_cmd_len=${#f}
-       test ${#f} -lt $min_cmd_len && min_cmd_len=${#f}
-    done
-    expr $max_cmd_len + 1" )))
-
-(set! table-fmt (string-append
-                "%-" table-fmt "s " PFX-STR "_" ENUM-TYPE "_%s\n" ))
+(define table-fmt (string-append
+                "%-" (number->string (+ max-cmd-width 1))
+                "s " PFX-STR "_" ENUM-TYPE "_%s\n" ))
 (out-push-new)
 
 =][= #
@@ -535,7 +564,7 @@ DEFINE run-gperf     =]
 [=
 
 (define gperf-opts (out-pop #t))
-(out-push-new (string-append tmp-dir "/" base-out-name ".gp"))
+(out-push-new (string-append tmp-dir "/" base-file-name ".gp"))
 
 \=][= #
 
@@ -589,7 +618,7 @@ ENDFOR \=]
 outdir=$PWD
 cd ${tmp_dir}
 
-gperf [= (. base-out-name) =].gp | \
+gperf [= (. base-file-name) =].gp | \
     sed -e '/^_*inline$/d' \
         -e '/^#line /d' \
         -e '/GNUC_.*_INLINE/d' \

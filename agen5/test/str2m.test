@@ -31,6 +31,8 @@ echo creating $testname.def
 cat > $testname.def <<'_EOF_'
 AutoGen Definitions str2enum;
 cmd = one, two_3, four;
+type = kwd;
+mask = { m-name = one-four; m-bit = one, four; };
 _EOF_
 
 # # # # # # # # # # EXPECTED OUTPUT FILES # # # # # # #
@@ -39,11 +41,11 @@ echo creating $testname-h.base
 # this is the output we should expect to see
 cat > $testname-h.base <<- _EOF_
 	typedef enum {
-	    STR2M_INVALID_CMD,
-	    STR2M_CMD_ONE,
-	    STR2M_CMD_TWO_3,
-	    STR2M_CMD_FOUR,
-	    STR2M_COUNT_CMD
+	    STR2M_INVALID_KWD = 0,
+	    STR2M_KWD_ONE      = 1,
+	    STR2M_KWD_TWO_3    = 2,
+	    STR2M_KWD_FOUR     = 3,
+	    STR2M_COUNT_KWD
 	} str2m_enum_t;
 
 	extern str2m_enum_t
@@ -71,14 +73,14 @@ cat > $testname-c.base <<- _EOF_
 	 * @param[in] str  a string that should start with a known key word.
 	 * @param[in] len  the length of the keyword at \a str.
 	 * @returns the enumeration value.
-	 * If not found, that value is STR2M_INVALID_CMD.
+	 * If not found, that value is STR2M_INVALID_KWD.
 	 */
 	str2m_enum_t
 	find_str2m_id(char const * str, unsigned int len)
 	{
 	    str2m_map_t const * map;
 	    map = find_str2m_name(str, len);
-	    return (map == NULL) ? STR2M_INVALID_CMD : map->str2m_id;
+	    return (map == NULL) ? STR2M_INVALID_KWD : map->str2m_id;
 	}
 
 	/**
@@ -91,7 +93,7 @@ cat > $testname-c.base <<- _EOF_
 	char const *
 	str2m_name(str2m_enum_t id)
 	{
-	    if (id >= STR2M_COUNT_CMD) id = STR2M_INVALID_CMD;
+	    if (id >= STR2M_COUNT_KWD) id = STR2M_INVALID_KWD;
 	    return str2m_name_table[id];
 	}
 	/* end of str2m.c */
@@ -124,17 +126,18 @@ cmp -s $fpair || \
 echo creating $testname-h2.base
 TNAME=`echo $testname | tr a-z A-Z`
 rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
-{
-    ${SED} "$rep_name;/_enum_t;/q" $testname-h.base
-    cat <<- _EOF_
+cat > $testname-h2.base <<- _EOF_
+	#ifndef STR2ENUM_STR2M_2_H_GUARD
+	#define STR2ENUM_STR2M_2_H_GUARD 1
+	#include <sys/types.h>
+	#include <inttypes.h>
 
-	#define STR2M_2_BIT_ONE   (1U << 0)
-	#define STR2M_2_BIT_TWO_3 (1U << 1)
-	#define STR2M_2_BIT_FOUR  (1U << 2)
-	_EOF_
+	#define STR2M_2_KWD_ONE           0x0001U
+	#define STR2M_2_KWD_TWO_3         0x0002U
+	#define STR2M_2_KWD_FOUR          0x0004U
 
-    ${SED} "1,/_enum_t;/d;/^#endif .*GUARD/,\$d;$rep_name" $testname-h.base
-    cat <<- _EOF_
+	/** bits in mask: one four */
+	#define STR2M_2_KWD_ONE_FOUR_MASK 0x0005U
 
 	#define STR2M_2_MAX_MASK_NAME_SIZE 15
 	typedef uint8_t str2m_2_mask_t;
@@ -145,16 +148,46 @@ rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 	extern size_t
 	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len);
 
-	#endif /* STR2ENUM_${TNAME}_2_H_GUARD */
+	#endif /* STR2ENUM_STR2M_2_H_GUARD */
 	_EOF_
 
-} > $testname-h2.base
+cat > $testname-c2.base <<- _EOF_
+	static char const str2m_2_names[15] =
+	/*     0 */ "one\0"
+	/*     4 */ "two_3\0"
+	/*    10 */ "four";
 
-{
-    ${SED} "/_names+/d
-	/ end of .*\.c /d
-	$rep_name" $testname-c.base
-    cat <<- _EOF_
+	static char const * str2m_2_name_table[] = {
+
+	/**
+	 * Convert a command (keyword) to a str2m_2_enum_t enumeration value.
+	 *
+	 * @param[in] str  a string that should start with a known key word.
+	 * @param[in] len  the length of the keyword at \a str.
+	 * @returns the enumeration value.
+	 * If not found, that value is STR2M_2_COUNT_KWDBNM.
+	 */
+	static str2m_2_enum_t
+	find_str2m_2_id(char const * str, unsigned int len)
+	{
+	    str2m_2_map_t const * map;
+	    map = find_str2m_2_name(str, len);
+	    return (map == NULL) ? STR2M_2_COUNT_KWDBNM : map->str2m_2_id;
+	}
+
+	/**
+	 * Convert an str2m_2_enum_t value into a string.
+	 *
+	 * @param[in] id  the enumeration value
+	 * @returns the associated string, or "* UNDEFINED *" if \a id
+	 * is out of range.
+	 */
+	static char const *
+	str2m_2_name(str2m_2_enum_t id)
+	{
+	    if (id >= STR2M_2_COUNT_KWDBNM) id = STR2M_2_COUNT_KWDBNM;
+	    return str2m_2_name_table[id];
+	}
 
 	#include <sys/types.h>
 	#include <string.h>
@@ -213,7 +246,7 @@ rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 	        if (val_len == 0)
 	            return 0;
 	        val = find_str2m_2_id(str, val_len);
-	        if (val-- == STR2M_2_INVALID_CMD)
+	        if (val == STR2M_2_COUNT_KWDBNM)
 	            return 0;
 	        if (invert)
 	            res &= ~((str2m_2_mask_t)1 << val);
@@ -242,11 +275,11 @@ rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 	    size_t res = 0;
 	    if (buf == NULL) len = 0;
 
-	    for (; mask != 0; mask >>= 1) {
+	    for (; mask != 0; val++, mask >>= 1) {
 	        char const * p;
 	        size_t l;
 
-	        if (++val >= STR2M_2_COUNT_CMD)
+	        if (val >= STR2M_2_COUNT_KWDBNM)
 	            break;
 
 	        if ((mask & 1) == 0)
@@ -270,7 +303,6 @@ rep_name="s/${testname}/${testname}_2/g;s/${TNAME}/${TNAME}_2/g"
 	}
 	/* end of str2m-2.c */
 	_EOF_
-} > $testname-c2.base
 
 # # # # # # # # # # RUN THE TEST PART 2 # # # # # # #
 
@@ -278,6 +310,7 @@ echo run_ag x ${AGCMD} -T str2mask $testname.def
 echo "base-name = '$testname-2'; prefix = '${testname}_2';" >> $testname.def
 run_ag x ${AGCMD} -T str2mask $testname.def || \
     failure ${AGCMD} failed
+get_h_text='/#ifndef .*_GUARD/,/#endif .*_GUARD/p'
 ${SED} -n "${get_h_text}" $testname-2.h > $testname-h2.res
 get_c_text=`echo "$get_c_text" | ${SED} "$rep_name"`
 ${SED} -n "/_names+/d;${get_c_text}" $testname-2.c > $testname-c2.res
@@ -312,9 +345,9 @@ cat >> $testname-2.c <<- _EOF_
 	        return 1;
 	    }
 	    mask = str2m_2_str2mask("- one", mask);
-	    if (mask != (STR2M_2_BIT_TWO_3 | STR2M_2_BIT_FOUR)) {
+	    if (mask != (STR2M_2_KWDBNM_TWO_3 | STR2M_2_KWDBNM_FOUR)) {
 	        fprintf(stderr, "0x%04X != 0x%04X\n", mask,
-	                (STR2M_2_BIT_TWO_3 | STR2M_2_BIT_FOUR));
+	                (STR2M_2_KWDBNM_TWO_3 | STR2M_2_KWDBNM_FOUR));
 	        return 1;
 	    }
 	    return 0;
