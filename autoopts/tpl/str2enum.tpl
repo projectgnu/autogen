@@ -32,7 +32,6 @@
 
 ;;   You may optionally supply any of the following:
 
-;;   copyright    See the AutoOpts documentation for its usage.
 ;;   partial      Accept unique partial matches of at least two characters.
 ;;   base-name    The base name is normally derived from the definitions
 ;;                file name.  This will override that and cause the
@@ -52,6 +51,10 @@
 ;;                   alias = "< source"; alias = "# comment"; alias = "? help";
 ;;                will cause a '<' character to represent "source",
 ;;                a '#' to represent comment, and '?' for help.
+;;   undef-str    by default, the display string for an undefined value is
+;;                "* UNDEFINED *".  Use this to change that.
+;;   equate       A series of punctuation characters considered equivalent.
+;;                Typically, "-_" but sometimes (Tandem) "-_^".
 ;;
 ;;   dispatch     describes the format of handler functions:
 ;;      d-nam     printf format string for constructing the command name.
@@ -95,10 +98,16 @@ CASE (suffix)                   =][= #
 ;;;
 ;;;=][=
 == h                            =][=
-INVOKE init-header              =]
+INVOKE init-header              =][= DEBUG =][=
+
+  FOR add-on-text               =][=
+    IF (= (get "ao-file") "enum-header") =]
+[= ao-text                      =][=
+    ENDIF correct type          =][=
+  ENDFOR add-on-text            =]
 
 typedef enum {[=
-    (if (not (exist? "invalid-val"))
+    (if (> enum-val-offset 0)
         (string-append "\n    " invalid-cmd " = 0,") ) =][=
     (shellf "mk_enum_list %d" enum-val-offset) =]
     [= (. cmd-count) =][=
@@ -179,6 +188,12 @@ extern char const *
     INVOKE mk-enum2name         =][=
   ENDIF dispatch                =][=
 
+  FOR add-on-text               =][=
+    IF (= (get "ao-file") "enum-code") =]
+[= ao-text                      =][=
+    ENDIF correct type          =][=
+  ENDFOR add-on-text            =][=
+
 ESAC  suffix c/h
 
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -197,6 +212,8 @@ INCLUDE "str2init.tlib" =][=
 (define len-arg     (if (exist? "no-length") ""
                         ", unsigned int len"))
 
+(define equate-from "")
+(define equate-to   "")
 (out-push-new)
 
 =]
@@ -208,7 +225,11 @@ mk_char_list() {
 chmod a+w ${tmp_dir}/commands
 readonly max_cmd_width=[=(. max-cmd-width)=]
 readonly min_cmd_width=[=(. min-cmd-width)=]
-
+[= IF (exist? "equate") =]
+equate_from='[=(define equate-from (get "equate")) equate-from=]'
+equate_to=`echo "$equate_from" | sed 's/\(.\).*/\1/'`
+equate_to=`echo "$equate_from" | tr "$equate_from" "$equate_to"`
+[= ENDIF =]
 mk_enum_list() {
     chmod a+w ${tmp_dir}/commands
     sort -o ${tmp_dir}/commands ${tmp_dir}/commands
@@ -263,8 +284,8 @@ mk_lengths() {
                 =]_%-${n}s ="
     while read -u3 n c
     do
-        printf ',\n    '"$fmt = ${#c}" "$c]"
-    done | columns -I8 -S, --end=' };'
+        printf '\n        '"$fmt ${#c}," "$c]"
+    done | sed '$s/,$//'
 
     exec 3<&-
 }[=
@@ -274,7 +295,8 @@ ENDIF dispatch exists
 =][=
 
 (shell (out-pop #t))
-
+(if (exist? "equate")
+    (set! equate-to (shell "echo \"${equate_to}\"")) )
 (define cmd-chars (join "" (stack "cmd")))
 
 (if (exist? "no-case")
@@ -304,17 +326,24 @@ DEFINE mk-finder                =][=
   IF (or (exist? "partial") (not (exist? "no-name"))) =]
 [=
     (define str-table-name (string-append pfx-str "_names"))
-    (string-table-new str-table-name) (out-push-new)
-    (if (not (exist? "invalid-val"))
-        (emit (string-table-add-ref str-table-name "* UNDEFINED *") "\n") )
+    (string-table-new str-table-name)
 
+    (out-push-new)
+    (if insert-undef
+        (emit (string-table-add-ref str-table-name undef-str) "\n") )
+    (define start-ix (if (or insert-undef (= enum-val-offset 0)) 0 1))
     =][=
-    FOR cmd (for-from 0) (for-by 1) (for-sep "\n")=][=
-        (string-table-add-ref str-table-name (get "cmd" "* UNDEFINED *")) =][=
+
+    FOR cmd (for-from start-ix) (for-by 1) (for-sep "\n")
+       =][=
+       (set! tmp-str (if (found-for?) (get "cmd") undef-str))
+       (string-table-add-ref str-table-name tmp-str)
+       =][=
     ENDFOR                      =][=
+
     (out-suspend "main")
     (emit-string-table str-table-name)
-    (emit "\nstatic char const * " pfx-str "_name_table[] = {\n")
+    (emit "\nstatic char const * " pfx-str "_name_table[" cmd-count "] = {\n")
     (out-resume "main")
     (shell "columns -I8 -S, --spread=1 --end=' };' <<_EOF_\n"
         (out-pop #t) "\n_EOF_" )=][=
@@ -409,22 +438,21 @@ ENDDEF mk-finder
 DEFINE cvt-chars
 
 =]
-    char name_buf[[=(shell "echo $max_cmd_len")=]];
+    char name_buf[[=(+ 1 max-cmd-width)=]];
     unsigned int ix;
 
-    if (  (len < [=(shell "echo $min_cmd_len")=])
-       || (len > sizeof(name_buf))
-       || isalnum((unsigned)str[len]))
+    /* too short, too long or followed immediately by a name char... */
+    if (  (len <  [=(. min-cmd-width)=])
+       || (len >= [=(. max-cmd-width)=])
+       || isalnum((unsigned)str[len]) )
         return [=(. invalid-cmd)=];
 
     for (ix = 0; ix < len; ix++) {
         int ch = (unsigned char)str[ix];[=
   IF (exist? "equate")          =]
         switch (ch) {
-        [= (shell (string-append
-             "echo '" (get "equate") "' | "
-               "sed \"s/\\(.\\)/case '\\1': /g\""
-        )) =]
+        [= (shell "echo '" (get "equate") "' | "
+               "sed \"s/\\(.\\)/case '\\1': /g\"") =]
             name_buf[ix] = '[= (substring (get "equate") 0 1) =]';
             break;
         default:[=
@@ -475,15 +503,15 @@ disp_[=(. base-type-name)=](char * str[=
 [= (. proc-list) =] };
     [= (. enum-name) =] id = find_[=(. base-type-name)=]_id(str[=
         (if (exist? "no-length") "" ", len") =]);
-    static unsigned int keywd_len[] = { [0] = 0,[=
-        (shell "mk_lengths") =]
-    unsigned int len = [=
+    static unsigned int keywd_len[] = {[=
+        (shell "mk_lengths") =] };
+    unsigned int klen = [=
   IF (exist? "alias") =](! isalnum((unsigned)*str)) ? 1 : [=
   ENDIF  =]keywd_len[id];
 
     [=
     (if (= (get "dispatch.d-ret") "void") "" "return ")
-    =]dispatch[id](id, str + len[=
+    =]dispatch[id](id, str + klen[=
 
     IF (exist? "dispatch.d-arg") =], [=
 
@@ -518,13 +546,15 @@ DEFINE mk-enum2name
  * Convert an [= (. enum-name) =] value into a string.
  *
  * @param[in] id  the enumeration value
- * @returns the associated string, or "* UNDEFINED *" if \a id
+ * @returns the associated string, or "[=(. undef-str)=]" if \a id
  * is out of range.
  */
 char const *
 [=(. base-type-name)=]_name([= (. enum-name) =] id)
 {
-    if (id >= [=(. cmd-count)=]) id = [=(. invalid-cmd)=];
+    if (id >= [=(. cmd-count)=])
+        return [= (if insert-undef str-table-name
+            (string-append "\"" undef-str "\"") ) =];
     return [=(. pfx-str)=]_name_table[id];
 }
 [=
@@ -592,8 +622,14 @@ typedef struct {
 [=
 FOR cmd =][=
  (define cmd (get "cmd"))
+ (if (exist? "no-case")
+     (set! cmd (string-downcase cmd)) )
+ (if (exist? "equate")
+     (set! cmd (string-tr! cmd equate-from equate-to)) )
+
  (define tmp-val (string-append
                  (if (exist? "no-case") (string-downcase cmd) cmd) "," ))
+
  (sprintf table-fmt tmp-val (string-upcase! (string->c-name! cmd))) =][=
 ENDFOR \=]
 %%

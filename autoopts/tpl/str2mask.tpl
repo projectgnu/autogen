@@ -26,13 +26,14 @@
 ;;; and this will result in additional mask(s) in the header containing
 ;;; bits that are set for the flag1 and flag4 values, e.g.:
 ;;;
-;;;     #define STR2M_2_KWD_FLAG1                 0x0001U
-;;;     #define STR2M_2_KWD_FLAG2                 0x0002U
-;;;     #define STR2M_2_KWD_FLAG3                 0x0004U
-;;;     #define STR2M_2_KWD_FLAG4                 0x0008U
+;;;     #define PFX_KWD_FLAG1                 0x0001U
+;;;     #define PFX_KWD_FLAG2                 0x0002U
+;;;     #define PFX_KWD_FLAG3                 0x0004U
+;;;     #define PFX_KWD_FLAG4                 0x0008U
 ;;;
 ;;;     /** bits in mask: flag1 flag4 */
-;;;     #define STR2M_2_KWD_THIS_IS_A_SAMPLE_MASK 0x0009U
+;;;     #define PFX_KWD_THIS_IS_A_SAMPLE_MASK 0x0009U
+;;;     #define PFX_KWD_MASK_ALL              0x000FU
 ;;;
 ;;; The produced header will contain a typedef for the mask type.
 ;;; It will be named after the "base-type-name" with a "_mask_t" suffix.
@@ -53,61 +54,9 @@ CASE (suffix)                   =][= #
 
 INVOKE init-header              =][=
 
-(out-push-new)                  =][=
+INVOKE sizes-n-formats          =][=
 
-FOR mask            =][=
-  (set! tmp-str (string-append (get "m-name") "_MASK"))
-  (set! idx     (string-length tmp-str))
-  (if (> idx max-cmd-width) (set! max-cmd-width idx))
-  =][=
-ENDFOR mask
-
-=]
-sfx=U
-bits=[=(count "cmd")=]
-hex_width=$(( (bits + 3) / 4 ))
-(( hex_width < 4 )) && hex_width=4
-[=
-
-IF (exist? "mask-type")
-
-=]
-mask_type=[= mask-type =]
-(( bits > 32 )) && {
-    (( bits > 64 )) && die "cannot handle a $bits bit mask"
-    sfx=UL
-}
-[=
-
-ELSE mask type not provided
-
-=]
-if (( bits <= 8 ))
-then mask_type='uint8_t'
-elif (( bits <= 16 ))
-then mask_type='uint16_t'
-elif (( bits <= 32 ))
-then mask_type='uint32_t'
-elif (( bits <= 64 ))
-then mask_type='uint64_t'
-     sfx=UL
-else
-    die "cannot handle a $bits bit mask"
-fi
-[=
-
-ENDIF mask type provided/not
-
-=]
-hex_fmt=0x%0${hex_width}X${sfx}
-def_fmt="#define [=(string-append PFX-STR "_" ENUM-TYPE "_")
-=]%-[=(. max-cmd-width)=]s ${hex_fmt}\\n"
-[=
-
-;;; * * * * * * * *
-;;; Compute above before proceeding with actual output
-;;;
-(shell (out-pop #t)) (out-push-new)
+(out-push-new)
 
 =]
 hdr_file=[=(string-append tmp-dir "/" base-file-name)=].h
@@ -115,35 +64,75 @@ src_file=${hdr_file%.h}.c
 mask_name=[= (. mask-name) =]
 
 sed '/^#define .*_GUARD/q' ${hdr_file}
-printf '#include <sys/types.h>\n#include <inttypes.h>\n\n'
+cat <<- _EOF_
+	#include <sys/types.h>
+	#include <inttypes.h>
+[=
+FOR add-on-text                 =][=
+  IF (= (get "ao-file") "mask-header") =]
+[= ao-text                      =][=
+  ENDIF correct type            =][=
+ENDFOR add-on-text              =]
+	_EOF_
 
+echo "/** bits defined for ${mask_name} */"
 ix=0
 
 declare -u C
 exec 4< ${tmp_dir}/commands
+all_mask=0
 while read -u4 n C
 do
-    printf "$def_fmt" $C $(( 1 << n ))
+    v=$(( 1 << n ))
+    printf "$def_fmt" $C $v
+    (( all_mask += v ))
 done
 exec 4<&-
+
+emit_mask_def() {
+    declare v=0
+    declare mname=${1}
+    shift
+    declare which_bits='in'
+    $INVERT && which_bits='omitted from'
+    printf "\n/** bits $which_bits ${mname%_MASK} mask:\n"
+    echo $* | tr ' ' '\n' | columns --spread=1 -I' *  ' --end=' */'
+
+    for f in $*
+    do  case "$f" in
+        -* )
+            eval f=\${val_${f#-}}
+            (( v &= ~f ))
+            ;;
+
+        *  )
+            eval f=\${val_$f}
+            (( v |= f ))
+            ;;
+        esac
+    done
+    $INVERT && (( v ^= all_mask ))
+    printf "$def_fmt" ${mname} $v
+    eval $(echo val_${mname}_mask=$v | tr 'A-Z' 'a-z')
+}
 [=
 
 FOR mask            =][=
    (set! tmp-str (string-append
        (string-upcase! (string->c-name! (get "m-name"))) "_MASK"))
-   (shell "v=0;list='" (string->c-name! (join " " (stack "m-bit"))) "'\n"
-         "for f in $list"
-         "\ndo eval f=\\${$f} ; (( v |= f )) ; done\n"
-         "echo echo\n"
-         "echo \"echo '/** bits in mask:' $list '*/'\"\n"
-         "printf \"echo '$def_fmt'\" " tmp-str " $v") =][=
+   (string-append "INVERT=" (if (exist? "m-invert") "true" "false")
+   " emit_mask_def " tmp-str " "
+      (string->c-name! (join " " (stack "m-bit"))) "\n") =][=
 
 ENDFOR mask
 
-=]
+\=]
+printf "\n/** all bits in ${mask_name} masks */\n"
+printf "$def_fmt" MASK_ALL $all_mask
 line='[=(join " " (stack "cmd"))=] '
-
 cat <<- _EOF_
+
+	/** buffer size needed to hold all bit names for ${mask_name} masks */
 	#define [=(. PFX-STR)=]_MAX_MASK_NAME_SIZE ${#line}
 	typedef $mask_type ${mask_name};
 
@@ -160,6 +149,16 @@ IF (not (exist? "no-name"))   =]
 ENDIF no name
 
 =]
+	#ifdef UINT64_MASK_INTERFACE
+	extern uint64_t
+	[=(. base-type-name)
+		=]_str2mask64(char const * str, uint64_t old);
+
+	extern size_t
+	[=(. base-type-name)
+		=]_mask64_2str(uint64_t mask, char * buf, size_t len);
+	#endif
+
 	_EOF_
 
 grep -E '^#endif .*_GUARD ' ${hdr_file}
@@ -264,7 +263,14 @@ exec 4<&-
         have_data = 1;
         str += val_len;
     }
-}[=
+}
+#ifdef UINT64_MASK_INTERFACE
+uint64_t
+[=(. base-type-name)=]_str2mask64(char const * str, uint64_t old)
+{
+    return [=(. base-type-name)=]_str2mask(str, ([=(. mask-name)=])old);
+}
+#endif[=
 
 IF (not (exist? "no-name"))   =]
 
@@ -311,8 +317,21 @@ size_t
         res += l;
     }
     return (res == 0) ? 1 : res;
-}[=
+}
+#ifdef UINT64_MASK_INTERFACE
+size_t
+[=(. base-type-name)=]_mask64_2str(uint64_t mask, char * buf, size_t len)
+{
+    return [=(. base-type-name)=]_mask2str(([=(. mask-name)=])mask, buf, len);
+}
+#endif[=
 ENDIF dispatch=][=
+
+  FOR add-on-text               =][=
+    IF (= (get "ao-file") "mask-code") =]
+[= ao-text                      =][=
+    ENDIF correct type          =][=
+  ENDFOR add-on-text            =][=
 
 ESAC  suffix c/h
 
@@ -324,6 +343,68 @@ ESAC  suffix c/h
 ;;;=]
 /* end of [= (out-name) =] */
 [=
+
+DEFINE sizes-n-formats              =][=
+(out-push-new)                      =][=
+
+FOR mask                            =][=
+  (set! tmp-str (string-append (get "m-name") "_MASK"))
+  (set! idx     (string-length tmp-str))
+  (if (> idx max-cmd-width) (set! max-cmd-width idx))
+  =][=
+ENDFOR mask
+
+=]
+sfx=U
+bits=[=(. bit-count)=]
+hex_width=$(( (bits + 3) / 4 ))
+(( hex_width < 4 )) && hex_width=4
+[=
+
+IF (exist? "mask-type")
+
+=]
+mask_type=[= mask-type =]
+(( bits > 32 )) && {
+    (( bits > 64 )) && die "cannot handle a $bits bit mask"
+    sfx=UL
+}
+[=
+
+ELSE mask type not provided
+
+=]
+if (( bits <= 8 ))
+then mask_type='uint8_t'
+elif (( bits <= 16 ))
+then mask_type='uint16_t'
+elif (( bits <= 32 ))
+then mask_type='uint32_t'
+elif (( bits <= 64 ))
+then mask_type='uint64_t'
+     sfx=UL
+else
+    die "cannot handle a $bits bit mask"
+fi
+[=
+
+ENDIF mask type provided/not
+
+=]
+hex_fmt=0x%0${hex_width}X${sfx}
+def_fmt="#define [=(string-append PFX-STR "_" ENUM-TYPE "_")
+=]%-[=(. max-cmd-width)=]s ${hex_fmt}\\n"
+[=
+
+(shell (out-pop #t))                =][=
+
+ENDDEF sizes-n-formats
+
+;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+;;;
+;;;  Initialize for the header
+;;;
+;;;=][=
 
 DEFINE init-header                  =][=
 
@@ -337,17 +418,17 @@ DEFINE init-header                  =][=
 
 INCLUDE "str2init.tlib"             =][=
 
-(out-move ".STR2MASK-SET-ASIDE")
-(out-push-new (string-append tmp-dir "/" base-file-name ".def"))
+(out-move ".Str2Mask-Set-Aside")
 (define bit-enum-type
-    (string-append (if (== enum-type "bit") "" enum-type) "BNM"))
+    (string-append (if (== enum-type "bit") "" enum-type) "bnm"))
 (define enum-count (string-append PFX-STR "_COUNT_"
        (string-upcase bit-enum-type)))
 (define assign-vals "")
+(out-push-new (string-append tmp-dir "/" base-file-name ".def"))
 =]
 AutoGen Definitions str2enum;
 prefix  = '[=(. pfx-str)=]';
-type    = '[=(. bit-enum-type)=]';
+type    = '[=(string-downcase bit-enum-type)=]';
 invalid-name = '[=(. invalid-name)=]';
 invalid-val  = '';
 [=
@@ -359,14 +440,15 @@ FOR cmd     =][=
     (set! tmp-str (string-downcase! (string->c-name! tmp-str)))
     (set! idx (ash 1 idx))
     (set! assign-vals (string-append assign-vals
-          tmp-str "=" (number->string idx) "\n"))
+          "val_" tmp-str "=" (number->string idx) "\n"))
             =][=
 ENDFOR      =][=
 
 (out-pop)
 (shell assign-vals
 "{ ${AGexe} -L" (dirname (tpl-file #t)) " ${tmp_dir}/" base-file-name ".def"
-" || die 'Could not build enumeration'\n"
+" || die 'Could not build enumeration\n'"
+      "\"`cat ${tmp_dir}/" base-file-name ".def`\"\n"
 "cp " base-file-name ".[ch] ${tmp_dir}/.\n"
 "rm -f " base-file-name ".[ch]\n} 1>&2")
 (out-move (string-append base-file-name ".h"))

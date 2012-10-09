@@ -27,19 +27,22 @@
 (set!   enum-type       (string-downcase enum-type))
 (define cmd-count       (string-append PFX-STR "_COUNT_" ENUM-TYPE))
 (define enum-val-offset (if (exist? "cmd[0]") 1 0))
+(define insert-undef    #t)
 (define invalid-name    (if (exist? "invalid-name")
                             (string->c-name! (get "invalid-name"))
                             "invalid"))
 (define INVALID-NAME    (string-upcase invalid-name))
-(define max-cmd-width 0)
-(define min-cmd-width 99999)
+(define max-cmd-width   0)
+(define min-cmd-width   99999)
+(define bit-count       (+ 1 (high-lim "cmd")))
+(define undef-str (if (exist? "undef-str") (get "undef-str") "* UNDEFINED *"))
 
 (make-tmp-dir)
 (out-push-new (string-append tmp-dir "/commands"))
 
 =][=
 
-FOR cmd         =][=
+FOR cmd                 =][=
 
   (set! tmp-str (string-downcase! (string->c-name! (get "cmd"))))
   (set! idx (string-length tmp-str))
@@ -47,31 +50,34 @@ FOR cmd         =][=
   (if (< idx min-cmd-width) (set! min-cmd-width idx))
   (sprintf "%5u %s\n" (for-index) tmp-str) =][=
 
-ENDFOR cmd      =][=
+ENDFOR cmd              =][=
 
 (out-pop)
 (if (< max-cmd-width 8) (set! max-cmd-width 8))
 
-=][=
-CASE invalid-val =][=
-!E               =][=
+                        =][=
+CASE invalid-val        =][=
+!E                      =][=
   (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
   =][=
 
-== "~0"          =][=
+== "~0"                 =][=
   (set! enum-val-offset 0)
+  (set! insert-undef    #f)
   (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
   =][=
 
-== ""            =][=
+== ""                   =][=
   (set! enum-val-offset 0)
+  (set! insert-undef    #f)
   (define invalid-cmd cmd-count)
   =][=
 
-*                =][=
+*                       =][=
   (error "if invalid-val exists, it is constrained to:
 	'' (empty) or '~0'.")
   =][=
 
 ESAC
+
 \=]

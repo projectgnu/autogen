@@ -94,10 +94,9 @@ ag_scm_first_for_p(SCM which)
     if (! AG_SCM_STRING_P(which))
         return (for_state->for_isfirst) ? SCM_BOOL_T : SCM_BOOL_F;
 
-    which = (p->for_isfirst ? SCM_BOOL_T : SCM_BOOL_F);
+    which = p->for_isfirst ? SCM_BOOL_T : SCM_BOOL_F;
     return which;
 }
-
 
 /*=gfunc last_for_p
  *
@@ -115,10 +114,28 @@ ag_scm_last_for_p(SCM which)
     if (p == NULL)
         return SCM_UNDEFINED;
 
-    which = (p->for_islast ? SCM_BOOL_T : SCM_BOOL_F);
+    which = p->for_islast ? SCM_BOOL_T : SCM_BOOL_F;
     return which;
 }
 
+/*=gfunc found_for_p
+ *
+ * what:    is current index in list?
+ * exparg:  for_var, which for loop, opt
+ * doc:     Returns SCM_BOOL_T if present, otherwise SCM_BOOL_F.
+ *          Outside of any FOR loop, it returns SCM_UNDEFINED.
+ *          @xref{FOR}.
+=*/
+SCM
+ag_scm_found_for_p(SCM which)
+{
+    for_state_t * p = find_for_state(which);
+    if (p == NULL)
+        return SCM_UNDEFINED;
+
+    which = p->for_not_found ? SCM_BOOL_F : SCM_BOOL_T;
+    return which;
+}
 
 /*=gfunc for_index
  *
@@ -140,7 +157,6 @@ ag_scm_for_index(SCM which)
     which = AG_SCM_INT2SCM(p->for_index);
     return which;
 }
-
 
 /*=gfunc for_from
  *
@@ -338,7 +354,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
      */
     for (;;) {
         int  next_ix;
-        bool have_next = next_def(invert, &found);
+        for_state->for_not_found = ! next_def(invert, &found);
 
         if (loopLimit-- < 0) {
             fprintf(trace_fp, TRACE_FOR_STEP_TOO_FAR,
@@ -367,7 +383,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
         /*
          *  IF we have a non-base definition, use the old def context
          */
-        if (! have_next)
+        if (for_state->for_not_found)
             curr_def_ctx = ctx;
 
         /*
@@ -645,9 +661,9 @@ load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
  *
  *  @strong{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
  *  @code{for-sep} functions are disabled outside of the context of the
- *  @code{FOR} macro.  Likewise, the @code{first-for}, @code{last-for}
- *  and @code{for-index} functions are disabled outside of the range
- *  of a @code{FOR} block.
+ *  @code{FOR} macro.  Likewise, the @code{first-for?}, @code{last-for?}
+ *  @code{for-index}, and @code{found-for?} functions are disabled outside
+ *  of the range of a @code{FOR} block.
  *
  *  @strong{Also:} the @code{<value-name>} must be a single level name,
  *  not a compound name (@pxref{naming values}).

@@ -30,11 +30,20 @@
 echo creating $testname.def
 cat > $testname.def <<'_EOF_'
 AutoGen Definitions str2enum;
-cmd = one, two_3, four;
+
+cmd[0]  = one;
+cmd[3]  = three;
+cmd[7]  = seven;
+cmd[11] = eleven;
+cmd[19] = ninteen;
+
 type = kwd;
-mask = { m-name = one-four; m-bit = one, four; };
+mask = { m-name = one-seven; m-bit = one, seven; };
+mask = { m-name = not-one-seven; m-bit = three, eleven, ninteen; m-invert; };
 _EOF_
 
+cmd_list=`${SED} -n '/^cmd/{s/.*= *//;s/;//;p;}' $testname.def`
+cmd_list=`echo $cmd_list`
 # # # # # # # # # # EXPECTED OUTPUT FILES # # # # # # #
 
 echo creating $testname-h.base
@@ -43,8 +52,10 @@ cat > $testname-h.base <<- _EOF_
 	typedef enum {
 	    STR2M_INVALID_KWD = 0,
 	    STR2M_KWD_ONE      = 1,
-	    STR2M_KWD_TWO_3    = 2,
-	    STR2M_KWD_FOUR     = 3,
+	    STR2M_KWD_THREE    = 4,
+	    STR2M_KWD_SEVEN    = 8,
+	    STR2M_KWD_ELEVEN   = 12,
+	    STR2M_KWD_NINTEEN  = 20,
 	    STR2M_COUNT_KWD
 	} str2m_enum_t;
 
@@ -58,14 +69,21 @@ cat > $testname-h.base <<- _EOF_
 	_EOF_
 
 cat > $testname-c.base <<- _EOF_
-	static char const str2m_names[29] =
+	static char const str2m_names[45] =
 	/*     0 */ "* UNDEFINED *\0"
 	/*    14 */ "one\0"
-	/*    18 */ "two_3\0"
-	/*    24 */ "four";
+	/*    18 */ "three\0"
+	/*    24 */ "seven\0"
+	/*    30 */ "eleven\0"
+	/*    37 */ "ninteen";
 
-	static char const * str2m_name_table[] = {
-	        str2m_names+0,  str2m_names+14, str2m_names+18, str2m_names+24 };
+	static char const * str2m_name_table[STR2M_COUNT_KWD] = {
+	        str2m_names+0,  str2m_names+14, str2m_names+0,  str2m_names+0,
+	        str2m_names+18, str2m_names+0,  str2m_names+0,  str2m_names+0,
+	        str2m_names+24, str2m_names+0,  str2m_names+0,  str2m_names+0,
+	        str2m_names+30, str2m_names+0,  str2m_names+0,  str2m_names+0,
+	        str2m_names+0,  str2m_names+0,  str2m_names+0,  str2m_names+0,
+	        str2m_names+37 };
 
 	/**
 	 * Convert a command (keyword) to a str2m_enum_t enumeration value.
@@ -93,7 +111,8 @@ cat > $testname-c.base <<- _EOF_
 	char const *
 	str2m_name(str2m_enum_t id)
 	{
-	    if (id >= STR2M_COUNT_KWD) id = STR2M_INVALID_KWD;
+	    if (id >= STR2M_COUNT_KWD)
+	        return str2m_names;
 	    return str2m_name_table[id];
 	}
 	/* end of str2m.c */
@@ -132,15 +151,27 @@ cat > $testname-h2.base <<- _EOF_
 	#include <sys/types.h>
 	#include <inttypes.h>
 
-	#define STR2M_2_KWD_ONE           0x0001U
-	#define STR2M_2_KWD_TWO_3         0x0002U
-	#define STR2M_2_KWD_FOUR          0x0004U
+	/** bits defined for str2m_2_mask_t */
+	#define STR2M_2_KWD_ONE                0x00001U
+	#define STR2M_2_KWD_THREE              0x00008U
+	#define STR2M_2_KWD_SEVEN              0x00080U
+	#define STR2M_2_KWD_ELEVEN             0x00800U
+	#define STR2M_2_KWD_NINTEEN            0x80000U
 
-	/** bits in mask: one four */
-	#define STR2M_2_KWD_ONE_FOUR_MASK 0x0005U
+	/** bits in ONE_SEVEN mask:
+	 *  one   seven */
+	#define STR2M_2_KWD_ONE_SEVEN_MASK     0x00081U
 
-	#define STR2M_2_MAX_MASK_NAME_SIZE 15
-	typedef uint8_t str2m_2_mask_t;
+	/** bits omitted from NOT_ONE_SEVEN mask:
+	 *  three   eleven  ninteen */
+	#define STR2M_2_KWD_NOT_ONE_SEVEN_MASK 0x00081U
+
+	/** all bits in str2m_2_mask_t masks */
+	#define STR2M_2_KWD_MASK_ALL           0x80889U
+
+	/** buffer size needed to hold all bit names for str2m_2_mask_t masks */
+	#define STR2M_2_MAX_MASK_NAME_SIZE 31
+	typedef uint32_t str2m_2_mask_t;
 
 	extern str2m_2_mask_t
 	str2m_2_str2mask(char const * str, str2m_2_mask_t old);
@@ -148,16 +179,30 @@ cat > $testname-h2.base <<- _EOF_
 	extern size_t
 	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len);
 
+	#ifdef UINT64_MASK_INTERFACE
+	extern uint64_t
+	str2m_2_str2mask64(char const * str, uint64_t old);
+
+	extern size_t
+	str2m_2_mask64_2str(uint64_t mask, char * buf, size_t len);
+	#endif
+
 	#endif /* STR2ENUM_STR2M_2_H_GUARD */
 	_EOF_
 
-cat > $testname-c2.base <<- _EOF_
-	static char const str2m_2_names[15] =
-	/*     0 */ "one\0"
-	/*     4 */ "two_3\0"
-	/*    10 */ "four";
+mask_all=`
+    sed -n '/KWD_MASK_ALL/{;s/.*0x/0x/;s/UL*$//;p;q;}' $testname-h2.base`
 
-	static char const * str2m_2_name_table[] = {
+cat > $testname-c2.base <<- _EOF_
+	static char const str2m_2_names[45] =
+	/*     0 */ "one\0"
+	/*     4 */ "* UNDEFINED *\0"
+	/*    18 */ "three\0"
+	/*    24 */ "seven\0"
+	/*    30 */ "eleven\0"
+	/*    37 */ "ninteen";
+
+	static char const * str2m_2_name_table[STR2M_2_COUNT_KWDBNM] = {
 
 	/**
 	 * Convert a command (keyword) to a str2m_2_enum_t enumeration value.
@@ -185,7 +230,8 @@ cat > $testname-c2.base <<- _EOF_
 	static char const *
 	str2m_2_name(str2m_2_enum_t id)
 	{
-	    if (id >= STR2M_2_COUNT_KWDBNM) id = STR2M_2_COUNT_KWDBNM;
+	    if (id >= STR2M_2_COUNT_KWDBNM)
+	        return "* UNDEFINED *";
 	    return str2m_2_name_table[id];
 	}
 
@@ -256,6 +302,13 @@ cat > $testname-c2.base <<- _EOF_
 	        str += val_len;
 	    }
 	}
+	#ifdef UINT64_MASK_INTERFACE
+	uint64_t
+	str2m_2_str2mask64(char const * str, uint64_t old)
+	{
+	    return str2m_2_str2mask(str, (str2m_2_mask_t)old);
+	}
+	#endif
 
 	/**
 	 * Convert a str2m_2_mask_t mask to a string.
@@ -301,6 +354,13 @@ cat > $testname-c2.base <<- _EOF_
 	    }
 	    return (res == 0) ? 1 : res;
 	}
+	#ifdef UINT64_MASK_INTERFACE
+	size_t
+	str2m_2_mask64_2str(uint64_t mask, char * buf, size_t len)
+	{
+	    return str2m_2_mask2str((str2m_2_mask_t)mask, buf, len);
+	}
+	#endif
 	/* end of str2m-2.c */
 	_EOF_
 
@@ -329,11 +389,12 @@ cmp -s $fpair || \
 
 echo running $testname-2.c program
 chmod 666 $testname-2.c
+cmd_sum=`echo $cmd_list | sed 's/ / + /g'`
 cat >> $testname-2.c <<- _EOF_
 	#include <stdio.h>
 	int main(int argc, char ** argv) {
 	    str2m_2_mask_t mask =
-	        str2m_2_str2mask("one + two_3 | four", 0);
+	        str2m_2_str2mask("${cmd_sum}", 0);
 	    char buf[STR2M_2_MAX_MASK_NAME_SIZE];
 	    size_t l = str2m_2_mask2str(mask, buf, STR2M_2_MAX_MASK_NAME_SIZE);
 
@@ -344,10 +405,10 @@ cat >> $testname-2.c <<- _EOF_
 	                STR2M_2_MAX_MASK_NAME_SIZE, (unsigned int)l);
 	        return 1;
 	    }
-	    mask = str2m_2_str2mask("- one", mask);
-	    if (mask != (STR2M_2_KWDBNM_TWO_3 | STR2M_2_KWDBNM_FOUR)) {
+	    mask = str2m_2_str2mask("- three - eleven - ninteen", mask);
+	    if (mask != STR2M_2_KWD_NOT_ONE_SEVEN_MASK) {
 	        fprintf(stderr, "0x%04X != 0x%04X\n", mask,
-	                (STR2M_2_KWDBNM_TWO_3 | STR2M_2_KWDBNM_FOUR));
+	                STR2M_2_KWD_NOT_ONE_SEVEN_MASK);
 	        return 1;
 	    }
 	    return 0;
@@ -357,7 +418,8 @@ cat >> $testname-2.c <<- _EOF_
 ${CC:-cc} -o ${testname} $testname-2.c || \
     failure "cannot compile $testname-2.c"
 ./${testname} > ${testname}-btest
-echo "0x0007 --> 15 bytes: 'one two_3 four'" > ${testname}-bbase
+echo "$mask_all --> $(( ${#cmd_list} + 1 )) bytes: '$cmd_list'" \
+    > ${testname}-bbase
 fpair="${testname}-bbase ${testname}-btest"
 cmp -s $fpair || \
     failure "$testname $fpair run failed`echo

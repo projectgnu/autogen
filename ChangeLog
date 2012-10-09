@@ -1,3 +1,13 @@
+2012-10-12  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/funcFor.c (ag_scm_found_for_p): new function.  Tells you
+	if you are on a skipped over entry.
+	* agen5/autogen.h (for_state): add a field to hold not-found state
+	* autoopts/tpl/str2enum.tpl: polishing
+	* autoopts/tpl/str2init.tlib: likewise
+	* autoopts/tpl/str2mask.tpl: likewise
+	* agen5/test/str2m.test: likewise
+
 2012-10-06  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expOutput.c (ag_scm_out_move): short circuit process if

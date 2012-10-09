@@ -296,6 +296,7 @@ struct for_state {
     char *        for_name;     //!< name of iterator (not allocated)
     bool          for_islast;   //!< true for last iteration
     bool          for_isfirst;  //!< true for first iteration
+    bool          for_not_found;//!< usually false, true with sparse arrays
     jmp_buf       for_env;      //!< long jump buffer (BREAK, CONTINUE)
 };
 
