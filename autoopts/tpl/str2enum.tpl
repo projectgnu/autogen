@@ -441,8 +441,8 @@ DEFINE cvt-chars
     unsigned int ix;
 
     /* too short, too long or followed immediately by a name char... */
-    if (  (len <  [=(. min-cmd-width)=])
-       || (len >= [=(. max-cmd-width)=])
+    if (  (len < [=(. min-cmd-width)=])
+       || (len > [=(. max-cmd-width)=])
        || isalnum((unsigned)str[len]) )
         return [=(. invalid-cmd)=];
 
