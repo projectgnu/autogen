@@ -179,14 +179,6 @@ cat > $testname-h2.base <<- _EOF_
 	extern size_t
 	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len);
 
-	#ifdef UINT64_MASK_INTERFACE
-	extern uint64_t
-	str2m_2_str2mask64(char const * str, uint64_t old);
-
-	extern size_t
-	str2m_2_mask64_2str(uint64_t mask, char * buf, size_t len);
-	#endif
-
 	#endif /* STR2ENUM_STR2M_2_H_GUARD */
 	_EOF_
 
@@ -302,13 +294,6 @@ cat > $testname-c2.base <<- _EOF_
 	        str += val_len;
 	    }
 	}
-	#ifdef UINT64_MASK_INTERFACE
-	uint64_t
-	str2m_2_str2mask64(char const * str, uint64_t old)
-	{
-	    return str2m_2_str2mask(str, (str2m_2_mask_t)old);
-	}
-	#endif
 
 	/**
 	 * Convert a str2m_2_mask_t mask to a string.
@@ -354,13 +339,6 @@ cat > $testname-c2.base <<- _EOF_
 	    }
 	    return (res == 0) ? 1 : res;
 	}
-	#ifdef UINT64_MASK_INTERFACE
-	size_t
-	str2m_2_mask64_2str(uint64_t mask, char * buf, size_t len)
-	{
-	    return str2m_2_mask2str((str2m_2_mask_t)mask, buf, len);
-	}
-	#endif
 	/* end of str2m-2.c */
 	_EOF_
 

@@ -149,16 +149,6 @@ IF (not (exist? "no-name"))   =]
 ENDIF no name
 
 =]
-	#ifdef UINT64_MASK_INTERFACE
-	extern uint64_t
-	[=(. base-type-name)
-		=]_str2mask64(char const * str, uint64_t old);
-
-	extern size_t
-	[=(. base-type-name)
-		=]_mask64_2str(uint64_t mask, char * buf, size_t len);
-	#endif
-
 	_EOF_
 
 grep -E '^#endif .*_GUARD ' ${hdr_file}
@@ -263,14 +253,7 @@ exec 4<&-
         have_data = 1;
         str += val_len;
     }
-}
-#ifdef UINT64_MASK_INTERFACE
-uint64_t
-[=(. base-type-name)=]_str2mask64(char const * str, uint64_t old)
-{
-    return [=(. base-type-name)=]_str2mask(str, ([=(. mask-name)=])old);
-}
-#endif[=
+}[=
 
 IF (not (exist? "no-name"))   =]
 
@@ -317,14 +300,7 @@ size_t
         res += l;
     }
     return (res == 0) ? 1 : res;
-}
-#ifdef UINT64_MASK_INTERFACE
-size_t
-[=(. base-type-name)=]_mask64_2str(uint64_t mask, char * buf, size_t len)
-{
-    return [=(. base-type-name)=]_mask2str(([=(. mask-name)=])mask, buf, len);
-}
-#endif[=
+}[=
 ENDIF dispatch=][=
 
   FOR add-on-text               =][=

@@ -54,7 +54,7 @@
 ;;   undef-str    by default, the display string for an undefined value is
 ;;                "* UNDEFINED *".  Use this to change that.
 ;;   equate       A series of punctuation characters considered equivalent.
-;;                Typically, "-_" but sometimes (Tandem) "-_^".
+;;                Typically, "-_" but sometimes (Tandem) "-_^".  Do not use '#'
 ;;
 ;;   dispatch     describes the format of handler functions:
 ;;      d-nam     printf format string for constructing the command name.
@@ -98,13 +98,7 @@ CASE (suffix)                   =][= #
 ;;;
 ;;;=][=
 == h                            =][=
-INVOKE init-header              =][= DEBUG =][=
-
-  FOR add-on-text               =][=
-    IF (= (get "ao-file") "enum-header") =]
-[= ao-text                      =][=
-    ENDIF correct type          =][=
-  ENDFOR add-on-text            =]
+INVOKE init-header              =]
 
 typedef enum {[=
     (if (> enum-val-offset 0)
@@ -113,7 +107,13 @@ typedef enum {[=
     [= (. cmd-count) =][=
     (if (= (get "invalid-val") "~0")
         (string-append ",\n    " invalid-cmd " = ~0") ) =]
-} [= (. enum-name) =];
+} [= (. enum-name) =];[=
+
+  FOR add-on-text               =][=
+    IF (= (get "ao-file") "enum-header") =]
+[= ao-text                      =][=
+    ENDIF correct type          =][=
+  ENDFOR add-on-text            =]
 
 extern [= (. enum-name)         =]
 find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=]);[=
@@ -227,8 +227,7 @@ readonly max_cmd_width=[=(. max-cmd-width)=]
 readonly min_cmd_width=[=(. min-cmd-width)=]
 [= IF (exist? "equate") =]
 equate_from='[=(define equate-from (get "equate")) equate-from=]'
-equate_to=`echo "$equate_from" | sed 's/\(.\).*/\1/'`
-equate_to=`echo "$equate_from" | tr "$equate_from" "$equate_to"`
+equate_to=`echo "$equate_from" | sed "s#.#[=(substring equate-from 0 1)=]#g"`
 [= ENDIF =]
 mk_enum_list() {
     chmod a+w ${tmp_dir}/commands
