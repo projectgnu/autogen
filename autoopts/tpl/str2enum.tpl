@@ -4,91 +4,18 @@
 # keyword parsing code
 
 =][=
- (emit (dne " *  " "/*  ")) (emit "\n * \n")
- (if (exist? "copyright")
-     (license-description
-         (get "copyright.type" "unknown")
-         (get "package" (shell "basename `pwd`"))
-         " * "
-         (get "copyright.owner" (get "copyright.author" "unknown")) )
-     (license-description "mbsd" "str2enum" " * " "Bruce Korb")
+
+(emit (dne " *  " "/*  ")) (emit "\n * \n")
+(if (exist? "copyright")
+    (license-description
+        (get "copyright.type" "unknown")
+        (get "package" (shell "basename `pwd`"))
+        " * "
+        (get "copyright.owner" (get "copyright.author" "unknown")) )
+    (license-description "mbsd" "str2enum" " * " "Bruce Korb")
 )
- =][= # /*
 
-;; DESCRIPTION:
-;; Determine the enumeration value associated with a name.  This can then be
-;; used to automatically call a dispatch procedure.  A procedure to convert
-;; that integer back into a string can also be generated.
-
-;; PURPOSE:
-;;    This template will produce a header and a source file.
-;;    You supply a list of commands as values for "cmd" and it will produce
-;;    an enumeration of these commands and code that will match strings against
-;;    these command names.
-
-;; YOU SUPPLY:
-;;   an AutoGen definitions file.  It must contain a list of values for
-;;   "cmd".  e.g.:  cmd = first, second, third;
-
-;;   You may optionally supply any of the following:
-
-;;   partial      Accept unique partial matches of at least two characters.
-;;   base-name    The base name is normally derived from the definitions
-;;                file name.  This will override that and cause the
-;;                output files to have this "base name".
-;;   prefix       By default, the enumeration value uses the first segment
-;;                of the base name as the prefix for each name.  This
-;;                overrides that.
-;;   type         After the prefix, each enum value has a "type" segment.
-;;                By default, this is "cmd", but may be specified with this.
-;;   invalid-val  Invalid enumeration value.  By default, 0 (zero).
-;;                Alternatively, you may select "~0" to be the invalid value
-;;                or specify it to be empty.  Then there is no specific
-;;                invalid value, but the count value may be used.
-;;   invalid-name By default, "invalid", but you may also select "unused" or
-;;                any other string that suits your fancy.
-;;   alias        A special character can be used to represent a command. e.g.
-;;                   alias = "< source"; alias = "# comment"; alias = "? help";
-;;                will cause a '<' character to represent "source",
-;;                a '#' to represent comment, and '?' for help.
-;;   undef-str    by default, the display string for an undefined value is
-;;                "* UNDEFINED *".  Use this to change that.
-;;   equate       A series of punctuation characters considered equivalent.
-;;                Typically, "-_" but sometimes (Tandem) "-_^".  Do not use '#'
-;;
-;;   dispatch     describes the format of handler functions:
-;;      d-nam     printf format string for constructing the command name.
-;;                The formatting element must be "%s" and the rest of
-;;                the format string must be valid for a C procedure name.
-;;      d-arg     The type and name of argument(s) to handler functions.
-;;                The argument name must be separated from type information
-;;                by at least one space character (separate any asterisks),
-;;                and place a comma between each argument next to the
-;;                argument name.  This text gets inserted unmodified into
-;;                the procedure definition.
-;;      d-ret     the function return type.
-
-;;      The handler functions will have the command enumeration as its first
-;;      first argument, a pointer to a constant string that will be the
-;;      character *after* the parsed command (keyword) name, plus any "d-arg"
-;;      arguments that follow that.  In addition to providing a handler for
-;;      all the named "cmd"s, you must provide one for "invalid".
-
-;; THE TEMPLATE PRODUCES:
-
-;;   <basename>.h The enumeration of the commands in the form:
-;;                <PREFIX>_CMD_<COMMAND> of type <base_name>_enum_t
-;;                plus two extra entries: <PREFIX>_INVALID_CMD, and
-;;                <PREFIX>_COUNT_CMD.
-
-;;                External declarations of the  generated
-;;                procedure(s).
-
-;;   <basename>.c The implementing code
-
-;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-;; =][=
+=][=
 
 CASE (suffix)                   =][= #
 
@@ -99,6 +26,8 @@ CASE (suffix)                   =][= #
 ;;;=][=
 == h                            =][=
 INVOKE init-header              =]
+#include <sys/types.h>
+#include <inttypes.h>
 
 typedef enum {[=
     (if (> enum-val-offset 0)
@@ -113,12 +42,14 @@ typedef enum {[=
     IF (= (get "ao-file") "enum-header") =]
 [= ao-text                      =][=
     ENDIF correct type          =][=
-  ENDFOR add-on-text            =]
+  ENDFOR add-on-text            =][=
+
+  IF (not (exist? "no-code"))   =]
 
 extern [= (. enum-name)         =]
-find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=]);[=
+[=(. find-func-name)=](char const * str[=(. len-arg)=]);[=
 
-  IF (exist? "dispatch")        =]
+    IF (exist? "dispatch")      =]
 
 typedef [= dispatch.d-ret =]([=(. base-type-name)=]_handler_t)(
     [=
@@ -133,9 +64,7 @@ typedef [= dispatch.d-ret =]([=(. base-type-name)=]_handler_t)(
 (if (not (exist? "dispatch.d-nam"))
     (error "dispatch needs callout procedure name format ('d-nam')"))
 
-(define proc-list (shell "mk_proc_list"))
-
-proc-list =];
+(shell "mk_proc_list") =];
 
 extern [= dispatch.d-ret =]
 disp_[=(. base-type-name)=](char * str[=
@@ -143,17 +72,17 @@ disp_[=(. base-type-name)=](char * str[=
          (string-append len-arg ", " (get "dispatch.d-arg"))
          len-arg) =]);[=
 
-  ENDIF  dispatch exists        =][=
+    ENDIF  dispatch exists      =][=
 
-  IF (not (exist? "no-name"))   =]
+    IF (not (exist? "no-name")) =]
 
 extern char const *
 [=(. base-type-name)=]_name([= (. enum-name) =] id);[=
 
-  ENDIF dispatch
+    ENDIF dispatch
 
 =]
-
+[=ENDIF (not (exist? "no-code"))=]
 #endif /* [=(. header-guard)    =] */
 [= #
 
@@ -166,16 +95,12 @@ extern char const *
 
 =]
  */
-#include "[=
+#include "[= ;;"
+    (if (exist? "no-code") (out-delete))
     (if move-output-file
         (out-move (string-append base-file-name ".c")))
-    header-file                 =]"[=
-  IF (exist? "no-length")       =]
-#include <ctype.h>
-#include <string.h>[=
-  ELIF (or (exist? "no-case") (exist? "alias")) =]
-#include <ctype.h>[=
-  ENDIF                         =][=
+    header-file                 =]"[=#"=][=
+  (. extra-c-incl)              =][=
 
   INVOKE run-gperf              =][=
   INVOKE mk-finder              =][=
@@ -203,14 +128,36 @@ ESAC  suffix c/h
 ;;;
 ;;;=][=
 
-DEFINE init-header      =][=
+DEFINE init-header              =][=
 
-(define enum-type "cmd")=][=
-INCLUDE "str2init.tlib" =][=
+(define computed-length #f)
+(define return-length   #f)
+(define tmp-str         "")
+(define extra-c-incl    "")
+(define len-arg         ", size_t len")
+(define enum-type       "cmd")  =][=
 
-(define tmp-str     "")
-(define len-arg     (if (exist? "no-length") ""
-                        ", unsigned int len"))
+INCLUDE "str2init.tlib"         =][=
+  CASE length                   =][=
+  !E                            =][=
+    (if (or (exist? "no-case") (exist? "alias"))
+      (set! extra-c-incl "\n#include <ctype.h>")) =][=
+
+  = provided                    =][=
+    (if (or (exist? "no-case") (exist? "alias"))
+      (set! extra-c-incl "\n#include <ctype.h>")) =][=
+
+  = returned                    =][=
+    (set! extra-c-incl "\n#include <ctype.h>\n#include <string.h>")
+    (set! len-arg         ", size_t * len")
+    (set! computed-length #t)
+    (set! return-length   #t)   =][=
+
+  *                             =][=
+    (set! extra-c-incl "\n#include <ctype.h>\n#include <string.h>")
+    (set! computed-length #t)
+    (set! len-arg "")           =][=
+  ESAC                          =][=
 
 (define equate-from "")
 (define equate-to   "")
@@ -235,7 +182,7 @@ mk_enum_list() {
     exec 3< ${tmp_dir}/commands
     declare n
     declare -u c
-    declare fmt='\n    [=(string-append PFX-STR "_" ENUM-TYPE)
+    declare fmt='\n    [=(string-append PFX-STR ENUM-TYPE)
                 =]_'"%-${max_cmd_width}s = %s,"
     while read -u3 n c
     do
@@ -264,22 +211,36 @@ IF (exist? "dispatch")
 =]
 mk_proc_list() {
     exec 3< ${tmp_dir}/commands
-    declare n
     declare -l c
     {
         echo invalid
-        while read -u3 n c
+        while read -u3 _ c
         do
             echo $c
         done
     } | columns -f '[= dispatch.d-nam =]' -I8 --spread=1 -S,
     exec 3<&-
 }
+mk_proc_dispatch() {
+    exec 3< ${tmp_dir}/commands
+    declare -l c
+    declare -u C
+    declare fmt=$(printf '\n        [[=(string-append PFX-STR ENUM-TYPE)
+                =]_%%-%us] = ' ${max_cmd_width})"[= dispatch.d-nam =],"
+
+    while read -u3 _ c
+    do
+        C=$c
+        printf "$fmt" $C $c
+    done | sed '$s/,$/ };/'
+
+    exec 3<&-
+}
 mk_lengths() {
     exec 3< ${tmp_dir}/commands
     declare n=`expr ${max_cmd_width} + 1`
     declare -u c
-    declare fmt="[[=(string-append PFX-STR "_" ENUM-TYPE)
+    declare fmt="[[=(string-append PFX-STR ENUM-TYPE)
                 =]_%-${n}s ="
     while read -u3 n c
     do
@@ -320,37 +281,11 @@ ENDDEF init-header
 ;;;
 ;;;=][=
 
-DEFINE mk-finder                =][=
-
-  IF (or (exist? "partial") (not (exist? "no-name"))) =]
-[=
-    (define str-table-name (string-append pfx-str "_names"))
-    (string-table-new str-table-name)
-
-    (out-push-new)
-    (if insert-undef
-        (emit (string-table-add-ref str-table-name undef-str) "\n") )
-    (define start-ix (if (or insert-undef (= enum-val-offset 0)) 0 1))
-    =][=
-
-    FOR cmd (for-from start-ix) (for-by 1) (for-sep "\n")
-       =][=
-       (set! tmp-str (if (found-for?) (get "cmd") undef-str))
-       (string-table-add-ref str-table-name tmp-str)
-       =][=
-    ENDFOR                      =][=
-
-    (out-suspend "main")
-    (emit-string-table str-table-name)
-    (emit "\nstatic char const * " pfx-str "_name_table[" cmd-count "] = {\n")
-    (out-resume "main")
-    (shell "columns -I8 -S, --spread=1 --end=' };' <<_EOF_\n"
-        (out-pop #t) "\n_EOF_" )=][=
-  ENDIF  partial or ! no-name   =]
+DEFINE mk-finder                =]
 
 /**
  * Convert a command (keyword) to a [= (. enum-name) =] enumeration value.[=
-   IF (exist? "no-length")      =]
+   IF (. computed-length)       =]
  * The length of the command is computed by calling \a strspn()
  * on the input argument.[=
    ENDIF                        =][=
@@ -359,15 +294,24 @@ DEFINE mk-finder                =][=
  *   \a [=(. cmd-chars)     =][=
    ENDIF                        =]
  *
- * @param[in] str  a string that should start with a known key word.[=
-   IF (not (exist? "no-length"))=]
- * @param[in] len  the length of the keyword at \a str.[=
-   ENDIF                        =]
+ * @param[in] str   a string that should start with a known key word.[=
+
+   CASE (out-push-new)
+        (. len-arg)             =][=
+   *==  "size_t len"            =]
+ * @param[in] len   the length of the keyword at \a str.[=
+   *==  "size_t * len"          =]
+ * @param[out] len  the length of the keyword found at \a str.[=
+   ESAC len-arg                 =][=
+   (define len-descrip (out-pop #t))
+   len-descrip
+
+=]
  * @returns the enumeration value.
  * If not found, that value is [=(. invalid-cmd)=].
  */
 [= (. enum-name) =]
-find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=])
+[=(. find-func-name)=](char const * str[=(. len-arg)=])
 {[=
   IF (exist? "alias")           =]
   switch (*str) {[=
@@ -375,7 +319,7 @@ find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=])
   case '[= (define cmd (get "alias"))
            (substring cmd 0 1)=]': return [=
            (set! cmd (shellf "echo %s" (substring cmd 1)))
-           (string-append PFX-STR "_" ENUM-TYPE "_"
+           (string-append PFX-STR ENUM-TYPE "_"
                    (string->c-name! (string-upcase! cmd))) =];[=
     ENDFOR alias                =]
   default:
@@ -385,43 +329,37 @@ find_[=(. base-type-name)=]_id(char const * str[=(. len-arg)=])
   }
 
   {[=
-  ENDIF   alias                 =][=
-
-  IF (exist? "no-length")       =]
-    static char const accept[] =
-        [= (kr-string cmd-chars) =];
-    unsigned int len = strspn(str, accept);[=
-  ENDIF no-length
-
-=]
+  ENDIF   alias                 =]
     [= (. base-type-name) =]_map_t const * map;[=
+
+  IF (define len-param-name (if computed-length "clen" "len"))
+     (define check-length   (if return-length "\n    *len = clen;" "\n"))
+     computed-length            =]
+    static char const accept[] =
+        [= (set! check-length (string-append
+        check-length
+        "\n    if (isalnum((unsigned)str[clen]))"
+        "\n        return " invalid-cmd ";" ))
+
+        (kr-string cmd-chars)
+        =];
+    unsigned int clen = strspn(str, accept);[=
+  ENDIF computed-length
+
+=][=
   IF (or (exist? "no-case") (exist? "equate"))   =][=
     INVOKE cvt-chars            =][=
+  ELSE  =][= (. check-length)   =][=
+  ENDIF                        \=]
 
-  ENDIF                         =]
-    map = find_[=(. base-type-name)=]_name(str, len);[=
-  IF (not (exist? "partial")) =]
-    return (map == NULL) ? [=(. invalid-cmd)=] : map->[=(. pfx-str)=]_id;[=
-  ELSE  =]
-    if (map != NULL)
-        return map->[=(. pfx-str)=]_id;
-    if (len < 2)
-        return [=(. invalid-cmd)=];
-    {
-        [= (. enum-name) =] res = [=(. invalid-cmd)=];
-        int ix = 0;
+    map = find_[=(. base-type-name)=]_name(str, [= (. len-param-name) =]);[=
 
-        while (++ix < [=(. cmd-count)=]) {
-            if (strncmp([=(. pfx-str)=]_name_table[ix], str, len) == 0) {
-                if (res != [=(. invalid-cmd)=])
-                    return [=(. invalid-cmd)=];
-                res = ([= (. enum-name) =])ix;
-            }
-        }
-        return res;
-    }[=
-  ENDIF =][=
-  (if (exist? "alias") (emit "\n  }")) =]
+  IF (not (exist? "partial"))   =]
+    return (map == NULL) ? [=(. invalid-cmd)=] : map->[=(. enum-field)=];[=
+  ELSE                          =][=
+    INVOKE find-part-match      =][=
+  ENDIF                         =][=
+  (if (exist? "alias") "\n  }") =]
 }
 [=
 
@@ -434,19 +372,22 @@ ENDDEF mk-finder
 ;;;
 ;;;=][=
 
-DEFINE cvt-chars
+DEFINE cvt-chars                =][=
+
+(define min-len (if (and (exist? "partial") (> min-cmd-width 2))
+                2 min-cmd-width))
 
 =]
     char name_buf[[=(+ 1 max-cmd-width)=]];
     unsigned int ix;
 
     /* too short, too long or followed immediately by a name char... */
-    if (  (len < [=(. min-cmd-width)=])
-       || (len > [=(. max-cmd-width)=])
-       || isalnum((unsigned)str[len]) )
+    if (  ([=(sprintf "%s < %u" len-param-name min-len)=])
+       || ([=(sprintf "%s > %u" len-param-name max-cmd-width)=])
+       || isalnum((unsigned)str[[=(. len-param-name)=]]) )
         return [=(. invalid-cmd)=];
 
-    for (ix = 0; ix < len; ix++) {
+    for (ix = 0; ix < [=(. len-param-name)=]; ix++) {
         int ch = (unsigned char)str[ix];[=
   IF (exist? "equate")          =]
         switch (ch) {
@@ -469,6 +410,8 @@ DEFINE cvt-chars
   ENDIF no-case/equate          =]
     }
     str = name_buf;[=
+  (if return-length (string-append "\n    *len = clen;"))
+  =][=
 
 ENDDEF cvt-chars
 
@@ -484,9 +427,7 @@ DEFINE mk-dispatch
  * Dispatch a [=(. base-type-name)=] function, based on the keyword.
  *
  * @param[in] str  a string that should start with a known key word.[=
-   IF (not (exist? "no-length"))=]
- * @param[in] len  the length of the keyword at \a str.[=
-   ENDIF =]
+   (. len-descrip) =]
  * @returns [= dispatch.d-ret =], returned by the dispatched function.
  */
 [= dispatch.d-ret =]
@@ -498,12 +439,14 @@ disp_[=(. base-type-name)=](char * str[=
         (string-append len-arg ", " (get "dispatch.d-arg"))
         len-arg) =])
 {
-    static [=(. base-type-name)=]_handler_t * const dispatch[] = {
-[= (. proc-list) =] };
-    [= (. enum-name) =] id = find_[=(. base-type-name)=]_id(str[=
-        (if (exist? "no-length") "" ", len") =]);
+    static [=(. base-type-name)=]_handler_t * const dispatch[] = {[=
+        (shell "mk_proc_dispatch") =]
+
     static unsigned int keywd_len[] = {[=
         (shell "mk_lengths") =] };
+
+    [= (. enum-name) =] id = [=(. find-func-name)=](str[=
+        (if (> (string-length len-arg) 0) ", len" "") =]);
     unsigned int klen = [=
   IF (exist? "alias") =](! isalnum((unsigned)*str)) ? 1 : [=
   ENDIF  =]keywd_len[id];
@@ -533,6 +476,67 @@ ENDDEF mk-dispatch
 
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;;;
+;;;  Search through the alphabetized indexes for a unique partial match.
+;;;
+;;;=][=
+
+DEFINE find-part-match          =]
+    if (map != NULL)
+        return map->[=(. enum-field)=];
+    {
+        static unsigned int const ix_map[] = {
+[=
+
+(out-push-new)
+
+=]
+    sed 's/:.*//' ${tmp_dir}/table  | \
+    while read ix
+    do
+        echo $(( ix - 1 ))
+    done | columns --spread=1 -S, -I12 --end ' };'
+[=
+
+(shell (out-pop #t))
+
+=][= (define cmp-call (string-append
+        "strncmp(map->" name-field ", str, " len-param-name ")" )) =]
+        [= (. enum-name) =] res = [=(. invalid-cmd)=];
+        static int const HI = (sizeof(ix_map) / sizeof(ix_map[0])) - 1;
+        int lo = 0;
+        int hi = HI;
+        int av;
+        int cmp;
+
+        for (;;) {
+            av  = (hi + lo) / 2;
+            map = [=(. base-type-name)=]_table + ix_map[av];
+            cmp = [=(. cmp-call)=];
+            if (cmp == 0) break;
+            if (cmp > 0)
+                 hi = av - 1;
+            else lo = av + 1;
+            if (lo > hi)
+                return [=(. invalid-cmd)=];
+        }
+        res = map->[=(. enum-field)=];
+        if (av < HI) {
+            map = [=(. base-type-name)=]_table + ix_map[av + 1];
+            if ([=(. cmp-call)=] == 0)
+                return [=(. invalid-cmd)=];
+        }
+        if (av > 0) {
+            map = [=(. base-type-name)=]_table + ix_map[av - 1];
+            if ([=(. cmp-call)=] == 0)
+                return [=(. invalid-cmd)=];
+        }
+        return res;
+    }[=
+
+ENDDEF find-part-match
+
+;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+;;;
 ;;;  Make an enum to name converter.  If the input id is valid, we *must*
 ;;;  find an associated name.  The table is compact and starts with 0.
 ;;;
@@ -551,10 +555,34 @@ DEFINE mk-enum2name
 char const *
 [=(. base-type-name)=]_name([= (. enum-name) =] id)
 {
-    if (id >= [=(. cmd-count)=])
-        return [= (if insert-undef str-table-name
-            (string-append "\"" undef-str "\"") ) =];
-    return [=(. pfx-str)=]_name_table[id];
+    static char const undef[] = "[=
+        (if insert-undef "* UNDEFINED *" undef-str) =]";
+    static char const * const nm_table[] = {
+[=
+
+(out-push-new)
+
+=]
+exec 4< ${tmp_dir}/table
+while IFS='' read -u4 line
+do
+    str=${line%\"*}
+    line=${line%'}'*}
+    line=${line##*,}
+    echo "[${line}] = \"${str#*\"}\""
+done | columns -I8 -S, --spread=1 --end ' };'
+[=
+
+(shell (out-pop #t))
+
+=]
+    char const * res = undef;
+    if (id < [=(. cmd-count)=]) {
+        res = nm_table[id];
+        if (res == NULL)
+            res = undef;
+    }
+    return res;
 }
 [=
 
@@ -567,7 +595,7 @@ DEFINE run-gperf     =]
 [=
 (define table-fmt (string-append
                 "%-" (number->string (+ max-cmd-width 1))
-                "s " PFX-STR "_" ENUM-TYPE "_%s\n" ))
+                "s " PFX-STR ENUM-TYPE "_%s\n" ))
 (out-push-new)
 
 =][= #
@@ -585,7 +613,8 @@ DEFINE run-gperf     =]
 %readonly-tables
 %compare-strncmp
 
-%define slot-name               [= (. pfx-str) =]_name
+%define slot-name               [=
+(define name-field (string-append pfx-str "_name")) name-field =]
 %define hash-function-name      [=(. base-type-name)=]_hash
 %define lookup-function-name    find_[=(. base-type-name)=]_name
 %define word-array-name         [=(. base-type-name)=]_table
@@ -609,8 +638,9 @@ DEFINE run-gperf     =]
 
 #include "[=(. header-file)=]"
 typedef struct {
-    char const *    [= (. pfx-str) =]_name;
-    [= (. enum-name) =] [= (. pfx-str) =]_id;
+    char const *    [=(. name-field)=];
+    [= (. enum-name) =] [= (define enum-field (string-append pfx-str "_id"))
+                       enum-field =];
 } [=(. base-type-name)=]_map_t;
 %}
 
@@ -662,6 +692,16 @@ gperf [= (. base-file-name) =].gp | \
         -e '/^#\(ifdef\|else\|endif$\)/d' \
         -e 's/^\(const [=(. base-type-name)=]_map_t\)/static inline \1/' \
     > baseline
+
+sed -n -e '1,/_table\[\] =/d' \
+       -e '/^ *{$/d' \
+       -e '/^ *};/q' \
+       -e 's/^ *//' \
+       -e 's/}, {/},\
+{/' \
+       -e p baseline | \
+    grep -n -v '""'  | \
+    sort -t: -k2     > table
 
 sedcmd=`
     egrep '^#define ' baseline | \

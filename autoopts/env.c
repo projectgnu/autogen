@@ -43,23 +43,23 @@ do_env_opt(tOptState * os, char * env_name,
 LOCAL void
 doPrognameEnv(tOptions * pOpts, teEnvPresetType type)
 {
-    char const *  pczOptStr = getenv(pOpts->pzPROGNAME);
-    token_list_t* pTL;
-    int           sv_argc;
-    tAoUI         sv_flag;
-    char **       sv_argv;
+    char const *        env_opts = getenv(pOpts->pzPROGNAME);
+    token_list_t*       pTL;
+    int                 sv_argc;
+    proc_state_mask_t   sv_flag;
+    char **             sv_argv;
 
     /*
      *  No such beast?  Then bail now.
      */
-    if (pczOptStr == NULL)
+    if (env_opts == NULL)
         return;
 
     /*
      *  Tokenize the string.  If there's nothing of interest, we'll bail
      *  here immediately.
      */
-    pTL = ao_string_tokenize(pczOptStr);
+    pTL = ao_string_tokenize(env_opts);
     if (pTL == NULL)
         return;
 

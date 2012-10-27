@@ -60,7 +60,7 @@ cat > $testname-h.base <<- _EOF_
 	} str2m_enum_t;
 
 	extern str2m_enum_t
-	find_str2m_id(char const * str, unsigned int len);
+	find_str2m_kwd(char const * str, size_t len);
 
 	extern char const *
 	str2m_name(str2m_enum_t id);
@@ -69,34 +69,18 @@ cat > $testname-h.base <<- _EOF_
 	_EOF_
 
 cat > $testname-c.base <<- _EOF_
-	static char const str2m_names[45] =
-	/*     0 */ "* UNDEFINED *\0"
-	/*    14 */ "one\0"
-	/*    18 */ "three\0"
-	/*    24 */ "seven\0"
-	/*    30 */ "eleven\0"
-	/*    37 */ "ninteen";
-
-	static char const * str2m_name_table[STR2M_COUNT_KWD] = {
-	        str2m_names+0,  str2m_names+14, str2m_names+0,  str2m_names+0,
-	        str2m_names+18, str2m_names+0,  str2m_names+0,  str2m_names+0,
-	        str2m_names+24, str2m_names+0,  str2m_names+0,  str2m_names+0,
-	        str2m_names+30, str2m_names+0,  str2m_names+0,  str2m_names+0,
-	        str2m_names+0,  str2m_names+0,  str2m_names+0,  str2m_names+0,
-	        str2m_names+37 };
-
-	/**
 	 * Convert a command (keyword) to a str2m_enum_t enumeration value.
 	 *
-	 * @param[in] str  a string that should start with a known key word.
-	 * @param[in] len  the length of the keyword at \a str.
+	 * @param[in] str   a string that should start with a known key word.
+	 * @param[in] len   the length of the keyword at \a str.
 	 * @returns the enumeration value.
 	 * If not found, that value is STR2M_INVALID_KWD.
 	 */
 	str2m_enum_t
-	find_str2m_id(char const * str, unsigned int len)
+	find_str2m_kwd(char const * str, size_t len)
 	{
 	    str2m_map_t const * map;
+
 	    map = find_str2m_name(str, len);
 	    return (map == NULL) ? STR2M_INVALID_KWD : map->str2m_id;
 	}
@@ -111,9 +95,18 @@ cat > $testname-c.base <<- _EOF_
 	char const *
 	str2m_name(str2m_enum_t id)
 	{
-	    if (id >= STR2M_COUNT_KWD)
-	        return str2m_names;
-	    return str2m_name_table[id];
+	    static char const undef[] = "* UNDEFINED *";
+	    static char const * const nm_table[] = {
+	        [   STR2M_KWD_ELEVEN] = "eleven",  [  STR2M_KWD_NINTEEN] = "ninteen",
+	        [      STR2M_KWD_ONE] = "one",     [    STR2M_KWD_SEVEN] = "seven",
+	        [    STR2M_KWD_THREE] = "three" };
+	    char const * res = undef;
+	    if (id < STR2M_COUNT_KWD) {
+	        res = nm_table[id];
+	        if (res == NULL)
+	            res = undef;
+	    }
+	    return res;
 	}
 	/* end of str2m.c */
 	_EOF_
@@ -131,8 +124,7 @@ fpair="$testname-h.base $testname-h.res"
 cmp -s $fpair || \
     failure "$testname $fpair failed`echo
         diff $fpair`"
-
-get_c_text="/^static char const ${testname}_names/,/end of $testname.c/p"
+get_c_text="/ Convert .*to a ${testname}_enum_t/,/end of $testname.c/p"
 ${SED} -n "${get_c_text}" $testname.c > $testname-c.res
 
 fpair="$testname-c.base $testname-c.res"
@@ -150,6 +142,9 @@ cat > $testname-h2.base <<- _EOF_
 	#define STR2ENUM_STR2M_2_H_GUARD 1
 	#include <sys/types.h>
 	#include <inttypes.h>
+
+	/** integral type for holding str2m_2 masks */
+	typedef uint32_t str2m_2_mask_t;
 
 	/** bits defined for str2m_2_mask_t */
 	#define STR2M_2_KWD_ONE                0x00001U
@@ -169,9 +164,11 @@ cat > $testname-h2.base <<- _EOF_
 	/** all bits in str2m_2_mask_t masks */
 	#define STR2M_2_KWD_MASK_ALL           0x80889U
 
+	/** no bits in str2m_2_mask_t */
+	#define STR2M_2_KWD_EMPTY              0x00000U
+
 	/** buffer size needed to hold all bit names for str2m_2_mask_t masks */
-	#define STR2M_2_MAX_MASK_NAME_SIZE 31
-	typedef uint32_t str2m_2_mask_t;
+	#define MAX_STR2M_2_NAME_SIZE 31
 
 	extern str2m_2_mask_t
 	str2m_2_str2mask(char const * str, str2m_2_mask_t old);
@@ -186,28 +183,18 @@ mask_all=`
     sed -n '/KWD_MASK_ALL/{;s/.*0x/0x/;s/UL*$//;p;q;}' $testname-h2.base`
 
 cat > $testname-c2.base <<- _EOF_
-	static char const str2m_2_names[45] =
-	/*     0 */ "one\0"
-	/*     4 */ "* UNDEFINED *\0"
-	/*    18 */ "three\0"
-	/*    24 */ "seven\0"
-	/*    30 */ "eleven\0"
-	/*    37 */ "ninteen";
-
-	static char const * str2m_2_name_table[STR2M_2_COUNT_KWDBNM] = {
-
-	/**
 	 * Convert a command (keyword) to a str2m_2_enum_t enumeration value.
 	 *
-	 * @param[in] str  a string that should start with a known key word.
-	 * @param[in] len  the length of the keyword at \a str.
+	 * @param[in] str   a string that should start with a known key word.
+	 * @param[in] len   the length of the keyword at \a str.
 	 * @returns the enumeration value.
 	 * If not found, that value is STR2M_2_COUNT_KWDBNM.
 	 */
 	static str2m_2_enum_t
-	find_str2m_2_id(char const * str, unsigned int len)
+	find_str2m_2_kwdbnm(char const * str, size_t len)
 	{
 	    str2m_2_map_t const * map;
+
 	    map = find_str2m_2_name(str, len);
 	    return (map == NULL) ? STR2M_2_COUNT_KWDBNM : map->str2m_2_id;
 	}
@@ -222,9 +209,20 @@ cat > $testname-c2.base <<- _EOF_
 	static char const *
 	str2m_2_name(str2m_2_enum_t id)
 	{
-	    if (id >= STR2M_2_COUNT_KWDBNM)
-	        return "* UNDEFINED *";
-	    return str2m_2_name_table[id];
+	    static char const undef[] = "* UNDEFINED *";
+	    static char const * const nm_table[] = {
+	        [   STR2M_2_KWDBNM_ELEVEN] = "eleven",
+	        [  STR2M_2_KWDBNM_NINTEEN] = "ninteen",
+	        [      STR2M_2_KWDBNM_ONE] = "one",
+	        [    STR2M_2_KWDBNM_SEVEN] = "seven",
+	        [    STR2M_2_KWDBNM_THREE] = "three" };
+	    char const * res = undef;
+	    if (id < STR2M_2_COUNT_KWDBNM) {
+	        res = nm_table[id];
+	        if (res == NULL)
+	            res = undef;
+	    }
+	    return res;
 	}
 
 	#include <sys/types.h>
@@ -267,7 +265,7 @@ cat > $testname-c2.base <<- _EOF_
 	        str += strspn(str, white);
 	        switch (*str) {
 	        case NUL: return res;
-	        case '-':
+	        case '-': case '~':
 	            invert = 1;
 	            /* FALLTHROUGH */
 
@@ -283,7 +281,7 @@ cat > $testname-c2.base <<- _EOF_
 	        val_len = strspn(str, name_chars);
 	        if (val_len == 0)
 	            return 0;
-	        val = find_str2m_2_id(str, val_len);
+	        val = find_str2m_2_kwdbnm(str, val_len);
 	        if (val == STR2M_2_COUNT_KWDBNM)
 	            return 0;
 	        if (invert)
@@ -304,7 +302,7 @@ cat > $testname-c2.base <<- _EOF_
 	 * @results    The full length of the space needed for the result,
 	 * including the terminating NUL byte.  The actual result will not
 	 * overwrite \a len bytes at \a buf.  This value will also never
-	 * exceed STR2M_2_MAX_MASK_NAME_SIZE.
+	 * exceed MAX_STR2M_2_NAME_SIZE.
 	 */
 	size_t
 	str2m_2_mask2str(str2m_2_mask_t mask, char * buf, size_t len)
@@ -373,14 +371,14 @@ cat >> $testname-2.c <<- _EOF_
 	int main(int argc, char ** argv) {
 	    str2m_2_mask_t mask =
 	        str2m_2_str2mask("${cmd_sum}", 0);
-	    char buf[STR2M_2_MAX_MASK_NAME_SIZE];
-	    size_t l = str2m_2_mask2str(mask, buf, STR2M_2_MAX_MASK_NAME_SIZE);
+	    char buf[MAX_STR2M_2_NAME_SIZE];
+	    size_t l = str2m_2_mask2str(mask, buf, MAX_STR2M_2_NAME_SIZE);
 
 	    printf("0x%04X --> %u bytes: '%s'\n",
 	           (unsigned int)mask, (unsigned int)l, buf);
-	    if (l != STR2M_2_MAX_MASK_NAME_SIZE) {
+	    if (l != MAX_STR2M_2_NAME_SIZE) {
 	        fprintf(stderr, "expected len:  %u, actual:  %u\n",
-	                STR2M_2_MAX_MASK_NAME_SIZE, (unsigned int)l);
+	                MAX_STR2M_2_NAME_SIZE, (unsigned int)l);
 	        return 1;
 	    }
 	    mask = str2m_2_str2mask("- three - eleven - ninteen", mask);

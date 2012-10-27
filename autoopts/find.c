@@ -687,7 +687,7 @@ find_opt(tOptions * opts, tOptState * o_st)
      *  OTHERWISE see if there is room to advance and then do so.
      */
     if ((opts->pzCurOpt != NULL) && (*opts->pzCurOpt != NUL))
-        return opt_find_short(opts, (tAoUC)*(opts->pzCurOpt), o_st);
+        return opt_find_short(opts, (uint8_t)*(opts->pzCurOpt), o_st);
 
     if (opts->curOptIdx >= opts->origArgCt)
         return PROBLEM; /* NORMAL COMPLETION */
@@ -698,10 +698,10 @@ find_opt(tOptions * opts, tOptState * o_st)
      *  IF all arguments must be named options, ...
      */
     if (NAMED_OPTS(opts)) {
-        char *   pz  = opts->pzCurOpt;
-        int      def;
-        tSuccess res;
-        tAoUS *  def_opt;
+        char *      pz  = opts->pzCurOpt;
+        int         def;
+        tSuccess    res;
+        uint16_t *  def_opt;
 
         opts->curOptIdx++;
 
@@ -768,7 +768,7 @@ find_opt(tOptions * opts, tOptState * o_st)
      *  short (i.e. single character) option.
      */
     if ((opts->fOptSet & OPTPROC_SHORTOPT) != 0)
-        return opt_find_short(opts, (tAoUC)*(opts->pzCurOpt), o_st);
+        return opt_find_short(opts, (uint8_t)*(opts->pzCurOpt), o_st);
 
     return opt_find_long(opts, opts->pzCurOpt, o_st);
 }

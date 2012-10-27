@@ -101,7 +101,7 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
             return;
         }
 
-        succ = opt_find_short(pOpts, (tAoUC)*pzArg, &opt_state);
+        succ = opt_find_short(pOpts, (uint8_t)*pzArg, &opt_state);
         if (! SUCCESSFUL(succ)) {
             fprintf(stderr, zIllOptChr, pOpts->pzProgPath, *pzArg);
             pOpts->pUsageProc(pOpts, EXIT_FAILURE);

@@ -130,7 +130,7 @@ checkShortOpts(tOptions* pOpts, char* pzArg, tOptState* pOS,
                char** ppzOpts, int* pOptsIdx)
 {
     while (*pzArg != NUL) {
-        if (FAILED(opt_find_short(pOpts, (tAoUC)*pzArg, pOS)))
+        if (FAILED(opt_find_short(pOpts, (uint8_t)*pzArg, pOS)))
             return FAILURE;
 
         /*
@@ -261,7 +261,7 @@ optionSort(tOptions* pOpts)
             if ((pOpts->fOptSet & OPTPROC_SHORTOPT) == 0) {
                 res = opt_find_long(pOpts, pzArg+1, &os);
             } else {
-                res = opt_find_short(pOpts, (tAoUC)pzArg[1], &os);
+                res = opt_find_short(pOpts, (uint8_t)pzArg[1], &os);
             }
             break;
         }

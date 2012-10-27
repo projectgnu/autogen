@@ -2,7 +2,6 @@
  *
  *    getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2012-02-28 19:45:07 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.
@@ -54,7 +53,7 @@ size_t   indexAlloc  = 0;    /* allocation size */
 /*
  *  Name of program to process output (normally ``autogen'')
  */
-tCC*     pzAutogen   = "autogen";
+char const *    pzAutogen   = "autogen";
 
 /*
  *  const global strings

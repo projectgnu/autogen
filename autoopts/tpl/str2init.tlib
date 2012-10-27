@@ -21,11 +21,17 @@
 (define PFX-STR         (string-upcase pfx-str))
 (define mask-name       (string-append base-type-name "_mask_t"))
 (define enum-name       (string-append base-type-name "_enum_t"))
+(define BASE-TYPE       (string-upcase base-type-name))
 
 (if (exist? "type")     (set! enum-type (string->c-name! (get "type"))))
-(define ENUM-TYPE       (string-upcase   enum-type))
+(define ENUM-TYPE       (if (<= (string-length enum-type) 0) ""
+                            (string-upcase  (string-append "_" enum-type)) ))
+
 (set!   enum-type       (string-downcase enum-type))
-(define cmd-count       (string-append PFX-STR "_COUNT_" ENUM-TYPE))
+(define find-func-name  (string-append
+   "find_" base-type-name "_" enum-type ))
+
+(define cmd-count       (string-append PFX-STR "_COUNT" ENUM-TYPE))
 (define enum-val-offset (if (exist? "cmd[0]") 1 0))
 (define insert-undef    #t)
 (define invalid-name    (if (exist? "invalid-name")
@@ -58,13 +64,13 @@ ENDFOR cmd              =][=
                         =][=
 CASE invalid-val        =][=
 !E                      =][=
-  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
+  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME ENUM-TYPE))
   =][=
 
 == "~0"                 =][=
   (set! enum-val-offset 0)
   (set! insert-undef    #f)
-  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME "_" ENUM-TYPE))
+  (define invalid-cmd (string-append PFX-STR "_" INVALID-NAME ENUM-TYPE))
   =][=
 
 == ""                   =][=

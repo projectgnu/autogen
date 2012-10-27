@@ -367,7 +367,10 @@ ESAC   no-xlate             =]
 #endif /* ENABLE_NLS */
 [= ENDIF no-nls             =][=
    IF (exist? "resettable") =]
-static optArgBucket_t const original_[=(. pname-down)=]_defaults[ [=
+#ifndef optArgBucket_t
+#define opt_arg_union_t optArgBucket_t
+#endif
+static opt_arg_union_t const original_[=(. pname-down)=]_defaults[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [= (shell (string-append
       "sed '$s@},@} @' <<\\_EOF_" default-text "\n_EOF_\n")) =]

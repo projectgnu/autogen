@@ -1,3 +1,14 @@
+2012-10-27  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/str2enum.tpl: polishing
+	* autoopts/tpl/str2init.tlib: likewise
+	* autoopts/tpl/str2mask.tpl: likewise
+	* autoopts/opt-state.def: convert to these templates
+	* autoopts/proc-state.def: likewise
+	* autoopts/autoopts.h: adjust for conversion
+	* autoopts/options_h.tpl: likewise
+	* doc/bitmaps.texi: doc this stuff
+
 2012-10-12  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/funcFor.c (ag_scm_found_for_p): new function.  Tells you

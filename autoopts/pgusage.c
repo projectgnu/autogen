@@ -64,7 +64,7 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
             return;
 
         my_pid  = getpid();
-        snprintf(fil_name, sizeof(fil_name), TMP_USAGE_FMT, (tAoUL)my_pid);
+        snprintf(fil_name, sizeof(fil_name), TMP_USAGE_FMT, (uint64_t)my_pid);
         unlink(fil_name);
 
         /*
@@ -105,7 +105,7 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
          *  Page the file and remove it when done.
          */
         snprintf(fil_name, sizeof(fil_name), PAGE_USAGE_FMT, pzPager,
-                 (tAoUL)my_pid);
+                 (uint64_t)my_pid);
         fclose(stderr);
         dup2(STDOUT_FILENO, STDERR_FILENO);
 

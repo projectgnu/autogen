@@ -341,7 +341,7 @@ prt_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
     case OPARG_TYPE_ENUMERATION:
     case OPARG_TYPE_MEMBERSHIP:
         if (pOD != NULL) {
-            tAoUI     opt_state = pOD->fOptState;
+            uint32_t  opt_state = pOD->fOptState;
             uintptr_t val = pOD->optArg.argEnum;
             char const * typ = (ovp->valType == OPARG_TYPE_ENUMERATION)
                 ? "keyword" : "set-membership";

@@ -103,6 +103,7 @@ setup_exports()
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt
 
   ADDON_TEXI="
+    ${top_srcdir}/doc/bitmaps.texi
     ${top_builddir}/columns/invoke-columns.texi
     ${top_builddir}/getdefs/invoke-getdefs.texi
     ${top_builddir}/xml2ag/invoke-xml2ag.texi

@@ -1204,7 +1204,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
         txt = SPN_WHITESPACE_CHARS(txt+1);
         len = SPN_LOWER_CASE_CHARS(txt) - txt;
 
-        switch (find_option_xat_attribute_id(txt, len)) {
+        switch (find_option_xat_attribute_cmd(txt, len)) {
         case XAT_CMD_TYPE:
             txt = parse_value(txt+len, pType);
             break;
@@ -1313,7 +1313,7 @@ parse_value(char * txt, tOptionValue * typ)
         return skip_unkn(txt + len);
     }
 
-    switch (find_option_value_type_id(txt, len)) {
+    switch (find_option_value_type_cmd(txt, len)) {
     default:
     case VTP_INVALID_CMD: goto woops;
 

@@ -162,10 +162,10 @@ typedef enum {
 } teOptType;
 
 typedef struct {
-    tOptDesc*  pOD;
-    tCC*       pzOptArg;
-    tAoUL      flags;
-    teOptType  optType;
+    tOptDesc *          pOD;
+    char const *        pzOptArg;
+    opt_state_mask_t    flags;
+    teOptType           optType;
 } tOptState;
 #define OPTSTATE_INITIALIZER(st) \
     { NULL, NULL, OPTST_ ## st, TOPT_UNDEFINED }

@@ -22,14 +22,14 @@
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-tSCC zConflict[] =
+static char const zConflict[] =
     "the file name operand conflicts with the definitions option.\n";
 
-tSCC zTextFmt[] =
+static char const zTextFmt[] =
     "text = '%s';\n";
 
 
-tSCC* typeName[] = {
+static char const* typeName[] = {
     "0 - inval",
     "ELEMENT_NODE",
     "ATTRIBUTE_NODE",
@@ -279,12 +279,12 @@ trim( char const* pzSrc, size_t* pSz )
 static xmlNodePtr
 printHeader( xmlDocPtr pDoc )
 {
-    tSCC zDef[] = "AutoGen Definitions %s%s;\n";
-    char const* pzSfx = ".tpl";
+    static char const zDef[] = "AutoGen Definitions %s%s;\n";
+    char const * pzSfx = ".tpl";
 
     xmlNodePtr pRootNode = xmlDocGetRootElement( pDoc );
-    xmlChar*   pTpl = NULL;
-    xmlChar*   pzTpl;
+    xmlChar *  pTpl = NULL;
+    xmlChar *  pzTpl;
 
     if (pRootNode == NULL) {
         fprintf( stderr, "Root node not found\n" );

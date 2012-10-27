@@ -24,6 +24,7 @@ h=options.h
 
 =][=
 
+(make-tmp-dir)
 (dne " *  " "/*  ")
 
 =]
@@ -160,12 +161,16 @@ struct argList {
  *  Bits in the fOptState option descriptor field.
  */
 [= `
- ${AGexe} opt-state.def || die "Cannot regen opt-state.h"
-sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
-    -e 's/_BIT / /g' \
-    -e 's/_MASK     /_MASK /' opt-state.h
-rm  -f opt-state.h
-` =]
+src_dir=\`pwd\`
+mk_mask() {
+    hdr=${1%.def}.h
+    cd ${tmp_dir}
+    ${AGexe} -L ${src_dir}/tpl ${src_dir}/${1} || \
+        die "Cannot process ${hdr}"
+    sed -e '1,/#define.*GUARD *1/d;/^#include/d;/^#endif/,$d' $hdr
+}
+
+mk_mask opt-state.def` =]
 
 #ifdef NO_OPTIONAL_OPT_ARGS
 # undef  OPTST_ARG_OPTIONAL
@@ -174,16 +179,16 @@ rm  -f opt-state.h
 
 #define VENDOR_OPTION_VALUE   'W'
 
-#define OPTST_PERSISTENT_MASK (~OPTST_MUTABLE_MASK)
-
 #define SELECTED_OPT(_od)     ((_od)->fOptState  & OPTST_SELECTED_MASK)
 #define UNUSED_OPT(  _od)     (((_od)->fOptState & OPTST_SET_MASK) == 0)
 #define DISABLED_OPT(_od)     ((_od)->fOptState  & OPTST_DISABLED)
 #define OPTION_STATE(_od)     ((_od)->fOptState)
-#define OPTST_SET_ARGTYPE(_n) ((_n) << OPTST_ARG_TYPE_1_ID)
-#define OPTST_GET_ARGTYPE(_f) (((_f)&OPTST_ARG_TYPE_MASK)>>OPTST_ARG_TYPE_1_ID)
+#define OPTST_SET_ARGTYPE(_n) ((_n) << OPTST_ARG_TYPE_SHIFT)
+#define OPTST_GET_ARGTYPE(_f) \
+    (((_f)&OPTST_ARG_TYPE_MASK) >> OPTST_ARG_TYPE_SHIFT)
 
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
  *  PRIVATE INTERFACES
  *
  *  The following values are used in the generated code to communicate
@@ -194,35 +199,16 @@ rm  -f opt-state.h
 /*
  *  Define the processing state flags
  */
-[= `
- ${AGexe} proc-state.def || die 'Cannot regen proc-state.h'
-sed -e '1,/typedef.*_bits_t/d;/^#endif/,$d' \
-    -e 's/_BIT / /g' \
-    -e 's/_MASK    /_MASK/' proc-state.h
-rm  -f proc-state.h
-
-` =]
+[= `mk_mask proc-state.def` =]
 
 #define STMTS(s)  do { s; } while (false)
 
 /*
  *  The following must be #defined instead of typedef-ed
- *  because "static const" cannot both be applied to a type,
+ *  because "char const" cannot both be applied to a type,
  *  tho each individually can...so they all are
  */
-#define tSCC        static char const
 #define tCC         char const
-#define tAoSC       static char
-#define tAoUC       unsigned char
-#define tAoUI       unsigned int
-#define tAoUL       unsigned long
-#define tAoUS       unsigned short
-
-/*
- *  It is so disgusting that there must be so many ways
- *  of specifying TRUE and FALSE.
- */
-typedef enum { AG_FALSE = 0, AG_TRUE } ag_bool;
 
 /*
  *  Define a structure that describes each option and
@@ -241,8 +227,8 @@ typedef struct optNames tOptNames;
  *  The option procedures do the special processing for each
  *  option flag that needs it.
  */
-typedef void (tOptProc)(tOptions*  pOpts, tOptDesc* pOptDesc);
-typedef tOptProc*  tpOptProc;
+typedef void (tOptProc)(tOptions * pOpts, tOptDesc * pOptDesc);
+typedef tOptProc * tpOptProc;
 
 /*
  *  The usage procedure will never return.  It calls "exit(2)"
@@ -270,39 +256,40 @@ typedef union {
     unsigned int    argBool;
     FILE *          argFp;
     int             argFd;
-} optArgBucket_t;
+} opt_arg_union_t;
 
-#define             pzLastArg   optArg.argString
+#define             pzLastArg       optArg.argString
+#define             optArgBucket_t  opt_arg_union_t
 
 /*
  *  Descriptor structure for each option.
  *  Only the fields marked "PUBLIC" are for public use.
  */
 struct optDesc {
-    tAoUS const     optIndex;         /* PUBLIC */
-    tAoUS const     optValue;         /* PUBLIC */
-    tAoUS           optActualIndex;   /* PUBLIC */
-    tAoUS           optActualValue;   /* PUBLIC */
+    unsigned short const    optIndex;         /* PUBLIC */
+    unsigned short const    optValue;         /* PUBLIC */
+    unsigned short          optActualIndex;   /* PUBLIC */
+    unsigned short          optActualValue;   /* PUBLIC */
 
-    tAoUS const     optEquivIndex;    /* PUBLIC */
-    tAoUS const     optMinCt;
-    tAoUS const     optMaxCt;
-    tAoUS           optOccCt;         /* PUBLIC */
+    unsigned short const    optEquivIndex;    /* PUBLIC */
+    unsigned short const    optMinCt;
+    unsigned short const    optMaxCt;
+    unsigned short          optOccCt;         /* PUBLIC */
 
-    tAoUI           fOptState;        /* PUBLIC */
-    tAoUI           reserved;
-    optArgBucket_t  optArg;           /* PUBLIC */
-    void*           optCookie;        /* PUBLIC */
+    opt_state_mask_t        fOptState;        /* PUBLIC */
+    unsigned int            reserved;
+    opt_arg_union_t          optArg;           /* PUBLIC */
+    void *                  optCookie;        /* PUBLIC */
 
-    int const * const   pOptMust;
-    int const * const   pOptCant;
-    tpOptProc   const   pOptProc;
-    char const* const   pzText;
-
-    char const* const   pz_NAME;
-    char const* const   pz_Name;
-    char const* const   pz_DisableName;
-    char const* const   pz_DisablePfx;
+    int const  * const      pOptMust;
+    int const  * const      pOptCant;
+    tpOptProc    const      pOptProc;
+    char const * const      pzText;
+               
+    char const * const      pz_NAME;
+    char const * const      pz_Name;
+    char const * const      pz_DisableName;
+    char const * const      pz_DisablePfx;
 };
 
 /*
@@ -311,10 +298,10 @@ struct optDesc {
  */
 typedef struct optSpecIndex tOptSpecIndex;
 struct optSpecIndex {
-    const tAoUS         more_help;
-    const tAoUS         save_opts;
-    const tAoUS         number_option;
-    const tAoUS         default_opt;
+    const unsigned short        more_help;
+    const unsigned short        save_opts;
+    const unsigned short        number_option;
+    const unsigned short        default_opt;
 };
 
 /*
@@ -329,44 +316,44 @@ typedef void (tOptionXlateProc)(void);
  * Do not even look at these outside of libopts.
  */
 struct options {
-    int const           structVersion;
-    unsigned int        origArgCt;
-    char**              origArgVect;
-    unsigned int        fOptSet;
-    unsigned int        curOptIdx;
-    char*               pzCurOpt;
+    int const                   structVersion;
+    unsigned int                origArgCt;
+    char **                     origArgVect;
+    proc_state_mask_t           fOptSet;
+    unsigned int                curOptIdx;
+    char *                      pzCurOpt;
 
-    char const* const   pzProgPath;         /* PUBLIC */
-    char const* const   pzProgName;         /* PUBLIC */
-    char const* const   pzPROGNAME;         /* PUBLIC */
-    char const* const   pzRcName;           /* PUBLIC */
-    char const* const   pzCopyright;        /* PUBLIC */
-    char const* const   pzCopyNotice;       /* PUBLIC */
-    char const* const   pzFullVersion;      /* PUBLIC */
-    char const* const* const papzHomeList;
-    char const* const   pzUsageTitle;
-    char const* const   pzExplain;
-    char const* const   pzDetail;
-    tOptDesc*   const   pOptDesc;           /* PUBLIC */
-    char const* const   pzBugAddr;          /* PUBLIC */
+    char const * const          pzProgPath;         /* PUBLIC */
+    char const * const          pzProgName;         /* PUBLIC */
+    char const * const          pzPROGNAME;         /* PUBLIC */
+    char const * const          pzRcName;           /* PUBLIC */
+    char const * const          pzCopyright;        /* PUBLIC */
+    char const * const          pzCopyNotice;       /* PUBLIC */
+    char const * const          pzFullVersion;      /* PUBLIC */
+    char const * const *        const papzHomeList;
+    char const * const          pzUsageTitle;
+    char const * const          pzExplain;
+    char const * const          pzDetail;
+    tOptDesc   * const          pOptDesc;           /* PUBLIC */
+    char const * const          pzBugAddr;          /* PUBLIC */
 
-    void*               pExtensions;
-    void*               pSavedState;
+    void*                       pExtensions;
+    void*                       pSavedState;
 
     // coverity[+kill]
-    tpUsageProc         pUsageProc;
-    tOptionXlateProc*   pTransProc;
+    tpUsageProc                 pUsageProc;
+    tOptionXlateProc*           pTransProc;
 
-    tOptSpecIndex       specOptIdx;
-    int const           optCt;
-    int const           presetOptCt;
-    char const *        pzFullUsage;
-    char const *        pzShortUsage;
+    tOptSpecIndex               specOptIdx;
+    int const                   optCt;
+    int const                   presetOptCt;
+    char const *                pzFullUsage;
+    char const *                pzShortUsage;
     /* PUBLIC: */
-    optArgBucket_t const * const originalOptArgArray;
-    void * const * const originalOptArgCookie;
-    char const * const  pzPkgDataDir;
-    char const * const  pzPackager;
+    opt_arg_union_t const * const originalOptArgArray;
+    void * const * const        originalOptArgCookie;
+    char const * const          pzPkgDataDir;
+    char const * const          pzPackager;
 };
 
 /*

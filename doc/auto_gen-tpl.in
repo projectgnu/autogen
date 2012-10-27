@@ -131,7 +131,7 @@ The AutoGen distribution includes the basic generator engine and
 several add-on libraries and programs.  Of the most general interest
 would be Automated Option processing, @xref{AutoOpts}, which also
 includes stand-alone support for configuration file parsing, @xref{Features}.
-Please see the ``Add-on packages for AutoGen'' section for additional
+@xref{Add-Ons, Add-on packages for AutoGen}, section for additional
 programs and libraries associated with AutoGen.
 
 This edition documents version [=`echo ${AG_REVISION}, ${UPDATED}.`=]
@@ -465,6 +465,7 @@ at all, I decided to leave it in the list of chapters.
 * AutoFSM::                        Automated Finite State Machine.
 * AutoXDR::                        Combined RPC Marshalling.
 * AutoEvents::                     Automated Event Management.
+* Bit Maps::                       Bit Maps and Enumerations.
 * columns Invocation::             Invoking columns.
 * getdefs Invocation::             Invoking getdefs.
 * xml2ag Invocation::              Invoking xml2ag.

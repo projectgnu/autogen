@@ -122,9 +122,10 @@ ag_scm_last_for_p(SCM which)
  *
  * what:    is current index in list?
  * exparg:  for_var, which for loop, opt
- * doc:     Returns SCM_BOOL_T if present, otherwise SCM_BOOL_F.
- *          Outside of any FOR loop, it returns SCM_UNDEFINED.
- *          @xref{FOR}.
+ * doc:
+ *  Returns SCM_BOOL_T if the currently indexed value is present,
+ *  otherwise SCM_BOOL_F.  Outside of any FOR loop, it returns
+ *  SCM_UNDEFINED. @xref{FOR}.
 =*/
 SCM
 ag_scm_found_for_p(SCM which)
@@ -654,10 +655,11 @@ load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
  *  If the from/by/to functions are invoked, they will specify which copies of
  *  the named value are to be processed.  If there is no copy of the named
  *  value associated with a particular index, the @code{FOR} template block
- *  will be instantiated anyway.  The template must use methods for detecting
- *  missing definitions and emitting default text.  In this fashion, you can
- *  insert entries from a sparse or non-zero based array into a dense, zero
- *  based array.
+ *  will be instantiated anyway.  The template must use @code{found-for?}
+ *  (@pxref{SCM found-for?}) or other methods for detecting missing
+ *  definitions and emitting default text.  In this fashion, you can insert
+ *  entries from a sparse or non-zero based array into a dense, zero based
+ *  array.
  *
  *  @strong{NB:} the @code{for-from}, @code{for-to}, @code{for-by} and
  *  @code{for-sep} functions are disabled outside of the context of the

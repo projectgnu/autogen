@@ -1,46 +1,5 @@
 [= AutoGen5 Template h c -*- Mode: Scheme -*-
 
-=][= #
-
-;;; This file contains the templates used to generate
-;;; keyword bitmask code.  It uses the str2enum template to start,
-;;; but places some restrictions upon it:
-;;;
-;;; * names are constrained to alphanumerics and the underscore
-;;; * aliases are not allowed
-;;; * dispatch procedures are not allowed
-;;;
-;;; Two procedures are produced for constructing a mask from a string
-;;; and to produce a string of bit names from a mask.  The latter,
-;;; however, is bypassed if "no-name" is specified.  See str2enum.tpl.
-;;;
-;;; Additionally, you may specify collections of bits (masks) in terms of
-;;; the individual bits.  Define one or more values for "mask" with
-;;; contained values for "m-name" and "m-bit" as in:
-;;;
-;;; mask = {
-;;;   m-name = this-is-a-sample;
-;;;   m-bit  = flag1, flag4;
-;;; };
-;;;
-;;; and this will result in additional mask(s) in the header containing
-;;; bits that are set for the flag1 and flag4 values, e.g.:
-;;;
-;;;     #define PFX_KWD_FLAG1                 0x0001U
-;;;     #define PFX_KWD_FLAG2                 0x0002U
-;;;     #define PFX_KWD_FLAG3                 0x0004U
-;;;     #define PFX_KWD_FLAG4                 0x0008U
-;;;
-;;;     /** bits in mask: flag1 flag4 */
-;;;     #define PFX_KWD_THIS_IS_A_SAMPLE_MASK 0x0009U
-;;;     #define PFX_KWD_MASK_ALL              0x000FU
-;;;
-;;; The produced header will contain a typedef for the mask type.
-;;; It will be named after the "base-type-name" with a "_mask_t" suffix.
-;;; It will be a fundamental integer type of uint8_t, uint16_t, uint32_t
-;;; or uint64_t, depending on what is needed.  This may be overridden
-;;; by specifying a value for "mask-type".
-
 =][=
 
 CASE (suffix)                   =][= #
@@ -60,13 +19,15 @@ INVOKE sizes-n-formats          =][=
 
 =]
 hdr_file=[=(string-append tmp-dir "/" base-file-name)=].h
-src_file=${hdr_file%.h}.c
 mask_name=[= (. mask-name) =]
 
 sed '/^#define .*_GUARD/q' ${hdr_file}
 cat <<- _EOF_
 	#include <sys/types.h>
 	#include <inttypes.h>
+
+	/** integral type for holding [=(. base-type-name)=] masks */
+	typedef $mask_type ${mask_name};
 [=
 FOR add-on-text                 =][=
   IF (= (get "ao-file") "mask-header") =]
@@ -95,25 +56,21 @@ emit_mask_def() {
     shift
     declare which_bits='in'
     $INVERT && which_bits='omitted from'
-    printf "\n/** bits $which_bits ${mname%_MASK} mask:\n"
-    echo $* | tr ' ' '\n' | columns --spread=1 -I' *  ' --end=' */'
+    if test $# -eq 0
+    then
+        printf "\n/** There are no bits in ${mname}. */\n"
+    else
+        printf "\n/** bits $which_bits ${mname%_MASK} mask:\n"
+        echo $* | tr ' ' '\n' | columns --spread=1 -I' *  ' --end=' */'
+    fi
 
     for f in $*
-    do  case "$f" in
-        -* )
-            eval f=\${val_${f#-}}
-            (( v &= ~f ))
-            ;;
-
-        *  )
-            eval f=\${val_$f}
-            (( v |= f ))
-            ;;
-        esac
+    do  eval f=\${val_$f}
+        (( v |= f ))
     done
     $INVERT && (( v ^= all_mask ))
     printf "$def_fmt" ${mname} $v
-    eval $(echo val_${mname}_mask=$v | tr 'A-Z' 'a-z')
+    eval $(echo val_${mname}=$v | tr 'A-Z' 'a-z')
 }
 [=
 
@@ -128,19 +85,26 @@ ENDFOR mask
 
 \=]
 printf "\n/** all bits in ${mask_name} masks */\n"
-printf "$def_fmt" MASK_ALL $all_mask
-line='[=(join " " (stack "cmd"))=] '
+printf "$def_fmt" MASK_ALL $all_mask[=
+(define zero-mask-name (string-append "MASK_" )) =][=
+IF (define zero-name (get "zero-name" "EMPTY"))
+   (> (string-length zero-name) 0)  =]
+printf "\n/** no bits in ${mask_name} */\n"
+printf "$def_fmt" [=(string-upcase! (string->c-name! zero-name))=] 0[=
+ENDIF have zero-name            =][=
+
+IF (not (exist? "no-code"))     =]
 cat <<- _EOF_
 
 	/** buffer size needed to hold all bit names for ${mask_name} masks */
-	#define [=(. PFX-STR)=]_MAX_MASK_NAME_SIZE ${#line}
-	typedef $mask_type ${mask_name};
+	#define MAX_[=(. BASE-TYPE)=]_NAME_SIZE [=
+		(+ 1 (string-length (join " " (stack "cmd")))) =]
 
 	extern ${mask_name}
 	[=(. base-type-name) =]_str2mask(char const * str, ${mask_name} old);
 [=
 
-IF (not (exist? "no-name"))   =]
+IF (not (exist? "no-name"))     =]
 	extern size_t
 	[=(. base-type-name)=]_mask2str([=(. mask-name)
 	=] mask, char * buf, size_t len);
@@ -149,8 +113,9 @@ IF (not (exist? "no-name"))   =]
 ENDIF no name
 
 =]
-	_EOF_
+	_EOF_[=
 
+ENDIF not exist no-code         =]
 grep -E '^#endif .*_GUARD ' ${hdr_file}
 [=
 (emit (shell (out-pop #t)))
@@ -164,6 +129,7 @@ grep -E '^#endif .*_GUARD ' ${hdr_file}
 == c
 
 =][=
+(if (exist? "no-code") (out-delete))
 (out-move (string-append base-file-name ".c"))
 (out-push-new) \=]
 exec 4< ${tmp_dir}/[=(. base-file-name)=].c
@@ -227,7 +193,7 @@ exec 4<&-
         str += strspn(str, white);
         switch (*str) {
         case NUL: return res;
-        case '-':
+        case '-': case '~':
             invert = 1;
             /* FALLTHROUGH */
 
@@ -243,7 +209,7 @@ exec 4<&-
         val_len = strspn(str, name_chars);
         if (val_len == 0)
             return 0;
-        val = find_[=(. base-type-name)=]_id(str, val_len);
+        val = [=(. find-func-name)=](str, val_len);
         if (val == [=(. enum-count)=])
             return 0;
         if (invert)
@@ -266,7 +232,7 @@ IF (not (exist? "no-name"))   =]
  * @results    The full length of the space needed for the result,
  * including the terminating NUL byte.  The actual result will not
  * overwrite \a len bytes at \a buf.  This value will also never
- * exceed [=(. PFX-STR)=]_MAX_MASK_NAME_SIZE.
+ * exceed MAX_[=(. BASE-TYPE)=]_NAME_SIZE.
  */
 size_t
 [=(. base-type-name)=]_mask2str([=(. mask-name)=] mask, char * buf, size_t len)
@@ -368,7 +334,7 @@ ENDIF mask type provided/not
 
 =]
 hex_fmt=0x%0${hex_width}X${sfx}
-def_fmt="#define [=(string-append PFX-STR "_" ENUM-TYPE "_")
+def_fmt="#define [=(string-append PFX-STR ENUM-TYPE "_")
 =]%-[=(. max-cmd-width)=]s ${hex_fmt}\\n"
 [=
 
@@ -397,9 +363,11 @@ INCLUDE "str2init.tlib"             =][=
 (out-move ".Str2Mask-Set-Aside")
 (define bit-enum-type
     (string-append (if (== enum-type "bit") "" enum-type) "bnm"))
-(define enum-count (string-append PFX-STR "_COUNT_"
+(define enum-count      (string-append PFX-STR "_COUNT_"
        (string-upcase bit-enum-type)))
 (define assign-vals "")
+(define find-func-name  (string-append
+   "find_" base-type-name "_" bit-enum-type ))
 (out-push-new (string-append tmp-dir "/" base-file-name ".def"))
 =]
 AutoGen Definitions str2enum;
@@ -419,7 +387,7 @@ FOR cmd     =][=
           "val_" tmp-str "=" (number->string idx) "\n"))
             =][=
 ENDFOR      =][=
-
+(if (exist? "no-code") (emit "no-code;\n"))
 (out-pop)
 (shell assign-vals
 "{ ${AGexe} -L" (dirname (tpl-file #t)) " ${tmp_dir}/" base-file-name ".def"

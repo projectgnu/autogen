@@ -1,4 +1,4 @@
-AutoGen Definitions bits.tpl;
+AutoGen Definitions str2mask.tpl;
 /*
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -20,10 +20,10 @@ AutoGen Definitions bits.tpl;
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
 */
-mask-name  = opt-state;
 prefix     = optst;
+type       = '';
 zero-name  = init;
-
+mask-type  = uint32_t;
 no-code;
 omit-test-n-set;
 
@@ -32,79 +32,140 @@ omit-test-n-set;
  *  the autoopts interface will also have to be changed.  The result is
  *  incompatible.  The first 8 bits are mutable, tho 7 are used.
  */
-bit[ 0] = { b-name = set;           b-what = 'Set via the "SET_OPT()" macro'; };
-bit[ 1] = { b-name = preset;        b-what = 'Set via an RC/INI file'; };
-bit[ 2] = { b-name = defined;       b-what = 'Set via a command line option'; };
-bit[ 3] = { b-name = reset;         b-what = 'Reset via command line option'; };
+cmd[ 0] = set;
+wht[ 0] = 'Set via the "SET_OPT()" macro';
 
-bit[ 4] = { b-name = equivalence;   b-what = 'selected by equiv\'ed option'; };
-bit[ 5] = { b-name = disabled;      b-what = 'option is in disabled state'; };
-bit[ 6] = { b-name = alloc-arg;     b-what = 'pzOptArg was allocated'; };
+cmd[ 1] = preset;
+wht[ 1] = 'Set via an RC/INI file';
+
+cmd[ 2] = defined;
+wht[ 2] = 'Set via a command line option';
+
+cmd[ 3] = reset;
+wht[ 3] = 'Reset via command line option';
+
+
+cmd[ 4] = equivalence;
+wht[ 4] = 'selected by equiv\'ed option';
+
+cmd[ 5] = disabled;
+wht[ 5] = 'option is in disabled state';
+
+cmd[ 6] = alloc-arg;
+wht[ 6] = 'pzOptArg was allocated';
+
 
 /*
- * The remaining bits must not change
+ * The rem must not change
  */
-bit[ 8] = { b-name = no-init;       b-what = 'option cannot be preset'; };
-bit[ 9] = { b-name = number-opt;    b-what = 'opt value (flag) is any digit'; };
-bit[10] = { b-name = stacked;       b-what = 'opt uses optionStackArg proc'; };
-bit[11] = { b-name = initenabled;   b-what = 'option defaults to enabled'; };
+cmd[ 8] = no-init;
+wht[ 8] = 'option cannot be preset';
 
-bit[12] = { b-name = arg-type-1;    b-what = 'bit 1 of arg type enum'; };
-bit[13] = { b-name = arg-type-2;    b-what = 'bit 2 of arg type enum'; };
-bit[14] = { b-name = arg-type-3;    b-what = 'bit 3 of arg type enum'; };
-bit[15] = { b-name = arg-type-4;    b-what = 'bit 4 of arg type enum'; };
+cmd[ 9] = number-opt;
+wht[ 9] = 'opt value (flag) is any digit';
 
-bit[16] = { b-name = arg-optional;  b-what = 'the option arg not required'; };
-bit[17] = { b-name = imm;           b-what = 'process opt on first pass'; };
-bit[18] = { b-name = disable-imm;   b-what = 'process disablement immed.'; };
-bit[19] = { b-name = omitted;       b-what = 'compiled out of program'; };
+cmd[10] = stacked;
+wht[10] = 'opt uses optionStackArg proc';
 
-bit[20] = { b-name = must-set;      b-what = 'must be set or pre-set'; };
-bit[21] = { b-name = document;      b-what = 'opt is for doc only'; };
-bit[22] = { b-name = twice;         b-what = 'process opt twice - imm + reg'; };
-bit[23] = { b-name = disable-twice; b-what = 'process disabled option twice'; };
+cmd[11] = initenabled;
+wht[11] = 'option defaults to enabled';
 
-bit[24] = { b-name = scaled-num;    b-what = 'scaled integer value'; };
-bit[25] = { b-name = no-command;    b-what = 'disable from cmd line'; };
-bit[26] = { b-name = deprecated;    b-what = 'support is being removed'; };
-bit[27] = { b-name = alias;         b-what = 'alias for other option'; };
+add-on-text = { ao-file = mask-header;
+    ao-text = '#define OPTST_ARG_TYPE_SHIFT 12'; };
+cmd[12] = arg-type-1;
+wht[12] = 'bit 1 of arg type enum';
+
+cmd[13] = arg-type-2;
+wht[13] = 'bit 2 of arg type enum';
+
+cmd[14] = arg-type-3;
+wht[14] = 'bit 3 of arg type enum';
+
+cmd[15] = arg-type-4;
+wht[15] = 'bit 4 of arg type enum';
+
+
+cmd[16] = arg-optional;
+wht[16] = 'the option arg not required';
+
+cmd[17] = imm;
+wht[17] = 'process opt on first pass';
+
+cmd[18] = disable-imm;
+wht[18] = 'process disablement immed.';
+
+cmd[19] = omitted;
+wht[19] = 'compiled out of program';
+
+
+cmd[20] = must-set;
+wht[20] = 'must be set or pre-set';
+
+cmd[21] = document;
+wht[21] = 'opt is for doc only';
+
+cmd[22] = twice;
+wht[22] = 'process opt twice - imm + reg';
+
+cmd[23] = disable-twice;
+wht[23] = 'process disabled option twice';
+
+
+cmd[24] = scaled-num;
+wht[24] = 'scaled integer value';
+
+cmd[25] = no-command;
+wht[25] = 'disable from cmd line';
+
+cmd[26] = deprecated;
+wht[26] = 'support is being removed';
+
+cmd[27] = alias;
+wht[27] = 'alias for other option';
+
 
 mask = {
   m-name  = set;
-  b-name  = set, preset, reset, defined;
+  m-bit   = set, preset, reset, defined;
 };
 
 mask = {
   m-name  = mutable;
-  b-name  = set, preset, reset, defined, equivalence, disabled, alloc-arg;
+  m-bit   = set, preset, reset, defined, equivalence, disabled, alloc-arg;
+};
+
+mask = {
+  m-name  = persistent;
+  m-invert;
+  m-bit   = 'mutable-mask';
 };
 
 mask = {
   m-name  = selected;
-  b-name  = set, defined;
+  m-bit   = set, defined;
 };
 
 mask = {
   m-name  = arg-type;
-  b-name  = arg-type-1, arg-type-2, arg-type-3, arg-type-4;
+  m-bit   = arg-type-1, arg-type-2, arg-type-3, arg-type-4;
 };
 
 mask = {
   m-name  = no-usage;
-  b-name  = omitted, no-command, deprecated;
+  m-bit   = omitted, no-command, deprecated;
 };
 
 mask = {
   m-name  = immutable;
-  b-name  = document, omitted;
+  m-bit   = document, omitted;
 };
 
 mask = {
   m-name  = do-not-save;
-  b-name  = document, omitted, no-init;
+  m-bit   = document, omitted, no-init;
 };
 
 mask = {
   m-name  = no-output;
-  b-name  = document, omitted, alias;
+  m-bit   = document, omitted, alias;
 };
