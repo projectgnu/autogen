@@ -1,4 +1,15 @@
-New in __CURRENT_VERSION__ August 2012
+New in __CURRENT_VERSION__ October 2012
+
+* Bit Map and Enumeration templates are now fully integrated.
+  They have their own section in the texi docs and the
+  templates produce more easily used output.
+
+* Guile adjustments.  Guile inserts /usr/local/lib into the
+  LD_LIBRARY_PATH variable, causing problems when you are
+  trying to run programs that use not-yet-installed libraries.
+  LD_LIBRARY_PATH is now discarded.  :(
+
+New in 5.16.2 August 2012
 
 * Coverity cleanups
 * evade Guile issue on BSD platform.
@@ -19,19 +30,8 @@ New in 5.16 May 2012
 * texi documentation generation has been much improved.
   Please see the "Option Sectioning Comment" documentation.
 
-* configuring with --disable-static should now pass make check
-
 * AutoOpts supports a "die-code" attribute.  It will generate code
   for "die", "diev" and "fserr" functions that will print a farewell
   message and die.
 
 * a keyword option value of "-1" or "~0" now means "largest value".
-
-* much improved .texi documentation templates.
-
-* de-tabbed "here strings" may have output lines prefixed with tabs
-  by backslash escaping the first tab to output.
-
-* -Werror may be appended by "=warn-group".  That is accommodated now.
-
-* many warning fixes and CamelCase name removals
