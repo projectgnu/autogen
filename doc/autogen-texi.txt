@@ -2686,6 +2686,13 @@ static int
 @}
 @end example
 
+@item interleaved
+If this attribute is specified, then options and operands may be
+interleaved.  Arguments or input lines beginning with a hyphen will
+cause it to be passed through to an option processing function and
+will take effect for the remainder of the operands (input lines)
+processed.
+
 @item main-init
 @vindex main-init
 This is code that gets inserted after the options have been processed, but
@@ -4318,6 +4325,23 @@ If option processing has stopped (either because of an error
 or something was encountered that looked like a program argument),
 it can be resumed by providing this macro with the index @code{n}
 of the next option to process and calling @code{optionProcess()} again.
+
+@example
+int main(int argc, char ** argv) @{
+  for (int ai = 0; ai < argc ;) @{
+  restart:
+    ai = optionProcess(&progOptions, argc, argv);
+    for (; ai < argc; ai++) @{
+      char * arg = arg[ai];
+      if (*arg == '-') @{
+        RESTART_OPT(ai);
+        goto restart;
+      @}
+      process(arg);
+    @}
+  @}
+@}
+@end example
 
 @node SET_OPT_name
 @subsection SET_OPT_name - Force an option to be set

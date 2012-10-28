@@ -213,7 +213,7 @@ mk_proc_list() {
     exec 3< ${tmp_dir}/commands
     declare -l c
     {
-        echo invalid
+        echo [=(. invalid-name)=]
         while read -u3 _ c
         do
             echo $c

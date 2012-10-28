@@ -381,23 +381,36 @@ ENDIF handler-type exists  =][=
 int
 main(int argc, char** argv)
 {
-    int res = 0;
-    {
-        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
-        argc -= ct;
-        argv += ct;
-    }[=
+    int res     = 0;
+    int proc_ct = 0;
+    int arg_ix  = optionProcess(&[=(. pname)=]Options, argc, argv);[=
+
     (if (exist? "main-init") (string-append
     "\n    " (def-file-line "main-init" extract-fmt) "\n" (get "main-init")))
 
     =][= (tpl-file-line extract-fmt) =]
     /*
-     *  Input list from command line
+     *  IF the input list is from the command line...
      */
-    if (argc > 0) {
-        do  {
-            res |= [= (. handler-proc) =](*(argv++));
-        } while (--argc > 0);
+    if (arg_ix < argc) {
+        for (; arg_ix < argc; arg_ix++) {
+            char * arg = argv[arg_ix];[=
+    IF (exist? "interleaved")   =]
+            if (*arg == '-') {
+                RESTART_OPT(arg_ix - 1);
+                arg_ix = optionProcess(&[=(. pname)=]Options, argc, argv) - 1;
+                continue;
+            }[=
+    ENDIF interleaved           =]
+            res |= [= (. handler-proc) =](arg);
+            proc_ct++;
+        }[=
+    IF (exist? "interleaved")   =]
+
+        if (proc_ct == 0)
+            fputs(_("[=(. prog-name)
+            =] Warning:  no command operands were processed\n"), stderr);[=
+    ENDIF interleaved           =]
     }
 
     /*
@@ -413,7 +426,6 @@ main(int argc, char** argv)
      *  Input list from a pipe or file or some such
      */
     else {
-        int in_ct   = 0;
         size_t pg_size = getpagesize();
         char* buf   = malloc(pg_size);
         if (buf == NULL) {
@@ -428,13 +440,19 @@ main(int argc, char** argv)
                 break;
 
             pz = trim_input_line(pz);
-            if (pz != NULL) {
-                 res |= [= (. handler-proc) =](pz);
-                 in_ct++;
-            }
+            if (pz == NULL)
+                continue;[=
+    IF (exist? "interleaved")   =]
+            if (*pz == '-') {
+                optionLoadLine(&[=(. pname)=]Options, pz);
+                continue;
+            }[=
+    ENDIF interleaved           =]
+            res |= [= (. handler-proc) =](pz);
+            proc_ct++;
         }
 
-        if (in_ct == 0)
+        if (proc_ct == 0)
             fputs(_("[=(. prog-name)
                    =] Warning:  no input lines were read\n"), stderr);
         free(buf);

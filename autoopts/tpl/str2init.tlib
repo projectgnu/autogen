@@ -51,6 +51,8 @@
 FOR cmd                 =][=
 
   (set! tmp-str (string-downcase! (string->c-name! (get "cmd"))))
+  (if (= tmp-str invalid-name)
+      (error (string-append "You cannot specify a cmd of " invalid-name)) )
   (set! idx (string-length tmp-str))
   (if (> idx max-cmd-width) (set! max-cmd-width idx))
   (if (< idx min-cmd-width) (set! min-cmd-width idx))

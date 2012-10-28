@@ -50,6 +50,9 @@ FOO_CMD_MUMBLE = 5
 @end example
 @noindent
 to be inserted into the enumeration.
+Do not specify a value of ``@t{invalid}'', unless you specify the
+@code{invalid-name} attribute.  (In that case, do not specify a
+@code{cmd} value that matches the @code{invalid-name} value.)
 
 @item prefix
 This specifies the first segment of each enumeration name.
@@ -118,7 +121,8 @@ When looking up a string, the case of the input string is ignored.
 A single punctuation character can be interpreted as a command.  The first
 character of this attribute is the aliased character and the remainder the
 aliased-to command.  e.g. ``@t{#comment}'' makes '@t{#}' an alias for the
-@command{comment} command.
+@command{comment} command.  ``@t{#comment}'' must still be listed in the
+@code{cmd} attributes.
 
 @item length
 Specify how lengths are to be handled.  Under the covers, @command{gperf(1)}
@@ -158,20 +162,21 @@ by default, the display string for an undefined value is
 
 @item equate
 A series of punctuation characters considered equivalent.
-Typically, ``@t{-_}'' but sometimes (Tandem) ``@t{-_^}''.  Do not use '@t{#}'
+Typically, ``@t{-_}'' but sometimes (Tandem) ``@t{-_^}''.
+Do not use '@t{#}' in the list of characters.
 
 @item dispatch
-The lookup procedure will call a dispatch function.
-You must provide a function for every named ``cmd'',
-though you can use @code{add-on-text} to ``@t{#define}'' one
-function to another.  The first two dispatch attributes are required,
-and the @code{d-arg} attribute is optional:
+The lookup procedure will call a dispatch function.  You must provide a
+function for every named ``cmd'', plus an error handling function with
+``invalid'' (or the @code{invalid-name} value) being the @code{cmd} name.
+You may also use @code{add-on-text} to ``@t{#define}'' one function to
+another.  The first two dispatch attributes are required, and the
+@code{d-arg} attribute is optional:
 
 @table @samp
 @item d-nam
 This must be a printf format string with one formatting element: @code{%s}.
-The @code{%s} will be replaced by each @code{cmd} name, including
-``@t{invalid}'' (or the value of @code{invalid-val}, if specified).
+The @code{%s} will be replaced by each @code{cmd} name.
 
 @item d-ret
 The return type of the dispatched function, even if ``@t{void}''.
@@ -187,6 +192,58 @@ The handler functions will have the command enumeration as its first first
 argument, a pointer to a constant string that will be the character
 @i{after} the parsed command (keyword) name, plus any @code{d-arg} arguments
 that follow that.
+
+@noindent
+As an example, a file @file{samp-chk.def} containing this:
+@example
+AutoGen Definitions str2enum;
+cmd = one, two; invalid-name = oops;
+dispatch = @{ d-nam = 'hdl_%s_cmd'; d-ret = void; @};
+@end example
+@noindent
+will produce a header containing:
+@example
+typedef enum @{
+    SAMP_OOPS_CMD = 0,
+    SAMP_CMD_ONE      = 1,
+    SAMP_CMD_TWO      = 2,
+    SAMP_COUNT_CMD
+@} samp_chk_enum_t;
+
+extern samp_chk_enum_t
+find_samp_chk_cmd(char const * str, size_t len);
+
+typedef void(samp_chk_handler_t)(
+    samp_chk_enum_t id, char const * str);
+
+samp_chk_handler_t
+        hdl_oops_cmd, hdl_one_cmd,  hdl_two_cmd;
+
+extern void
+disp_samp_chk(char * str, size_t len);
+
+extern char const *
+samp_chk_name(samp_chk_enum_t id);
+@end example
+
+@itemize @bullet
+@item
+@code{find_samp_chk_cmd} will look up a @code{len} byte @code{str} and
+return the corresponding @code{samp_chk_enum_t} value.  That value is
+@code{SAMP_OOPS_CMD} if the string is not ``one'' or ``two''.
+@item
+@code{samp_chk_handler_t} is the type of the callback procedures.
+Three must be provided for the dispatching function to call:
+@code{hdl_oops_cmd}, @code{hdl_one_cmd} and @code{hdl_two_cmd}.
+@code{hdl_oops_cmd} will receive calls when the string does not match.
+@item
+@code{disp_samp_chk} this function will call the handler function
+and return whatever the handler returns.  In this case, it is void.
+@item
+@code{samp_chk_name} will return a string corresponding to the enumeration
+value argument.  If the value is not valid, ``* UNDEFINED *'' (or the
+value of @code{undef-str}) is used.
+@end itemize
 @end table
 
 @c
