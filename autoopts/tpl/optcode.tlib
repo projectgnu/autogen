@@ -324,8 +324,13 @@ s/^@item *$/\
       (if (== (get "main.main-type") "for-each")
           (set! tmp-text (string-append tmp-text
 "\nIf no arguments are provided, input arguments are read from stdin,
-one per line; blank and '#'-prefixed lines are comments.
-'stdin' may not be a terminal (tty).\n" ))  )
+one per line; blank and '"
+(if (exist? "main.comment-char") (get "main.comment-char") "#")
+"'-prefixed lines are comments.\n"
+(if (exist? "main.interleaved")
+    "Options may appear in the input interspersed with the 'normal' input.\n"
+    "")
+"'stdin' may not be a terminal (tty).\n" ))  )
 
       (string-table-add-ref opt-strs tmp-text)
     )

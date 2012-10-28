@@ -48,8 +48,9 @@ cat >&4 <<-  _EOF_
 	argument = '[ <argument> ... ]';
 	main = {
 	  handler-proc = fumble;
-	  fumble-code  = 'printf( "%s\n", pz_entry );';
+	  fumble-code  = '    printf("%s\n", pz_entry);';
 	  main-type    = for-each;
+	  interleaved;
 	};
 	_EOF_
 exec 4>&-
@@ -78,34 +79,30 @@ USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
 This is some explanatory text.
 If no arguments are provided, input arguments are read from stdin,
 one per line; blank and '#'-prefixed lines are comments.
+Options may appear in the input interspersed with the 'normal' input.
 'stdin' may not be a terminal (tty).
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${basehlp} ${testname}.help`"
+pair=`echo ${testname}.h*lp`
+cmp -s $pair || \
+  failure "DIFFER: $pair
+`diff $pair`"
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
+sedcmd='/illegal option /d'
+echo '-?' | ./${testname} 2>&1 | clean_help > ${testname}.out
 
-./${testname} > ${testname}.out < ${testname}.hlp
+pair="${testname}.hlp ${testname}.out"
+cmp -s $pair || \
+  failure "DIFFER: $pair
+`diff ${testname}.base ${testname}.out`"
 
-clean_help > ${testname}.base <<\_EOF_
-test_main - Test AutoOpts for main
-USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
-Flg Arg Option-Name    Description
--o Str option         The option option descrip
--s Num second         The second option descrip
--? no  help           Display extended usage information and exit
--! no  more-help      Extended usage information passed thru pager
-This is some explanatory text.
-If no arguments are provided, input arguments are read from stdin,
-one per line; blank and '#'-prefixed lines are comments.
-'stdin' may not be a terminal (tty).
-_EOF_
-
-cmp -s ${testname}.base ${testname}.out || \
-  failure "`diff ${testname}.base ${testname}.out`"
-
-./${testname} -s 5 the quick 'brown fox' > ${testname}.out2
+./${testname} > ${testname}.out2 <<EOF
+the
+-s 5
+quick
+brown fox
+EOF
 
 cat > ${testname}.base2 <<\_EOF_
 the

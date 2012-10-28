@@ -182,6 +182,9 @@ test_keyword \- Test AutoOpts for keyword
 .RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP "[[=| ]\fIvalue\fP]]..."
 .PP
 All arguments must be options.
+.PP
+This program will emit text that is expected to be evaluated by
+a Bourne-compatible shell, thus digesting the options for the script.
 .SH "DESCRIPTION"
 There is no description for this command.
 .SH "OPTIONS"
@@ -307,6 +310,9 @@ cat > ${testname}-base.mdoc <<\_EOMan_
 .Op Fl \-option-name Ar value
 .Pp
 All arguments must be options.
+.Pp
+This program will emit text that is expected to be evaluated by
+a Bourne-compatible shell, thus digesting the options for the script.
 .Pp
 .Sh "DESCRIPTION"
 There is no description for this command.

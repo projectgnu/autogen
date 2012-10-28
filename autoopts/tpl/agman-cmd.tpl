@@ -95,7 +95,7 @@ All arguments are named options.[+:
   ENDIF                                     :+][+:
 
   IF (exist? "argument")
-    :+] " " "[+: argument                  :+]"[+:
+    :+] " " "[+: argument                   :+]"[+:
 
     IF (exist? "reorder-args")              :+]
 .PP
@@ -109,6 +109,35 @@ Operands and options may be intermixed.  They will be reordered.
 All arguments must be options.[+:
 
   ENDIF                                     :+][+:
+
+  IF (exist? "main")                        :+][+:
+  CASE main.main-type                       :+][+:
+  == shell-process                          :+]
+.PP
+This program will emit text that is expected to be evaluated by
+a Bourne-compatible shell, thus digesting the options for the script.[+:
+
+  == shell-parser                           :+]
+.PP
+This program is designed to produce output suitable for inclusion
+into a shell script that will parse the options described.[+:
+
+  == for-each                               :+]
+.PP
+The operands that this program operates on may be specified either
+on the command line or read from standard input, one per line.
+In that input, leading and trailing white space is stripped,
+blank lines are ignored and lines beginning with the character
+.I [+:(if (exist? "comment-char") (get "comment-char") "#"):+]
+are treated as comments.[+:
+    IF (exist? "interleaved") :+]
+Options may be interleaved with operands both on the command
+line and when operands are read from standard input.[+:
+    ENDIF  interleaved        :+]
+Standard input may not be a terminal.[+:
+
+  ESAC  main-type                           :+][+:
+  ENDIF  main exists                        :+][+:
 
 (if (exist? "explain")
     (string-append "\n.PP\n"
