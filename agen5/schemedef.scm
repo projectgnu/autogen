@@ -103,6 +103,10 @@
 (define-macro (defined-as predicate symbol)
   `(and (defined? ',symbol) (,predicate ,symbol)))
 
+(catch #t
+  (lambda () (read-enable 'curly-infix))
+  (lambda args #f))
+
 ;;; /*=gfunc   html_escape_encode
 ;;;  *
 ;;;  * what:   encode html special characters

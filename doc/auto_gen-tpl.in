@@ -338,6 +338,8 @@ FOR macfunc =][=
        (get "what") ) =][=
   ENDIF =][=
 ENDFOR macfunc=]
+* shell command::    Inserting text from a shell script
+* guile command::    Inserting text from a scheme script
 @end menu
 @node AGMacro syntax
 @subsection AutoGen Macro Syntax
@@ -408,11 +410,11 @@ set up as arguments.  @xref{DEFINE}.
 The AutoGen @code{COMMENT}, @code{ELSE}, @code{ESAC} and the @code{END*}
 macros take no arguments and ignore everything after the macro name
 (e.g. see @ref{COMMENT})
-@end enumerate[=
+@end enumerate[= #
 
 
-#  FOR each defined function,
-      this code will insert the extracted documentation =][=
+@c  FOR each defined function,
+@c    this code will insert the extracted documentation =][=
 
 FOR macfunc =][=
   IF (exist? "desc") =]
@@ -428,6 +430,25 @@ FOR macfunc =][=
 [=desc=][=
   ENDIF desc exists =][=
 ENDFOR macfunc=]
+@node shell command
+@subsection Inserting text from a shell script
+
+If the text between the start and end macro markers starts with an opening
+curly brace ('@code{@{}') or is surrounded by back quotes ('@code{`}'), then
+the text is handed off to the server shell for evaluation.  The output to
+standard out is inserted into the document.  If the text starts with the
+curly brace, all the text is passed of as is to the shell.  If surrounded by
+back quotes, then the string is ``cooked'' before being handed off to the
+shell.
+
+@node guile command
+@subsection Inserting text from a scheme script
+
+If the text between the start and end macro markers starts with a semi-colon
+or an opening parenthesis, all the text is handed off to the Guile/scheme
+processor.  If the last result is text or a number, it is added (as text)
+to the output document.
+
 [=
 
 INVOKE  get-text tag = augmenting

@@ -198,12 +198,12 @@ find_mac_end(char const ** ppzMark)
 }
 
 static char const *
-find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
+find_mac_start(char const * pz, macro_t ** ppm, templ_t * tpl)
 {
     char *       pzCopy;
     char const * pzEnd;
     char const * res = strstr(pz, st_mac_mark);
-    macro_t *     pM  = *ppM;
+    macro_t *    mac = *ppm;
 
     if (res == pz)
         return res;
@@ -211,20 +211,20 @@ find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
     /*
      *  There is some text here.  Make a text macro entry.
      */
-    pzCopy      = pTpl->td_scan;
+    pzCopy      = tpl->td_scan;
     pzEnd       = (res != NULL) ? res : pz + strlen(pz);
-    pM->md_txt_off = pzCopy - pTpl->td_text;
-    pM->md_code = FTYP_TEXT;
-    pM->md_line = tpl_line;
+    mac->md_txt_off = pzCopy - tpl->td_text;
+    mac->md_code = FTYP_TEXT;
+    mac->md_line = tpl_line;
 
 #if defined(DEBUG_ENABLED)
     if (HAVE_OPT(SHOW_DEFS)) {
         int ct = tplNestLevel;
-        fprintf(trace_fp, "%3u ", (unsigned int)(pM - pTpl->td_macros));
+        fprintf(trace_fp, "%3u ", (unsigned int)(mac - tpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
         fprintf(trace_fp, zTDef, ag_fun_names[ FTYP_TEXT ], FTYP_TEXT,
-                pM->md_line, pM->md_end_idx, (unsigned int)(pzEnd - pz));
+                mac->md_line, mac->md_end_idx, (unsigned int)(pzEnd - pz));
     }
 #endif
 
@@ -234,19 +234,19 @@ find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl)
     } while (pz < pzEnd);
 
     *(pzCopy++)   = NUL;
-    *ppM          = pM + 1;
-    pTpl->td_scan = pzCopy;
+    *ppm          = mac + 1;
+    tpl->td_scan = pzCopy;
 
     return res;  /* may be NULL, if there are no more macros */
 }
 
 static char const *
-find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan)
+find_macro(templ_t * tpl, macro_t ** ppm, char const ** pscan)
 {
     char const * scan = *pscan;
     char const * pzMark;
 
-    pzMark = find_mac_start(scan, ppM, pTpl);
+    pzMark = find_mac_start(scan, ppm, tpl);
 
     /*
      *  IF no more macro marks are found, THEN we are done...
@@ -257,7 +257,7 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan)
     /*
      *  Find the macro code and the end of the macro invocation
      */
-    cur_macro = *ppM;
+    cur_macro = *ppm;
     scan    = find_mac_end(&pzMark);
 
     /*
@@ -282,8 +282,8 @@ find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan)
 
         if (pzMark != pzMacEnd) {
             pzMacEnd = SPN_WHITESPACE_BACK( pzMark, pzMacEnd);
-            (*ppM)->md_txt_off = (uintptr_t)pzMark;
-            (*ppM)->md_res     = (long)(pzMacEnd - pzMark);
+            (*ppm)->md_txt_off = (uintptr_t)pzMark;
+            (*ppm)->md_res     = (long)(pzMacEnd - pzMark);
         }
     }
 

@@ -451,7 +451,7 @@ eval(char const * expr)
 /*=macfunc EXPR
  *
  *  what:  Evaluate and emit an Expression
- *  alias: + - + ? + % + ; + ( + '`' + '"' + "'" + . +
+ *  alias: + - + ? + % + ; + ( + '`' + '"' + "'" + . + { +
  *
  *  handler_proc:
  *  load_proc:
@@ -558,6 +558,11 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
         (void) mLoad_Unknown(tpl, mac, ppzScan);
         mac->md_res = EMIT_NO_DEFINE | EMIT_SHELL;
         span_quote(tpl->td_text + mac->md_txt_off);
+        return mac + 1;
+
+    case '{':
+        (void) mLoad_Unknown(tpl, mac, ppzScan);
+        mac->md_res = EMIT_NO_DEFINE | EMIT_SHELL;
         return mac + 1;
 
     case '"':
