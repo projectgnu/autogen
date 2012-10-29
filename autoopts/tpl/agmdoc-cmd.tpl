@@ -117,13 +117,21 @@ into a shell script that will parse the options described.[+:
 The operands that this program operates on may be specified either
 on the command line or read from standard input, one per line.
 In that input, leading and trailing white space is stripped,
-blank lines are ignored and lines beginning with the character
-.I [+:(if (exist? "comment-char") (get "comment-char") "#"):+]
-are treated as comments.[+:
-    IF (exist? "interleaved") :+]
+blank lines are ignored[+:
+
+    IF (define comment-char (get "comment-char" "#"))
+       (> (string-length comment-char) 1)  \:+]
+ and lines beginning with the character
+.I [+: (substring comment-char 1 0):+]
+are treated as comments[+:
+    ENDIF :+].[+:
+
+    IF (exist? "interleaved")               :+]
 Options may be interleaved with operands both on the command
 line and when operands are read from standard input.[+:
-    ENDIF  interleaved        :+]
+    ENDIF  interleaved
+
+:+]
 Standard input may not be a terminal.[+:
 
   ESAC  main-type                           :+][+:

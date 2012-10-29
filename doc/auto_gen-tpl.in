@@ -437,7 +437,7 @@ If the text between the start and end macro markers starts with an opening
 curly brace ('@code{@{}') or is surrounded by back quotes ('@code{`}'), then
 the text is handed off to the server shell for evaluation.  The output to
 standard out is inserted into the document.  If the text starts with the
-curly brace, all the text is passed of as is to the shell.  If surrounded by
+curly brace, all the text is passed off as is to the shell.  If surrounded by
 back quotes, then the string is ``cooked'' before being handed off to the
 shell.
 

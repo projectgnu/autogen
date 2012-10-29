@@ -157,8 +157,9 @@ trim_input_line(char * pz_s)
     while ((unsigned int)isspace(*pz_s))  pz_s++;
 
     switch (*pz_s) {
-    case '\0':
-    case '[= ?% comment-char "%s" "#" =]':
+    case '\0':[= (define comment-char (get "comment-char" "#"))
+    (if (> (string-length comment-char) 0)
+        (string-append "\n    case '" (substring comment-char 0 1) "':")) =]
         return NULL;
     default:
         return pz_s;
@@ -379,7 +380,7 @@ ENDIF handler-type exists  =][=
  * @returns program exit code
  */
 int
-main(int argc, char** argv)
+main(int argc, char ** argv)
 {
     int res     = 0;
     int proc_ct = 0;
@@ -397,7 +398,7 @@ main(int argc, char** argv)
             char * arg = argv[arg_ix];[=
     IF (exist? "interleaved")   =]
             if (*arg == '-') {
-                RESTART_OPT(arg_ix - 1);
+                RESTART_OPT(arg_ix);
                 arg_ix = optionProcess(&[=(. pname)=]Options, argc, argv) - 1;
                 continue;
             }[=
@@ -427,7 +428,7 @@ main(int argc, char** argv)
      */
     else {
         size_t pg_size = getpagesize();
-        char* buf   = malloc(pg_size);
+        char * buf     = malloc(pg_size);
         if (buf == NULL) {
             fputs(_("[=(. prog-name)
                    =] ERROR: no memory for input list\n"), stderr);
@@ -435,7 +436,7 @@ main(int argc, char** argv)
         }
 
         for (;;) {
-            char* pz = fgets(buf, (ssize_t)pg_size, stdin);
+            char * pz = fgets(buf, (ssize_t)pg_size, stdin);
             if (pz == NULL)
                 break;
 

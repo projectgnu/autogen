@@ -2711,6 +2711,13 @@ If that character is the @code{NUL} byte, then only blank lines will be
 considered comments.
 @end table
 
+@noindent
+For an example of the produced main procedure, in the @file{autoopts/test}
+build directory, type the following command and look at @file{main.c}:
+@example
+make verbose TESTS=main.test
+@end example
+
 @node option attributes
 @subsection Option Attributes
 @cindex option attributes
@@ -4342,6 +4349,12 @@ int main(int argc, char ** argv) @{
   @}
 @}
 @end example
+
+If you want a program to operate this way, you might consider specifying a
+@code{for-each} main function (@pxref{main for-each, for-each main
+procedure}) with the @code{interleaved} attribute.  It will allow you to
+process interleaved operands and options from either the command line or
+when reading them from standard input.
 
 @node SET_OPT_name
 @subsection SET_OPT_name - Force an option to be set
