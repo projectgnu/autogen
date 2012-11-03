@@ -72,7 +72,7 @@ cat > $testname-c.base <<- _EOF_
 	 * Convert a command (keyword) to a str2m_enum_t enumeration value.
 	 *
 	 * @param[in] str   a string that should start with a known key word.
-	 * @param[in] len   the length of the keyword at \a str.
+	 * @param[in] len   the provided length of the keyword at \a str.
 	 * @returns the enumeration value.
 	 * If not found, that value is STR2M_INVALID_KWD.
 	 */
@@ -97,9 +97,11 @@ cat > $testname-c.base <<- _EOF_
 	{
 	    static char const undef[] = "* UNDEFINED *";
 	    static char const * const nm_table[] = {
-	        [   STR2M_KWD_ELEVEN] = "eleven",  [  STR2M_KWD_NINTEEN] = "ninteen",
-	        [      STR2M_KWD_ONE] = "one",     [    STR2M_KWD_SEVEN] = "seven",
-	        [    STR2M_KWD_THREE] = "three" };
+	        [STR2M_KWD_ELEVEN  ] = "eleven",
+	        [STR2M_KWD_NINTEEN ] = "ninteen",
+	        [STR2M_KWD_ONE     ] = "one",
+	        [STR2M_KWD_SEVEN   ] = "seven",
+	        [STR2M_KWD_THREE   ] = "three" };
 	    char const * res = undef;
 	    if (id < STR2M_COUNT_KWD) {
 	        res = nm_table[id];
@@ -108,6 +110,7 @@ cat > $testname-c.base <<- _EOF_
 	    }
 	    return res;
 	}
+
 	/* end of str2m.c */
 	_EOF_
 
@@ -186,7 +189,7 @@ cat > $testname-c2.base <<- _EOF_
 	 * Convert a command (keyword) to a str2m_2_enum_t enumeration value.
 	 *
 	 * @param[in] str   a string that should start with a known key word.
-	 * @param[in] len   the length of the keyword at \a str.
+	 * @param[in] len   the provided length of the keyword at \a str.
 	 * @returns the enumeration value.
 	 * If not found, that value is STR2M_2_COUNT_KWDBNM.
 	 */
@@ -211,11 +214,11 @@ cat > $testname-c2.base <<- _EOF_
 	{
 	    static char const undef[] = "* UNDEFINED *";
 	    static char const * const nm_table[] = {
-	        [   STR2M_2_KWDBNM_ELEVEN] = "eleven",
-	        [  STR2M_2_KWDBNM_NINTEEN] = "ninteen",
-	        [      STR2M_2_KWDBNM_ONE] = "one",
-	        [    STR2M_2_KWDBNM_SEVEN] = "seven",
-	        [    STR2M_2_KWDBNM_THREE] = "three" };
+	        [STR2M_2_KWDBNM_ELEVEN  ] = "eleven",
+	        [STR2M_2_KWDBNM_NINTEEN ] = "ninteen",
+	        [STR2M_2_KWDBNM_ONE     ] = "one",
+	        [STR2M_2_KWDBNM_SEVEN   ] = "seven",
+	        [STR2M_2_KWDBNM_THREE   ] = "three" };
 	    char const * res = undef;
 	    if (id < STR2M_2_COUNT_KWDBNM) {
 	        res = nm_table[id];

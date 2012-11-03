@@ -201,6 +201,8 @@ close_server_shell(void)
 #endif
     (void)kill(serv_id, SIGKILL);
     serv_id = NULLPROCESS;
+    if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)
+        fprintf(trace_fp, "close_server_shell in %u state\n", processing_state);
 
     /*
      *  This guard should not be necessary.  However, sometimes someone
@@ -646,6 +648,9 @@ shell_cmd(char const * cmd)
      *  THEN try to start it.
      */
     if (serv_id == NULLPROCESS) {
+        static int was_started = 0;
+        if (was_started++ > 0)
+            fprintf(stderr, "SERVER RESTART:  serv_id is NULLPROCESS\n");
         putenv((char *)SHELL_SET_PS4_FMT);
         serv_id = server_fp_open(&serv_pair, server_args);
         if (serv_id > 0)

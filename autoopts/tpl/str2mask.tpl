@@ -39,11 +39,12 @@ ENDFOR add-on-text              =]
 echo "/** bits defined for ${mask_name} */"
 ix=0
 
-declare -u C
+declare C
 exec 4< ${tmp_dir}/commands
 all_mask=0
 while read -u4 n C
 do
+    C=$(echo $C | tr '[a-z]' '[A-Z]')
     v=$(( 1 << n ))
     printf "$def_fmt" $C $v
     (( all_mask += v ))

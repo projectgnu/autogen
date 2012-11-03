@@ -24,13 +24,18 @@
 (define BASE-TYPE       (string-upcase base-type-name))
 
 (if (exist? "type")     (set! enum-type (string->c-name! (get "type"))))
-(define ENUM-TYPE       (if (<= (string-length enum-type) 0) ""
-                            (string-upcase  (string-append "_" enum-type)) ))
+(define ENUM-TYPE       (string-upcase  (string-append "_" enum-type)))
+(define find-func-name  "")
 
-(set!   enum-type       (string-downcase enum-type))
-(define find-func-name  (string-append
-   "find_" base-type-name "_" enum-type ))
+(if (<= (string-length enum-type) 0) (begin
+       (set! ENUM-TYPE      "")
+       (set! find-func-name (string-append "find_" base-type-name))
+   )
+   (set! find-func-name  (string-append
+         "find_" base-type-name "_" enum-type ))
+)
 
+(define enum-prefix     (string-append PFX-STR ENUM-TYPE))
 (define cmd-count       (string-append PFX-STR "_COUNT" ENUM-TYPE))
 (define enum-val-offset (if (exist? "cmd[0]") 1 0))
 (define insert-undef    #t)
@@ -61,6 +66,7 @@ FOR cmd                 =][=
 ENDFOR cmd              =][=
 
 (out-pop)
+(shell "chmod a+w ${tmp_dir}/commands")
 (if (< max-cmd-width 8) (set! max-cmd-width 8))
 
                         =][=

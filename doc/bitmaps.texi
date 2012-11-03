@@ -166,9 +166,13 @@ Typically, ``@t{-_}'' but sometimes (Tandem) ``@t{-_^}''.
 Do not use '@t{#}' in the list of characters.
 
 @item dispatch
-The lookup procedure will call a dispatch function.  You must provide a
-function for every named ``cmd'', plus an error handling function with
-``invalid'' (or the @code{invalid-name} value) being the @code{cmd} name.
+A lookup procedure will call a dispatch function for each defined dispatch
+type.  For every named ``cmd'', you must provide a handling function, plus
+an error handling function with ``invalid'' (or the @code{invalid-name}
+value) as the @code{cmd} name.  Multiple @code{dispatch} definitions will
+produce multiple dispatching functions, each with (potentially) unique
+argument lists and return types.
+
 You may also use @code{add-on-text} to ``@t{#define}'' one function to
 another.  The first two dispatch attributes are required, and the
 @code{d-arg} attribute is optional:
@@ -176,7 +180,9 @@ another.  The first two dispatch attributes are required, and the
 @table @samp
 @item d-nam
 This must be a printf format string with one formatting element: @code{%s}.
-The @code{%s} will be replaced by each @code{cmd} name.
+The @code{%s} will be replaced by each @code{cmd} name.  The @code{%s} will
+be stripped and the result will be combined with the base name to construct
+the dispatch procedure name.
 
 @item d-ret
 The return type of the dispatched function, even if ``@t{void}''.
@@ -186,6 +192,17 @@ If there are additional arguments that are to be passed through to the
 dispatched function, specify this as though it were part of the procedure
 header.  (It will be glued into the dispatching function as is and sedded
 into what is needed for the dispatched function.)
+
+@item d-omit
+Instead of providing handling functions for all of the @code{cmd} names,
+the invalid function will be called for omitted command codes.
+
+@item d-only
+You need only provide functions for the names listed by @code{d-only}, plus
+the ``invalid'' name.  All other command values will trigger calls to
+the invalid handling function.  Note that the invalid call can distinguish
+from a command that could not be found by examining the value of its
+first (@code{id}) argument.
 @end table
 
 The handler functions will have the command enumeration as its first first

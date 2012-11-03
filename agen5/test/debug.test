@@ -151,15 +151,17 @@ ${SED} -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
     -e '/Called ag_scm_for_index/d' \
     -e '/^AutoGen [0-9]* starts:/d' \
     ${traceout} > ${testname}.trace1
-cmp -s ${testname}.base1 ${testname}.trace1 || \
-  failure "`diff -c ${testname}.base1 ${testname}.trace1`"
+pair="${testname}.base1 ${testname}.trace1"
+cmp -s $pair || \
+  failure "`diff -c $pair`"
 
 ${VERBOSE} || {
+    unset `set | ${SED} -n '/^AUTOGEN[A-Z_]*=/{;s/=.*//;p;}'`
     traceout=${testname}-aglog-x2-$$.log
     trace_args=--trace-out=${traceout}
     run_ag x2 ${trace_args} ${testname}.def || failure AutoGen failed
     test -f ${traceout} -a -s ${traceout} && \
-        failure "autogen produced trace output"
+        failure "autogen produced trace output`echo;cat ${traceout}`"
 }
 
 cleanup

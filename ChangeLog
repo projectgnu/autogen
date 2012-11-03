@@ -1,3 +1,14 @@
+2012-11-03  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/agShell.c (close_server_shell): trace the action
+	(shell_cmd): be verbose when restarting -- always.
+	* agen5/test/debug.test: do not allow AUTOGEN env vars through
+	* autoopts/tpl/str2enum.tpl: allow multiple dispatcher functions
+	* autoopts/tpl/str2init.tlib: add some convenience defines
+	* autoopts/tpl/str2mask.tpl: accommodate older shells
+	* agen5/test/str2m.test: adjust test
+	* doc/bitmaps.texi: clarify docs
+
 2012-10-27  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/str2enum.tpl: polishing
