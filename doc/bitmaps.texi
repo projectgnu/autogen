@@ -5,7 +5,12 @@ AutoGen provides two templates for managing enumerations and bit maps
 (flag words).  They produce an enumeration of the enum or @code{#define}s
 for the bit maps, plus conversion functions for converting a string into
 one of these values or converting one of these values into a human readable
-string.  There is a separate project that produces a GDB add-on that
+string.  Finally, for enumerations, you may specify one or more sets of
+dispatching functions that will be selected by identifying a keyword
+prefix of a string (@pxref{enum-code, the @i{dispatch} attribute in
+Strings to Enums and Back}).
+
+There is a separate project that produces a GDB add-on that
 will add these capabilities into GDB for bit masks.  (GDB does just fine
 with enumerations.)
 
@@ -166,16 +171,18 @@ Typically, ``@t{-_}'' but sometimes (Tandem) ``@t{-_^}''.
 Do not use '@t{#}' in the list of characters.
 
 @item dispatch
-A lookup procedure will call a dispatch function for each defined dispatch
-type.  For every named ``cmd'', you must provide a handling function, plus
-an error handling function with ``invalid'' (or the @code{invalid-name}
-value) as the @code{cmd} name.  Multiple @code{dispatch} definitions will
-produce multiple dispatching functions, each with (potentially) unique
-argument lists and return types.
+A lookup procedure will call a dispatch function for the procedure named
+after the keyword identified at the start of a string.  Other than as
+specially noted below, for every named ``cmd'', must have a handling
+function, plus another function to handle errors, with ``invalid'' (or the
+@code{invalid-name} value) as the @code{cmd} name.  Multiple @code{dispatch}
+definitions will produce multiple dispatching functions, each with
+(potentially) unique argument lists and return types.
 
 You may also use @code{add-on-text} to ``@t{#define}'' one function to
-another.  The first two dispatch attributes are required, and the
-@code{d-arg} attribute is optional:
+another, thus allowing one function to handle multiple keywords or commands.
+The @code{d-nam} and @code{d-ret} attributes are required.  The @code{d-arg},
+@code{d-omit} and @code{d-only} attributes are optional:
 
 @table @samp
 @item d-nam
