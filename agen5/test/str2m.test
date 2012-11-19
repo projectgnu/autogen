@@ -369,8 +369,9 @@ cmp -s $fpair || \
 echo running $testname-2.c program
 chmod 666 $testname-2.c
 cmd_sum=`echo $cmd_list | sed 's/ / + /g'`
-cat >> $testname-2.c <<- _EOF_
+cat > $testname-main.c <<- _EOF_
 	#include <stdio.h>
+	#include "$testname-2.c"
 	int main(int argc, char ** argv) {
 	    str2m_2_mask_t mask =
 	        str2m_2_str2mask("${cmd_sum}", 0);
@@ -394,7 +395,7 @@ cat >> $testname-2.c <<- _EOF_
 	}
 	_EOF_
 
-${CC:-cc} -o ${testname} $testname-2.c || \
+${CC:-cc} -o ${testname} $testname-main.c || \
     failure "cannot compile $testname-2.c"
 ./${testname} > ${testname}-btest
 echo "$mask_all --> $(( ${#cmd_list} + 1 )) bytes: '$cmd_list'" \

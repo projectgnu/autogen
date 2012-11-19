@@ -234,7 +234,7 @@ MACROS:
 DEFINE script-preamble
 
 \=]
-#! @CONFIG_[=#=]SHELL@
+#! @CONFIG_[=# defer substitution #=]SHELL@
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
@@ -260,8 +260,7 @@ case "${libdir}" in
     ;;
 
 * )
-    test -n "${ldopts}" && \
-        ldflags="${ldopts}${libdir} ${ldflags}"
+    ldflags="${ldopts} ${ldflags}"
     ;;
 esac
 libs=${ldflags}

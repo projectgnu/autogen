@@ -1,3 +1,9 @@
+2012-11-18  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/expFormat.c (ag_scm_license_name): guard against not being
+	able to find a license file.
+	* agen5/guile-iface.def: use "latin1_string" instead of "utf8".
+
 2012-11-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c (close_server_shell): trace the action

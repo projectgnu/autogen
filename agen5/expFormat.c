@@ -614,10 +614,12 @@ ag_scm_license_name(SCM lic)
     char * txt = find_lic_text(LSEG_NAME, lic, &text_len, "");
     char * e;
 
-    txt = SPN_WHITESPACE_CHARS(txt);
-    e   = SPN_WHITESPACE_BACK(txt, txt);
-    *e  = NUL;
-    lic = AG_SCM_STR02SCM(txt);
+    if (txt != NULL) {
+        txt = SPN_WHITESPACE_CHARS(txt);
+        e   = SPN_WHITESPACE_BACK(txt, txt);
+        *e  = NUL;
+        lic = AG_SCM_STR02SCM(txt);
+    }
     return lic;
 }
 

@@ -114,7 +114,7 @@ iface = {
   i-args    = '_s';
   i-impl    = { i-end = '107'; i-code = 'scm_makfrom0str(_s)'; };
   i-impl    = { i-end = '200'; i-code = 'scm_from_locale_string(_s)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_from_utf8_string(_s)'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_from_latin1_string(_s)'; };
 };
 
 iface = {
@@ -122,7 +122,7 @@ iface = {
   i-args    = '_st,_sz';
   i-impl    = { i-end = '107'; i-code = 'scm_mem2string(_st,_sz)'; };
   i-impl    = { i-end = '200'; i-code = 'scm_from_locale_stringn(_st,_sz)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_from_utf8_stringn(_st,_sz)'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_from_latin1_stringn(_st,_sz)'; };
 };
 
 iface = {
@@ -130,7 +130,7 @@ iface = {
   i-args    = '_s';
   i-impl    = { i-end = '107'; i-code = 'gh_scm2newstr(_s, NULL)'; };
   i-impl    = { i-end = '200'; i-code = 'scm_to_locale_string(_s)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_to_utf8_string(_s)'; };
+  i-impl    = { i-end = '201'; i-code = 'scm_to_latin1_string(_s)'; };
 };
 
 iface = {
