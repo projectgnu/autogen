@@ -1,4 +1,4 @@
-// -*- Mode: C -*-
+// -*- Mode: text -*-
 
 autogen definitions conftest.tpl;
 
@@ -175,19 +175,45 @@ test   = {
 };
 
 test   = {
+  name      = guile_ver;
+  type      = withconf;
+  check     = "the guile version is set";
+  action    = { yes; act-type = script; asis;
+    act-text = 'ag_cv_test_guile_version=${ag_cv_set_guile_ver}'; };
+};
+
+test   = {
   name      = guile_version;
   type      = test;
   check     = "the guile version";
   code      = <<- _END_OF_CODE_
-	pkginfo=`dpkg --list 2>/dev/null | egrep 'guile-[0-9.]-dev'`
-	if test -n "${pkginfo}"
-	then echo ${pkginfo} | sed -e 's/.*guile-//' -e 's/-dev.*//'
-	else
-	  v=`( guile-config --version 2>&1 ) | sed 's/.*Guile version *//'`
-	  test -z "${v}" && v=`guile --version | sed 's/.*Guile *//;1q'`
-	  test -z "${v}" && exit 1
-	  echo ${v}
-	fi
+	v=`guile-config --version 2>&1`
+	test -n "${v}" && {
+	  echo "${v}" | sed 's/.*Guile version *//'
+	  exit 0
+	}
+	v=`guile --version`
+	test -n "${v}" && {
+	  echo "${v}" | sed 's/.*Guile *//;1q'
+	  exit 0
+	}
+	v=`rpm -q --list guile-devel 2>/dev/null | \
+	        grep '/version\.h' | \
+	        head -1`
+	test -n "${v}" && {
+	  v=`awk '/^#define SCM_M/{print $2 "=" $3}' $v`
+	  eval "$v"
+	  test "X$SCM_MICRO_VERSION" = X || \
+	    SCM_MINOR_VERSION=$SCM_MINOR_VERSION.$SCM_MICRO_VERSION
+	  echo "$SCM_MAJOR_VERSION.$SCM_MINOR_VERSION"
+	  exit 0
+	}
+	v=`dpkg --list 2>/dev/null | egrep 'guile-[0-9.]*-dev' | head -1`
+	test -n "${v}" && {
+	  echo "${v}" | sed 's/.*guile-//;s/-dev.*//'
+	  exit 0
+	}
+	exit 1
 	_END_OF_CODE_;
   code-quoting  = asis;
 
@@ -198,6 +224,8 @@ test   = {
 	i=${3}
 	test -z "${i}" && i=0
 	GUILE_VERSION=`expr ${1} \* 100000 + ${2} \* 1000 + ${i}`
+	test ${GUILE_VERSION} -lt 107000 && \
+	    AC_MSG_ERROR([Guile must be no older than 1.7.x])
 	AC_DEFINE_UNQUOTED([GUILE_VERSION], [${GUILE_VERSION}],
 	         [define to Guile version expression])
 	AC_SUBST(GUILE_VERSION)

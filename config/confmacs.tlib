@@ -349,6 +349,23 @@ DEFINE  emit-enablement
 
 ENDDEF  emit-enablement
 
+# # # # # # # # # # SETTING # # # # # # # # # # =][=
+
+DEFINE  emit-setting
+
+  =]
+  AC_ARG_[=arg-name=]([[=(. hyphen-name)=]],
+    AS_HELP_STRING([--[=type=]-[=(. hyphen-name)=]], [[=check=]]),
+    [[=(. cv-name)=]=${[=(string-downcase! (get "arg-name"))
+      =]_[=(. down-name)=]}],
+    AC_CACHE_CHECK([whether [=check=]], [=(. cv-name)=],
+      [=(. cv-name)=]=no)
+  ) # end of AC_ARG_[=arg-name=][=
+
+  INVOKE emit-results =][=
+
+ENDDEF  emit-setting
+
 # # # # # # # # # SET-LANGUAGE # # # # # # # # =][=
 
 DEFINE  set-language
@@ -393,6 +410,15 @@ DEFINE  try-with                =][=
   INVOKE emit-enablement
        arg-name  = WITH         =][=
 ENDDEF  try-with                =][=
+
+# # # # # # # # # # WITHCONF # # # # # # # =][=
+
+DEFINE  try-withconf            =][=
+  (set! cv-name (string-append group-pfx "cv_set_" down-name)) =][=
+  INVOKE emit-setting
+       type      = with
+       arg-name  = WITH         =][=
+ENDDEF  try-withconf            =][=
 
 # # # # # # # # # # WITHOUT # # # # # # # =][=
 

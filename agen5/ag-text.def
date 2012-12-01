@@ -551,6 +551,12 @@ string = { nm = LD_EXTRACT_BAD_READ;
 string = { nm = LD_EXTRACT_READ_FAIL;
    str = "read failure"; };
 
+string = { nm = LD_LIB_PATH_PFX;
+   str = "LD_LIBRARY_PATH="; };
+
+string = { nm = LD_LIB_PATH_STR;
+   str = "LD_LIBRARY_PATH"; };
+
 string = { nm = LD_FOR_IN;
    str = "in"; };
 

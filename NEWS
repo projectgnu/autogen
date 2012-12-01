@@ -9,6 +9,9 @@ New in __CURRENT_VERSION__ October 2012
   trying to run programs that use not-yet-installed libraries.
   LD_LIBRARY_PATH is now discarded.  :(
 
+* The AG_OTEST_GUILE_VERSION will now try "rpm -q" first
+  before dpkg, "guile-config --verision" and "guile --version".
+
 New in 5.16.2 August 2012
 
 * Coverity cleanups

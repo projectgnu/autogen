@@ -22,6 +22,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static char const * ld_lib_path = NULL;
+
 /* = = = START-STATIC-FORWARD = = = */
 static char const *
 make_quote_str(char const * str);
@@ -31,9 +33,6 @@ dep_usage(char const * fmt, ...);
 
 static void
 add_sys_env(char * env_name);
-
-static void
-add_env_vars(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef DAEMON_ENABLED
@@ -55,6 +54,8 @@ add_env_vars(void);
 LOCAL void
 initialize(int arg_ct, char** arg_vec)
 {
+    putenv(C(char *, ld_lib_path));
+
     ag_scribble_init();
 
     /*
@@ -80,7 +81,6 @@ initialize(int arg_ct, char** arg_vec)
 
     last_scm_cmd = NULL;
     processing_state = PROC_STATE_OPTIONS;
-    add_env_vars();
 
     process_ag_opts(arg_ct, arg_vec);
     exit_code = AUTOGEN_EXIT_LOAD_ERROR;
@@ -269,7 +269,7 @@ add_sys_env(char * env_name)
      *  override it.
      */
     if (getenv(env_name) == NULL) {
-        char* pz;
+        char * pz;
 
         if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
             fprintf(trace_fp, TRACE_ADD_TO_ENV_FMT, env_name);
@@ -280,12 +280,44 @@ add_sys_env(char * env_name)
 }
 
 /**
- * Define system environment variables.  "__autogen__=1" is exported,
- * along with various ones derivable from Solaris sysinfo(3p) or uname.
+ * Prepare the raft of environment variables.
+ * This runs before Guile starts and grabs the value for LD_LIBRARY_PATH.
+ * Guile likes to fiddle that.  When we run initialize(), we will force it
+ * to match what we currently have.  Additionally, force our environment
+ * to be "C" and export all the variables that describe our system.
  */
-static void
-add_env_vars(void)
+LOCAL void
+prep_env(void)
 {
+    putenv(C(char *, "GUILE_SYSTEM_EXTENSIONS_PATH="));
+
+    /*
+     *  as of 2.0.2, Guile will fiddle with strings all on its own accord.
+     *  Coerce the environment into being POSIX ASCII strings so it keeps
+     *  its bloody stinking nose out of our data.
+     */
+    putenv(C(char *, LC_ALL_IS_C));
+
+    /*
+     *  If GUILE_WARN_DEPRECATED has not been defined, then likely we are
+     *  not in a development environment and likely we don't want to give
+     *  our users any angst.
+     */
+    if (getenv(GUILE_WARN_DEP_STR) == NULL)
+        putenv(C(char *, GUILE_WARN_NO_ENV));
+
+    ld_lib_path = getenv(LD_LIB_PATH_STR);
+    if (ld_lib_path == NULL) {
+        ld_lib_path = LD_LIB_PATH_PFX;
+
+    } else {
+        size_t psz = strlen(ld_lib_path) + 1;
+        char * p = AGALOC(LD_LIB_PATH_PFX_LEN + psz, "lp");
+        memcpy(p, LD_LIB_PATH_PFX, LD_LIB_PATH_PFX_LEN);
+        memcpy(p + LD_LIB_PATH_PFX_LEN, ld_lib_path, psz);
+        ld_lib_path = p;
+    }
+
     /*
      *  Set the last resort search directories first (lowest priority)
      *  The lowest of the low is the config time install data dir.

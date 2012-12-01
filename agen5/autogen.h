@@ -27,11 +27,7 @@
 
 #include REGEX_HEADER
 #include <libguile/scmconfig.h>
-#if GUILE_VERSION < 107000
-# include <guile/gh.h>
-#else
-# include <libguile.h>
-#endif
+#include <libguile.h>
 
 #include "ag-text.h"
 #include "opts.h"

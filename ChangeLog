@@ -1,3 +1,16 @@
+2012-12-01  Bruce Korb  <bkorb@gnu.org>
+
+	* ag-text.def: fetch and store strings for LD_LIBRARY_PATH
+	* agen5/agInit.c (add_env_vars): rename to prep_env, make global
+	and invoke it after setting up signal handling, before boot Guile.
+	(initialize): set LD_LIBRARY_PATH to the preserved value
+	* agen5/autogen.c (main): move environment setting to prep_env().
+	* autoopts/usage.c (prt_preamble): The Windows printf library cannot
+	handle "%1$s" formatting elements.  Add exceptional code for it.
+	* config/confmacs.tlib (try-withconf): complete implementation
+	* config/misc.def (guile-ver): use "withconf" type to set
+	guile version.  Also permanently disable Guile 1.4 and 1.6.
+
 2012-11-18  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/expFormat.c (ag_scm_license_name): guard against not being

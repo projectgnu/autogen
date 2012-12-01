@@ -35,8 +35,8 @@ typedef enum {
 static char const * const state_names[] = { STATE_TABLE };
 #undef _State_
 
-static sigjmp_buf  abendJumpEnv;
-static int         abendJumpSignal = 0;
+static sigjmp_buf  abend_env;
+static int         abend_sig = 0;
 
 typedef void (sighandler_proc_t)(int sig);
 static sighandler_proc_t ignore_signal, catch_sig_and_bail;
@@ -120,33 +120,17 @@ inner_main(void * closure, int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
-    putenv(C(char *, "GUILE_SYSTEM_EXTENSIONS_PATH="));
-
     /*
      *  IF we've been kicked with a signal,
      *  THEN abort, passing the signal that whacked us.
      */
-    if (sigsetjmp(abendJumpEnv, 0) != 0)
-        cleanup_and_abort(abendJumpSignal);
+    if (sigsetjmp(abend_env, 0) != 0)
+        cleanup_and_abort(abend_sig);
 
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
     optionSaveState(&autogenOptions);
     trace_fp = stderr;
-
-    /*
-     *  as of 2.0.2, Guile will fiddle with strings all on its own accord.
-     *  Coerce the environment into being POSIX ASCII strings so it keeps
-     *  its bloody stinking nose out of our data.
-     */
-    putenv(C(char *, LC_ALL_IS_C));
-
-    /*
-     *  If GUILE_WARN_DEPRECATED has not been defined, then likely we are
-     *  not in a development environment and likely we don't want to give
-     *  our users any angst.
-     */
-    if (getenv(GUILE_WARN_DEP_STR) == NULL)
-        putenv(C(char *, GUILE_WARN_NO_ENV));
+    prep_env();
 
     AG_SCM_BOOT_GUILE(argc, argv, inner_main);
 
@@ -301,9 +285,9 @@ catch_sig_and_bail(int sig)
         break;
 
     default:
-        abendJumpSignal = sig;
+        abend_sig = sig;
         exit_code = AUTOGEN_EXIT_SIGNAL;
-        siglongjmp(abendJumpEnv, sig);
+        siglongjmp(abend_env, sig);
     }
 }
 
