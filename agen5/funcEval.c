@@ -41,7 +41,7 @@ LOCAL char const *
 scm2display(SCM s)
 {
     static char  z[48];
-    char const * pzRes = z;
+    char const * res = z;
 
     switch (ag_scm_type_e(s)) {
     case GH_TYPE_BOOLEAN:
@@ -50,17 +50,17 @@ scm2display(SCM s)
 
     case GH_TYPE_STRING:
     case GH_TYPE_SYMBOL:
-        pzRes = ag_scm2zchars(s, "SCM Result");
+        res = ag_scm2zchars(s, "SCM Result");
         break;
 
     case GH_TYPE_CHAR:
         z[0] = AG_SCM_CHAR(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
-        pzRes = RESOLVE_SCM_VECTOR; break;
+        res = RESOLVE_SCM_VECTOR; break;
 
     case GH_TYPE_PAIR:
-        pzRes = RESOLVE_SCM_PAIR; break;
+        res = RESOLVE_SCM_PAIR; break;
 
     case GH_TYPE_NUMBER:
         snprintf(z, sizeof(z), RESOLVE_SCM_NUMBER, AG_SCM_TO_ULONG(s)); break;
@@ -75,27 +75,27 @@ scm2display(SCM s)
         break;
     }
 #else
-        pzRes = "** PROCEDURE **";
+        res = "** PROCEDURE **";
         break;
 #endif
 
     case GH_TYPE_LIST:
-        pzRes = RESOLVE_SCM_LIST; break;
+        res = RESOLVE_SCM_LIST; break;
 
     case GH_TYPE_INEXACT:
-        pzRes = RESOLVE_SCM_INEXACT; break;
+        res = RESOLVE_SCM_INEXACT; break;
 
     case GH_TYPE_EXACT:
-        pzRes = RESOLVE_SCM_EXACT; break;
+        res = RESOLVE_SCM_EXACT; break;
 
     case GH_TYPE_UNDEFINED:
-        pzRes = (char*)zNil; break;
+        res = (char*)zNil; break;
 
     default:
-        pzRes = RESOLVE_SCM_UNKNOWN; break;
+        res = RESOLVE_SCM_UNKNOWN; break;
     }
 
-    return pzRes;
+    return res;
 }
 
 /**

@@ -412,6 +412,7 @@ MODE char *         cgi_stderr       VALUE( NULL );
 
 MODE char const *   server_args[2]   VALUE( { NULL } );
 MODE char const *   shell_program    VALUE( MK_STR(CONFIG_SHELL) );
+MODE char const *   libguile_ver     VALUE( NULL );
 
 /*
  *  AutoGen definiton and template context

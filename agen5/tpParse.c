@@ -35,10 +35,10 @@ static char const *
 find_mac_end(char const ** ppzMark);
 
 static char const *
-find_mac_start(char const * pz, macro_t** ppM, templ_t* pTpl);
+find_mac_start(char const * pz, macro_t ** ppm, templ_t * tpl);
 
 static char const *
-find_macro(templ_t * pTpl, macro_t ** ppM, char const ** pscan);
+find_macro(templ_t * tpl, macro_t ** ppm, char const ** pscan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*

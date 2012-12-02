@@ -9,6 +9,9 @@ string = { nm = ADD_ENV_VARS_SUFFIX_FMT;
 string = { nm = ADD_SYS_ENV_VAL_FMT;
    str = "%s=1"; };
 
+string = { nm = ADDR_FAMILY_BAD;
+   str = "The '%d' address family cannot be handled"; };
+
 string = { nm = AG_ABEND_STATE_FMT;
    str = "ABEND-ing in %s state\n"; };
 
@@ -430,12 +433,21 @@ string = { nm = FN_IF_ELSE;
 string = { nm = FOR_IN_LISTLESS;
    str = "FOR x IN ... has no list"; };
 
+string = { nm = FORK_FAILED;
+   str = "Error %d while forking:  %s\n"; };
+
 string = { nm = GUARD_SFX;
    str = "_GUARD"; };
 
 string = { nm = GUILE_CMD_FAIL_FMT;
    str = "Failing Guile command:  = = = = =\n\n%s\n\n"
          "=================================\n"; };
+
+string = { nm = GUILE_VERSION_BAD;
+   str = "Could not decipher Guile version: %s\n"; };
+
+string = { nm = GUILE_VERSION_WRONG;
+   str = "Compiled Guile version does not match: %s vs %s\n"; };
 
 string = { nm = GUILE_WARN_DEP_STR;
    str = "GUILE_WARN_DEPRECATED"; };
@@ -777,6 +789,9 @@ string = { nm = OUT_SWITCH_FAIL;
 string = { nm = PARSE_INPUT_AG_DEF_STR;
    str = "Autogen Definitions cgi;\n"; };
 
+string = { nm = PATH_TOO_BIG;
+   str = "AF_UNIX path exceeds %d"; };
+
 string = { nm = PIPE_DEFS_STDIN_NAME;
    str = "stdin"; };
 
@@ -806,6 +821,9 @@ string = { nm = PIPE_POLL_NAME_STR;
 
 string = { nm = PIPE_WRITE_NAME_STR;
    str = "write"; };
+
+string = { nm = PORT_NUM_BAD;
+   str = "Invalid port number:  '%s'"; };
 
 string = { nm = PREFIX_FAIL;
    str = "(prefix ...) failed"; };
@@ -971,6 +989,9 @@ string = { nm = SET_TMP_DIR_CMD;
 string = { nm = SET_WRITE_WARN;
    str = "Warning: (set-writable) function in %s on line %d:\n"
          "\toverridden by invocation option\n"; };
+
+string = { nm = SETSID_FAIL;
+   str = "Error %d setting session ID:  %s\n"; };
 
 string = { nm = SFX_FMT;
    str = "%s%s"; };
@@ -1205,6 +1226,9 @@ string = { nm = TRACE_SHELL_STARTS_FMT;
 
 string = { nm = TRACE_START_FMT;
    str = "\nAutoGen %u starts:  %s"; };
+
+string = { nm = TRACE_START_GUILE;
+   str = "\nGuile Library Version %s\n"; };
 
 string = { nm = TRACE_SUSPEND;
    str = "%s %s as '%s'\n"; };

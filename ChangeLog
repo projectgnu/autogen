@@ -1,3 +1,17 @@
+2012-12-02  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/ag-text.def: new messages
+	* agen5/schemedef.scm: make '(version)' the last thing to do.
+	* agen5/agInit.c (init_scm): new function split out of initialize.
+	Do all the initialization stuff and capture the version of the
+	guile library we're bound to.  Make sure it matches major and minor
+	release numbers with the one we are compiled against.
+	(globally): move a few messages to ag-text.def.
+	* agen5/autogen.h (libguile_ver): new global to save the libguile
+	verstion string.
+	* agen5/agUtils.c (open_trace_file): print the libguile version
+	* agen5/test/debug.test: adjust
+
 2012-12-01  Bruce Korb  <bkorb@gnu.org>
 
 	* ag-text.def: fetch and store strings for LD_LIBRARY_PATH

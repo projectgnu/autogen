@@ -25,6 +25,9 @@
 static char const * ld_lib_path = NULL;
 
 /* = = = START-STATIC-FORWARD = = = */
+static void
+init_scm(void);
+
 static char const *
 make_quote_str(char const * str);
 
@@ -62,22 +65,7 @@ initialize(int arg_ct, char** arg_vec)
      *  Initialize all the Scheme functions.
      */
     ag_init();
-    last_scm_cmd = SCHEME_INIT_TEXT;
-    ag_scm_c_eval_string_from_file_line(
-        SCHEME_INIT_TEXT, AG_TEXT_STRTABLE_FILE, SCHEME_INIT_TEXT_LINENO);
-
-    {
-#if GUILE_VERSION > 200000
-#define SCHEME_INIT_DEBUG SCHEME_INIT_DEBUG_2_0
-#else
-#define SCHEME_INIT_DEBUG SCHEME_INIT_DEBUG_1_6
-#endif
-        char * p = aprf(INIT_SCM_ERRS_FMT, SCHEME_INIT_DEBUG);
-#undef  SCHEME_INIT_DEBUG
-        last_scm_cmd = p;
-        ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
-        AGFREE(p);
-    }
+    init_scm();
 
     last_scm_cmd = NULL;
     processing_state = PROC_STATE_OPTIONS;
@@ -112,6 +100,47 @@ initialize(int arg_ct, char** arg_vec)
             spawnPipe(pzS);
     }
 #endif /* DAEMON_ENABLED */
+}
+
+static void
+init_scm(void)
+{
+    last_scm_cmd = SCHEME_INIT_TEXT;
+
+    {
+        SCM ini_res = ag_scm_c_eval_string_from_file_line(
+            SCHEME_INIT_TEXT, AG_TEXT_STRTABLE_FILE, SCHEME_INIT_TEXT_LINENO);
+        AGDUPSTR(libguile_ver, scm2display(ini_res), "ini res");
+    }
+
+    {
+        unsigned int maj, min, mic;
+        switch (sscanf(libguile_ver, "%u.%u.%u", &maj, &min, &mic)) {
+        case 2:
+        case 3: break;
+        default:
+            AG_ABEND(aprf(GUILE_VERSION_BAD, libguile_ver));
+            /* NOT_REACHED */
+        }
+        maj = min + (100 * maj);
+        if ((GUILE_VERSION / 1000) != maj)
+            AG_ABEND(aprf(GUILE_VERSION_WRONG, libguile_ver,
+                          MK_STR(GUILE_VERSION)));
+    }
+
+    {
+#       if GUILE_VERSION >= 200000
+#         define SCHEME_INIT_DEBUG SCHEME_INIT_DEBUG_2_0
+#       else
+#         define SCHEME_INIT_DEBUG SCHEME_INIT_DEBUG_1_6
+#       endif
+        char * p = aprf(INIT_SCM_ERRS_FMT, SCHEME_INIT_DEBUG);
+#       undef  SCHEME_INIT_DEBUG
+
+        last_scm_cmd = p;
+        ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
+        AGFREE(p);
+    }
 }
 
 /**
@@ -289,8 +318,6 @@ add_sys_env(char * env_name)
 LOCAL void
 prep_env(void)
 {
-    putenv(C(char *, "GUILE_SYSTEM_EXTENSIONS_PATH="));
-
     /*
      *  as of 2.0.2, Guile will fiddle with strings all on its own accord.
      *  Coerce the environment into being POSIX ASCII strings so it keeps
@@ -523,7 +550,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
         uint32_t p_len = strlen(pzPort);
 
         if (p_len > sizeof(sa.un_addr.sun_path))
-            AG_ABEND(aprf("AF_UNIX path exceeds %d", p_len));
+            AG_ABEND(aprf(PATH_TOO_BIG, p_len));
         sa.un_addr.sun_family  = AF_UNIX;
         strncpy(sa.un_addr.sun_path, pzPort, p_len);
         addr_len = sizeof(sa.un_addr) - sizeof(sa.un_addr.sun_path) + p_len;
@@ -544,7 +571,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
 
         port = (uint16_t)strtol(pzPort, &pz, 0);
         if ((errno != 0) || (*pz != NUL))
-            AG_ABEND(aprf("Invalid port number:  '%s'", pzPort));
+            AG_ABEND(aprf(PORT_NUM_BAD, pzPort));
 
         sa.in_addr.sin_port = htons((short)port);
         addr_len = sizeof(sa.in_addr);
@@ -552,8 +579,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
     break;
 
     default:
-        AG_ABEND(aprf("The '%d' address family cannot be handled",
-                      addr_family));
+        AG_ABEND(aprf(ADDR_FAMILY_BAD, addr_family));
     }
 
     if (bind(socket_fd, &sa.addr, addr_len) < 0) {
@@ -637,7 +663,6 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
 daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
           char const * pzDaemonDir)
 {
-    static char const zNoFork[] = "Error %d while forking:  %s\n";
     /*
      *  Become a daemon process by exiting the current process
      *  and allowing the child to continue.  Also, change stdin,
@@ -649,7 +674,7 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
 
         switch (ret) {
         case -1:
-            fprintf(stderr, zNoFork, errno, strerror(errno));
+            fprintf(stderr, FORK_FAILED, errno, strerror(errno));
         default:
             exit(ret);
 
@@ -662,8 +687,7 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
      *  Now, become a process group and session group leader.
      */
     if (setsid() == -1) {
-        fprintf(stderr, "Error %d setting session ID:  %s\n",
-                errno, strerror(errno));
+        fprintf(stderr, SETSID_FAIL, errno, strerror(errno));
         exit(99);
     }
 
@@ -675,7 +699,7 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
      */
     switch (fork()) {
     case -1:
-        fprintf(stderr, zNoFork, errno, strerror(errno));
+        fprintf(stderr, FORK_FAILED, errno, strerror(errno));
         exit(99);
 
     case 0:

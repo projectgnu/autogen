@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # debug.test --- definition reference testing
 #
-# Time-stamp:        "2012-04-07 09:45:03 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 #
 ## This file is part of AutoGen.
@@ -50,6 +49,8 @@ _EOF_
 
 cat > ${testname}.base1 <<\_EOF_
 
+AutoGen NNNN starts:
+Guile Library Version X.X.X
 eval from file agInit.c line XXX:
 (debug-enable 'backtrace)
 Definition Load:
@@ -147,9 +148,11 @@ else trace_args=--trace=everything\ --trace-out=${traceout}
 fi
 
 run_ag x1 ${trace_args} ${testname}.def || failure AutoGen failed
-${SED} -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
+${SED} \
+    -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
     -e '/Called ag_scm_for_index/d' \
-    -e '/^AutoGen [0-9]* starts:/d' \
+    -e '/^AutoGen /s/[0-9][0-9]* starts:.*/NNNN starts:/' \
+    -e 's/Guile Library Version .*/Guile Library Version X.X.X/' \
     ${traceout} > ${testname}.trace1
 pair="${testname}.base1 ${testname}.trace1"
 cmp -s $pair || \

@@ -400,4 +400,5 @@
 (define stack-join (lambda (j-str ag-name)
   (join j-str (stack ag-name))))
 
+(version)
 ;;; end of agen5/schemedef.scm

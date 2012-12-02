@@ -168,7 +168,7 @@ open_trace_file(char ** av, tOptDesc * odsc)
     fprintf(trace_fp, TRACE_START_FMT, (unsigned int)getpid(), *av);
     while (*(++av) != NULL)
         fprintf(trace_fp, TRACE_AG_ARG_FMT, *av);
-    putc(NL, trace_fp);
+    fprintf(trace_fp, TRACE_START_GUILE, libguile_ver);
 }
 
 /**

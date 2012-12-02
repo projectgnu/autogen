@@ -60,26 +60,26 @@ prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
                char const * pOptTitle);
 
 static void
-prt_ini_list(char const * const * papz, bool * pInitIntro,
-             char const * pzRc, char const * pzPN);
+prt_ini_list(char const * const * papz, bool * need_intro,
+             char const * ini_file, char const * path_nm);
 
 static void
-prt_preamble(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT);
+prt_preamble(tOptions * opts, tOptDesc * od, arg_types_t * at);
 
 static void
-prt_one_usage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT);
+prt_one_usage(tOptions * opts, tOptDesc * od, arg_types_t * at);
 
 static void
-prt_opt_usage(tOptions * pOpts, int ex_code, char const * pOptTitle);
+prt_opt_usage(tOptions * opts, int ex_code, char const * title);
 
 static void
-prt_prog_detail(tOptions* pOptions);
+prt_prog_detail(tOptions * opts);
 
 static int
-setGnuOptFmts(tOptions* pOpts, tCC** ppT);
+setGnuOptFmts(tOptions * opts, char const ** ptxt);
 
 static int
-setStdOptFmts(tOptions* pOpts, tCC** ppT);
+setStdOptFmts(tOptions * opts, char const ** ptxt);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*

@@ -228,13 +228,13 @@ ENDDEF doc-sections
 
 DEFINE ao-sections              :+][+:
 
-INVOKE cond-section  sec = "OPTIONS"           mode = "replace"       :+][+:
-INVOKE cond-section  sec = "SYNOPSIS"          mode = "alt"           :+][+:
-INVOKE cond-section  sec = "DESCRIPTION"       mode = "append"        :+][+:
-INVOKE cond-section  sec = "EXIT STATUS"       mode = "insert"        :+][+:
-INVOKE cond-section  sec = "AUTHORS"           mode = "alt"           :+][+:
-INVOKE cond-section  sec = "BUGS"              mode = "append"        :+][+:
-INVOKE cond-section  sec = "NOTES"             mode = "append"        :+][+:
+  INVOKE cond-section  sec = "OPTIONS"         mode = "replace"       :+][+:
+  INVOKE cond-section  sec = "SYNOPSIS"        mode = "alt"           :+][+:
+  INVOKE cond-section  sec = "DESCRIPTION"     mode = "append"        :+][+:
+  INVOKE cond-section  sec = "EXIT STATUS"     mode = "insert"        :+][+:
+  INVOKE cond-section  sec = "AUTHORS"         mode = "alt"           :+][+:
+  INVOKE cond-section  sec = "BUGS"            mode = "append"        :+][+:
+  INVOKE cond-section  sec = "NOTES"           mode = "append"        :+][+:
 
 IF (exist? "copyright")                                               :+][+:
   INVOKE cond-section   sec = "COPYRIGHT"      mode = "alt"           :+][+:
@@ -250,7 +250,6 @@ IF (or home-rc-files environ-init)                                    :+][+:
   IF (. environ-init)                                                 :+][+:
     INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"        :+][+:
   ENDIF                                                               :+][+:
-
 ENDIF                                                                 :+][+:
 
 ENDDEF ao-sections
