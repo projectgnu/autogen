@@ -1,3 +1,20 @@
+2012-12-09  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/autoopts.h: incorporate gnulib's ignore_value macro
+	* autoopts/configfile.c (handle_struct): handle NULL result
+	(parse_attrs): handle NULL result
+	* autoopts/nested.c (scan_xml) reworked to handle NULL result
+	and split out several new functions:
+	(unnamed_xml) new
+	(scan_xml_name) new
+	(find_end_xml) new
+	* autoopts/pgusage.c (optionPagedUsage): remove GCC warning
+	* autoopts/tpl/optcode.tlib (AO_gettext): double cast to remove
+	"const" attribute.
+	* config/bootstrap: strip out autoconf chaff warnings
+	* config/missing: update
+	* pkg/libopts/mklibsrc.sh: cleanup in prep for using xz compression
+
 2012-12-02  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/ag-text.def: new messages

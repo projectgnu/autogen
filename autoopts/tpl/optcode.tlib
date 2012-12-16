@@ -508,6 +508,9 @@ DEFINE emit-nls-code
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef HAVE_DCGETTEXT
+# include <gettext.h>
+#endif
 #include <autoopts/usage-txt.h>
 
 static char * AO_gettext(char const * pz);
@@ -538,11 +541,11 @@ AO_gettext(char const * pz)
     if (option_xlateable_txt.field_ct != 0) {
         res = dgettext("libopts", pz);
         if (res == pz)
-            res = _(pz);
+            res = (char *)(void *)_(pz);
     } else
-        res = _(pz);
+        res = (char *)(void *)_(pz);
 #else
-    res = _(pz);
+    res = (char *)(void *)_(pz);
 #endif
     if (res == pz)
         return res;

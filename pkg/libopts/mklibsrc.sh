@@ -39,14 +39,12 @@ tagd=`pwd`/${tag}
 #  WORKING IN SOURCE DIRECTORY
 #
 cd ${top_builddir}/autoopts
-files=`fgrep '#include' libopts.c | \
+files='libopts.c gettext.h parse-duration.c parse-duration.h '`
+    fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
            -e '/^compat\/compat\.h$/d' `
 
-egrep "#define HAVE_PARSE_DURATION" ${top_builddir}/config.h >/dev/null || \
-  files="${files} parse-duration.c parse-duration.h"
-
-for f in libopts.c ${files}
+for f in ${files}
 do
   test -f ${f} &&
     cp -f ${f} ${tagd}/${f} && continue
@@ -80,8 +78,8 @@ sed s,'\${tag}',"${tag}",g ${top_srcdir}/pkg/libopts/README > README
 touch MakeDefs.inc
 
 vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
-exec 3> Makefile.am
-cat >&3 <<- EOMakefile
+{
+  cat <<- EOMakefile
 	## LIBOPTS Makefile
 	MAINTAINERCLEANFILES    = Makefile.in
 	if INSTALL_LIBOPTS
@@ -95,19 +93,13 @@ cat >&3 <<- EOMakefile
 	EXTRA_DIST              = \\
 	EOMakefile
 
-find $(ls -A) -type f \
-  | egrep -v '^(libopts\.c|Makefile\.am)$' \
-  | ${CLexe} -I4 --spread=1 --line-sep="  \\" >&3
-exec 3>&-
+  find $(ls -A) -type f \
+    | egrep -v '^(libopts\.c|Makefile\.am)$' \
+    | ${CLexe} -I4 --spread=1 --line-sep="  \\"
+} > Makefile.am
 
-if gzip --version > /dev/null 2>&1
-then
-  gz='gzip --best'
-  sfx=tar.gz
-else
-  gz=compress
-  sfx=tar.Z
-fi
+gz='gzip --best'
+sfx=tar.gz
 
 cd ..
 echo ! cd `pwd`
@@ -121,10 +113,5 @@ rm -rf ${tag}
 ## sh-indentation: 2
 ## sh-basic-offset: 2
 ## End:
-
-# eval: (add-hook 'write-file-hooks 'time-stamp)
-# time-stamp-start: "timestamp='"
-# time-stamp-format: "%:y-%02m-%02d"
-# time-stamp-end: "'"
 
 ## end of mklibsrc.sh

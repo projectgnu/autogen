@@ -458,8 +458,10 @@ file_preset(tOptions * opts, char const * fname, int dir)
                     break;
 
             default:
-                goto all_done;
+                ftext = NULL;
             }
+            if (ftext == NULL)
+                goto all_done;
             break;
 
         case '[':
@@ -918,7 +920,9 @@ handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir)
     switch (*txt) {
     case ' ':
     case '\t':
-        txt = parse_attrs(opts, txt, &mode, &valu);
+        txt = parse_attrs(opts, SPN_WHITESPACE_CHARS(txt), &mode, &valu);
+        if (txt == NULL)
+            return txt;
         if (*txt == '>')
             break;
         if (*txt != '/')
@@ -1183,6 +1187,8 @@ optionLoadOpt(tOptions * opts, tOptDesc * odesc)
 
 /**
  *  Parse the various attributes of an XML-styled config file entry
+ *
+ * @returns NULL on failure, otherwise the scan point
  */
 LOCAL char*
 parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
@@ -1190,18 +1196,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
 {
     size_t len;
 
-    do  {
-        if (! IS_WHITESPACE_CHAR(*txt))
-            switch (*txt) {
-            case '/': pType->valType = OPARG_TYPE_NONE;
-                      /* FALLTHROUGH */
-            case '>': return txt;
-
-            default:
-            case NUL: return NULL;
-            }
-
-        txt = SPN_WHITESPACE_CHARS(txt+1);
+    for (;;) {
         len = SPN_LOWER_CASE_CHARS(txt) - txt;
 
         switch (find_option_xat_attribute_cmd(txt, len)) {
@@ -1247,9 +1242,18 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
             pType->valType = OPARG_TYPE_NONE;
             return skip_unkn(txt);
         }
-    } while (txt != NULL);
 
-    return txt;
+        if (txt == NULL)
+            return NULL;
+        txt = SPN_WHITESPACE_CHARS(txt);
+        switch (*txt) {
+            case '/': pType->valType = OPARG_TYPE_NONE;
+                      /* FALLTHROUGH */
+            case '>': return txt;
+        }
+        if (! IS_LOWER_CASE_CHAR(*txt))
+            return NULL;
+    }
 }
 
 /**

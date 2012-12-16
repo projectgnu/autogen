@@ -95,7 +95,7 @@ config_tools()
     # Make sure all of the maintainer tools required for bootstrap are
     # available on the host machine.
     # ------------------------------------------------------------------
-
+    #
     tools="autoconf autoheader aclocal automake libtoolize"
     for f in $tools
     do
@@ -156,13 +156,43 @@ post_local()
     . ${conf_dir}/bootstrap.local ${1+"$@"}
 }
 
+filter_autotool_chaff() {
+    local unsetx=
+    case ":$SHELLOPTS:" in
+    *:xtrace:* ) unsetx='' ;;
+    * ) unsetx='set -x' ; set +x ;;
+    esac
+    pat='^configure.ac:.*warning'
+    while IFS='' read line
+    do
+        [[ $line =~ $pat ]] && break
+        echo "$line"
+    done
+    pat='running POST-bootstrap.dir in '
+    while IFS='' read line
+    do
+        [[ $line =~ $pat ]] && break
+        echo "$line"
+    done > autotool-chaff.txt
+    local chaffct=$(wc -l < autotool-chaff.txt)
+    if grep -i -w error autotool-chaff.txt >/dev/null
+    then cat autotool-chaff.txt
+    else
+        (( chaffct > 4 )) && \
+            echo "<< $chaffct lines of autotool chaff deleted >>"
+    fi
+    echo "$line"
+    $unsetx
+    cat
+}
+
 run_autotools()
 {
     # remove any stale config.cache
     doit rm -f config.cache
 
     test -n "$auxdir" || auxdir=${srcdir}
-    test -d $auxdir || auxdir=.
+    test -d $auxdir   || auxdir=.
 
     doit $LIBTOOLIZE    --force
     doit $ACLOCAL       -I config
@@ -177,7 +207,7 @@ run_autotools()
 #
 config_tools
 ( pre_local )
-run_autotools
+run_autotools 2>&1 | filter_autotool_chaff 1>&2
 post_local
 
 trap '' 0

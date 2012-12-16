@@ -148,7 +148,9 @@ config_versions()
     for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath
     do test -s ${GNULIBDIR}/$f || die "not found: ${GNULIBDIR}/$f"
     done
-    ${GNULIBTOOL} $glopts $glmods
+    cmd=$(echo ${GNULIBTOOL} $glopts $glmods)
+    echo GNULIB-TOOL: $cmd
+    ${cmd}
     sed -i 's/do_not_make_me_.*_SOURCES/EXTRA_DIST/;/do_not_make_me/d' \
         autoopts/gnulib.mk
     cp ${GNULIBDIR}/build-aux/config.rpath ${GNULIBDIR}/m4/lib-link.m4 config/.
@@ -171,7 +173,7 @@ tweak_Makefile_am()
     #  THEN it is the directory above the directory of this file.
     #
     test -z "${srcdir}" && \
-        srcdir=$(\cd $(dirname $0) ; \cd .. ; pwd)
+        srcdir=$({ \cd $(dirname $0) ; \cd .. ; } >/dev/null ; pwd)
     cd ${srcdir}
 
     {
@@ -180,7 +182,7 @@ tweak_Makefile_am()
             q
         }' Makefile.am
         find VERSION NOTES config/bootstrap* config/*.m4 config/config.rpath \
-               autoopts/parse-duration.[ch] doc/gendocs* \
+               autoopts/parse-duration.[ch] autoopts/gettext.h doc/gendocs* \
             -type f | \
             columns --spread=1 -I4 --line=' \'
 

@@ -234,7 +234,7 @@ start_dep_file(void)
             if (--ac == 0) break;
             fputs(DEP_FILE_SPLICE_STR, dep_fp);
         }
-        fputs("\n", dep_fp);
+        putc('\n', dep_fp);
     }
 
     {
@@ -274,8 +274,7 @@ start_dep_file(void)
 static void
 tidy_dep_file(void)
 {
-    static mode_t const fil_mode =
-        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+    static mode_t const fil_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
     /*
      * Trim off the temporary suffix and rename the dependency file into

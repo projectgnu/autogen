@@ -32,8 +32,8 @@
  * private:
  *
  * what:  Decipher a boolean value
- * arg:   + tOptions* + pOpts    + program options descriptor +
- * arg:   + tOptDesc* + pOptDesc + the descriptor for this arg +
+ * arg:   + tOptions* + opts + program options descriptor +
+ * arg:   + tOptDesc* + od   + the descriptor for this arg +
  *
  * doc:
  *  Run the usage output through a pager.
@@ -41,13 +41,13 @@
  *  This is disabled on platforms without a working fork() function.
 =*/
 void
-optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
+optionPagedUsage(tOptions * opts, tOptDesc * od)
 {
 #if ! defined(HAVE_WORKING_FORK)
-    if ((pOD->fOptState & OPTST_RESET) != 0)
+    if ((od->fOptState & OPTST_RESET) != 0)
         return;
 
-    (*pOptions->pUsageProc)(pOptions, EXIT_SUCCESS);
+    (*opts->pUsageProc)(opts, EXIT_SUCCESS);
 #else
     static pid_t     my_pid;
     char fil_name[1024];
@@ -60,11 +60,12 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
     switch (pagerState) {
     case PAGER_STATE_INITIAL:
     {
-        if ((pOD->fOptState & OPTST_RESET) != 0)
+        if ((od->fOptState & OPTST_RESET) != 0)
             return;
 
         my_pid  = getpid();
-        snprintf(fil_name, sizeof(fil_name), TMP_USAGE_FMT, (uint64_t)my_pid);
+        snprintf(fil_name, sizeof(fil_name), TMP_USAGE_FMT,
+                 (unsigned long)my_pid);
         unlink(fil_name);
 
         /*
@@ -85,7 +86,7 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
          *  The usage procedure will now put the usage information into
          *  the temporary file we created above.
          */
-        (*pOptions->pUsageProc)(pOptions, EXIT_SUCCESS);
+        (*opts->pUsageProc)(opts, EXIT_SUCCESS);
 
         /* NOTREACHED */
         _exit(EXIT_FAILURE);
@@ -93,23 +94,23 @@ optionPagedUsage(tOptions * pOptions, tOptDesc * pOD)
 
     case PAGER_STATE_READY:
     {
-        tCC* pzPager  = (tCC*)getenv(PAGER_NAME);
+        char const * pager  = (char const *)getenv(PAGER_NAME);
 
         /*
          *  Use the "more(1)" program if "PAGER" has not been defined
          */
-        if (pzPager == NULL)
-            pzPager = MORE_STR;
+        if (pager == NULL)
+            pager = MORE_STR;
 
         /*
          *  Page the file and remove it when done.
          */
-        snprintf(fil_name, sizeof(fil_name), PAGE_USAGE_FMT, pzPager,
-                 (uint64_t)my_pid);
+        snprintf(fil_name, sizeof(fil_name), PAGE_USAGE_FMT, pager,
+                 (unsigned long)my_pid);
         fclose(stderr);
         dup2(STDOUT_FILENO, STDERR_FILENO);
 
-        (void)system(fil_name);
+        ignore_val( system( fil_name));
     }
 
     case PAGER_STATE_CHILD:

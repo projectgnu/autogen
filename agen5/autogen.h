@@ -57,12 +57,6 @@
 
 #define ag_offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE *)0)->MEMBER)
 
-/**
- *  Coercive cast.  Compel an address to be interpreted as the type
- *  of the first argument.  No complaints, just do it.
- */
-#define C(_t, _p)  ((_t)(void *)_p)
-
 /*
  *  Dual pipe opening of a child process
  */
