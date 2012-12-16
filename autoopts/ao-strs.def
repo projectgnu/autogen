@@ -111,6 +111,24 @@ string = { nm = SGL_DEF_FMT;
 	_EOStr_;
 };
 
+string = { nm = MULTI_DEF_CHK;
+  str  = <<- _EOStr_
+	test ${%1$s_%2$s_CT-0} -ge %3$u || {
+	    echo %1$s_%2$s has not been set
+	    exit 1
+	} 1>&2
+	_EOStr_;
+};
+
+string = { nm = SGL_DEF_CHK;
+  str  = <<- _EOStr_
+	test -n "$%1$s_%2$s" || {
+	    echo %1$s_%2$s has not been set
+	    exit 1
+	} 1>&2
+	_EOStr_;
+};
+
 string = { nm = SGL_NO_DEF_FMT;
   str  = <<- _EOStr_
 
@@ -125,6 +143,7 @@ string = { nm = SGL_NO_DEF_FMT;
 string = { nm = LOOP_STR;
   str  = <<- _EOStr_
 
+	ARG_COUNT=$#
 	OPT_PROCESS=true
 	OPT_ARG=$1
 	while ${OPT_PROCESS} && [ $# -gt 0 ]
@@ -144,6 +163,7 @@ string = { nm = LOOP_STR;
 string = { nm = ONLY_OPTS_LOOP;
   str  = <<- _EOStr_
 
+	ARG_COUNT=$#
 	OPT_ARG=$1
 	while [ $# -gt 0 ]
 	do
@@ -162,6 +182,8 @@ string = { nm = zLoopEnd;
 	        export %1$s_${OPT_NAME}${OPT_ELEMENT}
 	    fi
 	done
+	OPTION_COUNT=`expr $ARG_COUNT - $#`
+	OPERAND_COUNT=$#
 	unset OPT_PROCESS || :
 	unset OPT_ELEMENT || :
 	unset OPT_ARG     || :
@@ -169,7 +191,7 @@ string = { nm = zLoopEnd;
 	unset OPT_NAME    || :
 	unset OPT_CODE    || :
 	unset OPT_ARG_VAL || :
-	%2$s
+
 	_EOStr_;
 };
 

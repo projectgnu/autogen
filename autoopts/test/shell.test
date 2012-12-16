@@ -41,6 +41,10 @@ test_main="${test_main}"    \
  argument="reg-arg [ ... ]" \
 long_opts=true  \
 ${SHELLX} ${stdopts} option: second || failure "Could not run stdopts.def"
+mv ${testname}.def ${testname}.def-ori
+${SED} '/value = .s/i\
+min = 1; max = 2;
+' ${testname}.def-ori > ${testname}.def
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
@@ -53,20 +57,22 @@ compile "-?"
 echo creating ${testname}.hlp
 clean_help > ${testname}.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
-USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+USAGE:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
-  Flg Arg Option-Name    Description
-   -o Str option         The option option descrip
-   -s no  second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-
+  Flg Arg Option-Name   Req?  Description
+   -o Str option         opt  The option option descrip
+   -s no  second         YES  The second option descrip
+				- may appear up to 2 times
+   -? no  help           opt  Display extended usage information and exit
+   -! no  more-help      opt  Extended usage information passed thru pager
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+pair="${testname}.hlp ${testname}.help"
+cmp -s ${pair} || \
+  failure "HELP mismatch
+`diff $pair`"
 
 ./${testname} -X 2> /dev/null && \
   failure ${testname} should not accept bogus options
@@ -92,8 +98,10 @@ _EOF_
 ./${testname} -o opt-arg -s a1 a2 > ${testname}.test || \
   failure ${testname} did not handle its options
 
-cmp -s ${testname}.test ${testname}.out || \
-  failure "`diff ${testname}.out ${testname}.test`"
+pair="${testname}.out ${testname}.test"
+cmp -s $pair || \
+  failure "SHELL PARSE OUTPUT CHANGED
+`diff ${pair}`"
 
 ${SED} '/test-main/s/yes/optionParseShell/' ${testname}.def > XX
 mv -f XX ${testname}.def
@@ -137,21 +145,22 @@ This incarnation of genshell will produce
 a shell script to parse the options for test_shell:
 
 test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
-  Flg Arg Option-Name    Description
-   -o Str option         The option option descrip
-   -s no  second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+  Flg Arg Option-Name   Req?  Description
+   -o Str option         opt  The option option descrip
+   -s no  second         YES  The second option descrip
+   -? no  help           opt  Display extended usage information and exit
+   -! no  more-help      opt  Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 _EOF_
 
-files=${testname}.hlp\ ${testname}.help
-cmp -s ${files} || \
-  failure "script generator help output mismatch: `diff -c ${files}`"
+pair=${testname}.hlp\ ${testname}.help
+cmp -s ${pair} || \
+  failure "script generator help output mismatch:
+`diff -c ${pair}`"
 
 # # # # # # # # # # SCRIPT OUTPUT FILE # # # # # # # # #
 
@@ -161,25 +170,26 @@ echo "#! ${SHELL}" >&3
 cat >&3 <<'_EOF_'
 #
 TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
-  Flg Arg Option-Name    Description
-   -o Str option         The option option descrip
-   -s no  second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+  Flg Arg Option-Name   Req?  Description
+   -o Str option         opt  The option option descrip
+   -s no  second         YES  The second option descrip
+				- may appear up to 2 times
+   -? no  help           opt  Display extended usage information and exit
+   -! no  more-help      opt  Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
-  Flg Arg Option-Name    Description
-   -o Str option         The option option descrip
-   -s no  second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+  Flg Arg Option-Name   Req?  Description
+   -o Str option         opt  The option option descrip
+   -s no  second         YES  The second option descrip
+   -? no  help           opt  Display extended usage information and exit
+   -! no  more-help      opt  Extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.'
@@ -189,10 +199,15 @@ TEST_SHELL_OPTION=${TEST_SHELL_OPTION}
 TEST_SHELL_OPTION_set=false
 export TEST_SHELL_OPTION
 
-TEST_SHELL_SECOND=${TEST_SHELL_SECOND}
-TEST_SHELL_SECOND_set=false
-export TEST_SHELL_SECOND
-
+if test -z "${TEST_SHELL_SECOND}"
+then
+  TEST_SHELL_SECOND_CT=0
+else
+  TEST_SHELL_SECOND_CT=1
+  TEST_SHELL_SECOND_1=${TEST_SHELL_SECOND}
+fi
+export TEST_SHELL_SECOND_CT
+ARG_COUNT=$#
 OPT_PROCESS=true
 OPT_ARG=$1
 while ${OPT_PROCESS} && [ $# -gt 0 ]
@@ -232,11 +247,12 @@ do
         'seco' | \
         'secon' | \
         'second' )
-            if [ -n "${TEST_SHELL_SECOND}" ] && ${TEST_SHELL_SECOND_set} ; then
-                echo Error:  duplicate SECOND option >&2
+            if [ $TEST_SHELL_SECOND_CT -ge 2 ] ; then
+                echo Error:  more than 2 SECOND options >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
-            TEST_SHELL_SECOND_set=true
+            TEST_SHELL_SECOND_CT=`expr ${TEST_SHELL_SECOND_CT} + 1`
+            OPT_ELEMENT="_${TEST_SHELL_SECOND_CT}"
             OPT_NAME='SECOND'
             eval TEST_SHELL_SECOND${OPT_ELEMENT}=true
             export TEST_SHELL_SECOND${OPT_ELEMENT}
@@ -314,11 +330,12 @@ do
             ;;
 
         's' )
-            if [ -n "${TEST_SHELL_SECOND}" ] && ${TEST_SHELL_SECOND_set} ; then
-                echo Error:  duplicate SECOND option >&2
+            if [ $TEST_SHELL_SECOND_CT -ge 2 ] ; then
+                echo Error:  more than 2 SECOND options >&2
                 echo "$TEST_SHELL_USAGE_TEXT"
                 exit 1 ; fi
-            TEST_SHELL_SECOND_set=true
+            TEST_SHELL_SECOND_CT=`expr ${TEST_SHELL_SECOND_CT} + 1`
+            OPT_ELEMENT="_${TEST_SHELL_SECOND_CT}"
             OPT_NAME='SECOND'
             eval TEST_SHELL_SECOND${OPT_ELEMENT}=true
             export TEST_SHELL_SECOND${OPT_ELEMENT}
@@ -399,6 +416,8 @@ do
         export TEST_SHELL_${OPT_NAME}${OPT_ELEMENT}
     fi
 done
+OPTION_COUNT=`expr $ARG_COUNT - $#`
+OPERAND_COUNT=$#
 unset OPT_PROCESS || :
 unset OPT_ELEMENT || :
 unset OPT_ARG     || :
@@ -406,7 +425,10 @@ unset OPT_ARG_NEEDED || :
 unset OPT_NAME    || :
 unset OPT_CODE    || :
 unset OPT_ARG_VAL || :
-
+test ${TEST_SHELL_SECOND_CT-0} -ge 1 || {
+    echo TEST_SHELL_SECOND has not been set
+    exit 1
+} 1>&2
 # # # # # # # # # #
 #
 #  END OF AUTOMATED OPTION PROCESSING
@@ -430,8 +452,11 @@ ${FGREP} 'Packaged by '  ${testname}.sh >/dev/null && {
 }
 
 ${SED} "$sedcmd"  ${testname}.sh > ${testname}.shx
-cmp -s ${testname}.sh[tx] || \
-  failure "`diff ${testname}.sh[tx]`"
+
+pair="${testname}.sht ${testname}.shx"
+cmp -s ${pair} || \
+  failure "PARSING SCRIPT CHANGE
+`diff ${pair}`"
 
 # # # # # # # # # # SCRIPT PROCESSING TEST # # # # # # # # #
 
@@ -440,11 +465,14 @@ cmp -s ${testname}.sh[tx] || \
 
 sort > ${testname}.out <<_EOF_
 TEST_SHELL_OPTION=opt-arg
-TEST_SHELL_SECOND=true
+TEST_SHELL_SECOND_1=true
+TEST_SHELL_SECOND_CT=1
 _EOF_
 
-cmp -s ${testname}.out ${testname}.test || \
-  failure "`diff ${testname}.out ${testname}.test`"
+pair="${testname}.out ${testname}.test"
+cmp -s $pair || \
+  failure "Misprocessed options
+`diff $pair`"
 
 cleanup
 

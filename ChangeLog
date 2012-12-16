@@ -1,3 +1,13 @@
+2012-12-16  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/makeshell.c: througout, de-camelize names
+	(emit_wrapup): new function to ensure required options were set
+	* autoopts/ao-strs.def: new strings for the above, also added
+	"ARG_COUNT", "OPTION_COUNT" and "OPERAND_COUNT" to the results.
+	If generated code is wrapped in a function, the caller can thus
+	``shift $OPTION_COUNT'' and have only operands left.
+	* autoopts/test/shell.test: adjustments
+
 2012-12-09  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/autoopts.h: incorporate gnulib's ignore_value macro
