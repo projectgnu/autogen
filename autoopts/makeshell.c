@@ -398,7 +398,7 @@ emit_wrapup(tOptions * opts)
     int          opt_ct = opts->presetOptCt;
     char const * fmt;
 
-    printf(zLoopEnd, opts->pzPROGNAME);
+    printf(FINISH_LOOP, opts->pzPROGNAME);
     for (;opt_ct > 0; od++, --opt_ct) {
         /*
          *  Options that are either usage documentation or are compiled out
@@ -414,8 +414,8 @@ emit_wrapup(tOptions * opts)
             continue;
 
         if (od->optMaxCt > 1)
-             fmt = MULTI_DEF_CHK;
-        else fmt = SGL_DEF_CHK;
+             fmt = CHK_MIN_COUNT;
+        else fmt = CHK_ONE_REQUIRED;
 
         {
             unsigned int min = (od->optMinCt == 0) ? 1 : od->optMinCt;
@@ -494,29 +494,29 @@ static void
 emit_action(tOptions * opts, tOptDesc * od)
 {
     if (od->pOptProc == optionPrintVersion)
-        printf(zTextExit, opts->pzPROGNAME, VER_STR);
+        printf(ECHO_N_EXIT, opts->pzPROGNAME, VER_STR);
 
     else if (od->pOptProc == optionPagedUsage)
-        printf(zPagedUsageExit, opts->pzPROGNAME);
+        printf(PAGE_USAGE_TEXT, opts->pzPROGNAME);
 
     else if (od->pOptProc == optionLoadOpt) {
-        printf(zCmdFmt, NO_LOAD_WARN);
-        printf(zCmdFmt, YES_NEED_OPT_ARG);
+        printf(LVL3_CMD, NO_LOAD_WARN);
+        printf(LVL3_CMD, YES_NEED_OPT_ARG);
 
     } else if (od->pz_NAME == NULL) {
 
         if (od->pOptProc == NULL) {
-            printf(zCmdFmt, NO_SAVE_OPTS);
-            printf(zCmdFmt, OK_NEED_OPT_ARG);
+            printf(LVL3_CMD, NO_SAVE_OPTS);
+            printf(LVL3_CMD, OK_NEED_OPT_ARG);
         } else
-            printf(zTextExit, opts->pzPROGNAME, LONG_USE_STR);
+            printf(ECHO_N_EXIT, opts->pzPROGNAME, LONG_USE_STR);
 
     } else {
         if (od->optMaxCt == 1)
             printf(SGL_ARG_FMT, opts->pzPROGNAME, od->pz_NAME);
         else {
             if ((unsigned)od->optMaxCt < NOLIMIT)
-                printf(zCountTest, opts->pzPROGNAME,
+                printf(CHK_MAX_COUNT, opts->pzPROGNAME,
                        od->pz_NAME, od->optMaxCt);
 
             printf(MULTI_ARG_FMT, opts->pzPROGNAME, od->pz_NAME);
@@ -526,13 +526,15 @@ emit_action(tOptions * opts, tOptDesc * od)
          *  Fix up the args.
          */
         if (OPTST_GET_ARGTYPE(od->fOptState) == OPARG_TYPE_NONE) {
-            printf(zCantArg, opts->pzPROGNAME, od->pz_NAME);
+            printf(SET_MULTI_ARG, opts->pzPROGNAME, od->pz_NAME);
+            printf(LVL3_CMD, NO_ARG_NEEDED);
 
         } else if (od->fOptState & OPTST_ARG_OPTIONAL) {
-            printf(zMayArg,  opts->pzPROGNAME, od->pz_NAME);
+            printf(SET_MULTI_ARG,  opts->pzPROGNAME, od->pz_NAME);
+            printf(LVL3_CMD, OK_NEED_OPT_ARG);
 
         } else {
-            fputs(zMustArg, stdout);
+            printf(LVL3_CMD, YES_NEED_OPT_ARG);
         }
     }
     fputs(zOptionEndSelect, stdout);
@@ -543,7 +545,7 @@ static void
 emit_inaction(tOptions * opts, tOptDesc * od)
 {
     if (od->pOptProc == optionLoadOpt) {
-        printf(zCmdFmt, NO_SUPPRESS_LOAD);
+        printf(LVL3_CMD, NO_SUPPRESS_LOAD);
 
     } else if (od->optMaxCt == 1)
         printf(NO_SGL_ARG_FMT, opts->pzPROGNAME,
@@ -552,7 +554,7 @@ emit_inaction(tOptions * opts, tOptDesc * od)
         printf(NO_MULTI_ARG_FMT, opts->pzPROGNAME,
                od->pz_NAME, od->pz_DisablePfx);
 
-    printf(zCmdFmt, NO_ARG_NEEDED);
+    printf(LVL3_CMD, NO_ARG_NEEDED);
     fputs(zOptionEndSelect, stdout);
 }
 

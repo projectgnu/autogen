@@ -202,11 +202,13 @@ export TEST_SHELL_OPTION
 if test -z "${TEST_SHELL_SECOND}"
 then
   TEST_SHELL_SECOND_CT=0
+  export TEST_SHELL_SECOND_CT
 else
   TEST_SHELL_SECOND_CT=1
   TEST_SHELL_SECOND_1=${TEST_SHELL_SECOND}
+  export TEST_SHELL_SECOND_CT TEST_SHELL_SECOND_1
 fi
-export TEST_SHELL_SECOND_CT
+
 ARG_COUNT=$#
 OPT_PROCESS=true
 OPT_ARG=$1
@@ -234,9 +236,10 @@ do
         'optio' | \
         'option' )
             if [ -n "${TEST_SHELL_OPTION}" ] && ${TEST_SHELL_OPTION_set} ; then
-                echo Error:  duplicate OPTION option >&2
+                echo 'Error:  duplicate OPTION option'
                 echo "$TEST_SHELL_USAGE_TEXT"
-                exit 1 ; fi
+                exit 1
+            fi >&2
             TEST_SHELL_OPTION_set=true
             OPT_NAME='OPTION'
             OPT_ARG_NEEDED=YES
@@ -247,10 +250,11 @@ do
         'seco' | \
         'secon' | \
         'second' )
-            if [ $TEST_SHELL_SECOND_CT -ge 2 ] ; then
-                echo Error:  more than 2 SECOND options >&2
+            if [ $TEST_SHELL_SECOND_CT -gt 2 ] ; then
+                echo 'Error:  more than 2 SECOND options'
                 echo "$TEST_SHELL_USAGE_TEXT"
-                exit 1 ; fi
+                exit 1
+            fi >&2
             TEST_SHELL_SECOND_CT=`expr ${TEST_SHELL_SECOND_CT} + 1`
             OPT_ELEMENT="_${TEST_SHELL_SECOND_CT}"
             OPT_NAME='SECOND'
@@ -280,11 +284,10 @@ do
 
         * )
             echo Unknown option: "${OPT_CODE}" >&2
-            echo "$TEST_SHELL_USAGE_TEXT"
+            echo "$TEST_SHELL_USAGE_TEXT" >&2
             exit 1
             ;;
         esac
-
         case "${OPT_ARG_NEEDED}" in
         NO )
             OPT_ARG_VAL=''
@@ -294,10 +297,10 @@ do
             then
                 if [ $# -eq 0 ]
                 then
-                    echo No argument provided for ${OPT_NAME} option >&2
+                    echo No argument provided for ${OPT_NAME} option
                     echo "$TEST_SHELL_USAGE_TEXT"
                     exit 1
-                fi
+                fi >&2
                 OPT_ARG_VAL=${OPT_ARG}
                 shift
                 OPT_ARG=$1
@@ -321,19 +324,21 @@ do
         case "${OPT_CODE}" in
         'o' )
             if [ -n "${TEST_SHELL_OPTION}" ] && ${TEST_SHELL_OPTION_set} ; then
-                echo Error:  duplicate OPTION option >&2
+                echo 'Error:  duplicate OPTION option'
                 echo "$TEST_SHELL_USAGE_TEXT"
-                exit 1 ; fi
+                exit 1
+            fi >&2
             TEST_SHELL_OPTION_set=true
             OPT_NAME='OPTION'
             OPT_ARG_NEEDED=YES
             ;;
 
         's' )
-            if [ $TEST_SHELL_SECOND_CT -ge 2 ] ; then
-                echo Error:  more than 2 SECOND options >&2
+            if [ $TEST_SHELL_SECOND_CT -gt 2 ] ; then
+                echo 'Error:  more than 2 SECOND options'
                 echo "$TEST_SHELL_USAGE_TEXT"
-                exit 1 ; fi
+                exit 1
+            fi >&2
             TEST_SHELL_SECOND_CT=`expr ${TEST_SHELL_SECOND_CT} + 1`
             OPT_ELEMENT="_${TEST_SHELL_SECOND_CT}"
             OPT_NAME='SECOND'
@@ -354,11 +359,10 @@ do
 
         * )
             echo Unknown flag: "${OPT_CODE}" >&2
-            echo "$TEST_SHELL_USAGE_TEXT"
+            echo "$TEST_SHELL_USAGE_TEXT" >&2
             exit 1
             ;;
         esac
-
         case "${OPT_ARG_NEEDED}" in
         NO )
             if [ -n "${OPT_ARG}" ]
@@ -376,10 +380,10 @@ do
             else
                 if [ $# -eq 0 ]
                 then
-                    echo No argument provided for ${OPT_NAME} option >&2
+                    echo No argument provided for ${OPT_NAME} option
                     echo "$TEST_SHELL_USAGE_TEXT"
                     exit 1
-                fi
+                fi >&2
                 shift
                 OPT_ARG_VAL=$1
             fi
@@ -429,6 +433,7 @@ test ${TEST_SHELL_SECOND_CT-0} -ge 1 || {
     echo TEST_SHELL_SECOND has not been set
     exit 1
 } 1>&2
+
 # # # # # # # # # #
 #
 #  END OF AUTOMATED OPTION PROCESSING

@@ -103,7 +103,7 @@ enum_err(tOptions * pOpts, tOptDesc * pOD,
      */
     if (max_len > 35) {
         do  {
-            fprintf(option_usage_fp, ENUM_ERR_SEP_LINE_FMT, *(paz_names++));
+            fprintf(option_usage_fp, ENUM_ERR_LINE, *(paz_names++));
         } while (--ct_down > 0);
     }
 
@@ -126,7 +126,7 @@ enum_err(tOptions * pOpts, tOptDesc * pOD,
         unsigned int ent_no = 0;
         char  zFmt[16];  /* format for all-but-last entries on a line */
 
-        sprintf(zFmt, ENUM_ERR_STR_WIDTH_FMT, (int)max_len);
+        sprintf(zFmt, ENUM_ERR_WIDTH, (int)max_len);
         max_len = 78 / max_len; /* max_len is now max entries on a line */
         fputs(TWO_SPACES_STR, option_usage_fp);
 
