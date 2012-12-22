@@ -180,7 +180,7 @@ SNV_INLINE char *
 filccat (Filament *fil, int c)
 {
   fil_maybe_extend (fil, 1 + fil->length, true);
-  fil->value[fil->length++] = c;
+  fil->value[fil->length++] = (char)(c & 0xFF);
   return fil->value;
 }
 

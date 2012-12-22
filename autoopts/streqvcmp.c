@@ -223,7 +223,7 @@ void
 strequate(char const* s)
 {
     if ((s != NULL) && (*s != NUL)) {
-        unsigned char equiv = (unsigned)*s;
+        unsigned char equiv = (unsigned char)*s;
         while (*s != NUL)
             charmap[ (unsigned)*(s++) ] = equiv;
     }

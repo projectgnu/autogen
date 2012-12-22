@@ -332,7 +332,7 @@ ready_def_input(char const ** ppzfile, size_t * psz)
      *  the mod time on this file.  If any of the template files
      *  are more recent, then it will be adjusted.
      */
-    *psz = stbf.st_size;
+    *psz = (size_t)stbf.st_size;
 
     outfile_time = ENABLED_OPT(SOURCE_TIME) ? stbf.st_mtime : time(NULL);
 

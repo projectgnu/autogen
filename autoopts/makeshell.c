@@ -418,7 +418,7 @@ emit_wrapup(tOptions * opts)
         else fmt = CHK_ONE_REQUIRED;
 
         {
-            unsigned int min = (od->optMinCt == 0) ? 1 : od->optMinCt;
+            int min = (od->optMinCt == 0) ? 1 : od->optMinCt;
             printf(fmt, opts->pzPROGNAME, od->pz_NAME, min);
         }
     }
@@ -734,11 +734,11 @@ load_old_output(char const * fname)
      *  Read in all the data as fast as our OS will let us.
      */
     for (;;) {
-        int inct = fread((void*)scan, (size_t)1, stbf.st_size, fp);
+        size_t inct = fread((void*)scan, 1, (size_t)stbf.st_size, fp);
         if (inct == 0)
             break;
 
-        stbf.st_size -= inct;
+        stbf.st_size -= (ssize_t)inct;
 
         if (stbf.st_size == 0)
             break;
@@ -869,7 +869,7 @@ genshelloptUsage(tOptions * opts, int exit_cd)
         AGDUPSTR(pz, optionParseShellOptions->pzPROGNAME, "prog name");
         *pp = pz;
         while (*pz != NUL) {
-            *pz = tolower(*pz);
+            *pz = (char)tolower(*pz);
             pz++;
         }
     }

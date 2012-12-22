@@ -81,7 +81,7 @@ cat > $testname-c.base <<- _EOF_
 	{
 	    str2m_map_t const * map;
 
-	    map = find_str2m_name(str, len);
+	    map = find_str2m_name(str, (unsigned int)len);
 	    return (map == NULL) ? STR2M_INVALID_KWD : map->str2m_id;
 	}
 
@@ -198,7 +198,7 @@ cat > $testname-c2.base <<- _EOF_
 	{
 	    str2m_2_map_t const * map;
 
-	    map = find_str2m_2_name(str, len);
+	    map = find_str2m_2_name(str, (unsigned int)len);
 	    return (map == NULL) ? STR2M_2_COUNT_KWDBNM : map->str2m_2_id;
 	}
 

@@ -1,3 +1,17 @@
+2012-12-22  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: fix up nit-picky casts in preparation for using
+	-Wextra -Wconversion -Wstrict-overflow
+	* autoopts/tpl/str2enum.tpl: fix up a gperf call result for
+	the same purpose.
+	* autoopts/tpl/cmd-doc.tlib: ensure section text always starts
+	at the beginning of a line.  Also, after incorporating text
+	into an "insert" section, remove the file so not included twice.
+	Also, emit the "EX_SOFTWARE" exit code if need-ex-software is
+	true.
+	* autoopts/test/doc.test: adjust for template fixes.
+	* autoopts/test/keyword.test: likewise
+
 2012-12-16  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/makeshell.c: througout, de-camelize names

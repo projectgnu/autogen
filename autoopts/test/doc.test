@@ -503,6 +503,7 @@ Pass the extended usage information through a pager.
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
+
 .SH EXAMPLES
 To connect to a server using PSK authentication, you need to enable
 the choice of PSK by using a cipher priority parameter such as in the
@@ -550,6 +551,10 @@ Successful program execution.
 .TP
 .BR 1 " (EXIT_FAILURE)"
 The operation failed or the command syntax was not valid.
+.TP
+.BR 70 " (EX_SOFTWARE)"
+libopts had an internal operational error.  Please report
+it to autogen-users@lists.sourceforge.net.  Thank you.
 .SH "SEE ALSO"
 gnutls\-cli\-debug(1), gnutls\-serv(1)
 .SH "AUTHORS"
@@ -652,6 +657,7 @@ Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
 .El
+
 .Sh EXAMPLES
 To connect to a server using PSK authentication, you need to enable
 the choice of PSK by using a cipher priority parameter such as in the
@@ -692,6 +698,9 @@ One of the following exit values will be returned:
 Successful program execution.
 .It 1 " (EXIT_FAILURE)"
 The operation failed or the command syntax was not valid.
+.It 70 " (EX_SOFTWARE)"
+libopts had an internal operational error.  Please report
+it to autogen-users@lists.sourceforge.net.  Thank you.
 .El
 .Sh "SEE ALSO"
 gnutls\-cli\-debug(1), gnutls\-serv(1)

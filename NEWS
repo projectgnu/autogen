@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ October 2012
+New in __CURRENT_VERSION__ December 2012
 
 * Bit Map and Enumeration templates are now fully integrated.
   They have their own section in the texi docs and the
@@ -11,6 +11,9 @@ New in __CURRENT_VERSION__ October 2012
 
 * The AG_OTEST_GUILE_VERSION will now try "rpm -q" first
   before dpkg, "guile-config --verision" and "guile --version".
+
+* If a "min" count value has been specified, the emitted code will
+  now verify that the option appears that minimum number of times.
 
 New in 5.16.2 August 2012
 

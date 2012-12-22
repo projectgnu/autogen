@@ -216,7 +216,7 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
             if (res == name_ct)
                 res = idx; /* save partial match */
             else
-                res = ~0;  /* may yet find full match */
+                res = (uintptr_t)~0;  /* may yet find full match */
         }
     }
 
@@ -293,7 +293,7 @@ optionEnumerationVal(tOptions * pOpts, tOptDesc * pOD,
 
     case (uintptr_t)OPTPROC_EMIT_SHELL:
     {
-        unsigned int ix = pOD->optArg.argEnum;
+        unsigned int ix = (unsigned int)pOD->optArg.argEnum;
         /*
          *  print the name string.
          */
@@ -307,7 +307,7 @@ optionEnumerationVal(tOptions * pOpts, tOptDesc * pOD,
 
     case (uintptr_t)OPTPROC_RETURN_VALNAME:
     {
-        unsigned int ix = pOD->optArg.argEnum;
+        unsigned int ix = (unsigned int)pOD->optArg.argEnum;
         /*
          *  Replace the enumeration value with the name string.
          */
@@ -479,7 +479,7 @@ optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
             if (iv)
                 pzArg = SPN_WHITESPACE_CHARS(pzArg+1);
 
-            len = BRK_SET_SEPARATOR_CHARS(pzArg) - pzArg;
+            len = (int)(BRK_SET_SEPARATOR_CHARS(pzArg) - pzArg);
             if (len == 0)
                 break;
 
@@ -511,7 +511,8 @@ optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
                         p = pzArg;
                     }
 
-                    shift_ct = find_name(p, pOpts, pOD, paz_names, name_ct);
+                    shift_ct = (unsigned int)
+                        find_name(p, pOpts, pOD, paz_names, name_ct);
                     if (shift_ct >= name_ct) {
                         pOD->optCookie = (void*)0;
                         return;

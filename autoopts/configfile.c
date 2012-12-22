@@ -408,10 +408,10 @@ optionNextValue(tOptionValue const * ov_list,tOptionValue const * oov )
 static void
 file_preset(tOptions * opts, char const * fname, int dir)
 {
-    tmap_info_t   cfgfile;
-    tOptState     optst = OPTSTATE_INITIALIZER(PRESET);
-    unsigned long st_flags = optst.flags;
-    char *        ftext =
+    tmap_info_t       cfgfile;
+    tOptState         optst = OPTSTATE_INITIALIZER(PRESET);
+    opt_state_mask_t  st_flags = optst.flags;
+    char *            ftext =
         text_mmap(fname, PROT_READ|PROT_WRITE, MAP_PRIVATE, &cfgfile);
 
     if (TEXT_MMAP_FAILED_ADDR(ftext))
@@ -646,7 +646,7 @@ aoflags_directive(tOptions * opts, char * txt)
     txt = strchr(pz, '>');
     if (txt != NULL) {
 
-        size_t len  = txt - pz;
+        size_t len  = (unsigned)(txt - pz);
         char * ftxt = AGALOC(len + 1, "aoflags");
 
         memcpy(ftxt, pz, len);
@@ -837,7 +837,7 @@ trim_xml_text(char * intxt, char const * pznm, tOptionLoadMode mode)
         if (len >= sizeof(z))
             pz = AGALOC(len, "scan name");
 
-        len = sprintf(pz, fmt, pznm);
+        len = (size_t)sprintf(pz, fmt, pznm);
         *intxt = ' ';
         etext = strstr(intxt, pz);
         if (pz != z) AGFREE(pz);
@@ -889,7 +889,7 @@ cook_xml_text(char * pzData)
                 return;
             }
 
-            ch = strtoul(bf, NULL, 16);
+            ch = (int)strtoul(bf, NULL, 16);
             /* FALLTHROUGH */
 
         default:
@@ -961,7 +961,7 @@ handle_struct(tOptions * opts, tOptState * ost, char * txt, int dir)
      *  Rejoin the name and value for parsing by "loadOptionLine()".
      *  Erase any attributes parsed by "parse_attrs()".
      */
-    memset(pcNulPoint, ' ', pzData - pcNulPoint);
+    memset(pcNulPoint, ' ', (size_t)(pzData - pcNulPoint));
 
     /*
      *  If we are getting a "string" value that is to be cooked,
@@ -1197,7 +1197,7 @@ parse_attrs(tOptions * opts, char * txt, tOptionLoadMode * pMode,
     size_t len;
 
     for (;;) {
-        len = SPN_LOWER_CASE_CHARS(txt) - txt;
+        len = (size_t)(SPN_LOWER_CASE_CHARS(txt) - txt);
 
         switch (find_option_xat_attribute_cmd(txt, len)) {
         case XAT_CMD_TYPE:
@@ -1309,7 +1309,7 @@ parse_value(char * txt, tOptionValue * typ)
     if (*(txt++) != '=')
         goto woops;
 
-    len = SPN_OPTION_NAME_CHARS(txt) - txt;
+    len = (size_t)(SPN_OPTION_NAME_CHARS(txt) - txt);
 
     if ((len == 0) || (! IS_END_XML_TOKEN_CHAR(txt[len]))) {
     woops:

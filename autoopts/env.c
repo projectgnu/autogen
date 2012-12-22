@@ -66,7 +66,7 @@ doPrognameEnv(tOptions * pOpts, teEnvPresetType type)
     /*
      *  Substitute our $PROGNAME argument list for the real one
      */
-    sv_argc = pOpts->origArgCt;
+    sv_argc = (int)pOpts->origArgCt;
     sv_argv = pOpts->origArgVect;
     sv_flag = pOpts->fOptSet;
 
@@ -80,7 +80,7 @@ doPrognameEnv(tOptions * pOpts, teEnvPresetType type)
         uintptr_t v = (uintptr_t)(pTL->tkn_list);
         pOpts->origArgVect = (void *)(v - sizeof(char *));
     }
-    pOpts->origArgCt   = pTL->tkn_ct   + 1;
+    pOpts->origArgCt   = (unsigned int)pTL->tkn_ct   + 1;
     pOpts->fOptSet    &= ~OPTPROC_ERRSTOP;
 
     pOpts->curOptIdx   = 1;
@@ -106,7 +106,7 @@ doPrognameEnv(tOptions * pOpts, teEnvPresetType type)
      */
     free(pTL);
     pOpts->origArgVect = sv_argv;
-    pOpts->origArgCt   = sv_argc;
+    pOpts->origArgCt   = (unsigned int)sv_argc;
     pOpts->fOptSet     = sv_flag;
 }
 
@@ -206,7 +206,7 @@ env_presets(tOptions * pOpts, teEnvPresetType type)
 
     pzFlagName = zEnvName
         + snprintf(zEnvName, sizeof(zEnvName), "%s_", pOpts->pzPROGNAME);
-    spaceLeft = AO_NAME_SIZE - (pzFlagName - zEnvName) - 1;
+    spaceLeft = AO_NAME_SIZE - (unsigned long)(pzFlagName - zEnvName) - 1;
 
     for (;ct-- > 0; st.pOD++) {
         size_t nln;

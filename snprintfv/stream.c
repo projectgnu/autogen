@@ -188,8 +188,8 @@ stream_puts (char *s, STREAM *stream)
   for (num = 0; *s; num++, s++)
     {
       if (stream->limit < 1)
-        return num + strlen (s);
-
+        return (int)((size_t)num + strlen (s));
+      
       stream->limit -= 1;
       ch_or_errorcode = (*stream->put_func) ((unsigned char) *s, stream);
 

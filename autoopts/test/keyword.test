@@ -264,6 +264,7 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
+
 .SH "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .SH "EXIT STATUS"
@@ -388,6 +389,7 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
+
 .Sh "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .Sh "EXIT STATUS"

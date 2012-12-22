@@ -275,7 +275,8 @@ DEFINE mk-finder                =]
   ELSE  =][= (. check-length)   =][=
   ENDIF                        \=]
 
-    map = find_[=(. base-type-name)=]_name(str, [= (. len-param-name) =]);[=
+    map = find_[=(. base-type-name)=]_name(str, (unsigned int)[=
+       (. len-param-name) =]);[=
 
   IF (not (exist? "partial"))   =]
     return (map == NULL) ? [=(. invalid-cmd)=] : map->[=(. enum-field)=];[=
@@ -737,6 +738,7 @@ gperf [= (. base-file-name) =].gp | \
         -e '/^#ifdef/d' \
         -e '/^#else/d' \
         -e '/^#endif$/d' \
+        -e '/key = [=(. base-type-name)=]_hash/s/key = /key = (int)/' \
         -e 's/^\(const [=(. base-type-name)=]_map_t\)/static inline \1/' \
     > baseline
 

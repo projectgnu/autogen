@@ -310,10 +310,11 @@ optionSort(tOptions* pOpts)
 
  joinLists:
     if (optsIdx > 0)
-        memcpy(pOpts->origArgVect + 1, ppzOpts, optsIdx * sizeof(char*));
+        memcpy(pOpts->origArgVect + 1, ppzOpts,
+               (size_t)optsIdx * sizeof(char*));
     if (opdsIdx > 0)
         memcpy(pOpts->origArgVect + 1 + optsIdx, ppzOpds,
-               opdsIdx * sizeof(char*));
+               (size_t)opdsIdx * sizeof(char*));
 
  freeTemps:
     free(ppzOpts);

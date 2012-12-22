@@ -119,7 +119,7 @@ lex_escaped_char(void)
 {
     static int const semi_colon = ';';
 
-    char* pz = strchr(cctx->scx_scan, semi_colon);
+    char * pz = strchr(cctx->scx_scan, semi_colon);
 
     for (;;) {
         if (pz == NULL) {
@@ -128,7 +128,7 @@ lex_escaped_char(void)
         }
         if (IS_WHITESPACE_CHAR(pz[1])) {
             *pz = NUL;
-            pz[1] = semi_colon;
+            pz[1] = (char)semi_colon;
             break;
         }
         pz = strchr(pz+1, semi_colon);
@@ -385,7 +385,7 @@ loadScheme(void)
     char*    pzText    = cctx->scx_scan;
     char*    pzEnd     = (char *)skip_scheme(pzText, pzText + strlen(pzText));
     char     endCh     = *pzEnd;
-    int      schemeLen = (pzEnd - pzText);
+    int      schemeLen = (int)(pzEnd - pzText);
     int      next_ln;
     SCM      res;
 
@@ -600,7 +600,7 @@ build_here_str(char* scan)
      */
     {
         char * pz = SPN_VARIABLE_NAME_CHARS(scan);
-        markLen = pz - scan;
+        markLen = (size_t)(pz - scan);
 
         if (markLen == 0)
             AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MISS_MARK_STR,

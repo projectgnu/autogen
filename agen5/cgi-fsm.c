@@ -292,7 +292,7 @@ cgi_run_fsm(
              *  We must backslash quote certain characters that are %-quoted
              *  in the input string:
              */
-            switch (*(pzOut++) = (int)strtol( z, NULL, 16 )) {
+            switch (*(pzOut++) = (char)strtol( z, NULL, 16 )) {
             case '\'':
             case '\\':
             case '#':

@@ -448,7 +448,7 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
          */
         {
             size_t rem_len = canonical_name(cname, scan, (int)src_len);
-            if (rem_len > src_len)
+            if (rem_len > (size_t)src_len)
                 AG_ABEND_IN(tpl, mac, LD_UNKNOWN_INVAL_DEF);
 
             scan   += src_len - rem_len;

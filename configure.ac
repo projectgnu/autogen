@@ -211,8 +211,8 @@ test ${GUILE_VERSION} -ge 108000 \
   -a "X${WERROR}" = Xyes \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
-       -Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-       -Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2 `
+	-Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
+	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2`
 ]
 AM_CONFIG_HEADER(config.h:config-h.in)
 

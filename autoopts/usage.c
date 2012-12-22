@@ -130,7 +130,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
         ao_flag_names_t const * fnt = fn_table;
 
         for (;;) {
-            if (strneqvcmp(flg_txt, fnt->fnm_name, fnt->fnm_len) == 0)
+            if (strneqvcmp(flg_txt, fnt->fnm_name, (int)fnt->fnm_len) == 0)
                 break;
             if (++ix >= AOUF_COUNT)
                 return;
@@ -144,7 +144,7 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
         if (! IS_END_LIST_ENTRY_CHAR(flg_txt[fnt->fnm_len]))
             return;
 
-        flg |= 1 << ix;
+        flg |= 1U << ix;
         flg_txt = SPN_WHITESPACE_CHARS(flg_txt + fnt->fnm_len);
 
         if (*flg_txt == NUL)

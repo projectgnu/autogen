@@ -21,8 +21,8 @@
  */
 
 /* = = = START-STATIC-FORWARD = = = */
-static char const*
-load_extract_file(char const* pzNewFile);
+static char const *
+load_extract_file(char const * pzNewFile);
 
 static SCM
 mk_empty_text(char const* pzStart, char const* pzEnd, SCM def);
@@ -36,13 +36,13 @@ get_text(char const* pzText, char const* pzStart, char const* pzEnd, SCM def);
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
  */
-static char const*
-load_extract_file(char const* pzNewFile)
+static char const *
+load_extract_file(char const * pzNewFile)
 {
     static char const * pzFile = NULL;
     static char const * pzText = NULL;
     struct stat  sbuf;
-    char* pzIn;
+    char * in_txt;
 
     /*
      *  Make sure that we:
@@ -78,19 +78,19 @@ load_extract_file(char const* pzNewFile)
     }
 
     AGDUPSTR(pzFile, pzNewFile, "extract file");
-    pzIn = (char*)AGALOC(sbuf.st_size + 1, "Extract Text");
+    in_txt = (char*)AGALOC(sbuf.st_size + 1, "Extract Text");
 
     if (! HAVE_OPT(WRITABLE))
         SET_OPT_WRITABLE;
 
-    pzText = (char const*)pzIn;
+    pzText = (char const*)in_txt;
 
     /*
      *  Suck up the file.  We must read it all.
      */
     {
         struct stat stbf;
-        FILE* fp = fopen(pzNewFile, "r");
+        FILE * fp = fopen(pzNewFile, "r");
         if (fp == NULL)
             goto bad_return;
 
@@ -103,18 +103,18 @@ load_extract_file(char const* pzNewFile)
             outfile_time = stbf.st_mtime;
 
         do  {
-            size_t sz = fread(pzIn, (size_t)1, (size_t)sbuf.st_size, fp);
+            size_t sz = fread(in_txt, (size_t)1, (size_t)sbuf.st_size, fp);
             if (sz == 0) {
                 fprintf(stderr, LD_EXTRACT_BAD_READ, errno, strerror(errno),
                         (int)sbuf.st_size, pzFile);
                 AG_ABEND(LD_EXTRACT_READ_FAIL);
             }
 
-            pzIn += sz;
-            sbuf.st_size -= sz;
+            in_txt += sz;
+            sbuf.st_size -= (size_t)sz;
         } while (sbuf.st_size > 0);
 
-        *pzIn = NUL;
+        *in_txt = NUL;
         fclose(fp);
 
         if (dep_fp != NULL)

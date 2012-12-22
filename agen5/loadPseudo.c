@@ -29,16 +29,16 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static char const *
-do_scheme_expr(char const * pzData, char const * pzFileName);
+do_scheme_expr(char const * text, char const * fname);
 
 static char const *
 handle_hash_line(char const * pz);
 
 static te_pm_event
-next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm);
+next_pm_token(char const ** ptext, te_pm_state fsm_state, char const * fnm);
 
 static char const *
-copy_mark(char const * pzData, char* pzMark, size_t * pCt);
+copy_mark(char const * text, char * marker, size_t * ret_ct);
 /* = = = END-STATIC-FORWARD = = = */
 
 
@@ -49,26 +49,26 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt);
  *  Process a scheme specification
  */
 static char const *
-do_scheme_expr(char const * pzData, char const * pzFileName)
+do_scheme_expr(char const * text, char const * fname)
 {
-    char*   pzEnd = (char*)pzData + strlen(pzData);
-    char    ch;
-    macro_t* pCM = cur_macro;
-    macro_t  mac = { (mac_func_t)~0, 0, 0, 0, 0, 0, 0, NULL };
+    char *    pzEnd = (char*)text + strlen(text);
+    char      ch;
+    macro_t * pCM   = cur_macro;
+    macro_t   mac   = { (mac_func_t)~0, 0, 0, 0, 0, 0, 0, NULL };
 
     mac.md_line = tpl_line;
-    pzEnd       = (char*)skip_scheme(pzData, pzEnd);
+    pzEnd       = (char*)skip_scheme(text, pzEnd);
     ch          = *pzEnd;
     *pzEnd      = NUL;
     cur_macro   = &mac;
 
     ag_scm_c_eval_string_from_file_line(
-          (char*)pzData, pzFileName, tpl_line );
+          (char*)text, fname, tpl_line );
 
     cur_macro = pCM;
     *pzEnd    = ch;
-    while (pzData < pzEnd)
-        if (*(pzData++) == NL)
+    while (text < pzEnd)
+        if (*(text++) == NL)
             tpl_line++;
     return (char const *)pzEnd;
 }
@@ -81,7 +81,7 @@ do_scheme_expr(char const * pzData, char const * pzFileName)
  *  Process a suffix specification
  */
 LOCAL char const *
-do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
+do_suffix(char const * const text, char const * fname, int lineNo)
 {
     /*
      *  The following is the complete list of POSIX required-to-be-legal
@@ -99,7 +99,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
     /*
      *  Skip over the suffix construct
      */
-    pzSfxFmt = SPN_SUFFIX_CHARS(pzData);
+    pzSfxFmt = SPN_SUFFIX_CHARS(text);
 
     if (*pzSfxFmt != '=') {
         pzResult = pzSfxFmt;
@@ -121,11 +121,11 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
     }
 
     /*
-     *  If pzFileName is NULL, then we are called by --select-suffix.
+     *  If fname is NULL, then we are called by --select-suffix.
      *  Otherwise, the suffix construct is saved only for the main template,
      *  and only when the --select-suffix option was not specified.
      */
-    if (  (pzFileName != NULL)
+    if (  (fname != NULL)
        && (  (processing_state != PROC_STATE_LOAD_TPL)
           || HAVE_OPT(SELECT_SUFFIX)))
         return pzResult;
@@ -135,7 +135,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      *  "spanned" text, including any '=' character, scheme expression or
      *  file name format string.
      */
-    spn = pzResult - pzData;
+    spn = (size_t)(pzResult - text);
     {
         size_t sz = sizeof(*pOS) + spn + 1;
         pOS = AGALOC(sz, "Output Specification");
@@ -144,7 +144,7 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
 
     *ppOSList  = pOS;
     ppOSList   = &pOS->os_next; /* NULL, from memset */
-    memcpy(pOS->os_sfx, pzData, spn);
+    memcpy(pOS->os_sfx, text, spn);
     pOS->os_sfx[spn] = NUL;
 
     /*
@@ -153,14 +153,14 @@ do_suffix(char const * const pzData, char const * pzFileName, int lineNo)
      *  ELSE supply a default.
      */
     if (pzSfxFmt != NULL) {
-        size_t sfx_len = pzSfxFmt - pzData;
+        size_t sfx_len = (size_t)(pzSfxFmt - text);
         pOS->os_sfx[sfx_len-1] = NUL;
         pOS->os_file_fmt = pOS->os_sfx + sfx_len;
 
         if (*pOS->os_file_fmt == '(') {
             SCM str =
                 ag_scm_c_eval_string_from_file_line(
-                    pOS->os_file_fmt, pzFileName, lineNo );
+                    pOS->os_file_fmt, fname, lineNo );
             size_t str_length;
             char const * pz;
 
@@ -211,13 +211,13 @@ handle_hash_line(char const * pz)
      */
     if ((pz[1] == '!') && (pz[2] == '/')) {
         char const * pzScn = pz + 3;
-        char * nmbuf;
+        char *  nmbuf;
         size_t len;
 
         pzScn = SPN_FILE_NAME_CHARS(pzScn);
 
-        len   = pzScn - (pz + 2);
-        nmbuf = ag_scribble(len);
+        len   = (size_t)(pzScn - (pz + 2));
+        nmbuf = ag_scribble((ssize_t)len);
         memcpy(nmbuf, pz+2, len);
         nmbuf[len] = NUL;
 
@@ -226,7 +226,7 @@ handle_hash_line(char const * pz)
          *  the SHELL environment variable to this executable.
          */
         if (access(nmbuf, X_OK) == 0) {
-            char * sp = malloc(len + 7); // len + "SHELL=" + NUL byte
+            char * sp = malloc((size_t)(len + 7)); // len + "SHELL=" + NUL byte
             sprintf(sp, HANDLE_HASH_ENV_FMT, HANDLE_HASH_SHELL, nmbuf);
             putenv(sp);
             AGDUPSTR(shell_program, nmbuf, "prog shell");
@@ -242,12 +242,12 @@ handle_hash_line(char const * pz)
  *  next_pm_token
  *
  *  Skiping leading white space, figure out what sort of token is under
- *  the scan pointer (pzData).
+ *  the scan pointer (text).
  */
 static te_pm_event
-next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
+next_pm_token(char const ** ptext, te_pm_state fsm_state, char const * fnm)
 {
-    char const * pzData = *ppzData;
+    char const * text = *ptext;
 
     /*
      *  At the start of processing in this function, we can never be at
@@ -258,8 +258,8 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
     bool line_start = false;
 
  skipWhiteSpace:
-    while (IS_WHITESPACE_CHAR(*pzData)) {
-        if (*(pzData++) == NL) {
+    while (IS_WHITESPACE_CHAR(*text)) {
+        if (*(text++) == NL) {
             line_start = true;
             tpl_line++;
 
@@ -268,18 +268,18 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
              *  THEN we skip white space only thru the first new line.
              */
             if (fsm_state == PM_ST_END_MARK) {
-                *ppzData = pzData;
+                *ptext = text;
                 return PM_EV_END_PSEUDO;
             }
         }
     }
 
-    if (line_start && (*pzData == '#')) {
-        pzData = handle_hash_line(pzData);
+    if (line_start && (*text == '#')) {
+        text = handle_hash_line(text);
         goto skipWhiteSpace;
     }
 
-    *ppzData = pzData; /* in case we return */
+    *ptext = text; /* in case we return */
 
     /*
      *  After the end marker has been found,
@@ -292,19 +292,19 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
      *  IF the token starts with an alphanumeric,
      *  THEN it must be "autogen5" or "template" or a suffix specification
      */
-    if (IS_VAR_FIRST_CHAR(*pzData)) {
-        if (strneqvcmp(pzData, AG_MARK, AG_MARK_LEN) == 0) {
-            if (IS_WHITESPACE_CHAR(pzData[ AG_MARK_LEN ])) {
-                *ppzData = pzData + AG_MARK_LEN + 1;
+    if (IS_VAR_FIRST_CHAR(*text)) {
+        if (strneqvcmp(text, AG_MARK, AG_MARK_LEN) == 0) {
+            if (IS_WHITESPACE_CHAR(text[ AG_MARK_LEN ])) {
+                *ptext = text + AG_MARK_LEN + 1;
                 return PM_EV_AUTOGEN;
             }
 
             return PM_EV_SUFFIX;
         }
 
-        if (  (strneqvcmp(pzData, TPL_MARK, TPL_MARK_LEN) == 0)
-           && (IS_WHITESPACE_CHAR(pzData[ TPL_MARK_LEN ])) ) {
-            *ppzData = pzData + TPL_MARK_LEN;
+        if (  (strneqvcmp(text, TPL_MARK, TPL_MARK_LEN) == 0)
+           && (IS_WHITESPACE_CHAR(text[ TPL_MARK_LEN ])) ) {
+            *ptext = text + TPL_MARK_LEN;
             return PM_EV_TEMPLATE;
         }
 
@@ -316,9 +316,9 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
      *  gotten past "init" state.
      */
     if (fsm_state > PM_ST_INIT)
-        switch (*pzData) {
+        switch (*text) {
         case '-':
-            if ((pzData[1] == '*') && (pzData[2] == '-'))
+            if ((text[1] == '*') && (text[2] == '-'))
                 return PM_EV_ED_MODE;
             break;
 
@@ -330,14 +330,14 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
      *  Alphanumerics and underscore are already handled.  Thus, it must be
      *  a punctuation character that may introduce a suffix:  '.' '-' '_'
      */
-    if (IS_SUFFIX_CHAR(*pzData))
+    if (IS_SUFFIX_CHAR(*text))
         return PM_EV_SUFFIX;
 
     /*
      *  IF it is some other punctuation,
      *  THEN it must be a start/end marker.
      */
-    if (IS_PUNCTUATION_CHAR(*pzData))
+    if (IS_PUNCTUATION_CHAR(*text))
         return PM_EV_MARKER;
 
     /*
@@ -355,28 +355,28 @@ next_pm_token(char const ** ppzData, te_pm_state fsm_state, char const * fnm)
  *  as we find punctuation characters.
  */
 static char const *
-copy_mark(char const * pzData, char* pzMark, size_t * pCt)
+copy_mark(char const * text, char * marker, size_t * ret_ct)
 {
-    int ct = 0;
+    size_t ct = 0;
 
     for (;;) {
-        char ch = *pzData;
+        char ch = *text;
         if (! IS_PUNCTUATION_CHAR(ch))
             break;
-        *(pzMark++) = ch;
-        if (++ct >= (int)sizeof(st_mac_mark))
+        *(marker++) = ch;
+        if (++ct >= sizeof(st_mac_mark))
             return NULL;
 
-        pzData++;
+        text++;
     }
 
-    *pCt = ct;
-    *pzMark = NUL;
+    *ret_ct = ct;
+    *marker = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
-        fprintf(trace_fp, TRACE_COPY_MARK, pzMark - ct);
+        fprintf(trace_fp, TRACE_COPY_MARK, marker - ct);
 
-    return pzData;
+    return text;
 }
 
 
@@ -386,7 +386,7 @@ copy_mark(char const * pzData, char* pzMark, size_t * pCt)
  *  "pseudo macro" at the start of every template.
  */
 LOCAL char const *
-loadPseudoMacro(char const * pzData, char const * pzFileName)
+loadPseudoMacro(char const * text, char const * fname)
 {
     char const * pzBadness;
 #   define BAD_MARKER(t) { pzBadness = t; goto abort_load; }
@@ -396,7 +396,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
     tpl_line  = 1;
 
     while (fsm_state != PM_ST_DONE) {
-        te_pm_event fsm_tkn = next_pm_token(&pzData, fsm_state, pzFileName);
+        te_pm_event fsm_tkn = next_pm_token(&text, fsm_state, fname);
         te_pm_state nxt_state;
         te_pm_trans trans;
 
@@ -411,25 +411,25 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         switch (trans) {
         case PM_TR_SKIP_ED_MODE:
         {
-            char* pzEnd = strstr(pzData + 3, PSEUDO_MAC_MODE_MARK);
-            char* pzNL  = strchr(pzData + 3, NL);
+            char* pzEnd = strstr(text + 3, PSEUDO_MAC_MODE_MARK);
+            char* pzNL  = strchr(text + 3, NL);
             if ((pzEnd == NULL) || (pzNL < pzEnd))
                 BAD_MARKER(PSEUDO_MAC_BAD_MODE);
 
-            pzData = pzEnd + 3;
+            text = pzEnd + 3;
             break;
         }
 
         case PM_TR_INIT_MARKER:
-            pzData = copy_mark(pzData, st_mac_mark, &st_mac_len);
-            if (pzData == NULL)
+            text = copy_mark(text, st_mac_mark, &st_mac_len);
+            if (text == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             break;
 
         case PM_TR_TEMPL_MARKER:
-            pzData = copy_mark(pzData, end_mac_mark, &end_mac_len);
-            if (pzData == NULL)
+            text = copy_mark(text, end_mac_mark, &end_mac_len);
+            if (text == NULL)
                 BAD_MARKER(PSEUDO_MAC_BAD_LENGTH);
 
             /*
@@ -439,7 +439,7 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
              */
             if (  (end_mac_len == 2 * st_mac_len)
                && (strcmp(st_mac_mark, end_mac_mark + st_mac_len) == 0))  {
-                pzData -= st_mac_len;
+                text -= st_mac_len;
                 end_mac_mark[ st_mac_len ] = NUL;
                 end_mac_len = st_mac_len;
             }
@@ -451,11 +451,11 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
             break;
 
         case PM_TR_TEMPL_SUFFIX:
-            pzData = do_suffix(pzData, pzFileName, tpl_line);
+            text = do_suffix(text, fname, tpl_line);
             break;
 
         case PM_TR_TEMPL_SCHEME:
-            pzData = do_scheme_expr(pzData, pzFileName);
+            text = do_scheme_expr(text, fname);
             break;
 
         case PM_TR_INVALID:
@@ -479,10 +479,10 @@ loadPseudoMacro(char const * pzData, char const * pzFileName)
         fsm_state = nxt_state;
     }
 
-    return pzData;
+    return text;
 
  abort_load:
-    AG_ABEND(aprf(PSEUDO_MAC_ERR_FMT, pzFileName, tpl_line, pzBadness));
+    AG_ABEND(aprf(PSEUDO_MAC_ERR_FMT, fname, tpl_line, pzBadness));
 #   undef BAD_MARKER
     return NULL;
 }

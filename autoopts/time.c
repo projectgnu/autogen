@@ -56,7 +56,7 @@ optionTimeVal(tOptions * pOpts, tOptDesc * pOD)
         pOD->fOptState &= ~OPTST_ALLOC_ARG;
     }
 
-    pOD->optArg.argInt = (unsigned long)val;
+    pOD->optArg.argInt = (long)val;
 }
 
 /*=export_func  optionTimeDate
@@ -130,7 +130,7 @@ optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
 #endif
     optionTimeVal(pOpts, pOD);
     if (pOD->optArg.argInt != BAD_TIME)
-        pOD->optArg.argInt += (unsigned long)time(NULL);
+        pOD->optArg.argInt += (long)time(NULL);
 }
 /*
  * Local Variables:

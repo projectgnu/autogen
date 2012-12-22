@@ -88,8 +88,8 @@ new_scribble_block(size_t min_size)
     /*
      * allow space for allocation header and round up
      */
-    min_size    += str_buf_hdr_sz;
-    min_size     = ROUND_SCRIBBLE(min_size, 0x2000);
+    min_size += str_buf_hdr_sz;
+    min_size  = ROUND_SCRIBBLE(min_size, 0x2000U);
 
     /*
      * Allocate and link into list.  Advance pointer to next entry.
@@ -122,15 +122,15 @@ new_scribble_block(size_t min_size)
 LOCAL char *
 ag_scribble(ssize_t size)
 {
-    string_buf_t* sb = ag_strbufs;
-    char* buf;
+    string_buf_t * sb = ag_strbufs;
+    char * buf;
 
     size += 1;  // allow for NUL byte & round to word boundary
-    size  = ROUND_SCRIBBLE(size, sizeof(void *));
+    size  = ROUND_SCRIBBLE(size, (ssize_t)sizeof(void *));
 
     for (;;) {
         if (sb == NULL) {
-            sb = new_scribble_block(size);
+            sb = new_scribble_block((size_t)size);
             break;
         }
 
@@ -179,7 +179,7 @@ ag_scm2zchars(SCM s, const char * type)
         return &z;
     }
 
-    buf = ag_scribble(len);
+    buf = ag_scribble((ssize_t)len);
 
     {
         size_t buflen = scm_to_locale_stringbuf(s, buf, len);

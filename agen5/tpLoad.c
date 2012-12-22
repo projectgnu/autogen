@@ -208,7 +208,7 @@ find_file(char const * in_name,
                 *pzEnd = NUL;
 
             } else {
-                int fmt_len;
+                unsigned int fmt_len;
 
                 /*
                  *  IF one of our template paths starts with '$', then expand it
@@ -217,8 +217,9 @@ find_file(char const * in_name,
                 if (*c_dir == '$')
                     c_dir = expand_dir(dirlist+1, res_name);
 
-                fmt_len = snprintf(res_name, AG_PATH_MAX - MAX_SUFFIX_LEN,
-                                   FIND_FILE_DIR_FMT, c_dir, in_name);
+                fmt_len = (unsigned)snprintf(
+                    res_name, AG_PATH_MAX - MAX_SUFFIX_LEN,
+                    FIND_FILE_DIR_FMT, c_dir, in_name);
                 if (fmt_len >= AG_PATH_MAX - MAX_SUFFIX_LEN)
                     break; // fail-return
                 pzEnd = res_name + fmt_len;
@@ -329,17 +330,18 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
         if (pzData != NULL)
             AG_ABEND(LOAD_MACS_BAD_PARSE);
 
-        ct = pMacEnd - pMac;
+        ct = (int)(pMacEnd - pMac);
 
         /*
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
         if (ct < pT->td_mac_ct) {
-            int     delta = sizeof(macro_t) * (pT->td_mac_ct - ct);
-            void*   data  =
+            int     delta =
+                (int)(sizeof(macro_t) * (size_t)(pT->td_mac_ct - ct));
+            void *  data  =
                 (pT->td_name == NULL) ? pT->td_text : pT->td_name;
-            size_t  size  = pT->td_scan - (char *)data;
+            size_t  size  = (size_t)(pT->td_scan - (char *)data);
             memmove((void*)pMacEnd, data, size);
 
             pT->td_text  -= delta;
@@ -349,7 +351,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
         }
     }
 
-    pT->td_size = pT->td_scan - (char *)pT;
+    pT->td_size = (size_t)(pT->td_scan - (char *)pT);
     pT->td_scan = NULL;
 
     /*
@@ -393,8 +395,9 @@ digest_tpl(tmap_info_t * minfo, char * fname)
     size_t mac_ct   = cnt_macros(dta);
     size_t alloc_sz = (sizeof(*res) + (mac_ct * sizeof(macro_t))
                        + minfo->txt_size
-                       - (dta - (char const *)minfo->txt_data)
-                       + strlen(fname) + 0x10) & ~0x0F;
+                       - (size_t)(dta - (char const *)minfo->txt_data)
+                       + strlen(fname) + 0x10)
+                    & (size_t)(~0x0F);
 
     res = (templ_t*)AGALOC(alloc_sz, "main template");
     memset((void*)res, 0, alloc_sz);
@@ -404,7 +407,7 @@ digest_tpl(tmap_info_t * minfo, char * fname)
      */
     res->td_magic  = magic_marker;
     res->td_size   = alloc_sz;
-    res->td_mac_ct = mac_ct;
+    res->td_mac_ct = (int)mac_ct;
 
     strcpy(res->td_start_mac, st_mac_mark); /* must fit */
     strcpy(res->td_end_mac,   end_mac_mark);   /* must fit */

@@ -64,7 +64,7 @@ check_existence(teOptFileType ftype, tOptions * pOpts, tOptDesc * pOD)
              */
             break;
 
-        l = p - fname;
+        l = (size_t)(p - fname);
         p = AGALOC(l + 1, "fname");
         memcpy(p, fname, l);
         p[l] = NUL;

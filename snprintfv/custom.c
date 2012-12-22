@@ -135,7 +135,7 @@ printf_generic (STREAM *stream, struct printf_info *const pinfo, union printf_ar
   out = stream_new (fil, SNV_UNLIMITED, NULL, snv_filputc);
   user_func (out, pinfo, args);
   stream_delete (out);
-  len = fillen (fil);
+  len = (int)fillen (fil);
   p = fildelete (fil);
 
   /* Left pad to the width if the supplied argument is less than

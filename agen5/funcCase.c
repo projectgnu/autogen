@@ -1296,6 +1296,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
     char const *  sel_arg;
     long          arg_len = mac->md_res; /* macro len  */
 
+    (void)pscan;
     /*
      *  Set the global macro loading mode
      */

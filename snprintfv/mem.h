@@ -50,9 +50,9 @@
 
 /* This is the API we use throughout libsnprintfv. */
 #define snv_new(type, count)		\
-		((type*)snv_malloc((size_t)sizeof(type) * (count)))
+		((type*)snv_malloc(sizeof(type) * (size_t)(count)))
 #define snv_renew(type, ptr, count)	\
-    		((type*)snv_xrealloc((ptr), (size_t)sizeof(type) * (count)))
+    		((type*)snv_xrealloc((ptr), sizeof(type) * (size_t)(count)))
 #define snv_delete(old)	snv_free(old)
 
 #ifdef __cplusplus

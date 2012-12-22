@@ -56,15 +56,15 @@ add_string(void ** pp, char const * name, size_t nm_len,
 
 static tOptionValue *
 add_bool(void ** pp, char const * name, size_t nm_len,
-         char const* pzValue, size_t dataLen);
+         char const * val, size_t d_len);
 
 static tOptionValue*
 add_number(void** pp, char const* pzName, size_t nm_len,
-           char const* pzValue, size_t dataLen);
+           char const* val, size_t d_len);
 
 static tOptionValue*
 add_nested(void** pp, char const* pzName, size_t nm_len,
-           char* pzValue, size_t dataLen);
+           char* val, size_t d_len);
 
 static char const *
 scan_name(char const* pzName, tOptionValue* pRes);
@@ -184,7 +184,7 @@ add_string(void ** pp, char const * name, size_t nm_len,
         if (dataLen > 0) {
             char const * src = pzValue;
             char * pzDst = pNV->v.strVal;
-            int    ct    = dataLen;
+            int    ct    = (int)dataLen;
             do  {
                 int ch = *(src++) & 0xFF;
                 if (ch == NUL) goto data_copy_done;
@@ -213,35 +213,35 @@ add_string(void ** pp, char const * name, size_t nm_len,
  */
 static tOptionValue *
 add_bool(void ** pp, char const * name, size_t nm_len,
-         char const* pzValue, size_t dataLen)
+         char const * val, size_t d_len)
 {
-    tOptionValue * pNV;
+    tOptionValue * new_val;
 
     {
         size_t sz = nm_len + sizeof(tOptionValue) + 1;
-        pNV = AGALOC(sz, "name/bool value");
+        new_val = AGALOC(sz, "name/bool value");
     }
 
     {
-        char * p = SPN_WHITESPACE_CHARS(pzValue);
-        dataLen -= p - pzValue;
-        pzValue  = p;
+        char * p = SPN_WHITESPACE_CHARS(val);
+        d_len -= (unsigned long)(p - val);
+        val  = p;
     }
 
-    if (dataLen == 0)
-        pNV->v.boolVal = 0;
+    if (d_len == 0)
+        new_val->v.boolVal = 0;
 
-    else if (IS_DEC_DIGIT_CHAR(*pzValue))
-        pNV->v.boolVal = atoi(pzValue);
+    else if (IS_DEC_DIGIT_CHAR(*val))
+        new_val->v.boolVal = (unsigned)atoi(val);
 
-    else pNV->v.boolVal = ! IS_FALSE_TYPE_CHAR(*pzValue);
+    else new_val->v.boolVal = ! IS_FALSE_TYPE_CHAR(*val);
 
-    pNV->valType = OPARG_TYPE_BOOLEAN;
-    pNV->pzName = (char*)(pNV + 1);
-    memcpy(pNV->pzName, name, nm_len);
-    pNV->pzName[ nm_len ] = NUL;
-    addArgListEntry(pp, pNV);
-    return pNV;
+    new_val->valType = OPARG_TYPE_BOOLEAN;
+    new_val->pzName = (char*)(new_val + 1);
+    memcpy(new_val->pzName, name, nm_len);
+    new_val->pzName[ nm_len ] = NUL;
+    addArgListEntry(pp, new_val);
+    return new_val;
 }
 
 /**
@@ -249,28 +249,28 @@ add_bool(void ** pp, char const * name, size_t nm_len,
  */
 static tOptionValue*
 add_number(void** pp, char const* pzName, size_t nm_len,
-           char const* pzValue, size_t dataLen)
+           char const* val, size_t d_len)
 {
-    tOptionValue* pNV;
-    size_t sz = nm_len + sizeof(*pNV) + 1;
+    tOptionValue* new_val;
+    size_t sz = nm_len + sizeof(*new_val) + 1;
 
-    pNV = AGALOC(sz, "bool val");
-    if (pNV == NULL)
+    new_val = AGALOC(sz, "bool val");
+    if (new_val == NULL)
         return NULL;
-    while (IS_WHITESPACE_CHAR(*pzValue) && (dataLen > 0)) {
-        dataLen--; pzValue++;
+    while (IS_WHITESPACE_CHAR(*val) && (d_len > 0)) {
+        d_len--; val++;
     }
-    if (dataLen == 0)
-        pNV->v.longVal = 0;
+    if (d_len == 0)
+        new_val->v.longVal = 0;
     else
-        pNV->v.longVal = strtol(pzValue, 0, 0);
+        new_val->v.longVal = strtol(val, 0, 0);
 
-    pNV->valType = OPARG_TYPE_NUMERIC;
-    pNV->pzName  = (char*)(pNV + 1);
-    memcpy(pNV->pzName, pzName, nm_len);
-    pNV->pzName[ nm_len ] = NUL;
-    addArgListEntry(pp, pNV);
-    return pNV;
+    new_val->valType = OPARG_TYPE_NUMERIC;
+    new_val->pzName  = (char*)(new_val + 1);
+    memcpy(new_val->pzName, pzName, nm_len);
+    new_val->pzName[ nm_len ] = NUL;
+    addArgListEntry(pp, new_val);
+    return new_val;
 }
 
 /**
@@ -278,29 +278,29 @@ add_number(void** pp, char const* pzName, size_t nm_len,
  */
 static tOptionValue*
 add_nested(void** pp, char const* pzName, size_t nm_len,
-           char* pzValue, size_t dataLen)
+           char* val, size_t d_len)
 {
-    tOptionValue* pNV;
+    tOptionValue* new_val;
 
-    if (dataLen == 0) {
-        size_t sz = nm_len + sizeof(*pNV) + 1;
-        pNV = AGALOC(sz, "empty nest");
-        if (pNV == NULL)
+    if (d_len == 0) {
+        size_t sz = nm_len + sizeof(*new_val) + 1;
+        new_val = AGALOC(sz, "empty nest");
+        if (new_val == NULL)
             return NULL;
-        pNV->v.nestVal = NULL;
-        pNV->valType = OPARG_TYPE_HIERARCHY;
-        pNV->pzName = (char*)(pNV + 1);
-        memcpy(pNV->pzName, pzName, nm_len);
-        pNV->pzName[ nm_len ] = NUL;
+        new_val->v.nestVal = NULL;
+        new_val->valType = OPARG_TYPE_HIERARCHY;
+        new_val->pzName = (char*)(new_val + 1);
+        memcpy(new_val->pzName, pzName, nm_len);
+        new_val->pzName[ nm_len ] = NUL;
 
     } else {
-        pNV = optionLoadNested(pzValue, pzName, nm_len);
+        new_val = optionLoadNested(val, pzName, nm_len);
     }
 
-    if (pNV != NULL)
-        addArgListEntry(pp, pNV);
+    if (new_val != NULL)
+        addArgListEntry(pp, new_val);
 
-    return pNV;
+    return new_val;
 }
 
 /**
@@ -310,11 +310,11 @@ add_nested(void** pp, char const* pzName, size_t nm_len,
 static char const *
 scan_name(char const* pzName, tOptionValue* pRes)
 {
-    tOptionValue* pNV;
+    tOptionValue* new_val;
     char const * pzScan = pzName+1; /* we know first char is a name char */
     char const * pzVal;
     size_t       nm_len = 1;
-    size_t       dataLen = 0;
+    size_t       d_len = 0;
 
     /*
      *  Scan over characters that name a value.  These names may not end
@@ -323,7 +323,7 @@ scan_name(char const* pzName, tOptionValue* pRes)
     pzScan = SPN_VALUE_NAME_CHARS(pzName + 1);
     if (pzScan[-1] == ':')
         pzScan--;
-    nm_len = pzScan - pzName;
+    nm_len = (size_t)(pzScan - pzName);
 
     pzScan = SPN_HORIZ_WHITE_CHARS(pzScan);
 
@@ -350,11 +350,11 @@ scan_name(char const* pzName, tOptionValue* pRes)
     case '\'':
         pzVal = pzScan;
         pzScan = scan_q_str(pzScan);
-        dataLen = pzScan - pzVal;
-        pNV = add_string(&(pRes->v.nestVal), pzName, nm_len, pzVal,
-                         dataLen);
-        if ((pNV != NULL) && (option_load_mode == OPTION_LOAD_COOKED))
-            ao_string_cook(pNV->v.strVal, NULL);
+        d_len = (size_t)(pzScan - pzVal);
+        new_val = add_string(&(pRes->v.nestVal), pzName, nm_len, pzVal,
+                         d_len);
+        if ((new_val != NULL) && (option_load_mode == OPTION_LOAD_COOKED))
+            ao_string_cook(new_val->v.strVal, NULL);
         break;
 
     default:
@@ -369,7 +369,7 @@ scan_name(char const* pzName, tOptionValue* pRes)
             switch (ch) {
             case NUL:
                 pzScan--;
-                dataLen = pzScan - pzVal;
+                d_len = (size_t)(pzScan - pzVal);
                 goto string_done;
                 /* FALLTHROUGH */
 
@@ -381,12 +381,12 @@ scan_name(char const* pzName, tOptionValue* pRes)
                 /* FALLTHROUGH */
 
             case ',':
-                dataLen = (pzScan - pzVal) - 1;
+                d_len = (size_t)(pzScan - pzVal) - 1;
             string_done:
-                pNV = add_string(&(pRes->v.nestVal), pzName, nm_len,
-                                     pzVal, dataLen);
-                if (pNV != NULL)
-                    remove_continuation(pNV->v.strVal);
+                new_val = add_string(&(pRes->v.nestVal), pzName, nm_len,
+                                     pzVal, d_len);
+                if (new_val != NULL)
+                    remove_continuation(new_val->v.strVal);
                 goto leave_scan_name;
             }
         }
@@ -442,7 +442,7 @@ static char const *
 scan_xml_name(char const * name, size_t * nm_len, tOptionValue * val)
 {
     char const * scan = SPN_VALUE_NAME_CHARS(name + 1);
-    *nm_len = scan - name;
+    *nm_len = (size_t)(scan - name);
     if (*nm_len > 64)
         return NULL;
     val->valType = OPARG_TYPE_STRING;
@@ -500,7 +500,7 @@ find_end_xml(char const * src, size_t nm_len, char const * val, size_t * len)
             char const * end = (option_load_mode != OPTION_LOAD_KEEP)
                 ? SPN_WHITESPACE_BACK(val, res)
                 : res;
-            *len = end - val; /* includes trailing white space */
+            *len = (size_t)(end - val); /* includes trailing white space */
             res =  SPN_WHITESPACE_CHARS(res + (dst - z));
         }
         return res;
@@ -613,13 +613,13 @@ LOCAL void
 unload_arg_list(tArgList * arg_list)
 {
     int ct = arg_list->useCt;
-    tCC** ppNV = arg_list->apzArgs;
+    char const ** pnew_val = arg_list->apzArgs;
 
     while (ct-- > 0) {
-        tOptionValue* pNV = (tOptionValue*)(void*)*(ppNV++);
-        if (pNV->valType == OPARG_TYPE_HIERARCHY)
-            unload_arg_list(pNV->v.nestVal);
-        AGFREE(pNV);
+        tOptionValue* new_val = (tOptionValue*)(void*)*(pnew_val++);
+        if (new_val->valType == OPARG_TYPE_HIERARCHY)
+            unload_arg_list(new_val->v.nestVal);
+        AGFREE(new_val);
     }
 
     AGFREE((void*)arg_list);
@@ -806,9 +806,9 @@ optionNestedVal(tOptions * opts, tOptDesc * od)
         return;
 
     if (od->fOptState & OPTST_RESET) {
-        tArgList * arg_list = od->optCookie;
-        int        ct;
-        tCC **     av;
+        tArgList *    arg_list = od->optCookie;
+        int           ct;
+        char const ** av;
 
         if (arg_list == NULL)
             return;
@@ -854,7 +854,7 @@ get_special_char(char const ** ppz, int * ct)
         retch = (int)strtoul(pz, (char **)&pz, base);
         if (*pz != ';')
             return '&';
-        base = ++pz - *ppz;
+        base = (int)(++pz - *ppz);
         if (base > *ct)
             return '&';
 
@@ -869,7 +869,7 @@ get_special_char(char const ** ppz, int * ct)
 
         for (;;) {
             if (  (*ct >= xlatp->xml_len)
-               && (strncmp(pz, xlatp->xml_txt, xlatp->xml_len) == 0)) {
+               && (strncmp(pz, xlatp->xml_txt, (size_t)xlatp->xml_len) == 0)) {
                 *ppz += xlatp->xml_len;
                 *ct  -= xlatp->xml_len;
                 return xlatp->xml_ch;

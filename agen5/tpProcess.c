@@ -88,7 +88,7 @@ trace_macro(templ_t * tpl, macro_t * mac)
             pz = pz + 32;
 
         putc(' ', trace_fp); putc(' ', trace_fp);
-        fwrite(pz, pe - pz, 1, trace_fp);
+        fwrite(pz, (size_t)(pe - pz), 1, trace_fp);
         putc(NL, trace_fp);
     }
 }
@@ -197,8 +197,6 @@ process_tpl(templ_t * tpl)
     }
 
     do  {
-        out_spec_t * ospec = output_specs;
-
         /*
          * We cannot be in Scheme processing.  We've either just started
          * or we've made a long jump from our own code.  If we've made a
@@ -212,6 +210,9 @@ process_tpl(templ_t * tpl)
          */
         switch (setjmp(abort_jmp_buf)) {
         case SUCCESS:
+        {
+            out_spec_t * ospec = output_specs;
+
             if (OPT_VALUE_TRACE >= TRACE_EVERYTHING) {
                 fprintf(trace_fp, PROC_TPL_START, ospec->os_sfx);
                 fflush(trace_fp);
@@ -233,17 +234,25 @@ process_tpl(templ_t * tpl)
             do  {
                 out_close(false);  /* keep output */
             } while (cur_fpstack->stk_prev != NULL);
+
+            output_specs = next_out_spec(ospec);
             break;
+        }
 
         case PROBLEM:
+        {
+            out_spec_t * os = output_specs;
             /*
-             *  We got here by a long jump.  Close/purge the open files.
+             *  We got here by a long jump.  Close/purge the open files
+             *  and go on to the next output.
              */
             do  {
                 out_close(true);  /* discard output */
             } while (cur_fpstack->stk_prev != NULL);
             last_scm_cmd = NULL; /* "problem" means "drop current output". */
+            output_specs = next_out_spec(os);
             break;
+        }
 
         default:
             fprintf(trace_fp, PROC_TPL_BOGUS_RET, oops_pfx);
@@ -251,6 +260,9 @@ process_tpl(templ_t * tpl)
             /* FALLTHROUGH */
 
         case FAILURE:
+        {
+            out_spec_t * os = output_specs;
+
             /*
              *  We got here by a long jump.  Close/purge the open files.
              */
@@ -262,13 +274,13 @@ process_tpl(templ_t * tpl)
              *  On failure (or unknown jump type), we quit the program, too.
              */
             processing_state = PROC_STATE_ABORTING;
-            do ospec = next_out_spec(ospec);
-            while (ospec != NULL);
+            while (os != NULL)
+                os = next_out_spec(os);
+
             exit(EXIT_FAILURE);
             /* NOTREACHED */
         }
-
-        output_specs = next_out_spec(ospec);
+        }
     } while (output_specs != NULL);
 }
 

@@ -72,7 +72,7 @@ parse_opt(char const ** nm_pp, char ** arg_pp, char * buf, size_t bufsz)
         case NUL: return res;
 
         case '=':
-            memcpy(buf, *nm_pp, res);
+            memcpy(buf, *nm_pp, (size_t)res);
 
             buf[res] = NUL;
             *nm_pp   = buf;
@@ -285,7 +285,7 @@ opt_ambiguous(tOptions * opts, char const * name, int match_ct)
     if ((opts->fOptSet & OPTPROC_ERRSTOP) != 0) {
         fprintf(stderr, zAmbigOptStr, opts->pzProgPath, name, match_ct);
         if (match_ct <= 4)
-            opt_ambiguities(opts, name, strlen(name));
+            opt_ambiguities(opts, name, (int)strlen(name));
         (*opts->pUsageProc)(opts, EXIT_FAILURE);
         /* NOTREACHED */
         _exit(EXIT_FAILURE); /* to be certain */
@@ -718,7 +718,7 @@ find_opt(tOptions * opts, tOptState * o_st)
         def      = *def_opt;
         *def_opt = NO_EQUIVALENT;
         res      = opt_find_long(opts, pz, o_st);
-        *def_opt = def;
+        *def_opt = (uint16_t)def;
         return res;
     }
 

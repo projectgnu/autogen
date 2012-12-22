@@ -112,11 +112,12 @@ func_code(char const ** pscan)
     /*
      *  Save the name for later lookup
      */
-    cur_macro->md_name_off = (current_tpl->td_scan - current_tpl->td_text);
+    cur_macro->md_name_off =
+        (size_t)(current_tpl->td_scan - current_tpl->td_text);
     {
         char * pzCopy = current_tpl->td_scan;
         char * pe = SPN_VALUE_NAME_CHARS(pzFuncName);
-        size_t l  = pe - pzFuncName;
+        size_t l  = (size_t)(pe - pzFuncName);
         memcpy(pzCopy, pzFuncName, l);
         pzCopy     += l;
         pzFuncName += l;
@@ -213,7 +214,7 @@ find_mac_start(char const * pz, macro_t ** ppm, templ_t * tpl)
      */
     pzCopy      = tpl->td_scan;
     pzEnd       = (res != NULL) ? res : pz + strlen(pz);
-    mac->md_txt_off = pzCopy - tpl->td_text;
+    mac->md_txt_off = (uintptr_t)(pzCopy - tpl->td_text);
     mac->md_code = FTYP_TEXT;
     mac->md_line = tpl_line;
 
@@ -283,7 +284,7 @@ find_macro(templ_t * tpl, macro_t ** ppm, char const ** pscan)
         if (pzMark != pzMacEnd) {
             pzMacEnd = SPN_WHITESPACE_BACK( pzMark, pzMacEnd);
             (*ppm)->md_txt_off = (uintptr_t)pzMark;
-            (*ppm)->md_res     = (long)(pzMacEnd - pzMark);
+            (*ppm)->md_res     = (uintptr_t)(pzMacEnd - pzMark);
         }
     }
 

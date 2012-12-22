@@ -111,7 +111,7 @@ load_text_file(tmap_info_t * mapinfo, char const * pzFile)
     mapinfo->txt_errno   = 0;
 
 #else /* HAVE mmap */
-    size_t const pgsz = GETPAGESIZE();
+    size_t const pgsz = (size_t)GETPAGESIZE();
     void * map_addr   = NULL;
 
     (void)pzFile;
@@ -187,7 +187,7 @@ validate_mmap(char const * fname, int prot, int flags, tmap_info_t * mapinfo)
             return;
         }
 
-        mapinfo->txt_size = sb.st_size;
+        mapinfo->txt_size = (size_t)sb.st_size;
     }
 
     /*

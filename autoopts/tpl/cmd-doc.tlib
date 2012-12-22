@@ -161,6 +161,7 @@ test -f "$1" && cat $* | [+:(. egrep-prog):+] -v '^[ 	]*$'
 
 #.\" Now insert the sections we squirreled away for the end.
 #
+echo
 cat  ${tmp_dir}/.fini
 [+: (out-pop)
     (shell ". ${tmp_dir}/.assemble")  :+][+:
@@ -177,7 +178,6 @@ ENDDEF build-doc
 DEFINE doc-sections                   :+][+:
 
 FOR doc-section                       :+][+:
-
   CASE
     (define sec-type (string-upcase (get "ds-type")))
     (define sec-name (name-to-fname sec-type))
@@ -187,9 +187,11 @@ FOR doc-section                       :+][+:
     (if (not (defined? 'cvt-fn))
         (error (sprintf "Cannot locate converter for %s"
                (get "ds-format" "man"))))
+
     sec-type :+][+:
+
     == ""    :+][+: (error "unnamed doc-section") :+][+:
-    *==* " " :+].Sh "[+: (. sec-type)            :+]"[+:
+    *==* " " :+].Sh "[+: (. sec-type)             :+]"[+:
     *        :+].Sh [+: (. sec-type)              :+][+:
     ESAC     :+]
 [+:
@@ -297,9 +299,9 @@ DEFINE cond-section                     :+][+:
          (out-pop)                      :+][+:
 
      ==  insert                         :+][+:
-         (set! fname-line (shellf "sed '1s/.Sh .*/.Pp/' %s" file-name)) :+][+:
+         (set! fname-line (shellf
+           "sed '1s/.Sh .*/.Pp/' %1$s ; rm -f %1$s" file-name)) :+][+:
          INVOKE (sect-line-fname)       :+][+:
-         (emit fname-line)
          (out-pop)                      :+][+:
 
      # * -- otherwise, do nothing       :+][+:
@@ -592,13 +594,13 @@ FOR exit-desc (for-from 2)            :+][+:
   (sprintf ".It %d \" (EXIT_%s)\"\n%s\n"
     (for-index)
     (string-upcase (string->c-name! tmp-str))
-    (get-cvt "exit-desc" ""))    :+][+:
+    (get-cvt "exit-desc" ""))         :+][+:
 ENDFOR exit-desc                      :+][+:
 (if need-ex-noinput
     (emit ".It 66 \" (EX_NOINPUT)\"
 A specified configuration file could not be loaded.\n"))
 
-(if need-ex-noinput
+(if need-ex-software
     (emit ".It 70 \" (EX_SOFTWARE)\"
 libopts had an internal operational error.  Please report
 it to autogen-users@lists.sourceforge.net.  Thank you.\n"))
@@ -608,7 +610,7 @@ it to autogen-users@lists.sourceforge.net.  Thank you.\n"))
 .El
 [+:
 
-ENDDEF exit-status
+ENDDEF mk-exit-status
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  M K - A U T H O R S

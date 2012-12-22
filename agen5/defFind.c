@@ -389,7 +389,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
     while (IS_VALUE_NAME_CHAR(*pzS)) {
         char ch = *(pzS++);
         if ((state != CN_INDEX_CLOSE) && IS_UPPER_CASE_CHAR(ch))
-            *(pzD++) = tolower(ch);
+            *(pzD++) = (char)tolower(ch);
 
         else switch (ch) { /* force the separator chars to be '_' */
         case '-':
@@ -614,7 +614,7 @@ hash_string(unsigned char const * pz)
     while (*pz)
         res ^= (res << 3) ^ *(pz++);
 
-    return res & (hash_table_ct - 1);
+    return (int)(res & ((unsigned)hash_table_ct - 1));
 }
 
 static void
@@ -627,7 +627,7 @@ add_string(char const * pz)
      *  If there is no hash table, create one.
      */
     if (hash_table_ct == 0) {
-        size_t ct = current_tpl->td_mac_ct;
+        size_t ct = (size_t)current_tpl->td_mac_ct;
         if (ct < SCRIBBLE_SIZE)
             ct = SCRIBBLE_SIZE;
         else {
@@ -636,10 +636,10 @@ add_string(char const * pz)
                 bit_ct++;
                 ct >>= 1;
             }
-            ct = 1 << bit_ct;
+            ct = 1U << bit_ct;
         }
 
-        hash_table_ct = ct;
+        hash_table_ct = (int)ct;
         hash_table    = malloc(ct * sizeof (*hash_table));
         memset(hash_table, NUL, ct * sizeof (*hash_table));
     }
@@ -654,7 +654,7 @@ add_string(char const * pz)
         p = strchr(pz, '[');
 
         if (p != NULL) {
-            z_len = (p - pz) + 1;
+            z_len = (size_t)(p - pz) + 1;
             if (z_len > sizeof(z))
                 return;
             memcpy(z, pz, z_len - 1);

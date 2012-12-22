@@ -173,7 +173,7 @@ make_absolute( char const *string, char const *dot_path )
         if (dot_path && dot_path[0]) {
             result = malloc( 2 + strlen( dot_path ) + strlen( string ) );
             strcpy( result, dot_path );
-            result_len = strlen( result );
+            result_len = (int)strlen(result);
             if (result[result_len - 1] != '/') {
                 result[result_len++] = '/';
                 result[result_len] = '\0';
@@ -288,7 +288,7 @@ canonicalize_pathname( char *path )
 static char*
 extract_colon_unit( char* pzDir, char const *string, int *p_index )
 {
-    char*  pzDest = pzDir;
+    char * pzDest = pzDir;
     int    ix     = *p_index;
 
     if (string == NULL)
@@ -298,7 +298,7 @@ extract_colon_unit( char* pzDir, char const *string, int *p_index )
         return NULL;
 
     {
-        char const* pzSrc = string + ix;
+        char const * pzSrc = string + ix;
 
         while (*pzSrc == ':')  pzSrc++;
 
@@ -316,7 +316,7 @@ extract_colon_unit( char* pzDir, char const *string, int *p_index )
                 break;
         } copy_done:;
 
-        ix = pzSrc - string;
+        ix = (int)(pzSrc - string);
     }
 
     if (*pzDir == NUL)

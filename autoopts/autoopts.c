@@ -373,7 +373,7 @@ optionProcess(tOptions * opts, int a_ct, char ** a_v)
     }
 
     if (! SUCCESSFUL(regular_opts(opts)))
-        return opts->origArgCt;
+        return (int)opts->origArgCt;
 
     /*
      *  IF    there were no errors
@@ -405,7 +405,7 @@ optionProcess(tOptions * opts, int a_ct, char ** a_v)
        && (! is_consistent(opts)))
         (*opts->pUsageProc)(opts, EXIT_FAILURE);
 
-    return opts->curOptIdx;
+    return (int)opts->curOptIdx;
 }
 
 /*

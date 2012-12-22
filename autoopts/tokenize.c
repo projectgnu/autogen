@@ -143,8 +143,8 @@ alloc_token_list(char const * str)
             pz = SPN_WHITESPACE_CHARS(pz);
         } while (*pz != NUL);
 
-        res = malloc(sizeof(*res) + (pz - str)
-                     + (max_token_ct * sizeof(ch_t*)));
+        res = malloc(sizeof(*res) + (size_t)(pz - str)
+                     + ((size_t)max_token_ct * sizeof(ch_t*)));
     }
 
     if (res == NULL)
