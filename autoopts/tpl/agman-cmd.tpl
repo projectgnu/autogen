@@ -147,9 +147,8 @@ Standard input may not be a terminal.[+:
   ESAC  main-type                           :+][+:
   ENDIF  main exists                        :+][+:
 
-(if (exist? "explain")
-    (string-append "\n.PP\n"
-      (join "\n.PP\n" (stack "explain"))) ) :+][+:
+(if (exist? "explain") (string-append "\n.PP\n"
+    (join "\n.PP\n" (get-cvt "explain" "")) )) :+][+:
 
 (out-pop)                                   :+][+:
 

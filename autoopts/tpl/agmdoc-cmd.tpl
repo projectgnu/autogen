@@ -140,7 +140,7 @@ Standard input may not be a terminal.[+:
 [+:
 
 FOR explain   "\n.Pp\n"                     :+][+:
-  explain                                   :+][+:
+  (get-cvt "explain" "")                    :+][+:
 ENDFOR                                      :+][+:
 
 (out-pop)                                   :+][+:

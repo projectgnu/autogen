@@ -162,7 +162,7 @@ do
     sedcmd="${sedcmd}s;@${f}${bracket};${replB};g${nl}"
 done
 
-for f in i file emph kbd key abbr acronym email
+for f in i file emph kbd key abbr acronym email indicateurl
 do
     sedcmd="${sedcmd}s;@${f}${bracket};${replI};g${nl}"
 done

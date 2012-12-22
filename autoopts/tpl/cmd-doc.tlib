@@ -103,10 +103,14 @@
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
 
-(set! tmp-str (find-file (if man-page "texi2man" "texi2mdoc")))
+(define target-form   (if man-page "man" "mdoc"))
+(define source-form   (get "option-format" "texi"))
+(define converter     (string-append source-form "2" target-form ))
+(set! tmp-str (find-file converter))
+
 (if (not (defined? 'tmp-str))
-    (error (string-append "cannot locate "
-           (if man-page "texi2man" "texi2mdoc"))))
+    (error (string-append "cannot locate " converter)))
+
 (shell (string-append "cvt_prog='" tmp-str
        "'\ntest -x \"$cvt_prog\" || die 'no conversion program'" ))
 
@@ -317,20 +321,18 @@ ENDDEF cond-section
 
 DEFINE mk-description                   :+][+:
 
-  (if (exist? "prog-man-descrip")
-      (stack-join "\n.Pp\n" "prog-man-descrip")
-      (if (exist? "detail")
-          (stack-join "\n.Pp\n" "detail")
-          "There is no description for this command."
-  )   )                                 :+]
-[+:
-  INVOKE append-description             :+][+:
+(shell
+   "{ $cvt_prog || die \"$cvt_prog failed\"
+   } <<\\_EndOfProgDesc_\n"
 
-ENDDEF mk-description
+   (if (exist? "prog-man-descrip")
+       (stack-join "\n.Pp\n" "prog-man-descrip")
+       (if (exist? "detail")
+           (stack-join "\n.Pp\n" "detail")
+           "There is no description for this command."
+   )   )
 
-.\" = = = = = APPEND TO IT:             :+][+:
-
-DEFINE append-description               :+][+:
+   "\n_EndOfProgDesc_" )                :+][+:
 
 IF (= (get "main.main-type") "for-each"):+][+:
 
@@ -355,8 +357,9 @@ The input list comments[+:
   ?% comment-char "%s" "#" :+]' character.
 [+:
 
-ENDIF - "main" exists                   :+][+:
-ENDDEF append-description
+ENDIF - "main" is of "for-each" type    :+][+:
+
+ENDDEF mk-description
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  M K - O P T I O N S
