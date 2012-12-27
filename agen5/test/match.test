@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # match.test --- test the "match-value?" scheme
 #
-# Time-stamp:        "2010-06-26 16:04:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

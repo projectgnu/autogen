@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # time.test --- test modification time settings
 #
-## Time-stamp:      "2010-02-24 08:41:34 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

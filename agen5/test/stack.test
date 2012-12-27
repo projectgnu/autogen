@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # stack.test --- test stack and join functionality
 #
-## Time-stamp:      "2010-02-24 08:41:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

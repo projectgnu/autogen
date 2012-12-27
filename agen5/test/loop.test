@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # loop.test --- test FOR loop
 #
-# Time-stamp:        "2010-06-26 16:04:59 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

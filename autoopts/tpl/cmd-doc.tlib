@@ -334,6 +334,16 @@ DEFINE mk-description                   :+][+:
 
    "\n_EndOfProgDesc_" )                :+][+:
 
+   INVOKE append-description            :+][+:
+
+ENDDEF mk-description
+
+.\" = = = = = = = = = = = = = = = = = =
+.\"  A P P E N D - D E S C R I P T I O N
+.\" = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE append-description               :+][+:
+
 IF (= (get "main.main-type") "for-each"):+][+:
 
   CASE main.handler-type                :+][+:
@@ -359,7 +369,7 @@ The input list comments[+:
 
 ENDIF - "main" is of "for-each" type    :+][+:
 
-ENDDEF mk-description
+ENDDEF append-description
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  M K - O P T I O N S

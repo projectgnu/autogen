@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # gperf.test --- test functionality of `gperf'
 #
-# Time-stamp:        "2010-12-06 13:08:36 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

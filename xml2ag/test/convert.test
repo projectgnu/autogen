@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # convert.test --- test XML -> AutoGen conversion
 #
-## Time-stamp:      "2010-07-16 15:29:12 bkorb"
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoGen.

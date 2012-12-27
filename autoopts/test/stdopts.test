@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # stdopts.test ---   test standard options
 #
-# Time-stamp:        "2013-03-10 07:14:45 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

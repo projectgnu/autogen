@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # pseudo.test --- test the select pseudo option
 #
-# Time-stamp:        "2010-06-26 16:04:38 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

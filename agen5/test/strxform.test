@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # strxform.test --- test string transformation functionality
 #
-# Time-stamp:        "2011-02-02 12:02:13 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # time.test ---  test time duration argument
 #
-# Time-stamp:        "2011-08-07 17:34:14 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.

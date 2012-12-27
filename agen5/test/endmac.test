@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # endmac.test --- test variations on the end macro marker
 #
-# Time-stamp:        "2011-02-24 10:53:51 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

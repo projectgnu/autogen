@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # suffix.test --- test the select suffix option
 #
-# Time-stamp:        "2013-03-10 07:10:42 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

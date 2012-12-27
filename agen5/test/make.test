@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # make.test --- test makefile script manufacture
 #
-# Time-stamp:        "2010-06-26 16:04:55 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

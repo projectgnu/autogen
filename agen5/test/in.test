@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------
 # in.test --- Verify that the "in?" predicate works
 #
-# Time-stamp:        "2010-06-26 16:05:12 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

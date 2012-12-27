@@ -3,7 +3,6 @@
  *
  *  getdefs Copyright (c) 1999-2012 by Bruce Korb - all rights reserved
  *
- *  Time-stamp:        "2012-04-14 11:15:08 bkorb"
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *
  *  This file is part of AutoGen.

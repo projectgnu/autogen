@@ -2,7 +2,6 @@
 #  -*- Mode: Shell-script -*-
 # get.test --- test get functionality
 #
-# Time-stamp:        "2011-03-06 15:26:30 bkorb"
 # Author:            Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.
