@@ -15,7 +15,9 @@ case "${1}" in
     ;;
 
 ( files )
-    primary_source=$(git ls-files . | \
+    primary_source=$(
+        test -f .sdir && cd $(<.sdir) >/dev/null
+        git ls-files . | \
         grep -E -v '^(.gitignore|test.sh|README|build-html.sh)$')
     example_source=test.sh
     {

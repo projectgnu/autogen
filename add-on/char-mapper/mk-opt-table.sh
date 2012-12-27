@@ -61,7 +61,8 @@ mk_enum() {
 	AutoGen Definitions str2enum;
 
 	base-name = ${base_name};
-	no-length; no-case; no-name;
+	length    = none;
+	no-case; no-name;
 	dispatch = {
 	    d-ret = 'char *';
 	    d-nam = 'handle_%s';

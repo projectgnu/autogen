@@ -2,6 +2,8 @@
 /**
  * \file char-mapper.c
  *
+ *  Time-stamp:        "2012-12-27 13:59:48 bkorb"
+ *
  *  This is the main routine for char-mapper.
  *
  *  This file is part of char-mapper.
@@ -767,7 +769,10 @@ parse_directive(char * scan)
     while (isspace(*++scan))
         /* skip leading '%' and white space */;
 
-    return disp_cm_opt(scan);
+    if (! isalpha(*scan))
+        die("directives must begin with an alphabetic character:  %s\n", scan);
+
+    return handle_cm_opt_disp(scan);
 }
 
 static char *
@@ -855,24 +860,40 @@ load_text(int pfx)
  * * * * * * * * * * * * * * * */
 
 /**
- * handle backup directive.
+ * handle file directive.
  *
- * Specifies emitting code to backup over matching text at the end of a string.
- * The macro takes two arguments:  a start point and an end point.
- * The "end point" is returned after backing up over skipped characters,
- * but it will be at or after the start pointer.  The second pointer may also
- * be NULL or set to the start pointer.  In that case, it is advanced to the
- * next NUL byte at or after where the start pointer points.
+ * Specifies the output file name.  The multi-inclusion guard is derived
+ * from this name.  If %file is not specified, that guard defaults to
+ * CHAR_MAPPER_H_GUARD.  The default output is to stdout.
  *
  * @param scan current scan point
  * @returns    end of guard scan
  */
 char *
-handle_backup(cm_opt_enum_t id, char const * txt)
+handle_file(cm_opt_enum_t id, char const * txt)
 {
     char * scan = (char *)(unsigned long)txt;
-    add_backup_code = true;
-    return scan + strlen(scan);
+    char * pz;
+    size_t fname_len;
+
+    if (! isspace(*scan)) die(bad_directive, scan-4);
+
+    while (isspace(*scan))   scan++;
+
+    if (freopen(scan, "w", stdout) != stdout)
+        die("fs error %d (%s) reopening %s as stdout\n", errno,
+            strerror(errno), scan);
+
+    fname_len = strlen(scan);
+    file_guard = pz = malloc(fname_len + guard_fmt_LEN);
+    sprintf(pz, guard_fmt, scan);
+    make_define_name(pz);
+
+    out_file_nm = pz = malloc(fname_len + 1);
+    strcpy(out_file_nm, scan);
+
+    *scan = NUL;
+    return scan;
 }
 
 /**
@@ -914,81 +935,31 @@ handle_emit(cm_opt_enum_t id, char const * txt)
 }
 
 /**
- * handle file directive.
+ * handle table directive.
  *
- * Specifies the output file name.  The multi-inclusion guard is derived
- * from this name.  If %file is not specified, that guard defaults to
- * CHAR_MAPPER_H_GUARD.  The default output is to stdout.
+ * Specifies the name of the output table.  If not specified, it defaults to
+ * the base file name, suffixed with "_table" and "char_type_table" if %file
+ * is not specified.  Normally, this table is "extern" in scope, but may be
+ * made static by specifying an empty %guard.
  *
  * @param scan current scan point
  * @returns    end of guard scan
  */
 char *
-handle_file(cm_opt_enum_t id, char const * txt)
+handle_table(cm_opt_enum_t id, char const * txt)
 {
     char * scan = (char *)(unsigned long)txt;
     char * pz;
-    size_t fname_len;
 
-    if (! isspace(*scan)) die(bad_directive, scan-4);
+    if (! isspace(*scan)) die(bad_directive, scan-5);
 
     while (isspace(*scan))   scan++;
-
-    if (freopen(scan, "w", stdout) != stdout)
-        die("fs error %d (%s) reopening %s as stdout\n", errno,
-            strerror(errno), scan);
-
-    fname_len = strlen(scan);
-    file_guard = pz = malloc(fname_len + guard_fmt_LEN);
-    sprintf(pz, guard_fmt, scan);
-    make_define_name(pz);
-
-    out_file_nm = pz = malloc(fname_len + 1);
-    strcpy(out_file_nm, scan);
-
-    *scan = NUL;
-    return scan;
-}
-
-/**
- * handle guard directive.
- *
- * Specifies the name of a '#ifdef' guard protecting the compilation of
- * the bit mask table.  One compilation unit must '#define' this name.
- * The default is the table name surrounded by "DEFINE_" and "_TABLE".
- * If empty, the output table is unguarded and made static in scope.
- *
- * @param scan current scan point
- * @returns    end of guard scan
- */
-char *
-handle_guard(cm_opt_enum_t id, char const * txt)
-{
-    char * scan = (char *)(unsigned long)txt;
-    char * pz;
-
-    if (! isspace(*scan)) {
-        table_is_static = true;
-        return scan;
+    table_name = pz = strdup(scan);
+    for (;*pz; pz++) {
+        if (! isalnum((int)*pz))
+            *pz = '_';
     }
 
-    while (isspace(*scan))   scan++;
-    data_guard = pz = strdup(scan);
-    make_define_name(pz);
-    return scan + strlen(scan);
-}
-
-/**
- * handle ignored comment
- *
- * A line prefixed with a hash mark is completely ignored.
- *
- * @param scan current scan point
- * @returns    end of guard scan
- */
-char * handle_ignore(cm_opt_enum_t id, char const * txt)
-{
-    char * scan = (char *)(unsigned long)txt;
     return scan + strlen(scan);
 }
 
@@ -1031,31 +1002,51 @@ handle_pthread(cm_opt_enum_t id, char const * txt)
 }
 
 /**
- * handle table directive.
+ * handle guard directive.
  *
- * Specifies the name of the output table.  If not specified, it defaults to
- * the base file name, suffixed with "_table" and "char_type_table" if %file
- * is not specified.  Normally, this table is "extern" in scope, but may be
- * made static by specifying an empty %guard.
+ * Specifies the name of a '#ifdef' guard protecting the compilation of
+ * the bit mask table.  One compilation unit must '#define' this name.
+ * The default is the table name surrounded by "DEFINE_" and "_TABLE".
+ * If empty, the output table is unguarded and made static in scope.
  *
  * @param scan current scan point
  * @returns    end of guard scan
  */
 char *
-handle_table(cm_opt_enum_t id, char const * txt)
+handle_guard(cm_opt_enum_t id, char const * txt)
 {
     char * scan = (char *)(unsigned long)txt;
     char * pz;
 
-    if (! isspace(*scan)) die(bad_directive, scan-5);
-
-    while (isspace(*scan))   scan++;
-    table_name = pz = strdup(scan);
-    for (;*pz; pz++) {
-        if (! isalnum((int)*pz))
-            *pz = '_';
+    if (! isspace(*scan)) {
+        table_is_static = true;
+        return scan;
     }
 
+    while (isspace(*scan))   scan++;
+    data_guard = pz = strdup(scan);
+    make_define_name(pz);
+    return scan + strlen(scan);
+}
+
+/**
+ * handle backup directive.
+ *
+ * Specifies emitting code to backup over matching text at the end of a string.
+ * The macro takes two arguments:  a start point and an end point.
+ * The "end point" is returned after backing up over skipped characters,
+ * but it will be at or after the start pointer.  The second pointer may also
+ * be NULL or set to the start pointer.  In that case, it is advanced to the
+ * next NUL byte at or after where the start pointer points.
+ *
+ * @param scan current scan point
+ * @returns    end of guard scan
+ */
+char *
+handle_backup(cm_opt_enum_t id, char const * txt)
+{
+    char * scan = (char *)(unsigned long)txt;
+    add_backup_code = true;
     return scan + strlen(scan);
 }
 
