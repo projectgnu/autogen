@@ -173,7 +173,7 @@ make_quote_str(char const * str)
 
         if (p == NULL)
             break;
-        sz = (p - str) + 1;
+        sz = (size_t)(p - str) + 1;
         memcpy(res, str, sz);
         res += sz;
         str += sz;
@@ -285,7 +285,7 @@ add_sys_env(char * env_name)
 
     for (;;) {
         if (IS_UPPER_CASE_CHAR(env_name[i]))
-            env_name[i] = tolower(env_name[i]);
+            env_name[i] = (char)tolower(env_name[i]);
         else if (! IS_ALPHANUMERIC_CHAR(env_name[i]))
             env_name[i] = '_';
 

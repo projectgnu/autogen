@@ -115,7 +115,7 @@ find_by_index(def_ent_t * ent, char * scan)
      */
     if (IS_DEC_DIGIT_CHAR(*scan)) {
         char * pz;
-        idx = strtol(scan, &pz, 0);
+        idx = (int)strtol(scan, &pz, 0);
 
         /*
          *  Skip over any trailing space and make sure we have a closer
@@ -161,7 +161,7 @@ find_by_index(def_ent_t * ent, char * scan)
         if ((val == NULL) || (*val == NUL))
             return NULL;
 
-        idx = strtol(val, &def, 0);
+        idx = (int)strtol(val, &def, 0);
 
         /*
          *  Make sure we got a legal number
@@ -246,7 +246,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
 
     char const* pzOri = pzS;
     char*       pzDst = pzD;
-    size_t      stLen = srcLen;
+    size_t      stLen = (size_t)srcLen;
 
     /*
      *  Before anything, skip a leading name_sep_ch as a special hack
@@ -254,7 +254,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
      */
     pzS = SPN_WHITESPACE_CHARS(pzS);
     if (pzOri != pzS) {
-        srcLen -= pzS - pzOri;
+        srcLen -= (int)(pzS - pzOri);
         if (srcLen <= 0)
             pzS = zNil;
     }
@@ -276,7 +276,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
     {
         char * p = SPN_WHITESPACE_CHARS(pzS);
         if (p != pzS) {
-            srcLen -= p - pzS;
+            srcLen -= (int)(p - pzS);
             if (srcLen <= 0)
                 pzS = zNil;
             pzS = p;
@@ -286,7 +286,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
     switch (state) {
     case CN_START_NAME:
         if (! IS_VAR_FIRST_CHAR(*pzS))
-            return bad_def_name(pzDst, pzOri, stLen);
+            return (int)bad_def_name(pzDst, pzOri, stLen);
         state = CN_NAME_ENDED;  /* we found the start of our first name */
         break;  /* fall through to name/number consumption code */
 
@@ -311,7 +311,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
         }
 
         if (--srcLen <= 0)
-            return bad_def_name(pzDst, pzOri, stLen);
+            return (int)bad_def_name(pzDst, pzOri, stLen);
         goto nextSegment;
 
     case CN_INDEX:
@@ -342,7 +342,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
          */
         if (*pzS == '$') {
             if (--srcLen < 0)
-                return bad_def_name(pzDst, pzOri, stLen);
+                return (int)bad_def_name(pzDst, pzOri, stLen);
 
             *(pzD++) = *(pzS++);
             goto nextSegment;
@@ -354,7 +354,7 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
          *  Nothing else is okay.
          */
         if ((*(pzD++) = *(pzS++)) != ']')
-            return bad_def_name(pzDst, pzOri, stLen);
+            return (int)bad_def_name(pzDst, pzOri, stLen);
 
         if (--srcLen <= 0) {
             *pzD = NUL;

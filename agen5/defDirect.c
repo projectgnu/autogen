@@ -32,7 +32,7 @@ AG_ABEND(aprf(DIRECT_NOMATCH_FMT, cctx->scx_fname, cctx->scx_line, _typ))
 static int  ifdefLevel = 0;
 
 static teDirectives
-findDirective(char* pzDirName);
+findDirective(char * dir_name);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -144,37 +144,37 @@ processDirective(char* pzScan)
  */
 
 static teDirectives
-findDirective(char* pzDirName)
+findDirective(char * dir_name)
 {
     teDirectives res = (teDirectives)0;
-    const tDirTable *  pTbl = dirTable;
+    const tDirTable *  dte = dirTable;
 
     do  {
-        if (strneqvcmp(pzDirName, pTbl->pzDirName, pTbl->nameSize) != 0)
+        if (strneqvcmp(dir_name, dte->pzDirName, (int)dte->nameSize) != 0)
             continue;
 
         /*
          *  A directive name ends with either white space or a NUL
          */
-        if (IS_END_TOKEN_CHAR(pzDirName[ pTbl->nameSize ]))
+        if (IS_END_TOKEN_CHAR(dir_name[ dte->nameSize ]))
             return res;
 
-    } while (pTbl++, ++res < DIRECTIVE_CT);
+    } while (dte++, ++res < DIRECTIVE_CT);
 
     {
         char ch;
-        if (strlen(pzDirName) > 32) {
-            ch = pzDirName[32];
-            pzDirName[32] = NUL;
+        if (strlen(dir_name) > 32) {
+            ch = dir_name[32];
+            dir_name[32] = NUL;
         } else {
             ch = NUL;
         }
 
         fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
-                cctx->scx_line, pzDirName);
+                cctx->scx_line, dir_name);
 
         if (ch != NUL)
-            pzDirName[32] = ch;
+            dir_name[32] = ch;
     }
     return res;
 }
@@ -720,8 +720,8 @@ static char*
 doDir_include(char* pzArg, char* pzScan)
 {
     static char const * const apzSfx[] = { DIRECT_INC_DEF_SFX, NULL };
-    scan_ctx_t*  pCtx;
-    size_t     inclSize;
+    scan_ctx_t * pCtx;
+    size_t     inc_sz;
     char       zFullName[ AG_PATH_MAX + 1 ];
 
     /*
@@ -754,12 +754,12 @@ doDir_include(char* pzArg, char* pzScan)
             fprintf(trace_fp, DIRECT_INC_NOT_REG, zFullName);
             return pzScan;
         }
-        inclSize = stbf.st_size;
+        inc_sz = (size_t)stbf.st_size;
         if (outfile_time < stbf.st_mtime)
             outfile_time = stbf.st_mtime;
     }
 
-    if (inclSize == 0)
+    if (inc_sz == 0)
         return pzScan;
 
     /*
@@ -768,7 +768,7 @@ doDir_include(char* pzArg, char* pzScan)
      *  'loadData()' for this special context.
      */
     {
-        size_t sz = sizeof(scan_ctx_t) + 4 + inclSize;
+        size_t sz = sizeof(scan_ctx_t) + 4 + inc_sz;
         pCtx = (scan_ctx_t*)AGALOC(sz, "inc def head");
 
         memset((void*)pCtx, 0, sz);
@@ -801,14 +801,14 @@ doDir_include(char* pzArg, char* pzScan)
             add_source_file(zFullName);
 
         do  {
-            size_t rdct = fread((void*)pz, (size_t)1, inclSize, fp);
+            size_t rdct = fread((void*)pz, (size_t)1, inc_sz, fp);
 
             if (rdct == 0)
                 AG_CANT(DIRECT_INC_CANNOT_READ, zFullName);
 
             pz += rdct;
-            inclSize -= rdct;
-        } while (inclSize > 0);
+            inc_sz -= rdct;
+        } while (inc_sz > 0);
 
         fclose(fp);
         *pz = NUL;
@@ -846,7 +846,7 @@ doDir_line(char* pzArg, char* pzScan)
     if (! IS_DEC_DIGIT_CHAR(*pzArg))
         return pzScan;
 
-    cctx->scx_line = strtol(pzArg, &pzArg, 0);
+    cctx->scx_line = (int)strtol(pzArg, &pzArg, 0);
 
     /*
      *  Now extract the quoted file name string.

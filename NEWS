@@ -6,10 +6,10 @@ New in 5.17 - December 2012
   They have their own section in the texi docs and the
   templates produce more easily used output.
 
-* Guile adjustments.  Guile inserts /usr/local/lib into the
+* Guile adjustments.  Early 2.0.x Guile fiddles the
   LD_LIBRARY_PATH variable, causing problems when you are
   trying to run programs that use not-yet-installed libraries.
-  LD_LIBRARY_PATH is now discarded.  :(
+  The LD_LIBRARY_PATH is now preserved.
 
 * The AG_OTEST_GUILE_VERSION will now try "rpm -q" first
   before dpkg, "guile-config --verision" and "guile --version".

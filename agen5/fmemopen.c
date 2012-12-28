@@ -246,7 +246,7 @@ fmem_read(void *cookie, void *pBuf, size_t sz)
 
     pFMC->next_ix += sz;
 
-    return sz;
+    return (ssize_t)sz;
 }
 
 /**
@@ -256,7 +256,7 @@ static ssize_t
 fmem_write(void *cookie, const void *pBuf, size_t sz)
 {
     fmem_cookie_t *pFMC = cookie;
-    int add_nul_char;
+    size_t add_nul_char;
 
     /*
      *  In append mode, always seek to the end before writing.
@@ -272,12 +272,12 @@ fmem_write(void *cookie, const void *pBuf, size_t sz)
      *  * the last character to write is not already NUL
      */
     add_nul_char =
-           ((pFMC->mode & FLAG_BIT(binary)) != 0)
+        (  ((pFMC->mode & FLAG_BIT(binary)) != 0)
         && (sz > 0)
-        && (((char*)pBuf)[sz - 1] != NUL);
+        && (((char*)pBuf)[sz - 1] != NUL)) ? 1 : 0;
 
     {
-        size_t next_pos = pFMC->next_ix + sz + add_nul_char;
+        size_t next_pos = (size_t)pFMC->next_ix + sz + add_nul_char;
         if (next_pos > pFMC->buf_size) {
             if (fmem_extend(pFMC, next_pos) != 0) {
                 /*
@@ -307,7 +307,7 @@ fmem_write(void *cookie, const void *pBuf, size_t sz)
      */
     if (pFMC->next_ix > pFMC->eof) {
         pFMC->eof = pFMC->next_ix;
-        if (add_nul_char)
+        if (add_nul_char != 0)
             /*
              *  There is space for this NUL.  The "add_nul_char" is not part of
              *  the "sz" that was added to "next_ix".
@@ -315,7 +315,7 @@ fmem_write(void *cookie, const void *pBuf, size_t sz)
             pFMC->buffer[ pFMC->eof ] = NUL;
     }
 
-    return sz;
+    return (ssize_t)sz;
 }
 
 /**
@@ -332,9 +332,9 @@ fmem_seek(void * cookie, seek_off_t offset, int dir)
      *  GNU interface:  offset passed and returned by address.
      */
     switch (dir) {
-    case SEEK_SET: new_pos = *offset;  break;
-    case SEEK_CUR: new_pos = pFMC->next_ix  + *offset;  break;
-    case SEEK_END: new_pos = pFMC->eof - *offset;  break;
+    case SEEK_SET: new_pos = (size_t)*offset;  break;
+    case SEEK_CUR: new_pos = pFMC->next_ix  + (size_t)*offset; break;
+    case SEEK_END: new_pos = pFMC->eof - (size_t)*offset;      break;
 
     default:
         goto seek_oops;
@@ -428,13 +428,13 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
         /*
          *  "write" mode
          */
-        pFMC->eof = \
+        pFMC->eof =
             pFMC->next_ix = 0;
     }
 
     else if (pFMC->mode & FLAG_BIT(binary)) {
-        pFMC->eof = len;
-        pFMC->next_ix    = (pFMC->mode & FLAG_BIT(append)) ? len : 0;
+        pFMC->eof     = (size_t)len;
+        pFMC->next_ix = (pFMC->mode & FLAG_BIT(append)) ? (size_t)len : 0;
 
     } else {
         /*
@@ -457,7 +457,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
         pFMC->buffer[pFMC->next_ix] = NUL;
     }
 
-    pFMC->buf_size = len;
+    pFMC->buf_size = (size_t)len;
     return true;
 }
 
@@ -472,7 +472,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
      */
     pFMC->mode |= FLAG_BIT(allocated);
     if (len == 0)
-        len = pFMC->pg_size;
+        len = (ssize_t)pFMC->pg_size;
 
     /*
      *  Unallocated file space is set to NULs.  Emulate that.
@@ -490,7 +490,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
      */
     pFMC->next_ix  = 0;
     pFMC->eof      = 0;
-    pFMC->buf_size = len;
+    pFMC->buf_size = (size_t)len;
     return true;
 }
 
@@ -593,7 +593,7 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
          *  We only need page size if we might extend an allocation.
          */
         len = -len;
-        pFMC->pg_size = getpagesize();
+        pFMC->pg_size = (size_t)getpagesize();
     }
 
     else {
@@ -729,7 +729,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
     gba->buf_size = cookie->buf_size;
     gba->eof      = cookie->eof;
     if (gba->own != FMEMC_GBUF_LEAVE_OWNERSHIP)
-        cookie->mode &= ~FLAG_BIT(allocated);
+        cookie->mode &= (unsigned long)~FLAG_BIT(allocated);
     return 0;
 }
 

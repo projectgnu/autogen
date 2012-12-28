@@ -107,7 +107,7 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         time_t     curTime = time(NULL);
         struct tm*   pTime = localtime(&curTime);
 
-        date_str = ag_scribble(tsiz);
+        date_str = ag_scribble((ssize_t)tsiz);
         strftime((char *)date_str, tsiz, tim_fmt, pTime);
     }
 
@@ -182,16 +182,16 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
 SCM
 ag_scm_error(SCM res)
 {
-    char const *  pzMsg;
+    char const *  msg;
     tSuccess      abrt = FAILURE;
-    char          zNum[16];
-    int           msgLen;
+    char          num_bf[16];
+    size_t        msg_ln;
 
     switch (ag_scm_type_e(res)) {
     case GH_TYPE_BOOLEAN:
         if (AG_SCM_FALSEP(res))
             abrt = PROBLEM;
-        pzMsg = zNil;
+        msg = zNil;
         break;
 
     case GH_TYPE_NUMBER:
@@ -199,47 +199,47 @@ ag_scm_error(SCM res)
         unsigned long val = AG_SCM_TO_ULONG(res);
         if (val == 0)
             abrt = PROBLEM;
-        snprintf(zNum, sizeof(zNum), "%d", (int)val);
-        pzMsg = zNum;
+        snprintf(num_bf, sizeof(num_bf), "%d", (int)val);
+        msg = num_bf;
         break;
     }
 
     case GH_TYPE_CHAR:
-        zNum[0] = AG_SCM_CHAR(res);
-        if ((zNum[0] == NUL) || (zNum[0] == '0'))
+        num_bf[0] = (char)AG_SCM_CHAR(res);
+        if ((num_bf[0] == NUL) || (num_bf[0] == '0'))
             abrt = PROBLEM;
-        zNum[1] = NUL;
-        pzMsg = zNum;
+        num_bf[1] = NUL;
+        msg = num_bf;
         break;
 
     case GH_TYPE_STRING:
-        pzMsg  = ag_scm2zchars(res, "error string");
-        pzMsg  = SPN_WHITESPACE_CHARS(pzMsg);
-        msgLen = strlen(pzMsg);
+        msg  = ag_scm2zchars(res, "error string");
+        msg  = SPN_WHITESPACE_CHARS(msg);
+        msg_ln = strlen(msg);
 
         /*
          *  IF the message starts with the number zero,
          *    OR the message is the empty string,
          *  THEN this is just a warning that is ignored
          */
-        if (msgLen <= 0)
+        if (msg_ln == 0)
             abrt = PROBLEM;
-        else if (IS_DEC_DIGIT_CHAR(*pzMsg) && (strtol(pzMsg, NULL, 0) == 0))
+        else if (IS_DEC_DIGIT_CHAR(*msg) && (strtol(msg, NULL, 0) == 0))
             abrt = PROBLEM;
         break;
 
     default:
-        pzMsg = BAD_MSG_STR;
+        msg = BAD_MSG_STR;
     }
 
     /*
      *  IF there is a message,
      *  THEN print it.
      */
-    if (*pzMsg != NUL) {
+    if (*msg != NUL) {
         char* pz = aprf(DEF_NOTE_FMT, (abrt != PROBLEM) ? ERROR_STR : WARN_STR,
                         current_tpl->td_file, cur_macro->md_line,
-                        cur_fpstack->stk_fname, pzMsg);
+                        cur_fpstack->stk_fname, msg);
         if (abrt != PROBLEM)
             AG_ABEND(pz);
         fputs(pz, trace_fp);
@@ -373,9 +373,9 @@ find_lic_text(
     static char const * const lic_sfx[] = { FIND_LIC_TEXT_SFX, NULL };
 
     char const * lic_pz = ag_scm2zchars(lic, "license");
-    char fname[ AG_PATH_MAX ];
-    char * ftext;
-    size_t flen;
+    char    fname[ AG_PATH_MAX ];
+    char *  ftext;
+    ssize_t flen;
 
     /*
      * auto-convert "bsd" into "mbsd" for compatibility.
@@ -397,7 +397,7 @@ find_lic_text(
         flen = stbf.st_size;
     }
 
-    ftext = ag_scribble(flen + EXP_FMT_BAD_LIC_LEN + 1);
+    ftext    = ag_scribble(flen + EXP_FMT_BAD_LIC_LEN + 1);
     *txt_len = flen;
 
     {
@@ -406,7 +406,7 @@ find_lic_text(
         if (fp == NULL)
             AG_CANT(FIND_LIC_TEXT_OPEN, fname);
 
-        if (fread(ftext, 1, flen, fp) != flen)
+        if (fread(ftext, 1, (size_t)flen, fp) != (size_t)flen)
             AG_CANT(FIND_LIC_TEXT_BAD_FILE, fname);
 
         ftext[flen] = NUL;
@@ -735,9 +735,9 @@ ag_scm_bsd(SCM prog_name, SCM owner, SCM prefix)
 SCM
 ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
 {
-    char const * pzPfx   = ag_scm2zchars(prefix,    "GPL line prefix");
-    char const * pzPrg   = ag_scm2zchars(prog_name, "program name");
-    char const * pzOwner = ag_scm2zchars(owner,     "owner");
+    char const * prefx = ag_scm2zchars(prefix,    "line pfx");
+    char const * pname = ag_scm2zchars(prog_name, "p name");
+    char const * ownrz = ag_scm2zchars(owner,     "owner");
     static struct {
         char const * pzFN;
         tmap_info_t  mi;
@@ -751,14 +751,14 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
     {
         static char const * const apzSfx[] = { MK_LIC_SFX, NULL };
         static char fname[ AG_PATH_MAX ];
-        char const * pzLicense = ag_scm2zchars(license, "lic file");
+        char const * l_file = ag_scm2zchars(license, "lic file");
 
         /*
          *  Find the template file somewhere
          */
-        if (! SUCCESSFUL(find_file(pzLicense, fname, apzSfx, NULL))) {
+        if (! SUCCESSFUL(find_file(l_file, fname, apzSfx, NULL))) {
             errno = ENOENT;
-            AG_CANT(MK_LIC_NO_LIC, pzLicense);
+            AG_CANT(MK_LIC_NO_LIC, l_file);
         }
 
         if ((lic.pzFN != NULL) && (strcmp(fname, lic.pzFN) != 0)) {
@@ -770,10 +770,10 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         if (lic.pzFN == NULL) {
             text_mmap(fname, PROT_READ|PROT_WRITE, MAP_PRIVATE, &lic.mi);
             if (TEXT_MMAP_FAILED_ADDR(lic.mi.txt_data))
-                AG_ABEND(aprf(MK_LIC_NO_OPEN, pzLicense));
+                AG_ABEND(aprf(MK_LIC_NO_OPEN, l_file));
 
             if (dep_fp != NULL)
-                add_source_file(pzLicense);
+                add_source_file(l_file);
 
             AGDUPSTR(lic.pzFN, fname, "lic f name");
         }
@@ -807,13 +807,13 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
     /*
      *  Reformat the string with the given arguments
      */
-    pzRes = aprf((char*)lic.mi.txt_data, pzPrg, pzOwner);
+    pzRes = aprf((char*)lic.mi.txt_data, pname, ownrz);
     {
-        int     pfx_size = strlen(pzPfx);
-        char*   pzScan   = pzRes;
-        char*   pzOut;
-        char*   pzSaveRes;
-        size_t  out_size = pfx_size;
+        int     pfx_size = (int)strlen(prefx);
+        char *  pzScan   = pzRes;
+        char *  pzOut;
+        char *  pzSaveRes;
+        ssize_t out_size = pfx_size;
 
         /*
          *  Figure out how much space we need (text size plus
@@ -836,7 +836,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
          */
         pzOut = pzSaveRes = ag_scribble(out_size);
 
-        strcpy(pzOut, pzPfx);
+        strcpy(pzOut, prefx);
         pzOut += pfx_size;
         pzScan = pzRes;
 
@@ -846,7 +846,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
                 goto exit_copy;
 
             case NL:
-                strcpy(pzOut, pzPfx);
+                strcpy(pzOut, prefx);
                 pzOut += pfx_size;
                 break;
 

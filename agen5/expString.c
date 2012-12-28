@@ -122,7 +122,7 @@ makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
                  *  We must escape these characters in the output string
                  */
                 *(pzDta++) = '\\';
-            *(pzDta++) = ch;
+            *(pzDta++) = (char)ch;
 
         } else switch (ch) {
         case NUL:
@@ -217,16 +217,16 @@ static size_t
 stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta)
 {
     char * pz = pzNew;
-    *(pz++) = qt;
+    *(pz++) = (char)qt;
 
     for (;;) {
-        char c = (*(pz++) = *(pzDta++));
+        char c = *(pz++) = *(pzDta++);
         switch (c) {
         case NUL:
-            pz[-1]  = qt;
+            pz[-1]  = (char)qt;
             *pz     = NUL;
 
-            return (pz - pzNew);
+            return (size_t)(pz - pzNew);
 
         case '\\':
             /*
@@ -347,8 +347,8 @@ do_substitution(
 {
     char* pzMatch  = ag_scm2zchars(match, "match text");
     char* rep_str  = ag_scm2zchars(repl,  "repl text");
-    int   mark_len = AG_SCM_STRLEN(match);
-    int   repl_len = AG_SCM_STRLEN(repl);
+    int   mark_len = (int)AG_SCM_STRLEN(match);
+    int   repl_len = (int)AG_SCM_STRLEN(repl);
 
     {
         int ct = sub_count(src_str, pzMatch);
@@ -369,7 +369,7 @@ do_substitution(
 
             if (next == NULL)
                 break;
-            len = next - src_str;
+            len = (size_t)(next - src_str);
             if (len != 0) {
                 memcpy(dest, src_str, len);
                 dest += len;
@@ -469,7 +469,7 @@ ag_scm_in_p(SCM obj, SCM list)
         return SCM_BOOL_F;
     }
 
-    len = scm_ilength(list);
+    len = (int)scm_ilength(list);
     if (len == 0)
         return SCM_BOOL_F;
 
@@ -528,7 +528,7 @@ ag_scm_join(SCM sep, SCM list)
     if (! AG_SCM_STRING_P(sep))
         return SCM_UNDEFINED;
 
-    sv_l_len = l_len = scm_ilength(list);
+    sv_l_len = l_len = (int)scm_ilength(list);
     if (l_len == 0)
         return AG_SCM_STR02SCM(zNil);
 
@@ -565,7 +565,7 @@ ag_scm_join(SCM sep, SCM list)
     }
 
     l_len = sv_l_len;
-    pzRes = pzScan = ag_scribble(str_len);
+    pzRes = pzScan = ag_scribble((ssize_t)str_len);
 
     /*
      *  Now, copy each one into the output
@@ -623,23 +623,18 @@ ag_scm_join(SCM sep, SCM list)
  *  @end example
 =*/
 SCM
-ag_scm_prefix(SCM prefix, SCM text)
+ag_scm_prefix(SCM prefx, SCM txt)
 {
-    char*    pzPfx;
-    char*    pzText;
-    char*    pzDta;
-    size_t   out_size, rem_size;
-    size_t   pfx_size;
-    char*    pzRes;
-
-    pzPfx    = ag_scm2zchars(prefix, "prefix");
-    pzDta    = \
-    pzText   = ag_scm2zchars(text, "text");
-    pfx_size = strlen(pzPfx);
-    out_size = pfx_size;
+    char *   prefix = ag_scm2zchars(prefx, "pfx");
+    char *   text   = ag_scm2zchars(txt,   "txt");
+    char *   data  = text;
+    size_t   rem_size;
+    size_t   pfx_size = strlen(prefix);
+    size_t   out_size = pfx_size;
+    char *   r_str;
 
     for (;;) {
-        switch (*(pzText++)) {
+        switch (*(text++)) {
         case NUL:
             goto exit_count;
         case NL:
@@ -650,32 +645,32 @@ ag_scm_prefix(SCM prefix, SCM text)
         }
     } exit_count:;
 
-    pzText = pzDta;
-    pzRes  = pzDta = ag_scribble(rem_size = out_size);
-    strcpy(pzDta, pzPfx);
-    pzDta    += pfx_size;
-    rem_size -= pfx_size;
-    pfx_size++;
+    text     = data;
+    rem_size = out_size;
+    r_str    = data = ag_scribble((ssize_t)out_size);
+    strcpy(data, prefix);
+    data     += pfx_size;
+    rem_size -= pfx_size++;
 
     for (;;) {
-        char ch = *(pzText++);
+        char ch = *(text++);
         switch (ch) {
         case NUL:
             if (rem_size != 0)
                 AG_ABEND(PREFIX_FAIL);
 
-            return AG_SCM_STR2SCM(pzRes, out_size);
+            return AG_SCM_STR2SCM(r_str, out_size);
 
         case NL:
-            *pzDta    = ch;
-            strcpy(pzDta+1, pzPfx);
-            pzDta    += pfx_size;
+            *data    = ch;
+            strcpy(data+1, prefix);
+            data    += pfx_size;
             rem_size -= pfx_size;
             break;
 
         default:
             rem_size--;
-            *(pzDta++) = ch;
+            *(data++) = ch;
             break;
         }
     }
@@ -703,15 +698,15 @@ ag_scm_prefix(SCM prefix, SCM text)
 SCM
 ag_scm_raw_shell_str(SCM obj)
 {
-    char*      pzDta;
-    char*      pz;
-    char*      pzFree;
+    char * data;
+    char * pz;
+    char * pzFree;
 
-    pzDta = ag_scm2zchars(obj, "AG Object");
+    data = ag_scm2zchars(obj, "AG Object");
 
     {
         size_t dtaSize = AG_SCM_STRLEN(obj) + 3; /* NUL + 2 quotes */
-        pz = pzDta-1;
+        pz = data-1;
         for (;;) {
             pz = strchr(pz+1, '\'');
             if (pz == NULL)
@@ -725,14 +720,14 @@ ag_scm_raw_shell_str(SCM obj)
     /*
      *  Handle leading single quotes before starting the first quote.
      */
-    while (*pzDta == '\'') {
+    while (*data == '\'') {
         *(pz++) = '\\';
         *(pz++) = '\'';
 
         /*
          *  IF pure single quotes, then we're done.
          */
-        if (*++pzDta == NUL) {
+        if (*++data == NUL) {
             *pz = NUL;
             goto returnString;
         }
@@ -744,7 +739,7 @@ ag_scm_raw_shell_str(SCM obj)
     *(pz++) = '\'';
 
     for (;;) {
-        switch (*(pz++) = *(pzDta++)) {
+        switch (*(pz++) = *(data++)) {
         case NUL:
             goto loopDone;
 
@@ -754,12 +749,12 @@ ag_scm_raw_shell_str(SCM obj)
              *  Now, insert escaped quotes for every quote char we find, then
              *  restart the quoting.
              */
-            pzDta--;
+            data--;
             do {
                 *(pz++) = '\\';
                 *(pz++) = '\'';
-            } while (*++pzDta == '\'');
-            if (*pzDta == NUL) {
+            } while (*++data == '\'');
+            if (*data == NUL) {
                 *pz = NUL;
                 goto returnString;
             }
@@ -979,33 +974,33 @@ SCM
 ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
 {
     unsigned char ch_map[ 1 << 8 /* bits-per-byte */ ];
-    int   i      = sizeof(ch_map) - 1;
-    char* pzFrom = ag_scm2zchars(from_xform, "str");
-    char* pzTo   = ag_scm2zchars(to_xform, "str");
+    int   i    = sizeof(ch_map) - 1;
+    char* from = ag_scm2zchars(from_xform, "str");
+    char* to   = ag_scm2zchars(to_xform, "str");
 
     do  {
-        ch_map[i] = i;
+        ch_map[i] = (unsigned char)i;
     } while (--i > 0);
 
     for (; i <= (int)sizeof(ch_map) - 1; i++) {
-        unsigned char fch = (unsigned char)*(pzFrom++);
-        unsigned char tch = (unsigned char)*(pzTo++);
+        unsigned char fch = (unsigned char)*(from++);
+        unsigned char tch = (unsigned char)*(to++);
 
         if (tch == NUL) {
-            pzTo--;
-            tch = pzTo[-1];
+            to--;
+            tch = (unsigned char)to[-1];
         }
 
         switch (fch) {
         case NUL:
-            goto mapDone;
+            goto map_done;
 
         case '-':
             if ((i > 0) && (tch == '-')) {
-                unsigned char fs = (unsigned char)pzFrom[-2];
-                unsigned char fe = (unsigned char)pzFrom[0];
-                unsigned char ts = (unsigned char)pzTo[-2];
-                unsigned char te = (unsigned char)pzTo[0];
+                unsigned char fs = (unsigned char)from[-2];
+                unsigned char fe = (unsigned char)from[0];
+                unsigned char ts = (unsigned char)to[-2];
+                unsigned char te = (unsigned char)to[0];
                 if (te != NUL) {
                     while (fs < fe) {
                         ch_map[ fs++ ] = ts;
@@ -1018,13 +1013,13 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
         default:
             ch_map[ fch ] = tch;
         }
-    } mapDone:;
+    } map_done:;
 
-    pzTo = C(char *, AG_SCM_CHARS(str));
-    i    = AG_SCM_STRLEN(str);
+    to = C(char *, AG_SCM_CHARS(str));
+    i    = (int)AG_SCM_STRLEN(str);
     while (i-- > 0) {
-        *pzTo = ch_map[ (int)*pzTo ];
-        pzTo++;
+        *to = (char)ch_map[ (int)*to ];
+        to++;
     }
     return str;
 }
@@ -1070,24 +1065,24 @@ ag_scm_string_tr(SCM Str, SCM From, SCM To)
  * @end example
 =*/
 SCM
-ag_scm_string_substitute(SCM Str, SCM Match, SCM Repl)
+ag_scm_string_substitute(SCM str, SCM Match, SCM Repl)
 {
-    char const *  pzStr;
+    char const *  text;
     ssize_t len;
     SCM     res;
 
-    if (! AG_SCM_STRING_P(Str))
+    if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    pzStr = AG_SCM_CHARS(Str);
-    len   = AG_SCM_STRLEN(Str);
+    text = AG_SCM_CHARS(str);
+    len   = (ssize_t)AG_SCM_STRLEN(str);
 
     if (AG_SCM_STRING_P(Match))
-        do_substitution(pzStr, len, Match, Repl, (char**)&pzStr, &len);
+        do_substitution(text, len, Match, Repl, (char**)&text, &len);
     else
-        do_multi_subs((char**)&pzStr, &len, Match, Repl);
+        do_multi_subs((char**)&text, &len, Match, Repl);
 
-    res = AG_SCM_STR2SCM(pzStr, len);
+    res = AG_SCM_STR2SCM(text, (size_t)len);
     return res;
 }
 

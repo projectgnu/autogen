@@ -43,7 +43,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
 {
     char * pzScn = *ppzi;
     char * pzOut = *ppzo;
-    int    l_len = pzOut - bol;
+    int    l_len = (int)(pzOut - bol);
 
     /*
      *  Backup past trailing white space (other than newline).
@@ -187,7 +187,7 @@ handle_sed_expr(char ** src_p, char ** out_p)
         size_t l;
         if (*p == NL) /* do not skip NUL */
             p++;
-        l = p - src;
+        l = (size_t)(p - src);
         memcpy(out, src, l);
         *src_p = src + l;
         *out_p = out + l;
@@ -244,7 +244,7 @@ script_size(char ** txt_p, char * tab)
 
     ptxte = SPN_WHITESPACE_BACK(txt, ptxte);
     *ptxte = NUL;
-    sz += (ptxte - txt);
+    sz += (size_t)(ptxte - txt);
     return sz;
 }
 
@@ -342,7 +342,7 @@ ag_scm_makefile_script(SCM text_scm)
     if (sz == 0)
         return AG_SCM_STR02SCM(zNil);
 
-    bol = out = res_str = ag_scribble(sz);
+    bol = out = res_str = ag_scribble((ssize_t)sz);
 
     /*
      *  Force the initial line to start with a real tab.
@@ -351,7 +351,7 @@ ag_scm_makefile_script(SCM text_scm)
 
     for (;;) {
         char * p = BRK_MAKE_SCRIPT_CHARS(text);
-        size_t l = p - text;
+        size_t l = (size_t)(p - text);
         if (l > 0) {
             memcpy(out, text, l);
             text  = p;
@@ -413,7 +413,7 @@ ag_scm_makefile_script(SCM text_scm)
     }
 
     {
-        SCM res = AG_SCM_STR2SCM(res_str, out - res_str);
+        SCM res = AG_SCM_STR2SCM(res_str, (size_t)(out - res_str));
         return res;
     }
 }

@@ -279,7 +279,7 @@ parse_mac_args(templ_t * pT, macro_t * mac)
     /*
      *  The result is zero if we don't have any
      */
-    mac->md_sib_idx = ct;
+    mac->md_sib_idx = (int)ct;
     if (ct == 0) {
         mac->md_txt_off = 0;
         mac->md_res = 0;
@@ -376,7 +376,7 @@ prep_invoke_args(macro_t * mac)
             AG_ABEND_IN(pT, mac, PREP_INVOKE_NO_SEP);
         *pzText = NUL;
         pzText = SPN_WHITESPACE_CHARS(pzText + 1);
-        mac->md_txt_off = pzText - pT->td_text;
+        mac->md_txt_off = (uintptr_t)(pzText - pT->td_text);
         parse_mac_args(pT, mac);
         current_tpl = pT;
     }
@@ -756,10 +756,10 @@ new_template(templ_t * base_tpl, macro_t * mac, char const * scan)
     templ_t * ntpl;
     char * copy;
     char const * src = (char const *)mac->md_txt_off;
-    int ct = base_tpl->td_mac_ct - (mac - base_tpl->td_macros);
-    size_t aloc_sz =
-        sizeof(*ntpl) + (ct * sizeof(macro_t)) + strlen(scan) + 0x100;
-    aloc_sz &= ~0x0F;
+    int ct = (int)(base_tpl->td_mac_ct - (mac - base_tpl->td_macros));
+    size_t aloc_sz = sizeof(*ntpl)
+        + ((uint32_t)ct * sizeof(macro_t)) + strlen(scan) + 0x100;
+    aloc_sz &= (size_t)~0x0F;
 
     /*
      *  Allocate a new template block that is much larger than needed.
@@ -804,16 +804,16 @@ load_define_tpl(templ_t * tpl, char const ** ppzScan)
     if (*ppzScan == NULL)
         AG_ABEND_IN(tpl, tpl->td_macros, LD_DEF_WOOPS);
 
-    ct = last_mac - tpl->td_macros;
+    ct = (int)(last_mac - tpl->td_macros);
 
     /*
      *  IF there are empty macro slots,
      *  THEN pack the text
      */
     if (ct < tpl->td_mac_ct) {
-        int    delta = sizeof(macro_t) * (tpl->td_mac_ct - ct);
+        int    delta = (int)sizeof(macro_t) * (int)(tpl->td_mac_ct - ct);
         void * data  = (tpl->td_name == NULL) ? tpl->td_text : tpl->td_name;
-        size_t size  = tpl->td_scan - (char*)data;
+        size_t size  = (size_t)(tpl->td_scan - (char*)data);
         memmove((void*)last_mac, data, size);
 
         tpl->td_text  -= delta;
@@ -861,7 +861,7 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
      *  size.  Restore the offsets to pointer values.
      */
     {
-        size_t sz = new_tpl->td_scan - (char*)new_tpl;
+        size_t sz = (size_t)(new_tpl->td_scan - (char*)new_tpl);
         if (sz < new_tpl->td_size) {
             new_tpl->td_size = sz;
             new_tpl->td_name -= (long)new_tpl;

@@ -75,7 +75,7 @@ eval_true(void)
     case 'f':
     case 'F':
     {
-        int len = strlen(pz);
+        int len = (int)strlen(pz);
         if (len > 5)
             len = 5;
         if (strneqvcmp(EVAL_TRUE_FALSE_STR, pz, len) == 0)
@@ -275,7 +275,7 @@ mLoad_Elif(templ_t * pT, macro_t * pMac, char const ** ppzScan)
      */
     (void)mLoad_Expr(pT, pMac, ppzScan);
 
-    current_if.pElse->md_sib_idx = pMac - pT->td_macros;
+    current_if.pElse->md_sib_idx = (int)(pMac - pT->td_macros);
     current_if.pElse = pMac;
     return pMac + 1;
 }
@@ -310,7 +310,7 @@ mLoad_Else(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 
     load_proc_table = load_for_if_after_else_procs;
 
-    current_if.pElse->md_sib_idx = pMac - pT->td_macros;
+    current_if.pElse->md_sib_idx = (int)(pMac - pT->td_macros);
     current_if.pElse = pMac;
     pMac->md_txt_off = 0;
 
@@ -400,8 +400,8 @@ mLoad_If(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     if (*ppzScan == NULL)
         AG_ABEND_IN(tpl, mac, LD_IF_NO_ENDIF);
 
-    current_if.pIf->md_end_idx   = \
-    current_if.pElse->md_sib_idx = pEndifMac - tpl->td_macros;
+    current_if.pIf->md_end_idx   =
+        current_if.pElse->md_sib_idx = (int)(pEndifMac - tpl->td_macros);
 
     /*
      *  Restore the context of any encompassing block macros
@@ -465,8 +465,8 @@ mLoad_While(templ_t * pT, macro_t * mac, char const ** p_scan)
         if (*p_scan == NULL)
             AG_ABEND_IN(pT, mac, LD_WHILE_NO_ENDWHILE);
 
-        mac->md_sib_idx = \
-            mac->md_end_idx = end - pT->td_macros;
+        mac->md_sib_idx =
+            mac->md_end_idx = (int)(end - pT->td_macros);
 
         load_proc_table = lpt; // restore context
         return end;

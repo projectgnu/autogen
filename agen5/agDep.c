@@ -225,7 +225,7 @@ start_dep_file(void)
     fprintf(dep_fp, START_DEP_FILE_FMT, autogenOptions.pzProgPath);
 
     {
-        int     ac = autogenOptions.origArgCt   - 1;
+        int     ac = (int)autogenOptions.origArgCt - 1;
         char ** av = autogenOptions.origArgVect + 1;
 
         for (;;) {
@@ -287,7 +287,7 @@ tidy_dep_file(void)
 
         if (pze == NULL) break;
 
-        len = (pze - dep_file);
+        len = (size_t)(pze - dep_file);
         pzn = AGALOC(len + 1, "dep file");
         memcpy(pzn, dep_file, len);
         pzn[len] = NUL;

@@ -101,7 +101,7 @@ ag_scm_max(SCM list)
 #   ifndef MAX
 #     define MAX(m,v) ((v > m) ? v : m)
 #   endif
-    len = scm_ilength(list);
+    len = (int)scm_ilength(list);
     if (len <= 0)
         return SCM_UNDEFINED;
 
@@ -160,7 +160,7 @@ ag_scm_min(SCM list)
 #   ifndef MIN
 #     define MIN(m,v) ((v < m) ? v : m)
 #   endif
-    len = scm_ilength(list);
+    len = (int)scm_ilength(list);
     if (len <= 0)
         return SCM_UNDEFINED;
 
@@ -213,7 +213,7 @@ ag_scm_min(SCM list)
 SCM
 ag_scm_sum(SCM list)
 {
-    int  len = scm_ilength(list);
+    int  len = (int)scm_ilength(list);
     long sum = 0;
 
     if (len <= 0)
@@ -257,13 +257,13 @@ ag_scm_sum(SCM list)
 SCM
 ag_scm_string_to_c_name_x(SCM str)
 {
-    int   len;
-    char* pz;
+    int    len;
+    char * pz;
 
     if (! AG_SCM_STRING_P(str))
         scm_wrong_type_arg(STR_TO_C_NAME, 1, str);
 
-    for (pz = C(char *, AG_SCM_CHARS(str)), len = AG_SCM_STRLEN(str);
+    for (pz = C(char *, AG_SCM_CHARS(str)), len = (int)AG_SCM_STRLEN(str);
          --len >= 0;
          pz++) {
 
@@ -293,18 +293,18 @@ ag_scm_string_to_c_name_x(SCM str)
 SCM
 ag_scm_string_upcase_x(SCM str)
 {
-    int   len;
-    char* pz;
+    int    len;
+    char * pz;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    len = AG_SCM_STRLEN(str);
+    len = (int)AG_SCM_STRLEN(str);
     pz  = C(char *, AG_SCM_CHARS(str));
     while (--len >= 0) {
          char ch = *pz;
         if (IS_LOWER_CASE_CHAR(ch))
-            *pz = toupper(ch);
+            *pz = (char)toupper((int)ch);
         pz++;
     }
 
@@ -348,28 +348,28 @@ SCM
 ag_scm_string_capitalize_x(SCM str)
 {
     int     len;
-    char*   pz;
-    bool word_start = true;
+    char *  pz;
+    bool    w_start = true;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    len = AG_SCM_STRLEN(str);
+    len = (int)AG_SCM_STRLEN(str);
     pz  = C(char *, AG_SCM_CHARS(str));
 
     while (--len >= 0) {
         char ch = *pz;
 
         if (! IS_ALPHANUMERIC_CHAR(ch)) {
-            word_start = true;
+            w_start = true;
 
-        } else if (word_start) {
-            word_start = false;
+        } else if (w_start) {
+            w_start = false;
             if (IS_LOWER_CASE_CHAR(ch))
-                *pz = toupper(ch);
+                *pz = (char)toupper((int)ch);
 
         } else if (IS_UPPER_CASE_CHAR(ch))
-            *pz = tolower(ch);
+            *pz = (char)tolower(ch);
 
         pz++;
     }
@@ -414,18 +414,18 @@ ag_scm_string_capitalize(SCM str)
 SCM
 ag_scm_string_downcase_x(SCM str)
 {
-    int   len;
-    char* pz;
+    int    len;
+    char * pz;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    len = AG_SCM_STRLEN(str);
+    len = (int)AG_SCM_STRLEN(str);
     pz  = C(char *, AG_SCM_CHARS(str));
     while (--len >= 0) {
         char ch = *pz;
         if (IS_UPPER_CASE_CHAR(ch))
-            *pz = tolower(ch);
+            *pz = (char)tolower(ch);
         pz++;
     }
 
@@ -470,29 +470,29 @@ ag_scm_string_downcase(SCM str)
 SCM
 ag_scm_string_to_camelcase(SCM str)
 {
-    int   len;
-    char* pzd, * res;
-    char* pzs;
-    bool cap_done = false;
+    int    len;
+    char * pzd, * res;
+    char * pzs;
+    bool   cap_done = false;
 
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    len = AG_SCM_STRLEN(str);
+    len = (int)AG_SCM_STRLEN(str);
     res = pzd = ag_scribble(len + 1);
     pzs = C(char *, AG_SCM_CHARS(str));
 
     while (--len >= 0) {
-        unsigned int ch = *(pzs++);
+        unsigned int ch = (unsigned int)*(pzs++);
         if (IS_LOWER_CASE_CHAR(ch)) {
             if (! cap_done) {
-                ch = toupper(ch);
+                ch = (unsigned)toupper((int)ch);
                 cap_done = true;
             }
 
         } else if (IS_UPPER_CASE_CHAR(ch)) {
             if (cap_done)
-                ch = tolower(ch);
+                ch = (unsigned)tolower((int)ch);
             else
                 cap_done = true;
 
@@ -504,10 +504,10 @@ ag_scm_string_to_camelcase(SCM str)
             continue;
         }
 
-        *(pzd++) = ch;
+        *(pzd++) = (char)ch;
     }
 
-    return AG_SCM_STR2SCM(res, (pzd - res));
+    return AG_SCM_STR2SCM(res, (size_t)(pzd - res));
 }
 /*
  * Local Variables:

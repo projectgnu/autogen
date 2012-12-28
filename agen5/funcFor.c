@@ -282,7 +282,7 @@ next_def(bool invert, def_ent_t** de_lst)
              *  When the "by" step is zero, force syncronization.
              */
             if (for_state->for_by == 0) {
-                for_state->for_index = ent->de_index;
+                for_state->for_index = (int)ent->de_index;
                 haveMatch = true;
             }
             break;
@@ -322,10 +322,12 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
                            ? found->de_etwin : found;
 
         if (for_state->for_from == UNASSIGNED)
-            for_state->for_from = (invert) ? pLast->de_index : found->de_index;
+            for_state->for_from = (invert)
+                ? (int)pLast->de_index : (int)found->de_index;
 
         if (for_state->for_to == UNASSIGNED)
-            for_state->for_to = (invert) ? found->de_index : pLast->de_index;
+            for_state->for_to = (invert)
+                ? (int)found->de_index : (int)pLast->de_index;
 
         /*
          *  "loopLimit" is intended to catch runaway ending conditions.
@@ -372,13 +374,13 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
 
         } else if (invert) {
             next_ix = (found->de_ptwin == NULL)
-                ? for_state->for_to - 1  /* last iteration !! */
-                : found->de_ptwin->de_index;
+                ? (int)(for_state->for_to - 1)  /* last iteration !! */
+                : (int)found->de_ptwin->de_index;
 
         } else {
             next_ix = (found->de_twin == NULL)
-                ? for_state->for_to + 1  /* last iteration !! */
-                : found->de_twin->de_index;
+                ? (int)(for_state->for_to + 1)  /* last iteration !! */
+                : (int)found->de_twin->de_index;
         }
 
         /*
@@ -473,7 +475,7 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
         /*
          *  Set the global current index
          */
-        for_state->for_index = def_ent->de_index;
+        for_state->for_index = (int)def_ent->de_index;
 
         /*
          *  Advance to the next twin
@@ -526,7 +528,7 @@ load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
     pz = SPN_WHITESPACE_CHARS(pzSrc + 3);
     if (*pz == NUL)
         AG_ABEND_IN(pT, pMac, FOR_IN_LISTLESS);
-    srcLen -= pz - pzSrc;
+    srcLen -= (size_t)(pz - pzSrc);
     pzSrc = pz;
 
     {
@@ -791,7 +793,9 @@ new_for_context(void)
      */
     if (++(curr_ivk_info->ii_for_depth) > curr_ivk_info->ii_for_alloc) {
         void * dta = curr_ivk_info->ii_for_data;
-        size_t sz  = (curr_ivk_info->ii_for_alloc += 5) * sizeof(for_state_t);
+        size_t sz;
+        curr_ivk_info->ii_for_alloc += 5;
+        sz  = (size_t)curr_ivk_info->ii_for_alloc * sizeof(for_state_t);
 
         if (dta == NULL)
              dta = AGALOC(sz, "Init FOR sate");
@@ -861,7 +865,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      *  Special hack:  if the name is preceeded by a `.',
      *  then the lookup is local-only and we will accept it.
      */
-    mac->md_name_off = tpl->td_scan - tpl->td_text;
+    mac->md_name_off = (uintptr_t)(tpl->td_scan - tpl->td_text);
     if (*scan_in == '.') {
         *(scan_out++) = *(scan_in++);
         if (! IS_VAR_FIRST_CHAR(*scan_in))
@@ -878,7 +882,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      *  Skip space to the start of the text following the iterator name
      */
     scan_in = SPN_WHITESPACE_CHARS(scan_in);
-    in_len -= scan_in - (char*)mac->md_txt_off;
+    in_len -= (size_t)(scan_in - (char*)mac->md_txt_off);
 
     /* * * * *
      *
@@ -903,7 +907,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      *  *OR*         FOR foo (scheme ...) ...
      */
     else {
-        mac->md_txt_off = scan_out - tpl->td_text;
+        mac->md_txt_off = (uintptr_t)(scan_out - tpl->td_text);
         memmove(scan_out, scan_in, in_len);
         scan_out[in_len] = NUL;
         if (IS_QUOTE_CHAR(*scan_out))
@@ -919,7 +923,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
         if (*p_scan == NULL)
             AG_ABEND_IN(tpl, mac, LD_FOR_NO_ENDFOR);
 
-        mac->md_end_idx = mac->md_sib_idx = next_mac - tpl->td_macros;
+        mac->md_end_idx = mac->md_sib_idx = (int)(next_mac - tpl->td_macros);
 
         load_proc_table = save_load_procs;
         return next_mac;

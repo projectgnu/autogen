@@ -251,7 +251,7 @@ check_make_dep_env(void)
             if (IS_END_TOKEN_CHAR(ch))
                 break;
 
-            *(pz++) = ch;
+            *(pz++) = (char)ch;
         }
         *pz = NUL;
 
@@ -267,7 +267,7 @@ check_make_dep_env(void)
             if (IS_END_TOKEN_CHAR(ch))
                 break;
 
-            *(pz++) = ch;
+            *(pz++) = (char)ch;
         }
         *pz = NUL;
         SET_OPT_SAVE_OPTS(fp);
@@ -404,7 +404,7 @@ span_quote(char * in_q)
 
         case '\\':
             if (qc != '\'') {
-                int ct = ao_string_cook_escape_char(in_q, dp-1, 0x7F);
+                int ct = (int)ao_string_cook_escape_char(in_q, dp-1, 0x7F);
                 if (dp[-1] == 0x7F)  dp--;
                 in_q += ct;
 
@@ -460,8 +460,7 @@ skip_quote(char const * qstr)
 
             } else {
                 char p[10];  /* provide a scratch pad for escape processing */
-                int ct = ao_string_cook_escape_char(qstr, p, 0x7F);
-                qstr += ct;
+                qstr += ao_string_cook_escape_char(qstr, p, 0x7F);
             } /* if (q == '\'')      */
         }     /* switch (*qstr++)   */
     }         /* while (*qstr != q) */

@@ -54,7 +54,7 @@ scm2display(SCM s)
         break;
 
     case GH_TYPE_CHAR:
-        z[0] = AG_SCM_CHAR(s); z[1] = NUL; break;
+        z[0] = (char)AG_SCM_CHAR(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
         res = RESOLVE_SCM_VECTOR; break;
@@ -136,7 +136,7 @@ eval_mac_expr(bool * allocated)
 {
     templ_t *     tpl   = current_tpl;
     macro_t *     mac   = cur_macro;
-    int           code  = mac->md_res;
+    int           code  = (int)mac->md_res;
     char const *  text  = NULL; /* warning patrol */
     def_ent_t *   ent;
 
@@ -523,7 +523,7 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 {
     char *        copy; /* next text dest   */
     char const *  src     = (char const*)mac->md_txt_off; /* macro text */
-    size_t        src_len = (long)mac->md_res;           /* macro len  */
+    size_t        src_len = (size_t)mac->md_res;          /* macro len  */
     char const *  end_src = src + src_len;
 
     if (src_len == 0) {
@@ -584,9 +584,9 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     }
 
     copy = tpl->td_scan;
-    mac->md_name_off = (copy - tpl->td_text);
+    mac->md_name_off = (uintptr_t)(copy - tpl->td_text);
     {
-        size_t remLen = canonical_name(copy, src, (int)src_len);
+        size_t remLen = (size_t)canonical_name(copy, src, (int)src_len);
         if (remLen > src_len)
             AG_ABEND_IN(tpl, mac, LD_EXPR_BAD_NAME);
         src    += src_len - remLen;
@@ -602,9 +602,9 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 
     } else {
         char* pz = copy;
-        src_len = (long)(end_src - src);
+        src_len = (size_t)(end_src - src);
 
-        mac->md_txt_off = (copy - tpl->td_text);
+        mac->md_txt_off = (uintptr_t)(copy - tpl->td_text);
         /*
          *  Copy the expression
          */
@@ -635,11 +635,12 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
              */
             *(pzNextExpr++) = NUL;
             pzNextExpr = SPN_WHITESPACE_CHARS(pzNextExpr);
-            mac->md_res |= (expr_type(pzNextExpr) << EMIT_SECONDARY_SHIFT);
-            mac->md_end_idx = pzNextExpr - tpl->td_text;
+            mac->md_res |= (uintptr_t)(
+                (expr_type(pzNextExpr) << EMIT_SECONDARY_SHIFT));
+            mac->md_end_idx = (int)(pzNextExpr - tpl->td_text);
         }
 
-        mac->md_res |= expr_type(pz);
+        mac->md_res |= (uintptr_t)expr_type(pz);
     }
 
     tpl->td_scan = copy;

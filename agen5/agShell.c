@@ -114,7 +114,7 @@ ag_scm_shell(SCM cmd)
 SCM
 ag_scm_shellf(SCM fmt, SCM alist)
 {
-    int   len = scm_ilength(alist);
+    int   len = (int)scm_ilength(alist);
     char* pz;
 
 #ifdef DEBUG_ENABLED
@@ -535,7 +535,7 @@ server_fp_open(fp_pair_t * fp_pair, char const ** ppArgs)
 static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
 {
-    *p_sz  = (*p_sz + need_len + 0xFFF) & ~0xFFF;
+    *p_sz  = (*p_sz + need_len + 0xFFF) & (size_t)~0xFFF;
     *p_txt = AGREALOC((void*)*p_txt, *p_sz, "expand text");
 }
 
@@ -620,7 +620,7 @@ load_data(void)
     while (  (scan > text)
           && IS_WHITESPACE_CHAR(scan[-1]))
         scan--;
-    text_sz = (scan - text) + 1;
+    text_sz = (size_t)(scan - text) + 1;
     *scan  = NUL;
 
     if (OPT_VALUE_TRACE >= TRACE_SERVER_SHELL)

@@ -78,7 +78,7 @@ do_output_file_line(int line_delta, char const * fmt)
     }
 
     {
-        size_t sz = strlen(fmt) + strlen(fname) + 24;
+        ssize_t sz = (ssize_t)(strlen(fmt) + strlen(fname) + 24);
         buf = ag_scribble(sz);
     }
 
@@ -300,13 +300,13 @@ ag_scm_out_pop(SCM ret_contents)
             pos = 0;
 
         } else {
-            pz = ag_scribble((size_t)pos + 1);
+            pz = ag_scribble((ssize_t)pos + 1);
             rewind(cur_fpstack->stk_fp);
             if (fread(pz, (size_t)pos, (size_t)1, cur_fpstack->stk_fp) != 1)
                 AG_CANT(SCM_OUT_POP_NO_REREAD, cur_fpstack->stk_fname);
         }
 
-        res = AG_SCM_STR2SCM(pz, pos);
+        res = AG_SCM_STR2SCM(pz, (size_t)pos);
     }
 
     outputDepth--;
@@ -335,18 +335,20 @@ ag_scm_out_pop(SCM ret_contents)
 SCM
 ag_scm_output_file_next_line(SCM num_or_str, SCM str)
 {
-    char const * pzFmt = FILE_LINE_FMT;
+    char const * fmt;
     int  line_off = 1;
 
     if (AG_SCM_NUM_P(num_or_str))
-        line_off = AG_SCM_TO_LONG(num_or_str);
+        line_off = (int)AG_SCM_TO_LONG(num_or_str);
     else
         str = num_or_str;
 
     if (AG_SCM_STRING_P(str))
-        pzFmt = ag_scm2zchars(str, "file/line format");
-
-    return do_output_file_line(line_off, pzFmt);
+        fmt = ag_scm2zchars(str, "file/line format");
+    else
+        fmt = FILE_LINE_FMT;
+    
+    return do_output_file_line(line_off, fmt);
 }
 
 
@@ -465,9 +467,9 @@ ag_scm_out_emit_suspended(SCM susp_nm)
 SCM
 ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
 {
-    int   list_len = scm_ilength(alist);
-    char const * pzFmt = ag_scm2zchars(fmt, WORD_FORMAT);
-    SCM   res      = run_printf(pzFmt, list_len, alist);
+    int   list_len = (int)scm_ilength(alist);
+    SCM   res =
+        run_printf(ag_scm2zchars(fmt, WORD_FORMAT), list_len, alist);
 
     /*
      *  If "port" is a string, it must match one of the suspended outputs.
@@ -644,7 +646,7 @@ ag_scm_out_push_new(SCM new_file)
             ag_scm_make_tmp_dir();
 
         tmplen  = temp_tpl_dir_len + 10;
-        tmp_fnm = ag_scribble(tmplen + 1);
+        tmp_fnm = ag_scribble((ssize_t)tmplen + 1);
         memcpy(tmp_fnm, pz_temp_tpl, tmplen + 1);
         tmpfd   = mkstemp(tmp_fnm);
 
@@ -770,11 +772,10 @@ ag_scm_out_line(void)
 
         rewind(cur_fpstack->stk_fp);
         do {
-            int ich = fgetc(cur_fpstack->stk_fp);
-            unsigned char ch = ich;
-            if (ich < 0)
+            int ch = fgetc(cur_fpstack->stk_fp);
+            if (ch < 0)
                 break;
-            if (ch == (unsigned char)NL)
+            if (ch == (int)NL)
                 lineNum++;
         } while (--pos > 0);
         fseek(cur_fpstack->stk_fp, svpos, SEEK_SET);
@@ -893,7 +894,7 @@ ag_scm_make_header_guard(SCM name)
 
         gpz = scan_p;  // gpz must be freed
         do  {
-            *(scan_p++) = toupper(*(lpz++));
+            *(scan_p++) = (char)toupper(*(lpz++));
         } while (--lsz > 0);
 
         /*
@@ -906,18 +907,18 @@ ag_scm_make_header_guard(SCM name)
             *(scan_p++) = '_';
             lpz = BRK_ALPHANUMERIC_CHARS(lpz);
             while (IS_ALPHANUMERIC_CHAR(*lpz))
-                *(scan_p++) = toupper((unsigned)*(lpz++));
+                *(scan_p++) = (char)toupper((unsigned)*(lpz++));
         } while (*lpz != NUL);
 
         memcpy(scan_p, GUARD_SFX, GUARD_SFX_LEN + 1);
-        gsz = (scan_p - gpz) + GUARD_SFX_LEN;
+        gsz = (size_t)(scan_p - gpz) + GUARD_SFX_LEN;
     }
 
     {
         size_t sz1 = MK_HEAD_GUARD_SCM_LEN + gsz + osz;
         size_t sz2 = MK_HEAD_GUARD_GUARD_LEN + 2 * gsz;
         size_t sz  = (sz1 < sz2) ? sz2 : sz1;
-        char * p = ag_scribble(sz);
+        char * p   = ag_scribble((ssize_t)sz);
         sprintf(p, MK_HEAD_GUARD_SCM, opz, gpz);
         (void)ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
 

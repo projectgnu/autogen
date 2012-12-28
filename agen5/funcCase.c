@@ -21,9 +21,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#undef  IS_LOW
-#define IS_LOW(c)  (((c) <= 'z') && ((c) >= 'a'))
-
 #ifndef _toupper
 #  ifdef __toupper
 #    define _toupper(c)     __toupper(c)
@@ -31,8 +28,6 @@
 #    define _toupper(c)     toupper(c)
 #  endif
 #endif
-
-#define PTRUP(p) STMTS(if(IS_LOW(*(p))) *(p)=_toupper(*(p));(p)++)
 
 typedef tSuccess (tSelectProc)(char const * sample, char const * pattern);
 static tSelectProc
@@ -70,10 +65,10 @@ static load_proc_p_t apSelectOnly[ FUNC_CT ] = { NULL };
 
 /* = = = START-STATIC-FORWARD = = = */
 static void
-compile_re(regex_t* pRe, char const * pzPat, int flags);
+compile_re(regex_t * re, char const * pat, int flags);
 
 static inline void
-up_case(char* pz);
+up_case(char * pz);
 
 static tSuccess
 Select_Compare(char const * sample, char const * pattern);
@@ -130,25 +125,26 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static void
-compile_re(regex_t* pRe, char const * pzPat, int flags)
+compile_re(regex_t * re, char const * pat, int flags)
 {
-    void * const pat = (void *)pzPat;
-    int  rerr = regcomp(pRe, pat, flags);
+    int rerr = regcomp(re, (void *)pat, flags);
     if (rerr != 0) {
-        char zEr[ SCRIBBLE_SIZE ];
-        regerror(rerr, pRe, zEr, sizeof(zEr));
-        fprintf(stderr, BAD_RE_FMT, rerr, zEr, pzPat);
+        char erbf[ SCRIBBLE_SIZE ];
+        regerror(rerr, re, erbf, sizeof(erbf));
+        fprintf(stderr, BAD_RE_FMT, rerr, erbf, pat);
         AG_ABEND(COMPILE_RE_BAD);
     }
 }
 
-
 static inline void
-up_case(char* pz)
+up_case(char * pz)
 {
-    while (*pz != NUL) PTRUP(pz);
+    while (*pz != NUL) {
+        if (IS_LOWER_CASE_CHAR(*pz))
+            *pz = (char)_toupper((int)*pz);
+        pz++;
+    }
 }
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -496,9 +492,9 @@ Select_Match(char const * sample, char const * pattern)
      */
     if (cur_macro->md_pvt == NULL) {
         void *    mat = (void *)pattern;
-        regex_t*  pRe = AGALOC(sizeof(*pRe), "select match re");
-        compile_re(pRe, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)pRe;
+        regex_t*  re = AGALOC(sizeof(*re), "select match re");
+        compile_re(re, mat, (int)cur_macro->md_res);
+        cur_macro->md_pvt = (void*)re;
     }
 
     if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)0,
@@ -579,9 +575,9 @@ Select_Match_End(char const * sample, char const * pattern)
      */
     if (cur_macro->md_pvt == NULL) {
         void *    mat = (void *)pattern;
-        regex_t*  pRe = AGALOC(sizeof(*pRe), "select match end re");
-        compile_re(pRe, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)pRe;
+        regex_t*  re = AGALOC(sizeof(*re), "select match end re");
+        compile_re(re, mat, (int)cur_macro->md_res);
+        cur_macro->md_pvt = (void*)re;
     }
 
     if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
@@ -673,9 +669,9 @@ Select_Match_Start(char const * sample, char const * pattern)
      */
     if (cur_macro->md_pvt == NULL) {
         void *    mat = (void *)pattern;
-        regex_t*  pRe = AGALOC(sizeof(*pRe), "select match start re");
-        compile_re(pRe, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)pRe;
+        regex_t*  re = AGALOC(sizeof(*re), "select match start re");
+        compile_re(re, mat, (int)cur_macro->md_res);
+        cur_macro->md_pvt = (void*)re;
     }
 
     if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
@@ -769,14 +765,14 @@ Select_Match_Full(char const * sample, char const * pattern)
      */
     if (cur_macro->md_pvt == NULL) {
         void *    mat = (void *)pattern;
-        regex_t*  pRe = AGALOC(sizeof(*pRe), "select match full re");
+        regex_t*  re = AGALOC(sizeof(*re), "select match full re");
 
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
             fprintf(trace_fp, TRACE_SEL_MATCH_FULL,
                      pattern, cur_macro->md_res);
         }
-        compile_re(pRe, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = pRe;
+        compile_re(re, mat, (int)cur_macro->md_res);
+        cur_macro->md_pvt = re;
     }
 
     if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
@@ -1142,8 +1138,8 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
      *
      *  Also, make sure the CASE macro knows where the end is.
      */
-    pMac->md_end_idx = \
-    current_case.pSelect->md_sib_idx = (pEsacMac - pT->td_macros);
+    pMac->md_end_idx =
+        current_case.pSelect->md_sib_idx = (int)(pEsacMac - pT->td_macros);
 
     /*
      *  Restore any enclosing CASE function's context.
@@ -1294,7 +1290,7 @@ static macro_t *
 mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
 {
     char const *  sel_arg;
-    long          arg_len = mac->md_res; /* macro len  */
+    long          arg_len = (long)mac->md_res; /* macro len  */
 
     (void)pscan;
     /*
@@ -1308,7 +1304,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
     if (selection_type_complete(tpl, mac, &sel_arg))
         goto selection_done;
 
-    arg_len -= (intptr_t)sel_arg - mac->md_txt_off;
+    arg_len -= (intptr_t)(sel_arg - mac->md_txt_off);
     if (arg_len <= 0)
         AG_ABEND_IN(tpl, mac, LD_SEL_INVAL);
 
@@ -1334,13 +1330,13 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
     {
         char *       dest   = tpl->td_scan;
         char const * svdest = dest;
-        mac->md_txt_off = (dest - tpl->td_text);
+        mac->md_txt_off = (uintptr_t)(dest - tpl->td_text);
         if (mac->md_code == FTYP_SELECT_EQUIVALENT) {
             do  {
-                *(dest++) = toupper((uint8_t)*(sel_arg++));
+                *(dest++) = (char)toupper((uint8_t)*(sel_arg++));
             } while (--arg_len > 0);
         } else {
-            memcpy(dest, sel_arg, arg_len);
+            memcpy(dest, sel_arg, (size_t)arg_len);
             dest += arg_len;
         }
         *(dest++) = NUL;
@@ -1359,7 +1355,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
     /*
      *  Link this selection macro to the list of selectors for CASE.
      */
-    current_case.pSelect->md_sib_idx = (mac - tpl->td_macros);
+    current_case.pSelect->md_sib_idx = (int)(mac - tpl->td_macros);
     current_case.pSelect = (macro_t*)mac;
 
     return mac + 1;

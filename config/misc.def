@@ -156,8 +156,10 @@ test   = {
 
   config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
   action = { yes; act-type = script;
-             act-text = '  CPPFLAGS="${ag_save_CPPFLAGS}"' "\n"
-                        '  LIBS="${ag_save_LIBS}"';
+             act-text = <<- _EOF_
+		      CPPFLAGS="${ag_save_CPPFLAGS}"
+		      LIBS="${ag_save_LIBS}"
+		_EOF_;
   };
 
   action = { no; act-type = script; asis;

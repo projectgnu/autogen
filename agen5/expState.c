@@ -43,10 +43,10 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
-entry_length(char* name);
+entry_length(char * name);
 
 static int
-count_entries(char* name);
+count_entries(char * name);
 
 static SCM
 find_entry_value(SCM op, SCM obj, SCM test);
@@ -63,20 +63,20 @@ do_tpl_file_line(int line_delta, char const * fmt);
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 static int
-entry_length(char* name)
+entry_length(char * name)
 {
-    def_ent_t**  papDefs = find_def_ent_list(name);
+    def_ent_t ** defs = find_def_ent_list(name);
     int          res     = 0;
 
-    if (papDefs == NULL)
+    if (defs == NULL)
         return 0;
 
     for (;;) {
-        def_ent_t*   pDE = *(papDefs++);
-        if (pDE == NULL)
+        def_ent_t * de = *(defs++);
+        if (de == NULL)
             break;
-        if (pDE->de_type == VALTYP_TEXT)
-            res += strlen(pDE->de_val.dvu_text);
+        if (de->de_type == VALTYP_TEXT)
+            res += (int)strlen(de->de_val.dvu_text);
         else
             res++;
     }
@@ -85,17 +85,17 @@ entry_length(char* name)
 
 
 static int
-count_entries(char* name)
+count_entries(char * name)
 {
-    def_ent_t**  papDefs = find_def_ent_list(name);
+    def_ent_t ** defs = find_def_ent_list(name);
     int          res     = 0;
 
-    if (papDefs == NULL)
+    if (defs == NULL)
         return 0;
 
     for (;;) {
-        def_ent_t*   pDE = *(papDefs++);
-        if (pDE == NULL)
+        def_ent_t * de = *(defs++);
+        if (de == NULL)
             break;
         res++;
     }
@@ -679,16 +679,17 @@ ag_scm_tpl_file(SCM full)
 static SCM
 do_tpl_file_line(int line_delta, char const * fmt)
 {
+    unsigned int ln_no = (unsigned int)cur_macro->md_line;
     void * args[2] = {
         [0] = (void *)current_tpl->td_file,
-        [1] = (void *)((uintptr_t)cur_macro->md_line + line_delta)
+        [1] = (void *)(uintptr_t)(ln_no + (unsigned)line_delta)
     };
     char * buf = strrchr(args[0], DIRCH);
     if (buf != NULL)
         args[0] = buf + 1;
 
     {
-        size_t sz = strlen(fmt) + strlen(args[0]) + 24;
+        ssize_t sz = (ssize_t)(strlen(fmt) + strlen(args[0]) + 24);
         buf = ag_scribble(sz);
     }
 
@@ -795,14 +796,15 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
             (void *)pE->de_file,
             (void *)(uintptr_t)pE->de_line
         };
-        size_t maxlen;
+        ssize_t maxlen;
 
         buf = strrchr(args[0], DIRCH);
         if (buf != NULL)
             args[0] = buf + 1;
 
-        maxlen = strlen(args[0]) + strlen(pzFmt) + LOG10_2to32 + 1;
-        buf = ag_scribble(maxlen);
+        maxlen = (ssize_t)(
+            strlen(args[0]) + strlen(pzFmt) + LOG10_2to32 + 1);
+        buf    = ag_scribble(maxlen);
         sprintfv(buf, pzFmt, (snv_constpointer*)args);
     }
 

@@ -388,7 +388,7 @@ macro_t *
 mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
 {
     char const * scan;
-    ssize_t      src_len = (size_t)mac->md_res; /* macro len  */
+    ssize_t      src_len = (ssize_t)mac->md_res; /* macro len  */
     (void)unused;
 
     if (src_len <= 0)
@@ -440,19 +440,19 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
          */
         while (IS_WHITESPACE_CHAR(scan[-1])) scan--, src_len++;
         scan    -= cname_len;
-        src_len += cname_len;
+        src_len += (ssize_t)cname_len;
 
         /*
          *  Now copy over the full canonical name.  Check for errors.
          *  Advance the scan pointer to just past the name we've copied.
          */
         {
-            size_t rem_len = canonical_name(cname, scan, (int)src_len);
-            if (rem_len > (size_t)src_len)
+            ssize_t rem_len = canonical_name(cname, scan, (int)src_len);
+            if (rem_len > src_len)
                 AG_ABEND_IN(tpl, mac, LD_UNKNOWN_INVAL_DEF);
 
             scan   += src_len - rem_len;
-            src_len = rem_len;
+            src_len = (ssize_t)rem_len;
         }
 
         /*
@@ -471,9 +471,9 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
      */
     {
         char * dest = tpl->td_scan; /* next text dest   */
-        mac->md_txt_off = (dest - tpl->td_text);
+        mac->md_txt_off = (uintptr_t)(dest - tpl->td_text);
         mac->md_res = 0;
-        memcpy(dest, scan, src_len);
+        memcpy(dest, scan, (size_t)src_len);
         dest       += src_len;
         *(dest++)   = NUL;
         *dest       = NUL; /* double terminate */

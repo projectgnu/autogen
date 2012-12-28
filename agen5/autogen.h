@@ -26,8 +26,16 @@
 #include "compat/unlocked-io.h"
 
 #include REGEX_HEADER
+#pragma  GCC diagnostic push
+#pragma  GCC diagnostic ignored "-Wextra"
+#pragma  GCC diagnostic ignored "-Wconversion"
+#pragma  GCC diagnostic ignored "-Wsign-conversion"
+#pragma  GCC diagnostic ignored "-Wstrict-overflow"
+
 #include <libguile/scmconfig.h>
 #include <libguile.h>
+
+#pragma  GCC diagnostic pop
 
 #include "ag-text.h"
 #include "opts.h"
