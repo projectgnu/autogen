@@ -226,8 +226,11 @@ make_gver()
     run_ag gver guile-iface.def
 }
 
+# make_proto() -- comes from bootstrap.shlib
+
 dispatch()
 {
+    test -z "$DEPDIR" && test -d .deps && DEPDIR=.deps
     if test -d "${DEPDIR}"
     then DEPFILE=./${DEPDIR}/stamp-${1}.d
     else DEPFILE=''
@@ -267,8 +270,11 @@ do
     autogen.texi | autogen.menu )
         dispatch texi ;;
 
-    autogen.1 | fmemopen.3 )
+    autogen.1 )
         dispatch man ;;
+
+    fmemopen.3 )
+        dispatch fmem ;;
 
     proto.h )
         dispatch proto ;;
@@ -276,13 +282,12 @@ do
     functions.h )
         dispatch func ;;
 
-    *)  if test `type -t $t` = function 2>/dev/null 1>&2
+    *)  if test `type -t make_$t` = function 2>/dev/null 1>&2
         then dispatch $t
         else die "Don't know how to make $t"
         fi ;;
     esac
 done
-assemble_Makefile
 
 rm -f $rmlist ag-*.log
 

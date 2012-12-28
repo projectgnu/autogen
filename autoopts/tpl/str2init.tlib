@@ -53,6 +53,20 @@
 
 =][=
 
+  ;;# START-BUILDTREE-ISMS
+  ;;
+  (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+=][= # END-BUILDTREE-ISMS
+
+  (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE =][=
+
 FOR cmd                 =][=
 
   (set! tmp-str (string-downcase! (string->c-name! (get "cmd"))))

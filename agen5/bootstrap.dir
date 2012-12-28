@@ -50,9 +50,7 @@ set_defaults()
     #  Make sure we have a default for top build and source.
     #  Some of the templates need this information.
     #
-    local verdata=$(egrep '^AG_' ${top_srcdir}/VERSION | \
-       sed 's,^\(AG[^=]*\)\(.*\),\1\2 export \1,')
-    eval "set -a;${verdata};set +a"
+    eval "set -a;$(egrep '^AG_[A-Z0-9_]*=' ${top_srcdir}/VERSION);set +a"
 
     #  disable any $HOME defaults
     #
@@ -92,7 +90,8 @@ assemble_Makefile() {
             g=$(echo $f | sed 's/[^a-zA-Z0-9]/_/g')
             printf "$fmt" $f $g
         done
-        printf '\n# end-generated-text\n# end of Makefile.am\n'
+        printf '.PHONY: stamps\nstamps: $(list_stamps)\n%s' \
+            $'\n# end-generated-text\n# end of Makefile.am\n'
 
     } > Makefile.XX
 
@@ -103,6 +102,9 @@ assemble_Makefile() {
 }
 
 assemble_fmemopen() {
+    # The original source lives in a private library.
+    # If not available, leave everything alone.
+    #
     fmemdir=~bkorb/tools/mine/lib/fmemopen
     test -f ${fmemdir}/fmemopen.c || return
 
@@ -127,6 +129,7 @@ assemble_fmemopen() {
 PS4='>bsag-${FUNCNAME}> '
 set_defaults ${1+"$@"}
 DEPDIR=
+
 . ${srcdir}/mk-stamps.sh $stamp_list
 assemble_fmemopen
 assemble_Makefile

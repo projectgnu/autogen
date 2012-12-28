@@ -402,7 +402,7 @@ ENDIF d-only
 {
     echo [=(. invalid-name)=]
     cat ${tmp_dir}/disp-list
-} | columns -f '[= d-nam =]' -I4 --spread=1 -S, --end ';'[=
+} | $CLexe -f '[= d-nam =]' -I4 --spread=1 -S, --end ';'[=
 
 (shell  (out-pop #t))           =][=
 (out-resume "disp-text")        =][=
@@ -539,7 +539,7 @@ DEFINE find-part-match          =]
 for f in `sed 's/:.*//' ${tmp_dir}/table`
 do
     echo `expr $f - 1`
-done | columns --spread=1 -S, -I12 --end ' };'[=
+done | $CLexe --spread=1 -S, -I12 --end ' };'[=
 
 (shell (out-pop #t))
 

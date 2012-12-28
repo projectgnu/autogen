@@ -694,7 +694,7 @@ string = { nm = MK_GPERF_SCRIPT;
 		%3$s
 		_EOLIST_
 
-	  cat << '_EOF_'
+	  cat << \_EOF_
 		%%%%
 		int main(int argc, char** argv) {
 		    char*    pz = argv[1];
@@ -1426,4 +1426,3 @@ string = { nm = YYLEX_UNENDING_QUOTE;
 
 string = { nm = zNil;
    str = ""; };
-

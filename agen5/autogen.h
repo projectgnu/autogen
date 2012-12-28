@@ -523,20 +523,27 @@ MODE v2c_t p2p VALUE( { NULL } );
 
 #include "proto.h"
 
-static inline SCM ag_eval(char const * pzStr)
+/**
+ * Evaluate a scheme expression, setting the file and line number from
+ * the file and line of the currently active macro.
+ *
+ * @param[in] str  the scheme expression
+ * @returns the SCM result.  That may be SCM_UNDEFINED.
+ */
+static inline SCM ag_eval(char const * str)
 {
     SCM res;
-    char const * pzSaveScheme = last_scm_cmd; /* Watch for nested calls */
-    last_scm_cmd = pzStr;
+    char const * sv = last_scm_cmd; /* Watch for nested calls */
+    last_scm_cmd = str;
 
     res = ag_scm_c_eval_string_from_file_line(
-        pzStr, current_tpl->td_file, cur_macro->md_line);
+        str, current_tpl->td_file, cur_macro->md_line);
 
-    last_scm_cmd = pzSaveScheme;
+    last_scm_cmd = sv;
     return res;
 }
 
-/*
+/**
  *  Extracted from guile-iface stuff.  Seems to be stable since for at least
  *  1.6.0 through 2.0.0.  1.4.x is thoroughly dead now (May, 2011).
  */
@@ -551,11 +558,12 @@ static inline SCM ag_eval(char const * pzStr)
 
 #define AG_SCM_CHAR_P(_c)            SCM_CHARP(_c)
 
-/*
+/**
  * Hide dummy functions from complexity measurement tools
  */
 #define HIDE_FN(_t)  _t
 
+#define LOCAL static
 #endif /* AUTOGEN_BUILD */
 /*
  * Local Variables:

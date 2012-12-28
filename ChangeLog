@@ -1,3 +1,18 @@
+2012-12-27  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/Makefile.am: use mk-stamps.sh in the rule, not bootstrap.dir
+	* agen5/autogen.h: doxyfy some comments. define LOCAL to static
+	* agen5/bootstrap.dir: simplify some expressions
+	* agen5/functions.c (mLoad_Leave): do not mark with LOCAL
+	* agen5/mk-stamps.sh: fmemopen.3 and autogen.1 use separate rules
+	* autoopts/tpl/str2init.tlib (CLexe): define it differently for
+	test and install
+	* autoopts/tpl/str2enum.tpl: use it
+	* autoopts/tpl/str2mask.tpl: likewise
+	* config/bootstrap.shlib (make proto): fix up prototype rule
+
+	5.17 release
+
 2012-12-22  Bruce Korb  <bkorb@gnu.org>
 
 	* everywhere: fix up nit-picky casts in preparation for using

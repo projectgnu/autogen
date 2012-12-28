@@ -156,7 +156,7 @@ gen_new_block(templ_t * tpl)
  *
  *  @returns the macro table entry after mac
  */
-LOCAL macro_t *
+macro_t *
 mLoad_Leave(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
     (void) tpl;

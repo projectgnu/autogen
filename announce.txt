@@ -62,25 +62,10 @@ cat > ${tfile} <<- _EOF_
 
 	The self-referential example:
 	http://www.gnu.org/software/${project}/man1-autogen.html
-
-	Subprojects:  AutoGen contains several "subprojects" since it relys
-	on them and arranging for their distribution ahead of time is painful.
-	There are basically two:
-
-	FSM - A finite state machine generator.  It allows you to specify an
-	fsm by specifying the states, the valid transitions and the actions
-	to take for the valid transitions.  The actions may be either function
-	calls or switch/case elements.  The processing may be step-and-return,
-	process-until-done or reentrant.
-
-	str2enum - string to enumeration.  Take a list of names and produce
-	both an enumeration of those names and a function to convert strings
-	into those enumeration values.  Optionally, it may produce functions
-	to convert the integer values into the string name and/or dispatch
-	a function with a name derived from each of the names.
-
-	Further details can be seen in the leading comments of fsm.tpl and
-	str2enum.tpl.
+	
+	There are several other examples embedded in AutoGen:
+	A finite state machine generator, string name to enumeration value
+	conversions, and bit map and bit mask management, to name a few.
 
 	New in ${AG_VERSION} - $(date '+%B, %Y')
 	NEWS entries since the last release:

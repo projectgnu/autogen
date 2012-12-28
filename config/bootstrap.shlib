@@ -87,9 +87,11 @@ test -n "${BASH_VERSION}" || {
 
 test -z "${BASH_VERSION}" && local() { : ; }
 # Setup run_ag
-tpl_dir='-L'$(\cd ${top_srcdir}/autoopts/tpl && pwd)' -L'$(
-    \cd ${top_builddir}/autoopts/tpl && pwd)
-typeset -r tpl_dir
+f=$(\cd ${top_srcdir}/autoopts/tpl >/dev/null && pwd)
+g=$(\cd ${top_builddir}/autoopts/tpl >/dev/null && pwd)
+tpl_dir='-L'$f
+test "X$f" = "X$g" || tpl_dir=$tpl_dir' -L'$g
+readonly tpl_dir
 
 if ${VERBOSE}
 then
@@ -170,7 +172,7 @@ make_proto()
     exec 5> $temp_proto
 
     local files=`ls -1 *.c | grep -v 'fsm\.c$'`
-    local dirname=
+    local locs=
     local base_dir=`basename \`pwd\``
     local marker=`echo ${base_dir} | tr a-z A-Z`_PROTO_H_GUARD
     local ct=0
@@ -184,14 +186,9 @@ make_proto()
 	#ifndef ${marker}
 	#define ${marker} 1
 
-	#ifndef LOCAL
-	#  define LOCAL extern
-	#  define REDEF_LOCAL 1
-	#else
-	#  undef  REDEF_LOCAL
-	#endif
 	_EOF_
 
+    deplist=
     for f in ${files}
     do
         test ! -f ${f} && echo "not a file:  $f" >&2 && continue
@@ -209,12 +206,13 @@ make_proto()
             cat $f.Y >&4
             exec 4>&-
 
-            if cmp $f.X $f > /dev/null 2>&1
-            then :
-            else echo WARNING: ${f} has been updated >&2
-                mv -f $f.X $f ; fi
+            cmp -s $f.X $f || {
+                echo WARNING: ${f} has been updated >&2
+                mv -f $f.X $f
+            }
 
             rm -f $f.[XY]
+            deplist=$deplist' \'$nl$ht$f
             ;;
 
         ( 0 ) : ;;
@@ -223,31 +221,29 @@ make_proto()
             continue
         esac
 
-        ct=`echo \`egrep '^LOCAL ' $f | wc -l\` `
-        test $ct -eq 0 && continue
-
-        echo $'/*\n *  Extracted from '$f$'\n */' >&5
-        sed -n '/^LOCAL /,/^{/p' $f | \
-            sed 's/)$/);/;s/^{.*//' >&5
+        egrep '^LOCAL ' $f >/dev/null && {
+            printf '/*\n *  Extracted from %s\n */\n' $f
+            sed -n '/^LOCAL /,/^{/p' $f | \
+                sed 's/^LOCAL /static /;s@)$@);@;s/^{.*//'
+        } >&5
     done
 
-    cat >&5 <<- _EOF_
-	#ifdef REDEF_LOCAL
-	#  undef LOCAL
-	#  define LOCAL
-	#endif
-	#endif /* ${marker} */
-	_EOF_
+    test -d "$DEPDIR" && {
+        echo "${proto_h}  : stamp-proto"
+        echo "stamp-proto : $deplist"
+    } > $DEPDIR/stamp-proto.d
+
+    echo "#endif /* ${marker} */" >&5
     exec 5>&-
 
-    if cmp -s ${temp_proto} ${proto_h}
+    if test -f ${proto_h} && cmp -s ${temp_proto} ${proto_h}
     then
         rm -f ${temp_proto}
-        if test -f
+        if test -f ${target}
         then
             rm -f ${target}-$$
         else
-            mv -f ${target}-$$  ${target}
+            mv -f ${target}-$$ ${target}
             touch ${proto_h}
         fi
     else

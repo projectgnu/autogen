@@ -62,7 +62,7 @@ emit_mask_def() {
         printf "\n/** There are no bits in ${mname}. */\n"
     else
         printf "\n/** bits $which_bits ${mname%_MASK} mask:\n"
-        echo $* | tr ' ' '\n' | columns --spread=1 -I' *  ' --end=' */'
+        echo $* | tr ' ' '\n' | $CLexe --spread=1 -I' *  ' --end=' */'
     fi
 
     for f in $*

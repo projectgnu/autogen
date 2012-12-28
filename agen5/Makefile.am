@@ -52,7 +52,7 @@ hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
 
 EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) $(man_MANS) \
 		defParse.x bootstrap.dir schemedef.scm \
-		guile-iface.def guile-iface.tpl \
+		guile-iface.def guile-iface.tpl ag-text.def \
 		invoke-autogen.texi mk-stamps.sh
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
@@ -82,7 +82,7 @@ STAMPENV = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
 	DEPDIR="$(DEPDIR)"
 
-MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
+MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/mk-stamps.sh $@
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \
@@ -94,4 +94,4 @@ MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/bootstrap.dir $@
 .NOTPARALLEL:
 
 # start-generated-text
-# end of agen5/MakeBase
+# end of agen5/Makefile.am
