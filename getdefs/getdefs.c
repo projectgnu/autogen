@@ -194,10 +194,10 @@ assignIndex(char*  pzOut,  char*  pzDef)
      *  We have a new entry.  Make sure we have room for it
      *  in our in-memory string
      */
-    if (((pzEndIndex - pzIndexText) + len + 64 ) > indexAlloc) {
-        char* pz;
+    if (((size_t)(pzEndIndex - pzIndexText) + len + 64 ) > indexAlloc) {
+        char * pz;
         indexAlloc +=  0x1FFF;
-        indexAlloc &= ~0x0FFF;
+        indexAlloc &= (unsigned long)~0x0FFFUL;
         pz = (char*)realloc((void*)pzIndexText, indexAlloc);
         if (pz == NULL) {
             fputs("Realloc of index text failed\n", stderr);
@@ -220,7 +220,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
      *  THEN use default index.
      */
     if (pzEndIndex == pzIndexText)
-        idx = OPT_VALUE_FIRST_INDEX;
+        idx = (int)OPT_VALUE_FIRST_INDEX;
     else do {
         char* pz = strrchr(pzDef, ' ');
         *pz = NUL;
@@ -234,7 +234,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
             /*
              *  No entries for this category.  Use default index.
              */
-            idx = OPT_VALUE_FIRST_INDEX;
+            idx = (int)OPT_VALUE_FIRST_INDEX;
             *pz = ' ';
             break;
         }
@@ -252,7 +252,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
          */
         *pz = ' ';
         pzMatch = strchr(pzMatch + len, '[');
-        idx = strtol(pzMatch+1, (char**)NULL, 0)+1;
+        idx = (int)strtol(pzMatch+1, (char**)NULL, 0)+1;
     } while (false);
 
     /*
@@ -677,10 +677,10 @@ doPreamble(FILE* outFp)
 LOCAL char*
 loadFile(char const * pzFname)
 {
-    FILE*  fp = fopen(pzFname, "r" FOPEN_BINARY_FLAG);
+    FILE * fp = fopen(pzFname, "r" FOPEN_BINARY_FLAG);
     int    res;
-    char*  pzText;
-    char*  pzRead;
+    char * pzText;
+    char * pzRead;
     size_t rdsz;
 
     if (fp == (FILE*)NULL)
@@ -700,7 +700,7 @@ loadFile(char const * pzFname)
                     pzFname);
             exit(EXIT_FAILURE);
         }
-        rdsz = stb.st_size;
+        rdsz = (size_t)stb.st_size;
         if (rdsz < 16)
             die("Error file %s only contains %d bytes.\n"
                 "\tit cannot contain autogen definitions\n",
@@ -739,17 +739,17 @@ loadFile(char const * pzFname)
 static void
 printEntries(FILE* fp)
 {
-    int     ct  = blkUseCt;
-    char**  ppz = papzBlocks;
+    size_t  ct  = blkUseCt;
+    char ** ppz = papzBlocks;
 
     if (ct == 0)
         exit(EXIT_FAILURE);
 
     for (;;) {
-        char* pz = *(ppz++);
+        char * pz = *(ppz++);
         fputs(pz, fp);
         free((void*)pz);
-        if (--ct <= 0)
+        if (--ct == 0)
             break;
         fputc('\n', fp);
     }
@@ -874,16 +874,16 @@ static void
 set_first_idx(void)
 {
     char    zNm[ 128 ] = { NUL };
-    int     nmLn = 1;
-    int     ct   = blkUseCt;
-    char**  ppz  = papzBlocks;
+    size_t  nmLn = 1;
+    int     ct   = (int)blkUseCt;
+    char ** ppz  = papzBlocks;
 
     if (ct == 0)
         exit(EXIT_FAILURE);
 
     for (; --ct >= 0; ppz++) {
         char *  pzOld = *ppz;
-        int     changed = (strneqvcmp(pzOld, zNm, nmLn) != 0);
+        int     changed = (strneqvcmp(pzOld, zNm, (int)nmLn) != 0);
         char *  pzNew;
 
         /*
@@ -1024,7 +1024,7 @@ exec_autogen(char ** pzBase)
      *  ELSE insert each one into the arg list.
      */
     if (! HAVE_OPT(AGARG)) {
-        paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
+        paparg = pparg = malloc((size_t)argCt * sizeof(char*));
         *pparg++ = pzAutogen;
 
     } else {
@@ -1032,7 +1032,7 @@ exec_autogen(char ** pzBase)
         char const ** ppz = STACKLST_OPT(AGARG);
 
         argCt += ct;
-        paparg = pparg = (char const **)malloc(argCt * sizeof(char*));
+        paparg = pparg = malloc((size_t)argCt * sizeof(char*));
         *pparg++ = pzAutogen;
 
         do  {

@@ -115,10 +115,11 @@ main(int argc, char ** argv)
         qsort( (void*)papzLines, usedCt, sizeof( char* ), &compProc );
 
     if (HAVE_OPT( BY_COLUMNS ))
-         writeColumns();
+        writeColumns();
     else if (HAVE_OPT(FILL))
         writeFill();
-    else writeRows();
+    else
+        writeRows();
 
     return EXIT_SUCCESS;
 }

@@ -26,16 +26,28 @@
 #include "compat/unlocked-io.h"
 
 #include REGEX_HEADER
+#if !defined(__GNUC__)
+#define GCC_VERSION 0
+#elif ! defined(GCC_VERSION)
+#define GCC_VERSION (__GNUC__ * 10000 \
+                    + __GNUC_MINOR__ * 100 \
+                    + __GNUC_PATCHLEVEL__)
+#endif
+
+#if GCC_VERSION > 40400
 #pragma  GCC diagnostic push
 #pragma  GCC diagnostic ignored "-Wextra"
 #pragma  GCC diagnostic ignored "-Wconversion"
 #pragma  GCC diagnostic ignored "-Wsign-conversion"
 #pragma  GCC diagnostic ignored "-Wstrict-overflow"
+#endif
 
 #include <libguile/scmconfig.h>
 #include <libguile.h>
 
+#if GCC_VERSION > 40400
 #pragma  GCC diagnostic pop
+#endif
 
 #include "ag-text.h"
 #include "opts.h"

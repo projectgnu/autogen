@@ -223,7 +223,7 @@ trim( char const* pzSrc, size_t* pSz )
             if (pSz != NULL) *pSz = 0;
             return zNil;
         }
-        strSize = (pzEnd - pzSrc);
+        strSize = (size_t)(pzEnd - pzSrc);
     }
 
     /*

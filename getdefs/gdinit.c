@@ -93,7 +93,7 @@ compressOptionText(char* pzS, char* pzE)
     } compressDone:;
 
     {
-        size_t len = (pzD - pzR);
+        size_t len = (size_t)(pzD - pzR);
         pzD = malloc(len + 1);
         if (pzD == NULL)
             die("cannot dup %d byte string\n", (int)(pzD - pzR));
@@ -441,8 +441,8 @@ validateOptions(void)
             indexAlloc = 0x4000;
             pzEndIndex += sprintf(pzEndIndex, "%s", zIndexPreamble);
         } else {
-            pzEndIndex  = pzIndexEOF = pzIndexText + strlen(pzIndexText);
-            indexAlloc = (pzEndIndex - pzIndexText) + 1;
+            pzEndIndex = pzIndexEOF = pzIndexText + strlen(pzIndexText);
+            indexAlloc = (size_t)(pzEndIndex - pzIndexText) + 1;
         }
 
         /*

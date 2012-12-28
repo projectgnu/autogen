@@ -33,11 +33,11 @@ static void
 add_arg(char const * arg, int ix)
 {
     char ** arg_vec = xml2agOptions.origArgVect;
-    int  arg_ct = xml2agOptions.origArgCt;
+    int      arg_ct = (int)xml2agOptions.origArgCt;
 
     if (ix >= (int)arg_ct) {
         arg_ct += 5;
-        arg_vec = realloc(arg_vec, sizeof(void*) * (arg_ct+1));
+        arg_vec = realloc(arg_vec, sizeof(void*) * (size_t)(arg_ct+1));
         if (arg_vec == NULL) {
             fprintf(stderr, "No memory for %d args\n", arg_ct);
             exit(EXIT_FAILURE);
@@ -124,7 +124,7 @@ forkAutogen(char const* pzInput)
             if (p == NULL) {
                 strcpy(pz, zAg);
             } else {
-                size_t len = (p - xml2agOptions.pzProgPath) + 1;
+                size_t len = (size_t)(p - xml2agOptions.pzProgPath) + 1;
                 memcpy(pz, xml2agOptions.pzProgPath, len);
                 strcpy(pz + len, zAg);
             }
