@@ -55,8 +55,7 @@ distclean-local:
 $(TESTS)    : defs
 
 defs        : ${top_builddir}/autoopts/test/defs
-	@set -x ; \
-	$(SED) -e '/^ *srcdir=/s@".*"@"$(srcdir)"@' \
+	@$(SED) -e '/^ *srcdir=/s@".*"@"$(srcdir)"@' \
 	    -e '/^ *top_srcdir=/s@".*"@"$(top_srcdir)"@' \
 	   ${top_builddir}/autoopts/test/defs > $@ ; \
 	cd $(srcdir) ; chmod +x *.test || :

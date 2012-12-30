@@ -412,57 +412,60 @@ buildDefinition(char * pzDef, char const * pzFile, int line, char * pzOut)
  *  buildPreamble
  */
 static tSuccess
-buildPreamble(char ** ppzDef, char ** ppzOut, char const * pzFile, int line)
+buildPreamble(char ** ppzDef, char ** ppzOut, char const * fname, int line)
 {
     char * pzDef      = *ppzDef;
     char * pzOut      = *ppzOut;
 
-    char   zDefText[ MAXNAMELEN ];
-    char * pzDefText  = zDefText;
-    char   zNameText[ MAXNAMELEN ];
-    char * pzNameText = zNameText;
+    char   def_bf[  MAXNAMELEN ];
+    char   name_bf[ MAXNAMELEN ];
+    char * def_str    = def_bf;
     char * pzIfText   = NULL;
 
     /*
      *  Copy out the name of the entry type
      */
-    *pzDefText++ = '`';
+    *def_str++ = '`';
     while (isalnum(*pzDef) || (*pzDef == '_') || (*pzDef == '.')
           || (*pzDef == '[') || (*pzDef == ']'))
-        *pzDefText++ = *pzDef++;
+        *def_str++ = *pzDef++;
 
-    *pzDefText = NUL;
+    *def_str = NUL;
 
-    pzDef += strspn(pzDef, "* \t");
+    pzDef += (int)strspn(pzDef, "* \t");
 
     /*
      *  Copy out the name for this entry of the above entry type.
      */
-    while (isalnum(*pzDef) || (*pzDef == '_'))
-        *pzNameText++ = *pzDef++;
-    *pzNameText = NUL;
+    {
+        char * name_str = name_bf;
+        while (isalnum(*pzDef) || (*pzDef == '_'))
+            *name_str++ = *pzDef++;
+        *name_str = NUL;
+    }
 
-    if (  (zDefText[1]  == NUL)
-       || (zNameText[0] == NUL) )  {
-        fprintf(stderr, zNoData, pzFile, line);
+    if (  (def_bf[1]  == NUL)
+       || (name_bf[0] == NUL) )  {
+        fprintf(stderr, zNoData, fname, line);
         return FAILURE;
     }
 
-    pzDef += strspn(pzDef, " \t");
+    pzDef += (int)strspn(pzDef, " \t");
 
     /*
      *  IF these names are followed by a comma and an "if" clause,
      *  THEN we emit the definition with "#if..."/"#endif" around it
      */
     if (*pzDef == ',') {
-        pzDef += strspn(pzDef+1, " \t")+1;
+        pzDef++;
+        pzDef += strspn(pzDef, " \t");
         if ((pzDef[0] == 'i') && (pzDef[1] == 'f'))
             pzIfText = pzDef;
     }
 
     pzDef = strchr(pzDef, '\n');
     if (pzDef == NULL) {
-        fprintf(stderr, zNoData, pzFile, line);
+        fprintf(stderr, zNoData, fname, line);
         return FAILURE;
     }
 
@@ -473,11 +476,11 @@ buildPreamble(char ** ppzDef, char ** ppzOut, char const * pzFile, int line)
      *  then any "#ifdef..." line and finally put the
      *  entry type name into the output.
      */
-    pzOut += sprintf(pzOut, zLineId, line, pzFile);
+    pzOut += sprintf(pzOut, zLineId, line, fname);
     if (pzIfText != NULL)
         pzOut += sprintf(pzOut, "#%s\n", pzIfText);
     {
-        char*  pz = zDefText+1;
+        char * pz = def_bf+1;
         while (*pz != NUL)
             *pzOut++ = *pz++;
     }
@@ -488,15 +491,15 @@ buildPreamble(char ** ppzDef, char ** ppzOut, char const * pzFile, int line)
      *       and insert the index into the output.
      */
     if (pzIndexText != NULL) {
-        sprintf(pzDefText, "  %s'", zNameText);
-        pzOut = assignIndex(pzOut, zDefText);
+        sprintf(def_str, "  %s'", name_bf);
+        pzOut = assignIndex(pzOut, def_bf);
     }
 
     /*
      *  Now insert the name with a consistent name string prefix
      *  that we use to locate the sort key later.
      */
-    pzOut  += sprintf(pzOut, "%s%s';\n", zNameTag, zNameText);
+    pzOut  += sprintf(pzOut, "%s%s';\n", zNameTag, name_bf);
     *ppzOut = pzOut;
     *ppzDef = pzDef;
     *pzDef  = '\n';  /* restore the newline.  Used in pattern match */
@@ -761,9 +764,9 @@ printEntries(FILE* fp)
  *  processFile
  */
 static void
-processFile(char const * pzFile)
+processFile(char const * fname)
 {
-    char* pzText = loadFile(pzFile); /* full text */
+    char* pzText = loadFile(fname); /* full text */
     char* pzScan;  /* Scanning Pointer  */
     char* pzDef;   /* Def block start   */
     char* pzNext;  /* start next search */
@@ -773,7 +776,7 @@ processFile(char const * pzFile)
     regmatch_t  matches[MAX_SUBMATCH+1];
 
     if (pzText == NULL)
-        fserr_die("read opening %s\n", pzFile);
+        fserr_die("read opening %s\n", fname);
 
     processEmbeddedOptions(pzText);
     pzNext = pzText;
@@ -802,7 +805,7 @@ processFile(char const * pzFile)
                 *pz = NUL;
             }
 
-            fprintf(stderr, zNoSubexp, lineNo, pzFile, pzDef);
+            fprintf(stderr, zNoSubexp, lineNo, fname, pzDef);
             if (pz != NULL)
                 *pz = ch;
             continue;
@@ -811,7 +814,7 @@ processFile(char const * pzFile)
         pzDef = pzScan + matches[0].rm_so + sizeof("/*=") - 1;
         pzNext = strstr(pzDef, "=*/");
         if (pzNext == NULL)
-            die(zNoEnd, pzFile, lineNo);
+            die(zNoEnd, fname, lineNo);
 
         *pzNext = NUL;
         pzNext += 3;
@@ -845,7 +848,7 @@ processFile(char const * pzFile)
          *  OK.  We are done figuring out where the boundaries of the
          *  definition are and where we will resume our processing.
          */
-        buildDefinition(pzDef, pzFile, lineNo, pzOut);
+        buildDefinition(pzDef, fname, lineNo, pzOut);
         pzDta   = (char*)realloc((void*)pzDta, strlen(pzDta) + 1);
         lineNo += linesInDef;
 

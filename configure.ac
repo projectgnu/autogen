@@ -203,18 +203,17 @@ else
  INCLIST='-I${top_builddir} -I${top_srcdir}'
  INCLIST="${INCLIST} -I\${top_builddir}/autoopts -I\${top_srcdir}/autoopts"
 fi
-]
-AC_SUBST(INCLIST)
-[
+]AC_SUBST(INCLIST)[
 test ${GUILE_VERSION} -ge 108000 \
   -a "X${WERROR}" = Xyes \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
 	-Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2`
-]
+	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2 \
+	-Wextra
+`
+]dnl -Wconversion -Wsign-conversion -Wstrict-overflow
 AM_CONFIG_HEADER(config.h:config-h.in)
-
 AH_TOP([#ifndef AUTOGEN_CONFIG_H])
 AH_TOP([#define AUTOGEN_CONFIG_H 1])
 AH_BOTTOM([#endif /* AUTOGEN_CONFIG_H */])

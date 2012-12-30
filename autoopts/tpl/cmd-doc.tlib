@@ -99,6 +99,11 @@
 (define home-rc-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration files.")
 
+(if (=* man-sect "5") (begin
+    (set! home-rc-files #f)
+    (set! home-rc-text "")
+)   )
+
 (define environ-init  (exist? "environrc"))
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
@@ -137,8 +142,9 @@ DEFINE build-doc                      :+][+:
 INVOKE doc-sections                   :+][+:
 INVOKE ao-sections                    :+][+:
 
-(out-push-new (string-append tmp-dir "/.assemble")) \:+]
+(out-push-new)
 
+:+]
 cat_n_rm() {
   test -f ${tmp_dir}/$1 || return 0
   [+:(. egrep-prog):+] -v '^[ 	]*$' ${tmp_dir}/$1
@@ -167,8 +173,29 @@ test -f "$1" && cat $* | [+:(. egrep-prog):+] -v '^[ 	]*$'
 #
 echo
 cat  ${tmp_dir}/.fini
-[+: (out-pop)
-    (shell ". ${tmp_dir}/.assemble")  :+][+:
+[+:
+
+IF (exist? "doc-sub")   :+][+:
+  (shell "{\n" (out-pop #t) "\n} > ${tmp_dir}/.raw-doc")
+  (out-push-new (string-append tmp-dir "/sed-cmd"))
+  :+][+:
+
+  FOR doc-sub           :+][+:
+    (define field-name (get "sub-name"))
+    (define rep-string (string-append "<<" field-name ">>"))
+    (string-substitute (get "sub-expr") rep-string (get field-name))
+    :+][+:
+  ENDFOR doc-sub        :+][+:
+
+  (out-pop)
+  (shell "sed -f $tmp_dir/sed-cmd $tmp_dir/.raw-doc")
+  :+][+:
+
+ELSE                    :+][+:
+
+  (shell (out-pop #t))  :+][+:
+
+ENDIF doc-sub exists    :+][+:
 
 ENDDEF build-doc
 
@@ -233,29 +260,34 @@ ENDDEF doc-sections
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
 DEFINE ao-sections              :+][+:
+  IF (not (=* man-sect "5"))    :+][+:
+    INVOKE cond-section  sec = "OPTIONS"       mode = "replace"       :+][+:
+    INVOKE cond-section  sec = "EXIT STATUS"   mode = "insert"        :+][+:
 
-  INVOKE cond-section  sec = "OPTIONS"         mode = "replace"       :+][+:
+    IF (or home-rc-files environ-init)                                :+][+:
+      INVOKE cond-section   sec = "OPTION PRESETS" mode = "replace"   :+][+:
+
+      IF (. home-rc-files)                                            :+][+:
+        INVOKE cond-section sec = "FILES"          mode = "append"    :+][+:
+      ENDIF                                                           :+][+:
+
+      IF (. environ-init)                                             :+][+:
+        INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"    :+][+:
+      ENDIF                                                           :+][+:
+    ENDIF                                                             :+][+:
+
+  ELSE  section 5 manual        :+][+:
+    INVOKE cond-section sec = "FILES"          mode = "append"        :+][+:
+  ENDIF  section 5/not          :+][+:
+
   INVOKE cond-section  sec = "SYNOPSIS"        mode = "alt"           :+][+:
   INVOKE cond-section  sec = "DESCRIPTION"     mode = "append"        :+][+:
-  INVOKE cond-section  sec = "EXIT STATUS"     mode = "insert"        :+][+:
   INVOKE cond-section  sec = "AUTHORS"         mode = "alt"           :+][+:
   INVOKE cond-section  sec = "BUGS"            mode = "append"        :+][+:
   INVOKE cond-section  sec = "NOTES"           mode = "append"        :+][+:
 
 IF (exist? "copyright")                                               :+][+:
   INVOKE cond-section   sec = "COPYRIGHT"      mode = "alt"           :+][+:
-ENDIF                                                                 :+][+:
-
-IF (or home-rc-files environ-init)                                    :+][+:
-  INVOKE cond-section   sec = "OPTION PRESETS" mode = "replace"       :+][+:
-
-  IF (. home-rc-files)                                                :+][+:
-    INVOKE cond-section sec = "FILES"          mode = "append"        :+][+:
-  ENDIF                                                               :+][+:
-
-  IF (. environ-init)                                                 :+][+:
-    INVOKE cond-section sec = "ENVIRONMENT"    mode = "append"        :+][+:
-  ENDIF                                                               :+][+:
 ENDIF                                                                 :+][+:
 
 ENDDEF ao-sections
@@ -287,7 +319,6 @@ DEFINE cond-section                     :+][+:
      (not (access? file-name R_OK))     :+][+:
 
      INVOKE (sect-line-fname)           :+][+:
-     (out-pop)                          :+][+:
 
   ELSE file exists                      :+][+:
 
@@ -295,24 +326,27 @@ DEFINE cond-section                     :+][+:
 
      ==  replace                        :+][+:
          INVOKE (sect-line-fname)       :+][+:
-         (out-pop)                      :+][+:
 
      ==  append                         :+][+:
          (out-push-add file-name)       :+][+:
          INVOKE (string-append "append-" macro-name) :+][+:
-         (out-pop)                      :+][+:
 
      ==  insert                         :+][+:
          (set! fname-line (shellf
            "sed '1s/.Sh .*/.Pp/' %1$s ; rm -f %1$s" file-name)) :+][+:
          INVOKE (sect-line-fname)       :+][+:
-         (out-pop)                      :+][+:
 
-     # * -- otherwise, do nothing       :+][+:
+     ==  alt                            :+][+:
+         (out-push-new)                 :+][+:
 
+     *                                  :+][+:
+         (error (sprintf "invalid section type: %s" (get "mode")))
+
+     :+][+:
      ESAC                               :+][+:
 
   ENDIF file existence/non-existence    :+][+:
+  (out-pop) :+][+: # All paths open out :+][+:
 ENDDEF cond-section
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =

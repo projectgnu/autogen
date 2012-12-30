@@ -39,42 +39,60 @@ null
 
 :+][+:
 
-(out-push-new)
+(define sed-script (string-append (base-name) ".post-proc-sed"))
+(out-push-new sed-script)
 
 \:+]
-sed \
- -e   's;@code{\([^}]*\)};\\fB\1\\fP;g' \
- -e    's;@var{\([^}]*\)};\\fB\1\\fP;g' \
- -e   's;@samp{\([^}]*\)};\\fB\1\\fP;g' \
- -e      's;@i{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@file{\([^}]*\)};\\fI\1\\fP;g' \
- -e   's;@emph{\([^}]*\)};\\fI\1\\fP;g' \
- -e 's;@strong{\([^}]*\)};\\fB\1\\fP;g' \
- -e 's/@\([{}]\)/\1/g' \
- -e 's,^\$\*$,.br,' \
- -e '/@ *example/,/@ *end *example/s/^/    /' \
- -e 's/^ *@ *example/.nf/' \
- -e 's/^ *@ *end *example/.fi/' \
- -e  '/^ *@ *noindent/d' \
- -e  '/^ *@ *enumerate/d' \
- -e 's/^ *@ *end *enumerate/.br/' \
- -e  '/^ *@ *table/d' \
- -e 's/^ *@ *end *table/.br/' \
- -e 's/^@item \(.*\)/.sp\
-.IR "\1"/' \
- -e 's/^@item/.sp 1/' \
- -e 's/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g' \
- -e 's/``\([a-zA-Z0-9:~+=_ -]*\)'"''"'/\\(lq\1\\(rq/g' \
- -e "s/^'/\\'/" \
- -e 's/^@\*/.br/' \
- -e 's/ -/ \\-/g;s/^\.in \\-/.in -/' <<'_End_Of_Man_'
+s;@code{\([^}]*\)};\\fB\1\\fP;g
+s;@var{\([^}]*\)};\\fB\1\\fP;g
+s;@samp{\([^}]*\)};\\fB\1\\fP;g
+s;@i{\([^}]*\)};\\fI\1\\fP;g
+s;@file{\([^}]*\)};\\fI\1\\fP;g
+s;@emph{\([^}]*\)};\\fI\1\\fP;g
+s;@strong{\([^}]*\)};\\fB\1\\fP;g
+s/@\([{}]\)/\1/g
+s,^\$\*$,.br,
+/@ *example/,/@ *end *example/s/^/    /
+s/^ *@ *example/.nf/
+s/^ *@ *end *example/.fi/
+/^ *@ *noindent/d
+/^ *@ *enumerate/d
+s/^ *@ *end *enumerate/.br/
+/^ *@ *table/d
+s/^ *@ *end *table/.br/
+s/^@item \(.*\)/.sp\
+.IR "\1"/
+s/^@item/.sp 1/
+s/\*\([a-zA-Z0-9:~=_ -]*\)\*/\\fB\1\\fP/g
+s/``\([a-zA-Z0-9:~+=_ -]*\)''/\\(lq\1\\(rq/g
+s/^'/\\'/
+s/^@\*/.br/
+s/ -/ \\-/g
+s/^\.in \\-/.in -/
 [+:
 
-DEFINE emit-man-text    :+]
-_End_Of_Man_[+:
+(out-suspend  "sed-script")
+(define raw-text (string-append (base-name) ".raw"))
+(out-push-new raw-text)
 
-(shell (out-pop #t) )   :+][+:
+:+][+:
 
-ENDDEF emit-man-text    :+][+: #
+DEFINE emit-man-text        :+][+:
+  (out-pop)
+  (out-resume "sed-script") :+][+:
 
-agman-lib.tpl ends here :+]
+  FOR doc-sub               :+][+:
+
+    (define field-name (get "sub-name"))
+    (define rep-string (string-append "<<" field-name ">>"))
+    (string-substitute (get "sub-expr") rep-string (get field-name))
+    :+][+:
+  ENDFOR doc-sub            :+][+:
+
+  (out-pop)
+  (shellf "sed -f %1$s %2$s ; rm -f %1$s %2$s"
+    sed-script raw-text)    :+][+:
+
+ENDDEF emit-man-text        :+][+: #
+
+agman-lib.tpl ends here     :+]

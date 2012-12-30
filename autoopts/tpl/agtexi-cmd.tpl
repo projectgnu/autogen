@@ -4,7 +4,6 @@ texi
 
 #  Documentation template
 #
-#
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
 #  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
@@ -49,14 +48,9 @@ IF (match-value? == "doc-section.ds-type" "DESCRIPTION") =][=
     IF (== (get "ds-type") "DESCRIPTION") =][=
        (define cvt-fn (get "ds-format" "texi"))
        (if (not (== cvt-fn "texi"))
-           (begin
-              (divert-convert cvt-fn)
-              (emit "\n" (get "ds-text") "\n")
-              (convert-divert)
-           )
-
-           (emit "\n" (get "ds-text") "\n")
-       )            =][=
+           (divert-convert cvt-fn) )
+       (emit (string-append "\n" (get "ds-text") "\n"))
+       =][=
        BREAK        =][=
 
     ENDIF           =][=
@@ -758,7 +752,7 @@ DEFINE initialization                   =][=
          (set! cvt-script
                (find-file (string-append diversion-type "2texi")))
          (if (not (defined? 'cvt-script))
-             (error (sprintf "unknown source format type: %s" diversion-type)))
+             (error (sprintf "unknown source format type: %s" diversion-type)) )
          (out-push-new) ))  )))
 
   (define heredoc-marker "_Unlikely_Here_Doc_Marker_\n")

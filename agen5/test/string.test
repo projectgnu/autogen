@@ -83,9 +83,10 @@ _EOF_
 
 test -z "$LINENO" && LINENO=`
     ${GREP} -n FIND-THIS-LINE-NUMBER $0 | sed 's/:.*//'` # close enough
-printf '\nchar zTestFile[] = "%s";\n#line %s\n' \
-    ${testname}.raw `expr $LINENO + 4` >&4
+printf '\nchar zTestFile[] = "%s";\n' \
+    ${testname}.raw >&4
 
+echo "#line $(( $LINENO - 1 )) \"$(basename $0)\"" >&4
 cat >&4 <<'_EOF_'
 char zGened[]  = [=(c-string  (get "string"))=];
 char zKrGen[]  = [=(kr-string (get "string"))=];
@@ -107,7 +108,7 @@ int checkStr( char* pz, char const* pzWhat )
 
     char* pzE = zExpect;
     char* pzR = pz;
-    int   ix  = strlen( pz );
+    int   ix  = (int)strlen(pz);
     int   res = 0;
 
     if (ix != expectSize) {

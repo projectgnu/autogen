@@ -140,6 +140,18 @@ typedef int snv_wint_t;
 
 /* inline and const keywords are (mostly) handled by config.h */
 #ifdef __GNUC__
+
+#  define GCC_VERSION (__GNUC__ * 10000 \
+                    + __GNUC_MINOR__ * 100 \
+                    + __GNUC_PATCHLEVEL__)
+
+#  if GCC_VERSION > 40400
+#    pragma  GCC diagnostic ignored "-Wextra"
+#    pragma  GCC diagnostic ignored "-Wconversion"
+#    pragma  GCC diagnostic ignored "-Wsign-conversion"
+#    pragma  GCC diagnostic ignored "-Wstrict-overflow"
+#  endif
+
 #  ifndef const
 #    define const	__const
 #  endif
@@ -149,7 +161,9 @@ typedef int snv_wint_t;
 #  ifndef signed
 #    define signed	__signed
 #  endif
+
 #else
+#  define GCC_VERSION 0
 #  ifndef __STDC__
 #    undef  signed
 #    define signed
@@ -246,17 +260,17 @@ typedef enum {
 
 #undef SNV_GNUC_PRINTF
 #undef SNV_GNUC_NORETURN
-#if	__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#if GCC_VERSION > 20400
 #  define SNV_GNUC_PRINTF( args, format_idx, arg_idx )		\
   	args __attribute__((format (printf, format_idx, arg_idx)))
 #  define SNV_GNUC_NORETURN						\
 	__attribute__((noreturn))
 #  define SNV_ASSERT_FCN  	 " (", __PRETTY_FUNCTION__, ")"
-#else /* !__GNUC__ */
+#else /* GCC_VERSION */
 #  define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) args
 #  define SNV_GNUC_NORETURN
 #  define SNV_ASSERT_FCN		"", "", ""
-#endif /* !__GNUC__ */
+#endif /* GCC_VERSION */
 
 #define SNV_ASSERT_FMT  "file %s: line %d%s%s%s: assertion \"%s\" failed.\n"
 

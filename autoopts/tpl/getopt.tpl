@@ -4,6 +4,8 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
+  Time-stamp:        "2012-12-29 12:30:22 bkorb"
+_EOF_
 \` `            +][+
 
 ;;  This file is part of AutoOpts, a companion to AutoGen.
