@@ -73,17 +73,17 @@ sub Handle_An
     #   .An "Joe Author" ) ) ,          Joe Author)),
 
     do {
-        if ($words[0] =~ /^"/)
-        {
-            print parseQuote(\@words);
-        }
-        else
-        {
-            print "$words[0]";
-        }
-        shift @words;
-    } while scalar(@words);
-    print "@*";
+        parseQuote(\@words) if ($words[0] =~ /^"/);
+        print shift @words;
+    } while (@words > 0 && $words[0] !~ /^[[:punct:]]$/);
+
+    while ($_ = shift @words)
+    {
+        print;
+    }
+
+    # Line break after each author
+    print "\@*\n";
 }
 
 sub Handle_Bl
@@ -525,8 +525,6 @@ sub Handle_Q
 
     my ($lq, $rq, $wc);
     $wc = 0;
-
-    # print STDERR "Handle_Q: <", join(' ', @words), ">\n";     # XXX
 
     s/^\.//;
 

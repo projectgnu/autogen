@@ -4,8 +4,6 @@
 
 ## agman-file.tpl -- Template for file man pages
 ##
-## Time-stamp:      "2011-11-18 07:48:17 bkorb"
-##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
 ##  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
@@ -26,9 +24,7 @@
 ##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
 ##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
 
-# Produce a man page for section 1, 5 or 8 commands.
-# Which is selected via:  -DMAN_SECTION=n
-# passed to the autogen invocation.  "n" may have a suffix, if desired.
+# Produce a man page for section 5 - configuration file formats.
 #
 :+][+:
 

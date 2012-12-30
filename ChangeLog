@@ -1,3 +1,19 @@
+2012-12-30  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/test/string.test: fix $LINENO use
+	* autoopts/tpl/agman-file.tpl: new template for documenting config
+	file formats with a man page.
+	* autoopts/tpl/agmdoc-file.tpl: new template for documenting config
+	file formats with an mdoc page.
+	* autoopts/tpl/agtexi-file.tpl: new template for documenting config
+	file formats for texinfo documentation.
+	* autoopts/tpl/cmd-doc.tlib: adjustments for section 5 paragraphs.
+	* configure.ac: -Wconversion -Wsign-conversion -Wstrict-overflow
+	do not work.
+	* snprintfv/compat.h: turn off severe warnings
+	* agen5/autogen.h: ignore severe warnings in Guile headers
+	* everywhere: a lot of casting to silence picky warnings
+
 2012-12-27  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/Makefile.am: use mk-stamps.sh in the rule, not bootstrap.dir

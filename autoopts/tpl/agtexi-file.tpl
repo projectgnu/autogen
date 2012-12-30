@@ -4,9 +4,6 @@ texi
 
 #  Documentation template
 #
-# Time-stamp:        "2012-08-11 08:33:08 bkorb"
-# Author:            Bruce Korb <bkorb@gnu.org>
-#
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
 #  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved

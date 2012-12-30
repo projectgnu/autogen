@@ -86,7 +86,8 @@ test -z "$LINENO" && LINENO=`
 printf '\nchar zTestFile[] = "%s";\n' \
     ${testname}.raw >&4
 
-echo "#line $(( $LINENO - 1 )) \"$(basename $0)\"" >&4
+test "X$LINENO" = X || \
+    echo "#line `expr $LINENO - 1` \"$(basename $0)\"" >&4
 cat >&4 <<'_EOF_'
 char zGened[]  = [=(c-string  (get "string"))=];
 char zKrGen[]  = [=(kr-string (get "string"))=];
@@ -240,8 +241,8 @@ cleanup
 ## Local Variables:
 ## mode: shell-script
 ## indent-tabs-mode: nil
-## sh-indentation: 2
-## sh-basic-offset: 2
+## sh-indentation: 4
+## sh-basic-offset: 4
 ## End:
 
 # end of string.test
