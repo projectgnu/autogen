@@ -48,6 +48,7 @@
 (define down-prog-name (string-downcase! (get "prog-name")))
 (define UP-PROG-NAME   (get-up-name "prog-name"))
 
+(define command-doc    #t)
 (define tmp-val        (getenv "MAN_SECTION"))
 (define man-sect       (if (exist? "cmd-section") (get "cmd-section") "1"))
 (define file-name      "")
@@ -99,11 +100,6 @@
 (define home-rc-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration files.")
 
-(if (=* man-sect "5") (begin
-    (set! home-rc-files #f)
-    (set! home-rc-text "")
-)   )
-
 (define environ-init  (exist? "environrc"))
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
@@ -139,6 +135,11 @@ INCLUDE "tpl-config.tlib"             :+][+:#
 
 DEFINE build-doc                      :+][+:
 
+(if (not command-doc) (begin
+    (set! home-rc-files #f)
+    (set! home-rc-text "")
+)   )                                 :+][+: DEBUG :+][+:
+
 INVOKE doc-sections                   :+][+:
 INVOKE ao-sections                    :+][+:
 
@@ -163,17 +164,11 @@ for f in implementation-notes environment files examples exit-status errors \
       compatibility see-also conforming-to history authors copyright bugs notes
 do cat_n_rm $f ; done > ${tmp_dir}/.fini
 
-#.\" Insert the contents of all remaining files in alphabetic order,
-#.\" except remove any blank lines.
-#
-set XX ${tmp_dir}/* ; shift
+set ${tmp_dir}/*
 test -f "$1" && cat $* | [+:(. egrep-prog):+] -v '^[ 	]*$'
 
-#.\" Now insert the sections we squirreled away for the end.
-#
 echo
-cat  ${tmp_dir}/.fini
-[+:
+cat  ${tmp_dir}/.fini[+:
 
 IF (exist? "doc-sub")   :+][+:
   (shell "{\n" (out-pop #t) "\n} > ${tmp_dir}/.raw-doc")
@@ -181,14 +176,19 @@ IF (exist? "doc-sub")   :+][+:
   :+][+:
 
   FOR doc-sub           :+][+:
-    (define field-name (get "sub-name"))
-    (define rep-string (string-append "<<" field-name ">>"))
-    (string-substitute (get "sub-expr") rep-string (get field-name))
-    :+][+:
+
+    IF (define field-name (get "sub-type" target-form))
+       (~~ target-form field-name)  :+][+:
+       (set! field-name (get "sub-name"))
+       (define rep-string (string-append "<<" field-name ">>"))
+       (string-substitute (get "sub-text") rep-string (get field-name))
+    :+][+:  ENDIF       :+][+:
+
   ENDFOR doc-sub        :+][+:
 
   (out-pop)
-  (shell "sed -f $tmp_dir/sed-cmd $tmp_dir/.raw-doc")
+  (define post-proc-cmd (get "doc-sub-cmd" "sed -f %s %s"))
+  (shellf post-proc-cmd "$tmp_dir/sed-cmd" "$tmp_dir/.raw-doc")
   :+][+:
 
 ELSE                    :+][+:
@@ -260,7 +260,7 @@ ENDDEF doc-sections
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
 DEFINE ao-sections              :+][+:
-  IF (not (=* man-sect "5"))    :+][+:
+  IF (. command-doc)            :+][+:
     INVOKE cond-section  sec = "OPTIONS"       mode = "replace"       :+][+:
     INVOKE cond-section  sec = "EXIT STATUS"   mode = "insert"        :+][+:
 
@@ -276,7 +276,7 @@ DEFINE ao-sections              :+][+:
       ENDIF                                                           :+][+:
     ENDIF                                                             :+][+:
 
-  ELSE  section 5 manual        :+][+:
+  ELSE  section 5, not command  :+][+:
     INVOKE cond-section sec = "FILES"          mode = "append"        :+][+:
   ENDIF  section 5/not          :+][+:
 
@@ -419,11 +419,11 @@ DEFINE mk-options
 (define optname-from  "A-Z_^")
 (define optname-to    "a-z--")
 (define cvt-cmd       "")
-(define formatted-doc (exist? "option-doc-format"))
+(define formatted-doc (exist? "option-format"))
 
 (if formatted-doc (begin
     (out-push-new)
-    (set! cvt-cmd (string-append (get "option-doc-format") "2mdoc"))
+    (set! cvt-cmd (string-append (get "option-format") "2mdoc"))
 )   )
 
 (if (exist? "preserve-case")

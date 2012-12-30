@@ -42,9 +42,10 @@ INCLUDE "cmd-doc.tlib"
 :+]
 .\"
 .SH NAME
-[+: prog-name :+] \- [+: prog-title :+]
+[+: prog-name :+] \- [+: prog-title :+] configuration file
 [+:
 
+(define command-doc #f)
 (out-push-new)            :+][+:
 
 INVOKE build-doc          :+][+:
