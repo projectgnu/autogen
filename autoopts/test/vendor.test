@@ -82,27 +82,23 @@ clean_help > ${testname}.hlp <<_EOF_
 USAGE:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
 The following options select definitions, templates and scheme functions
 to use:
-   -L str     Template search directory list
+   -L str     Search for templates in DIR
 				- may appear multiple times
-   -T str     Override template file
+   -T str     Use TPL-FILE for the template
 				- may not be preset
-   -l str     Library template file
-				- may appear multiple times
-   -S str     Scheme code file to load
-   -F str     Load scheme function library
    -m         Do not use in-mem streams
 The following options modify how output is handled:
-   -b str     Base name for output file(s)
+   -b str     Specify NAME as the base name for output
 				- may not be preset
 The following options are often useful while debugging new templates:
-   -t num     Time limit for server shell
+   -t num     Limit server shell operations to SECONDS
 				- It must be in the range:
 				  0 to 3600
        --- show-defs      This option has been disabled
    -C         Leave a core dump on a failure exit
 These options can be used to control what gets processed in the
 definitions files and template files:
-   -s str     Omit the file with this suffix
+   -s str     Skip the file with this SUFFIX
 				- prohibits these options:
 				select-suffix
 				- may not be preset
@@ -131,7 +127,7 @@ version, usage and configuration options:
 The next option supports vendor supported extra options:
    -W str     vendor supported additional options
 				These additional options are:
-      definitions=str  Definitions input file
+      definitions=str  Read definitions from FILE
 				- disabled as --no-definitions
 				- enabled by default
 				- may not be preset
@@ -167,7 +163,8 @@ ${testname} is a tool designed for generating program files that contain
 repetitive text with varied substitutions.
 _EOF_
 
-cmp -s ${testname}.h*lp || \
-  failure "`diff ${testname}.hlp ${testname}.help`"
+pair="${testname}.hlp ${testname}.help"
+cmp -s ${pair} || \
+  failure "vendor help mismatch$nl`diff $pair`"
 
 cleanup

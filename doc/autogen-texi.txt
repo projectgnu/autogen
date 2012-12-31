@@ -767,12 +767,6 @@ to autogen and exit from the "persistent" shell.
 
 Guile also maintains context from one command to the next.  This means you may
 define functions and variables in one place and reference them elsewhere.
-You also may load Guile macro definitions from a Scheme file by using the
-@option{--load-scheme} command line option (@pxref{autogen load-scheme}).
-Beware, however, that the AutoGen specific scheme functions have not been
-loaded at this time, so though you may define functions that reference them,
-do not invoke the AutoGen functions at this time.
-
 If your Scheme script should determine that AutoGen should stop
 processing, the recommended method for stopping AutoGen is:
 @example
@@ -851,9 +845,8 @@ beginning of the @file{agen5/snarf.tpl} template file.
 @section AutoGen Macros
 
 There are two kinds@:  those you define yourself and AutoGen native.
-The user-defined macros may be defined in your templates or loaded
-with the @option{--lib-template} option
-(See @ref{DEFINE} and  @ref{autogen lib-template}).
+The user-defined macros may be defined in your templates,
+@xref{DEFINE}.
 
 As for AutoGen native macros, do not add any. It is easy to do, but I
 won't like it.  The basic functions needed to accomplish looping over
@@ -889,9 +882,9 @@ Extraction from autogen.texi
 @cindex configuring
 
 AutoGen is configured and built using Libtool, Automake and Autoconf.
-Consequently, you can install it wherever you wish using the various
-@samp{--prefix} options.  To the various configuration options supplied
-by these tools, AutoGen adds a few of its own:
+Consequently, you can install it wherever you wish using the @samp{--prefix}
+and other options.  To the various configuration options supplied by these
+tools, AutoGen adds a few of its own:
 
 @table @samp
 @item --disable-shell
@@ -2543,9 +2536,7 @@ be dictated by your template.
 
 You must write a template to produce your main procedure.  That template
 must contain a definition for the function specified with the @code{func}
-attribute to this @code{main()} procedure specification.  Typically, this
-template will be incorporated by using the @option{--lib-template} option
-(@pxref{autogen lib-template}) in the AutoGen invocation.  Otherwise, this
+attribute to this @code{main()} procedure specification.  This
 variation operates in much the same way as @code{include}
 (@pxref{main include}) method.
 

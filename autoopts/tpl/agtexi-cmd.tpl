@@ -372,7 +372,7 @@ This option has some usage constraints.  It:
 ?% doc "\n%s" "\nThis option has no @samp{doc} documentation." =][=
   IF (exist? "deprecated") =]
 
-@strong{NOTE: THIS OPTION IS DEPRECATED}[=
+@strong{NOTE:} @emph{THIS OPTION IS DEPRECATED}[=
 
   ENDIF     =][=
 

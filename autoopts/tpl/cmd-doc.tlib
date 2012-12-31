@@ -138,7 +138,7 @@ DEFINE build-doc                      :+][+:
 (if (not command-doc) (begin
     (set! home-rc-files #f)
     (set! home-rc-text "")
-)   )                                 :+][+: DEBUG :+][+:
+)   )                                 :+][+:
 
 INVOKE doc-sections                   :+][+:
 INVOKE ao-sections                    :+][+:
