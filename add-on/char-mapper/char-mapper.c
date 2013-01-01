@@ -2,12 +2,10 @@
 /**
  * \file char-mapper.c
  *
- *  Time-stamp:        "2012-12-27 13:59:48 bkorb"
- *
  *  This is the main routine for char-mapper.
  *
  *  This file is part of char-mapper.
- *  char-mapper Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+ *  char-mapper Copyright (c) 2003-2013 by Bruce Korb - all rights reserved
  *
  * char-mapper is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

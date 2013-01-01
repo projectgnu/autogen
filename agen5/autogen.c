@@ -5,7 +5,7 @@
  *  This is the main routine for autogen.
  *
  *  This file is part of AutoGen.
- *  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
+ *  Copyright (c) 1992-2013 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

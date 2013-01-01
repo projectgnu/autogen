@@ -2,7 +2,7 @@
 ##
 ## Makefile.am -- process this file with automake to produce Makefile.in
 ##
-## Copyright (c)    1997-2012 by Bruce Korb
+## Copyright (c)    1997-2013 by Bruce Korb
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
 ## This file is part of AutoGen.

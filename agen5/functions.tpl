@@ -31,7 +31,7 @@
  *
  *  Tables of Text Functions for AutoGen
  *
- *  copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+ *  copyright (c) 1992-2013 by Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *

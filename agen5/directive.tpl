@@ -1,8 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
-##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+## AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -16,11 +15,10 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
 
 h =]
 [=
-
+  (use-modules (srfi srfi-19))
   (define ix 0)
   (define tmp-txt "")
   (define dir-tbl "")
@@ -30,7 +28,8 @@ h =]
   (string-append
      (dne " *  " "/*  ")
      "\n *"
-     "\n *  copyright (c) 1992-2012 by Bruce Korb - all rights reserved"
+     "\n *  copyright (c) 1992-" (date->string (current-date) "~Y")
+         " by Bruce Korb - all rights reserved"
      "\n *\n"
      (gpl "AutoGen" " *  ")
      "\n */\n"
@@ -40,7 +39,7 @@ h =]
 =]
 #ifdef DEFINING
 
-typedef char* (tDirProc)( char* pzArg, char* pzScan );
+typedef char * (tDirProc)(char* pzArg, char* pzScan);
 
 typedef struct dir_table tDirTable;
 struct dir_table {

@@ -2,11 +2,11 @@
 /*
  *  \file columns.c
  *
- *  Columns Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+ *  Columns Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
  *  Columns is free software.
  *  This file is part of AutoGen.
  *
- *  AutoGen copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+ *  AutoGen copyright (c) 1992-2013 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the

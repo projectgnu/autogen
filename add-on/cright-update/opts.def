@@ -2,7 +2,7 @@ AutoGen Definitions options; /* -*- Mode: conf -*- */
 
 /*
  *  update-copyright is copyrighted
- *  Copyright (c) 2001-2012 Bruce Korb
+ *  Copyright (c) 2001-2013 Bruce Korb
  *  All rights reserved.
  */
 argument        = "[ <file-name> ... ]";

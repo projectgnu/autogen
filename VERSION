@@ -5,7 +5,7 @@
 MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -23,7 +23,7 @@ MAINTAINER='Bruce Korb <bkorb@gnu.org>'
 AG_MAJOR_VERSION=5
 AG_MINOR_VERSION=17
 AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
-AG_PATCHLEVEL=".1pre9"
+AG_PATCHLEVEL=".1pre10"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
 # Making releases:

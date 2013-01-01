@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#  cright-update Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
+#  cright-update Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
 
 TMP=`mktemp -d ${TMPDIR:-/tmp}/test.XXXXXX`
 trap "rm -rf $TMP 2>/dev/null" EXIT
