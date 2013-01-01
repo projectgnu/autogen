@@ -8,11 +8,18 @@
 	* autoopts/tpl/agtexi-file.tpl: new template for documenting config
 	file formats for texinfo documentation.
 	* autoopts/tpl/cmd-doc.tlib: adjustments for section 5 paragraphs.
+	* autoopts/tpl/agtexi-cmd.tpl: use the new doc-sub stuff.
 	* configure.ac: -Wconversion -Wsign-conversion -Wstrict-overflow
 	do not work.
 	* snprintfv/compat.h: turn off severe warnings
 	* agen5/autogen.h: ignore severe warnings in Guile headers
 	* everywhere: a lot of casting to silence picky warnings
+	* agen5/defLoad.c (insert_ent): print the address of the def entry
+	structure in the debug log.
+	* agen5/test/debug.test: adjust
+	* agen5/opts.def (doc-sub): use this feature to verify it works
+	* autoopts/tpl/mdoc2texi.pl: update from Harlan
+	* doc/autogen-texi.txt: describe the new stuff
 
 2012-12-27  Bruce Korb  <bkorb@gnu.org>
 

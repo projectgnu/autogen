@@ -886,7 +886,7 @@ string = { nm = PREP_INVOKE_NO_SEP;
    str = "The INVOKE macro name not space separated"; };
 
 string = { nm = PRINT_DEF_SHOW_FMT;
-   str = "%s%s[%u] (%s) from %s/%d\n"; };
+   str = "%s%s[%u] (%s) from %s/%d at %p\n"; };
 
 string = { nm = PRINT_DEF_SPACES;
   str =  "                                "; }; // 32 spaces

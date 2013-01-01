@@ -102,7 +102,11 @@ export = <<- _EOExport_
 	extern char const * tpl_fname;
 	extern bool      trace_is_to_pipe;
 	_EOExport_;
-#endif /* XML2AG */
+
+doc-sub = {
+    sub-name  = prog-name;
+    sub-text  = 's/#PROG#/@command{<<prog-name>>}/g';
+};
 
 exit-name[1]  = option-error;
 exit-desc[1]  = 'The command options were misconfigured.';
@@ -114,22 +118,21 @@ exit-name[4]  = load-error;
 exit-desc[4]  = 'An error was encountered during the load phase.';
 exit-name[5]  = signal;
 exit-desc[5]  = <<- _EndDesc_
-	Program exited due to catching a signal.  If your template includes
+	#PROG# exited due to catching a signal.  If your template includes
 	string formatting, a number argument to a "%s" formatting element will
 	trigger a segmentation fault.  Autogen will catch the seg fault signal
 	and exit with @code{AUTOGEN_EXIT_SIGNAL(5)}.  Alternatively, AutoGen
 	may have been interrupted with a @code{kill(2)} signal.
 	_EndDesc_;
 
-#ifndef XML2AG
 flag = {
     name        = input-select;
     documentation;
 
-    descrip =
-'The following options select definitions, templates and '
-'scheme functions to use';
+    descrip = 'The following options select definitions, templates and '
+              'scheme functions to use';
 };
+
 #endif
 
 flag = {
@@ -145,10 +148,10 @@ flag = {
 #ifndef XML2AG
     settable;
     doc = <<-  _EOF_
-	Add a directory to the list of directories to search when opening
-	a template, either as the primary template or an included one.
-	The last entry has the highest priority in the search list.
-	That is to say, they are searched in reverse order.
+	Add a directory to the list of directories #PROG# searches when
+	opening a template, either as the primary template or an included one.
+	The last entry has the highest priority in the search list.  That is
+	to say, they are searched in reverse order.
 	_EOF_;
 #else
     doc = "Pass-through AutoGen argument";

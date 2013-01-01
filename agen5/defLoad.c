@@ -38,8 +38,8 @@ static void*      pAllocList     = NULL;
     ((ENTRY_ALLOC_CT * sizeof(def_ent_t)) + sizeof(void*))
 
 /* = = = START-STATIC-FORWARD = = = */
-static def_ent_t*
-insert_ent(def_ent_t* pDef);
+static def_ent_t *
+insert_ent(def_ent_t * de);
 
 static def_input_mode_t
 ready_def_input(char const ** ppzfile, size_t * psz);
@@ -88,18 +88,19 @@ new_def_ent(void)
     return pRes;
 }
 
-/*
- *  Append a new entry at the end of a sibling (or twin) list.
+/**
+ * Append a new entry at the end of a sibling (or twin) list.
+ * @param de  new definition
  */
 LOCAL void
-print_ent(def_ent_t * pDef)
+print_ent(def_ent_t * de)
 {
     int ix = 32 - (2 * ent_stack_depth);
     char const * space = PRINT_DEF_SPACES + ((ix < 0) ? 0 : ix);
 
     char const * vtyp;
 
-    switch (pDef->de_type) {
+    switch (de->de_type) {
     case VALTYP_UNKNOWN: vtyp = DEF_TYPE_UNKNOWN; break;
     case VALTYP_TEXT:    vtyp = DEF_TYPE_TEXT;    break;
     case VALTYP_BLOCK:   vtyp = DEF_TYPE_BLOCK;   break;
@@ -108,132 +109,132 @@ print_ent(def_ent_t * pDef)
 
     fprintf(trace_fp, PRINT_DEF_SHOW_FMT,
             space,
-            pDef->de_name, (unsigned int)pDef->de_index,
+            de->de_name, (unsigned int)de->de_index,
             vtyp,
-            pDef->de_file, pDef->de_line);
+            de->de_file, de->de_line, de);
 }
 
 /**
  *  Append a new entry into a sibling (or twin) list.
  *
- * @param pDef new definition
+ * @param[in]  de new definition
  * @returns usually, the input, but sometimes it is necessary to move
  *  the data, so returns the address of the incoming data regardless.
  */
-static def_ent_t*
-insert_ent(def_ent_t* pDef)
+static def_ent_t *
+insert_ent(def_ent_t * de)
 {
-    def_ent_t* pList = ent_stack[ ent_stack_depth ];
+    def_ent_t * de_list = ent_stack[ ent_stack_depth ];
 
     /*
      *  If the current level is empty, then just insert this one and quit.
      */
-    if (pList->de_val.dvu_entry == NULL) {
-        if (pDef->de_index == NO_INDEX)
-            pDef->de_index = 0;
-        pList->de_val.dvu_entry = pDef;
+    if (de_list->de_val.dvu_entry == NULL) {
+        if (de->de_index == NO_INDEX)
+            de->de_index = 0;
+        de_list->de_val.dvu_entry = de;
 
-        return pDef;
+        return de;
     }
-    pList = pList->de_val.dvu_entry;
+    de_list = de_list->de_val.dvu_entry;
 
     /*
      *  Scan the list looking for a "twin" (same-named entry).
      */
-    while (strcmp(pDef->de_name, pList->de_name) != 0) {
+    while (strcmp(de->de_name, de_list->de_name) != 0) {
         /*
          *  IF we are at the end of the list,
          *  THEN put the new entry at the end of the list.
          *       This is a new name in the current context.
          *       The value type is forced to be the same type.
          */
-        if (pList->de_next == NULL) {
-            pList->de_next = pDef;
+        if (de_list->de_next == NULL) {
+            de_list->de_next = de;
 
-            if (pDef->de_index == NO_INDEX)
-                pDef->de_index = 0;
+            if (de->de_index == NO_INDEX)
+                de->de_index = 0;
 
-            return pDef;
+            return de;
         }
 
         /*
          *  Check the next sibling for a twin value.
          */
-        pList = pList->de_next;
+        de_list = de_list->de_next;
     }
 
     /*  * * * * *  WE HAVE FOUND A TWIN
      *
      *  Link in the new twin chain entry into the list.
      */
-    if (pDef->de_index == NO_INDEX) {
-        def_ent_t* pT = pList->de_etwin;
+    if (de->de_index == NO_INDEX) {
+        def_ent_t* pT = de_list->de_etwin;
         if (pT == NULL)
-            pT = pList;
+            pT = de_list;
 
-        pDef->de_index  = pT->de_index + 1;
-        pT->de_twin     = pDef;
-        pDef->de_ptwin  = pT;
-        pList->de_etwin = pDef;
+        de->de_index = pT->de_index + 1;
+        pT->de_twin  = de;
+        de->de_ptwin = pT;
+        de_list->de_etwin = de;
 
-    } else if (pList->de_index > pDef->de_index) {
-
-        /*
-         *  Insert the new entry before any other in the list.
-         *  We actually do this by leaving the pList pointer alone and swapping
-         *  the contents of the definition entry.
-         */
-        def_ent_t def = *pDef;
-
-        memcpy(&(pDef->de_name), &(pList->de_name),
-               sizeof(def) - ag_offsetof(def_ent_t, de_name));
-
-        memcpy(&(pList->de_name), &(def.de_name),
-               sizeof(def) - ag_offsetof(def_ent_t, de_name));
+    } else if (de_list->de_index > de->de_index) {
 
         /*
-         * Contents are swapped.  Link "pDef" after "pList" and return "pList".
+         *  Insert the new entry before any other in the list.  We
+         *  actually do this by leaving the de_list pointer alone and
+         *  swapping the contents of the definition entry.
          */
-        pDef->de_twin = pList->de_twin;
-        if (pDef->de_twin != NULL)
-            pDef->de_twin->de_ptwin = pDef;
+        def_ent_t def = *de;
 
-        pDef->de_ptwin = pList;
-        pList->de_twin  = pDef;
+        memcpy(&(de->de_name), &(de_list->de_name),
+               sizeof(def) - ag_offsetof(def_ent_t, de_name));
+
+        memcpy(&(de_list->de_name), &(def.de_name),
+               sizeof(def) - ag_offsetof(def_ent_t, de_name));
+
+        /*
+         * Contents are swapped.  Link "de" after "de_list" and return "de_list".
+         */
+        de->de_twin = de_list->de_twin;
+        if (de->de_twin != NULL)
+            de->de_twin->de_ptwin = de;
+
+        de->de_ptwin = de_list;
+        de_list->de_twin  = de;
 
         /*
          *  IF this is the first twin, then the original list head is now
          *  the "end twin".
          */
-        if (pList->de_etwin == NULL)
-            pList->de_etwin = pDef;
+        if (de_list->de_etwin == NULL)
+            de_list->de_etwin = de;
 
-        pDef = pList;  /* Return the replacement structure address */
+        de = de_list;  /* Return the replacement structure address */
 
     } else {
-        def_ent_t* pL = pList;
-        def_ent_t* pT = pL->de_twin;
+        def_ent_t * scn = de_list;
+        def_ent_t * twn = scn->de_twin;
 
         /*
          *  Insert someplace after the first entry.  Scan the list until
          *  we either find a larger index or we get to the end.
          */
-        while ((pT != NULL) && (pT->de_index < pDef->de_index)) {
-            pL = pT;
-            pT = pT->de_twin;
+        while ((twn != NULL) && (twn->de_index < de->de_index)) {
+            scn = twn;
+            twn = twn->de_twin;
         }
 
-        pDef->de_twin = pT;
+        de->de_twin = twn;
 
-        pL->de_twin = pDef;
-        pDef->de_ptwin = pL;
-        if (pT == NULL)
-            pList->de_etwin = pDef;
+        scn->de_twin = de;
+        de->de_ptwin = scn;
+        if (twn == NULL)
+            de_list->de_etwin = de;
         else
-            pT->de_ptwin = pDef;
+            twn->de_ptwin = de;
     }
 
-    return pDef; /* sometimes will change */
+    return de; /* sometimes will change */
 }
 
 /**
