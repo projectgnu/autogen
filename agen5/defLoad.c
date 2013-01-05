@@ -219,13 +219,18 @@ insert_ent(def_ent_t * de)
          *  Insert someplace after the first entry.  Scan the list until
          *  we either find a larger index or we get to the end.
          */
-        while ((twn != NULL) && (twn->de_index < de->de_index)) {
+        while (twn != NULL) {
+            if (twn->de_index >= de->de_index) {
+                if (twn->de_index == de->de_index)
+                    AG_ABEND(aprf(DUP_VALUE_INDEX, de->de_name, de->de_index));
+                break;
+            }
+
             scn = twn;
             twn = twn->de_twin;
         }
 
-        de->de_twin = twn;
-
+        de->de_twin  = twn;
         scn->de_twin = de;
         de->de_ptwin = scn;
         if (twn == NULL)

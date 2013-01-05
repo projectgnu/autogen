@@ -318,24 +318,24 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
      *       entries of the twin set.
      */
     {
-        def_ent_t* pLast = (found->de_etwin != NULL)
-                           ? found->de_etwin : found;
+        def_ent_t * lde = (found->de_etwin != NULL)
+                          ? found->de_etwin : found;
 
         if (for_state->for_from == UNASSIGNED)
             for_state->for_from = (invert)
-                ? (int)pLast->de_index : (int)found->de_index;
+                ? (int)lde->de_index : (int)found->de_index;
 
         if (for_state->for_to == UNASSIGNED)
             for_state->for_to = (invert)
-                ? (int)found->de_index : (int)pLast->de_index;
+                ? (int)found->de_index : (int)lde->de_index;
 
         /*
          *  "loopLimit" is intended to catch runaway ending conditions.
          *  However, if you really have a gazillion entries, who am I
          *  to stop you?
          */
-        if (loopLimit <  pLast->de_index - found->de_index)
-            loopLimit = (pLast->de_index - found->de_index) + 1;
+        if (loopLimit <  lde->de_index - found->de_index)
+            loopLimit = (lde->de_index - found->de_index) + 1;
     }
 
     /*
@@ -414,6 +414,13 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
             ? ((next_ix < for_state->for_to) ? true : false)
             : ((next_ix > for_state->for_to) ? true : false);
 
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
+            fprintf(trace_fp, FOR_ITERATION_FMT, "by-step",
+                    for_state->for_name,
+                    for_state->for_index, loopCt, next_ix,
+                    for_state->for_isfirst ? "yes" : "no",
+                    for_state->for_islast  ? "yes" : "no");
+
         switch (call_gen_block(for_state->for_env, pT, pMac+1, end_mac)) {
         case LOOP_JMP_OKAY:
         case LOOP_JMP_NEXT:
@@ -484,6 +491,16 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
         if (def_ent == NULL)
             for_state->for_islast = true;
 
+        if (OPT_VALUE_TRACE == TRACE_EVERYTHING) {
+            int next = (def_ent == NULL)
+                ? (for_state->for_index + 1) : def_ent->de_index;
+            fprintf(trace_fp, FOR_ITERATION_FMT, "each",
+                    for_state->for_name,
+                    for_state->for_index, loopCt, next,
+                    for_state->for_isfirst ? "yes" : "no",
+                    for_state->for_islast  ? "yes" : "no");
+        }
+
         switch (call_gen_block(for_state->for_env, tpl, mac, end_mac)) {
         case LOOP_JMP_OKAY:
         case LOOP_JMP_NEXT:
@@ -504,7 +521,9 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
         /*
          *  Emit the iteration separation
          */
-        fputs(for_state->for_sep_str, cur_fpstack->stk_fp);
+        if (  ( for_state->for_sep_str != NULL)
+           && (*for_state->for_sep_str != NUL))
+            fputs(for_state->for_sep_str, cur_fpstack->stk_fp);
         fflush(cur_fpstack->stk_fp);
     } leave_loop:;
 
@@ -762,18 +781,17 @@ mFunc_For(templ_t * tpl, macro_t * mac)
         lp_ct = for_each(tpl, mac, def);
     }
 
-    if (for_state->for_sep_str != NULL)
-        AGFREE(for_state->for_sep_str);
-
-    free_for_context(false);
-
     if (OPT_VALUE_TRACE >= TRACE_BLOCK_MACROS) {
-        fprintf(trace_fp, TRACE_FN_FOR_REPEAT, tpl->td_text + mac->md_name_off,
-                lp_ct);
+        fprintf(trace_fp, TRACE_FN_FOR_REPEAT, for_state->for_name, lp_ct);
 
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
             fprintf(trace_fp, TAB_FILE_LINE_FMT, tpl->td_file, mac->md_line);
     }
+
+    if (for_state->for_sep_str != NULL)
+        AGFREE(for_state->for_sep_str);
+
+    free_for_context(false);
 
     return ret_mac;
 }

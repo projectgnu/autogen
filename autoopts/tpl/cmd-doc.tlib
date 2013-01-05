@@ -645,7 +645,7 @@ FOR exit-desc (for-from 2)            :+][+:
   (sprintf ".It %d \" (EXIT_%s)\"\n%s\n"
     (for-index)
     (string-upcase (string->c-name! tmp-str))
-    (get "exit-desc" ""))         :+][+:
+    (get "exit-desc" ""))             :+][+:
 ENDFOR exit-desc                      :+][+:
 (if need-ex-noinput
     (emit ".It 66 \" (EX_NOINPUT)\"
@@ -657,7 +657,7 @@ libopts had an internal operational error.  Please report
 it to autogen-users@lists.sourceforge.net.  Thank you.\n"))
 
 (if (> (string-length fname-line) 1)
-    (emit fname-line)) :+]
+    (emit fname-line))                :+]
 .El
 [+:
 

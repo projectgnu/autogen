@@ -1,6 +1,20 @@
-2013-01-03  Bruce Korb  <bkorb@gnu.org>
+2013-01-05  Bruce Korb  <bkorb@gnu.org>
+
+	5.17.1 release
 
 	* autoopts/tpl/mdoc2texi.pl: update from Harlan
+	* autoopts/tpl/agtexi-file.tpl: likewise
+	* agen5/defLoad.c (insert_ent): error out on duplicate entry indexes
+	* agen5/funcFor.c (for_by_step): trace each "FOR" iteration
+	(for_each): likewise, also emit separation string IFF there is one
+	(mFunc_For): put the index variable from "for_state" in the
+	trace entry.
+	* agen5/test/debug.test: adjust sample output
+	* autoopts/tpl/optmain.tlib: prefer sysconf(_SC_PAGESIZE) to
+	getpagesize().
+	* agen5/fsm.tpl: capture copyright years from header
+	* agen5/fsm-macro.tlib: insert copyright years into output
+	* EVERYWHERE: s/2012/2013/
 
 2012-12-30  Bruce Korb  <bkorb@gnu.org>
 
@@ -30,7 +44,6 @@
 	* agen5/test/string.test: fix $LINENO use
 	* doc/autogen-texi.txt: describe the new stuff
 	* autoopts/options_h.tpl: Insert a $AO_VERSION.$AO_REVISION string
-	* EVERYWHERE: s/2012/2013/
 
 2012-12-27  Bruce Korb  <bkorb@gnu.org>
 

@@ -394,7 +394,7 @@ open_output(out_spec_t * spec)
         if (end != NULL) {
             size_t len = (unsigned)(end - pst);
             if (len >= sizeof(z))
-                AG_ABEND("--base-name name is too long");
+                AG_ABEND(BASE_NAME_TOO_LONG);
 
             memcpy(z, pst, len);
             z[ end - pst ] = NUL;

@@ -67,6 +67,7 @@ Text       (15) in debug.tpl at line 2
   The last of each list:
 FOR        ( F) in debug.tpl at line 3
 FOR list loop in debug.tpl on line 3 begins:
+  -  FOR-each list[0] it#0: Nxt 3, first=yes, last=no
 DEBUG      ( 5) in debug.tpl at line 3
   slot 64
   --  DEBUG slot 64 -- FOR index 0
@@ -80,6 +81,7 @@ Text       (15) in debug.tpl at line 4
 FOR        ( F) in debug.tpl at line 7
   , 
 FOR val loop in debug.tpl on line 7 begins:
+  -  FOR-each val[0] it#0: Nxt 1, first=yes, last=no
 DEBUG      ( 5) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 0
@@ -94,6 +96,7 @@ Text       (15) in debug.tpl at line 7
 Unknown    (16) in debug.tpl at line 7
 remapped to 'Expr' (16) in debug.tpl at line 7
 	based on val
+  -  FOR-each val[1] it#1: Nxt 2, first=no, last=yes
 DEBUG      ( 5) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 1
@@ -108,6 +111,7 @@ Text       (15) in debug.tpl at line 7
 EXPR       ( E) in debug.tpl at line 7
 FOR val repeated 2 times
 	from debug.tpl line 7
+  -  FOR-each list[3] it#1: Nxt 4, first=no, last=yes
 DEBUG      ( 5) in debug.tpl at line 3
   slot 64
   --  DEBUG slot 64 -- FOR index 3
@@ -119,6 +123,7 @@ Text       (15) in debug.tpl at line 4
 FOR        ( F) in debug.tpl at line 7
   , 
 FOR val loop in debug.tpl on line 7 begins:
+  -  FOR-each val[0] it#0: Nxt 1, first=yes, last=yes
 DEBUG      ( 5) in debug.tpl at line 7
   bucket 128
   --  DEBUG bucket 128 -- FOR index 0

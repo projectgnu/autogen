@@ -1,9 +1,14 @@
 [= AutoGen5 Template  -*- Mode: text -*-
 
 h=%s-fsm.h  c=%s-fsm.c
+=]
+[= (define cright-years
 
+   "Copyright (C) 1992-2013 Bruce Korb - all rights reserved"
+
+   ) =][= #
+/*
 ## This file is part of AutoGen.
-## Copyright (C) 1992-2013 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -19,9 +24,6 @@ h=%s-fsm.h  c=%s-fsm.c
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ## NB:  THIS FILE IS GPL.  THE OUTPUT OF THIS FILE IS LICENSED MBSD.
-
-=][= #
-/*
 
 DESCRIPTION:
 Produce Finite State Machine Code

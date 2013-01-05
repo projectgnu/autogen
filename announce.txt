@@ -83,6 +83,4 @@ cat > ${tfile} <<- _EOF_
 
 recip=bruce.korb@gmail.com
 
-echo "sendmail ${recip} < ${tfile}"
-
-echo rm -f ${tfile}
+echo "sendmail ${recip} < ${tfile}"$'\nrm -f '${tfile}

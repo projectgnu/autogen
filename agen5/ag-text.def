@@ -65,6 +65,9 @@ string = { nm = BAD_NAME_FMT;
 string = { nm = BAD_RE_FMT;
    str = "Invalid regular expression:  error %d (%s):\n%s"; };
 
+string = { nm = BASE_NAME_TOO_LONG;
+   str = "--base-name name is too long"; };
+
 string = { nm = BOGUS_TAG;
    str = "** BOGUS **"; };
 
@@ -281,6 +284,9 @@ string = { nm = DO_SUFFIX_BAD_CHARS;
 string = { nm = DO_SUFFIX_EMPTY;
    str = "Empty suffix format"; };
 
+string = { nm = DUP_VALUE_INDEX;
+   str = "Duplicate value index for %s:  %d"; };
+
 string = { nm = EMIT_INVAL_PORT;
    str = "invalid emission port: %d"; };
 
@@ -435,6 +441,9 @@ string = { nm = FORK_FAILED;
 
 string = { nm = FOR_IN_LISTLESS;
    str = "FOR x IN ... has no list"; };
+
+string = { nm = FOR_ITERATION_FMT;
+   str = "  -  FOR-%s %s[%d] it#%d: Nxt %d, first=%s, last=%s\n"; };
 
 string = { nm = GUARD_SFX;
    str = "_GUARD"; };

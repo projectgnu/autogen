@@ -271,6 +271,8 @@ ENDIF  =]
  *
  *  Automated Finite State Machine
  *
+ *  [=(. cright-years)=]
+ *
 [=(license-description "mbsd" "AutoFSM" " * " "Bruce Korb")=]
  */[=
 

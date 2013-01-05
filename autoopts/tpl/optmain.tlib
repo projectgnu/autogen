@@ -427,8 +427,8 @@ main(int argc, char ** argv)
      *  Input list from a pipe or file or some such
      */
     else {
-        size_t pg_size = getpagesize();
-        char * buf     = malloc(pg_size);
+        long pg_size = sysconf(_SC_PAGESIZE);
+        char * buf   = malloc((size_t)pg_size);
         if (buf == NULL) {
             fputs(_("[=(. prog-name)
                    =] ERROR: no memory for input list\n"), stderr);

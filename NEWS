@@ -1,5 +1,16 @@
 New in __CURRENT_VERSION__ December 2013
 
+* Added a documentation substitution stanza so that texi, man
+  and mdoc documents may be massaged before being finalized.
+
+* Many, many picky warning fixes
+
+* Section 5 man pages and mdoc pages can now be emitted
+  with the templates.  They still need work, though.
+
+* The enumeration and bitmask management templates are now rigged
+  so they work in the build tree without autogen being installed.
+
 New in 5.17 - December 2012
 
 * Bit Map and Enumeration templates are now fully integrated.
