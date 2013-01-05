@@ -6,7 +6,7 @@
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -102,7 +102,7 @@ run_ag als -T agmdoc-cmd.tpl ${testname}.def
 test -f test_${testname}.1 || failure "no man page output"
 mv test_${testname}.1 ${testname}.1
 lnct=`
-    ${EGREP} '^This is an alias for the (option|second) option[,.]$' \
+    ${EGREP} '^This is an alias for the .*(option|second).* option' \
         ${testname}.texi ${testname}.1 | \
         wc -l`
 test $lnct -eq 4 || \

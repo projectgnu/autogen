@@ -1,7 +1,7 @@
 [= AutoGen5 template -*- Mode: C -*-
 
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+## AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -28,7 +28,7 @@ h =]
   (string-append
      (dne " *  " "/*  ")
      "\n *"
-     "\n *  copyright (c) 1992-" (date->string (current-date) "~Y")
+     "\n *  Copyright (C) 1992-" (date->string (current-date) "~Y")
          " by Bruce Korb - all rights reserved"
      "\n *\n"
      (gpl "AutoGen" " *  ")

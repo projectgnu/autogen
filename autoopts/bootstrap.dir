@@ -1,7 +1,7 @@
 #! /bin/echo This_file_must_be_sourced,_not_executed
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -164,6 +164,7 @@ make_funcs_def()
 	vers-min        = "${vers_min}";
 	vers-min-str    = "$(expr $AO_CURRENT - $AO_AGE):0:0";
 	vers-sovers     = "${AO_SOVERS}";
+	display-ver     = "${AO_CURRENT}.${AO_REVISION}";
 	library         = opts;
 
 	/*

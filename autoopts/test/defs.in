@@ -7,7 +7,7 @@
 #
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -151,8 +151,9 @@ init_tests()
   LIB="${lo_lib} ${LIB}"
 
   AG_L=run_ag\ ao
-  agl_opts="-L${top_builddir}/autoopts/tpl -L${top_srcdir}/autoopts/tpl"
-
+  agl_opts="-L${top_builddir}/autoopts/tpl"
+  test "L${top_builddir}" = "L${top_srcdir}" || \
+    agl_opts="$agl_opts -L${top_srcdir}/autoopts/tpl"
   export TMPDIR PATH LD_LIBRARY_PATH \
          GUILE_WARN_DEPRECATED LIB AG_L agl_opts \
          CC LIBGUILE AG_VERSION

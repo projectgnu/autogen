@@ -2,18 +2,22 @@
 
 use strict;
 
-my ($literal);
 my ($line);
-my ($blCf,$blEl,@blEl,$blIt,@blIt,$count,$tableitemcount);
+my ($bdEd,$blCf,$blEl,@blEl,$blIt,@blIt);
 my ($progName);
-my (@words, $retval,$columnline);
-my ($extArg);
+my (@words,$wc);
+my ($extArg,$ns,$sm,$wantspace);
+my ($noNl);
+my ($ref,$refCount);
 my (%anchor, $aCount);
 
 $aCount = 0;
-$optlist = 0;       ### 1 = bullet, 2 = enum, 3 = tag, 4 = item/column
-$oldoptlist = 0;
-$extArg = 0;
+$noNl = 0;
+$ns = 0;                # .Ns (no spaces from here to first parameter)
+$sm = 1;                # Spacing mode
+$extArg = 0;            # Extended Arguments - disable NLs.
+$ref = 0;
+$refCount = 0;
 
 ###
 #
@@ -29,20 +33,29 @@ $extArg = 0;
 
 while ($line = <STDIN>)
 {
-    if ($line !~ /^\./)
+    chomp $line;
+
+    $wc = 0;
+
+    if ($line =~ /^\./)
+    {
+        $line =~ s/^\.//;
+        @words = split(/\s+/, $line);
+        parseMacro();
+    }
+    else
     {
         print $line;
-        print "\@*\n"
-            if ($literal);              # $literal is never 'true'...
-        next;
     }
 
-    next
-        if ($line =~ /^\.\\"/);         # comment
-
-    $line = ParseMacro($line);
-    print($line)
-        if (defined $line);
+    if ($noNl)
+    {
+        $noNl = 0;
+    }
+    elsif (!$extArg)
+    {
+        print "\n";
+    }
 }
 
 sub Anchor ($)
@@ -73,16 +86,67 @@ sub Handle_An
 
     do {
         parseQuote(\@words) if ($words[0] =~ /^"/);
-        print shift @words;
+        print shift @words;             # XXX: Spaces?
     } while scalar(@words);
 
+    # Anything else should be punctuation.
     while ($_ = shift @words)
     {
         print;
     }
 
-    # Line break after each author
-    print "\@*\n";
+    print "\@*";
+}
+
+sub Handle_Bd
+{
+    # Must end with a .Ed.
+    # Bd {-literal | -filled | -unfilled | -ragged | -centered} 
+    # UNSUPPORTED:  [-offset <string>] [-file <file name>] [-compact]
+
+    my ($bd);
+
+    if ($words[0] eq '-literal')        # Literal font display.
+    {
+        $bd = "\@verbatim";
+        $bdEd = "\@end verbatim";
+    }
+    elsif ($words[0] eq '-filled')      # Filled display (R/L justified)
+    {
+        die "Handle_Bd: -filled not supported.\n";
+        $bd = "\@table \@asis";
+        $bdEd = "\@end table";
+    }
+    elsif ($words[0] eq '-unfilled')    # Display as typed.
+    {
+        die "Handle_Bd: -unfilled not supported.\n";
+        $bd = "\@table \@asis";
+        $bdEd = "\@end table";
+    }
+    elsif ($words[0] eq '-ragged')      # Left-justified only.
+    {
+        die "Handle_Bd: -ragged not supported.\n";
+        $bd = "\@table \@asis";
+        $bdEd = "\@end table";
+    }
+    elsif ($words[0] eq '-centered')    # Center each line.
+    {
+        die "Handle_Bd: -centered not supported.\n";
+        $bd = "\@table \@asis";
+        $bdEd = "\@end table";
+    }
+    else
+    {
+        die "Handle_Bd: Unknown list type <$words[0]>\n";
+    }
+
+    shift @words;
+
+    while ($_ = shift @words)
+    {
+        die "Handle_Bd: unexpected argument: <$_>\n";
+    }
+    print $bd;
 }
 
 sub Handle_Bl
@@ -111,138 +175,136 @@ sub Handle_Bl
     $inMulti = 0;
     if ($words[0] eq '-hang')           # hanging tags
     {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
+        print "\@table \@asis";
+        $blEl = "\@end table";
     }
     elsif ($words[0] eq '-ohang')       # tag on its own line, no indent
-        {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
-        }
+    {
+        print "\@table \@asis";
+        $blEl = "\@end table";
+    }
     elsif ($words[0] eq '-tag')         # like hang.
-        {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
-        }
+    {
+        print "\@table \@asis";
+        $blEl = "\@end table";
+    }
     elsif ($words[0] eq '-diag')        # man (4) diagnostic list - inset
     {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
+        print "\@table \@asis";
+        $blEl = "\@end table";
     }
     elsif ($words[0] eq '-inset')       # inset list - See the mdoc page.
     {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
+        print "\@table \@asis";
+        $blEl = "\@end table";
     }
     elsif ($words[0] eq '-column')      # Multiple columns
-        {
-        print "\@multitable \n";
-        $blEl = "\@end multitable\n";
+    {
+        print "\@multitable\n";         # XXX Set $wc to 0?
+        $blEl = "\@end multitable";
         $blCf = "\@columnfractions";
         $inMulti = 1;
-        }
+    }
     elsif ($words[0] eq '-item')        # Item with no list markers
-        {
-        print "\@table \@asis\n";
-        $blEl = "\@end table\n";
-        }
+    {
+        print "\@table \@asis";
+        $blEl = "\@end table";
+    }
     elsif ($words[0] eq '-enum')        # Enumerated (numbered) list
     {
-        print "\@itemize \@enumerate\n";
-        $blEl = "\@end enumerate\n";
+        print "\@itemize \@enumerate";
+        $blEl = "\@end enumerate";
     }
     elsif ($words[0] eq '-bullet')      # Bullet list
     {
-        print "\@itemize \@bullet\n";
-        $blEl = "\@end itemize\n";
+        print "\@itemize \@bullet";
+        $blEl = "\@end itemize";
     }
     elsif ($words[0] eq '-hyphen')      # dash/hyphen list
     {
         # What would be better?  Maybe a 2 column table...
-        print "\@itemize \@bullet\n";
-        $blEl = "\@end itemize\n";
+        print "\@itemize \@bullet";
+        $blEl = "\@end itemize";
         $blIt = "-";                    # @minus ?
     }
     elsif ($words[0] eq '-dash')        # dash/hyphen list
-        {
+    {
         # What would be better?  Maybe a 2 column table...
-        print "\@itemize \@bullet\n";
-        $blEl = "\@end itemize\n";
+        print "\@itemize \@bullet";
+        $blEl = "\@end itemize";
         $blIt = "-";                    # @minus ?
     }
     else
-            {
+    {
         die "Handle_Bl: Unknown list type <$words[0]>\n";
     }
 
     shift @words;
 
     while ($_ = shift @words)
-                {
+    {
         if (/^-width$/)
         {
             # Maybe some day we will do something with the value...
             parseQuote(\@words) if ($words[0] =~ /^"/);
             shift @words;
-                }
+        }
         elsif (/^-offset$/)
-                {
+        {
             # Maybe some day we will do something with the value...
             shift @words;
         }
         elsif (/^-compact$/)
         {
             # No argument expected
-                }
+        }
         elsif ($inMulti)                        # -column width
         {
             # Maybe some day we will do something with the value...
             $blCf .= " .2";
-            }
+        }
         else
         {
             die "Handle_Bl: unexpected argument: <$_>\n";
         }
     }
 
-    print $blCf,"\n" if ($blCf ne "");
-    $blCf = "";
+    if ($blCf ne "")
+    {
+        print $blCf;            # The \n below used to be here...
+        $blCf = "";
+    }
+
+    print "\n";
+    $wc = 0;
+}
+
+sub Handle_Comment
+{
+    while ($_ = shift @words)
+    {
+    }
+
+    $noNl = 1;                                  # No newline needed.
 }
 
 sub Handle_It
 {
     # .It Li "sntp ntpserver.somewhere"
 
-    print "\@item ";
+    print "\@item";
     if ($blIt ne "")
     {
-        print $blIt;
+        print " $blIt";
         # Assert @words is empty?
     }
     else
     {
-        while ($_ = shift @words)
+        do
         {
-            # print STDERR "Handle_It: looking at <$_>\n";     # XXX
-            if (/^Op$/)
-            {
-                Handle_Op();
-            }
-            elsif (/^(Ar|Cm|Fl|Ic|Li)$/)
-            {
-                Handle_ArCmFlIcLi();
-            }
-            elsif (/^Ta$/)  # separate columns
-            {
-                print "\n\@tab\n";
-            }
-            else
-            {
-                print $_;
-            }
-        }
+            parseMacro();
+        } while scalar(@words);
     }
-    print "\n";
 }
 
 sub Handle_D
@@ -250,10 +312,12 @@ sub Handle_D
     # .D1 Fl abcdefg    <tt>-abcdefg<>          # 1 line of indented text
     # .Dl % ls \-l /etc <tt>% ls -l /etc<tt>    # 1 indented literal text line
 
-    s/^\.//;
     if (/^D1$/)
     {
-        die "Handle_D(): D1 isn't implemented yet.\n";
+        print "\@example\n";
+        $wc = 0;
+        parseMacro();
+        print "\n\@end example";
     }
     elsif (/^Dl$/)
     {
@@ -263,12 +327,17 @@ sub Handle_D
             s/\\//;
             print "$_ ";
         }
-        print "\n\@end example\n";
+        print "\n\@end example";
     }
     else
     {
         die "Handle_D(): Unexpected mode: <$_>\n";
     }
+}
+
+sub Handle_Ed
+{
+    print $bdEd;
 }
 
 sub Handle_El
@@ -286,20 +355,15 @@ sub Handle_Em
     #   .Em or Ap ing           <italic>or</italic>'ing
     #
 
-    parseQuote(\@words) if ($words[0] =~ /^"/);
-
     print '@emph{';
-    do {
-        print shift @words;
-    } while (@words > 0 && $words[0] !~ /^[[:punct:]]$/);
+    parseMacro();                       # XXX: Might we get a leading space?
     print "}";
 
+    # On the assumption that the rest is punctuation...
     while ($_ = shift @words)
     {
         print;
     }
-
-    print "\n";
 }
 
 sub Handle_ArCmFlIcLi
@@ -319,36 +383,36 @@ sub Handle_ArCmFlIcLi
     #   .Ic "do while {...}"    do while {...}
     #   .Li M1 M2 ;  <tt>M1 M2<tt<tt>>;
     #
-    my ($dash, $didOne, $font, $fontE, $spacing);
-
-    s/^\.//;
+    my ($dash, $didOne, $font, $fontE);
 
     $dash = (/^Fl$/) ? "-" : "";
     $font = (/^Ar$/) ? "\@kbd{" : "\@code{";            # }
     $fontE = '}';
     $didOne = 0;
-    $spacing = 1;
 
     do {
         if ($words[0] eq '|')
         {
-            print " " if $didOne && $spacing;
+            print " " if $didOne && $sm && !$ns;
             print $font, $dash, $fontE, ' ' if ($dash ne "");
             print "$words[0]";
+            $ns = 0;
         }
         elsif ($words[0] eq '-')
         {
-            print " " if $didOne && $spacing;
+            print " " if $didOne && $sm && !$ns;
             print $font, $dash, $words[0], $fontE;
+            $ns = 0;
         }
         elsif ($words[0] =~ /^"/)
         {
-            print " " if $didOne && $spacing;
+            print " " if $didOne && $sm && !$ns;
             print $font;
             print $dash if ($dash ne "");       # Do we need this?
             parseQuote(\@words);
             print $words[0];
             print $fontE;
+            $ns = 0;
         }
         elsif ($words[0] eq 'Ar')               # Argument
         {
@@ -360,30 +424,29 @@ sub Handle_ArCmFlIcLi
         }
         elsif ($words[0] eq 'Xc')
         {
-            $spacing = 1;
+            $sm = 1;
         }
         elsif ($words[0] eq 'Xo')
         {
-            $spacing = 0;
+            $sm = 0;
         }
         elsif ($words[0] =~ /^[[:punct:]]$/)
         {
-            # print " " if $didOne && $spacing;
             print $words[0];
         }
         else            # Should be empty or a word
         {
-            print " " if $didOne && $spacing;
+            print " " if $didOne && $sm && !$ns;
             print $font;
             print $dash if ($dash ne "");       # Do we need this?
             $words[0] =~ s/\\&//;
             print $words[0];
             print $fontE;
+            $ns = 0;
         }
         shift @words;
         $didOne = 1;
     } while (scalar(@words) && $words[0] ne "Op");
-    print " ";
 }
 
 sub Handle_Fn
@@ -404,18 +467,20 @@ sub Handle_Fn
     {
         if ($words[0] =~ /^"/) {
             # assert $isOpen == 1
-            print '@code{, }' if ($didArg);
+            if ($didArg)
+            {
+                print '@code{,}', (($sm) ? ' ' : '');   # Ignore $ns here
+            }
             parseQuote(\@words);
             print '@emph{', $words[0], "}";
             $didArg = 1;
+            $ns = 0;
         } else {
             print ")" if ($isOpen);
             $isOpen = 0;
             print $words[0];
         }
     }
-
-    print "\n";
 }
 
 sub Handle_Nm
@@ -451,7 +516,16 @@ sub Handle_Nm
     {
         print;
     }
-    print "\n";
+}
+
+sub Handle_Ns
+{
+    # Usage: .Pf ...
+    #   .Pa ntpkey_cert_ Ns Ar hostname
+    #
+    # Suppress whitespace between "here" and the first parameter
+
+    $wc = 0;            # This might be ok...
 }
 
 sub Handle_Op
@@ -489,7 +563,6 @@ sub Handle_Op
         }
     } while (@words > 0);
     print ']' if ($op);
-    print "\n";                 # HMS: We may not want these in many places...
 }
 
 sub Handle_Pa
@@ -510,10 +583,16 @@ sub Handle_Pa
     }
 
     print '@file{',"$pa_path","}";
-    while ($_ = shift @words) {
-        print;
-    }
-    print "\n";
+}
+
+sub Handle_Pf
+{
+    # Usage: .Pf ...
+    #   .Pf ( Fa name2          (<slant>name2
+    #
+    # Suppress whitespace between the first and 2nd argument.
+
+    die "Handle_Pf: not done yet\n";
 }
 
 sub Handle_Q
@@ -530,10 +609,8 @@ sub Handle_Q
     #   .Sq ...                 Single quote: <lq>...<rq>
     #
 
-    my ($lq, $rq, $wc);
+    my ($lq, $rq);
     $wc = 0;
-
-    s/^\.//;
 
     if    (/^Aq$/)      { $lq = "<"; $rq = ">"; }
     elsif (/^Bq$/)      { $lq = "["; $rq = "]"; }
@@ -546,26 +623,97 @@ sub Handle_Q
     elsif (/^Sq$/)      { $lq = '@quoteleft{}'; $rq = '@quoteright{}'; }
 
     print "$lq";
-    while ($_ = shift @words) {
-        last if (/^[[:punct:]]$/);
-        print " " if ($wc);
-        if (/^(Ar|Cm|Fl|Ic|Li)$/)
-        {
-            Handle_ArCmFlIcLi();
-        }
-        else
-        {
-            s/^\\&//;
-            print;
-        }
-        ++$wc;
-    }
+
+    do {
+        parseMacro();
+    } while (@words > 0 && $words[0] !~ /^[[:punct:]]$/);
+
     print "$rq";
+    # The assumption is the rest are punctuation.
     while ($_ = shift @words)
     {
         print;
     }
-    print "\n";
+}
+
+sub Handle_Ref
+{
+    # Usage:
+    #   .Rs     Starts a reference.  No arguments.  Collects info.
+    #           Causes a line break in the SEE ALSO section.  Yeah.
+    #   .Re     Ends a reference.  No arguments.  Emits collected data:
+    #   .%A     Reference author name; one name per invocation.
+    #   .%B     Book title.
+    #   .%C     City/Place (not implemented yet).
+    #   .%D     Date.
+    #   .%I     Issuer/publisher name.
+    #   .%J     Journal name.
+    #   .%N     Issue number.
+    #   .%O     Optional information.
+    #   .%P     Page Number.
+    #   .%Q     Corporate or foreign author.
+    #   .%R     Report name.
+    #   .%T     Title of article. Italic.
+    #   .%U     Optional hypertext reference.
+    #   .%V     Volume
+    #
+    # Collecting during Rs and emitting during Re would make it easy
+    # to be pretty about multiple authors, journals, etc.
+    # 
+    # Remember to:
+    #   $noNl = 1;                              # No newline needed.
+    # where appropriate.
+
+    if (/^Rs$/)
+    {
+        die "Cannot nest .Rs directives.\n" if ($ref);
+        ++$ref;
+
+        # Assert no args?
+        # Initialize.
+        # Assert $refCount is 0?
+        $refCount = 0;
+
+        print "\@*\n";
+        $extArg = 1;                    # HMS: give it a try...
+        $wc = 0;
+    }
+    elsif (/^Re$/)
+    {
+        --$ref;
+        die ".Re seen without a .Rs directive.\n" if ($ref);
+
+        # Assert no args?
+
+        print ".";
+
+        # Cleanup.
+        $extArg = 0;                    # HMS: give it a try...
+        # Initialize.
+        $refCount = 0;
+    }
+    elsif (/^%A$/)
+    {
+        print ", " if ($refCount++);
+        parseMacro();
+    }
+    elsif (/^%O$/)
+    {
+        print ", " if ($refCount++);
+        parseMacro();
+    }
+    elsif (/^%T$/)
+    {
+        print ", " if ($refCount++);
+
+        # Use @emph{} for italics.
+        $wc = 0;
+        Handle_Em();
+    }
+    else
+    {
+        die "Handle_Ref: Unknown/unimplemented command in .Rs/.Rs block <$_>\n";
+    }
 }
 
 sub Handle_Sec
@@ -583,11 +731,42 @@ sub Handle_Sec
 
     parseQuote(\@words) if ($words[0] =~ /^"/);
 
-    $a = $words[0];
+    while ($_ = shift @words)
+    {
+        $a .= " " if ($a ne "");
+        $a .= $_;
+    }
 
     print '@node ', "$a\n";
-    print '@', $sh ? "sub" : "", "section $a\n";
+    print '@', ($sh ? "sub" : ""), "section $a\n";
     print "@anchor{$a}\n";
+    $wc = 0;
+}
+
+sub Handle_Sm
+{
+    # Usage: Sm [ off | on ]
+
+    if (scalar(@words))
+    {
+        if ($words[0] eq 'off')
+        {
+                $sm = 0;
+        }
+        elsif ($words[0] eq 'on')
+        {
+                $sm = 1;
+        }
+        else
+        {
+                die "Handle_Sm: Unexpected argument to Sm: <$words[0]>\n";
+        }
+        shift @words;
+    }
+    else
+    {
+        $sm = !$sm;
+    }
 }
 
 sub Handle_Sx
@@ -603,9 +782,24 @@ sub Handle_Sx
 
     parseQuote(\@words) if ($words[0] =~ /^"/);
 
-    $a = $words[0];
+    while ($_ = shift @words)
+    {
+        $a .= " " if ($a ne "");
+        $a .= $_;
+        last if ($words[0] =~ /^[[:punct:]]$/);
+    }
 
     print '@ref{',"$a","}";
+}
+
+sub Handle_Ta
+{
+    # Usage: .Ta
+    #   .Ta
+    #
+    # multitable column separator
+
+    print '@tab';
 }
 
 sub Handle_Ux
@@ -629,7 +823,6 @@ sub Handle_Ux
     {
         print;
     }
-    print "\n";
 }
 
 sub Handle_Xr
@@ -680,15 +873,12 @@ sub Handle_Xr
     print "($xr_sec)"           if (defined $xr_sec);
     print "}"                   if (defined $xr_cmd);
     print "$xr_punc"            if (defined $xr_punc);
-    print "\n";
 }
 
 sub parseQuote # ref to array of words
 {
     my ($waref) = @_;   # word array reference
     my ($string);
-
-    # Passing in "foo" will lose...
 
     $string = shift @{$waref};
 
@@ -701,49 +891,85 @@ sub parseQuote # ref to array of words
     unshift @{$waref}, $string;
 }
 
-sub ParseMacro #line
+sub pSp
 {
-    my ($line) = @_;
+    print ' ' if $wantspace;
+}
 
-    @words = split(/\s+/, $line);
-    $retval = '';
+sub isPunct ($)
+{
+    my $string = shift;
+    my $rc;
 
-    # print('@words = ', scalar(@words), ': ', join(' ', @words), "\n");
+    $rc = ($string =~/^(\\&)?[[:punct:]]+$/) ? 1 : 0;
+    return $rc;
+}
 
+sub parseMacro
+{
     while ($_ = shift @words)
     {
-        if    (/^\.An$/)                { Handle_An(); }
-        elsif (/^\.Aq/)                 { Handle_Q(); }
-        elsif (/^\.Ar$/)                { Handle_ArCmFlIcLi(); }
-        elsif (/^\.Bl$/)                { Handle_Bl(); }
-        elsif (/^\.Bq/)                 { Handle_Q(); }
-        elsif (/^\.Brq/)                { Handle_Q(); }
-        elsif (/^\.Cm$/)                { Handle_ArCmFlIcLi(); }
-        elsif (/^\.D1/)                 { Handle_D(); }
-        elsif (/^\.Dl/)                 { Handle_D(); }
-        elsif (/^\.Dq/)                 { Handle_Q(); }
-        elsif (/^\.El$/)                { Handle_El(); }
-        elsif (/^\.Em$/)                { Handle_Em(); }
-        elsif (/^\.Eq/)                 { Handle_Q(); }
-        elsif (/^\.Fl$/)                { Handle_ArCmFlIcLi(); }
-        elsif (/^\.Fn$/)                { Handle_Fn(); }
-        elsif (/^\.Ic$/)                { Handle_ArCmFlIcLi(); }
-        elsif (/^\.It$/)                { Handle_It(); }
-        elsif (/^\.Nm$/)                { Handle_Nm(); }
-        elsif (/^\.Op$/)                { Handle_Op(); }
-        elsif (/^\.Pa$/)                { Handle_Pa(); }
-        elsif (/^\.Pp$/)                { print "\n";  }
-        elsif (/^\.Pq/)                 { Handle_Q(); }
-        elsif (/^\.Ql/)                 { Handle_Q(); }
-        elsif (/^\.Qq/)                 { Handle_Q(); }
-        elsif (/^\.Sh/)                 { Handle_Sec(); } # Section Header
-        elsif (/^\.Sq/)                 { Handle_Q(); }
-        elsif (/^\.Ss/)                 { Handle_Sec(); } # Sub Section
-        elsif (/^\.Sx/)                 { Handle_Sx(); } # Section xref
-        elsif (/^\.Ux/)                 { Handle_Ux(); }
-        elsif (/^\.Xc/)                 { $extArg = 0; }
-        elsif (/^\.Xo/)                 { $extArg = 1; }
-        elsif (/^\.Xr/)                 { Handle_Xr(); }
-        else                            { print $_,"\n"; }
+        s/^\\&//;
+        $wantspace = (($wc++ && !isPunct($_) && $sm && !$ns) ? 1 : 0);
+
+        if    (/^\\"/)                  { Handle_Comment(); }
+        elsif (/^"/)                    { parseQuote(\@words); }
+        elsif (/^An$/)                  { pSp(); Handle_An(); }
+        elsif (/^Aq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Ar$/)                  { pSp(); Handle_ArCmFlIcLi(); }
+        elsif (/^Bd$/)                  { Handle_Bd(); }
+        elsif (/^Bl$/)                  { Handle_Bl(); }
+        elsif (/^Bq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Brq$/)                 { pSp(); Handle_Q(); }
+        elsif (/^Cm$/)                  { pSp(); Handle_ArCmFlIcLi(); }
+        elsif (/^D1$/)                  { Handle_D(); }
+        elsif (/^Dl$/)                  { Handle_D(); }
+        elsif (/^Dq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Ed$/)                  { Handle_Ed(); }
+        elsif (/^El$/)                  { Handle_El(); }
+        elsif (/^Em$/)                  { pSp(); Handle_Em(); }
+        elsif (/^Eq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Fl$/)                  { pSp(); Handle_ArCmFlIcLi(); }
+        elsif (/^Fn$/)                  { pSp(); Handle_Fn(); }
+        elsif (/^Ic$/)                  { pSp(); Handle_ArCmFlIcLi(); }
+        elsif (/^It$/)                  { Handle_It(); }
+        elsif (/^Li$/)                  { pSp(); Handle_ArCmFlIcLi(); }
+        elsif (/^Nm$/)                  { pSp(); Handle_Nm(); }
+        elsif (/^Ns$/)                  { Handle_Ns(); }
+        elsif (/^Op$/)                  { pSp(); Handle_Op(); }
+        elsif (/^Pa$/)                  { pSp(); Handle_Pa(); }
+        elsif (/^Pf$/)                  { Handle_Pf(); }
+        elsif (/^Pp$/)                  { ; }   # @* ?
+        elsif (/^Pq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Ql$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Qq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Re$/)                  { Handle_Ref(); }       # EOReference
+        elsif (/^Rs$/)                  { Handle_Ref(); }       # BOReference
+        elsif (/^%A$/)                  { Handle_Ref(); }
+        elsif (/^%B$/)                  { Handle_Ref(); }
+        elsif (/^%C$/)                  { Handle_Ref(); }
+        elsif (/^%D$/)                  { Handle_Ref(); }
+        elsif (/^%I$/)                  { Handle_Ref(); }
+        elsif (/^%J$/)                  { Handle_Ref(); }
+        elsif (/^%N$/)                  { Handle_Ref(); }
+        elsif (/^%O$/)                  { Handle_Ref(); }
+        elsif (/^%P$/)                  { Handle_Ref(); }
+        elsif (/^%Q$/)                  { Handle_Ref(); }
+        elsif (/^%R$/)                  { Handle_Ref(); }
+        elsif (/^%T$/)                  { Handle_Ref(); }
+        elsif (/^%U$/)                  { Handle_Ref(); }
+        elsif (/^%V$/)                  { Handle_Ref(); }
+        elsif (/^Sh$/)                  { Handle_Sec(); }       # Sec Header
+        elsif (/^Sm$/)                  { Handle_Sm(); }
+        elsif (/^Sq$/)                  { pSp(); Handle_Q(); }
+        elsif (/^Ss$/)                  { Handle_Sec(); }       # Sub Section
+        elsif (/^Sx$/)                  { pSp(); Handle_Sx(); } # Section xref
+        elsif (/^Ta$/)                  { pSp(); Handle_Ta(); } # pSP()?
+        elsif (/^Ux$/)                  { pSp(); Handle_Ux(); }
+        elsif (/^Xc$/)                  { $extArg = 0; }
+        elsif (/^Xo$/)                  { $extArg = 1; }
+        elsif (/^Xr$/)                  { pSp(); Handle_Xr(); }
+        else                            { pSp(); print; $ns = 0; }
     }
+    $wc = 0;
 }

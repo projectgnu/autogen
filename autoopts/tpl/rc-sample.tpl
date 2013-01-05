@@ -2,7 +2,7 @@
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -42,7 +42,7 @@ IF (if (not (exist? "homerc"))
 [=
   CASE copyright.type                   =][=
   == ""   =][=
-   (sprintf "#  %s copyright (c) %s %s - all rights reserved\n#  %s"
+   (sprintf "#  %s Copyright (C) %s %s - all rights reserved\n#  %s"
      prog-name (get "copyright.date") (get "copyright.owner")
      "licensing type not specified" )   =][=
 

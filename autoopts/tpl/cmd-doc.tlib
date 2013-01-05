@@ -6,7 +6,7 @@
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
-#  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
+#  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
 #
 #  AutoOpts is available under any one of two licenses.  The license
 #  in use must be one of these two and the choice is under the control
@@ -104,26 +104,6 @@
 (define environ-text
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
 
-(define target-form   (if man-page "man" "mdoc"))
-(define source-form   (get "option-format" "texi"))
-(define converter     (string-append source-form "2" target-form ))
-(set! tmp-str (find-file converter))
-
-(if (not (defined? 'tmp-str))
-    (error (string-append "cannot locate " converter)))
-
-(shell (string-append "cvt_prog='" tmp-str
-       "'\ntest -x \"$cvt_prog\" || die 'no conversion program'" ))
-
-(define get-cvt (lambda (nm alt-txt)
-    (shell (string-append
-      "{\n${cvt_prog} || die ${cvt_prog} failed in $PWD\n"
-      "} <<\\_EndOfTexiSection_\n"
-      (get nm alt-txt)
-      "\n_EndOfTexiSection_"
-    ))
-))
-
 (emit (head-line))
 (dne ".\\\"  ")                       :+][+:
 
@@ -142,89 +122,119 @@ DEFINE build-doc                      :+][+:
 
 INVOKE doc-sections                   :+][+:
 INVOKE ao-sections                    :+][+:
+INVOKE assemble-sections              :+][+:
+
+ENDDEF build-doc
+
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+.\"  A S S E M B L E   S E C T I O N S
+.\"
+.\" Emit the files for each section that was provided, and do conversions
+.\"
+.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
+
+DEFINE assemble-sections    :+][+:
 
 (out-push-new)
 
-:+]
-cat_n_rm() {
-  test -f ${tmp_dir}/$1 || return 0
-  [+:(. egrep-prog):+] -v '^[ 	]*$' ${tmp_dir}/$1
-  rm -f ${tmp_dir}/$1
-}
+:+][+:
+#.\" Insert the sections in the prescribed order
+#.\" Ensure a newline between them all.  We strip blank lines,
+#.\" so extra blank lines get removed.
+#:+]
+cvt_prog='[+:
 
-#.\" Insert these sections first, in the prescribed order
-#
-for f in synopsis description options option-presets
-do cat_n_rm $f ; done
-test -f ${tmp_dir}/name && rm -f ${tmp_dir}/name
+    (define target-form   (if man-page "man" "mdoc"))
+    (define source-form   (get "option-format" "texi"))
+    (define converter     (string-append source-form "2" target-form ))
+    (set! tmp-str (find-file converter))
 
-#.\" These sections go last, in the prescribed order
-#
-for f in implementation-notes environment files examples exit-status errors \
-      compatibility see-also conforming-to history authors copyright bugs notes
-do cat_n_rm $f ; done > ${tmp_dir}/.fini
-
-set ${tmp_dir}/*
-test -f "$1" && cat $* | [+:(. egrep-prog):+] -v '^[ 	]*$'
-
-echo
-cat  ${tmp_dir}/.fini[+:
-
-IF (exist? "doc-sub")   :+][+:
-  (shell "{\n" (out-pop #t) "\n} > ${tmp_dir}/.raw-doc")
-  (out-push-new (string-append tmp-dir "/sed-cmd"))
-  :+][+:
-
-  FOR doc-sub           :+][+:
+    (if (not (defined? 'tmp-str))
+        (error (string-append "cannot locate " converter)))
+    tmp-str
+:+]'
+cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
+         `/`basename "$cvt_prog"`
+cd $tmp_dir
+test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
+{
+    list='synopsis description options option-presets'
+    for f in $list ; do cat $f ; echo ; done
+    rm -f $list name
+    list='implementation-notes environment files examples exit-status errors
+        compatibility see-also conforming-to history authors copyright bugs
+        notes'
+    for f in $list ; do cat $f ; echo ; done > .end-doc
+    rm -f $list
+    list=`ls -1 *`' .end-doc'
+    for f in $list ; do cat $f ; echo ; done
+    rm -f $list
+} 1>.doc 2>/dev/null
+[+:
+IF (exist? "doc-sub")       :+][+:
+  (out-push-new (string-append tmp-dir "/.cmds")) :+][+:
+  FOR doc-sub               :+][+:
 
     IF (define field-name (get "sub-type" target-form))
        (~~ target-form field-name)  :+][+:
+
        (set! field-name (get "sub-name"))
        (define rep-string (string-append "<<" field-name ">>"))
-       (string-substitute (get "sub-text") rep-string (get field-name))
-    :+][+:  ENDIF       :+][+:
+       (emit (string-substitute (get "sub-text") rep-string (get field-name)))
+       "\n"
 
-  ENDFOR doc-sub        :+][+:
+    :+][+:  ENDIF           :+][+:
+
+  ENDFOR doc-sub            :+][+:
 
   (out-pop)
-  (define post-proc-cmd (get "doc-sub-cmd" "sed -f %s %s"))
-  (shellf post-proc-cmd "$tmp_dir/sed-cmd" "$tmp_dir/.raw-doc")
+  (define post-proc-cmd (string-append
+          (get "doc-sub-cmd" "sed -f %s %s") " | "
+          egrep-prog " -v '^[ 	]*$' | $cvt_prog"))
+  (sprintf post-proc-cmd ".cmds" ".doc")
   :+][+:
+ELSE                       \:+]
+[+:(. egrep-prog):+] -v '^[ 	]*$' .doc | $cvt_prog[+:
+ENDIF doc-sub exists        :+][+:
 
-ELSE                    :+][+:
+(shell (out-pop #t))        :+][+:
 
-  (shell (out-pop #t))  :+][+:
-
-ENDIF doc-sub exists    :+][+:
-
-ENDDEF build-doc
+ENDDEF assemble-sections
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  D O C   S E C T I O N S
 .\"
 .\" Emit the files for each section that was provided.
-.\"
+.\" If multiple sections exist, they get glued together with ".Pp"
+.\" between them.
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
 DEFINE doc-sections                   :+][+:
 
 FOR doc-section                       :+][+:
-  CASE
+  IF
     (define sec-type (string-upcase (get "ds-type")))
     (define sec-name (name-to-fname sec-type))
-    (out-push-new (string-append tmp-dir "/" sec-name))
     (define cvt-fn (find-file (string-append
          (get "ds-format" "man") "2mdoc")))
     (if (not (defined? 'cvt-fn))
         (error (sprintf "Cannot locate converter for %s"
                (get "ds-format" "man"))))
 
+    (define sec-file (string-append tmp-dir "/" sec-name))
+    (access? sec-file R_OK)           :+][+:
+        (out-push-add sec-file)
+        (emit ".Pp\n")                :+][+:
+
+  ELSE :+][+: CASE
+    (out-push-new sec-file)
     sec-type :+][+:
 
     == ""    :+][+: (error "unnamed doc-section") :+][+:
     *==* " " :+].Sh "[+: (. sec-type)             :+]"[+:
     *        :+].Sh [+: (. sec-type)              :+][+:
-    ESAC     :+]
+    ESAC     :+][+:
+  ENDIF :+]
 [+:
     (shell (string-append
       "fn='" cvt-fn "'\n"
@@ -234,7 +244,7 @@ FOR doc-section                       :+][+:
       "\n_EndOfDocSection_"
     ))                                :+][+:
 
-    CASE (. sec-type)                 :+][+:
+    CASE (emit "\n") sec-type         :+][+:
     == FILES                          :+][+:
         (if home-rc-files (emit home-rc-text))
         (set! home-rc-files #f)       :+][+:
@@ -355,19 +365,13 @@ ENDDEF cond-section
 
 DEFINE mk-description                   :+][+:
 
-(shell
-   "{ $cvt_prog || die \"$cvt_prog failed\"
-   } <<\\_EndOfProgDesc_\n"
-
    (if (exist? "prog-man-descrip")
        (stack-join "\n.Pp\n" "prog-man-descrip")
        (if (exist? "detail")
            (stack-join "\n.Pp\n" "detail")
            "There is no description for this command."
    )   )
-
-   "\n_EndOfProgDesc_" )                :+][+:
-
+   :+][+:
    INVOKE append-description            :+][+:
 
 ENDDEF mk-description
@@ -451,9 +455,9 @@ FOR flag                              :+][+:
     ENDIF                             :+][+:
 
   ELSE                                :+]
-.Ss "[+: (get-cvt "descrip" "") :+]"[+:
+.Ss "[+: (get "descrip" "") :+]"[+:
 
-    IF (set! tmp-str (get-cvt "documentation" ""))
+    IF (set! tmp-str (get "documentation" ""))
        (> (string-length tmp-str) 3)  :+]
 [+: (. tmp-str) :+]
 [+: ENDIF                             :+][+:
@@ -621,14 +625,14 @@ One of the following exit values will be returned:
 [+:
 (ag-fprintf 0 ".It 0 \" (EXIT_%s)\"\n%s\n"
     (string->c-name! (string-upcase (get "exit-name[0]" "SUCCESS")))
-    (get-cvt "exit-desc[0]" "Successful program execution.") )
+    (get "exit-desc[0]" "Successful program execution.") )
 
 (define need-ex-noinput  (exist? "homerc"))
 (define need-ex-software #t)
 
 (ag-fprintf 0 ".It 1 \" (EXIT_%s)\"\n%s\n"
     (string->c-name! (string-upcase (get "exit-name[1]" "FAILURE")))
-    (get-cvt "exit-desc[1]"
+    (get "exit-desc[1]"
     "The operation failed or the command syntax was not valid.")) :+][+:
 
 FOR exit-desc (for-from 2)            :+][+:
@@ -641,7 +645,7 @@ FOR exit-desc (for-from 2)            :+][+:
   (sprintf ".It %d \" (EXIT_%s)\"\n%s\n"
     (for-index)
     (string-upcase (string->c-name! tmp-str))
-    (get-cvt "exit-desc" ""))         :+][+:
+    (get "exit-desc" ""))         :+][+:
 ENDFOR exit-desc                      :+][+:
 (if need-ex-noinput
     (emit ".It 66 \" (EX_NOINPUT)\"
@@ -682,8 +686,6 @@ ENDDEF mk-authors
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  M K - B U G S
-.\"
-.\"  This section is guaranteed to be the last section in the man page
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
 
 DEFINE mk-bugs                        :+][+:
@@ -700,7 +702,7 @@ DEFINE append-bugs                    :+][+:
 
     (set! tmp-val (get "copyright.eaddr" (get "eaddr")))
     (if (> (string-length tmp-val) 1)
-        (string-append "Please send bug reports to: " tmp-val "\n") )
+        (string-append "\n.Pp\nPlease send bug reports to: " tmp-val "\n") )
     :+][+:
 
 ENDDEF append-bugs
@@ -740,7 +742,7 @@ ENDDEF mk-notes
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-notes                  \:+]
+DEFINE append-notes                   :+]
 .Pp
 This manual page was \fIAutoGen\fP-erated from the \fB[+: prog-name :+]\fP
 option definitions.[+:
@@ -757,8 +759,8 @@ ENDDEF mk-environment
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-environment             :+][+:
-   (. environ-text)                   :+][+:
+DEFINE append-environment             :+]
+[+:(. environ-text)                   :+][+:
 ENDDEF append-environment
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -771,8 +773,8 @@ ENDDEF mk-files
 
 .\" = = = = = APPEND TO IT:           :+][+:
 
-DEFINE append-files                   :+][+:
-   (. home-rc-text)                   :+][+:
+DEFINE append-files                   :+]
+[+:(. home-rc-text)                   :+][+:
 ENDDEF append-files
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -793,10 +795,16 @@ DEFINE emit-alias-opt                   :+]
     IF (not (exist? "long-opts"))      \:+]
  [+: name :+][+:
     ELSE                               \:+]
- \-\-[+: (. opt-name)                   :+][+:
+ \-\-[+: (get "name")                   :+][+:
     ENDIF                               :+][+:
   ENDIF                                 :+]
-This is an alias for the [+: aliases :+] option.[+:
+This is an alias for the \fI--[+: aliases :+]\fR option.[+:
+  IF (exist? "deprecated")            :+]
+.sp
+.B
+NOTE: THIS OPTION IS DEPRECATED
+[+:
+  ENDIF                               :+][+:
 ENDDEF emit-alias-opt
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -904,7 +912,7 @@ DEFINE emit-flag-text                 :+][+:
       ENDIF                             :+][+:
     ENDIF                               :+][+:
   ENDIF                                 :+]
-[+: (get-cvt "descrip" "") :+].[+:
+[+: (get "descrip" "") :+].[+:
 
   IF (exist? "min")                     :+]
 This option is required to appear.[+:
@@ -1032,14 +1040,13 @@ The default [+: (. opt-arg) :+] for this option is:
   ENDIF                               :+]
 .sp
 [+:
- (if (exist? "doc")
-        (get-cvt "doc" "")
-        "This option has not been fully documented." ) :+][+:
+ (if (exist? "doc") (string-substitute (get "doc" "") "\n\n" "\n.sp\n")
+     "This option has not been fully documented." ) :+][+:
   IF (exist? "deprecated")            :+]
 .sp
 .B
 NOTE: THIS OPTION IS DEPRECATED
-.R[+:
+[+:
   ENDIF                               :+][+:
 
 ENDDEF emit-flag-text

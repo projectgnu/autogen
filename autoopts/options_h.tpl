@@ -4,7 +4,7 @@ h=options.h
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -75,13 +75,13 @@ h=options.h
 // END-CONFIGURED-HEADERS
 
 /**
- * Defined to normal value of EX_USAGE.  Used to indicate that paged usage
+ * Defined to abnormal value of EX_USAGE.  Used to indicate that paged usage
  * was requested.  It is used to distinguish a --usage from a --help request.
  * --usage is abbreviated and --help gives as much help as possible.
  */
 #define AO_EXIT_REQ_USAGE 10064
 
-/*
+/**
  *  PUBLIC DEFINES
  *
  *  The following defines may be used in applications that need to test the
@@ -101,51 +101,66 @@ h=options.h
 #define OPTIONS_VERSION_STRING      "[= vers-sovers  =]"
 #define OPTIONS_MINIMUM_VERSION     [=  vers-min     =]
 #define OPTIONS_MIN_VER_STRING      "[= vers-min-str =]"
+#define OPTIONS_DOTTED_VERSION      "[= display-ver  =]"
 #define OPTIONS_VER_TO_NUM(_v, _r)  (((_v) * 4096) + (_r))
 
+/**
+ * Option argument types.  This must fit in the OPTST_ARG_TYPE_MASK
+ * field of the fOptState field of an option descriptor (tOptDesc).
+ * It will be a problem to extend beyond 4 bits.
+ */
 typedef enum {
-    OPARG_TYPE_NONE             =  0,
-    OPARG_TYPE_STRING           =  1,    /* default type/ vanilla string      */
-    OPARG_TYPE_ENUMERATION      =  2,    /* opt arg is an enum (keyword list) */
-    OPARG_TYPE_BOOLEAN          =  3,    /* opt arg is boolean-valued         */
-    OPARG_TYPE_MEMBERSHIP       =  4,    /* opt arg sets set membership bits  */
-    OPARG_TYPE_NUMERIC          =  5,    /* opt arg is a long int             */
-    OPARG_TYPE_HIERARCHY        =  6,    /* option arg is hierarchical value  */
-    OPARG_TYPE_FILE             =  7,    /* option arg names a file           */
-    OPARG_TYPE_TIME             =  8,    /* opt arg is a time duration        */
-    OPARG_TYPE_FLOAT            =  9,    /* opt arg is a floating point num   */
-    OPARG_TYPE_DOUBLE           = 10,    /* opt arg is a double prec. float   */
-    OPARG_TYPE_LONG_DOUBLE      = 11,    /* opt arg is a long double prec.    */
-    OPARG_TYPE_LONG_LONG        = 12     /* opt arg is a long long int        */
+    OPARG_TYPE_NONE         =  0, /**< does not take an argument         */
+    OPARG_TYPE_STRING       =  1, /**< default type/ vanilla string      */
+    OPARG_TYPE_ENUMERATION  =  2, /**< opt arg is an enum (keyword list) */
+    OPARG_TYPE_BOOLEAN      =  3, /**< opt arg is boolean-valued         */
+    OPARG_TYPE_MEMBERSHIP   =  4, /**< opt arg sets set membership bits  */
+    OPARG_TYPE_NUMERIC      =  5, /**< opt arg is a long int             */
+    OPARG_TYPE_HIERARCHY    =  6, /**< option arg is hierarchical value  */
+    OPARG_TYPE_FILE         =  7, /**< option arg names a file           */
+    OPARG_TYPE_TIME         =  8, /**< opt arg is a time duration        */
+    OPARG_TYPE_FLOAT        =  9, /**< opt arg is a floating point num   */
+    OPARG_TYPE_DOUBLE       = 10, /**< opt arg is a double prec. float   */
+    OPARG_TYPE_LONG_DOUBLE  = 11, /**< opt arg is a long double prec.    */
+    OPARG_TYPE_LONG_LONG    = 12  /**< opt arg is a long long int        */
 } teOptArgType;
 
+/**
+ * value descriptor for sub options
+ */
 typedef struct optionValue {
-    teOptArgType        valType;
-    char*               pzName;
+    teOptArgType        valType;        /**< which argument type    */
+    char *              pzName;         /**< name of the sub-option */
     union {
-        char            strVal[1];      /* OPARG_TYPE_STRING      */
-        unsigned int    enumVal;        /* OPARG_TYPE_ENUMERATION */
-        unsigned int    boolVal;        /* OPARG_TYPE_BOOLEAN     */
-        unsigned long   setVal;         /* OPARG_TYPE_MEMBERSHIP  */
-        long            longVal;        /* OPARG_TYPE_NUMERIC     */
-        void*           nestVal;        /* OPARG_TYPE_HIERARCHY   */
+        char            strVal[1];      /**< OPARG_TYPE_STRING      */
+        unsigned int    enumVal;        /**< OPARG_TYPE_ENUMERATION */
+        unsigned int    boolVal;        /**< OPARG_TYPE_BOOLEAN     */
+        unsigned long   setVal;         /**< OPARG_TYPE_MEMBERSHIP  */
+        long            longVal;        /**< OPARG_TYPE_NUMERIC     */
+        void*           nestVal;        /**< OPARG_TYPE_HIERARCHY   */
     } v;
 } tOptionValue;
 
+/**
+ * file argument state and handling.
+ */
 typedef enum {
-    FTYPE_MODE_MAY_EXIST        = 0x00,
-    FTYPE_MODE_MUST_EXIST       = 0x01,
-    FTYPE_MODE_MUST_NOT_EXIST   = 0x02,
-    FTYPE_MODE_EXIST_MASK       = 0x03,
-    FTYPE_MODE_NO_OPEN          = 0x00,
-    FTYPE_MODE_OPEN_FD          = 0x10,
-    FTYPE_MODE_FOPEN_FP         = 0x20,
-    FTYPE_MODE_OPEN_MASK        = 0x30
+    FTYPE_MODE_MAY_EXIST        = 0x00, /**< may or may not exist */
+    FTYPE_MODE_MUST_EXIST       = 0x01, /**< must pre-exist       */
+    FTYPE_MODE_MUST_NOT_EXIST   = 0x02, /**< must *not* pre-exist */
+    FTYPE_MODE_EXIST_MASK       = 0x03, /**< mask for these bits  */
+    FTYPE_MODE_NO_OPEN          = 0x00, /**< leave file closed    */
+    FTYPE_MODE_OPEN_FD          = 0x10, /**< call open(2)         */
+    FTYPE_MODE_FOPEN_FP         = 0x20, /**< call fopen(3)        */
+    FTYPE_MODE_OPEN_MASK        = 0x30  /**< open/fopen/not open  */
 } teOptFileType;
 
+/**
+ * the open flag bits or the mode string, depending on the open type.
+ */
 typedef union {
-    int             file_flags;
-    char const *    file_mode;
+    int             file_flags;  /**< open(2) flag bits    */
+    char const *    file_mode;   /**< fopen(3) mode string */
 } tuFileMode;
 
 typedef struct argList tArgList;
@@ -157,7 +172,7 @@ struct argList {
     char const *    apzArgs[MIN_ARG_ALLOC_CT];
 };
 
-/*
+/**
  *  Bits in the fOptState option descriptor field.
  */
 [= `
@@ -196,7 +211,7 @@ mk_mask opt-state.def` =]
  *  and may be subject to change.
  */
 
-/*
+/**
  *  Define the processing state flags
  */
 [= `mk_mask proc-state.def` =]
@@ -247,6 +262,11 @@ typedef tUsageProc * tpUsageProc;
 #define OPTION_LIMIT     SHRT_MAX
 #define NO_EQUIVALENT    (OPTION_LIMIT+1)
 
+/**
+ * Option argument value.  Which is valid is determined by:
+ * (fOptState & OPTST_ARG_TYPE_MASK) >> OPTST_ARG_TYPE_SHIFT
+ * which will yield one of the teOptArgType values.
+ */
 typedef union {
     char const *    argString;
     uintptr_t       argEnum;
@@ -278,7 +298,7 @@ struct optDesc {
 
     opt_state_mask_t        fOptState;        /* PUBLIC */
     unsigned int            reserved;
-    opt_arg_union_t          optArg;           /* PUBLIC */
+    opt_arg_union_t         optArg;           /* PUBLIC */
     void *                  optCookie;        /* PUBLIC */
 
     int const  * const      pOptMust;

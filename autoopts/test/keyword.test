@@ -7,7 +7,7 @@
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -263,7 +263,6 @@ out of order.
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
-
 .SH "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .SH "EXIT STATUS"
@@ -307,12 +306,12 @@ cat > ${testname}-base.mdoc <<\_EOMan_
 .\" Mixture of short (flag) options and long options
 .Op Fl flags
 .Op Fl flag Ar value
-.Op Fl \-option-name Ar value
+.Op Fl \-option\-name Ar value
 .Pp
 All arguments must be options.
 .Pp
 This program will emit text that is expected to be evaluated by
-a Bourne-compatible shell, thus digesting the options for the script.
+a Bourne\-compatible shell, thus digesting the options for the script.
 .Pp
 .Sh "DESCRIPTION"
 There is no description for this command.
@@ -333,7 +332,7 @@ The available keywords are:
 .in +4
 .nf
 .na
-nothing      templates    block-macros
+nothing      templates    block\-macros
 expressions  explanations
 .fi
 or their numeric equivalent.
@@ -373,22 +372,21 @@ The default \fImember\-list\fP for this option is:
 This option has not been fully documented.
 .It \-X , " \-\-help"
 Display usage information and exit.
-.It \-! , " \-\-more-help"
+.It \-! , " \-\-more\-help"
 Pass the extended usage information through a pager.
-.It \-> " [\fIrcfile\fP]," " \-\-save-opts" "[=\fIrcfile\fP]"
+.It \-> " [\fIrcfile\fP]," " \-\-save\-opts" "[=\fIrcfile\fP]"
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
-.It \-< " \fIrcfile\fP," " \-\-load-opts" "=\fIrcfile\fP," " \-\-no-load-opts"
+.It \-< " \fIrcfile\fP," " \-\-load\-opts" "=\fIrcfile\fP," " \-\-no\-load\-opts"
 Load options from \fIrcfile\fP.
-The \fIno-load-opts\fP form will disable the loading
-of earlier RC/INI files.  \fI\-\-no-load-opts\fP is handled early,
+The \fIno\-load\-opts\fP form will disable the loading
+of earlier RC/INI files.  \fI\-\-no\-load\-opts\fP is handled early,
 out of order.
 .El
 .Sh "OPTION PRESETS"
 Any option that is not marked as \fInot presettable\fP may be preset
 by loading values from configuration ("RC" or ".INI") file(s).
 The file "\fI./keyword.cfg\fP" will be used, if present.
-
 .Sh "FILES"
 See \fBOPTION PRESETS\fP for configuration files.
 .Sh "EXIT STATUS"
@@ -402,10 +400,10 @@ The operation failed or the command syntax was not valid.
 A specified configuration file could not be loaded.
 .It 70 " (EX_SOFTWARE)"
 libopts had an internal operational error.  Please report
-it to autogen-users@lists.sourceforge.net.  Thank you.
+it to autogen\-users@lists.sourceforge.net.  Thank you.
 .El
 .Sh "NOTES"
-This manual page was \fIAutoGen\fP-erated from the \fBtest_keyword\fP
+This manual page was \fIAutoGen\fP\-erated from the \fBtest_keyword\fP
 option definitions.
 _EOMan_
 

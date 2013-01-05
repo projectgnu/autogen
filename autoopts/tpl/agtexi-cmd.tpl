@@ -6,7 +6,7 @@ texi
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
-#  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+#  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 #
 #  AutoOpts is available under any one of two licenses.  The license
 #  in use must be one of these two and the choice is under the control
@@ -148,17 +148,38 @@ FOR doc-section                 =][=
     CONTINUE                    =][=
   ENDIF                         =][=
 
-  (ag-fprintf "menu" menu-entry-fmt (string-append opt-name "::") opt-name)
-  (set! label-str (string-append
-        down-prog-name " " (string-capitalize opt-name)))
-  (print-node opt-name label-str)
+  (define section-file (string-append tmp-dir "/"
+                       (string-substitute opt-name " " "-")))
+  (if (not (access? section-file R_OK)) (begin
+      (ag-fprintf "menu" menu-entry-fmt (string-append opt-name "::") opt-name)
+      (set! label-str (string-append
+            down-prog-name " " (string-capitalize opt-name)))
+      (out-push-new section-file)
+      (print-node opt-name label-str)
+    )   (begin
+      (out-push-add section-file)
+      (emit "\n")
+  ) )
+
   (define cvt-fn (get "ds-format" "texi"))
   (if (not (== cvt-fn "texi"))
       (divert-convert cvt-fn) ) =][=
   (emit (string-append "\n" (get "ds-text") "\n"))
   (convert-divert)
+  (out-pop)
 
 =][=
+ENDFOR  doc-section             =][=
+
+FOR doc-section                 =][=
+  IF  (define opt-name (string-capitalize! (get "ds-type")))
+      (define section-file (string-append tmp-dir "/"
+                           (string-substitute opt-name " " "-")))
+      (access? section-file R_OK)
+    =][=
+    (shellf "cat %1$s ; rm -f %1$s" section-file)
+    =][=
+  ENDIF accessible section file =][=
 ENDFOR  doc-section             =][=
 
 ENDDEF emit-doc-sections

@@ -6,7 +6,7 @@ in=autoopts-config.in
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -238,7 +238,7 @@ DEFINE script-preamble
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
-##  Autoopts Copyright (c) [=`date +1992-%Y`=] by Bruce Korb
+##  Autoopts Copyright (C) [=`date +1992-%Y`=] by Bruce Korb
 ##
 [= (dne "## ") =]
 ##[=

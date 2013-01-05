@@ -10,7 +10,7 @@ _EOF_
 
 ;;  This file is part of AutoOpts, a companion to AutoGen.
 ;;  AutoOpts is free software.
-;;  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+;;  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ;;
 ;;  AutoOpts is available under any one of two licenses.  The license
 ;;  in use must be one of these two and the choice is under the control
@@ -290,7 +290,7 @@ optionPrintVersion(
          "" )
      (get "version") ) +]\n\
 Written by [+(join ", " (stack "copyright.author"))+].\n\n\
-copyright (c) [+ copyright.date +] [+ copyright.owner +]\n[+
+Copyright (C) [+ copyright.date +] [+ copyright.owner +]\n[+
 
 CASE copyright.type +][+
 *= gpl    +]\

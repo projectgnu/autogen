@@ -6,7 +6,7 @@
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  AutoOpts is Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -172,7 +172,7 @@ static void dummy_func(void) {[=
 
 \=]
 # Automated Option parsing usage text.
-# copyright (c) [=`date +1999-%Y`=] by Bruce Korb - all rights reserved
+# Copyright (C) [=`date +1999-%Y`=] by Bruce Korb - all rights reserved
 # This file is distributed under the same licenses as the AutoOpts package.
 # Bruce Korb <bkorb@gnu.org>
 #

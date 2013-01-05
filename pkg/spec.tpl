@@ -1,7 +1,7 @@
 [= AutoGen5 Template spec =]
 [= #
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ libopts LGPL  This is a tear-off, redistributable option processing library
 autofsm BSD   This is a template for producing finite state machine programs
 
 The Copyright itself is privately held by Bruce Korb.
-Copyright (c) [= copyright.date =] by [= copyright.owner
+Copyright (C) [= copyright.date =] by [= copyright.owner
                 =].  All rights reserved.  Licensed under GPL, [=#
                 =]version 2 or later.
 %prep

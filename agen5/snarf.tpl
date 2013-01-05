@@ -2,7 +2,7 @@
 
 ##
 ## This file is part of AutoGen.
-## AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+## AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -95,7 +95,7 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
 (define date-range (shell "date +1992-%Y"))
 (dne " *  " "/* ")=]
  *
- *  copyright (c) [=(. date-range)=] Bruce Korb - all rights reserved
+ *  Copyright (C) [=(. date-range)=] Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *
@@ -146,7 +146,7 @@ ENDFOR symbol   =]
 
 =]
  *
- *  copyright (c) [=(. date-range)=] Bruce Korb - all rights reserved
+ *  Copyright (C) [=(. date-range)=] Bruce Korb - all rights reserved
  *
 [=
 (string-table-new "g_nm")

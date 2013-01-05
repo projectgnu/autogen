@@ -6,7 +6,7 @@
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  Copyright (c) 1992-2012 Bruce Korb - all rights reserved
+##  Copyright (C) 1992-2012 Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -148,7 +148,7 @@ Standard input may not be a terminal.[+:
   ENDIF  main exists                        :+][+:
 
 (if (exist? "explain") (string-append "\n.PP\n"
-    (join "\n.PP\n" (get-cvt "explain" "")) )) :+][+:
+    (join "\n.PP\n" (get "explain" "")) )) :+][+:
 
 (out-pop)                                   :+][+:
 

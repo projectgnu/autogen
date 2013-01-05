@@ -4,7 +4,7 @@
  *  Manage a server shell process
  *
  *  This file is part of AutoGen.
- *  AutoGen Copyright (c) 1992-2013 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -146,9 +146,9 @@ HIDE_FN(char * shell_cmd(char const* pzCmd)) {
 /*
  *  Dual pipe opening of a child process
  */
-static fp_pair_t      serv_pair     = { NULL, NULL };
+static fp_pair_t    serv_pair     = { NULL, NULL };
 static pid_t        serv_id       = NULLPROCESS;
-static bool      was_close_err = false;
+static bool         was_close_err = false;
 static int          log_ct        = 0;
 static char const * last_cmd      = NULL;
 
