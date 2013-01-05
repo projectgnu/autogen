@@ -2,13 +2,14 @@
 %guard          cright_update
 %file           cright-cmap.h
 %table          cright-char-category
+%backup
 
 %comment
   This file contains the character classifications
   used by the cright-update program.
 
   This file is part of AutoGen.
-  cright-update Copyright (c) 2010-2013 by Bruce Korb - all rights reserved
+  cright-update Copyright (C) 2010-2013 by Bruce Korb - all rights reserved
 
   cright-update is free software: you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the Free

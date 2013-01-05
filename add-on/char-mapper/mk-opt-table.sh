@@ -2,7 +2,7 @@
 #  mk-opt-table.sh
 #
 #  This file is part of char-mapper.
-#  char-mapper Copyright (c) 2003-2013 by Bruce Korb - all rights reserved
+#  char-mapper Copyright (C) 2003-2013 by Bruce Korb - all rights reserved
 #
 # char-mapper is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the

@@ -2,7 +2,7 @@ AutoGen Definitions options; /* -*- Mode: conf -*- */
 
 /*
  *  update-copyright is copyrighted
- *  Copyright (c) 2001-2013 Bruce Korb
+ *  Copyright (C) 2001-2013 Bruce Korb
  *  All rights reserved.
  */
 argument        = "[ <file-name> ... ]";
@@ -10,21 +10,22 @@ prog_name       = cright-update;
 prog_title      = "update copyright notices in text files";
 
 explain         = <<- _EOF_
-	updates the year list following a "Copyright (c)" string in text files.
+	updates the year list following a "Copyright (C)" string in text files.
 	_EOF_;
 
 copyright = {
-    date  = "2009-2012";
+    date  = "2009-2013";
     owner = "Bruce Korb";
     eaddr = "bkorb@gnu.org";
     type  = mbsd;
 };
 
-version         = "0.3";
+version         = "0.4";
 long-opts;
 environrc;
 rcfile          = '.crightrc';
 homerc          = '$@/cright.cfg', '$HOME', '.';
+die-code;
 
 main = {
     main-type    = for-each;
@@ -35,9 +36,14 @@ main = {
 detail = <<- _EOF_
 	This program will add the current year to a list of copyright years
 	that appear between a copyright mark and the copyright owner name.
-	Comment markers at the start of each line are ignored.
-	A program name is allowed to appear after comment markers and before
-	the copyright mark.  The file modification time is left untouched.
+	Comment markers at the start of each line are preserved on following
+	lines, should they be necessary.  A program name is allowed to appear
+	after comment markers and before the copyright mark.
+
+	The file modification time is left untouched.  Copyright lines are
+	constrained to 80 columns, unless @option{--width} is specified.  Any
+	prefix used on the first line must also used on any continuation
+	lines and will be added in if the result requires another line.
 	_EOF_;
 
 flag = {
@@ -45,15 +51,10 @@ flag = {
     value       = y;
     arg-type    = string;
     arg-name    = year;
-    descrip     = "Latest year for copyright notice";
+    descrip     = "Specify @file{year} as the new copyright year";
+    doc         = "By default, the current year is used.";
     settable;
     no-preset;
-
-    doc = <<- EODoc
-	By default, the current year is used.  Copyright lines are constrained
-	to 80 columns and any prefix used on the first line is also used on
-	any continuation lines.
-	EODoc;
 };
 
 flag = {
@@ -63,11 +64,8 @@ flag = {
     arg-range   = "20->4096", "0";
     arg-name    = col-ct;
     arg-default = 80;
-    descrip     = "The maximum width of each copyright line.";
-
-    doc = <<- EODoc
-	A value of zero (0) allows an unlimited line length.
-	EODoc;
+    descrip     = "Sed the maximum width of copyright lines to @file{col-ct}";
+    doc         = "A value of zero (0) allows an unlimited line length.";
 };
 
 flag = {
@@ -80,18 +78,21 @@ flag = {
 
     doc = <<- EODoc
 	Replaces the latest year appearing in a copyright notice line.
-	Contiguous years of 2 or more years are replaced with a year
-	range, a la "2008-2011".  Copyright notices are detected via
-	the regex pattern "copyright \\(c\\) [12][90][0-9][0-9]".
-	The text preceding this pattern is the per-line prefix used for
-	each successive copyright line and, optionally, the program name.
+	Contiguous years of 2 or more years are replaced with a year range,
+	e.g. "2008-2011".  Copyright notices are detected via this @file{mark}
+	regex pattern.  If the program name precedes this on the line, it and
+	any intervening white space are copied to the output but are otherwise
+	ignored.  The text preceding that is the per-line prefix that must
+	start each successive copyright line.
 
-	Any supplied regular expression should have at least one subexpression.
-	The first character of the full match is presumed to be the start of
-	the copyright mark and the first non-whitespace character after the
-	subexpression match is presumed to be the start of the year list.
+	Any supplied regular expression should have at least one
+	subexpression, e.g. @samp{([12][90][0-9][0-9])}.  The first character
+	of the full match is presumed to be the start of the copyright mark
+	and the first non-whitespace character after the subexpression match
+	is presumed to be the start of the year list.
 
-	A program name is allowed to appear before the copyright mark.
+	Two digit years will trigger a diagnostic and the copyright will not
+	get updated.
 	EODoc;
 };
 
@@ -100,11 +101,12 @@ flag = {
     value       = o;
     arg-type    = string;
     arg-name    = name;
-    arg-default = 'by Bruce Korb';
     descrip     = "Ownership string";
 
     doc = <<- EODoc
 	This string must match the text following the copyright years.
+	The word "@samp{by}" followed by white space is ignored, both in this
+	option and in the source file text.
 	EODoc;
 };
 
@@ -127,39 +129,47 @@ flag = {
     descrip     = "join sequential years with hyphens";
 
     doc = <<- EODoc
-	If the final year of the year list is the previous year, by default this
-	program will add or replace the current year adjacent to a hyphen.
-	With this option, all the intervening years are examined for sequences
-	and any found are joined as a year range.  If specified with the "no-"
-	prefix, then the current year will always be appended with a comma
-	separator.
+	If the final year of the year list is the previous year, this program
+	will normally only add the new year after a hyphen, or replace that
+	year, if it is adjacent to a hyphen.  With this option, all the
+	intervening years are examined for sequences and any found are joined
+	as a year range.  If specified with the "no-" prefix, then the current
+	year will always be appended with a comma separator.
 	EODoc;
+};
+
+flag = {
+    name    = verbose;
+    value   = V;
+
+    descrip = 'run program with progress info';
+    doc = <<- _EODoc_
+	This option will cause the program to display lots of
+	information about its decision making.
+	_EODoc_;
 };
 
 /**
  *  Exit codes.  The first few are warnings and "or"-ed into the
  *  final exit code.
  */
-exit-name[2]  = no-update;
-exit-desc[2]  = 'at least one file was not updated';
+exit-name[2] = no-update;
+exit-desc[2] = 'Warning: at least one file was not updated';
 
-exit-name[4]  = nomem;
-exit-desc[4]  = 'insufficient memory to run';
+exit-name[3] = nomem;
+exit-desc[3] = 'insufficient memory to run';
 
-exit-name[8]  = regcomp;
-exit-desc[8]  = 'regcomp could not compile copyright expression';
+exit-name[4] = regcomp;
+exit-desc[4] = 'regcomp could not compile copyright expression';
 
-exit-name[9]  = regexec;
-exit-desc[9]  = 'regexec error searching for copyright expression';
+exit-name[5] = regexec;
+exit-desc[5] = 'regexec error searching for copyright expression';
 
-exit-name[10] = bad-year;
-exit-desc[10] = 'The year supplied was invalid';
+exit-name[6] = bad-year;
+exit-desc[6] = 'The year supplied was invalid';
 
-exit-name[11] = mkstemp;
-exit-desc[11] = 'mkstemp failed';
+exit-name[7] = mkstemp;
+exit-desc[7] = 'mkstemp failed';
 
-exit-status-desc = <<- _EODesc_
-	Exit codes 2 and 4 are warnings and may be added together,
-	possibly yielding exit codes of 2, 4 or 6.  The corresponding
-	files will not be updated.
-	_EODesc_;
+exit-name[8] = fserr;
+exit-desc[8] = 'could not put result file into place';
