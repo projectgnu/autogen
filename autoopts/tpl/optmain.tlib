@@ -263,7 +263,7 @@ validate_fname(char const * pz_fname)
 
   IF (== (get "handler-type") "file-r")         =]
     if ((pz_fname[0] == '-') && (pz_fname[1] == '\0'))
-        return [= handler-proc =](pz_fname, stdin);[=
+        return [= handler-proc =](_("standard input"), stdin);[=
   ENDIF  file-r handler type                    =]
     {
         struct stat sb;
@@ -280,7 +280,7 @@ validate_fname(char const * pz_fname)
         if (! S_ISREG(sb.st_mode)) {[=
     IF (. emit-failing-printf)                  =]
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                    "not regular file:", pz_fname);[=
+                    _("not regular file:"), pz_fname);[=
     ENDIF                                       =]
             return [= (. file-fail-exit-code)   =];
         }[=
@@ -290,7 +290,7 @@ validate_fname(char const * pz_fname)
         if (sb.st_size == 0) {[=
       IF (. emit-failing-printf)                =]
             fprintf(stderr, pz_fs_err, EINVAL, strerror(EINVAL),
-                    "empty file:", pz_fname);[=
+                    _("empty file:"), pz_fname);[=
       ENDIF                                     =]
             return [= (. file-fail-exit-code)   =];
         }[=
@@ -463,9 +463,13 @@ trim_input_line(char * pz_s)
     while ((unsigned int)isspace(*pz_s))  pz_s++;
 
     switch (*pz_s) {
-    case '\0':[= (define comment-char (get "comment-char" "#"))
-    (if (> (string-length comment-char) 0)
-        (string-append "\n    case '" (substring comment-char 0 1) "':")) =]
+    case '\0':[=
+    (define comment-char (substring (get "comment-char" "#") 0 1))
+    (if (> (string-length comment-char) 0) (begin
+        (if (or (== comment-char "\\") (== comment-char "'"))
+            (set! comment-char (string-append "\\" comment-char)) )
+        (string-append "\n    case '" comment-char "':")
+    )   ) =]
         return NULL;
     default:
         return pz_s;
@@ -524,10 +528,7 @@ DEFINE files-from-stdin         =]
             fputs(_("[=(. prog-name)
                    =] Warning:  no input lines were read\n"), stderr);
         free(buf);
-    }[=
-    (if (exist? "main-fini") (string-append
-    "\n    " (def-file-line "main-fini" extract-fmt) "\n" (get "main-fini")))
-    \=]
+    }
 [=
 
 ENDDEF files-from-stdin

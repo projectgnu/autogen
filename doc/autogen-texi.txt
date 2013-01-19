@@ -2616,11 +2616,25 @@ int @var{my_handler}(char const * pz_fname, FILE * entry_fp);
 @end example
 
 @noindent
-If the file handler is more specifically set to @samp{file-r} and
-a command line argument consists of a single hyphen, then @var{my_handler}
-will be called with @code{entry_fp} set to @code{stdin}.  Consequently,
+When processing inputs as file pointer stream files, there are several
+ways of treating standard input.  It may be an ordinary input file,
+or it may contain a list of files to operate on.
+
+If the file handler type is more specifically set to @samp{file-r} and
+a command line operand consists of a single hyphen, then @var{my_handler}
+will be called with @code{entry_fp} set to @code{stdin} and the @code{pz_fname}
+set to the translatable string, "standard input".  Consequently,
 in this case, if the input list is being read from @code{stdin}, a line
 containing a hyphen by itself will be ignored.
+
+@item  stdin-input
+@itemx stdin-input
+This attribute specifies that standard input is a data input file.  By
+default, @code{for-each} main procedures will read standard input for operands
+if no operands appear on the command line.  If there are operands after the
+command line options, then standard input is typically ignored.  It can be
+processed as an input data file, however, if a single bare hyphen is put on
+the command line.
 
 @item  text-of-file
 @itemx some-text-of-file
@@ -2686,7 +2700,7 @@ static int
 If this attribute is specified, then options and operands may be
 interleaved.  Arguments or input lines beginning with a hyphen will
 cause it to be passed through to an option processing function and
-will take effect for the remainder of the operands (input lines)
+will take effect for the remainder of the operands (or input lines)
 processed.
 
 @item main-init
@@ -2701,10 +2715,10 @@ just before returning from @code{main()}.
 
 @item comment-char
 @vindex comment-char
-If you wish comment lines to start with a character other than a hash
-(@code{#}) character, then specify one character with this attribute.
-If that character is the @code{NUL} byte, then only blank lines will be
-considered comments.
+When reading operands from standard input, if you wish comment lines to
+start with a character other than a hash (@code{#}) character, then
+specify one character with this attribute.  If string value is empty,
+then only blank lines will be considered comments.
 @end table
 
 @noindent
