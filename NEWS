@@ -1,5 +1,19 @@
 New in __CURRENT_VERSION__ December 2013
 
+* "for-each" main procedures may now be specified as processing
+  standard input as a data file instead of being replacement
+  operands.  Users can always have "stdin" treated as data by using
+  a single hyphen on the command line.
+
+* configuration fixes.
+
+* larger blocks of help text are now broken down into paragraphs
+  when NLS support has been specified.  These paragraphs are also
+  emitted into an xgettext extractable form so translators have
+  matching text to work from.
+
+New in 5.17.1 January, 2013
+
 * Added a documentation substitution stanza so that texi, man
   and mdoc documents may be massaged before being finalized.
 

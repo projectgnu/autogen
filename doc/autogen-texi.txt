@@ -2393,7 +2393,7 @@ The recognized values for @code{main-type} are:
 * main main::               main: user supplied main procedure
 * main include::            include: code emitted from included template
 * main invoke::             invoke: code emitted from AutoGen macro
-* main for-each::           for-each: perform function on each argument
+* main for-each::           for-each: perform function on each operand
 @end menu
 
 Here is an example of an @code{include} variation:
@@ -2544,7 +2544,7 @@ variation operates in much the same way as @code{include}
 (@pxref{main include}) method.
 
 @node main for-each
-@subsubsection for-each: perform function on each argument
+@subsubsection for-each: perform function on each operand
 
 This produces a main procedure that invokes a procedure once for each operand
 on the command line (non-option arguments), @strong{OR} once for each
@@ -2628,13 +2628,12 @@ in this case, if the input list is being read from @code{stdin}, a line
 containing a hyphen by itself will be ignored.
 
 @item  stdin-input
-@itemx stdin-input
-This attribute specifies that standard input is a data input file.  By
-default, @code{for-each} main procedures will read standard input for operands
-if no operands appear on the command line.  If there are operands after the
-command line options, then standard input is typically ignored.  It can be
-processed as an input data file, however, if a single bare hyphen is put on
-the command line.
+This attribute specifies that standard input is a data input file.
+By default, @code{for-each} main procedures will read standard input for
+operands if no operands appear on the command line.  If there are operands
+after the command line options, then standard input is typically ignored.
+It can always be processed as an input data file, however, if a single bare
+hyphen is put on the command line.
 
 @item  text-of-file
 @itemx some-text-of-file
