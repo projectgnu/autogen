@@ -74,7 +74,8 @@ test   = {
   run-mode   =  "run";
   code-mode  =  "all";
   action = { act-type = define; };
-
+  action = { no; act-type = script; asis;
+        act-text = 'AC_MSG_ERROR([the regex library does not work])'; };
   doc =
   "AutoGen won't work without a POSIX compliant regular expression library.";
 };
@@ -295,6 +296,8 @@ do-first = <<-_EOF_
 	     ]AC_MSG_ERROR([you must have ${f}.h on your system])[
 	   }
 	done
+	test "X${ac_cv_header_inttypes_h-no}" = Xyes || \
+	  echo '#include <stdint.h>' > inttypes.h
 
 	${lo_have_arg_hdr} || \
 	  ]AC_MSG_ERROR([you must have stdarg.h or varargs.h on your system])[

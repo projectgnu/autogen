@@ -1,6 +1,6 @@
-/*  
+/*
  *  EDIT THIS FILE WITH CAUTION  (collapse-fsm.c)
- *  
+ *
  *  It has been AutoGen-ed  January  5, 2011 at 03:11:22 PM by AutoGen 5.11.6pre7
  *  From the definitions    collapse.def
  *  and the template file   fsm
@@ -10,7 +10,7 @@
  *  Copyright (C) 2001-2013 by Bruce Korb - all rights reserved
  *
  *  AutoFSM is free software copyrighted by Bruce Korb.
- *  
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
@@ -22,7 +22,7 @@
  *  3. Neither the name ``Bruce Korb'' nor the name of any other
  *     contributor may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *  
+ *
  *  AutoFSM IS PROVIDED BY Bruce Korb ``AS IS'' AND ANY EXPRESS
  *  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -146,7 +146,7 @@ cyr_run_fsm(char * list)
         case CYR_TR_INITIALIZE:
             /* START == INITIALIZE == DO NOT CHANGE THIS COMMENT */
             list_len = strlen(list) + 4;
-            
+
             tbuf =  tscn = malloc(list_len + 8);
             tscn += sprintf(tscn, "%4.4d", tkn_val);
             /* END   == INITIALIZE == DO NOT CHANGE THIS COMMENT */

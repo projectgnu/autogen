@@ -62,7 +62,7 @@ cat > ${tfile} <<- _EOF_
 
 	The self-referential example:
 	http://www.gnu.org/software/${project}/man1-autogen.html
-	
+
 	There are several other examples embedded in AutoGen:
 	A finite state machine generator, string name to enumeration value
 	conversions, and bit map and bit mask management, to name a few.

@@ -19,11 +19,11 @@
 ##   The Modified Berkeley Software Distribution License
 ##      See the file "COPYING.mbsd"
 ##
-##  These files have the following md5sums:
+##  These files have the following sha256 sums:
 ##
-##  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+##  8584710e9b04216a394078dc156b781d0b47e1729104d666658aecef8ee32e95  COPYING.gplv3
+##  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
+##  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
 
 . ./defs
 
@@ -246,7 +246,7 @@ doc-section = {
 	- MAC: SHA1
 	- Compression: NULL
 	- Handshake was completed
-	    
+
 	- Simple Client Mode:
 	@end example
 	By keeping the --pskusername parameter and removing the --pskkey
@@ -394,7 +394,7 @@ Connecting to '127.0.0.1:5556'...
 - MAC: SHA1
 - Compression: NULL
 - Handshake was completed
-    
+
 - Simple Client Mode:
 @end example
 By keeping the --pskusername parameter and removing the --pskkey
@@ -522,6 +522,7 @@ Connecting to '127.0.0.1:5556'...
 - MAC: SHA1
 - Compression: NULL
 - Handshake was completed
+.sp
 - Simple Client Mode:
 .in -4
 .fi
@@ -673,6 +674,7 @@ Connecting to '127.0.0.1:5556'...
 - MAC: SHA1
 - Compression: NULL
 - Handshake was completed
+.sp
 - Simple Client Mode:
 .Ed
 By keeping the \-\-pskusername parameter and removing the \-\-pskkey
@@ -804,32 +806,10 @@ msgid "TLS algorithms and protocols to enable.  You can use predefined sets of\n
        "information on allowed keywords"
 msgstr ""
 
-#: doc.def:104
-msgid "gnutls-cli-debug(1), gnutls-serv(1)"
+#: doc.def:6
+msgid "Usage: gnutls-cli [options] hostname gnutls-cli --help for usage\n"
+       "instructions."
 msgstr ""
-
-#: doc.def:111
-msgid "To connect to a server using PSK authentication, you need to enable the\n"
-       "choice of PSK by using a cipher priority parameter such as in the\n"
-       "example below.  @example $ ./gnutls-cli -p 5556 localhost --pskusername\n"
-       "psk_identity \\\\ --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \\\\\n"
-       "--priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK Resolving\n"
-       "'localhost'...  Connecting to '127.0.0.1:5556'...  - PSK authentication.\n"
-       "- Version: TLS1.1 - Key Exchange: PSK - Cipher: AES-128-CBC - MAC: SHA1\n"
-       "- Compression: NULL - Handshake was completed\n\n"
-       "- Simple Client Mode: @end example By keeping the --pskusername\n"
-       "parameter and removing the --pskkey parameter, it will query only for\n"
-       "the password during the handshake.\n\n"
-       "To list the ciphersuites in a priority string: @example $ ./gnutls-cli\n"
-       "--priority SECURE192 -l Cipher suites for SECURE192\n"
-       "TLS_ECDHE_ECDSA_AES_256_CBC_SHA384 0xc0, 0x24 TLS1.2\n"
-       "TLS_ECDHE_ECDSA_AES_256_GCM_SHA384 0xc0, 0x2e TLS1.2\n"
-       "TLS_ECDHE_RSA_AES_256_GCM_SHA384 0xc0, 0x30 TLS1.2\n"
-       "TLS_DHE_RSA_AES_256_CBC_SHA256 0x00, 0x6b TLS1.2\n"
-       "TLS_DHE_DSS_AES_256_CBC_SHA256 0x00, 0x6a TLS1.2\n"
-       "TLS_RSA_AES_256_CBC_SHA256 0x00, 0x3d TLS1.2 @end example"
-msgstr ""
-
 #: doc.def:11
 msgid "Simple client program to set up a TLS connection to some other computer.\n"
        "It sets up a TLS connection and forwards data from the standard input to\n"

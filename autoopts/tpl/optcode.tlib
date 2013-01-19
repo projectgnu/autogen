@@ -14,11 +14,11 @@
 ##   The Modified Berkeley Software Distribution License
 ##      See the file "COPYING.mbsd"
 ##
-##  These files have the following md5sums:
+##  These files have the following sha256 sums:
 ##
-##  43b91e8ca915626ed3818ffb1b71248b COPYING.gplv3
-##  06a1a2e4760c90ea5e1dad8dfaac4d39 COPYING.lgplv3
-##  66a5cedaf62c4b2637025f049f9b826f COPYING.mbsd
+##  8584710e9b04216a394078dc156b781d0b47e1729104d666658aecef8ee32e95  COPYING.gplv3
+##  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
+##  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
 
 =][=
 
@@ -288,7 +288,7 @@ ELSE                    \=]
 ENDIF                   =]
 #define zBugsAddr       ([=
 (out-push-new)         \=]
-s/@[a-z]*{\([^{@}]*\)}/``\1''/g
+s/@[a-z]*{\([^{@}]*\)}/'\1'/g
 s=@<prog-name>@=[= prog-name =]=g
 /^@\(end *\)*example/d
 s/^@item *$/\
@@ -496,13 +496,82 @@ INVOKE emit-nls-code
 }
 #endif[= #
 
-// = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE emit-nls-code
-
-=][= IF (. omit-nls-code) =][= RETURN =][= ENDIF
+DEFINE emit-gettext-code
 
 =]
+#ifdef DO_NOT_COMPILE_THIS_CODE_IT_IS_FOR_GETTEXT
+static void bogus_function(void) {
+[=
+
+INVOKE genmsg msgid=prog-title              =][=
+
+IF (exist? "full-usage")                    =][=
+  INVOKE genmsg msgid=full-usage no-fill=1  =][=
+ELSE                                        =][=
+  FOR flag                                  =][=
+    INVOKE genmsg msgid=descrip             =][=
+    INVOKE genmsg msgid=doc                 =][=
+  ENDFOR                                    =][=
+  genmsg msgid=argument                     =][=
+ENDIF                                       =][=
+
+IF (exist? "short-usage")                   =][=
+  INVOKE genmsg msgid=short-usage no-fill=1 =][=
+ENDIF                                       =][=
+
+FOR explain                                 =][=
+  INVOKE genmsg msgid=explain               =][=
+ENDFOR                                      =][=
+
+FOR detail                                  =][=
+  INVOKE genmsg msgid=detail                =][=
+ENDFOR                                      =][=
+
+CASE (get "copyright.type")                 =][=
+  = note                                    =][=
+  == ''                                     =][=
+  *                                         =]
+  /* copyright.type */
+  puts(_([=(kr-string (string-append
+      "This program is released under the terms of "
+      (license-name (get "copyright.type")) "."))
+          =]));[=
+ESAC                                        =][=
+
+genmsg msgid=option-info                    =][=
+genmsg msgid=copyright.text                 =]
+}
+#endif /* uncompilable code */[=
+
+ENDDEF emit-gettext-code                     =][=
+
+DEFINE genmsg                                =][=
+
+  IF (define msg-id-text (get "msgid"))
+     (not (exist? msg-id-text))              =][=
+    RETURN      =][=
+  ENDIF         =]
+  /* [= msgid =] */
+  puts(_([=
+    (define final-length 0)
+    (define tmp-text (get msg-id-text))
+    (if (and (not (exist? "no-fill")) (> (string-length tmp-text) 2))
+        (begin
+           (patch-text msg-id-text)
+           (set! final-length (- (string-length tmp-text) 2))
+           (if (== (substring tmp-text (- final-length 1)) "\n")
+               (set! tmp-text (substring tmp-text 1 final-length ))
+               (set! tmp-text (substring tmp-text 1 (+ final-length 1)))
+    )   )  )
+    (kr-string tmp-text)  =]));[=
+ENDDEF genmsg
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-nls-code        =][=
+IF (. omit-nls-code) =][= RETURN =][= ENDIF =]
 #if ENABLE_NLS
 #include <stdio.h>
 #include <stdlib.h>
@@ -630,9 +699,9 @@ translate_option_strings(void)
 
 #endif /* ENABLE_NLS */
 [=
-
+INVOKE emit-gettext-code
+=][=
 ENDDEF emit-nls-code
-
 =][=
 
 DEFINE emit-option-desc-table

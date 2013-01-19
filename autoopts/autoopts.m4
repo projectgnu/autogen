@@ -17,11 +17,11 @@ dnl
 dnl   The Modified Berkeley Software Distribution License
 dnl      See the file "COPYING.mbsd"
 dnl
-dnl  These files have the following md5sums:
+dnl  These files have the following sha256 sums:
 dnl
-dnl  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
-dnl  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
-dnl  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+dnl  8584710e9b04216a394078dc156b781d0b47e1729104d666658aecef8ee32e95  COPYING.gplv3
+dnl  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
+dnl  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
 dnl --------------------------------------------------------------------
 dnl Code:
 

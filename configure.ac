@@ -81,8 +81,8 @@ AM_WITH_DMALLOC
 # ----------------------------------------------------------------------
 # check for various programs used during the build.
 # ----------------------------------------------------------------------
-AM_PROG_CC_C_O
 AC_PROG_CC_STDC
+AM_PROG_CC_C_O
 gl_FUNC_GLIBC_UNLOCKED_IO
 AC_EXEEXT
 AC_PROG_INSTALL
@@ -213,7 +213,7 @@ test ${GUILE_VERSION} -ge 108000 \
 	-Wextra
 `
 ]dnl -Wconversion -Wsign-conversion -Wstrict-overflow
-AM_CONFIG_HEADER(config.h:config-h.in)
+AC_CONFIG_HEADER(config.h:config-h.in)
 AH_TOP([#ifndef AUTOGEN_CONFIG_H])
 AH_TOP([#define AUTOGEN_CONFIG_H 1])
 AH_BOTTOM([#endif /* AUTOGEN_CONFIG_H */])

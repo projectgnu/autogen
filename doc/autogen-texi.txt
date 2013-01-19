@@ -2582,7 +2582,7 @@ here is part of the emitted code:
   int res = 0;
   if (argc > 0) @{
      do  @{
-         res |= @i{my_handler}( *(argv++) );
+         res |= @var{my_handler}( *(argv++) );
      @} while (--argc > 0);
   @} else @{ ...
 @end example
@@ -2593,7 +2593,7 @@ If you do not supply this attribute, your handler procedure must be
 the default type.  The profile of the procedure must be:
 
 @example
-int @i{my_handler}( char const *pz_entry );
+int @var{my_handler}(char const * pz_entry);
 @end example
 
 @noindent
@@ -2612,8 +2612,15 @@ where @code{X} may be any of the legal modes for @code{fopen(3C)}.  In this
 case, the profile for your procedure must be:
 
 @example
-int @i{my_handler}( char const* pz_fname, FILE* entry_fp );
+int @var{my_handler}(char const * pz_fname, FILE * entry_fp);
 @end example
+
+@noindent
+If the file handler is more specifically set to @samp{file-r} and
+a command line argument consists of a single hyphen, then @var{my_handler}
+will be called with @code{entry_fp} set to @code{stdin}.  Consequently,
+in this case, if the input list is being read from @code{stdin}, a line
+containing a hyphen by itself will be ignored.
 
 @item  text-of-file
 @itemx some-text-of-file
@@ -2624,7 +2631,7 @@ In this case, the profile for your procedure must be:
 
 @example
 program_exit_code_t
-@i{my_handler}(char const* pz_fname, char* file_text,
+@var{my_handler}(char const* pz_fname, char* file_text,
            size_t text_size);
 @end example
 
@@ -2645,7 +2652,7 @@ That is, something other than @code{failure}.  You may choose @code{success},
 in which case file access issues will not affect the exit code and the error
 message will not be printed.
 
-@item @i{my_handler}-code
+@item @var{my_handler}-code
 @vindex MYHANDLER-code
 With this attribute, you provide the code for your handler procedure
 in the option definition file.  In this case, your @code{main()}
@@ -2654,8 +2661,8 @@ procedure specification might look something like this:
 @example
 main = @{
   main-type    = for-each;
-  handler-proc = @i{my_handler};
-  @i{my_handler}-code = <<- EndOfMyCode
+  handler-proc = @var{my_handler};
+  @var{my_handler}-code = <<- EndOfMyCode
 	/* whatever you want to do */
 	EndOfMyCode;
 @};
@@ -2667,10 +2674,10 @@ that looks like this:
 
 @example
 static int
-@i{my_handler}( char const* pz_entry )
+@var{my_handler}( char const* pz_entry )
 @{
     int res = 0;
-    <<@i{my_handler}-code goes here>>
+    <<@var{my_handler}-code goes here>>
     return res;
 @}
 @end example

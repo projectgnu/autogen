@@ -101,7 +101,7 @@ sub Handle_An
 sub Handle_Bd
 {
     # Must end with a .Ed.
-    # Bd {-literal | -filled | -unfilled | -ragged | -centered} 
+    # Bd {-literal | -filled | -unfilled | -ragged | -centered}
     # UNSUPPORTED:  [-offset <string>] [-file <file name>] [-compact]
 
     my ($bd);
@@ -659,7 +659,7 @@ sub Handle_Ref
     #
     # Collecting during Rs and emitting during Re would make it easy
     # to be pretty about multiple authors, journals, etc.
-    # 
+    #
     # Remember to:
     #   $noNl = 1;                              # No newline needed.
     # where appropriate.

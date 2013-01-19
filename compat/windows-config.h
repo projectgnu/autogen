@@ -21,11 +21,11 @@
  *   The Modified Berkeley Software Distribution License
  *      See the file "COPYING.mbsd"
  *
- *  These files have the following md5sums:
+ *  These files have the following sha256 sums:
  *
- *  43b91e8ca915626ed3818ffb1b71248b pkg/libopts/COPYING.gplv3
- *  06a1a2e4760c90ea5e1dad8dfaac4d39 pkg/libopts/COPYING.lgplv3
- *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
+ *  8584710e9b04216a394078dc156b781d0b47e1729104d666658aecef8ee32e95  COPYING.gplv3
+ *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
+ *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
 #ifndef WINDOWS_CONFIG_HACKERY
@@ -38,6 +38,40 @@
  */
 #ifndef __windows__
 #  define __windows__ 4
+#endif
+
+/*
+ * Known predifined MS compiler version codes:
+ *  1700: MSVC++ 11.0 (Visual Studio 2012)
+ *  1600: MSVC++ 10.0 (Visual Studio 2010)
+ *  1500: MSVC++ 9.0  (Visual Studio 2008)
+ *  1400: MSVC++ 8.0  (Visual Studio 2005)
+ *  1310: MSVC++ 7.1  (Visual Studio 2003)
+ *  1300: MSVC++ 7.0
+ *  1200: MSVC++ 6.0  (Visual C++ 6)
+ *  1100: MSVC++ 5.0
+ */
+
+/* C99 exact size integer support. */
+#if defined(HAVE_INTTYPES_H)
+# include <inttypes.h>
+#elif defined(HAVE_STDINT_H)
+# include <stdint.h>
+#elif ! defined(ADDED_EXACT_SIZE_INTEGERS)
+# define  ADDED_EXACT_SIZE_INTEGERS 1
+# include <windows.h>
+
+  typedef __int8 int8_t;
+  typedef unsigned __int8 uint8_t;
+
+  typedef __int16 int16_t;
+  typedef unsigned __int16 uint16_t;
+
+  typedef __int32 int32_t;
+  typedef unsigned __int32 uint32_t;
+
+  typedef __int64 int64_t;
+  typedef unsigned __int64 uint64_t;
 #endif
 
 /*

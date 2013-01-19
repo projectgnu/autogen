@@ -60,7 +60,7 @@ convert an enumeration value into a string
 @item
 invoke a function based on the first token name found in a string
 @end itemize
- 
+
 The header file produced will contain the enumeration and declarations
 for the optional procedures.  The code (@file{.c}) file will contain
 these optional procedures, but can be omitted if the @code{no-code}

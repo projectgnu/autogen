@@ -347,7 +347,7 @@ ag_scm_output_file_next_line(SCM num_or_str, SCM str)
         fmt = ag_scm2zchars(str, "file/line format");
     else
         fmt = FILE_LINE_FMT;
-    
+
     return do_output_file_line(line_off, fmt);
 }
 

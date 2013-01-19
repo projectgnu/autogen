@@ -1,3 +1,20 @@
+2013-01-012  Bruce Korb  <bkorb@gnu.org>
+
+	* everywhere: change md5sums to sha256 sums.
+	* autoopts/tpl/def2pot.tpl: omit stuff that won't get used.
+	* autoopts/tpl/optcode.tlib: add a gettext extraction function
+	that contains the translatable strings.
+	* autoopts/tpl/optmain.tlib (validate_fname): when processing
+	a "for-each" main procedure, allow "stdin" to be specified,
+	but not when reading file names from stdin itself.
+	* compat/windows-config.h: make sure fixed width integer types
+	get defined properly on Windows.
+	* config/bootstrap (filter_autotool_chaff): turn off xtrace
+	* config/libopts.def (regex): fail-exit if libregex fails
+	(do-first): if no inttypes.h, then equate it to stdint.h.
+	* configure.ac: automake does not support AM_CONFIG_HEADER
+	* doc/autogen-texi.txt: cleanups
+
 2013-01-05  Bruce Korb  <bkorb@gnu.org>
 
 	5.17.1 release

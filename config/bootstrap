@@ -157,6 +157,7 @@ post_local()
 }
 
 filter_autotool_chaff() {
+    set +x
     local unsetx=
     case ":$SHELLOPTS:" in
     *:xtrace:* ) unsetx='' ;;
