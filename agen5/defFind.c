@@ -55,7 +55,7 @@ static size_t
 bad_def_name(char * pzD, char const * pzS, size_t srcLen);
 
 static def_ent_t *
-find_def(char * name, def_ctx_t * pDefCtx, bool * indexed);
+find_def(char * name, def_ctx_t * def_ctx, bool * indexed);
 
 static int
 hash_string(unsigned char const * pz);
@@ -64,7 +64,7 @@ static void
 add_string(char const * pz);
 
 static def_ent_t **
-get_def_list(char * name, def_ctx_t * pDefCtx);
+get_def_list(char * name, def_ctx_t * def_ctx);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**

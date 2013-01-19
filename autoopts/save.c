@@ -35,7 +35,7 @@ static char const *
 find_file_name(tOptions * opts, int * p_free_name);
 
 static void
-prt_entry(FILE * fp, tOptDesc * p, char const * pzLA);
+prt_entry(FILE * fp, tOptDesc * od, char const * l_arg);
 
 static void
 prt_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp);

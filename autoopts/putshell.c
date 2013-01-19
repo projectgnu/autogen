@@ -32,8 +32,11 @@
 static size_t
 string_size(char const * scan, size_t nl_len);
 
+static char const *
+print_quoted_apostrophes(char const * str);
+
 static void
-print_quot_str(char const * pzStr);
+print_quot_str(char const * str);
 
 static void
 print_enumeration(tOptions * pOpts, tOptDesc * pOD);
@@ -45,7 +48,7 @@ static void
 print_stacked_arg(tOptions * pOpts, tOptDesc * pOD);
 
 static void
-print_reordering(tOptions * pOpts);
+print_reordering(tOptions * opts);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
