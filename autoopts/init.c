@@ -24,9 +24,6 @@
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
-static char const ao_ver_string[] =
-    STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
-
 /* = = = START-STATIC-FORWARD = = = */
 static tSuccess
 do_presets(tOptions * opts);
@@ -58,7 +55,8 @@ validate_struct(tOptions * opts, char const * pname)
      *  is available, then go do it.
      */
     if (  ((opts->fOptSet & OPTPROC_TRANSLATE) != 0)
-       && (opts->pTransProc != NULL) ) {
+       && (opts->pTransProc != NULL)
+       && (option_xlateable_txt.field_ct != 0) ) {
         /*
          *  If option names are not to be translated at all, then do not do
          *  it for configuration parsing either.  (That is the bit that really
@@ -67,7 +65,6 @@ validate_struct(tOptions * opts, char const * pname)
         if ((opts->fOptSet & OPTPROC_NO_XLAT_MASK) == OPTPROC_NXLAT_OPT)
             opts->fOptSet |= OPTPROC_NXLAT_OPT_CFG;
         (*opts->pTransProc)();
-        opts->fOptSet &= ~OPTPROC_TRANSLATE;
     }
 
     /*
@@ -79,6 +76,9 @@ validate_struct(tOptions * opts, char const * pname)
        && (  (opts->structVersion > OPTIONS_STRUCT_VERSION  )
           || (opts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
+
+        static char const ao_ver_string[] =
+            STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
 
         fprintf(stderr, zAO_Err, pname, NUM_TO_VER(opts->structVersion));
         if (opts->structVersion > OPTIONS_STRUCT_VERSION )

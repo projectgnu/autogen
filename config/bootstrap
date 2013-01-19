@@ -64,9 +64,7 @@ config_tools()
 
     #  This missing function is used in many places
     #
-    MISSING="${conf_dir}/missing"
-    export config_file srcdir top_srcdir top_builddir MISSING
-    chmod +x ${MISSING} || exit 1
+    export config_file srcdir top_srcdir top_builddir
 
     #  Check for AutoGen version 5.
     #

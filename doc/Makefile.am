@@ -36,7 +36,7 @@ all : $(INFO_DEPS)
 BUILT_SOURCES   = autogen.texi
 info_TEXINFOS   = $(BUILT_SOURCES)
 EXTRA_DIST	= \
-    agdoc.texi            auto-opts.tpl       autogen-intro.texi \
+    agdoc.texi            auto-opts.tlib      autogen-intro.texi \
     autogen-intro.texi    autogen-texi.txt    fdl.texi \
     gendocs_template      libopts.texi        mk-agen-texi.sh    \
     invoke-autogen.texi   invoke-columns.texi \

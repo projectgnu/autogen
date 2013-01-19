@@ -27,14 +27,6 @@
 
 . ./defs
 
-set -x
-PS4='>${FUNCNAME:-go}> '
-
-CC="${CC} ${CFLAGS} ${INC}"
-CFLAGS=''
-INC=''
-export AUTOGEN_TEMPL_DIRS=${TMPDIR}
-
 compile_getopt() {
   run_ag opts -b${testname}-bn ${testname}.def || \
     failure "AutoGen could not process ${testname}.def #${1}"
@@ -73,11 +65,13 @@ compile_getopt() {
 go_init()
 {
   mkdir -p ${TMPDIR}/autoopts
-
+  test -d ${TMPDIR}/autoopts || exit 1
+  CC="${CC} ${CFLAGS} ${INC}"
+  INC=''
+  AUTOGEN_TEMPL_DIRS=${TMPDIR}
   CFLAGS="-I${TMPDIR}"
   LDFLAGS="${LDFLAGS} ${LIB}"
-  export CFLAGS LDFLAGS TMPDIR
-
+  export CFLAGS LDFLAGS TMPDIR AUTOGEN_TEMPL_DIRS INC CC
   aolib=`find ${top_builddir}/autoopts -type f -name libopts.a`
   case " ${LDFLAGS} " in
   *' -lgen '* ) aolib=${aolib}\ -lgen ;;
@@ -87,11 +81,13 @@ go_init()
   cp *.* ${TMPDIR}/.
   chmod u+w ${TMPDIR}/*
 
-  cd ${top_builddir}/autoopts/tpl
-  cp *.* ${TMPDIR}/.
-  chmod u+w ${TMPDIR}/*
+  test "X${top_srcdir}" = "X${top_builddir}" || {
+    cd ${top_builddir}/autoopts/tpl
+    cp *.* ${TMPDIR}/.
+    chmod u+w ${TMPDIR}/*
+  }
 
-  cd ${builddir}/testdir
+  cd ${testsubdir}
   ${SED} -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
     -e "/^ldflags=/s@=.*@='${aolib}'@" \
     ${TMPDIR}/usage.tlib > ${TMPDIR}/usage.tlib-XX
@@ -101,19 +97,21 @@ go_init()
   # header in our TMPDIR.  We also must find that header first.  Tweak CFLAGS:
   #
   DESTdestdir=${TMPDIR}/autoopts \
-  top_builddir=${top_builddir} \
+    top_builddir=${top_builddir} \
     CONFIG_SHELL="${SHELL}" \
-    ${SHELLX} -x ${top_srcdir}/autoopts/install-hook.sh
-  AUTOGEN_TEMPL_DIRS=${TMPDIR}
-  export AUTOGEN_TEMPL_DIRS
-}
+    POSIX_SHELL="${SHELL}" \
+    PS4='>ih-$FUNCNAME> ' \
+    ${SHELLX} ${top_srcdir}/autoopts/install-hook.sh
+
+  export AUTOGEN_TEMPL_DIRS=${TMPDIR}
+} 1>&8
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 go_samples() {
 
-echo "creating ${testname}.def in `pwd`"
+  echo "creating ${testname}.def in `pwd`"
 
-${SED} 's/^	//' >> ${testname}.def <<_EOF_
+  ${SED} 's/^	//' >> ${testname}.def <<_EOF_
 	AutoGen definitions getopt;
 
 	prog-name  = "test_${testname}";
@@ -181,11 +179,11 @@ ${SED} 's/^	//' >> ${testname}.def <<_EOF_
 	};
 _EOF_
 
-# # # # # # # # # # BASE-1 OUTPUT FILE # # # # # # # # #
+  # # # # # # # # # # BASE-1 OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}1-base.c
+  echo creating ${testname}1-base.c
 
-cat > ${testname}1-base.c <<\_EndOfSample_
+  cat > ${testname}1-base.c <<\_EndOfSample_
 #include "getopt-test_getopt.h"
 
 #include <sys/types.h>
@@ -212,14 +210,14 @@ static char z_opts[] = "o:s:FXM2hv";
  *  AutoOpts library replacement routines:
  */
 void
-optionUsage (tOptions* pOptions, int status)
+optionUsage (tOptions * pOptions, int status)
 {
   if (status != 0)
     fprintf (stderr, _("Try `%s -h' for more information.\n"),
              test_getoptOptions.pzProgName);
   else
     {
-      fputs (_("test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
+      fputs (_("test_getopt - Test AutoOpts for getopt\n\
 USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
    -o str     The option option descrip\n\
    -s str     The second option descrip\n\
@@ -236,9 +234,7 @@ USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
 }
 
 void
-optionPrintVersion(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+optionPrintVersion (tOptions * pOptions, tOptDesc * pOptDesc)
 {
   char const * pz_by =
     _("test_getopt 1.2.3\n\
@@ -400,11 +396,11 @@ process_test_getopt_opts (int argc, char** argv)
 }
 _EndOfSample_
 
-# # # # # # # # # # BASE-2 OUTPUT FILE # # # # # # # # #
+  # # # # # # # # # # BASE-2 OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}2-base.c
+  echo creating ${testname}2-base.c
 
-cat > ${testname}2-base.c <<\_EndOfSample_
+  cat > ${testname}2-base.c <<\_EndOfSample_
 #include "getopt-test_getopt.h"
 
 #include <sys/types.h>
@@ -447,14 +443,14 @@ static char z_opts[] = "o:s:h";
  *  AutoOpts library replacement routines:
  */
 void
-optionUsage (tOptions* pOptions, int status)
+optionUsage (tOptions * pOptions, int status)
 {
   if (status != 0)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
              test_getoptOptions.pzProgName);
   else
     {
-      fputs (_("test_getopt - Test AutoOpts for getopt - Ver. 1.2.3\n\
+      fputs (_("test_getopt - Test AutoOpts for getopt\n\
 USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
    -o, --option=str           The option option descrip\n\
    -s, --second=str           The second option descrip\n\
@@ -473,9 +469,7 @@ hyphen and the flag character.\n\
 }
 
 void
-optionPrintVersion(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+optionPrintVersion (tOptions * pOptions, tOptDesc * pOptDesc)
 {
   char const * pz_by =
     _("test_getopt 1.2.3\n\
@@ -650,6 +644,7 @@ ${GREP} 'getopt_long' /usr/include/getopt.h >/dev/null && {
 long-opts;\
 version-value;
 ' ${testname}.def > ${testname}2.def
+    mv -f ${testname}.def ${testname}1.def
     mv -f ${testname}2.def ${testname}.def
 
     compile_getopt 2

@@ -26,9 +26,7 @@ egrep '#undef +AUTOOPTS_ENABLED' ${top_builddir}/config.h >/dev/null && \
 srcdir=`dirname $0`
 srcdir=`cd ${srcdir} ; pwd`
 
-. ${top_builddir}/autoopts/test/defs
-
-test -z "${POSIX_SHELL}" && exit 1
+. ${top_builddir}/config/shdefs
 
 rm -f ${DESTdestdir}/options.h ${DESTdestdir}/usage-txt.h
 opthdrsrc=${srcdir}/autoopts/options.h

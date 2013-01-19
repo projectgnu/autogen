@@ -51,12 +51,16 @@ compile_with_nls() {
     failure AutoGen could not process
 
   chmod u+w ${testname}.[ch]
+  # a "gettext" that reverses the text lines and characters.
+  # Leading white space is stripped from each line so that
+  # output lines do not have trailing white space.
+  #
   cat >> ${testname}.c <<'_EOF_'
 #include <ctype.h>
 char*
-gettext( char const* pzS )
+gettext(char const* pzS)
 {
-    static char z[ 4096 ];
+    static char z[4096];
     char* pzD = z + sizeof(z) - 1;
     int ct = 0;
     int found_nl = 0;
@@ -65,7 +69,7 @@ gettext( char const* pzS )
     if (strchr(pzS, '%') != NULL)
         return (void *)pzS;
     *--pzD = '\0';
-    while (*pzS == ' ')  pzS++;
+    while ((*pzS == ' ') || (*pzS == '\t'))  pzS++;
     for (;;) {
         char ch = *(pzS++);
         if (ch == '\0')
@@ -75,7 +79,7 @@ gettext( char const* pzS )
         if (ch != '\n')
             continue;
         found_nl = 1;
-        while (*pzS == ' ')  pzS++;
+        while ((*pzS == ' ') || (*pzS == '\t'))  pzS++;
     }
     if (found_nl)
         strcpy(z + sizeof(z) - 2, "\n");
@@ -86,7 +90,7 @@ gettext( char const* pzS )
 _EOF_
 
   sedcmd='/ot sgub .* tropeR$/d;/ yb degakcaP/d'
-  compile "--pleh"
+  compile "--help"
   mv ${testname}.help ${testname}-${1}.help
   cmp -s ${testname}-${1}.help ${testname}-${1}.hlp || { set +x ; \
     failure "`diff -c ${testname}-${1}.hlp ${testname}-${1}.help`" ; }
@@ -99,11 +103,10 @@ clean_help > ${testname}-1.hlp <<'_EOF_'
 test_nls - Test AutoOpts for nls
 USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 noitpircseD    emaN-noitpO grA glF
-   -o Str noitpo         pircsed noitpo noitpo ehT
-   -s Num dnoces         pircsed noitpo dnoces ehT
-   -? no  pleh           tixe dna noitamrofni egasu dednetxe yalpsiD
-   -! no  pleh-erom      regap urht dessap noitamrofni egasu dednetxE
-
+   -o Str option         pircsed noitpo noitpo ehT
+   -s Num second         pircsed noitpo dnoces ehT
+   -? no  help           tixe dna noitamrofni egasu dednetxe yalpsiD
+   -! no  more-help      regap urht dessap noitamrofni egasu dednetxE
 .retcarahc galf eht dna nehpyh
 elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 _EOF_
@@ -131,16 +134,15 @@ echo '_EOF_;' >&3
 exec 3>&-
 
 clean_help > ${testname}-2.hlp <<'_EOF_'
-.retcarahc galf eht dna nehpyh
-elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
-
-regap urht dessap noitamrofni egasu dednetxE      pleh-erom  on !-
-tixe dna noitamrofni egasu dednetxe yalpsiD           pleh  on ?-
-pircsed dnoces ehT         dnoces muN s-
-pircsed noitpo ehT         noitpo rtS o-
-noitpircseD    emaN-noitpO grA glF
 ...] ]>lav<} |={[>eman<-- | ]>lav<[ >galf<- [ sln  :EGASU
 sln rof stpOotuA tseT - sln_tset
+pircsed noitpo ehT         noitpo rtS o-
+noitpircseD    emaN-noitpO grA glF
+pircsed dnoces ehT         dnoces muN s-
+.retcarahc galf eht dna nehpyh
+elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
+regap urht dessap noitamrofni egasu dednetxE      pleh-erom  on !-
+tixe dna noitamrofni egasu dednetxe yalpsiD           pleh  on ?-
 _EOF_
 
 compile_with_nls 2

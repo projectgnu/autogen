@@ -372,14 +372,14 @@ INVOKE  get-text tag = "ao-data2"
 
  (out-push-new)
 
-=]fn() {
+=]fn() { ( BASH_XTRACEFD=2 ; set -x
     cd ${top_builddir}/autoopts/test || return
-    VERBOSE=true
-    export VERBOSE
-    ${MAKE} check TESTS=errors.test > /dev/null 2>&1
-    if test ! -x testdir/errors
+    VERBOSE=true AUTOGEN_TRACE=every AUTOGEN_TRACE_OUT=">>$PWD/ag-log.txt"
+    export VERBOSE AUTOGEN_TRACE AUTOGEN_TRACE_OUT
+    ${MAKE:-make} check TESTS=errors.test >/tmp/errors.log 2>&1
+    if test ! -x errors-testd/errors
     then
-      return
+      die "no error usage in $PWD/errors-testd"
     fi
     cat <<-EOF
 
@@ -389,7 +389,7 @@ INVOKE  get-text tag = "ao-data2"
 	@example
 EOF
 
-    ./testdir/errors -? | sed 's,	,        ,g;s,\([@{}]\),@\1,g'
+    ./errors-testd/errors -? | sed 's,	,        ,g;s,\([@{}]\),@\1,g'
     cmd='errors operand1 -s first operand2 -X -- -s operand3'
     cat <<-EOF
 	@end example
@@ -401,9 +401,10 @@ EOF
 	you get the following output for your shell script to evaluate:
 
 	@example
-	`testdir/${cmd}`
+	`./errors-testd/${cmd}`
 	@end example
 EOF
+)
 }
 fn
 [=

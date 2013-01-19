@@ -50,7 +50,7 @@ TESTS_ENVIRONMENT = TERM='' \
 	top_srcdir="$(top_srcdir)"
 
 distclean-local:
-	-rm -rf testdir FAILURES
+	-rm -rf *-testd FAILURES
 
 $(TESTS)    : defs
 
@@ -64,7 +64,7 @@ ${top_builddir}/autoopts/test/defs :
 	cd ${top_builddir}/autoopts/test ; $(MAKE) defs
 
 verbose     : defs
-	rm -rf FAILURES testdir ; \
+	rm -rf FAILURES *-testd ; \
 	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
 
 # Makefile.am ends here

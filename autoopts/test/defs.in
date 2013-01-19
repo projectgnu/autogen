@@ -51,20 +51,20 @@ cfg_vals()
 
   script_name=$1
   set -a
-  . ${top_builddir}/config/shdefs
+  TESTS=''
+  . ${top_builddir:-@top_builddir@}/config/shdefs
   progname=`echo "$script_name" | ${SED} 's,^.*/,,'`
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
-  PS4=">${testname}-\${FUNCNAME}> "
-  test -z "$srcdir"       && exit 1
+  : ${srcdir=$top_srcdir/autoopts/test}
   srcdir=`cd $srcdir >/dev/null && pwd`
+  testsubdir=${testname}-testd
+  PS4=">${testname}-\${FUNCNAME}> "
   ( exec 2>/dev/null; ulimit -c unlimited ) && \
     ulimit -c unlimited
 
-  test -z "${CFLAGS}"     && CFLAGS='@CFLAGS@'
-  CFLAGS="${CFLAGS} @DEFS@"
-  test -z "${testsubdir}" && testsubdir=testdir
-  test -z "${PAGER}"      && PAGER=more
+  CFLAGS="${CFLAGS} ${DEFS}"
+  : ${PAGER=more}
   nl='
 ' ht='	'
 
@@ -110,24 +110,40 @@ purge()
 
 init_tests()
 {
-  logfile=`pwd`/testdir/${testname}.log
+  builddir=`pwd`
+  logfile="$builddir/$testsubdir/${testname}.log"
   exec 8>&2 1>${logfile} 2>&1
 
-  TMPDIR=`pwd`/testdir/${testname}-tmpd
-  mkdir ${TMPDIR}
+  TMPDIR="$builddir/$testsubdir/${testname}-tmpd"
+  if test -d ${TMPDIR}
+  then
+    test -f ${TMPDIR}/pid && {
+      local pid=`cat ${TMPDIR}/pid`
+      ps h $pid >/dev/null 2>&1 && {
+        echo "${testname} is running"
+        exit 1
+      } 1>&2
+    }
+  else
+    mkdir -p ${TMPDIR}
+  fi
+  echo $$ > ${TMPDIR}/pid
 
   f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
   PATH=${f}:${PATH}
-  echo PATH is ${PATH} >&2
 
-  builddir=`pwd`
-  testsubdir=testdir
   CFLAGS=`echo ${CFLAGS} | \
     ${SED} "s/-Werror[^ ${ht}]*//g;s/-Wextra//g"`
 
   lo_dir=${top_builddir}/autoopts
-  test -d ${lo_dir}/.libs && lo_dir=${lo_dir}/.libs
-  test "X${LD_LIBRARY_PATH}" = X || LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}
+  lo_lib=`find ${lo_dir} -type f -name "*libopts.${OBJEXT}" | head -n1`
+  test -f "$lo_lib" || {
+    lo_lib=`find ${lo_dir} -type f -name "*libopts.lo" | head -n1`
+    test -f "$lo_lib" || die "no libopts lib"
+  }
+  lo_dir=${lo_lib%/*}
+  test "X${LD_LIBRARY_PATH}" = X || \
+    LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}
   LD_LIBRARY_PATH=${lo_dir}:${LIBGUILE_PATH}${LD_LIBRARY_PATH}
 
   case ${AG_VERSION} in
@@ -147,7 +163,6 @@ init_tests()
     done
     ;;
   esac
-  lo_lib=`find ${lo_dir} -type f -name libopts*.${OBJEXT}`
   LIB="${lo_lib} ${LIB}"
 
   AG_L=run_ag\ ao
@@ -163,14 +178,14 @@ be_silent()
 {
   setx=:
   VERBOSE=false
-  purge testdir
+  purge $testsubdir
 
   # Sometimes, MSDos FS cannot even rename the directory!!
   #
-  if test -d testdir
-  then purge testdir/* testdir/.??*
+  if test -d ${testsubdir}
+  then purge ${testsubdir}/* ${testsubdir}/.??*
   else msg=echo
-       mkdir testdir || exit 1
+       mkdir ${testsubdir} || exit 1
   fi
 
   run_ag()
@@ -195,7 +210,7 @@ be_verbose()
   setx='set -x'
   msg=:
   VERBOSE=true
-  test -d testdir || mkdir testdir || exit 1
+  test -d ${testsubdir} || mkdir ${testsubdir} || exit 1
 
   run_ag()
   {
@@ -209,8 +224,7 @@ be_verbose()
     * ) opts="${agl_opts}" ;;
     esac
 
-    MALLOC_CHECK_=2 \
-      ${AGexe} ${opts} ${tr} "$@"
+    MALLOC_CHECK_=2 ${AGexe} ${opts} ${tr} "$@"
   }
 
   init_tests
@@ -218,8 +232,9 @@ be_verbose()
 
 cfg_inc()
 {
-  cd testdir || {
-    echo "Cannot make or change into testdir" >&8
+  test_src=$srcdir/${testname}.test
+  cd ${testsubdir} || {
+    echo "Cannot make or change into ${testsubdir}" >&8
     exit 1
   }
   testsubdir=`pwd`
@@ -277,10 +292,11 @@ cleanup()
   ${setx}
   ${VERBOSE} || {
     cd ${builddir}
-    purge testdir
-    test -d testdir && mv testdir ZZJUNK-$$
+    purge ${testsubdir}
+    test -d ${testsubdir} && mv ${testsubdir} ZZJUNK-$$
   }
-  ${msg} ${testname} done
+  ${msg} ${testname} done >&8
+  exit 0
 }
 
 # A standard failure function
@@ -288,24 +304,20 @@ cleanup()
 failure()
 {
   trap '' 15
-  ${setx}
-  cd ${testsubdir}
-  if test -d ../FAILURES
-  then ( \cd ../FAILURES ; purge -rf ${testname}* .*${testname}* )
-  else mkdir ../FAILURES ; fi
+  set -x
+  tdir=`basename $testsubdir`
+  cd ${testsubdir}/..
+  if test -d FAILURES
+  then test -d FAILURES/$tdir && rm -rf FAILURES/$tdir
+  else mkdir FAILURES
+  fi
 
-  exec > /dev/tty 2>&8
   cat ${logfile} >&2
+  mv $tdir FAILURES/$tdir
 
-  {
-    mv -f ${testname}* .*${testname}* ../FAILURES || :
-  } 2>/dev/null
-  for f in core*
-  do test -f ${f} && mv -f ${f} ../FAILURES/${testname}-${f} ; done
-
-  echo FAILURE: "$*" >&8
+  echo FAILURE: "$*"
   exit 1
-}
+} 1>&8 2>&1
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -336,7 +348,9 @@ trap "failure 'test ${testname} killed on timeout'" 15
     kill -15 $$
     sleep 1
     ps -p $$ || exit
-    mv -f `dirname $logfile` ${builddir}/FAILED-${testname}
+    test -d ${builddir}/FAILURES || \
+      mkdir ${builddir}/FAILURES
+    mv -f `dirname $logfile` ${builddir}/FAILURES/.
     kill -9 $$
 ) &
 )

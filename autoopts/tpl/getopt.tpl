@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2012-12-29 12:30:22 bkorb"
+  Time-stamp:        "2013-01-15 15:53:52 bkorb"
 _EOF_
 \` `            +][+
 
@@ -57,7 +57,6 @@ CASE (suffix) +][+
  (define header-file (out-name))
  (out-push-new) \+]
 {
-    test -x "${AGexe}" || die "AGexe not properly set:  ${AGexe}"
 [+ # START-BUILDTREE-ISMS:
 
 #  The following code is sedded away in install-hook.sh.
@@ -65,26 +64,14 @@ CASE (suffix) +][+
 #  remove them when installing this file.
 
 \+]
-    aobdir=`echo ${AGexe} | sed 's@/[^/]*$@@'`
-
-    if ! test -x ${aobdir}/autoopts-config
-    then
-        # Check for autoopts-config in build directory layout
-        #
-        aobdir=`echo ${aobdir} | sed 's@/[^/]*$@@'`/autoopts
-        test -x ${aobdir}/autoopts-config || {
-            aobdir=`echo ${aobdir} | sed 's@/[^/]*/autoopts$@@'`/autoopts
-            test -x ${aobdir}/autoopts-config || \
-                die 'cannot locate autoopts-config'
-        }
-    fi
-
-    agopts=`dirname [+ (tpl-file #t) +]`
-    agopts="-L${aobdir}/tpl -L$agopts "
+    aobdir=`echo ${AGexe} | sed 's@/agen5/.*$@@'`/autoopts
+    agopts=-L`dirname [+ (tpl-file #t) +]`' '
+    test "X-L$aobdir/tpl " = "X$agopts" || \
+        agopts="-L${aobdir}/tpl $agopts"
     tarfile=`set -- ${aobdir}/libopts*.tar.*
         test -f $1 || {
             cd ${aobdir}
-            ${MAKE:-make} libsrc
+            ${MAKE:-make} libsrc || exit 1
             cd -
             set -- ${aobdir}/libopts*.tar.*
             test -f $1 || die 'libopts tarball not built'
@@ -102,7 +89,6 @@ CASE (suffix) +][+
         AG_Dep_File=`dirname "${AG_Tracing}"`/ao-[+ (base-name) +].dep
         agopts="${agopts}-MF${AG_Dep_File} -MT${AG_Dep_File%.dep}.targ"
     fi
-
     ${AGexe} -b[+ (base-name) +] ${agopts} -Toptions.tpl [+ (def-file) +]
     def_hdr=[+ (base-name) +].h
     sed 's@<autoopts/options.h>@"[+ (. header-file)
@@ -262,7 +248,7 @@ static char z_opts[] = "[+ # close quote for emacs " +][+
  *  AutoOpts library replacement routines:
  */
 void
-optionUsage (tOptions* pOptions, int status)
+optionUsage (tOptions * pOptions, int status)
 {
   if (status != 0)
     fprintf (stderr, _("Try `%s [+(. help-opt)+]' for more information.\n"),
@@ -277,9 +263,7 @@ optionUsage (tOptions* pOptions, int status)
 }
 
 void
-optionPrintVersion(
-    tOptions*   pOptions,
-    tOptDesc*   pOptDesc )
+optionPrintVersion (tOptions * pOptions, tOptDesc * pOptDesc)
 {
   char const * pz_by =
     _("[+ # " +][+
@@ -293,7 +277,7 @@ Written by [+(join ", " (stack "copyright.author"))+].\n\n\
 Copyright (C) [+ copyright.date +] [+ copyright.owner +]\n[+
 
 CASE copyright.type +][+
-*= gpl    +]\
+*~ [l]*gpl    +]\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.[+
 
@@ -505,12 +489,13 @@ DEFINE emit-usage-string    +][+
 
   (out-push-new)            +][+
   INCLUDE "usage.tlib"      +][+
-  (kr-string (string-append (shell (string-append
+  (kr-string (string-append (shell
   "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
        -e '/: illegal option --/d' \
        -e 's/ --version\\[=arg\\]/ --version      /' <<_EOF_\n"
-  (out-pop #t) "\n_EOF_"
-  )) "\n" ))  +][+
+  (out-pop #t)
+  "\n_EOF_"
+  ) "\n" ))                 +][+
 
 ENDDEF
 

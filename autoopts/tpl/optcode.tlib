@@ -86,7 +86,7 @@
             (string-append " (" (get "package") ")")
             "" )
         " - " (get "prog-title")
-        (if (exist? "version")
+        (if (and (exist? "version") (not (exist? "gnu-usage")))
             (string-append " - Ver. " (get "version"))
             "" )
         "\n" usage-line "\n"
@@ -159,14 +159,14 @@ IF (not (exist? "copyright"))
 #define zCopyright      NULL
 #define zLicenseDescrip NULL[=
 ELSE  =][=
-  (define cright-owner (get "copyright.owner" (get "copyright.author")))
-  =][=
-  CASE (get "copyright.type") =][=
-    = note       =][=
+  CASE (define cright-owner (get "copyright.owner" (get "copyright.author")))
+       (get "copyright.type")   =][=
+
+    = note                      =][=
       (set! tmp-text (get  "copyright.text"))
       (define ext-text tmp-text)            =][=
 
-    ~~* .       =][=
+    ~~* .                       =][=
       (define ext-text
          (license-description (get "copyright.type")
             prog-name "" cright-owner ) )
@@ -174,17 +174,20 @@ ELSE  =][=
       (set! tmp-text
          (license-info (get "copyright.type")
             prog-name "" cright-owner (get "copyright.date") ) )
-                =][=
+                                =][=
 
-    *           =][=
+    *                           =][=
       (set! tmp-text (sprintf
               "Copyright (C) %s %s, all rights reserved"
               (get "copyright.date") cright-owner  ))
-      (define ext-text tmp-text)            =][=
+      (define ext-text tmp-text)  =][=
 
-  ESAC          =][=
+  ESAC                          =][=
 
 (set! tmp-text (string-append version-text "\n" tmp-text))
+(if (not omit-nls-code)
+    (put-xget "pzCopyright" tmp-text))
+
 (string-append "\n#define zCopyright      ("
     (string-table-add-ref opt-strs tmp-text)
     ")\n#define zLicenseDescrip ("
@@ -195,11 +198,13 @@ ELSE  =][=
            (set! ext-text (string-append (shell (string-append
              "${CLexe} --fill -I0 -W75 <<_EOF_\n" ext-text "\n_EOF_" )) "\n" ))
 
+           (if (not omit-nls-code)
+               (put-xget "pzCopyNotice" ext-text))
            (string-table-add-ref opt-strs ext-text)
     )   )
-    ")\n" )              =][=
+    ")\n" )                     =][=
 
-ENDIF "copyright"        =][=
+ENDIF "copyright"               =][=
 
    (define usage-proc (get "usage"))
    (if (< 1 (string-length usage-proc))
@@ -216,7 +221,7 @@ ENDIF "copyright"        =][=
 /*
  *  [= prog-name =] option static const strings
  */[=
- (out-resume "home-list") \=][=
+ (out-resume "home-list")      \=][=
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -258,12 +263,15 @@ ENDIF  there is a version
 [= (. lib-externs) =]
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *  Define the [= (. prog-name) =] Option Environment
+ *  Define the [= prog-name =] Option Environment
  */
 #define zPROGNAME       ([= (string-table-add-ref opt-strs pname-up)   =])
 #define zUsageTitle     ([=
  (define homerc-ct   0)
  (define homerc-txt "")
+ (if (not omit-nls-code)
+     (put-xget "pzUsageTitle" usage-text))
+
  (string-table-add-ref opt-strs usage-text) =])
 [=
 FOR homerc              =][=
@@ -299,7 +307,7 @@ s/^@item *$/\
     (raw-shell-str (out-pop #t)) ) )
 
 (define patch-text (lambda (t-name)
-  (set! tmp-text (string-append "\n"
+  (set! tmp-text (string-append
 
   (shell (string-append
     patch-text-sed
@@ -332,6 +340,8 @@ one per line; blank and '"
     "")
 "'stdin' may not be a terminal (tty).\n" ))  )
 
+      (if (not omit-nls-code)
+          (put-xget "pzExplain" tmp-text))
       (string-table-add-ref opt-strs tmp-text)
     )
     "NULL"
@@ -341,15 +351,19 @@ one per line; blank and '"
 (if (exist? "detail")
     (begin
       (patch-text "detail")
+      (if (not omit-nls-code)
+          (put-xget "pzDetail" tmp-text))
       (string-table-add-ref opt-strs tmp-text)
     )
     "NULL"
 )                       =])
 #define zFullVersion    ([=
 
-(if (exist? "version")
-    (string-table-add-ref opt-strs version-text)
-    "NULL")             =])[=
+(if (exist? "version") (begin
+    (if (not omit-nls-code)
+        (put-xget "pzFullVersion" version-text))
+    (string-table-add-ref opt-strs version-text) )
+  "NULL")               =])[=
 (tpl-file-line extract-fmt)
 =][=
 
@@ -387,8 +401,8 @@ static void * const original_[=(. pname-down)=]_cookies[ [=
 =]
 };
 [= ENDIF resettable=]
-[= INVOKE usage-text usage-type = full  \=]
-[= INVOKE usage-text usage-type = short  =]
+[= INVOKE emit-help-text help-type = full  \=]
+[= INVOKE emit-help-text help-type = short  =]
 #endif /* not defined __doxygen__ */
 [= INVOKE emit-option-callbacks          =]
 /**
@@ -489,7 +503,9 @@ tOptDesc* [= (string->c-name! (get "lib-name")) =]_optDesc_p = NULL;[=
 
 ENDFOR                      =][=
 
-INVOKE emit-nls-code
+IF (not omit-nls-code)      =][=
+  INVOKE emit-nls-code      =][=
+ENDIF
 
 =]
 #ifdef  __cplusplus
@@ -498,81 +514,15 @@ INVOKE emit-nls-code
 
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE emit-gettext-code
+DEFINE emit-nls-code
 
 =]
-#ifdef DO_NOT_COMPILE_THIS_CODE_IT_IS_FOR_GETTEXT
-static void bogus_function(void) {
-[=
-
-INVOKE genmsg msgid=prog-title              =][=
-
-IF (exist? "full-usage")                    =][=
-  INVOKE genmsg msgid=full-usage no-fill=1  =][=
-ELSE                                        =][=
-  FOR flag                                  =][=
-    INVOKE genmsg msgid=descrip             =][=
-    INVOKE genmsg msgid=doc                 =][=
-  ENDFOR                                    =][=
-  genmsg msgid=argument                     =][=
-ENDIF                                       =][=
-
-IF (exist? "short-usage")                   =][=
-  INVOKE genmsg msgid=short-usage no-fill=1 =][=
-ENDIF                                       =][=
-
-FOR explain                                 =][=
-  INVOKE genmsg msgid=explain               =][=
-ENDFOR                                      =][=
-
-FOR detail                                  =][=
-  INVOKE genmsg msgid=detail                =][=
-ENDFOR                                      =][=
-
-CASE (get "copyright.type")                 =][=
-  = note                                    =][=
-  == ''                                     =][=
-  *                                         =]
-  /* copyright.type */
-  puts(_([=(kr-string (string-append
-      "This program is released under the terms of "
-      (license-name (get "copyright.type")) "."))
-          =]));[=
-ESAC                                        =][=
-
-genmsg msgid=option-info                    =][=
-genmsg msgid=copyright.text                 =]
-}
-#endif /* uncompilable code */[=
-
-ENDDEF emit-gettext-code                     =][=
-
-DEFINE genmsg                                =][=
-
-  IF (define msg-id-text (get "msgid"))
-     (not (exist? msg-id-text))              =][=
-    RETURN      =][=
-  ENDIF         =]
-  /* [= msgid =] */
-  puts(_([=
-    (define final-length 0)
-    (define tmp-text (get msg-id-text))
-    (if (and (not (exist? "no-fill")) (> (string-length tmp-text) 2))
-        (begin
-           (patch-text msg-id-text)
-           (set! final-length (- (string-length tmp-text) 2))
-           (if (== (substring tmp-text (- final-length 1)) "\n")
-               (set! tmp-text (substring tmp-text 1 final-length ))
-               (set! tmp-text (substring tmp-text 1 (+ final-length 1)))
-    )   )  )
-    (kr-string tmp-text)  =]));[=
-ENDDEF genmsg
-
-// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
-
-DEFINE emit-nls-code        =][=
-IF (. omit-nls-code) =][= RETURN =][= ENDIF =]
 #if ENABLE_NLS
+/*
+ * This code is designed to translate translatable option text for the
+ * [= prog-name =] program.  These translations happen upon entry
+ * to optionProcess().
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -651,9 +601,8 @@ translate_option_strings(void)
          *  Do the translations.  The first pointer follows the field count
          *  field.  The field count field is the size of a pointer.
          */
-        tOptDesc * od = opts->pOptDesc;
-        char **    ppz = (char**)(void*)&(option_xlateable_txt);
-        int        ix  = option_xlateable_txt.field_ct;
+        char ** ppz = (char**)(void*)&(option_xlateable_txt);
+        int     ix  = option_xlateable_txt.field_ct;
 
         do {
             ppz++; /* skip over field_ct */
@@ -662,46 +611,44 @@ translate_option_strings(void)
         /* prevent re-translation and disable "libopts" domain lookup */
         option_xlateable_txt.field_ct = 0;
 [=
-  FOR field IN pzCopyright pzCopyNotice pzFullVersion pzUsageTitle pzExplain
-               pzDetail    pzPackager   =]
+  FOR field IN pzCopyright pzCopyNotice pzFullVersion =]
         coerce_it((void*)&(opts->[= field =]));[=
   ENDFOR                        =][=
 
-  IF (exist? "full-usage")      =]
-        coerce_it((void*)&(opts->pzFullUsage));[=
-  ENDIF                         =][=
-
-  IF (exist? "short-usage")     =]
-        coerce_it((void*)&(opts->pzShortUsage));[=
+  IF (not (exist? "full-usage"))=][=
+    FOR field IN pzUsageTitle pzExplain pzDetail =]
+        coerce_it((void*)&(opts->[= field =]));[=
+    ENDFOR                      =]
+        {
+            tOptDesc * od = opts->pOptDesc;
+            for (ix = opts->optCt; ix > 0; ix--, od++)
+                coerce_it((void*)&(od->pzText));
+        }[=
   ENDIF                         =]
-
-        for (ix = opts->optCt; ix > 0; ix--, od++)
-            coerce_it((void*)&(od->pzText));
-    }
-
-    if ((opts->fOptSet & OPTPROC_NXLAT_OPT_CFG) == 0) {
-        tOptDesc * od = opts->pOptDesc;
-        int        ix;
-
-        for (ix = opts->optCt; ix > 0; ix--, od++) {[=
-
-  FOR field IN pz_Name pz_DisableName pz_DisablePfx  =][=
-
-    (sprintf "\n            coerce_it((void*)&(od->%1$s));"
-             (get "field"))     =][=
-
-  ENDFOR                        =]
-        }
-        [= (. pname)
-        =]Options.fOptSet |= OPTPROC_NXLAT_OPT_CFG | OPTPROC_NXLAT_OPT;
     }
 }
-
 #endif /* ENABLE_NLS */
-[=
-INVOKE emit-gettext-code
-=][=
+
+#ifdef DO_NOT_COMPILE_THIS_CODE_IT_IS_FOR_GETTEXT
+/*
+ * TRANSLATORS: The following dummy function was crated solely so that
+ * xgettext can extract the correct strings.  These strings are actually
+ * referenced by a field name in the [=(. pname)=]Options structure
+ * noted in the comments below.  The literal text is defined in
+ * [=(. pname)=]_opt_strs.
+ *
+ * NOTE: the strings below are segmented with respect to the source string
+ * [=(. pname)=]_opt_strs.  The strings above are handed off for translation
+ * at run time a paragraph at a time.  Consequently, they are presented here
+ * for translation a paragraph at a time.
+ */
+static void bogus_function(void) {[=
+(out-resume "xget") (out-pop #t) =]
+}
+#endif /* uncompilable code */[=
+
 ENDDEF emit-nls-code
+
 =][=
 
 DEFINE emit-option-desc-table

@@ -48,6 +48,17 @@
 #undef  EXPORT
 #define EXPORT
 
+#ifndef NUL
+#define NUL                     '\0'
+#endif
+#define BEL                     '\a'
+#define BS                      '\b'
+#define HT                      '\t'
+#define LF                      '\n'
+#define VT                      '\v'
+#define FF                      '\f'
+#define CR                      '\r'
+
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # define DIRCH                  '\\'
 #else

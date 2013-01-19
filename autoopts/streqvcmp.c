@@ -96,7 +96,7 @@ static unsigned char charmap[] = {
  * err:  none checked.  Caller responsible for seg faults.
 =*/
 int
-strneqvcmp(tCC* s1, tCC* s2, int ct)
+strneqvcmp(char const * s1, char const * s2, int ct)
 {
     for (; ct > 0; --ct) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -135,7 +135,7 @@ strneqvcmp(tCC* s1, tCC* s2, int ct)
  * err:  none checked.  Caller responsible for seg faults.
 =*/
 int
-streqvcmp(tCC* s1, tCC* s2)
+streqvcmp(char const * s1, char const * s2)
 {
     for (;;) {
         unsigned char u1 = (unsigned char) *s1++;
@@ -155,8 +155,8 @@ streqvcmp(tCC* s1, tCC* s2)
  *
  * what: Set the character mappings for the streqv functions
  *
- * arg:  + char + From + Input character +
- * arg:  + char + To   + Mapped-to character +
+ * arg:  + char + from + Input character +
+ * arg:  + char + to   + Mapped-to character +
  * arg:  + int  + ct   + compare length +
  *
  * doc:
@@ -180,7 +180,7 @@ streqvcmp(tCC* s1, tCC* s2)
  * err:  none.
 =*/
 void
-streqvmap(char From, char To, int ct)
+streqvmap(char from, char to, int ct)
 {
     if (ct == 0) {
         ct = sizeof(charmap) - 1;
@@ -190,14 +190,14 @@ streqvmap(char From, char To, int ct)
     }
 
     else {
-        unsigned int chTo   = (int)To   & 0xFF;
-        unsigned int chFrom = (int)From & 0xFF;
+        unsigned int i_to   = (int)to   & 0xFF;
+        unsigned int i_from = (int)from & 0xFF;
 
         do  {
-            charmap[chFrom] = (unsigned char)chTo;
-            chFrom++;
-            chTo++;
-            if ((chFrom >= sizeof(charmap)) || (chTo >= sizeof(charmap)))
+            charmap[i_from] = (unsigned char)i_to;
+            i_from++;
+            i_to++;
+            if ((i_from >= sizeof(charmap)) || (i_to >= sizeof(charmap)))
                 break;
         } while (--ct > 0);
     }

@@ -17,10 +17,14 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-d=`dirname $0`
-d=`cd $d ; pwd`
-prog=${d}/`basename $0`
-parent_pid=$$
+typeset -r prog=$(basename "$0" .sh)
+typeset -r progdir=$(\cd $(dirname "$0") && pwd -P)
+typeset -r program=${progdir}/$(basename "$0")
+typeset -r progpid=$$
+typeset -r parent_pid=$$
+
+builddir=`pwd`
+. ${top_builddir:-..}/config/shdefs
 
 die()
 {
@@ -55,9 +59,8 @@ set_config_values()
   nl='
 ' ht='	'
   . ${top_builddir}/config/shdefs
-
-  test -z "${MAKE}"   && MAKE=`which make`
-
+  : ${MAKE=`which make`}
+  : ${srcdir=`pwd`}
   srcdir=`cd ${srcdir} >/dev/null ; pwd`
   INCLUDES="${DEFS} "`
 
@@ -191,9 +194,6 @@ sanity_check()
   do test -f ${f} || die cannot find doc file: ${f}
      test -f `basename $f` || ln -s $f .
   done
-
-  cmd=${AGexe}
-  ${VERBOSE} && cmd=${cmd}" --trace=every --trace-out=>>${TMPDIR}/ag.log"
 }
 
 build_agdoc() {
@@ -203,8 +203,6 @@ build_agdoc() {
   setup_exports
   sanity_check
   run_getdefs
-
-  VERBOSE=true
 
   env >&2
   {
@@ -216,17 +214,17 @@ build_agdoc() {
 	make-dep    F ${GEN_BASE}.dep
 	make-dep    P
 	_EOF_
-    ${VERBOSE} && false && {
+    ${VERBOSE} && {
       echo 'trace       every'
       echo "trace-out   >>${TMPDIR}/ag.log"
     }
   } > ${TMPDIR}/ag.ini
 
   opts="--load-opts=${TMPDIR}/ag.ini"
-  cmd=`echo "${cmd}" ${opts} ${TMPDIR}/${GEN_BASE}.def`
+  cmd=`echo ${AGexe} ${opts} ${TMPDIR}/${GEN_BASE}.def`
   echo "${PS4:-+} " ${cmd} >&8
 
-  ${cmd} || {
+  timeout ${timer}s ${cmd} || {
     cat ${TMPDIR}/ag.ini ${TMPDIR}/ag.log
     die could not regenerate doc
   } >&2

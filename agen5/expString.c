@@ -24,12 +24,6 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static size_t
-string_size(char const * pzScn, size_t newLineSize);
-
-static SCM
-makeString(char const * pzText, char const * pzNewLine, size_t newLineSize);
-
-static size_t
 stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta);
 
 static SCM
@@ -47,171 +41,6 @@ do_substitution(
     char **      ppz_res,
     ssize_t *    res_len);
 /* = = = END-STATIC-FORWARD = = = */
-
-static size_t
-string_size(char const * pzScn, size_t newLineSize)
-{
-    /*
-     *  Start by counting the start and end quotes, plus the NUL.
-     */
-    size_t dtaSize = 3;
-
-    for (;;) {
-        char ch = *(pzScn++);
-        if ((ch >= ' ') && (ch <= '~')) {
-
-            /*
-             *  One for each character, plus a backquote when needed
-             */
-            dtaSize++;
-            if ((ch == '"') || (ch == '\\'))
-                dtaSize++;
-        }
-
-        /*
-         *  When not a normal character, then count the characters
-         *  required to represent whatever it is.
-         */
-        else switch (ch) {
-        case NUL:
-            return dtaSize;
-
-        case NL:
-            dtaSize += newLineSize;
-            break;
-
-        case TAB:
-        case '\a':
-        case '\b':
-        case '\f':
-        case '\r':
-        case '\v':
-            dtaSize += 2;
-            break;
-
-        default:
-            dtaSize += 4;
-        }
-    }
-}
-
-static SCM
-makeString(char const * pzText, char const * pzNewLine, size_t newLineSize)
-{
-    char     z[SCRIBBLE_SIZE];
-    char*    pzDta;
-    char*    pzFre;
-    char const * pzScn   = pzText;
-    size_t   dtaSize = string_size(pzText, newLineSize);
-
-    /*
-     *  We now know how big the string is going to be.
-     *  Allocate what we need.
-     */
-    if (dtaSize >= sizeof(z))
-         pzFre = pzDta = AGALOC(dtaSize, "quoting string");
-    else pzFre = pzDta = z;
-
-    *(pzDta++) = '"';
-
-    for (;;) {
-        unsigned char ch = (unsigned char)*pzScn;
-        if ((ch >= ' ') && (ch <= '~')) {
-            if ((ch == '"') || (ch == '\\'))
-                /*
-                 *  We must escape these characters in the output string
-                 */
-                *(pzDta++) = '\\';
-            *(pzDta++) = (char)ch;
-
-        } else switch (ch) {
-        case NUL:
-            goto copyDone;
-
-        case NL:
-            /*
-             *  place contiguous new-lines on a single line
-             */
-            while (pzScn[1] == NL) {
-                *(pzDta++) = '\\';
-                *(pzDta++) = 'n';
-                pzScn++;
-            }
-
-            /*
-             *  Replace the new-line with its escaped representation.
-             *  Also, break and restart the output string, indented
-             *  7 spaces (so that after the '"' char is printed,
-             *  any contained tabbing will look correct).
-             *  Do *not* start a new line if there are no more data.
-             */
-            if (pzScn[1] == NUL) {
-                *(pzDta++) = '\\';
-                *(pzDta++) = 'n';
-                goto copyDone;
-            }
-
-            strcpy(pzDta, pzNewLine);
-            pzDta += newLineSize;
-            break;
-
-        case '\a':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'a';
-            break;
-
-        case '\b':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'b';
-            break;
-
-        case '\f':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'f';
-            break;
-
-        case '\r':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'r';
-            break;
-
-        case TAB:
-            *(pzDta++) = '\\';
-            *(pzDta++) = 't';
-            break;
-
-        case '\v':
-            *(pzDta++) = '\\';
-            *(pzDta++) = 'v';
-            break;
-
-        default:
-            /*
-             *  sprintf is safe here, because we already computed
-             *  the amount of space we will be using.
-             */
-            sprintf(pzDta, MK_STR_OCT_FMT, ch);
-            pzDta += 4;
-        }
-
-        pzScn++;
-    } copyDone:
-
-    /*
-     *  End of string.  Terminate the quoted output.
-     *  If necessary, deallocate the text string.
-     *  Return the scan resumption point.
-     */
-    *(pzDta++) = '"';
-    *pzDta = NUL;
-
-    {
-        SCM res = AG_SCM_STR02SCM(pzFre);
-        if (pzFre != z)
-            AGFREE(pzFre);
-        return res;
-    }
-}
 
 static size_t
 stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta)
@@ -433,6 +262,24 @@ do_multi_subs(char ** ppzStr, ssize_t * pStrLen, SCM match, SCM repl)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *  EXPRESSION EVALUATION ROUTINES
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/*=gfunc mk_gettextable
+ *
+ * what:   print a string in a gettext-able format
+ * exparg: string, a multi-paragraph string
+ *
+ * doc: Returns SCM_UNDEFINED.  The input text string is printed
+ *      to the current output as one puts() call per paragraph.
+=*/
+SCM
+ag_scm_mk_gettextable(SCM txt)
+{
+    if (AG_SCM_STRING_P(txt)) {
+        char const * pz = ag_scm2zchars(txt, "txt");
+        optionPrintParagraphs(pz, false, cur_fpstack->stk_fp);
+    }
+    return SCM_UNDEFINED;
+}
 
 /*=gfunc in_p
  *
@@ -921,8 +768,12 @@ ag_scm_stack(SCM obj)
 SCM
 ag_scm_kr_string(SCM str)
 {
-    return makeString(ag_scm2zchars(str, "str"),
-                      KR_STRING_NEWLINE, KR_STRING_NEWLINE_LEN);
+    char const * pz = ag_scm2zchars(str, "krstr");
+    SCM res;
+    pz  = optionQuoteString(pz, KR_STRING_NEWLINE);
+    res = AG_SCM_STR02SCM(pz);
+    AGFREE(pz);
+    return res;
 }
 
 
@@ -948,8 +799,12 @@ ag_scm_kr_string(SCM str)
 SCM
 ag_scm_c_string(SCM str)
 {
-    return makeString(ag_scm2zchars(str, "str"),
-                      C_STRING_NEWLINE, C_STRING_NEWLINE_LEN);
+    char const * pz = ag_scm2zchars(str, "cstr");
+    SCM res;
+    pz  = optionQuoteString(pz, C_STRING_NEWLINE);
+    res = AG_SCM_STR02SCM(pz);
+    AGFREE(pz);
+    return res;
 }
 
 

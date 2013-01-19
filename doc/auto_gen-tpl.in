@@ -466,7 +466,7 @@ Invocation section from [= ag-texi =]
 [=
 
 INVOKE  get-text tag = installation     =][=
-INCLUDE "auto-opts.tpl"
+INCLUDE "auto-opts.tlib"
 
 =]
 @page

@@ -445,19 +445,25 @@ ag_scm_match_value_p(SCM op, SCM obj, SCM test)
 SCM
 ag_scm_get(SCM agName, SCM altVal)
 {
-    def_ent_t*  pE;
-    bool     x;
+    if (AG_SCM_STRING_P(agName)) {
+        bool   x;
+        char * vnm = ag_scm2zchars(agName, "vname");
+        def_ent_t * de  = find_def_ent(vnm, &x);
+        if ((de != NULL) && (de->de_type == VALTYP_TEXT))
+            return AG_SCM_STR02SCM(de->de_val.dvu_text);
+        if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
+            fprintf(trace_fp, GOT_NOTHING_FMT, vnm,
+                    (de != NULL) ? "non text value" : "no value at all",
+                    current_tpl->td_file,
+                    (unsigned)cur_macro->md_line);
 
-    pE = (! AG_SCM_STRING_P(agName)) ? NULL :
-        find_def_ent(ag_scm2zchars(agName, "ag value"), &x);
-
-    if ((pE == NULL) || (pE->de_type != VALTYP_TEXT)) {
-        if (AG_SCM_STRING_P(altVal))
-            return altVal;
-        return AG_SCM_STR02SCM(zNil);
-    }
-
-    return AG_SCM_STR02SCM(pE->de_val.dvu_text);
+    } else if (OPT_VALUE_TRACE > TRACE_NOTHING)
+        fprintf(trace_fp, GET_NOTHING_FMT, current_tpl->td_file,
+                (unsigned)cur_macro->md_line);
+    
+    if (AG_SCM_STRING_P(altVal))
+        return altVal;
+    return AG_SCM_STR02SCM(zNil);
 }
 
 

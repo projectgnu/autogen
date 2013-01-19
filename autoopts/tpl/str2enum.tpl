@@ -47,7 +47,9 @@ CASE (suffix)                   =][= #
 == h                            =][=
 INVOKE init-header              =]
 #include <sys/types.h>
-#include <inttypes.h>
+#ifndef MISSING_INTTYPES_H
+# include <inttypes.h>
+#endif
 
 typedef enum {[=
     (if (> enum-val-offset 0)

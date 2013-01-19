@@ -357,12 +357,12 @@ struct options {
     tOptDesc   * const          pOptDesc;           /* PUBLIC */
     char const * const          pzBugAddr;          /* PUBLIC */
 
-    void*                       pExtensions;
-    void*                       pSavedState;
+    void *                      pExtensions;
+    void *                      pSavedState;
 
     // coverity[+kill]
     tpUsageProc                 pUsageProc;
-    tOptionXlateProc*           pTransProc;
+    tOptionXlateProc *          pTransProc;
 
     tOptSpecIndex               specOptIdx;
     int const                   optCt;

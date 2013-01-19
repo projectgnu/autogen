@@ -27,8 +27,6 @@
 
 . ./defs
 
-test_src=${srcdir}/${testname}.test
-
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 echo make defs from test file
 sed "1,/^##* *BEGIN-DEFS/d

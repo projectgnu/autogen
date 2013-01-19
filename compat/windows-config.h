@@ -1,6 +1,6 @@
 
 /**
- * \file autoopts.c
+ * \file windows-config.h
  *
  *  This file contains all of the routines that must be linked into
  *  an executable to use the generated option processing.  The optional
@@ -41,86 +41,14 @@
 #endif
 
 /*
- * Known predifined MS compiler version codes:
- *  1700: MSVC++ 11.0 (Visual Studio 2012)
- *  1600: MSVC++ 10.0 (Visual Studio 2010)
- *  1500: MSVC++ 9.0  (Visual Studio 2008)
- *  1400: MSVC++ 8.0  (Visual Studio 2005)
- *  1310: MSVC++ 7.1  (Visual Studio 2003)
- *  1300: MSVC++ 7.0
- *  1200: MSVC++ 6.0  (Visual C++ 6)
- *  1100: MSVC++ 5.0
- */
-
-/* C99 exact size integer support. */
-#if defined(HAVE_INTTYPES_H)
-# include <inttypes.h>
-#elif defined(HAVE_STDINT_H)
-# include <stdint.h>
-#elif ! defined(ADDED_EXACT_SIZE_INTEGERS)
-# define  ADDED_EXACT_SIZE_INTEGERS 1
-# include <windows.h>
-
-  typedef __int8 int8_t;
-  typedef unsigned __int8 uint8_t;
-
-  typedef __int16 int16_t;
-  typedef unsigned __int16 uint16_t;
-
-  typedef __int32 int32_t;
-  typedef unsigned __int32 uint32_t;
-
-  typedef __int64 int64_t;
-  typedef unsigned __int64 uint64_t;
-#endif
-
-/*
- * Miscellaneous functions that Microsoft maps
- * to other names
- *
- * #define inline __inline
- * #define vsnprintf _vsnprintf
+ * Miscellaneous functions that Microsoft maps to other names
  */
 #define snprintf _snprintf
-/*
- * #define stricmp _stricmp
- * #define strcasecmp _stricmp
- * #define isascii __isascii
- * #define finite _finite
- * #define random      rand
- * #define srandom     srand
- */
 
 #define SIZEOF_INT   4
 #define SIZEOF_CHARP 4
 #define SIZEOF_LONG  4
 #define SIZEOF_SHORT 2
-
-typedef unsigned long uintptr_t;
-
-/*
- * # define HAVE_NET_IF_H
- * # define QSORT_USES_VOID_P
- * # define HAVE_SETVBUF
- * # define HAVE_VSPRINTF
- * # define HAVE_SNPRINTF
- * # define HAVE_VSNPRINTF
- * # define HAVE_PROTOTYPES             /* from ntpq.mak * /
- * # define HAVE_MEMMOVE
- * # define HAVE_TERMIOS_H
- * # define HAVE_ERRNO_H
- * # define HAVE_STDARG_H
- * # define HAVE_NO_NICE
- * # define HAVE_MKTIME
- * # define TIME_WITH_SYS_TIME
- * # define HAVE_IO_COMPLETION_PORT
- * # define ISC_PLATFORM_NEEDNTOP
- * # define ISC_PLATFORM_NEEDPTON
- * # define NEED_S_CHAR_TYPEDEF
- * # define USE_PROTOTYPES              /* for ntp_types.h * /
- *
- * #define ULONG_CONST(a) a ## UL
- */
 
 #define HAVE_LIMITS_H   1
 #define HAVE_STRDUP     1
@@ -128,11 +56,10 @@ typedef unsigned long uintptr_t;
 #define HAVE_FCNTL_H    1
 
 /*
- * VS.NET's version of wspiapi.h has a bug in it
- * where it assigns a value to a variable inside
- * an if statement. It should be comparing them.
- * We prevent inclusion since we are not using this
- * code so we don't have to see the warning messages
+ * VS.NET's version of wspiapi.h has a bug in it where it assigns a value
+ * to a variable inside an if statement. It should be comparing them.
+ * We prevent inclusion since we are not using this code so we don't have
+ * to see the warning messages
  */
 #ifndef _WSPIAPI_H_
 #define _WSPIAPI_H_
@@ -159,7 +86,7 @@ typedef unsigned long uintptr_t;
 #define strdup  _strdup
 #define stat    _stat       /* struct stat from <sys/stat.h> */
 #define unlink  _unlink
-#define fchmod( _x, _y );
+#define fchmod( _x, _y )
 #define ssize_t SSIZE_T
 
 #include <io.h>
@@ -185,4 +112,33 @@ typedef unsigned long uintptr_t;
 #  define       S_ISDIR(mode)   (((mode) & S_IFDIR) == S_IFDIR)
 #endif
 
+/* C99 exact size integer support. */
+#if defined(HAVE_INTTYPES_H)
+# include <inttypes.h>
+
+#elif defined(HAVE_STDINT_H)
+# include <stdint.h>
+# define MISSING_INTTYPES_H 1
+
+#elif ! defined(ADDED_EXACT_SIZE_INTEGERS)
+# define ADDED_EXACT_SIZE_INTEGERS 1
+# define MISSING_INTTYPES_H 1
+
+  typedef __int8 int8_t;
+  typedef unsigned __int8 uint8_t;
+
+  typedef __int16 int16_t;
+  typedef unsigned __int16 uint16_t;
+
+  typedef __int32 int32_t;
+  typedef unsigned __int32 uint32_t;
+
+  typedef __int64 int64_t;
+  typedef unsigned __int64 uint64_t;
+
+  typedef unsigned long uintptr_t;
+  typedef long intptr_t;
+#endif
+
 #endif /* WINDOWS_CONFIG_HACKERY */
+/* windows-config.h ends here */

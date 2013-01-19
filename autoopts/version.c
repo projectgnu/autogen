@@ -42,90 +42,95 @@ optionVersion(void)
     return ver;
 }
 
-/**
- * Select among various ways to emit version information.
- *
- * @param opts  the option descriptor
- * @param fp    the output stream
- */
 static void
-emit_simple_ver(tOptions * opts, FILE * fp)
+emit_first_line(
+    FILE * fp, char const * alt1, char const * alt2, char const * alt3)
 {
-    /*
-     *  Use the supplied string
-     */
-    if (opts->pzFullVersion != NULL)
-        fputs(opts->pzFullVersion, fp);
-
-    /*
-     *  Extract the interesting part of the copyright string
-     */
-    else if (opts->pzCopyright != NULL) {
-        char const * pe = strchr(opts->pzCopyright, NL);
-        if (pe == NULL)
-            pe = opts->pzCopyright + strlen(opts->pzCopyright);
-        fwrite(opts->pzCopyright, 1, (size_t)(pe - opts->pzCopyright), fp);
-    }
-
-    /*
-     *  Extract the interesting part of the usage title string
-     */
-    else {
-        char const * pe = strchr(opts->pzUsageTitle, NL);
-        if (pe == NULL)
-            pe = opts->pzUsageTitle + strlen(opts->pzUsageTitle);
-        fwrite(opts->pzUsageTitle, 1, (size_t)(pe - opts->pzUsageTitle), fp);
-    }
+    char const * p = (alt1 != NULL) ? alt1 : ((alt2 != NULL) ? alt2 : alt3);
+    char const * e;
+    if (p == NULL)
+        return;
+    e = strchr(p, NL);
+    if (e == NULL)
+        fputs(p, fp);
+    else
+        fwrite(p, 1, (e - p), fp);
     fputc(NL, fp);
 }
 
+/**
+ * Select among various ways to emit version information.
+ *
+ * @param[in] o   the option descriptor
+ * @param[in] fp  the output stream
+ */
 static void
-emit_copy_ver(tOptions * opts, FILE * fp)
+emit_simple_ver(tOptions * o, FILE * fp)
+{
+    emit_first_line(fp, o->pzFullVersion, o->pzCopyright, o->pzUsageTitle);
+}
+
+/**
+ * print the version with a copyright notice.
+ *
+ * @param[in] o   the option descriptor
+ * @param[in] fp  the output stream
+ */
+static void
+emit_copy_full(tOptions * o, FILE * fp)
+{
+    if (o->pzCopyright != NULL)
+        fputs(o->pzCopyright, fp);
+
+    else if (o->pzFullVersion != NULL)
+        fputs(o->pzFullVersion, fp);
+
+    else
+        emit_first_line(fp, o->pzUsageTitle, NULL, NULL);
+    
+    if (HAS_pzPkgDataDir(o) && (o->pzPackager != NULL)) {
+        fputc(NL, fp);
+        fputs(o->pzPackager, fp);
+
+    } else if (o->pzBugAddr != NULL) {
+        fputc(NL, fp);
+        fprintf(fp, zPlsSendBugs, o->pzBugAddr);
+    }
+}
+
+/**
+ * print the version and any copyright notice.
+ * The version with a full copyright and additional notes.
+ *
+ * @param[in] opts  the option descriptor
+ * @param[in] fp    the output stream
+ */
+static void
+emit_copy_note(tOptions * opts, FILE * fp)
 {
     if (opts->pzCopyright != NULL)
         fputs(opts->pzCopyright, fp);
 
-    else if (opts->pzFullVersion != NULL)
-        fputs(opts->pzFullVersion, fp);
-
-    else {
-        char const * pe = strchr(opts->pzUsageTitle, NL);
-        if (pe == NULL)
-            pe = opts->pzUsageTitle + strlen(opts->pzUsageTitle);
-        fwrite(opts->pzUsageTitle, 1, (size_t)(pe - opts->pzCopyright), fp);
-    }
+    if (opts->pzCopyNotice != NULL)
+        fputs(opts->pzCopyNotice, fp);
 
     fputc(NL, fp);
-
-    if (HAS_pzPkgDataDir(opts) && (opts->pzPackager != NULL))
-        fputs(opts->pzPackager, fp);
-
-    else if (opts->pzBugAddr != NULL)
-        fprintf(fp, zPlsSendBugs, opts->pzBugAddr);
-}
-
-static void
-emit_copy_note(tOptions * opts, FILE * fp)
-{
-    if (opts->pzCopyright != NULL) {
-        fputs(opts->pzCopyright, fp);
-        fputc(NL, fp);
-    }
-
-    if (opts->pzCopyNotice != NULL) {
-        fputs(opts->pzCopyNotice, fp);
-        fputc(NL, fp);
-    }
-
     fprintf(fp, zAO_Ver, optionVersion());
-
-    if (HAS_pzPkgDataDir(opts) && (opts->pzPackager != NULL))
+    
+    if (HAS_pzPkgDataDir(opts) && (opts->pzPackager != NULL)) {
+        fputc(NL, fp);
         fputs(opts->pzPackager, fp);
 
-    else if (opts->pzBugAddr != NULL)
+    } else if (opts->pzBugAddr != NULL) {
+        fputc(NL, fp);
         fprintf(fp, zPlsSendBugs, opts->pzBugAddr);
+    }
 }
 
+/**
+ * Handle the version printing.  We must see how much information
+ * is being requested and select the correct printing routine.
+ */
 static void
 print_ver(tOptions * opts, tOptDesc * od, FILE * fp)
 {
@@ -153,7 +158,7 @@ print_ver(tOptions * opts, tOptDesc * od, FILE * fp)
     switch (ch) {
     case NUL: /* arg provided, but empty */
     case 'v': case 'V': emit_simple_ver(opts, fp); break;
-    case 'c': case 'C': emit_copy_ver(  opts, fp); break;
+    case 'c': case 'C': emit_copy_full( opts, fp); break;
     case 'n': case 'N': emit_copy_note( opts, fp); break;
 
     default:

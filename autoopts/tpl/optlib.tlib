@@ -40,20 +40,6 @@ DEFINE init-and-validate                =][=
     (error (sprintf "prog-name limited to 16 characters:  %s"
            prog-name)) )
 
-   ;;# START-BUILDTREE-ISMS
-   ;;
-   (shell "CLexe=${AGexe%/agen5/*}/columns/columns
-  test -x \"${CLexe}\" || {
-    CLexe=${AGexe%/autogen}/columns
-    test -x \"${CLexe}\" || die 'columns program is not findable'
-  }")
-
-=][= # END-BUILDTREE-ISMS
-
-   (shell "CLexe=${AGexe%/autogen}/columns")
-
-# END-INSTALL-ONLY-CODE =][=
-
 (make-tmp-dir)
 (define get-opt-value (lambda (val)
         (if (<= val 32) val (+ val 96))  ))
@@ -76,6 +62,7 @@ DEFINE init-and-validate                =][=
 (define extract-fmt     "\n/* extracted from %s near line %d */\n")
 (define make-callback-procs #f)
 (define omit-nls-code   (~ (get "no-xlate") "(any|no)thing"))
+(define xlate-desc-p    (and (not omit-nls-code) (not (exist? "full-usage"))))
 
 (define need-stacking (lambda()
     (if (not (exist? "max"))
@@ -83,10 +70,10 @@ DEFINE init-and-validate                =][=
         (> (string->number (get "max")) 1)
 )   )   )
 
-(define get-text (lambda (nm) (shell (string-append
+(define get-text (lambda (nm) (shell
         "{ sed 's/@[a-z]*{\\([^}]*\\)}/\\1/g' | "
           "${CLexe} --fill -I0 -W72\n}<<\\_EODesc_\n"
-        (get nm) "\n_EODesc_" ))))
+        (get nm) "\n_EODesc_" )))
 
 (define do-ifdefs (or (exist? "flag.ifdef") (exist? "flag.ifndef")))
 
@@ -309,6 +296,17 @@ ENDFOR flag
 (define opt-strs (string-append pname "_opt_strs"))
 (string-table-new opt-strs)
 (out-push-new) (out-suspend "home-list")
+(if (not omit-nls-code) (begin
+    (out-push-new)
+    (out-suspend "xget")
+)   )
+(define field-name-fmt (string-append "\n  /* " pname "Options.%s */\n"))
+(define put-xget (lambda (nm st) (begin
+    (out-resume      "xget")
+    (ag-fprintf 0    field-name-fmt nm)
+    (mk-gettextable  st)
+    (out-suspend     "xget")
+) ) )
 =][=
 
 ENDDEF init-and-validate
@@ -580,14 +578,10 @@ ENDDEF option-copyright
 
 Emit usage text                         =][=
 
-DEFINE usage-text                       =]
+DEFINE emit-help-text                  \=]
 #define [=
-  (set! tmp-val (string-append (get "usage-type") "-usage"))
-  (define usage-text-name
-         (string->c-name! (string-append pname "_" tmp-val)) )
-  usage-text-name
-
-  =] ([=
+  (set! tmp-val (string-append (get "help-type") "-usage"))
+  (string->c-name! (string-append pname "_" tmp-val))  =] ([=
 
   CASE  (set! tmp-val (get tmp-val "<<<NOT-FOUND>>>"))
         tmp-val                         =][=
@@ -598,7 +592,8 @@ DEFINE usage-text                       =]
 
     (out-push-new)                      =][=
     INCLUDE "usage.tlib"                =][=
-    (string-table-add-ref opt-strs (out-pop #t)) =][=
+    (define tmp-val (out-pop #t))       =][=
+    (string-table-add-ref opt-strs tmp-val) =][=
 
   ~ "[a-z][a-z0-9_]*"                   =][= (. tmp-val) =][=
 
@@ -606,8 +601,12 @@ DEFINE usage-text                       =]
     (string-table-add-ref opt-strs tmp-val) =][=
   ESAC  flavor of usage text.           =])
 [=
+(if (not omit-nls-code) (begin
+   (set! tmp-text (string-append
+         "pz" (string-capitalize (get "help-type")) "Usage"))
+   (put-xget tmp-text tmp-val) ))       =][=
 
-ENDDEF usage-text
+ENDDEF emit-help-text
 
 ;; # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
@@ -798,8 +797,11 @@ DEFINE   emit-alias-option
 
 =]
 #define [= (. UP-name) =]_DESC    ([=
-    (string-table-add-ref opt-strs
-           (string-append "This is an alias for '" (get "aliases") "'")) =])
+    (set! tmp-val (string-append
+          "This is an alias for '" (get "aliases") "'"))
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-val) )
+    (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_NAME    NULL
 #define [= (. UP-name) =]_name    ([=
     (string-table-add-ref opt-strs (get "name")) =])
@@ -814,12 +816,15 @@ Define the arrays of values associated with an option (strings, etc.) =][=
 
 DEFINE   emit-nondoc-option     =][=
   (if (exist? "translators")
-      (string-append "\n" (shellf
-"${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_
-%s
-_EOF_" (get "translators")  ) " */" )  ) =]
+      (string-append "\n" (shell
+        "${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_\n"
+        (get "translators") "\n_EOF_")
+      " */" )  ) =]
 #define [= (. UP-name) =]_DESC      ([=
-  (string-table-add-ref opt-strs (get-text "descrip")) =])
+  (define tmp-val (get-text "descrip"))
+  (if xlate-desc-p
+      (put-xget "pOptDesc->pzText" tmp-val) )
+  (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_NAME      ([=
     (string-table-add-ref opt-strs UP-name) =])[=
 
@@ -997,8 +1002,10 @@ DEFINE emit-opt-strs
 
   IF (exist? "documentation")           =]
 #define [= (. UP-name) =]_DESC      ([=
-    (string-table-add-ref opt-strs
-       (string-append (get-text "descrip") ":")) =])
+    (define tmp-val (string-append (get-text "descrip") ":"))
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-val) )
+    (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_FLAGS     (OPTST_DOCUMENT | OPTST_NO_INIT)[=
   ELIF (exist? "aliases")               =][=
      INVOKE emit-alias-option           =][=
@@ -1027,9 +1034,11 @@ DEFINE emit-opt-strs
     IF (exist? "omitted-usage") =]
 #define [= (. UP-name) =]_DESC      ([=
     (set! tmp-text (get "omitted-usage"))
-    (if (> (string-length tmp-text) 1)
-        (string-table-add-ref opt-strs tmp-text)
-        "NULL") =])
+    (if (> (string-length tmp-text) 1) (begin
+        (if xlate-desc-p
+            (put-xget "pOptDesc->pzText" tmp-text) )
+        (string-table-add-ref opt-strs tmp-text) )
+      "NULL") =])
 #define [= (. UP-name) =]_name      ([=
     (string-table-add-ref opt-strs (get "name")) =])[=
 
@@ -1061,8 +1070,10 @@ DEFINE help-strs
    (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
 #define HELP_DESC       ([=
-    (string-table-add-ref opt-strs
-        "Display extended usage information and exit")=])
+    (define tmp-text "Display extended usage information and exit")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define HELP_name       ([=
     (string-table-add-ref opt-strs "help")=])[=
 
@@ -1071,8 +1082,10 @@ DEFINE help-strs
 =]
 #ifdef HAVE_WORKING_FORK
 #define MORE_HELP_DESC  ([=
-    (string-table-add-ref opt-strs
-        "Extended usage information passed thru pager")=])
+    (define tmp-text "Extended usage information passed thru pager")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define MORE_HELP_name  ([=
     (string-table-add-ref opt-strs "more-help")=])
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
@@ -1094,7 +1107,10 @@ DEFINE help-strs
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
 #define VER_DESC        ([=
-    (string-table-add-ref opt-strs "Output version information and exit")=])
+    (define tmp-text "Output version information and exit")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define VER_name        ([=
     (string-table-add-ref opt-strs "version")=])[=
 
@@ -1104,7 +1120,10 @@ DEFINE help-strs
 
 =]
 #define RESET_DESC      ([=
-    (string-table-add-ref opt-strs "Reset an option's state")=])
+    (define tmp-text "Reset an option's state")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define RESET_name      ([=
     (string-table-add-ref opt-strs "reset-option")=])
 #define RESET_FLAGS     (OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)|OPTST_NO_INIT)[=
@@ -1115,7 +1134,10 @@ DEFINE help-strs
 
 =]
 #define USAGE_DESC      ([=
-    (string-table-add-ref opt-strs "Abbreviated usage to stdout")=])
+    (define tmp-text "Abbreviated usage to stdout")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define USAGE_name      ([=
     (string-table-add-ref opt-strs "usage")=])[=
 
@@ -1125,7 +1147,10 @@ DEFINE help-strs
 
 =]
 #define VEND_DESC       ([=
-    (string-table-add-ref opt-strs "vendor supported additional options")=])
+    (define tmp-text "vendor supported additional options")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define VEND_name       ([=
     (string-table-add-ref opt-strs "vendor-option")=])[=
 
@@ -1135,7 +1160,10 @@ DEFINE help-strs
 
     IF (not (exist? "disable-save"))    =]
 #define SAVE_OPTS_DESC  ([=
-    (string-table-add-ref opt-strs "Save the option state to a config file")=])
+    (define tmp-text "Save the option state to a config file")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define SAVE_OPTS_name  ([=
     (string-table-add-ref opt-strs "save-opts")=])[=
 
@@ -1143,7 +1171,10 @@ DEFINE help-strs
 
     IF (not (exist? "disable-load"))    =]
 #define LOAD_OPTS_DESC     ([=
-    (string-table-add-ref opt-strs "Load options from a config file")=])
+    (define tmp-text "Load options from a config file")
+    (if xlate-desc-p
+        (put-xget "pOptDesc->pzText" tmp-text) )
+    (string-table-add-ref opt-strs tmp-text)=])
 #define LOAD_OPTS_NAME     ([=
     (string-table-add-ref opt-strs "LOAD_OPTS")=])
 #define NO_LOAD_OPTS_name  ([=

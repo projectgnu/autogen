@@ -72,7 +72,7 @@ run_ag x --no-def -T${testname}.tpl -b ${testname} || \
   failure autogen failed
 cmp -s ${testname}.ok ${testname}.out || \
   failure "`diff ${testname}.ok ${testname}.out`"
-exit 0
+
 cleanup
 
 ## Local Variables:

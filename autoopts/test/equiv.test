@@ -191,7 +191,7 @@ Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 
 The following option preset mechanisms are supported:
- - reading file ..../testdir/.test_equivrc
+ - reading file ..../TD/.test_equivrc
 
 The valid "omega" option keywords are:
   uno dos tres mucho
@@ -205,7 +205,7 @@ ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
 compile "-?"
-${SED} '/^ - reading file/s, file .*/testdir/, file ..../testdir/,' \
+${SED} '/^ - reading file/s, file .*-testd/, file ..../TD/,' \
     ${testname}.help > ${testname}-test2.help
 cmp -s ${testname}-base2.help ${testname}-test2.help || \
   failure "`diff ${testname}-base2.help ${testname}-test2.help`"

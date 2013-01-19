@@ -3,6 +3,7 @@
 h
 c
 
+=][=
 # This file contains the templates used to generate the
 # option descriptions for client programs, and it declares
 # the macros used in the templates.
@@ -26,8 +27,22 @@ c
 ##  8584710e9b04216a394078dc156b781d0b47e1729104d666658aecef8ee32e95  COPYING.gplv3
 ##  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
 ##  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
+=][=
+;;# START-BUILDTREE-ISMS
+;;
+(shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }"
+)
+=][= # END-BUILDTREE-ISMS
 
-=][= (dne " *  " "/*  ")    =][=
+(shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE     =][=
+
+ (dne " *  " "/*  ")        =][=
 
 CASE    (suffix)            =][=
 

@@ -2,7 +2,7 @@
 ##
 ## Makefile.am
 ##
-## Author:          Bruce Korb <bkorb@gnu.org>
+## Author: Bruce Korb <bkorb@gnu.org>
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -36,22 +36,20 @@ TESTS      = \
 
 getopt.test : ../$(libsrc)
 ../$(libsrc):
-	cd .. ; $(MAKE) $(libsrc)
-
-testsubdir = ./testdir
-
-TESTS_ENVIRONMENT = TERM='' top_builddir="$(top_builddir)"
+	cd .. ; echo $(MAKE) $(libsrc) ; $(MAKE) $(libsrc) >/dev/null 2>&1
 
 distclean-local:
-	-rm -rf $(testsubdir) FAILURES
+	@-rm -rf *-testd FAILURES
 
 check : perm-stamp
 
 perm-stamp :
 	@-cd $(srcdir) ; chmod +x *.test 2>/dev/null
 
-verbose :
-	rm -rf FAILURES testdir ; VERBOSE=true ; export VERBOSE ; \
+verbose : distclean-local
+	VERBOSE=true ; export VERBOSE ; \
 	$(MAKE) check TESTS="$(TESTS)"
+
+.PHONY : distclean-local verbose perm-stamp
 
 # Makefile.am ends here

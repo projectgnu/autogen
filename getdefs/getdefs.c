@@ -42,7 +42,7 @@ static void
 buildDefinition(char * pzDef, char const * pzFile, int line, char * pzOut);
 
 static tSuccess
-buildPreamble(char ** ppzDef, char ** ppzOut, char const * pzFile, int line);
+buildPreamble(char ** ppzDef, char ** ppzOut, char const * fname, int line);
 
 static int
 compar_defname(const void* p1, const void* p2);
@@ -57,7 +57,7 @@ static void
 printEntries(FILE* fp);
 
 static void
-processFile(char const * pzFile);
+processFile(char const * fname);
 
 static void
 set_first_idx(void);

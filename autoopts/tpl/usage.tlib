@@ -23,6 +23,20 @@
  ;; This template is designed to emit help text from the current set
  ;; of option definitions.
  ;;
+   ;;# START-BUILDTREE-ISMS
+   ;;
+   (shell "CLexe=${AGexe%/agen5/*}/columns/columns
+  test -x \"${CLexe}\" || {
+    CLexe=${AGexe%/autogen}/columns
+    test -x \"${CLexe}\" || die 'columns program is not findable'
+  }")
+
+=][= # END-BUILDTREE-ISMS
+
+   (shell "CLexe=${AGexe%/autogen}/columns")
+
+# END-INSTALL-ONLY-CODE =][=
+
  (make-tmp-dir)
  (out-push-new (shellf "echo ${tmp_dir}/%s.def" (get "prog-name")))
  (define emit-def (lambda (vname)
@@ -92,7 +106,13 @@ flag = {[=
 ENDFOR flag                 =][=
 
 (out-pop)
-(out-push-new)             \=]
+(out-push-new)             \=][=
+(shell
+  "echo export tmp_dir=\\'$tmp_dir\\'\n"
+  "echo export top_builddir=\\'$top_builddir\\'\n"
+  "echo export CFLAGS=\\'$CFLAGS\\'\n"
+  "echo export CLexe=\\'$CLexe\\'\n" )=]
+save_dir=`pwd`
 # redirect stdout.  We see this IFF there is a problem
 #
 redirect_log=${tmp_dir}/redirected.log
@@ -129,7 +149,6 @@ test -d "${top_srcdir}" && \
 
 [= # END-BUILDTREE-ISMS the following code is for installed version:
 
-test -x "${AGexe}" || redirect_die "AGexe is invalid:  ${AGexe}"
 aocfg=`dirname ${AGexe}`/autoopts-config
 test -x "$aocfg" || redirect_die "missing $ag"
 ldflags="${cfg_ldflags} `${aocfg} ldflags`"
@@ -164,8 +183,12 @@ cp "${h}" ${exe}-config.h
 [= ENDIF \=]
 flags="-DTEST_[= (string-upcase! (string->c-name! (get "prog-name")))
     =]_OPTS=1 ${inc_list} ${cfg_cflags}"
+tpldir=`dirname [= (tpl-file)=]`
+tpldir=`cd $tpldir >/dev/null && pwd`
 cd ${tmp_dir}
-${AGexe} -Toptions.tpl [= prog-name =].def || \
+mkdir ag-tmp
+TMPDIR=${tmp_dir}/ag-tmp \
+  ${AGexe} -L $tpldir [= prog-name =].def || \
     redirect_die "Cannot gen [= prog-name =]"
 cd -
 ${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \

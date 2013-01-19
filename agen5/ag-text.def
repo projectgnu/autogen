@@ -445,6 +445,12 @@ string = { nm = FOR_IN_LISTLESS;
 string = { nm = FOR_ITERATION_FMT;
    str = "  -  FOR-%s %s[%d] it#%d: Nxt %d, first=%s, last=%s\n"; };
 
+string = { nm = GET_NOTHING_FMT;
+   str = "'get' invoked with no name in %s line %u\n"; };
+
+string = { nm = GOT_NOTHING_FMT;
+   str = "'get %s' retrieved in %s line %u\n"; };
+
 string = { nm = GUARD_SFX;
    str = "_GUARD"; };
 
@@ -774,9 +780,6 @@ string = { nm = MK_LIC_TOO_BIG_FMT;
 string = { nm = MK_LIC_YRS;
    str = "<years>"; };
 
-string = { nm = MK_STR_OCT_FMT;
-   str = "\\%03o"; };
-
 string = { nm = MK_TMP_DIR_CMD;
    str = "mk_tmp_dir ; echo ${tmp_dir}/ag-XXXXXX"; };
 
@@ -1060,6 +1063,9 @@ string = { nm = SCM_PROC_CAST;
 
 string = { nm = SCM_TRUE_STR;
    str = "#t"; };
+
+string = { nm = SERV_RESTART;
+   str = "SERVER RESTART:  serv_id is NULLPROCESS\n"; };
 
 string = { nm = SETSID_FAIL;
    str = "Error %d setting session ID:  %s\n"; };

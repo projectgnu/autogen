@@ -34,6 +34,9 @@
  */
 
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
+#ifdef HAVE_LIBINTL_H
+#include <libintl.h>
+#endif
 
 /* = = = START-STATIC-FORWARD = = = */
 static inline bool
@@ -46,17 +49,20 @@ static void
 print_usage_details(tOptions * opts, int exit_code);
 
 static void
-prt_conflicts(tOptions * pOptions, tOptDesc * pOD);
+print_one_paragraph(char const * text, bool plain, FILE * fp);
 
 static void
-prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
+prt_conflicts(tOptions * opts, tOptDesc * pOD);
+
+static void
+prt_one_vendor(tOptions * opts, tOptDesc * pOD,
                arg_types_t * pAT, char const * usefmt);
 
 static void
-prt_vendor_opts(tOptions * pOpts, char const * pOptTitle);
+prt_vendor_opts(tOptions * opts, char const * pOptTitle);
 
 static void
-prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
+prt_extd_usage(tOptions * opts, tOptDesc * pOD,
                char const * pOptTitle);
 
 static void
@@ -309,12 +315,132 @@ print_usage_details(tOptions * opts, int exit_code)
     }
 }
 
+static void
+print_one_paragraph(char const * text, bool plain, FILE * fp)
+{
+    if (plain) {
+#ifdef HAVE_LIBINTL_H
+#undef gettext
+        char * buf = dgettext("libopts", text);
+        if (buf == text)
+            text = gettext(text);
+#endif
+        fputs(text, fp);
+    }
+
+    else {
+        text = optionQuoteString(text, LINE_SPLICE);
+        fprintf(fp, PUTS_FMT, text);
+        AGFREE(text);
+    }
+}
+ 
+/*=export_func  optionPrintParagraphs
+ * private:
+ *
+ * what:  Print a paragraph of usage text
+ * arg:   + char const * + text  + a block of text that has bee i18n-ed +
+ * arg:   + bool         + plain + false -> wrap text in fputs()        +
+ * arg:   + FILE *       + fp    + the stream file pointer for output   +
+ *
+ * doc:
+ *  This procedure is called in two contexts: when a full or short usage text
+ *  has been provided for display, and when autogen is assembling a list of
+ *  translatable texts in the optmain.tlib template.  In the former case, \a
+ *  plain is set to \a true, otherwise \a false.
+ *
+ *  Anything less than 256 characters in size is printed as a single unit.
+ *  Otherwise, paragraphs are detected.  A paragraph break is defined as just
+ *  before a non-empty line preceded by two newlines or a line that starts
+ *  with at least one space character but fewer than 8 space characters.
+ *  Lines indented with tabs or more than 7 spaces are considered continuation
+ *  lines.
+=*/
+void
+optionPrintParagraphs(char const * text, bool plain, FILE * fp)
+{
+    size_t len = strlen(text);
+    char * buf;
+    if (len < 256) {
+        print_one_paragraph(text, plain, fp);
+        return;
+    }
+    AGDUPSTR(buf, text, "ppara");
+    text = buf;
+
+    for (;;) {
+        char * scan;
+
+        if (len < 256) {
+        done:
+            print_one_paragraph(buf, plain, fp);
+            break;
+        }
+        scan = buf;
+
+    try_longer:
+        scan = strchr(scan, NL);
+        if (scan == NULL)
+            goto done;
+
+        if ((scan - buf) < 40) {
+            scan++;
+            goto try_longer;
+        }
+
+        scan++;
+        if ((! isspace((int)*scan)) || (*scan == HT))
+            /*
+             * line starts with tab or non-whitespace --> continuation
+             */
+            goto try_longer;
+
+        if (*scan == NL) {
+            /*
+             * Double newline -> paragraph break
+             * Include all newlines in current paragraph.
+             */
+            while (*++scan == NL)  /*continue*/;
+
+        } else {
+            char * p = scan;
+            int   sp_ct = 0;
+
+            while (*p == ' ') {
+                if (++sp_ct >= 8) {
+                    /*
+                     * Too many spaces --> continuation line
+                     */
+                    scan = p;
+                    goto try_longer;
+                }
+                p++;
+            }
+        }
+
+        /*
+         * "scan" points to the first character of a paragraph or the
+         * terminating NUL byte.
+         */
+        {
+            char svch = *scan;
+            *scan = NUL;
+            print_one_paragraph(buf, plain, fp);
+            len -= scan - buf;
+            if (len <= 0)
+                break;
+            *scan = svch;
+            buf = scan;
+        }
+    }
+    AGFREE((void *)text);
+}
 
 /*=export_func  optionUsage
  * private:
  *
  * what:  Print usage text
- * arg:   + tOptions* + pOptions + program options descriptor +
+ * arg:   + tOptions* + opts + program options descriptor +
  * arg:   + int       + exitCode + exit code for calling exit(3) +
  *
  * doc:
@@ -327,7 +453,7 @@ print_usage_details(tOptions * opts, int exit_code)
  *  to stdout and the actual exit code will be "EXIT_SUCCESS".
 =*/
 void
-optionUsage(tOptions * pOptions, int usage_exit_code)
+optionUsage(tOptions * opts, int usage_exit_code)
 {
     int exit_code = (usage_exit_code == AO_EXIT_REQ_USAGE)
         ? EXIT_SUCCESS : usage_exit_code;
@@ -346,32 +472,35 @@ optionUsage(tOptions * pOptions, int usage_exit_code)
         char const * pz;
 
         if (exit_code == EXIT_SUCCESS) {
-            pz = (pOptions->structVersion >= 30 * 4096)
-                ? pOptions->pzFullUsage : NULL;
+            pz = (opts->structVersion >= 30 * 4096)
+                ? opts->pzFullUsage : NULL;
 
             if (option_usage_fp == NULL)
                 option_usage_fp = stdout;
         } else {
-            pz = (pOptions->structVersion >= 30 * 4096)
-                ? pOptions->pzShortUsage : NULL;
+            pz = (opts->structVersion >= 30 * 4096)
+                ? opts->pzShortUsage : NULL;
 
             if (option_usage_fp == NULL)
                 option_usage_fp = stderr;
         }
 
         if (pz != NULL) {
-            fputs(pz, option_usage_fp);
+            if ((opts->fOptSet & OPTPROC_TRANSLATE) != 0)
+                optionPrintParagraphs(pz, true, option_usage_fp);
+            else
+                fputs(pz, option_usage_fp);
             exit(exit_code);
         }
     }
 
-    fprintf(option_usage_fp, pOptions->pzUsageTitle, pOptions->pzProgName);
-    set_usage_flags(pOptions, NULL);
+    fprintf(option_usage_fp, opts->pzUsageTitle, opts->pzProgName);
+    set_usage_flags(opts, NULL);
 
     if ((exit_code == EXIT_SUCCESS) ||
-        (! skip_misuse_usage(pOptions)))
+        (! skip_misuse_usage(opts)))
 
-        print_usage_details(pOptions, usage_exit_code);
+        print_usage_details(opts, usage_exit_code);
 
     exit(exit_code);
 }
@@ -382,12 +511,12 @@ optionUsage(tOptions * pOptions, int usage_exit_code)
 /**
  * print option conflicts.
  *
- * @param pOptions the program option descriptor
+ * @param opts the program option descriptor
  * @param pOD      the option descriptor
  * @param pAT      names of the option argument types
  */
 static void
-prt_conflicts(tOptions * pOptions, tOptDesc * pOD)
+prt_conflicts(tOptions * opts, tOptDesc * pOD)
 {
 
     fputs(zTabHyp, option_usage_fp);
@@ -401,7 +530,7 @@ prt_conflicts(tOptions * pOptions, tOptDesc * pOD)
         fputs(zReqThese, option_usage_fp);
         for (;;) {
             fprintf(option_usage_fp, zTabout,
-                    pOptions->pOptDesc[*pOptNo].pz_Name);
+                    opts->pOptDesc[*pOptNo].pz_Name);
             if (*++pOptNo == NO_EQUIVALENT)
                 break;
         }
@@ -419,7 +548,7 @@ prt_conflicts(tOptions * pOptions, tOptDesc * pOD)
         fputs(zProhib, option_usage_fp);
         for (;;) {
             fprintf(option_usage_fp, zTabout,
-                    pOptions->pOptDesc[*pOptNo].pz_Name);
+                    opts->pOptDesc[*pOptNo].pz_Name);
             if (*++pOptNo == NO_EQUIVALENT)
                 break;
         }
@@ -434,10 +563,10 @@ prt_conflicts(tOptions * pOptions, tOptDesc * pOD)
  * @param pAT       names of the option argument types
  */
 static void
-prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
+prt_one_vendor(tOptions * opts, tOptDesc * pOD,
                arg_types_t * pAT, char const * usefmt)
 {
-    prt_preamble(pOptions, pOD, pAT);
+    prt_preamble(opts, pOD, pAT);
 
     {
         char z[ 80 ];
@@ -489,11 +618,11 @@ prt_one_vendor(tOptions * pOptions, tOptDesc * pOD,
  * Print the long options processed with "-W".  These options will be the
  * ones that do *not* have flag characters.
  *
- * @param pOptions the program option descriptor
- * @param pOD      the option descriptor
+ * @param opts  the program option descriptor
+ * @param pOD   the option descriptor
  */
 static void
-prt_vendor_opts(tOptions * pOpts, char const * pOptTitle)
+prt_vendor_opts(tOptions * opts, char const * pOptTitle)
 {
     static unsigned int const not_vended_mask =
         OPTST_NO_USAGE_MASK | OPTST_DOCUMENT;
@@ -505,8 +634,8 @@ prt_vendor_opts(tOptions * pOpts, char const * pOptTitle)
      *  Only handle client specified options.  The "vendor option" follows
      *  "presetOptCt", so we won't loop/recurse indefinitely.
      */
-    int          ct     = pOpts->presetOptCt;
-    tOptDesc *   pOD    = pOpts->pOptDesc;
+    int          ct     = opts->presetOptCt;
+    tOptDesc *   pOD    = opts->pOptDesc;
     size_t       nmlen  = 0;
 
     fprintf(option_usage_fp, zTabout, zVendOptsAre);
@@ -522,16 +651,16 @@ prt_vendor_opts(tOptions * pOpts, char const * pOptTitle)
     } while (pOD++, (--ct > 0));
 
     sprintf(vfmt, vfmtfmt, (unsigned int)nmlen + 4);
-    ct     = pOpts->presetOptCt;
-    pOD    = pOpts->pOptDesc;
+    ct     = opts->presetOptCt;
+    pOD    = opts->pOptDesc;
 
     do  {
         if (  ((pOD->fOptState & not_vended_mask) != 0)
            || IS_GRAPHIC_CHAR(pOD->optValue))
             continue;
 
-        prt_one_vendor(pOpts, pOD, &argTypes, vfmt);
-        prt_extd_usage(pOpts, pOD, pOptTitle);
+        prt_one_vendor(opts, pOD, &argTypes, vfmt);
+        prt_extd_usage(opts, pOD, pOptTitle);
 
     } while (pOD++, (--ct > 0));
 }
@@ -539,17 +668,17 @@ prt_vendor_opts(tOptions * pOpts, char const * pOptTitle)
 /**
  * Print extended usage.  Usage/help was requested.
  *
- * @param pOptions the program option descriptor
- * @param pOD      the option descriptor
- * @param pAT      names of the option argument types
+ * @param opts  the program option descriptor
+ * @param pOD   the option descriptor
+ * @param pAT   names of the option argument types
  */
 static void
-prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
+prt_extd_usage(tOptions * opts, tOptDesc * pOD,
                char const * pOptTitle)
 {
-    if (  ((pOpts->fOptSet & OPTPROC_VENDOR_OPT) != 0)
+    if (  ((opts->fOptSet & OPTPROC_VENDOR_OPT) != 0)
        && (pOD->optActualValue == VENDOR_OPTION_VALUE)) {
-        prt_vendor_opts(pOpts, pOptTitle);
+        prt_vendor_opts(opts, pOptTitle);
         return;
     }
 
@@ -559,7 +688,7 @@ prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
      */
     if (  (pOD->pOptMust != NULL)
        || (pOD->pOptCant != NULL) )
-        prt_conflicts(pOpts, pOD);
+        prt_conflicts(opts, pOD);
 
     /*
      *  IF there is a disablement string
@@ -603,7 +732,7 @@ prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
     if (  (pOD->optEquivIndex != NO_EQUIVALENT)
        && (pOD->optEquivIndex != pOD->optActualIndex )  )  {
         fprintf(option_usage_fp, zAlt,
-                 pOpts->pOptDesc[ pOD->optEquivIndex ].pz_Name);
+                 opts->pOptDesc[ pOD->optEquivIndex ].pz_Name);
         return;
     }
 
@@ -614,10 +743,10 @@ prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
      *  THEN advise that this option may not be preset.
      */
     if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
-       && (  (pOpts->papzHomeList != NULL)
-          || (pOpts->pzPROGNAME != NULL)
+       && (  (opts->papzHomeList != NULL)
+          || (opts->pzPROGNAME != NULL)
           )
-       && (pOD->optIndex < pOpts->presetOptCt)
+       && (pOD->optIndex < opts->presetOptCt)
        )
 
         fputs(zNoPreset, option_usage_fp);
@@ -649,8 +778,8 @@ prt_extd_usage(tOptions * pOpts, tOptDesc * pOD,
         fprintf(option_usage_fp, zMust, pOD->optMinCt, pOD->optMaxCt);
     }
 
-    if (  NAMED_OPTS(pOpts)
-       && (pOpts->specOptIdx.default_opt == pOD->optIndex))
+    if (  NAMED_OPTS(opts)
+       && (opts->specOptIdx.default_opt == pOD->optIndex))
         fputs(zDefaultOpt, option_usage_fp);
 }
 

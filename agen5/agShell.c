@@ -627,7 +627,7 @@ load_data(void)
         fprintf(trace_fp, TRACE_SHELL_RESULT_MSG,
                 (int)text_sz, text, zLine);
 
-    return AGREALOC((void*)text, text_sz, "resize output");
+    return AGREALOC((void*)text, text_sz, "resize out");
 #undef LOAD_RETRY_LIMIT
 }
 
@@ -649,8 +649,12 @@ shell_cmd(char const * cmd)
      */
     if (serv_id == NULLPROCESS) {
         static int was_started = 0;
-        if (was_started++ > 0)
-            fprintf(stderr, "SERVER RESTART:  serv_id is NULLPROCESS\n");
+        if (was_started++ > 0) {
+            fputs(SERV_RESTART, stderr);
+            if (trace_fp != stderr)
+                fputs(SERV_RESTART, trace_fp);
+        }
+
         putenv((char *)SHELL_SET_PS4_FMT);
         serv_id = server_fp_open(&serv_pair, server_args);
         if (serv_id > 0)

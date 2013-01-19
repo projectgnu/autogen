@@ -419,11 +419,11 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
  *  caller will not try to traverse the list of twins).
  *
  * @param[in]  name      name to look for
- * @param[in]  pDefCtx   definition context
+ * @param[in]  def_ctx   definition context
  * @param[out] indexed   whether the name was indexed or not
  */
 static def_ent_t *
-find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
+find_def(char * name, def_ctx_t * def_ctx, bool * indexed)
 {
     static int   nestingDepth = 0;
 
@@ -464,7 +464,7 @@ find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        ent = pDefCtx->dcx_defent;
+        ent = def_ctx->dcx_defent;
         if (ent == NULL)
             return NULL;
 
@@ -473,7 +473,7 @@ find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
              *  IF the name matches
              *  THEN break out of the double loop
              */
-            if (strcmp(ent->de_name, name) == 0)
+            if (streqvcmp(ent->de_name, name) == 0)
                 goto found_def_entry;
 
             ent = ent->de_next;
@@ -489,8 +489,8 @@ find_def(char * name, def_ctx_t * pDefCtx, bool * indexed)
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefCtx = pDefCtx->dcx_prev;
-        if (pDefCtx == NULL)
+        def_ctx = def_ctx->dcx_prev;
+        if (def_ctx == NULL)
             return NULL;
     } found_def_entry:;
 
@@ -744,7 +744,7 @@ print_used_defines(void)
  *  not try to traverse the list of twins).
  */
 static def_ent_t **
-get_def_list(char * name, def_ctx_t * pDefCtx)
+get_def_list(char * name, def_ctx_t * def_ctx)
 {
     static def_ent_list_t defList = { 0, 0, NULL, 0 };
 
@@ -785,7 +785,7 @@ get_def_list(char * name, def_ctx_t * pDefCtx)
          *  IF we are at the end of the definitions (reached ROOT),
          *  THEN it is time to bail out.
          */
-        ent = pDefCtx->dcx_defent;
+        ent = def_ctx->dcx_defent;
         if (ent == NULL) {
             /*
              *  Make sure we are not nested.  Once we start to nest,
@@ -822,8 +822,8 @@ get_def_list(char * name, def_ctx_t * pDefCtx)
         /*
          *  Let's go try the definitions at the next higher level.
          */
-        pDefCtx = pDefCtx->dcx_prev;
-        if (pDefCtx == NULL)
+        def_ctx = def_ctx->dcx_prev;
+        if (def_ctx == NULL)
             goto not_found;
     } found_def_entry:;
 
