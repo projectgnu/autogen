@@ -161,10 +161,12 @@ usage_text_t option_xlateable_txt = {
 do not compile this section.
 /* TRANSLATORS: The following dummy function was crated solely so that
  * xgettext can extract the correct strings.  These strings are actually
- * referenced where the preceding "#line" directive states, though you
- * will not see the literal string there.  The literal string is defined
- * above and referenced via a #define name that redirects into the
- * "option_xlateable_txt" structure above.
+ * referenced where the preceding "#line" directive states, though you will
+ * not see the literal string there.  The literal string is defined above in
+ * the @code{option_lib_text} table and referenced via a #define name that
+ * redirects into the @code{option_xlateable_txt} structure above.  When
+ * translating is activated, the pointers in @code{option_xlateable_txt} are
+ * updated to point to translated strings.
  */
 static void dummy_func(void) {[=
 
@@ -225,10 +227,10 @@ ENDFOR utxt
 =]
 }
 #endif /* XGETTEXT_SCAN_DO_NOT_COMPILE */
-#endif /* [= (. header-guard) =] */
+#endif /* [= (. header-guard)     =] */
 [= (out-resume "pot")
    (emit (shell "exec 4>&- ; cat ${tmp_dir}/pot") "\n")
-   (out-pop) =][=
+   (out-pop)                      =][=
 
 # Local Variables:
 # Mode: text

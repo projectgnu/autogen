@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ December 2013
+New in __CURRENT_VERSION__ February 2013
 
 * "for-each" main procedures may now be specified as processing
   standard input as a data file instead of being replacement
@@ -35,12 +35,6 @@ New in 5.17 - December 2012
   LD_LIBRARY_PATH variable, causing problems when you are
   trying to run programs that use not-yet-installed libraries.
   The LD_LIBRARY_PATH is now preserved.
-
-* The AG_OTEST_GUILE_VERSION will now try "rpm -q" first
-  before dpkg, "guile-config --verision" and "guile --version".
-
-* If a "min" count value has been specified, the emitted code will
-  now verify that the option appears that minimum number of times.
 
 New in 5.16 May 2012
 

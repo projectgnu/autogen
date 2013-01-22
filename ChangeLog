@@ -29,6 +29,7 @@
 	* autoopts/test/*.test: adjust for changes
 	* config/bootstrap: omit check for internal "missing" program
 	* config/missing: deleted
+	* autoopts/usage-txt.def: prefer apostrophes to back quotes
 
 2013-01-12  Bruce Korb  <bkorb@gnu.org>
 

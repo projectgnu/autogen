@@ -104,12 +104,12 @@ opt_ambiguities(tOptions * opts, char const * name, int nm_len)
     fputs(zAmbigList, stderr);
     do  {
         if (strneqvcmp(name, pOD->pz_Name, nm_len) == 0)
-            fprintf(stderr, zAmbiguous, hyph, pOD->pz_Name);
+            fprintf(stderr, zambig_file, hyph, pOD->pz_Name);
 
         else if (  (pOD->pz_DisableName != NULL)
                 && (strneqvcmp(name, pOD->pz_DisableName, nm_len) == 0)
                 )
-            fprintf(stderr, zAmbiguous, hyph, pOD->pz_DisableName);
+            fprintf(stderr, zambig_file, hyph, pOD->pz_DisableName);
     } while (pOD++, (++idx < opts->optCt));
 }
 

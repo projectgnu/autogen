@@ -82,7 +82,7 @@ The following option preset mechanisms are supported:
 _EOF_
 
 clean_help > ${testname}.ignored-expected <<\_EOF_
-errors: The ``ignored'' option has been disabled -- we have dumped this
+errors: The 'ignored' option has been disabled -- we have dumped this
 test_errors - Test AutoOpts for errors
 USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
