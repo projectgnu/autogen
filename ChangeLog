@@ -13,6 +13,7 @@
 	* autoopts/autoopts.c (optionProcess): use ao_bug()
 	* autoopts/find.c (get_opt_arg_may): likewise
 	(get_opt_arg): simplify code
+	* agen5/defDirect.c (processDirective): Correctly handle bad directives
 
 2013-01-26  Bruce Korb  <bkorb@gnu.org>
 

@@ -44,35 +44,27 @@ findDirective(char * dir_name);
  *  Decide what to do and return a pointer to the character
  *  where scanning is to resume.
  */
-LOCAL char*
-processDirective(char* pzScan)
+LOCAL char *
+processDirective(char * scan)
 {
-    const tDirTable * pTbl = dirTable;
-    char *     pzDir;
-    char *     pzEnd;
+    char * dirtv;
+    char * eodir;
 
     /*
      *  Search for the end of the #-directive.
      *  Replace "\\\n" sequences with "  ".
      */
     for (;;) {
-        pzEnd = strchr(pzScan, NL);
+        eodir = strchr(scan, NL);
 
-        if (pzEnd == NULL) {
-            /*
-             *  The end of the directive is the end of the string
-             */
-            pzEnd = pzScan + strlen(pzScan);
+        if (eodir == NULL) {
+            eodir = scan + strlen(scan);
             break;
         }
         cctx->scx_line++;
 
-        if (pzEnd[-1] != '\\') {
-            /*
-             *  The end of the directive is the end of the line
-             *  and the line has not been continued.
-             */
-            *(pzEnd++) = NUL;
+        if (eodir[-1] != '\\') {
+            *(eodir++) = NUL;
             break;
         }
 
@@ -80,61 +72,70 @@ processDirective(char* pzScan)
          *  Replace the escape-newline pair with spaces and
          *  find the next end of line
          */
-        pzEnd[-1] = pzEnd[0] = ' ';
+        eodir[-1] = eodir[0] = ' ';
     }
 
     /*
-     *  Ignore ``#!'' as a comment, enabling a definition file to behave
+     *  Ignore '#!' as a comment, enabling a definition file to behave
      *  as a script that gets interpreted by autogen.  :-)
      */
-    if (*pzScan == '!')
-        return pzEnd;
+    if (*scan == '!')
+        return eodir;
 
-    /*
-     *  Find the start of the directive name.  Ensure it _is_ a name.
-     */
-    pzScan = SPN_WHITESPACE_CHARS(pzScan);
-    if (! IS_ALPHABETIC_CHAR(*pzScan))
-        return pzEnd;
+    scan = SPN_WHITESPACE_CHARS(scan);
+    if (! IS_ALPHABETIC_CHAR(*scan))
+        goto bad_directive;
 
-    /*
-     *  Find the *END* of the directive name.
-     */
-    pzDir  = pzScan;
-    pzScan = SPN_ALPHABETIC_CHARS(pzScan+1);
+    dirtv  = scan;
+    scan = SPN_ALPHABETIC_CHARS(scan+1);
 
     /*
      *  IF there is anything that follows the name, ...
      */
-    if (*pzScan != NUL) {
+    if (*scan != NUL) {
         char * pz;
 
-        /*
-         *  IF something funny immediately follows the directive name,
-         *  THEN we will ignore it completely.
-         */
-        if (! IS_WHITESPACE_CHAR(*pzScan))
-            return pzEnd;
+        if (! IS_WHITESPACE_CHAR(*scan))
+            goto bad_directive;
 
-        /*
-         *  Terminate the name being defined
-         *  and find the start of anything else.
-         */
-        *pzScan = NUL;
-        pzScan  = SPN_WHITESPACE_CHARS(pzScan+1);
+        *scan = NUL;
+        scan  = SPN_WHITESPACE_CHARS(scan+1);
 
-
-        /*
-         *  Trim off trailing white space
-         */
-        pz = pzScan + strlen(pzScan);
-        while (  (pz > pzScan)
-              && IS_WHITESPACE_CHAR(pz[-1])) pz--;
+        pz  = SPN_WHITESPACE_BACK(scan, NULL);
         *pz = NUL;
     }
 
-    pTbl = dirTable + (int)findDirective(pzDir);
-    return (*(pTbl->pDirProc))(pzScan, pzEnd);
+    /*
+     * Dispatch the directive handling function
+     */
+    {
+        teDirectives dix = findDirective(dirtv);
+        const tDirTable * pTbl;
+        if (dix >= DIRECTIVE_CT) {
+            scan = dirtv;
+            goto bad_directive;
+        }
+        pTbl = dirTable + (int)findDirective(dirtv);
+        return (*(pTbl->pDirProc))(scan, eodir);
+    }
+
+ bad_directive:
+    {
+        char ch;
+        if (strlen(scan) > 32) {
+            ch = scan[32];
+            scan[32] = NUL;
+        } else {
+            ch = NUL;
+        }
+
+        fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
+                cctx->scx_line, scan);
+
+        if (ch != NUL)
+            scan[32] = ch;
+    }
+    return eodir;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -161,22 +162,7 @@ findDirective(char * dir_name)
 
     } while (dte++, ++res < DIRECTIVE_CT);
 
-    {
-        char ch;
-        if (strlen(dir_name) > 32) {
-            ch = dir_name[32];
-            dir_name[32] = NUL;
-        } else {
-            ch = NUL;
-        }
-
-        fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
-                cctx->scx_line, dir_name);
-
-        if (ch != NUL)
-            dir_name[32] = ch;
-    }
-    return res;
+    return DIRECTIVE_CT;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
