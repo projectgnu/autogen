@@ -61,15 +61,15 @@ compile "--help"
 echo creating ${testname}.res-help
 clean_help > ${testname}.res-help <<'_EOF_'
 test_errors - Test AutoOpts for errors
-USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
+Usage:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s Str second         The second option descrip
    -i --- ignored        we have dumped this
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -84,14 +84,14 @@ _EOF_
 clean_help > ${testname}.ignored-expected <<\_EOF_
 errors: The 'ignored' option has been disabled -- we have dumped this
 test_errors - Test AutoOpts for errors
-USAGE:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
+Usage:  errors [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg ...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s Str second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.

@@ -137,7 +137,7 @@ test $? -eq 0 || failure cannot compile ${testname}-main.c
 
 clean_help > ${testname}.help-base <<- _EOHelp_
 test-lib-prog - Test library Program
-USAGE:  library [ -<flag> ]...
+Usage:  library [ -<flag> ]...
   Flg Arg Option-Name    Description
    -p no  program        library program test
 
@@ -149,8 +149,8 @@ This option introduces the options for the zzyzx library:
 version, usage and configuration options:
 
   Flg Arg Option-Name    Description
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 	_EOHelp_
 

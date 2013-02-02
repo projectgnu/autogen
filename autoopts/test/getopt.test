@@ -218,15 +218,15 @@ optionUsage (tOptions * pOptions, int status)
   else
     {
       fputs (_("test_getopt - Test AutoOpts for getopt\n\
-USAGE:  test_getopt { -<flag> [<val>] }...\n\n\
+Usage:  test_getopt { -<flag> [<val>] }...\n\n\
    -o str     The option option descrip\n\
    -s str     The second option descrip\n\
    -F         option with no flag\n\
    -X         option with max ct\n\
    -M         option with min ct\n\
    -2         option with min ct\n\
-   -v         Output version information and exit\n\
-   -h         Display extended usage information and exit\n\n\
+   -v         output version information and exit\n\
+   -h         display extended usage information and exit\n\n\
 \n"), stdout);
     }
 
@@ -451,15 +451,15 @@ optionUsage (tOptions * pOptions, int status)
   else
     {
       fputs (_("test_getopt - Test AutoOpts for getopt\n\
-USAGE:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
+Usage:  test_getopt { -<flag> [<val>] | --<name>[{=| }<val>] }...\n\n\
    -o, --option=str           The option option descrip\n\
    -s, --second=str           The second option descrip\n\
        --no-val               option with no flag\n\
        --max-val              option with max ct\n\
        --min2-val             option with min ct\n\
        --min-val              option with min ct\n\
-       --version              Output version information and exit\n\
-   -h, --help                 Display extended usage information and exit\n\n\
+       --version              output version information and exit\n\
+   -h, --help                 display extended usage information and exit\n\n\
 Options are specified by doubled hyphens and their name or by a single\n\
 hyphen and the flag character.\n\
 \n"), stdout);

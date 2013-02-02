@@ -35,357 +35,357 @@ ${VERBOSE} && kill_delay=10 || kill_delay=5
 # ============= usage_LGFRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGFRA.hlp'
 test_usage_LGFRA - Checkout usage_LGFRA Options
-USAGE:  usage_LGFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  usage_LGFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
 X
 X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
-X   -?, --help                 Display extended usage information and exit
-X   -!, --more-help            Extended usage information passed thru pager
+X   -?, --help                 display extended usage information and exit
+X   -!, --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGFRp.hlp'
 test_usage_LGFRp - Checkout usage_LGFRp Options
-USAGE:  usage_LGFRp { -<flag> | --<name> }... cmd-arg ...
+Usage:  usage_LGFRp { -<flag> | --<name> }... cmd-arg ...
 X
 X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
-X   -?, --help                 Display extended usage information and exit
-X   -!, --more-help            Extended usage information passed thru pager
+X   -?, --help                 display extended usage information and exit
+X   -!, --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGFoA.hlp'
 test_usage_LGFoA - Checkout usage_LGFoA Options
-USAGE:  usage_LGFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+Usage:  usage_LGFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
 X
 X   -L, --check-dirs=str       Checkout directory list
 X       --show-defs[=arg]      Show the definition tree
-X   -?, --help                 Display extended usage information and exit
-X   -!, --more-help            Extended usage information passed thru pager
+X   -?, --help                 display extended usage information and exit
+X   -!, --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGFop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGFop.hlp'
 test_usage_LGFop - Checkout usage_LGFop Options
-USAGE:  usage_LGFop [ -<flag> | --<name> ]... cmd-arg ...
+Usage:  usage_LGFop [ -<flag> | --<name> ]... cmd-arg ...
 X
 X   -L, --check-dirs           Checkout directory list
 X       --show-defs            Show the definition tree
-X   -?, --help                 Display extended usage information and exit
-X   -!, --more-help            Extended usage information passed thru pager
+X   -?, --help                 display extended usage information and exit
+X   -!, --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGsRA.hlp'
 test_usage_LGsRA - Checkout usage_LGsRA Options
-USAGE:  usage_LGsRA { --<name>[{=| }<val>] }... cmd-arg ...
+Usage:  usage_LGsRA { --<name>[{=| }<val>] }... cmd-arg ...
 X
 X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
-X   --help                 Display extended usage information and exit
-X   --more-help            Extended usage information passed thru pager
+X   --help                 display extended usage information and exit
+X   --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGsRp.hlp'
 test_usage_LGsRp - Checkout usage_LGsRp Options
-USAGE:  usage_LGsRp { --<name> }... cmd-arg ...
+Usage:  usage_LGsRp { --<name> }... cmd-arg ...
 X
 X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
-X   --help                 Display extended usage information and exit
-X   --more-help            Extended usage information passed thru pager
+X   --help                 display extended usage information and exit
+X   --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGsoA.hlp'
 test_usage_LGsoA - Checkout usage_LGsoA Options
-USAGE:  usage_LGsoA [ --<name>[{=| }<val>] ]... cmd-arg ...
+Usage:  usage_LGsoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X
 X   --check-dirs=str       Checkout directory list
 X   --show-defs[=arg]      Show the definition tree
-X   --help                 Display extended usage information and exit
-X   --more-help            Extended usage information passed thru pager
+X   --help                 display extended usage information and exit
+X   --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LGsop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LGsop.hlp'
 test_usage_LGsop - Checkout usage_LGsop Options
-USAGE:  usage_LGsop [ --<name> ]... cmd-arg ...
+Usage:  usage_LGsop [ --<name> ]... cmd-arg ...
 X
 X   --check-dirs           Checkout directory list
 X   --show-defs            Show the definition tree
-X   --help                 Display extended usage information and exit
-X   --more-help            Extended usage information passed thru pager
+X   --help                 display extended usage information and exit
+X   --more-help            extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LaFRA.hlp'
 test_usage_LaFRA - Checkout usage_LaFRA Options
-USAGE:  usage_LaFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  usage_LaFRA { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L Str check-dirs     YES  Checkout directory list
 X      opt show-defs      opt  Show the definition tree
-X   -? no  help           opt  Display extended usage information and exit
-X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -? no  help           opt  display extended usage information and exit
+X   -! no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LaFRp.hlp'
 test_usage_LaFRp - Checkout usage_LaFRp Options
-USAGE:  usage_LaFRp { -<flag> | --<name> }... cmd-arg ...
+Usage:  usage_LaFRp { -<flag> | --<name> }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L no  check-dirs     YES  Checkout directory list
 X      no  show-defs      opt  Show the definition tree
-X   -? no  help           opt  Display extended usage information and exit
-X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -? no  help           opt  display extended usage information and exit
+X   -! no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LaFoA.hlp'
 test_usage_LaFoA - Checkout usage_LaFoA Options
-USAGE:  usage_LaFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
+Usage:  usage_LaFoA [ -<flag> [<val>] | --<name>[{=| }<val>] ]... \
 		cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L Str check-dirs     Checkout directory list
 X      opt show-defs      Show the definition tree
-X   -? no  help           Display extended usage information and exit
-X   -! no  more-help      Extended usage information passed thru pager
+X   -? no  help           display extended usage information and exit
+X   -! no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LaFop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LaFop.hlp'
 test_usage_LaFop - Checkout usage_LaFop Options
-USAGE:  usage_LaFop [ -<flag> | --<name> ]... cmd-arg ...
+Usage:  usage_LaFop [ -<flag> | --<name> ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L no  check-dirs     Checkout directory list
 X      no  show-defs      Show the definition tree
-X   -? no  help           Display extended usage information and exit
-X   -! no  more-help      Extended usage information passed thru pager
+X   -? no  help           display extended usage information and exit
+X   -! no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LasRA.hlp'
 test_usage_LasRA - Checkout usage_LasRA Options
-USAGE:  usage_LasRA { --<name>[{=| }<val>] }... cmd-arg ...
+Usage:  usage_LasRA { --<name>[{=| }<val>] }... cmd-arg ...
 X   Arg Option-Name   Req?  Description
 X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
-X   no  help           opt  Display extended usage information and exit
-X   no  more-help      opt  Extended usage information passed thru pager
+X   no  help           opt  display extended usage information and exit
+X   no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LasRp.hlp'
 test_usage_LasRp - Checkout usage_LasRp Options
-USAGE:  usage_LasRp { --<name> }... cmd-arg ...
+Usage:  usage_LasRp { --<name> }... cmd-arg ...
 X   Arg Option-Name   Req?  Description
 X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
-X   no  help           opt  Display extended usage information and exit
-X   no  more-help      opt  Extended usage information passed thru pager
+X   no  help           opt  display extended usage information and exit
+X   no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_LasoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_LasoA.hlp'
 test_usage_LasoA - Checkout usage_LasoA Options
-USAGE:  usage_LasoA [ --<name>[{=| }<val>] ]... cmd-arg ...
+Usage:  usage_LasoA [ --<name>[{=| }<val>] ]... cmd-arg ...
 X   Arg Option-Name    Description
 X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
-X   no  help           Display extended usage information and exit
-X   no  more-help      Extended usage information passed thru pager
+X   no  help           display extended usage information and exit
+X   no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_Lasop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_Lasop.hlp'
 test_usage_Lasop - Checkout usage_Lasop Options
-USAGE:  usage_Lasop [ --<name> ]... cmd-arg ...
+Usage:  usage_Lasop [ --<name> ]... cmd-arg ...
 X   Arg Option-Name    Description
 X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
-X   no  help           Display extended usage information and exit
-X   no  more-help      Extended usage information passed thru pager
+X   no  help           display extended usage information and exit
+X   no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGFRA.hlp'
 test_usage_sGFRA - Checkout usage_sGFRA Options
-USAGE:  usage_sGFRA { -<flag> [<val>] }... cmd-arg ...
+Usage:  usage_sGFRA { -<flag> [<val>] }... cmd-arg ...
 X
 X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
-X   -?         Display extended usage information and exit
-X   -!         Extended usage information passed thru pager
+X   -?         display extended usage information and exit
+X   -!         extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGFRp.hlp'
 test_usage_sGFRp - Checkout usage_sGFRp Options
-USAGE:  usage_sGFRp { -<flag> }... cmd-arg ...
+Usage:  usage_sGFRp { -<flag> }... cmd-arg ...
 X
 X   -L         Checkout directory list
 X   -s         Show the definition tree
-X   -?         Display extended usage information and exit
-X   -!         Extended usage information passed thru pager
+X   -?         display extended usage information and exit
+X   -!         extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGFoA.hlp'
 test_usage_sGFoA - Checkout usage_sGFoA Options
-USAGE:  usage_sGFoA [ -<flag> [<val>] ]... cmd-arg ...
+Usage:  usage_sGFoA [ -<flag> [<val>] ]... cmd-arg ...
 X
 X   -L str     Checkout directory list
 X   -s [arg]   Show the definition tree
-X   -?         Display extended usage information and exit
-X   -!         Extended usage information passed thru pager
+X   -?         display extended usage information and exit
+X   -!         extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGFop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGFop.hlp'
 test_usage_sGFop - Checkout usage_sGFop Options
-USAGE:  usage_sGFop [ -<flag> ]... cmd-arg ...
+Usage:  usage_sGFop [ -<flag> ]... cmd-arg ...
 X
 X   -L         Checkout directory list
 X   -s         Show the definition tree
-X   -?         Display extended usage information and exit
-X   -!         Extended usage information passed thru pager
+X   -?         display extended usage information and exit
+X   -!         extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGsRA.hlp'
 test_usage_sGsRA - Checkout usage_sGsRA Options
-USAGE:  usage_sGsRA { <option-name>[{=| }<val>] }...
+Usage:  usage_sGsRA { <option-name>[{=| }<val>] }...
 X
 X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
-X   help                   Display extended usage information and exit
-X   more-help              Extended usage information passed thru pager
+X   help                   display extended usage information and exit
+X   more-help              extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGsRp.hlp'
 test_usage_sGsRp - Checkout usage_sGsRp Options
-USAGE:  usage_sGsRp { <option-name> }...
+Usage:  usage_sGsRp { <option-name> }...
 X
 X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
-X   help                   Display extended usage information and exit
-X   more-help              Extended usage information passed thru pager
+X   help                   display extended usage information and exit
+X   more-help              extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGsoA.hlp'
 test_usage_sGsoA - Checkout usage_sGsoA Options
-USAGE:  usage_sGsoA [ <option-name>[{=| }<val>] ]...
+Usage:  usage_sGsoA [ <option-name>[{=| }<val>] ]...
 X
 X   check-dirs=str         Checkout directory list
 X   show-defs[=arg]        Show the definition tree
-X   help                   Display extended usage information and exit
-X   more-help              Extended usage information passed thru pager
+X   help                   display extended usage information and exit
+X   more-help              extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sGsop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sGsop.hlp'
 test_usage_sGsop - Checkout usage_sGsop Options
-USAGE:  usage_sGsop [ <option-name> ]...
+Usage:  usage_sGsop [ <option-name> ]...
 X
 X   check-dirs             Checkout directory list
 X   show-defs              Show the definition tree
-X   help                   Display extended usage information and exit
-X   more-help              Extended usage information passed thru pager
+X   help                   display extended usage information and exit
+X   more-help              extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_saFRA.hlp'
 test_usage_saFRA - Checkout usage_saFRA Options
-USAGE:  usage_saFRA { -<flag> [<val>] }... cmd-arg ...
+Usage:  usage_saFRA { -<flag> [<val>] }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L Str check-dirs     YES  Checkout directory list
 X   -s opt show-defs      opt  Show the definition tree
-X   -? no  help           opt  Display extended usage information and exit
-X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -? no  help           opt  display extended usage information and exit
+X   -! no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_saFRp.hlp'
 test_usage_saFRp - Checkout usage_saFRp Options
-USAGE:  usage_saFRp { -<flag> }... cmd-arg ...
+Usage:  usage_saFRp { -<flag> }... cmd-arg ...
 X  Flg Arg Option-Name   Req?  Description
 X   -L no  check-dirs     YES  Checkout directory list
 X   -s no  show-defs      opt  Show the definition tree
-X   -? no  help           opt  Display extended usage information and exit
-X   -! no  more-help      opt  Extended usage information passed thru pager
+X   -? no  help           opt  display extended usage information and exit
+X   -! no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_saFoA.hlp'
 test_usage_saFoA - Checkout usage_saFoA Options
-USAGE:  usage_saFoA [ -<flag> [<val>] ]... cmd-arg ...
+Usage:  usage_saFoA [ -<flag> [<val>] ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L Str check-dirs     Checkout directory list
 X   -s opt show-defs      Show the definition tree
-X   -? no  help           Display extended usage information and exit
-X   -! no  more-help      Extended usage information passed thru pager
+X   -? no  help           display extended usage information and exit
+X   -! no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_saFop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_saFop.hlp'
 test_usage_saFop - Checkout usage_saFop Options
-USAGE:  usage_saFop [ -<flag> ]... cmd-arg ...
+Usage:  usage_saFop [ -<flag> ]... cmd-arg ...
 X  Flg Arg Option-Name    Description
 X   -L no  check-dirs     Checkout directory list
 X   -s no  show-defs      Show the definition tree
-X   -? no  help           Display extended usage information and exit
-X   -! no  more-help      Extended usage information passed thru pager
+X   -? no  help           display extended usage information and exit
+X   -! no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasRA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sasRA.hlp'
 test_usage_sasRA - Checkout usage_sasRA Options
-USAGE:  usage_sasRA { <option-name>[{=| }<val>] }...
+Usage:  usage_sasRA { <option-name>[{=| }<val>] }...
 X   Arg Option-Name   Req?  Description
 X   Str check-dirs     YES  Checkout directory list
 X   opt show-defs      opt  Show the definition tree
-X   no  help           opt  Display extended usage information and exit
-X   no  more-help      opt  Extended usage information passed thru pager
+X   no  help           opt  display extended usage information and exit
+X   no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasRp.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sasRp.hlp'
 test_usage_sasRp - Checkout usage_sasRp Options
-USAGE:  usage_sasRp { <option-name> }...
+Usage:  usage_sasRp { <option-name> }...
 X   Arg Option-Name   Req?  Description
 X   no  check-dirs     YES  Checkout directory list
 X   no  show-defs      opt  Show the definition tree
-X   no  help           opt  Display extended usage information and exit
-X   no  more-help      opt  Extended usage information passed thru pager
+X   no  help           opt  display extended usage information and exit
+X   no  more-help      opt  extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasoA.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sasoA.hlp'
 test_usage_sasoA - Checkout usage_sasoA Options
-USAGE:  usage_sasoA [ <option-name>[{=| }<val>] ]...
+Usage:  usage_sasoA [ <option-name>[{=| }<val>] ]...
 X   Arg Option-Name    Description
 X   Str check-dirs     Checkout directory list
 X   opt show-defs      Show the definition tree
-X   no  help           Display extended usage information and exit
-X   no  more-help      Extended usage information passed thru pager
+X   no  help           display extended usage information and exit
+X   no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # ============= usage_sasop.hlp ==============
 ${SED} 's/^X//;/^[ 	]*$/d' << 'SHAR_EOF' > 'usage_sasop.hlp'
 test_usage_sasop - Checkout usage_sasop Options
-USAGE:  usage_sasop [ <option-name> ]...
+Usage:  usage_sasop [ <option-name> ]...
 X   Arg Option-Name    Description
 X   no  check-dirs     Checkout directory list
 X   no  show-defs      Show the definition tree
-X   no  help           Display extended usage information and exit
-X   no  more-help      Extended usage information passed thru pager
+X   no  help           display extended usage information and exit
+X   no  more-help      extended usage information passed thru pager
 SHAR_EOF
 
 # # # # # # # # # # DEFINITIONS FILES # # # # # # # # #
@@ -495,7 +495,7 @@ run_usage_test() {
       -e '/end of looked up def/,$d' ${defnames_raw} \
           ${defnames_raw} >> ${defnames_file}
   compile ${helpstr}
-  ${SED} -e '/Extended usage information passed thru pager/q' \
+  ${SED} -e '/extended usage information passed thru pager/q' \
       ${testname}.help > XXX
   mv XXX ${testname}.help
   cmp -s ${testname}.help ${testname}.hlp || \

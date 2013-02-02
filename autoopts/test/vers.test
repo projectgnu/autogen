@@ -52,12 +52,12 @@ compile "-h"
 echo creating $testname.hlp
 clean_help > $testname.hlp <<'_EOF_'
 test_vers - Test AutoOpts for vers
-USAGE:  vers [ -<flag> ]...
+Usage:  vers [ -<flag> ]...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s no  second         The second option descrip
-   -h no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -h no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -82,13 +82,13 @@ compile "-h"
 echo recreating $testname.hlp
 clean_help > $testname.hlp <<_EOF_
 test_vers - Test AutoOpts for vers - Ver. ${ver}
-USAGE:  vers [ -<flag> ]...
+Usage:  vers [ -<flag> ]...
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s no  second         The second option descrip
-   -V opt version        Output version information and exit
-   -h no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -V opt version        output version information and exit
+   -h no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 

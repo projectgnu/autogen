@@ -160,7 +160,7 @@ basehelp=${testname}-base.help
 echo creating ${basehelp}
 clean_help > ${basehelp} <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
-USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
+Usage:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
   Flg Arg Option-Name    Description
    -s Cpx struct         structured argument val
 				- may appear multiple times
@@ -181,11 +181,11 @@ USAGE:  ${testname} [ -<flag> [<val>] ]... [ <output-config-file> ]
    -O Fil out-file       an output file
 				- file must not pre-exist
    -T Fil test-file      a test file
-   -R Str reset-option   Reset an option's state
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -R Str reset-option   reset an option's state
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -196,9 +196,10 @@ The following option preset mechanisms are supported:
 The valid "members" option keywords are:
   one two three four five six seven eight nine ten
   or an integer mask with any of the lower 10 bits set
-or you may use a numeric representation.  Preceding these with a '!' will
-clear the bits, specifying 'none' will clear all bits, and 'all' will set them
-all.  Multiple entries may be passed as an option argument list.
+or you may use a numeric representation.  Preceding these with a '!'
+will clear the bits, specifying 'none' will clear all bits, and 'all'
+will set them all.  Multiple entries may be passed as an option
+argument list.
 The valid "enumerate" option keywords are:
   uno dos tres quatro cinco seis siete ocho
   or an integer from 0 through 7
@@ -207,8 +208,9 @@ _EOF_
 ${SED} "/ - reading file/s/ file .*/ file ${testname}.cfg/" \
     ${testname}.help > X$$
 mv -f X$$ ${testname}.help
-cmp -s ${basehelp} ${testname}.help || \
-  failure "`diff ${basehelp} ${testname}.help`"
+pair="${basehelp} ${testname}.help"
+cmp -s ${pair} || \
+  failure "$testname help mismatch$nl`diff ${pair}`"
 
 ./${testname} -m 'one + three + seven' '->'
 members=`${SED} -n 's/^members *//p' ${cfg_file}`

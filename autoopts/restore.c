@@ -98,16 +98,6 @@ optionSaveState(tOptions * pOpts)
         size_t sz = sizeof(*pOpts)
             + ((size_t)pOpts->optCt * sizeof(tOptDesc));
         p = AGALOC(sz, "saved option state");
-        if (p == NULL) {
-            tCC* pzName = pOpts->pzProgName;
-            if (pzName == NULL) {
-                pzName = pOpts->pzPROGNAME;
-                if (pzName == NULL)
-                    pzName = zNil;
-            }
-            fprintf(stderr, zCantSave, pzName, sz);
-            exit(EXIT_FAILURE);
-        }
 
         pOpts->pSavedState = p;
     }
@@ -140,7 +130,7 @@ optionRestore(tOptions* pOpts)
     tOptions* p = (tOptions*)pOpts->pSavedState;
 
     if (p == NULL) {
-        tCC* pzName = pOpts->pzProgName;
+        char const * pzName = pOpts->pzProgName;
         if (pzName == NULL) {
             pzName = pOpts->pzPROGNAME;
             if (pzName == NULL)

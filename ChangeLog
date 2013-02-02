@@ -1,3 +1,48 @@
+2013-02-03  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/options_h.tpl (opt_usage_t): enumeration of AutoOpts
+	supported options.  The "reserved" field of each option structure
+	is now initialized with this value.
+	* autoopts/tpl/optcode.tlib: use the enumerated values
+	* autoopts/usage.c (ao_bug): new function to print a message
+	and exit EX_SOFTWARE on a libopts bug
+	(print_offer_usage) new function to show misusers of an interface how
+	to request help when usage details are not printed.
+	* autoopts/usage-txt.def: adjust texts
+	* doc/autogen-texi.txt: describe some of the new workings.
+	* autoopts/autoopts.c (optionProcess): use ao_bug()
+	* autoopts/find.c (get_opt_arg_may): likewise
+	(get_opt_arg): simplify code
+
+2013-01-26  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/alias.c (too_many_occurrences): new function for handling
+	an option that occurs too many times.
+	(optionAlias): use it
+	* autoopts/autoopts.c (handle_opt): also use it
+	* autoopts/bootstrap.dir (usage-txt.tpl): do not install
+	* autoopts/ao-strs.def: add all immutable strings, remove translatable
+	ones
+	* autoopts/makeshell.c (fserr_warn): new function to emit message
+	about an error found in errno
+	(fserr_exit): call fserr_warn() and exit failure
+	* autoopts/restore.c (optionSaveState): AGALOC aborts on failure,
+	do not check result for NULL
+	* autoopts/usage.c (AOFLAG_TABLE): make module global
+	(parse_usage_flags): broken out of set_usage_flags().
+	Add code to handle "compute" usage so that the usage code ignores
+	the full usage and short usage strings.
+	* autoopts/usage-txt.def: remove all untranslatable strings and
+	mark libopts messages differently from usage construction strings.
+	Ensure all error messages include the program name and are made
+	consistent.
+	* autoopts/*.c: adjust for these changes
+	* autoopts/usage-txt.tpl: moved from tpl subdirectory.  Removed
+	accommodation for untranslatable strings
+	* autoopts/test/cfg-edit.test: adjust
+	* autoopts/test/enums.test: adjust
+	* autoopts/test/keyword.test: adjust
+
 2013-01-19  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/agShell.c (shell_cmd): add tracing info on server restart

@@ -115,7 +115,7 @@ emit_copy_note(tOptions * opts, FILE * fp)
         fputs(opts->pzCopyNotice, fp);
 
     fputc(NL, fp);
-    fprintf(fp, zAO_Ver, optionVersion());
+    fprintf(fp, zao_ver_fmt, optionVersion());
     
     if (HAS_pzPkgDataDir(opts) && (opts->pzPackager != NULL)) {
         fputc(NL, fp);
@@ -167,10 +167,10 @@ print_ver(tOptions * opts, tOptDesc * od, FILE * fp)
     }
 
     fflush(fp);
-    if (ferror(fp) != 0) {
-        fputs(zOutputFail, stderr);
-        exit(EXIT_FAILURE);
-    }
+    if (ferror(fp))
+        fserr_exit(opts->pzProgName, zwriting,
+                   (fp == stdout) ? zstdout_name : zstderr_name);
+
     exit(EXIT_SUCCESS);
 }
 

@@ -95,8 +95,7 @@ load_text_file(tmap_info_t * mapinfo, char const * pzFile)
             ssize_t rdct = read(mapinfo->txt_fd, pz, sz);
             if (rdct <= 0) {
                 mapinfo->txt_errno = errno;
-                fprintf(stderr, zFSErrReadFile,
-                        errno, strerror(errno), pzFile);
+                fserr_warn("libopts", "read", pzFile);
                 free(mapinfo->txt_data);
                 return;
             }

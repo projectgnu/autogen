@@ -65,11 +65,25 @@ static void
 emit_long(tOptions * opts);
 
 static char *
-load_old_output(char const * fname);
+load_old_output(char const * fname, char const * pname);
 
 static void
-open_out(char const * fname);
+open_out(char const * fname, char const * pname);
 /* = = = END-STATIC-FORWARD = = = */
+
+LOCAL void
+fserr_warn(char const * prog, char const * op, char const * fname)
+{
+    fprintf(stderr, zfserr_fmt, prog, errno, strerror(errno),
+            op, fname);
+}
+
+LOCAL void
+fserr_exit(char const * prog, char const * op, char const * fname)
+{
+    fserr_warn(prog, op, fname);
+    exit(EXIT_FAILURE);
+}
 
 /*=export_func  optionParseShell
  * private:
@@ -103,8 +117,8 @@ optionParseShell(tOptions * opts)
      *  Check for a specified output file
      */
     if (HAVE_GENSHELL_OPT(SCRIPT))
-        open_out(GENSHELL_OPT_ARG(SCRIPT));
-
+        open_out(GENSHELL_OPT_ARG(SCRIPT), opts->pzProgName);
+    
     emit_usage(opts);
     emit_setup(opts);
 
@@ -173,10 +187,8 @@ optionParseShell(tOptions * opts)
 #endif
     fclose(stdout);
 
-    if (ferror(stdout)) {
-        fputs(zOutputFail, stderr);
-        exit(EXIT_FAILURE);
-    }
+    if (ferror(stdout))
+        fserr_exit(opts->pzProgName, zwriting, zstdout_name);
 
     AGFREE(script_text);
     script_leader    = NULL;
@@ -273,16 +285,13 @@ text_to_var(tOptions * opts, teTextTo which, tOptDesc * od)
     fflush(stdout);
     fflush(stderr);
 
-    if (pipe(fdpair) != 0) {
-        fprintf(stderr, zBadPipe, errno, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+    if (pipe(fdpair) != 0)
+        fserr_exit(opts->pzProgName, "pipe", zinter_proc_pipe);
 
     switch (fork()) {
     case -1:
-        fprintf(stderr, zForkFail, errno, strerror(errno), opts->pzProgName);
-        exit(EXIT_FAILURE);
-        break;
+        fserr_exit(opts->pzProgName, "fork", opts->pzProgName);
+        /* NOTREACHED */
 
     case 0:
         /*
@@ -723,7 +732,7 @@ emit_long(tOptions * opts)
  * @param[in] fname  the output file name
  */
 static char *
-load_old_output(char const * fname)
+load_old_output(char const * fname, char const * pname)
 {
     /*
      *  IF we cannot stat the file,
@@ -742,10 +751,8 @@ load_old_output(char const * fname)
      * If we opened it, we should be able to stat it and it needs
      * to be a regular file
      */
-    if ((fstat(fileno(fp), &stbf) != 0) || (! S_ISREG(stbf.st_mode))) {
-        fprintf(stderr, zNotFile, fname);
-        exit(EXIT_FAILURE);
-    }
+    if ((fstat(fileno(fp), &stbf) != 0) || (! S_ISREG(stbf.st_mode)))
+        fserr_exit(pname, "fstat", fname);
 
     scan = text = AGALOC(stbf.st_size + 1, "f data");
 
@@ -783,11 +790,11 @@ load_old_output(char const * fname)
  * @param[in] fname  the output file name
  */
 static void
-open_out(char const * fname)
+open_out(char const * fname, char const * pname)
 {
 
     do  {
-        char * txt = script_text = load_old_output(fname);
+        char * txt = script_text = load_old_output(fname, pname);
         char * scn;
 
         if (txt == NULL)
@@ -818,10 +825,8 @@ open_out(char const * fname)
         script_leader  = txt;
     } while (false);
 
-    if (freopen(fname, "w" FOPEN_BINARY_FLAG, stdout) != stdout) {
-        fprintf(stderr, zFreopenFail, errno, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+    if (freopen(fname, "w" FOPEN_BINARY_FLAG, stdout) != stdout)
+        fserr_exit(pname, "freopen", fname);
 }
 
 /*=export_func genshelloptUsage
@@ -917,10 +922,8 @@ genshelloptUsage(tOptions * opts, int exit_cd)
     }
 
     fflush(stdout);
-    if (ferror(stdout)) {
-        fputs(zOutputFail, stderr);
-        exit(EXIT_FAILURE);
-    }
+    if (ferror(stdout))
+        fserr_exit(opts->pzProgName, zwriting, zstdout_name);
 
     exit(EXIT_SUCCESS);
 #endif

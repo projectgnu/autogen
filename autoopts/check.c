@@ -31,29 +31,31 @@
  *  Check for conflicts based on "must" and "cannot" attributes.
  */
 static bool
-has_conflict(tOptions * pOpts, tOptDesc * pOD)
+has_conflict(tOptions * pOpts, tOptDesc * od)
 {
-    if (pOD->pOptMust != NULL) {
-        int const * pMust = pOD->pOptMust;
+    if (od->pOptMust != NULL) {
+        int const * must = od->pOptMust;
 
-        while (*pMust != NO_EQUIVALENT) {
-            tOptDesc * p = pOpts->pOptDesc + *(pMust++);
+        while (*must != NO_EQUIVALENT) {
+            tOptDesc * p = pOpts->pOptDesc + *(must++);
             if (UNUSED_OPT(p)) {
-                const tOptDesc * pN = pOpts->pOptDesc + pMust[-1];
-                fprintf(stderr, zReqFmt, pOD->pz_Name, pN->pz_Name);
+                const tOptDesc * ood = pOpts->pOptDesc + must[-1];
+                fprintf(stderr, zneed_fmt, pOpts->pzProgName,
+                        od->pz_Name, ood->pz_Name);
                 return true;
             }
         }
     }
 
-    if (pOD->pOptCant != NULL) {
-        int const * pCant = pOD->pOptCant;
+    if (od->pOptCant != NULL) {
+        int const * cant = od->pOptCant;
 
-        while (*pCant != NO_EQUIVALENT) {
-            tOptDesc * p = pOpts->pOptDesc + *(pCant++);
+        while (*cant != NO_EQUIVALENT) {
+            tOptDesc * p = pOpts->pOptDesc + *(cant++);
             if (SELECTED_OPT(p)) {
-                const tOptDesc* pN = pOpts->pOptDesc + pCant[-1];
-                fprintf(stderr, zCantFmt, pOD->pz_Name, pN->pz_Name);
+                const tOptDesc * ood = pOpts->pOptDesc + cant[-1];
+                fprintf(stderr, zconflict_fmt, pOpts->pzProgName,
+                        od->pz_Name, ood->pz_Name);
                 return true;
             }
         }
@@ -86,8 +88,9 @@ occurs_enough(tOptions * pOpts, tOptDesc * pOD)
         return true;
 
     if (pOD->optMinCt > 1)
-         fprintf(stderr, zNotEnough, pOD->pz_Name, pOD->optMinCt);
-    else fprintf(stderr, zNeedOne, pOD->pz_Name);
+         fprintf(stderr, zneed_more, pOpts->pzProgName, pOD->pz_Name,
+                 pOD->optMinCt);
+    else fprintf(stderr, zneed_one,  pOpts->pzProgName, pOD->pz_Name);
     return false;
 }
 
@@ -154,7 +157,7 @@ is_consistent(tOptions * pOpts)
          */
         else if ((pOpts->fOptSet & OPTPROC_ARGS_REQ) != 0) {
             if (pOpts->origArgCt <= pOpts->curOptIdx) {
-                fprintf(stderr, zArgsMust, pOpts->pzProgName);
+                fprintf(stderr, zargs_must, pOpts->pzProgName);
                 return false;
             }
         }

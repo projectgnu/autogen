@@ -44,9 +44,7 @@ check_existence(teOptFileType ftype, tOptions * pOpts, tOptDesc * pOD)
         if ((stat(fname, &sb) == 0) || (errno != ENOENT)) {
             if (errno == 0)
                 errno = EINVAL;
-            fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    zFSOptErrNoExist, fname, pOD->pz_Name);
-            pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+            fserr_exit(pOpts->pzProgName, "stat", fname);
             /* NOTREACHED */
         }
         /* FALLTHROUGH */
@@ -69,25 +67,20 @@ check_existence(teOptFileType ftype, tOptions * pOpts, tOptDesc * pOD)
         memcpy(p, fname, l);
         p[l] = NUL;
 
-        if ((stat(p, &sb) != 0) || (errno = EINVAL, ! S_ISDIR(sb.st_mode))) {
-            fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    zFSOptErrMayExist, fname, pOD->pz_Name);
-            pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+        if ((stat(p, &sb) != 0) || (errno = EINVAL, ! S_ISDIR(sb.st_mode)))
+            fserr_exit(pOpts->pzProgName, "stat", p);
             /* NOTREACHED */
-        }
+
         AGFREE(p);
         break;
     }
 
     case FTYPE_MODE_MUST_EXIST:
         if (  (stat(fname, &sb) != 0)
-           || (errno = EINVAL, ! S_ISREG(sb.st_mode)) ) {
-            fprintf(stderr, zFSOptError, errno, strerror(errno),
-                    zFSOptErrMustExist, fname,
-                    pOD->pz_Name);
-            pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+           || (errno = EINVAL, ! S_ISREG(sb.st_mode))  )
+            fserr_exit(pOpts->pzProgName, "stat", fname);
             /* NOTREACHED */
-        }
+
         break;
     }
 }
@@ -103,12 +96,9 @@ static void
 open_file_fd(tOptions * pOpts, tOptDesc * pOD, tuFileMode mode)
 {
     int fd = open(pOD->optArg.argString, mode.file_flags);
-    if (fd < 0) {
-        fprintf(stderr, zFSOptError, errno, strerror(errno),
-                zFSOptErrOpen, pOD->optArg.argString, pOD->pz_Name);
-        pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+    if (fd < 0)
+        fserr_exit(pOpts->pzProgName, "open", pOD->optArg.argString);
         /* NOTREACHED */
-    }
 
     if ((pOD->fOptState & OPTST_ALLOC_ARG) != 0)
         pOD->optCookie = (void *)pOD->optArg.argString;
@@ -129,13 +119,10 @@ open_file_fd(tOptions * pOpts, tOptDesc * pOD, tuFileMode mode)
 static void
 fopen_file_fp(tOptions * pOpts, tOptDesc * pOD, tuFileMode mode)
 {
-    FILE* fp = fopen(pOD->optArg.argString, mode.file_mode);
-    if (fp == NULL) {
-        fprintf(stderr, zFSOptError, errno, strerror(errno),
-                zFSOptErrFopen, pOD->optArg.argString, pOD->pz_Name);
-        pOpts->pUsageProc(pOpts, EXIT_FAILURE);
+    FILE * fp = fopen(pOD->optArg.argString, mode.file_mode);
+    if (fp == NULL)
+        fserr_exit(pOpts->pzProgName, "fopen", pOD->optArg.argString);
         /* NOTREACHED */
-    }
 
     if ((pOD->fOptState & OPTST_ALLOC_ARG) != 0)
         pOD->optCookie = (void *)pOD->optArg.argString;

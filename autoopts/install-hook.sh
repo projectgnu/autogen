@@ -86,7 +86,7 @@ cfgf=${top_builddir}/config.h
     sed "${sedcmd};${nopathfind}" ${opthdrsrc}
 } > ${DESTdestdir}/options.h
 
-sed '/#if.*AUTOOPTS_INTERNAL/,/#endif.*XGETTEXT_SCAN/d' \
+sed '/#if.*AUTOOPTS_INTERNAL/,/#endif.*AUTOOPTS_INTERNAL/d' \
   ${usehdrsrc} > ${DESTdestdir}/usage-txt.h
 
 test -d "${DESTpkgdatadir}" && {

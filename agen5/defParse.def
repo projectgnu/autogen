@@ -30,7 +30,7 @@ handler-file    = defParse.x;
  * Non-terminal "events"
  */
 event  = "autogen", "definitions", end,
-         var_name, other_name, string, here_string, number;
+         var_name, other_name, string, here_string, delete_ent, number;
 
 /*
  * Terminal token-events
@@ -100,8 +100,7 @@ transition =
                       next  = have_value;      ttype = str_value; },
 { tst  = need_value;  tev   = lit_o_brace;     next  = need_name;
                       ttype = start_block; },
-{ tst  = have_value;  tev   = lit_semi;        next  = need_name;
-                      ttype = noop; },
-{ tst  = have_value;  tev   = lit_comma;       next  = need_value;
-                      ttype = next_val; };
+{ tst  = need_value;  tev   = delete_ent; next  = need_name; },
+{ tst  = have_value;  tev   = lit_semi;   next  = need_name; ttype = noop; },
+{ tst  = have_value;  tev   = lit_comma;  next  = need_value;ttype = next_val;};
 /* end of agen5/defParse.def */

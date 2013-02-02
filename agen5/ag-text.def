@@ -1004,6 +1004,9 @@ string = { nm = RESOLVE_SCM_VECTOR;
 string = { nm = RETURN_FROM_NOWHERE;
    str = "RETURN out of context"; };
 
+string = { nm = RM_MISSING_DE;
+   str = "attempt to remove unrecorded def entry\n"; };
+
 string = { nm = RUN_GPERF_CMD;
    str = <<- _EOF_
 	test -n "${gperf_%1$s}" || \

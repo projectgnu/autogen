@@ -124,7 +124,7 @@ find_dir_name(tOptions * opts, int * p_free)
         }
 
         if (pzEnv == NULL) {
-            fprintf(stderr, SAVE_WARN, opts->pzProgName);
+            fprintf(stderr, zsave_warn, opts->pzProgName);
             fprintf(stderr, zNotDef, pzDir);
             return NULL;
         }
@@ -176,7 +176,7 @@ find_file_name(tOptions * opts, int * p_free_name)
          */
         if (errno != ENOENT) {
         bogus_name:
-            fprintf(stderr, SAVE_WARN, opts->pzProgName);
+            fprintf(stderr, zsave_warn, opts->pzProgName);
             fprintf(stderr, zNoStat, errno, strerror(errno), pzDir);
             if (free_dir_name)
                 AGFREE((void*)pzDir);
@@ -230,7 +230,7 @@ find_file_name(tOptions * opts, int * p_free_name)
          */
         if (stat(pzDir, &stBuf) != 0) {
             if (errno != ENOENT) {
-                fprintf(stderr, SAVE_WARN, opts->pzProgName);
+                fprintf(stderr, zsave_warn, opts->pzProgName);
                 fprintf(stderr, zNoStat, errno, strerror(errno),
                         pzDir);
                 AGFREE((void*)pzDir);
@@ -249,8 +249,7 @@ find_file_name(tOptions * opts, int * p_free_name)
      *  or will soon be a file.
      */
     if (! S_ISREG(stBuf.st_mode)) {
-        fprintf(stderr, SAVE_WARN, opts->pzProgName);
-        fprintf(stderr, zNotFile, pzDir);
+        fprintf(stderr, zsave_warn, opts->pzProgName, pzDir);
         if (free_dir_name)
             AGFREE((void*)pzDir);
         return NULL;
@@ -524,7 +523,7 @@ open_sv_file(tOptions * opts)
 
         fp = fopen(pzFName, "w" FOPEN_BINARY_FLAG);
         if (fp == NULL) {
-            fprintf(stderr, SAVE_WARN, opts->pzProgName);
+            fprintf(stderr, zsave_warn, opts->pzProgName);
             fprintf(stderr, zNoCreat, errno, strerror(errno), pzFName);
             if (free_name)
                 AGFREE((void*) pzFName );

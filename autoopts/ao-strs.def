@@ -4,6 +4,11 @@ AutoGen Definitions strings;
  * \file ao-strs.def
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
+ *  It contains static immutable strings that are used throughout
+ *  the libopts library code.  The strings are split into two groups:
+ *  strings for generating a shell script to parse arguments, and
+ *  everything else.
+ *
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -24,6 +29,55 @@ AutoGen Definitions strings;
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
+#if 0
+string = { nm = ;
+  str  = << _EOStr_
+
+_EOStr_;
+};
+#endif
+
+string = { nm = zSepChars;        str = "-_^"; };
+string = { nm = zambig_file;      str = "  %s%s\n"; };
+string = { nm = zCfgAO_Flags;     str = "auto-options"; };
+string = { nm = zCfgProg;         str = "program"; };
+string = { nm = zFmtFmt;          str = "%%-%ds %%s\n"; };
+string = { nm = zGnuBreak;        str = "\n%s\n\n"; };
+string = { nm = zGnuFileArg;      str = "=file"; };
+string = { nm = zGnuKeyLArg;      str = "=Mbr"; };
+string = { nm = zGnuNestArg;      str = "=Cplx"; };
+string = { nm = zGnuOptArg;       str = "[=arg]"; };
+string = { nm = zGnuOptFmt;       str = "--%2$s%1$s"; };
+string = { nm = zGnuTimeArg;      str = "=Tim"; };
+string = { nm = zNone;            str = "none"; };
+string = { nm = zPresetFile; str = "#  preset/initialization file\n#  %s#\n";};
+string = { nm = zReqOptFmt;       str = " %3s %-14s %s"; };
+string = { nm = zShrtGnuOptFmt;   str = "%s"; };
+string = { nm = zStdBoolArg;      str = "T/F"; };
+string = { nm = zStdBreak;        str = "\n%s\n\n%s"; };
+string = { nm = zStdFileArg;      str = "Fil"; };
+string = { nm = zStdKeyArg;       str = "KWd"; };
+string = { nm = zStdKeyLArg;      str = "Mbr"; };
+string = { nm = zStdNestArg;      str = "Cpx"; };
+string = { nm = zStdNoArg;        str = "no "; };
+string = { nm = zStdNumArg;       str = "Num"; };
+string = { nm = zStdOptArg;       str = "opt"; };
+string = { nm = zStdReqArg;       str = "YES"; };
+string = { nm = zStdStrArg;       str = "Str"; };
+string = { nm = zStdTimeArg;      str = "Tim"; };
+string = { nm = zTabHyp;          str = "\t\t\t\t- "; };
+string = { nm = zTabHypAnd;       str = "\t\t\t\t-- and "; };
+string = { nm = zTabout;          str = "\t\t\t\t%s\n"; };
+string = { nm = zSixSpaces;       str = "      "; };
+string = { nm = zFiveSpaces;      str = "     "; };
+string = { nm = zThreeSpaces;     str = "   "; };
+string = { nm = zTwoSpaces;       str = "  "; };
+string = { nm = zAll;             str = "all"; };
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
+ *  STRINGS USED IN CREATING OPTION PARSING SHELL CODE
+ */
 string = { nm = ARG_BREAK_STR;    str  = " \t\n:="; };
 string = { nm = ARG_BY_NUM_FMT;   str  = "%s_%s_%d="; };
 string = { nm = BULLET_STR;       str  = "\t\t\t\t- "; };
@@ -112,8 +166,6 @@ string = { nm = NO_SUPPRESS_LOAD;
 
 string = { nm = NUMB_ATR_FMT;
   str  = "<%1$s type=integer>0x%2$lX</%1$s>\n"; };
-string = { nm = SAVE_WARN;
-  str  = "%s WARNING:  cannot save options - "; };
 
 string = { nm = SET_NO_TEXT_FMT;
   str  = "%1$s_%2$s_TEXT='no %2$s text'\n"; };
@@ -490,12 +542,3 @@ string = { nm = UNK_OPT_FMT;
 
 	_EOStr_;
 };
-
-
-#if 0
-string = { nm = ;
-  str  = << _EOStr_
-
-_EOStr_;
-};
-#endif

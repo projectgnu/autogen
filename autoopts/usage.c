@@ -38,12 +38,43 @@
 #include <libintl.h>
 #endif
 
+typedef struct {
+    size_t          fnm_len;
+    uint32_t        fnm_mask;
+    char const *    fnm_name;
+} ao_flag_names_t;
+
+/**
+ * Automated Options Usage Flags.
+ * NB: no entry may be a prefix of another entry
+ */
+#define AOFLAG_TABLE                            \
+    _aof_(gnu,             OPTPROC_GNUUSAGE )   \
+    _aof_(autoopts,        ~OPTPROC_GNUUSAGE)   \
+    _aof_(no_misuse_usage, OPTPROC_MISUSE   )   \
+    _aof_(misuse_usage,    ~OPTPROC_MISUSE  )   \
+    _aof_(compute,         OPTPROC_COMPUTE  )
+
+#define _aof_(_n, _f)   AOUF_ ## _n ## _ID,
+typedef enum { AOFLAG_TABLE AOUF_COUNT } ao_flag_id_t;
+#undef  _aof_
+
+#define _aof_(_n, _f)   AOUF_ ## _n = (1 << AOUF_ ## _n ## _ID),
+typedef enum { AOFLAG_TABLE } ao_flags_t;
+#undef  _aof_
+
 /* = = = START-STATIC-FORWARD = = = */
+static unsigned int
+parse_usage_flags(ao_flag_names_t const * fnt, char const * txt);
+
 static inline bool
 do_gnu_usage(tOptions * pOpts);
 
 static inline bool
 skip_misuse_usage(tOptions * pOpts);
+
+static void
+print_offer_usage(tOptions * opts);
 
 static void
 print_usage_details(tOptions * opts, int exit_code);
@@ -88,58 +119,46 @@ static int
 setStdOptFmts(tOptions * opts, char const ** ptxt);
 /* = = = END-STATIC-FORWARD = = = */
 
-/*
- *  NB: no entry may be a prefix of another entry
+/**
+ * Parse the option usage flags string.  Any parsing problems yield
+ * a zero (no flags set) result.  This function is internal to
+ * set_usage_flags().
+ *
+ * @param[in] fnt   Flag Name Table - maps a name to a mask
+ * @param[in] txt   the text to process.  If NULL, then
+ *                  getenv("AUTOOPTS_USAGE") is used.
+ * @returns a bit mask indicating which \a fnt entries were found.
  */
-#define AOFLAG_TABLE                            \
-    _aof_(gnu,             OPTPROC_GNUUSAGE )   \
-    _aof_(autoopts,        ~OPTPROC_GNUUSAGE)   \
-    _aof_(no_misuse_usage, OPTPROC_MISUSE   )   \
-    _aof_(misuse_usage,    ~OPTPROC_MISUSE  )
-
-LOCAL void
-set_usage_flags(tOptions * opts, char const * flg_txt)
+static unsigned int
+parse_usage_flags(ao_flag_names_t const * fnt, char const * txt)
 {
-    typedef struct {
-        size_t          fnm_len;
-        uint32_t        fnm_mask;
-        char const *    fnm_name;
-    } ao_flag_names_t;
+    unsigned int res = 0;
 
-#   define _aof_(_n, _f)   AOUF_ ## _n ## _ID,
-    typedef enum { AOFLAG_TABLE AOUF_COUNT } ao_flag_id_t;
-#   undef  _aof_
-
-#   define _aof_(_n, _f)   AOUF_ ## _n = (1 << AOUF_ ## _n ## _ID),
-    typedef enum { AOFLAG_TABLE } ao_flags_t;
-#   undef  _aof_
-
-#   define _aof_(_n, _f)   { sizeof(#_n)-1, _f, #_n },
-    static ao_flag_names_t const fn_table[AOUF_COUNT] = {
-        AOFLAG_TABLE
-    };
-#   undef  _aof_
-
-    unsigned int flg = (ao_flags_t)0;
-
-    if (flg_txt == NULL) {
-        flg_txt = getenv("AUTOOPTS_USAGE");
-        if (flg_txt == NULL) return;
+    /*
+     * The text may be passed in.  If not, use the environment variable.
+     */
+    if (txt == NULL) {
+        txt = getenv("AUTOOPTS_USAGE");
+        if (txt == NULL)
+            return 0;
     }
 
-    flg_txt = SPN_WHITESPACE_CHARS(flg_txt);
-    if (*flg_txt == NUL)
-        return;
+    txt = SPN_WHITESPACE_CHARS(txt);
+    if (*txt == NUL)
+        return 0;
 
+    /*
+     * search the string for table entries.  We must understand everything
+     * we see in the string, or we give up on it.
+     */
     for (;;) {
         int ix = 0;
-        ao_flag_names_t const * fnt = fn_table;
 
         for (;;) {
-            if (strneqvcmp(flg_txt, fnt->fnm_name, (int)fnt->fnm_len) == 0)
+            if (strneqvcmp(txt, fnt->fnm_name, (int)fnt->fnm_len) == 0)
                 break;
             if (++ix >= AOUF_COUNT)
-                return;
+                return 0;
             fnt++;
         }
 
@@ -147,35 +166,79 @@ set_usage_flags(tOptions * opts, char const * flg_txt)
          *  Make sure we have a full match.  Look for whitespace,
          *  a comma, or a NUL byte.
          */
-        if (! IS_END_LIST_ENTRY_CHAR(flg_txt[fnt->fnm_len]))
-            return;
+        if (! IS_END_LIST_ENTRY_CHAR(txt[fnt->fnm_len]))
+            return 0;
 
-        flg |= 1U << ix;
-        flg_txt = SPN_WHITESPACE_CHARS(flg_txt + fnt->fnm_len);
+        res |= 1U << ix;
+        txt = SPN_WHITESPACE_CHARS(txt + fnt->fnm_len);
 
-        if (*flg_txt == NUL)
-            break;
+        switch (*txt) {
+        case NUL:
+            return res;
 
-        if (*flg_txt == ',') {
-            /*
-             *  skip the comma and following white space
-             */
-            flg_txt = SPN_WHITESPACE_CHARS(flg_txt + 1);
-            if (*flg_txt == NUL)
-                break;
+        case ',':
+            txt = SPN_WHITESPACE_CHARS(txt + 1);
+            /* Something must follow the comma */
+
+        default:
+            continue;
         }
     }
+}
 
+/**
+ * Set option usage flags.  Any parsing problems yield no changes to options.
+ * Three different bits may be fiddled: \a OPTPROC_GNUUSAGE, \a OPTPROC_MISUSE
+ * and \a OPTPROC_COMPUTE.
+ *
+ * @param[in] flg_txt   text to parse.  If NULL, then the AUTOOPTS_USAGE
+ *                      environment variable is parsed.
+ * @param[in,out] opts  the program option descriptor
+ */
+LOCAL void
+set_usage_flags(tOptions * opts, char const * flg_txt)
+{
+#   define _aof_(_n, _f)   { sizeof(#_n)-1, _f, #_n },
+    static ao_flag_names_t const fn_table[AOUF_COUNT] = {
+        AOFLAG_TABLE
+    };
+#   undef  _aof_
+
+    /*
+     * the flag word holds a bit for each selected table entry.
+     */
+    unsigned int flg = parse_usage_flags(fn_table, flg_txt);
+    if (flg == 0) return;
+
+    /*
+     * Ensure we do not have conflicting selections
+     */
+    {
+        static unsigned int const form_mask =
+            AOUF_gnu | AOUF_autoopts;
+        static unsigned int const misuse_mask =
+            AOUF_no_misuse_usage | AOUF_misuse_usage;
+        if (  ((flg & form_mask)   == form_mask)
+           || ((flg & misuse_mask) == misuse_mask) )
+            return;
+    }
+
+    /*
+     * Now fiddle the fOptSet bits, based on settings.
+     * The OPTPROC_LONGOPT bit is immutable, thus if it is set,
+     * then fnm points to a mask off mask.
+     */
     {
         ao_flag_names_t const * fnm = fn_table;
-
-        while (flg != 0) {
+        for (;;) {
             if ((flg & 1) != 0) {
                 if ((fnm->fnm_mask & OPTPROC_LONGOPT) != 0)
                      opts->fOptSet &= fnm->fnm_mask;
                 else opts->fOptSet |= fnm->fnm_mask;
             }
             flg >>= 1;
+            if (flg == 0)
+                break;
             fnm++;
         }
     }
@@ -234,12 +297,63 @@ optionOnlyUsage(tOptions * pOpts, int ex_code)
     prt_opt_usage(pOpts, ex_code, pOptTitle);
 
     fflush(option_usage_fp);
-    if (ferror(option_usage_fp) != 0) {
-        fputs(zOutputFail, stderr);
-        exit(EXIT_FAILURE);
-    }
+    if (ferror(option_usage_fp) != 0)
+        fserr_exit(pOpts->pzProgName, zwriting, (option_usage_fp == stderr)
+                   ? zstderr_name : zstdout_name);
 }
 
+LOCAL void
+ao_bug(char const * msg)
+{
+    fprintf(stderr, zao_bug_msg, msg);
+    exit(EX_SOFTWARE);
+}
+
+/**
+ * Print a message suggesting how to get help.
+ *
+ * @param[in] opts      the program options
+ */
+static void
+print_offer_usage(tOptions * opts)
+{
+    char help[64];
+
+    if (HAS_opt_usage_t(opts)) {
+        int ix = opts->presetOptCt;
+        tOptDesc * od = opts->pOptDesc + ix;
+        while (od->optUsage != AOUSE_HELP) {
+            if (++ix >= opts->optCt)
+                ao_bug(zmissing_help_msg);
+            od++;
+        }
+
+    } else {
+        switch (opts->fOptSet & (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)) {
+        case OPTPROC_SHORTOPT:
+            strcpy(help, "-h");
+            break;
+
+        case OPTPROC_LONGOPT:
+        case (OPTPROC_LONGOPT | OPTPROC_SHORTOPT):
+            strcpy(help, "--help");
+        
+        case 0:
+            strcpy(help, "help");
+            break;
+        }
+    }
+
+    fprintf(option_usage_fp, zoffer_usage_fmt, opts->pzProgName, help);
+}
+
+/**
+ * Print information about each option.
+ *
+ * @param[in] opts      the program options
+ * @param[in] exit_code whether or not there was a usage error reported.
+ *                      used to select full usage versus abbreviated.
+ */
 static void
 print_usage_details(tOptions * opts, int exit_code)
 {
@@ -309,10 +423,9 @@ print_usage_details(tOptions * opts, int exit_code)
 
     fflush(option_usage_fp);
 
-    if (ferror(option_usage_fp) != 0) {
-        fputs(zOutputFail, stderr);
-        exit(EXIT_FAILURE);
-    }
+    if (ferror(option_usage_fp) != 0)
+        fserr_exit(opts->pzProgName, zwriting, (option_usage_fp == stderr)
+                   ? zstderr_name : zstdout_name);
 }
 
 static void
@@ -459,6 +572,7 @@ optionUsage(tOptions * opts, int usage_exit_code)
         ? EXIT_SUCCESS : usage_exit_code;
 
     displayEnum = false;
+    set_usage_flags(opts, NULL);
 
     /*
      *  Paged usage will preset option_usage_fp to an output file.
@@ -485,22 +599,29 @@ optionUsage(tOptions * opts, int usage_exit_code)
                 option_usage_fp = stderr;
         }
 
-        if (pz != NULL) {
+        if (((opts->fOptSet & OPTPROC_COMPUTE) == 0) && (pz != NULL)) {
             if ((opts->fOptSet & OPTPROC_TRANSLATE) != 0)
                 optionPrintParagraphs(pz, true, option_usage_fp);
             else
                 fputs(pz, option_usage_fp);
-            exit(exit_code);
+            goto flush_and_exit;
         }
     }
 
     fprintf(option_usage_fp, opts->pzUsageTitle, opts->pzProgName);
-    set_usage_flags(opts, NULL);
 
     if ((exit_code == EXIT_SUCCESS) ||
         (! skip_misuse_usage(opts)))
 
         print_usage_details(opts, usage_exit_code);
+    else
+        print_offer_usage(opts);
+    
+ flush_and_exit:
+    fflush(option_usage_fp);
+    if (ferror(option_usage_fp) != 0)
+        fserr_exit(opts->pzProgName, zwriting, (option_usage_fp == stdout)
+                   ? zstdout_name : zstderr_name);
 
     exit(exit_code);
 }
@@ -525,13 +646,13 @@ prt_conflicts(tOptions * opts, tOptDesc * pOD)
      *  REQUIRED:
      */
     if (pOD->pOptMust != NULL) {
-        const int* pOptNo = pOD->pOptMust;
+        const int * opt_no = pOD->pOptMust;
 
         fputs(zReqThese, option_usage_fp);
         for (;;) {
             fprintf(option_usage_fp, zTabout,
-                    opts->pOptDesc[*pOptNo].pz_Name);
-            if (*++pOptNo == NO_EQUIVALENT)
+                    opts->pOptDesc[*opt_no].pz_Name);
+            if (*++opt_no == NO_EQUIVALENT)
                 break;
         }
 
@@ -543,13 +664,13 @@ prt_conflicts(tOptions * opts, tOptDesc * pOD)
      *  CONFLICTS:
      */
     if (pOD->pOptCant != NULL) {
-        const int* pOptNo = pOD->pOptCant;
+        const int * opt_no = pOD->pOptCant;
 
         fputs(zProhib, option_usage_fp);
         for (;;) {
             fprintf(option_usage_fp, zTabout,
-                    opts->pOptDesc[*pOptNo].pz_Name);
-            if (*++pOptNo == NO_EQUIVALENT)
+                    opts->pOptDesc[*opt_no].pz_Name);
+            if (*++opt_no == NO_EQUIVALENT)
                 break;
         }
     }
@@ -610,8 +731,8 @@ prt_one_vendor(tOptions * opts, tOptDesc * pOD,
     return;
 
  bogus_desc:
-    fprintf(stderr, zInvalOptDesc, pOD->pz_Name);
-    exit(EX_SOFTWARE);
+    fprintf(stderr, zbad_od, opts->pzProgName, pOD->pz_Name);
+    ao_bug(zbad_arg_type_msg);
 }
 
 /**
@@ -731,7 +852,7 @@ prt_extd_usage(tOptions * opts, tOptDesc * pOD,
      */
     if (  (pOD->optEquivIndex != NO_EQUIVALENT)
        && (pOD->optEquivIndex != pOD->optActualIndex )  )  {
-        fprintf(option_usage_fp, zAlt,
+        fprintf(option_usage_fp, zalt_opt,
                  opts->pOptDesc[ pOD->optEquivIndex ].pz_Name);
         return;
     }
@@ -931,7 +1052,7 @@ prt_one_usage(tOptions * opts, tOptDesc * od, arg_types_t * at)
     return;
 
  bogus_desc:
-    fprintf(stderr, zInvalOptDesc, od->pz_Name);
+    fprintf(stderr, zbad_od, opts->pzProgName, od->pz_Name);
     exit(EX_SOFTWARE);
 }
 

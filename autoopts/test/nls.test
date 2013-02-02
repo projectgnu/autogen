@@ -101,12 +101,12 @@ _EOF_
 echo creating ${testname}.hlp
 clean_help > ${testname}-1.hlp <<'_EOF_'
 test_nls - Test AutoOpts for nls
-USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 noitpircseD    emaN-noitpO grA glF
    -o Str option         pircsed noitpo noitpo ehT
    -s Num second         pircsed noitpo dnoces ehT
-   -? no  help           tixe dna noitamrofni egasu dednetxe yalpsiD
-   -! no  more-help      regap urht dessap noitamrofni egasu dednetxE
+   -? no  help           tixe dna noitamrofni egasu dednetxe yalpsid
+   -! no  more-help      regap urht dessap noitamrofni egasu dednetxe
 .retcarahc galf eht dna nehpyh
 elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
 _EOF_
@@ -120,12 +120,12 @@ cat ${testname}-1.def >&3
 echo 'full-usage = <''<''- _EOF_' >&3
 clean_help >&3 <<'_EOF_'
 test_nls - Test AutoOpts for nls
-USAGE:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  nls [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option descrip
    -s Num second         The second descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -134,15 +134,15 @@ echo '_EOF_;' >&3
 exec 3>&-
 
 clean_help > ${testname}-2.hlp <<'_EOF_'
-...] ]>lav<} |={[>eman<-- | ]>lav<[ >galf<- [ sln  :EGASU
+...] ]>lav<} |={[>eman<-- | ]>lav<[ >galf<- [ sln  :egasU
 sln rof stpOotuA tseT - sln_tset
 pircsed noitpo ehT         noitpo rtS o-
 noitpircseD    emaN-noitpO grA glF
 pircsed dnoces ehT         dnoces muN s-
 .retcarahc galf eht dna nehpyh
 elgnis a yb ro eman rieht dna snehpyh delbuod yb deificeps era snoitpO
-regap urht dessap noitamrofni egasu dednetxE      pleh-erom  on !-
-tixe dna noitamrofni egasu dednetxe yalpsiD           pleh  on ?-
+regap urht dessap noitamrofni egasu dednetxe      pleh-erom  on !-
+tixe dna noitamrofni egasu dednetxe yalpsid           pleh  on ?-
 _EOF_
 
 compile_with_nls 2

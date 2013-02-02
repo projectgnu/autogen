@@ -67,12 +67,12 @@ basehlp=${testname}.hlp
 echo creating ${basehlp}
 clean_help > ${basehlp} <<'_EOF_'
 test_main - Test AutoOpts for main
-USAGE:  main [ -<flag> [<val>] ]... [ <argument> ... ]
+Usage:  main [ -<flag> [<val>] ]... [ <argument> ... ]
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 
 This is some explanatory text.

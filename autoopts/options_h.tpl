@@ -281,35 +281,53 @@ typedef union {
 #define             pzLastArg       optArg.argString
 #define             optArgBucket_t  opt_arg_union_t
 
+/**
+ * Enumeration of AutoOpts defined options.
+ * The enumeration is used in marking each option that is defined by
+ * AutoOpts so libopts can find the correct descriptor.  This renders
+ * tOptSpecIndex redundant.
+ */
+typedef enum {
+    AOUSE_USER_DEFINED = 0,     /**< user option */
+    AOUSE_RESET_OPTION,         /**< reset option state option */
+    AOUSE_VERSION,              /**< request version */
+    AOUSE_HELP,                 /**< request usage help */
+    AOUSE_MORE_HELP,            /**< request paged usage */
+    AOUSE_USAGE,                /**< request short usage */
+    AOUSE_SAVE_OPTS,            /**< save option state */
+    AOUSE_LOAD_OPTS,            /**< load options from file */
+    AOUSE_VENDOR_OPT            /**< specify a vendor option */
+} opt_usage_t;
+
 /*
  *  Descriptor structure for each option.
  *  Only the fields marked "PUBLIC" are for public use.
  */
 struct optDesc {
-    unsigned short const    optIndex;         /* PUBLIC */
-    unsigned short const    optValue;         /* PUBLIC */
-    unsigned short          optActualIndex;   /* PUBLIC */
-    unsigned short          optActualValue;   /* PUBLIC */
+    uint16_t const      optIndex;         /* PUBLIC */
+    uint16_t const      optValue;         /* PUBLIC */
+    uint16_t            optActualIndex;   /* PUBLIC */
+    uint16_t            optActualValue;   /* PUBLIC */
 
-    unsigned short const    optEquivIndex;    /* PUBLIC */
-    unsigned short const    optMinCt;
-    unsigned short const    optMaxCt;
-    unsigned short          optOccCt;         /* PUBLIC */
+    uint16_t const      optEquivIndex;    /* PUBLIC */
+    uint16_t const      optMinCt;
+    uint16_t const      optMaxCt;
+    uint16_t            optOccCt;         /* PUBLIC */
 
-    opt_state_mask_t        fOptState;        /* PUBLIC */
-    unsigned int            reserved;
-    opt_arg_union_t         optArg;           /* PUBLIC */
-    void *                  optCookie;        /* PUBLIC */
+    opt_state_mask_t    fOptState;        /* PUBLIC */
+    uint32_t            optUsage;
+    opt_arg_union_t     optArg;           /* PUBLIC */
+    void *              optCookie;        /* PUBLIC */
 
-    int const  * const      pOptMust;
-    int const  * const      pOptCant;
-    tpOptProc    const      pOptProc;
-    char const * const      pzText;
+    int const  * const  pOptMust;
+    int const  * const  pOptCant;
+    tpOptProc    const  pOptProc;
+    char const * const  pzText;
 
-    char const * const      pz_NAME;
-    char const * const      pz_Name;
-    char const * const      pz_DisableName;
-    char const * const      pz_DisablePfx;
+    char const * const  pz_NAME;
+    char const * const  pz_Name;
+    char const * const  pz_DisableName;
+    char const * const  pz_DisablePfx;
 };
 
 /*
@@ -318,10 +336,10 @@ struct optDesc {
  */
 typedef struct optSpecIndex tOptSpecIndex;
 struct optSpecIndex {
-    const unsigned short        more_help;
-    const unsigned short        save_opts;
-    const unsigned short        number_option;
-    const unsigned short        default_opt;
+    uint16_t const      more_help;
+    uint16_t const      save_opts;
+    uint16_t const      number_option;
+    uint16_t const      default_opt;
 };
 
 /*
@@ -376,17 +394,21 @@ struct options {
     char const * const          pzPackager;
 };
 
-/*
+/**
  *  Versions where in various fields first appear:
  *  ($AO_CURRENT * 4096 + $AO_REVISION, but $AO_REVISION must be zero)
  */
-#define originalOptArgArray_STRUCT_VERSION  131072 /* AO_CURRENT = 32 */
+#define originalOptArgArray_STRUCT_VERSION  0x20000 /* AO_CURRENT = 32 */
 #define HAS_originalOptArgArray(_opt) \
     ((_opt)->structVersion >= originalOptArgArray_STRUCT_VERSION)
 
-#define pzPkgDataDir_STRUCT_VERSION  139264 /* AO_CURRENT = 34 */
+#define pzPkgDataDir_STRUCT_VERSION  0x22000 /* AO_CURRENT = 34 */
 #define HAS_pzPkgDataDir(_opt) \
     ((_opt)->structVersion >= pzPkgDataDir_STRUCT_VERSION)
+
+#define opt_usage_t_STRUCT_VERSION  0x26000 /* AO_CURRENT = 38 */
+#define HAS_opt_usage_t(_opt) \
+    ((_opt)->structVersion >= opt_usage_t_STRUCT_VERSION)
 
 /*
  *  "token list" structure returned by "string_tokenize()"
@@ -418,14 +440,14 @@ typedef struct {
  *  is not zero, then there *may* not be a terminating NUL.
  */
 typedef struct {
-    void *      txt_data;      /*@< text file data   */
-    size_t      txt_size;      /*@< actual file size */
-    size_t      txt_full_size; /*@< mmaped mem size  */
-    int         txt_fd;        /*@< file descriptor  */
-    int         txt_zero_fd;   /*@< fd for /dev/zero */
-    int         txt_errno;     /*@< warning code     */
-    int         txt_prot;      /*@< "prot" flags     */
-    int         txt_flags;     /*@< mapping type     */
+    void *      txt_data;      /**< text file data   */
+    size_t      txt_size;      /**< actual file size */
+    size_t      txt_full_size; /**< mmaped mem size  */
+    int         txt_fd;        /**< file descriptor  */
+    int         txt_zero_fd;   /**< fd for /dev/zero */
+    int         txt_errno;     /**< warning code     */
+    int         txt_prot;      /**< "prot" flags     */
+    int         txt_flags;     /**< mapping type     */
 } tmap_info_t;
 
 #define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) ==  (void*)MAP_FAILED)

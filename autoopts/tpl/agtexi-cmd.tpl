@@ -744,7 +744,7 @@ then
   fi
 fi
 ${PROG} [=(. help-opt)=] 2>&1 | \
-    sed -e "s/USAGE:  lt-${prog_name} /USAGE:  ${prog_name} /" \
+    sed -e "s/Usage:  lt-${prog_name} /Usage:  ${prog_name} /" \
         -e 's/@/@@/g;s/{/@{/g;s/}/@}/g' \
         -e 's/	/        /g'
 [= (shell (out-pop #t))         =]

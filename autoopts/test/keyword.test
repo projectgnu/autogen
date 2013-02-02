@@ -72,19 +72,19 @@ compile "-X"
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
-echo creating ${testname}.res-help
-clean_help > ${testname}.res-help <<\_EOF_
+echo creating ${testname}.bas-help
+clean_help > ${testname}.bas-help <<\_EOF_
 test_keyword - Test AutoOpts for keyword
-USAGE:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  keyword [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
       KWd trace          tracing level of detail
       Mbr sets           set membership testing
 				- is a set membership option
-   -X no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -X no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -102,15 +102,17 @@ The valid "sets" option keywords are:
   seventh     eighth      ninth       tenth       eleventh    twelfth
   thirteenth  fourteenth  fifteenth   sixteenth   seventeenth eighteenth
   or an integer mask with any of the lower 18 bits set
-or you may use a numeric representation.  Preceding these with a '!' will
-clear the bits, specifying 'none' will clear all bits, and 'all' will set them
-all.  Multiple entries may be passed as an option argument list.
+or you may use a numeric representation.  Preceding these with a '!'
+will clear the bits, specifying 'none' will clear all bits, and 'all'
+will set them all.  Multiple entries may be passed as an option
+argument list.
 _EOF_
 
 dir=`pwd -P` || dir=`pwd`
-${SED} "s#${dir}/##" ${testname}.help > ${testname}.bas-help
-cmp -s ${testname}.*-help || \
-  failure "help output: `diff ${testname}.*-help`"
+${SED} "s#${dir}/##" ${testname}.help > ${testname}.res-help
+pair="${testname}.bas-help ${testname}.res-help"
+cmp -s ${pair} || \
+  failure "help output:$nl`diff ${pair}`"
 
 ./${testname} --trace=exp > /dev/null 2>&1 && \
   failure "${testname} accepted ambiguous keyword"

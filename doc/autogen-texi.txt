@@ -1467,55 +1467,66 @@ View the @file{libopts/README} file for further integration information.
 @node Caveats
 @section Developer and User Notes
 
-AutoOpts has its conventional way of displaying option information
-that includes somewhat more information that the standard GNU method.
-AutoOpts will also print out a line of usage text for each option type
-when options are misspecified.  GNU programs typically do not do this.
-These defaults can be changed on a per-program basis by adding either
-or both of the following in the option definition file:
+The formatting of the usage message can be controlled with the use of the
+@env{AUTOOPTS_USAGE} environment variable.  If it contains any of five
+possible comma separated values, it will affect @file{libopts} behavior.
+Any extraneous or conflicting data will cause its value to be ignored.
 
-@example
-gnu-usage;
-no-misuse-usage;
-@end example
+If the program attributes @code{long-usage} and @code{short-usage} have been
+specified (@pxref{usage attributes,Usage and Version Info Display}), these
+strings are used for displaying full usage and abbreviated usage.
+``Full usage'' is used when usage is requested, ``abbreviated usage''
+when a usage error is detected.  If these strings are not provided,
+the usage text is computed.
 
-Users may also override these settings with the @env{AUTOOPTS_USAGE}
-environment variable.  It may be set to a comma or white space separated
-list of the following strings:
+The @env{AUTOOPTS_USAGE} environment variable may be set to the comma and/or
+white space separated list of the following strings:
 
 @table @samp
+@item compute
+Ignore the provision of @code{long-usage} and @code{short-usage} attributes,
+and compute the usage strings.  This is useful, for example, if you wish to
+regenerate the basic form of these strings and either tweak them or translate
+them.  The methods used to compute the usage text are not suitable for
+translation.
+
 @item gnu
 @cindex gnu
-The format of the extended usage text will be displayed in GNU-normal form.
+The format of the usage text will be displayed in GNU-normal form.
 The default display for @option{--version} will be to include a note
 on licensing terms.
 
 @item autoopts
 @cindex autoopts
-The format of the extended usage will be in AutoOpts' native layout.
+The format of the extended usage will be in AutoOpts' native layout.  The
+default version display will be one line of text with the last token the
+version.  @code{gnu} and @code{autoopts} conflict and may not be used
+together.
 
 @item no-misuse-usage
 @cindex no-misuse-usage
-When an option error is made on the command line, the abbreviated
-usage text will be suppressed.
+When an option error is made on the command line, the abbreviated usage text
+will be suppressed.  An error message and the method for getting full usage
+information will be displayed.
 
 @item misuse-usage
 @cindex misuse-usage
-When an option error is made on the command line, the abbreviated
-usage text will be shown.
+When an option error is made on the command line, the abbreviated usage text
+will be shown.  @code{misuse-usage} and @code{no-misuse-usage} conflict and
+may not be used together.
 @end table
 
+@code{misuse-usage} and @code{autoopts} are the defaults.
+These defaults may be flipped to @code{no-misuse-usage} and @code{gnu}
+by specifying @code{gnu-usage} and @code{no-misuse-usage}
+program attributes, respectively, in the option definition file.
+
 @noindent
-The setting used is the last one seen.  The @code{autoopts} and
-@code{misuse-usage} serve no purpose, unless the definition file
-entries were specified as above.
+@i{Note for developers}:
 
-@b{Note for developers}:
-
-The templates used to implement AutoOpts depend heavily upon
-token pasting.  That mens that if you name an option, @code{debug}, for
-example, the generated header will expect to be able to emit
-@code{#define} macros such as this:
+The templates used to implement AutoOpts depend heavily upon token pasting.
+That mens that if you name an option, @code{debug}, for example, the generated
+header will expect to be able to emit @code{#define} macros such as this:
 @example
 #define DESC(n) (autogenOptions.pOptDesc[INDEX_OPT_## n])
 @end example
@@ -1527,7 +1538,6 @@ that something else will be in the above expansion.
 If you discover you are having strange problems like this,
 you may wish to use some variation of the @code{guard-option-names}
 @xref{program attributes}.
-
 
 @c === SECTION MARKER
 
@@ -1754,6 +1764,11 @@ value @emph{anything}.
 If this attribute is provided, it is used to specify an abbreviated
 version of the usage text.  This text is constructed in the same way
 as the @code{full-usage}, described above.
+
+Both @code{full-usage} and @code{short-usage} can be regenerated
+by setting the environment variable @env{AUTOOPTS_USAGE} to the
+string @i{compute}, or add that to whatever else is needed.
+See @xref{Caveats, Developer and User Notes}.
 
 @item gnu-usage
 @vindex gnu-usage
@@ -2358,7 +2373,7 @@ void @i{my_usage}( tOptions* pOptions, int exitCode )
 Normally, the default format produced by the @code{optionUsage} procedure
 is @i{AutoOpts Standard}.  By specifying this attribute, the default format
 will be @i{GNU-ish style}.  Either default may be overridden by the user with
-the @code{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
+the @env{AUTOOPTS_USAGE} environment variable.  If it is set to @code{gnu}
 or @code{autoopts}, it will alter the style appropriately.  This attribute
 will conflict with the @code{usage} attribute.
 

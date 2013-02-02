@@ -1167,18 +1167,15 @@ optionLoadOpt(tOptions * opts, tOptDesc * odesc)
         if ((opts->fOptSet & OPTPROC_ERRSTOP) == 0)
             return;
 
-        fprintf(stderr, zFSErrOptLoad, errno, strerror(errno),
-                odesc->optArg.argString);
-        exit(EX_NOINPUT);
+        fserr_exit(opts->pzProgName, "stat", odesc->optArg.argString);
         /* NOT REACHED */
     }
 
     if (! S_ISREG(sb.st_mode)) {
         if ((opts->fOptSet & OPTPROC_ERRSTOP) == 0)
             return;
-
-        fprintf(stderr, zNotFile, odesc->optArg.argString);
-        exit(EX_NOINPUT);
+        errno = EINVAL;
+        fserr_exit(opts->pzProgName, "stat", odesc->optArg.argString);
         /* NOT REACHED */
     }
 

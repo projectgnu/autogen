@@ -75,6 +75,15 @@ dp_do_end_block(te_dp_state initial, te_dp_state maybe_next,
 }
 
 static te_dp_state
+dp_do_need_value_delete_ent(te_dp_state initial, te_dp_state maybe_next,
+                            te_dp_event trans_evt)
+{
+    (void)initial; (void)trans_evt;
+    delete_ent(curr_ent);
+    return maybe_next;
+}
+
+static te_dp_state
 dp_do_have_name_lit_eq(te_dp_state initial, te_dp_state maybe_next,
                        te_dp_event trans_evt)
 {

@@ -44,7 +44,7 @@
 (if (exist? "flag.arg-type")
     (set! tmp-val "[{=| }<val>]"))
 
-(define usage-line (string-append "USAGE:  %s "
+(define usage-line (string-append "Usage:  %s "
 
   ;; If at least one option has a minimum occurrence count
   ;; we use curly brackets around the option syntax.
@@ -643,7 +643,21 @@ translate_option_strings(void)
  * for translation a paragraph at a time.
  */
 static void bogus_function(void) {[=
-(out-resume "xget") (out-pop #t) =]
+(out-resume "xget") (out-pop #t) \=]
+
+[=(out-push-new)=]
+incdir=[= (if (defined? 'inc-dir) inc-dir "") =]
+test -d $incdir || incdir=`dirname [=(tpl-file #t)=]`/..
+incdir=`cd $incdir/autoopts >/dev/null && pwd`
+test -f ${incdir}/usage-txt.h && {
+    sedcmd='/LIBOPTS-MESSAGES:/,/END-[=
+
+  (if (and (exist? "full-usage") (exist? "short-usage"))
+      "LIBOPTS-MESSAGES"
+      "USAGE-TEXT" ) =]/p'
+    sed -n "$sedcmd" ${incdir}/usage-txt.h
+}
+[= (shell (out-pop #t)) =]
 }
 #endif /* uncompilable code */[=
 
@@ -687,7 +701,7 @@ IF (exist? "resettable")
      /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]RESET_OPTION,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ RESET_FLAGS, 0,
+     /* opt state flags  */ RESET_FLAGS, AOUSE_RESET_OPTION,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -709,7 +723,7 @@ IF (exist? "version")   =]
      /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]VERSION,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ VER_FLAGS, 0,
+     /* opt state flags  */ VER_FLAGS, AOUSE_VERSION,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -729,7 +743,7 @@ ENDIF =]
      /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]HELP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, AOUSE_HELP,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -747,7 +761,7 @@ IF (not (exist? "no-libopts"))          =],
      /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]MORE_HELP,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ MORE_HELP_FLAGS, 0,
+     /* opt state flags  */ MORE_HELP_FLAGS, AOUSE_MORE_HELP,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -767,7 +781,7 @@ IF (exist? "usage-opt")                 =],
      /* equiv idx value  */ NO_EQUIVALENT, [= (. VALUE-pfx) =]USAGE,
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
-     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, 0,
+     /* opt state flags  */ OPTST_IMM | OPTST_NO_INIT, AOUSE_USAGE,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -792,7 +806,7 @@ IF (exist? "homerc")                    =][=
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, 0,
+                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, AOUSE_SAVE_OPTS,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,
@@ -815,7 +829,7 @@ IF (exist? "homerc")                    =][=
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
 			  | OPTST_DISABLE_IMM[=
-    (if (exist? "disable-load") "| OPTST_NO_COMMAND") =], 0,
+    (if (exist? "disable-load") "| OPTST_NO_COMMAND") =], AOUSE_LOAD_OPTS,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL, NULL,
@@ -840,7 +854,7 @@ IF (exist? "vendor-opt")                =],
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, NOLIMIT, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_IMM | OPTST_TWICE, 0, /* both directions */
+                          | OPTST_IMM | OPTST_TWICE, AOUSE_VENDOR_OPT,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,

@@ -65,7 +65,7 @@ optionResetEverything(tOptions * pOpts)
  *  For example, --reset=foo will cause the --foo option to be reset.
 =*/
 void
-optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
+optionResetOpt(tOptions * pOpts, tOptDesc * pOD)
 {
     static bool reset_active = false;
 
@@ -80,13 +80,11 @@ optionResetOpt( tOptions* pOpts, tOptDesc* pOD )
         return;
 
     if (  (! HAS_originalOptArgArray(pOpts))
-       || (pOpts->originalOptArgCookie == NULL)) {
-        fputs(zResetNotConfig, stderr);
-        _exit(EX_SOFTWARE);
-    }
+       || (pOpts->originalOptArgCookie == NULL))
+        ao_bug(zno_reset);
 
     if ((pzArg == NULL) || (*pzArg == NUL)) {
-        fputs(zNoResetArg, stderr);
+        fprintf(stderr, zreset_arg, pOpts->pzProgName, pOD->pz_Name);
         pOpts->pUsageProc(pOpts, EXIT_FAILURE);
         /* NOTREACHED */
         assert(0 == 1);

@@ -81,13 +81,13 @@ compile "help"
 echo creating ${testname}.hlp
 clean_help > ${testname}.hlp << '_EOF_'
 test_immediate - Test AutoOpts for immediate - Ver. 1.0
-USAGE:  immediate [ <option-name>[{=| }<val>] ]...
+Usage:  immediate [ <option-name>[{=| }<val>] ]...
    Arg Option-Name    Description
    Str second         The second option descrip
 				- disabled as --not-second
-   opt version        Output version information and exit
-   no  help           Display extended usage information and exit
-   no  more-help      Extended usage information passed thru pager
+   opt version        output version information and exit
+   no  help           display extended usage information and exit
+   no  more-help      extended usage information passed thru pager
 
 All arguments are named options.
 _EOF_
@@ -103,8 +103,8 @@ f=`./${testname} not-second`
 test "$f" = "invocation_ct = 2" || \
   failure "DIS-abled option not processed twice"
 
-f=`./${testname} help version=c | ${FGREP} 'USAGE:'`
-test -z "${f}" && failure "no USAGE: in help text"
+f=`./${testname} help version=c | ${FGREP} 'Usage:'`
+test -z "${f}" && failure "no Usage: in help text"
 
 f=`./${testname} version=c help | ${FGREP} -i 'Copyright (C)'`
 test -z "${f}" && failure "no 'Copyright (C)' in version text"

@@ -142,14 +142,14 @@ basehelp=${testname}-base.help
 echo creating ${basehelp}
 clean_help > ${basehelp} <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
-USAGE:  ${testname} [ -<flag> [<val>] ]...
+Usage:  ${testname} [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -s Cpx struct         structured argument val
 				- may appear multiple times
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 

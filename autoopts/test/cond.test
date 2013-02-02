@@ -65,13 +65,13 @@ mv ${testname} ${testname}-1
 echo creating ${testname}-1.help
 clean_help > ${testname}-1.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
-USAGE:  cond [ -<flag> [<val>] ]...
+Usage:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
    -I Num interfere      cond interference test
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -88,14 +88,14 @@ compile "-?"
 mv ${testname} ${testname}-2
 clean_help > ${testname}-2.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
-USAGE:  cond [ -<flag> [<val>] ]...
+Usage:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
    -c Num condition      cond test
    -I Num interfere      cond interference test
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -146,7 +146,7 @@ compile "-?"
 mv ${testname} ${testname}-5
 clean_help > ${testname}-5.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
-USAGE:  cond [ -<flag> [<val>] ]...
+Usage:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
@@ -154,8 +154,8 @@ USAGE:  cond [ -<flag> [<val>] ]...
 				- It must be in the range:
 				  0 to 1000
    -I Num interfere      cond interference test
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -169,13 +169,13 @@ compile "-?"
 mv ${testname} ${testname}-6
 clean_help > ${testname}-6.help <<'_EOF_'
 test_cond - Test AutoOpts for cond
-USAGE:  cond [ -<flag> [<val>] ]...
+Usage:  cond [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
    -I Num interfere      cond interference test
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 

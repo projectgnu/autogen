@@ -31,18 +31,66 @@ static SCM
 get_text(char const * text, char const * start, char const * end, SCM def);
 /* = = = END-STATIC-FORWARD = = = */
 
+LOCAL char *
+load_file(char const * fname)
+{
+    char * res = NULL;
+    FILE * fp  = fopen(fname, "r");
+    size_t fsz;
+
+    if (fp == NULL)
+        return NULL;
+
+    {
+        struct stat stbf;
+        if (fstat(fileno(fp), &stbf) != 0) {
+            fclose(fp);
+            return NULL;
+        }
+
+        fsz = stbf.st_size;
+        res = (char*)AGALOC(fsz + 1, "load_file");
+        if (outfile_time < stbf.st_mtime)
+            outfile_time = stbf.st_mtime;
+    }
+
+    {
+        char * scan = res;
+        do  {
+            size_t sz = fread(scan, 1, fsz, fp);
+            if (sz == 0) {
+                fprintf(stderr, LD_EXTRACT_BAD_READ, errno, strerror(errno),
+                        (int)fsz, fname);
+                AG_ABEND(LD_EXTRACT_READ_FAIL);
+            }
+
+            scan += sz;
+            fsz  -= sz;
+        } while (fsz > 0);
+
+        *scan = NUL;
+    }
+
+    fclose(fp);
+
+    if (dep_fp != NULL)
+        add_source_file(fname);
+    return res;
+}
+
 /**
  *  Load a file into memory.  Keep it in memory and try to reuse it
  *  if we get called again.  Likely, there will be several extractions
  *  from a single file.
+ *
+ * @param[in] new_fil  name of extraction file to load
+ * @returns the contents of the file or NULL
  */
 static char const *
 load_extract_file(char const * new_fil)
 {
-    static char const * pzFile = NULL;
-    static char const * pzText = NULL;
-    struct stat  sbuf;
-    char * in_txt;
+    static char const * last_fname = NULL;
+    static char const * file_text  = NULL;
 
     /*
      *  Make sure that we:
@@ -62,75 +110,40 @@ load_extract_file(char const * new_fil)
     if (new_fil == NULL)
         return NULL;
 
-    if (  (pzFile != NULL)
-       && (strcmp(pzFile, new_fil) == 0))
-        return pzText;
+    if (  (last_fname != NULL)
+       && (strcmp(last_fname, new_fil) == 0))
+        return file_text;
 
-    if (  (stat(new_fil, &sbuf) != 0)
-       || (! S_ISREG(sbuf.st_mode))
-       || (sbuf.st_size < 10) )
-        return NULL;
-
-    if (pzFile != NULL) {
-        AGFREE((void*)pzFile);
-        AGFREE((void*)pzText);
-        pzFile = pzText = NULL;
+    {
+        struct stat sbuf;
+        if (  (stat(new_fil, &sbuf) != 0)
+           || (! S_ISREG(sbuf.st_mode))
+           || (sbuf.st_size < 10) )
+            return NULL;
     }
 
-    AGDUPSTR(pzFile, new_fil, "extract file");
-    in_txt = (char*)AGALOC(sbuf.st_size + 1, "Extract Text");
+    if (last_fname != NULL) {
+        AGFREE((void*)last_fname);
+        AGFREE((void*)file_text);
+        last_fname = file_text = NULL;
+    }
+
+    AGDUPSTR(last_fname, new_fil, "extract file");
 
     if (! HAVE_OPT(WRITABLE))
         SET_OPT_WRITABLE;
 
-    pzText = (char const*)in_txt;
+    file_text = load_file(last_fname);
+    if (file_text != NULL)
+        return file_text;
 
-    /*
-     *  Suck up the file.  We must read it all.
-     */
-    {
-        struct stat stbf;
-        FILE * fp = fopen(new_fil, "r");
-        if (fp == NULL)
-            goto bad_return;
-
-        if (fstat(fileno(fp), &stbf) != 0) {
-            fclose(fp);
-            goto bad_return;
-        }
-
-        if (outfile_time < stbf.st_mtime)
-            outfile_time = stbf.st_mtime;
-
-        do  {
-            size_t sz = fread(in_txt, (size_t)1, (size_t)sbuf.st_size, fp);
-            if (sz == 0) {
-                fprintf(stderr, LD_EXTRACT_BAD_READ, errno, strerror(errno),
-                        (int)sbuf.st_size, pzFile);
-                AG_ABEND(LD_EXTRACT_READ_FAIL);
-            }
-
-            in_txt += sz;
-            sbuf.st_size -= (off_t)sz;
-        } while (sbuf.st_size > 0);
-
-        *in_txt = NUL;
-        fclose(fp);
-
-        if (dep_fp != NULL)
-            add_source_file(new_fil);
+    AGFREE((void*)last_fname);
+    last_fname = NULL;
+    if (file_text != NULL) {
+        AGFREE((void*)file_text);
+        file_text = NULL;
     }
-
-    return pzText;
-
- bad_return:
-
-    AGFREE((void*)pzFile);
-    pzFile = NULL;
-    AGFREE((void*)pzText);
-    pzText = NULL;
-
-    return pzText;
+    return NULL;
 }
 
 

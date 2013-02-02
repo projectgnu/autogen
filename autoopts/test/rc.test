@@ -56,15 +56,15 @@ ${AG_L} ${testname}.def || \
 
 clean_help > ${testname}-base1.help <<_EOF_
 test_rc - Test AutoOpts for rc
-USAGE:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
+Usage:  rc [ -<flag> [<val>] | --<name>[{=| }<val>] ]... mumble
   Flg Arg Option-Name    Description
    -o no  option         The option option descrip
    -s Str second         The second option descrip
    -t Str third          The third option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 
@@ -205,7 +205,7 @@ ${AG_L} ${testname}.def || \
 compile "--help"
 ${SED} 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
     ${testname}.help > ${testname}-res2.help
-egrep -v ' save-opts  +Save ' ${testname}-base1.help > ${testname}-base2.help
+egrep -v ' save-opts  +save ' ${testname}-base1.help > ${testname}-base2.help
 
 cmp ${testname}-*2.help || \
   failure "`diff ${testname}-*2.help`"
@@ -219,9 +219,8 @@ compile "--help"
 ${SED} 's@\( - reading file \).*\(/'${testname}.rc/rc.file'\)@\1....\2@' \
     ${testname}.help > ${testname}-res3.help
 
-${SED} -e '/ load-opts   *Load /,/multiple times$/d' \
-    -e '/ save-opts   *Save /d' \
-    ${testname}-base1.help > ${testname}-base3.help
+${SED} -e '/ load-opts   *load /,/multiple times$/d' \
+    ${testname}-base2.help > ${testname}-base3.help
 
 cmp ${testname}-*3.help || \
   failure "`diff ${testname}-*3.help`"

@@ -85,7 +85,7 @@ compile "-?"
 echo creating ${testname}-base.help
 clean_help > ${testname}-base.help <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
-USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
@@ -96,8 +96,8 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       opt omega          omega opt
 				- an alternate for alpha
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -169,7 +169,7 @@ cmp -s ${testname}-base.out ${testname}.out || \
 echo creating ${testname}-base2.help
 clean_help > ${testname}-base2.help <<_EOF_
 test_${testname} - Test AutoOpts for ${testname}
-USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
@@ -180,10 +180,10 @@ USAGE:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 				- an alternate for alpha
       opt omega          omega opt
 				- an alternate for alpha
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
-   -> opt save-opts      Save the option state to a config file
-   -< Str load-opts      Load options from a config file
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
+   -> opt save-opts      save the option state to a config file
+   -< Str load-opts      load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 

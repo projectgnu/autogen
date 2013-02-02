@@ -29,8 +29,8 @@ typedef enum {
     INPUT_FILE
 } def_input_mode_t;
 
-static def_ent_t* pFreeEntryList = NULL;
-static void*      pAllocList     = NULL;
+static def_ent_t * free_de_list = NULL;
+static void *      de_blocks    = NULL;
 
 #define ENTRY_SPACE        (4096 - sizeof(void*))
 #define ENTRY_ALLOC_CT     (ENTRY_SPACE / sizeof(def_ent_t))
@@ -38,6 +38,9 @@ static void*      pAllocList     = NULL;
     ((ENTRY_ALLOC_CT * sizeof(def_ent_t)) + sizeof(void*))
 
 /* = = = START-STATIC-FORWARD = = = */
+static void
+free_def_ent(def_ent_t * de);
+
 static def_ent_t *
 insert_ent(def_ent_t * de);
 
@@ -48,32 +51,32 @@ ready_def_input(char const ** ppzfile, size_t * psz);
 LOCAL def_ent_t *
 new_def_ent(void)
 {
-    def_ent_t * pRes = pFreeEntryList;
+    def_ent_t * res = free_de_list;
 
-    if (pRes != NULL) {
-        pFreeEntryList = pRes->de_next;
+    if (res != NULL) {
+        free_de_list = res->de_next;
 
     } else {
-        int   ct = ENTRY_ALLOC_CT-1;
-        void* p  = AGALOC(ENTRY_ALLOC_SIZE, "def headers");
+        int    ct = ENTRY_ALLOC_CT-1;
+        void * p  = AGALOC(ENTRY_ALLOC_SIZE, "def headers");
 
-        *((void **)p) = pAllocList;
-        pAllocList    = p;
-        pRes = pFreeEntryList = (def_ent_t *)((void **)p + 1);
+        *((void **)p) = de_blocks;
+        de_blocks     = p;
+        res = free_de_list = (def_ent_t *)((void **)p + 1);
 
         /*
          *  This is a post-loop test loop.  It will cycle one fewer times
          *  than there are 'def_ent_t' structs in the memory we just alloced.
          */
         do  {
-            def_ent_t* pNxt = pRes+1;
-            pRes->de_next = pNxt;
+            def_ent_t * next = res+1;
+            res->de_next = next;
 
             /*
-             *  When the loop ends, "pRes" will point to the last allocated
+             *  When the loop ends, "res" will point to the last allocated
              *  structure instance.  That is the one we will return.
              */
-            pRes = pNxt;
+            res = next;
         } while (--ct > 0);
 
         /*
@@ -81,11 +84,18 @@ new_def_ent(void)
          *  routine is called, the *FIRST* structure in this list will
          *  be returned.
          */
-        pRes[-1].de_next = NULL;
+        res[-1].de_next = NULL;
     }
 
-    memset((void *)pRes, 0, sizeof(*pRes));
-    return pRes;
+    memset((void *)res, 0, sizeof(*res));
+    return res;
+}
+
+static void
+free_def_ent(def_ent_t * de)
+{
+    de->de_next  = free_de_list;
+    free_de_list = de;
 }
 
 /**
@@ -112,6 +122,73 @@ print_ent(def_ent_t * de)
             de->de_name, (unsigned int)de->de_index,
             vtyp,
             de->de_file, de->de_line, de);
+}
+
+/**
+ *  Remove a new entry from a sibling (or twin) list.
+ *
+ * @param[in]  de  dead definition
+ */
+LOCAL void
+delete_ent(def_ent_t * de)
+{
+    def_ent_t * de_list = ent_stack[ ent_stack_depth ];
+    def_ent_t ** list_p = &(de_list->de_val.dvu_entry);
+
+    if (*list_p == NULL)
+        AG_ABEND(RM_MISSING_DE);
+
+    de_list = de_list->de_val.dvu_entry;
+
+    while (strcmp(de->de_name, de_list->de_name) != 0) {
+        if (de_list->de_next == NULL)
+            AG_ABEND(RM_MISSING_DE);
+        list_p  = &(de_list->de_next);
+        de_list = de_list->de_next;
+    }
+
+    /*
+     * Check for single entry list.  I.e. point the single pointer to
+     * this entry to the next, possibly NULL, entry.
+     */
+    if (de_list->de_etwin == NULL) {
+        if (de_list != de)
+            AG_ABEND(RM_MISSING_DE);
+        *list_p = de->de_next;
+    }
+
+    /*
+     * Multiple entry list.  Check for list head.
+     */
+    else if (de_list == de) {
+        /*
+         * The list head now becomes the second "twin".
+         * Adjust all the links *except* de_twin.
+         */
+        de_list = *list_p = de->de_twin;
+        de_list->de_etwin = de->de_etwin;
+        de_list->de_ptwin = NULL;
+        de_list->de_next  = de->de_next;
+    }
+
+    /*
+     * Somewhere in the middle.  Fix up the de_twin and de_ptwin pointers
+     * around the current entry.  If the current entry is actually last,
+     * then fix up the de_etwin pointer from the twin list head.
+     */
+    else {
+        def_ent_t * pde = de->de_ptwin;
+        def_ent_t * nde = de->de_twin;
+        pde->de_twin = de->de_twin;
+        if (nde != NULL)
+            nde->de_ptwin = pde;
+        else if (de_list->de_etwin != de)
+            AG_ABEND(RM_MISSING_DE);
+        else
+            de_list->de_etwin = pde;
+    }
+
+    free_def_ent(de);
 }
 
 /**

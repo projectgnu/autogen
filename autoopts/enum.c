@@ -191,7 +191,7 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
         unsigned long val = strtoul(pz, &pz, 0);
         if ((*pz == NUL) && (val < name_ct))
             return (uintptr_t)val;
-        pz_enum_err_fmt = zTooLarge;
+        pz_enum_err_fmt = znum_too_large;
         option_usage_fp = stderr;
         enum_err(pOpts, pOD, paz_names, (int)name_ct);
         return name_ct;
@@ -225,7 +225,7 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
 
  oops:
 
-    pz_enum_err_fmt = (res == name_ct) ? zNoKey : zAmbigKey;
+    pz_enum_err_fmt = (res == name_ct) ? zNoKey : zambiguous_key;
     option_usage_fp = stderr;
     enum_err(pOpts, pOD, paz_names, (int)name_ct);
     return name_ct;

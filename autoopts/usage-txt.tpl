@@ -2,7 +2,7 @@
 
   h
 
-(define time-stamp "2012-09-05 09:32:36")
+(define time-stamp "2013-01-24 13:48:26")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -52,13 +52,10 @@
 typedef struct {
   int           field_ct;[=
 FOR utxt        =][=
-  (if (exist? "ut-type")
-      (emit (sprintf "\n  %-13s utpz_%s;"
-                     (string-append (get "ut-type") " *")
-                     (get "ut-name")  ))
-      (if (not (exist? "ut-noi18n"))
-          (set! cch-ct (+ cch-ct 1))
-  )   ) =][=
+  (if (exist? "ut-mutable")
+      (string-append "\n  char *        utpz_" (get "ut-name") ";")
+      (set! cch-ct (+ cch-ct 1))
+  )             =][=
 
 ENDFOR  utxt    =]
   char const *  apz_str[[= (. cch-ct) =]];
@@ -78,27 +75,24 @@ extern usage_text_t option_xlateable_txt;
 (define str-ix     0)
 (define const-list "")
 (define typed-list "")
-(define no-cvt-ct  0)
 (set!   cch-ct     0)           =][=
 
 FOR utxt                        =][=
-  (sprintf "\n#define z%-20s " (get "ut-name")) =][=
-  IF (exist? "ut-type")
-    =](option_xlateable_txt.utpz_[= ut-name =])[=
+  IF
+     (ag-fprintf 0 "\n#define z%-20s (option_xlateable_txt." (get "ut-name"))
+     (exist? "ut-mutable")
+
+    =]utpz_[= ut-name =])[=
+
     (set! typed-list (string-append typed-list "\n" (get "ut-name")))
-    (ag-fprintf "strings" "\nstatic %-10s %-18s = %s;"
-          (get "ut-type") (string-append "eng_z" (get "ut-name") "[]")
+    (ag-fprintf "strings" "\nstatic char %-18s = %s;"
+          (string-append "eng_z" (get "ut-name") "[]")
           (kr-string (get "ut-text"))
     )
     =][=
 
-  ELIF (exist? "ut-noi18n")
-    =](option_lib_text + [=
-      (set! no-cvt-ct (+ 1 no-cvt-ct))
-      (string-table-add "option_lib_text" (get "ut-text")) =])[=
-
   ELSE                          =][=
-    (ag-fprintf 0 "(option_xlateable_txt.apz_str[%3d])" cch-ct)
+    (ag-fprintf 0 "apz_str[%3d])" cch-ct)
     (set! cch-ct (+ 1 cch-ct))
     (set! str-ix (string-table-add "option_lib_text" (get "ut-text")))
     (set! const-list (string-append const-list
@@ -142,7 +136,7 @@ sed 's/^static char const /char const /' ${tmp_dir}/usage.txt"))
  *  Aren't you glad you don't maintain this by hand?
  */
 usage_text_t option_xlateable_txt = {
-  [= (- (count "utxt") no-cvt-ct) =],
+  [= (count "utxt") =],
 [= (shell (string-append
   "CLexe=${AGexe%/agen5/*}/columns/columns
   test -x \"${CLexe}\" || {
@@ -159,7 +153,7 @@ usage_text_t option_xlateable_txt = {
 
 #ifdef XGETTEXT_SCAN_DO_NOT_COMPILE
 do not compile this section.
-/* TRANSLATORS: The following dummy function was crated solely so that
+/* TRANSLATORS: The following dummy functions were crated solely so that
  * xgettext can extract the correct strings.  These strings are actually
  * referenced where the preceding "#line" directive states, though you will
  * not see the literal string there.  The literal string is defined above in
@@ -192,45 +186,55 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 [=
 
-(out-suspend "pot")
 (out-push-new)
-(shell "exec 4>${tmp_dir}/pot")
 
-\=]
-sym=z%s
-str=$(cat <<\_EOF_
+=]
+str=$(cat << \_EOF_
 %s
 _EOF_
 )
+emit_puts z%s >&${%s}[=
+(define puts-fmt (out-pop #t))
+(out-suspend "pot")
+(out-push-new)
 
-puts="  puts(_($str));"
+=]
+exec 4>${tmp_dir}/pot 5>${tmp_dir}/msg 6>${tmp_dir}/use
+msg='5' use='6'
+printf '\n  /* LIBOPTS-MESSAGES: */\n'  >&$msg
+printf '  /* END-LIBOPTS-MESSAGES */\n\n  /* USAGE-TEXT: */\n' >&$use
 
-f=$(grep -n -w $sym *.c [agpo]*.h | \
+emit_puts() {
+    puts="  puts(_($str));"
+    f=$(grep -n -w $1 *.c [agpo]*.h | \
         sed 's@\([^:]*:[^:]*\):.*@../\1@')
-test -z "$f" && die "$sym not found in AutoOpts sources"
-sym="$f"
-printf "\n#: $(echo $sym)\nmsgid %%s\n" "$str" >&4
-
-echo "$sym" | while IFS=: read f l
-do
-  printf '#line %%d "%%s"\n' $l $f
-  echo "$puts"
-done
-[= (define puts-fmt (out-pop #t)) =][=
+    test -z "$f" && die "$1 not found in AutoOpts sources"
+    printf "\n#: $(echo $f)\nmsgid %s\n" "$str" >&4
+    echo "$f" | while IFS=: read s l
+    do
+        printf '#line %d "%s"\n' $l $s
+        echo "$puts"
+    done
+}[=
 
 FOR utxt  =][=
-  IF (not (exist? "ut-noi18n"))   =]
-[= (shellf puts-fmt (get "ut-name") (c-string (get "ut-text"))) =][=
-  ENDIF   =][=
+ (sprintf puts-fmt (c-string (get "ut-text")) (get "ut-name") (get "ut-i18n"))
+=][=
 ENDFOR utxt
 
 =]
+exec 4>&- 5>&- 6>&-
+[=
+(shell (out-pop #t))
+(out-resume "pot")
+(emit (shell "cat ${tmp_dir}/pot"))
+(out-pop)
+(shell "cat ${tmp_dir}/msg ${tmp_dir}/use")=]
+  /* END-USAGE-TEXT */
 }
 #endif /* XGETTEXT_SCAN_DO_NOT_COMPILE */
 #endif /* [= (. header-guard)     =] */
-[= (out-resume "pot")
-   (emit (shell "exec 4>&- ; cat ${tmp_dir}/pot") "\n")
-   (out-pop)                      =][=
+[=
 
 # Local Variables:
 # Mode: text

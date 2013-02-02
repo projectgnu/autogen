@@ -56,14 +56,14 @@ compile "-?"
 echo creating ${testname}.hlp
 clean_help > ${testname}.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
-USAGE:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
   Flg Arg Option-Name   Req?  Description
    -o Str option         opt  The option option descrip
    -s no  second         YES  The second option descrip
 				- may appear up to 2 times
-   -? no  help           opt  Display extended usage information and exit
-   -! no  more-help      opt  Extended usage information passed thru pager
+   -? no  help           opt  display extended usage information and exit
+   -! no  more-help      opt  extended usage information passed thru pager
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
 _EOF_
@@ -117,15 +117,15 @@ compile "-?"
 echo creating second ${testname}.hlp
 clean_help > ${testname}.hlp <<'_EOF_'
 genshellopt - Generate Shell Option Processing Script - Ver. 1
-USAGE:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+Usage:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str script         Output Script File
    -s Str shell          Shell name (follows "#!" magic)
 				- disabled as --no-shell
 				- enabled by default
-   -v opt version        Output version information and exit
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -v opt version        output version information and exit
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -144,13 +144,13 @@ This incarnation of genshell will produce
 a shell script to parse the options for test_shell:
 
 test_shell - Test AutoOpts for shell
-USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
   Flg Arg Option-Name   Req?  Description
    -o Str option         opt  The option option descrip
    -s no  second         YES  The second option descrip
-   -? no  help           opt  Display extended usage information and exit
-   -! no  more-help      opt  Extended usage information passed thru pager
+   -? no  help           opt  display extended usage information and exit
+   -! no  more-help      opt  extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -169,26 +169,26 @@ echo "#! ${SHELL}" >&3
 cat >&3 <<'_EOF_'
 #
 TEST_SHELL_LONGUSAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
   Flg Arg Option-Name   Req?  Description
    -o Str option         opt  The option option descrip
    -s no  second         YES  The second option descrip
 				- may appear up to 2 times
-   -? no  help           opt  Display extended usage information and exit
-   -! no  more-help      opt  Extended usage information passed thru pager
+   -? no  help           opt  display extended usage information and exit
+   -! no  more-help      opt  extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.'
 
 TEST_SHELL_USAGE_TEXT='test_shell - Test AutoOpts for shell
-USAGE:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
+Usage:  test_shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
   Flg Arg Option-Name   Req?  Description
    -o Str option         opt  The option option descrip
    -s no  second         YES  The second option descrip
-   -? no  help           opt  Display extended usage information and exit
-   -! no  more-help      opt  Extended usage information passed thru pager
+   -? no  help           opt  display extended usage information and exit
+   -! no  more-help      opt  extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.'

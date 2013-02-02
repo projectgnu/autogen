@@ -49,12 +49,12 @@ basehlp=${testname}.hlp
 echo creating ${basehlp}
 clean_help > ${basehlp} <<'_EOF_'
 test_argument - Test AutoOpts for argument
-USAGE:  argument [ -<flag> [<val>] ]...
+Usage:  argument [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -106,7 +106,7 @@ compile "-?"
 
 clean_help > ${testname}2.hlp <<'_EOF_'
 test_argument - Test AutoOpts for argument
-USAGE:  argument2 [ -<flag> [<val>] ]...
+Usage:  argument2 [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
@@ -115,8 +115,8 @@ USAGE:  argument2 [ -<flag> [<val>] ]...
 				  -1 exactly, or
 				  3 to 17, or
 				  32 to 8191
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 
@@ -174,13 +174,13 @@ compile "-?"
 
 clean_help > ${testname}3.hlp <<'_EOF_'
 test_argument - Test AutoOpts for argument
-USAGE:  argument3 [ -<flag> [<val>] ]...
+Usage:  argument3 [ -<flag> [<val>] ]...
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Fil second         The second option descrip
 				- file must pre-exist
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 _EOF_
 

@@ -46,7 +46,7 @@ LOCAL tSuccess
 validate_struct(tOptions * opts, char const * pname)
 {
     if (opts == NULL) {
-        fputs(zAO_Bad, stderr);
+        fputs(zno_opt_arg, stderr);
         return FAILURE;
     }
 
@@ -80,11 +80,11 @@ validate_struct(tOptions * opts, char const * pname)
         static char const ao_ver_string[] =
             STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
 
-        fprintf(stderr, zAO_Err, pname, NUM_TO_VER(opts->structVersion));
+        fprintf(stderr, zwrong_ver, pname, NUM_TO_VER(opts->structVersion));
         if (opts->structVersion > OPTIONS_STRUCT_VERSION )
-            fputs(zAO_Big, stderr);
+            fputs(ztoo_new, stderr);
         else
-            fputs(zAO_Sml, stderr);
+            fputs(ztoo_old, stderr);
 
         fwrite(ao_ver_string, sizeof(ao_ver_string) - 1, 1, stderr);
         return FAILURE;

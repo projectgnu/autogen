@@ -60,14 +60,14 @@ compile "-?"
 echo creating ${testname}-1.help
 clean_help > ${testname}-1.help <<'_EOF_'
 test_alias - Test AutoOpts for alias
-USAGE:  alias [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg [...]
+Usage:  alias [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg [...]
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -a Str a-opt          This is an alias for 'option'
-   -b Num b-second       This is an alias for 'second'
-   -? no  help           Display extended usage information and exit
-   -! no  more-help      Extended usage information passed thru pager
+   -a Str a-opt          an alias for 'option'
+   -b Num b-second       an alias for 'second'
+   -? no  help           display extended usage information and exit
+   -! no  more-help      extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -102,7 +102,7 @@ run_ag als -T agmdoc-cmd.tpl ${testname}.def
 test -f test_${testname}.1 || failure "no man page output"
 mv test_${testname}.1 ${testname}.1
 lnct=`
-    ${EGREP} '^This is an alias for the .*(option|second).* option' \
+    ${EGREP} 'an alias for the .*(option|second).* option' \
         ${testname}.texi ${testname}.1 | \
         wc -l`
 test $lnct -eq 4 || \

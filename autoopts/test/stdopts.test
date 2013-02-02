@@ -58,7 +58,7 @@ compile "-?"
 echo creating ${testname}.hlp
 clean_help > ${testname}.hbase <<- _EOF_
 	test_stdopts - stdopts test
-	USAGE:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+	Usage:  stdopts [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 
 	The following options are commonly used and are provided and supported
 	by AutoOpts:
@@ -69,8 +69,8 @@ clean_help > ${testname}.hbase <<- _EOF_
 	version, usage and configuration options:
 
 	  Flg Arg Option-Name    Description
-	   -? no  help           Display extended usage information and exit
-	   -! no  more-help      Extended usage information passed thru pager
+	   -? no  help           display extended usage information and exit
+	   -! no  more-help      extended usage information passed thru pager
 
 	Options are specified by doubled hyphens and their name or by a single
 	hyphen and the flag character.
@@ -120,12 +120,12 @@ compile "--usage"
 
 clean_help > ${testname}.hbase <<- _EOF_
 	test_stdopts-2 - stdopts-2 test
-	USAGE:  stdopts-2 [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
+	Usage:  stdopts-2 [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
 	  Flg Arg Option-Name    Description
 	   -V KWd verbose        run program with progress info
-	   -? no  help           Display extended usage information and exit
-	   -! no  more-help      Extended usage information passed thru pager
-	   -u no  usage          Abbreviated usage to stdout
+	   -? no  help           display extended usage information and exit
+	   -! no  more-help      extended usage information passed thru pager
+	   -u no  usage          abbreviated usage to stdout
 
 	Options are specified by doubled hyphens and their name or by a single
 	hyphen and the flag character.

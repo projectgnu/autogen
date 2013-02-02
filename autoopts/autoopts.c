@@ -48,7 +48,7 @@ ao_malloc(size_t sz)
 {
     void * res = malloc(sz);
     if (res == NULL) {
-        fprintf(stderr, zAO_Alloc, (int)sz);
+        fprintf(stderr, zalloc_fail, (int)sz);
         exit(EXIT_FAILURE);
     }
     return res;
@@ -61,7 +61,7 @@ ao_realloc(void *p, size_t sz)
 {
     void * res = (p == NULL) ? malloc(sz) : realloc(p, sz);
     if (res == NULL) {
-        fprintf(stderr, zAO_Realloc, (int)sz, p);
+        fprintf(stderr, zrealloc_fail, (int)sz, p);
         exit(EXIT_FAILURE);
     }
     return res;
@@ -74,7 +74,7 @@ ao_strdup(char const *str)
 {
     char * res = strdup(str);
     if (res == NULL) {
-        fprintf(stderr, zAO_Strdup, (int)strlen(str));
+        fprintf(stderr, zalloc_fail, (int)strlen(str));
         exit(EXIT_FAILURE);
     }
     return res;
@@ -111,7 +111,7 @@ ao_strdup(char const *str)
  *  invokes the handler procedure, if any.
  */
 LOCAL tSuccess
-handle_opt(tOptions * pOpts, tOptState * o_st)
+handle_opt(tOptions * opts, tOptState * o_st)
 {
     /*
      *  Save a copy of the option procedure pointer.
@@ -128,7 +128,7 @@ handle_opt(tOptions * pOpts, tOptState * o_st)
      *  IF we are presetting options, then we will ignore any un-presettable
      *  options.  They are the ones either marked as such.
      */
-    if (  ((pOpts->fOptSet & OPTPROC_PRESETTING) != 0)
+    if (  ((opts->fOptSet & OPTPROC_PRESETTING) != 0)
        && ((pOD->fOptState & OPTST_NO_INIT) != 0)
        )
         return PROBLEM;
@@ -142,7 +142,7 @@ handle_opt(tOptions * pOpts, tOptState * o_st)
      *      set the pointer to the equivalence class base
      */
     if (pOD->optEquivIndex != NO_EQUIVALENT) {
-        tOptDesc* p = pOpts->pOptDesc + pOD->optEquivIndex;
+        tOptDesc* p = opts->pOptDesc + pOD->optEquivIndex;
 
         /*
          * IF the current option state has not been defined (set on the
@@ -159,8 +159,8 @@ handle_opt(tOptions * pOpts, tOptState * o_st)
              *  THEN we have a usage problem.
              */
             if (p->optActualIndex != pOD->optIndex) {
-                fprintf(stderr, (char*)zMultiEquiv, p->pz_Name, pOD->pz_Name,
-                        (pOpts->pOptDesc + p->optActualIndex)->pz_Name);
+                fprintf(stderr, zmultiway_bug, p->pz_Name, pOD->pz_Name,
+                        (opts->pOptDesc + p->optActualIndex)->pz_Name);
                 return FAILURE;
             }
         } else {
@@ -203,28 +203,13 @@ handle_opt(tOptions * pOpts, tOptState * o_st)
      *  IF we have too many, build up an error message and bail.
      */
     if (  (pOD->fOptState & OPTST_DEFINED)
-       && (++pOD->optOccCt > pOD->optMaxCt)  )  {
-
-        if ((pOpts->fOptSet & OPTPROC_ERRSTOP) != 0) {
-            char const * pzEqv =
-                (pOD->optEquivIndex != NO_EQUIVALENT) ? zEquiv : zNil;
-
-            fputs(zErrOnly, stderr);
-
-            if (pOD->optMaxCt > 1)
-                fprintf(stderr, zAtMost, pOD->optMaxCt, pOD->pz_Name, pzEqv);
-            else
-                fprintf(stderr, zOnlyOne, pOD->pz_Name, pzEqv);
-        }
-
-        return FAILURE;
-    }
-
+       && (++pOD->optOccCt > pOD->optMaxCt)  )
+        return too_many_occurrences(opts, pOD);
     /*
      *  If provided a procedure to call, call it
      */
     if (pOP != NULL)
-        (*pOP)(pOpts, pOD);
+        (*pOP)(opts, pOD);
 
     return SUCCESS;
 }
@@ -354,8 +339,8 @@ int
 optionProcess(tOptions * opts, int a_ct, char ** a_v)
 {
     if (! SUCCESSFUL(validate_struct(opts, a_v[0])))
-        exit(EX_SOFTWARE);
-
+        ao_bug(zbad_data_msg);
+    
     /*
      *  Establish the real program name, the program full path,
      *  and do all the presetting the first time thru only.

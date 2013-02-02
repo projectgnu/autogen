@@ -97,6 +97,9 @@ wht[18] = 'vendor options active';
 cmd[19] = presetting;
 wht[19] = 'opt processing in preset state';
 
+cmd[20] = compute;
+wht[20] = 'Ignore pzFullUsage, compute usage text';
+
 
 mask = {
   m-name = no-xlat;

@@ -247,7 +247,7 @@ basehlp=${testname}.hlp
 echo creating ${basehlp}
 clean_help > ${basehlp} <<_EOF_
 ${testname}-test - test complex main procedure
-USAGE:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
+Usage:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
   Flg Arg Option-Name   Req?  Description
    -p KWd print          YES  Print operational info
    -D no  dump-log       opt  Dump the program log
@@ -261,8 +261,8 @@ USAGE:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
    -m Str msg-num        opt  message number
 				- may not be preset
 				- may appear multiple times
-   -? no  help           opt  Display extended usage information and exit
-   -! no  more-help      opt  Extended usage information passed thru pager
+   -? no  help           opt  display extended usage information and exit
+   -! no  more-help      opt  extended usage information passed thru pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
@@ -275,9 +275,10 @@ The valid "set" option keywords are:
   eighth     ninth      tenth      eleventh   twelfth    thirteenth fourteenth
   fifteenth  sixteenth
   or an integer mask with any of the lower 16 bits set
-or you may use a numeric representation.  Preceding these with a '!' will
-clear the bits, specifying 'none' will clear all bits, and 'all' will set them
-all.  Multiple entries may be passed as an option argument list.
+or you may use a numeric representation.  Preceding these with a '!'
+will clear the bits, specifying 'none' will clear all bits, and 'all'
+will set them all.  Multiple entries may be passed as an option
+argument list.
 _EOF_
 
 cmp -s ${testname}.h*lp || \

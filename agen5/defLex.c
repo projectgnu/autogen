@@ -64,6 +64,9 @@ static tSuccess
 lex_comment(void);
 
 static tSuccess
+lex_dollar(void);
+
+static tSuccess
 lex_here_string(void);
 
 static void
@@ -200,6 +203,60 @@ lex_comment(void)
     return FAILURE;
 }
 
+/**
+ * process a dollar character introduced value.
+ *
+ * '$(<...)' load a file that must be there.
+ * '$(?...)' load a file that may be there. If not there, then delete
+ *           the named value associated with it.
+ */
+static tSuccess
+lex_dollar(void)
+{
+    char * next;
+
+    /*
+     * First, ensure the string starts with what we recognize
+     */
+    if (cctx->scx_scan[1] != '(')
+        return FAILURE;
+    switch (cctx->scx_scan[2]) {
+    case '<':
+    case '?': break;
+    default: return FAILURE;
+    }
+
+    /*
+     * Find the start and end of the file name and load the file text.
+     */
+    do {
+        char * fns = SPN_WHITESPACE_CHARS(cctx->scx_scan+3);
+        char * fne = strchr(fns, ')');
+        char   svc;
+
+        if (fne == NULL)
+            return FAILURE;
+        next = fne + 1;
+        fne  = SPN_WHITESPACE_BACK(fns, fne-1);
+        svc  = *fne;
+        *fne = NUL;
+        token_str = load_file(fns);
+        *fne = svc;
+        if (token_str == NULL)
+            break;
+        token_code = DP_EV_STRING;
+        cctx->scx_scan = next;
+        return SUCCESS; /* done -- we've loaded the file. */
+    } while (0);
+
+    if (cctx->scx_scan[2] == '<')
+        return FAILURE;
+
+    cctx->scx_scan = next;
+    token_code = DP_EV_DELETE_ENT;
+    return SUCCESS;
+}
+
 static tSuccess
 lex_here_string(void)
 {
@@ -230,7 +287,7 @@ yylex(void)
 
     token_code = DP_EV_INVALID;
 
-scanAgain:
+scan_again:
     /*
      *  Start the process of locating a token.
      *  We branch here after skipping over a comment
@@ -249,7 +306,7 @@ scanAgain:
             goto lex_done;
 
         pop_context();
-        goto scanAgain;
+        goto scan_again;
 
     case '#':
     {
@@ -260,7 +317,7 @@ scanAgain:
          *  "cctx" in a register.  It must be reloaded from memory.
          */
         cctx->scx_scan = pz;
-        goto scanAgain;
+        goto scan_again;
     }
 
     case '{': SET_LIT_TKN(O_BRACE);   break;
@@ -285,10 +342,15 @@ scanAgain:
         break;
     }
 
+    case '$':
+        if (lex_dollar() == SUCCESS)
+            break;
+        goto bad_token;
+        
     case '<':
         switch (lex_here_string()) {
         case SUCCESS: break;
-        case FAILURE: goto BrokenToken;
+        case FAILURE: goto bad_token;
         case PROBLEM: return DP_EV_INVALID;
         }
         break;
@@ -300,7 +362,7 @@ scanAgain:
     case '\\':
         if (strncmp(cctx->scx_scan+1, START_SCHEME_LIST, (size_t)2) == 0) {
             alist_to_autogen_def();
-            goto scanAgain;
+            goto scan_again;
         }
         lex_escaped_char();
         break;
@@ -308,20 +370,18 @@ scanAgain:
     case '`':
         switch (lex_backquote()) {
         case FAILURE: goto NUL_error;
-        case PROBLEM: goto scanAgain;
+        case PROBLEM: goto scan_again;
         case SUCCESS: break;
         }
         break;
 
     case '/':
-        switch (lex_comment()) {
-        case SUCCESS: goto scanAgain;
-        default: break;
-        }
+        if (lex_comment() == SUCCESS)
+            goto scan_again;
         /* FALLTHROUGH */ /* to Invalid input char */
 
     default:
-    BrokenToken:
+    bad_token:
         cctx->scx_scan = gather_name(cctx->scx_scan, &token_code);
         break;
     }   /* switch (*cctx->scx_scan) */

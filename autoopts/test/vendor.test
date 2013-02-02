@@ -79,7 +79,7 @@ ${SED} 1d ${testname}.help > ${testname}.$$
 mv -f ${testname}.$$ ${testname}.help
 
 clean_help > ${testname}.hlp <<_EOF_
-USAGE:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
+Usage:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
 The following options select definitions, templates and scheme functions
 to use:
    -L str     Search for templates in DIR
@@ -115,13 +115,13 @@ This option is used to automate dependency tracking:
 				- may not be preset
 				- may appear multiple times
 version, usage and configuration options:
-   -R str     Reset an option's state
-   -v [arg]   Output version information and exit
-   -h         Display extended usage information and exit
-   -!         Extended usage information passed thru pager
-   -u         Abbreviated usage to stdout
-   -S [arg]   Save the option state to a config file
-   -P str     Load options from a config file
+   -R str     reset an option's state
+   -v [arg]   output version information and exit
+   -h         display extended usage information and exit
+   -!         extended usage information passed thru pager
+   -u         abbreviated usage to stdout
+   -S [arg]   save the option state to a config file
+   -P str     load options from a config file
 				- disabled as --no-load-opts
 				- may appear multiple times
 The next option supports vendor supported extra options:

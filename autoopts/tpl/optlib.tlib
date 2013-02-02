@@ -798,7 +798,7 @@ DEFINE   emit-alias-option
 =]
 #define [= (. UP-name) =]_DESC    ([=
     (set! tmp-val (string-append
-          "This is an alias for '" (get "aliases") "'"))
+          "an alias for '" (get "aliases") "'"))
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-val) )
     (string-table-add-ref opt-strs tmp-val) =])
@@ -1070,7 +1070,7 @@ DEFINE help-strs
    (if (exist? "version")    "/Version" "")) =] option descriptions:
  */
 #define HELP_DESC       ([=
-    (define tmp-text "Display extended usage information and exit")
+    (define tmp-text "display extended usage information and exit")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1082,7 +1082,7 @@ DEFINE help-strs
 =]
 #ifdef HAVE_WORKING_FORK
 #define MORE_HELP_DESC  ([=
-    (define tmp-text "Extended usage information passed thru pager")
+    (define tmp-text "extended usage information passed thru pager")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1107,7 +1107,7 @@ DEFINE help-strs
                          OPTST_ARG_OPTIONAL | OPTST_IMM | OPTST_NO_INIT)
 #endif
 #define VER_DESC        ([=
-    (define tmp-text "Output version information and exit")
+    (define tmp-text "output version information and exit")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1120,7 +1120,7 @@ DEFINE help-strs
 
 =]
 #define RESET_DESC      ([=
-    (define tmp-text "Reset an option's state")
+    (define tmp-text "reset an option's state")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1134,7 +1134,7 @@ DEFINE help-strs
 
 =]
 #define USAGE_DESC      ([=
-    (define tmp-text "Abbreviated usage to stdout")
+    (define tmp-text "abbreviated usage to stdout")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1160,7 +1160,7 @@ DEFINE help-strs
 
     IF (not (exist? "disable-save"))    =]
 #define SAVE_OPTS_DESC  ([=
-    (define tmp-text "Save the option state to a config file")
+    (define tmp-text "save the option state to a config file")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
@@ -1171,7 +1171,7 @@ DEFINE help-strs
 
     IF (not (exist? "disable-load"))    =]
 #define LOAD_OPTS_DESC     ([=
-    (define tmp-text "Load options from a config file")
+    (define tmp-text "load options from a config file")
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-text) )
     (string-table-add-ref opt-strs tmp-text)=])
