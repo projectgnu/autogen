@@ -38,6 +38,7 @@ INCLUDES        = @INCLIST@
 CONFIG_CLEAN_FILES = $(BUILT_SOURCES) stamp-*
 MAINTAINERCLEANFILES = $(CONFIG_CLEAN_FILES)
 DISTCLEANFILES  = cols.c
+DOC_TIMEOUT     = -DLEVEL=section --timeout=`expr $(AG_TIMEOUT) '*' 3`
 
 gen : $(BUILT_SOURCES)
 
@@ -58,7 +59,7 @@ cols.c : Makefile
 
 stamp-agtexi : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \
-	$(RUNAG) -Tagtexi-cmd.tpl -DLEVEL=section $(srcdir)/opts.def
+	$(RUNAG) -Tagtexi-cmd.tpl $(DOC_TIMEOUT) $(srcdir)/opts.def
 
 stamp-agman  : opts.def columns$(EXEEXT)
 	top_builddir=$(top_builddir) \

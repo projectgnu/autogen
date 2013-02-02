@@ -80,7 +80,7 @@ ag.c : Makefile
 
 STAMPENV = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
-	DEPDIR="$(DEPDIR)"
+	DEPDIR="$(DEPDIR)" AG_TIMEOUT=$(AG_TIMEOUT)
 
 MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/mk-stamps.sh $@
 

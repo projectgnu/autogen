@@ -42,7 +42,7 @@ BOOTENV     = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
 RUNAG       = $(BOOTENV) $(AGexe) $(AGDEPS) \
 	-L$(top_srcdir)/autoopts/tpl -L$(top_builddir)/autoopts/tpl \
 	--definition=$(srcdir)/xmlopts.def
-
+DOC_TIMEOUT     = -DLEVEL=section --timeout=`expr $(AG_TIMEOUT) '*' 3`
 CLEAN_RULES = \
 	clean-stamp-opts clean-stamp-texi clean-stamp-man clean-stamp-fork
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stamp-opts.d@am__quote@
@@ -67,7 +67,7 @@ stamp-fork  : fork.tpl xmlopts.def $(CLexe)
 
 invoke-$(TARG).texi invoke-$(TARG).menu : stamp-texi
 stamp-texi  : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)
-	$(RUNAG) -Tagtexi-cmd -DLEVEL=section
+	$(RUNAG) -Tagtexi-cmd $(DOC_TIMEOUT)
 
 $(TARG).1   : stamp-man
 stamp-man   : xmlopts.def $(TARG)$(EXEEXT) ../columns/columns$(EXEEXT)

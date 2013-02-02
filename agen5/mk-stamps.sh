@@ -180,6 +180,7 @@ make_directive()
 make_texi()
 {
     eopt="-Tagtexi-cmd.tpl -DLEVEL=chapter -binvoke-autogen"
+    eopt=${eopt}\ --timeout=`expr $AG_TIMEOUT '*' 3`
     run_ag texi ${eopt} ${srcdir}/opts.def
 }
 
@@ -264,7 +265,7 @@ do
     expr.h | expr.def | expr.ini )
         dispatch exprini ;;
 
-    directive.def | directive.h )
+    directive.h )
         dispatch directive ;;
 
     autogen.texi | autogen.menu )
