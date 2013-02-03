@@ -19,7 +19,7 @@
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SUBDIRS         = test
-INCLUDES        = @INCLIST@
+AM_CPPFLAGS     = @INCLIST@
 FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
 TEMPLATES       = snarf.tpl $(FSMTPL)
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def

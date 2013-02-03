@@ -384,9 +384,13 @@ copy_mark(char const * text, char * marker, size_t * ret_ct)
 /**
  *  Using a finite state machine, scan over the tokens that make up the
  *  "pseudo macro" at the start of every template.
+ *
+ *  @param[in,out]  text    text of template
+ *  @param[in]      fname   name of template file
+ *  @returns the address of the byte following the pseudo macro
  */
 LOCAL char const *
-loadPseudoMacro(char const * text, char const * fname)
+load_pseudo_mac(char const * text, char const * fname)
 {
     char const * pzBadness;
 #   define BAD_MARKER(t) { pzBadness = t; goto abort_load; }

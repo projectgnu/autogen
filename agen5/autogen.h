@@ -175,49 +175,56 @@ struct tlib_mark {
     unsigned short  tlm_cksum;      /* FUNCTION_CKSUM       */
 };
 
-/*
+/**
  *  Defines for conditional expressions.
  *  The first four are an enumeration that appear in the
  *  low four bits and the next-to-lowest four bits.
  *  "PRIMARY_TYPE" and "SECONDARY_TYPE" are masks for
  *  extracting this enumeration.  The rest are flags.
  */
-#define EMIT_VALUE          0x0000  /* emit value of variable  */
-#define EMIT_EXPRESSION     0x0001  /* Emit Scheme result      */
-#define EMIT_SHELL          0x0002  /* emit shell output       */
-#define EMIT_STRING         0x0003  /* emit content of expr    */
-#define EMIT_PRIMARY_TYPE   0x0007
-#define EMIT_SECONDARY_TYPE 0x0070
-#define EMIT_SECONDARY_SHIFT     4
-#define EMIT_IF_ABSENT      0x0100
-#define EMIT_ALWAYS         0x0200  /* emit one of two exprs   */
-#define EMIT_FORMATTED      0x0400  /* format, if val present  */
-#define EMIT_NO_DEFINE      0x0800  /* don't get defined value */
+#define EMIT_VALUE          0x0000  //!< emit value of variable
+#define EMIT_EXPRESSION     0x0001  //!< Emit Scheme result
+#define EMIT_SHELL          0x0002  //!< emit shell output
+#define EMIT_STRING         0x0003  //!< emit content of expr
+#define EMIT_PRIMARY_TYPE   0x0007  //!< mask for primary emission type
+#define EMIT_SECONDARY_TYPE 0x0070  //!< mask for secondary emission type
+#define EMIT_SECONDARY_SHIFT     4  //!< bit offset for secondary type
+#define EMIT_IF_ABSENT      0x0100  //!< emit text when value non-existant
+#define EMIT_ALWAYS         0x0200  //!< emit one of two exprs
+#define EMIT_FORMATTED      0x0400  //!< format, if val present
+#define EMIT_NO_DEFINE      0x0800  //!< don't get defined value
 
+/**
+ * template macro descriptor.
+ */
 struct macro_desc {
-    mac_func_t    md_code;     /* Macro function           */
-    int           md_line;     /* of macro def             */
-    int           md_end_idx;  /* End of block macro       */
-    int           md_sib_idx;  /* Sibling macro (ELIF or SELECT) */
+    mac_func_t    md_code;      //!< Macro function
+    int           md_line;      //!< of macro def
+    int           md_end_idx;   //!< End of block macro
+    int           md_sib_idx;   //!< Sibling macro (ELIF or SELECT)
 
-    uintptr_t     md_name_off; /* macro name (sometimes)   */
-    uintptr_t     md_txt_off;  /* associated text          */
-    uintptr_t     md_res;      /* some sort of result      */
-    void *        md_pvt;
+    uintptr_t     md_name_off;  //!< macro name (sometimes)
+    uintptr_t     md_txt_off;   //!< associated text
+    uintptr_t     md_res;       //!< some sort of result
+    void *        md_pvt;       //!< private data for particular macro
 };
 
+/**
+ * AutoGen template descriptor.
+ * A full template or a defined macro is managed with this structure.
+ */
 struct template_desc {
-    tlib_mark_t   td_magic;    /* TEMPLATE_MAGIC_MARKER    */
-    size_t        td_size;     /* Structure Size           */
-    char *        td_scan;     /* Next Pointer             */
-    int           td_mac_ct;   /* Count of Macros          */
-    char const *  td_file;     /* Name of template file    */
-    char *        td_name;     /* Defined Macro Name       */
-    char *        td_text;     /* offset of the text       */
+    tlib_mark_t   td_magic;     //!< TEMPLATE_MAGIC_MARKER
+    size_t        td_size;      //!< Structure Size
+    char *        td_scan;      //!< Next Pointer
+    int           td_mac_ct;    //!< Count of Macros
+    char const *  td_file;      //!< Name of template file
+    char *        td_name;      //!< Defined Macro Name
+    char *        td_text;      //!< base address of the text
     char          td_start_mac[MAX_SUFFIX_LEN];
     char          td_end_mac[  MAX_SUFFIX_LEN];
-    macro_t       td_macros[1]; /* Array of Macros          */
-/*  char          td_text[...];  * strings at end of macros */
+    macro_t       td_macros[1]; //!< Array of Macros
+//  char          td_text[...];  * strings are at end of macros
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

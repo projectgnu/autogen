@@ -22,9 +22,9 @@
  */
 
 #if defined(DEBUG_ENABLED)
-static int tplNestLevel = 0;
+static int tpl_nest_lvl = 0;
 
-static char const zTDef[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
+static char const tpl_def_fmt[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
 #endif
 
 /* = = = START-STATIC-FORWARD = = = */
@@ -220,11 +220,11 @@ find_mac_start(char const * pz, macro_t ** ppm, templ_t * tpl)
 
 #if defined(DEBUG_ENABLED)
     if (HAVE_OPT(SHOW_DEFS)) {
-        int ct = tplNestLevel;
+        int ct = tpl_nest_lvl;
         fprintf(trace_fp, "%3u ", (unsigned int)(mac - tpl->td_macros));
         do { fputs("  ", trace_fp); } while (--ct > 0);
 
-        fprintf(trace_fp, zTDef, ag_fun_names[ FTYP_TEXT ], FTYP_TEXT,
+        fprintf(trace_fp, tpl_def_fmt, ag_fun_names[ FTYP_TEXT ], FTYP_TEXT,
                 mac->md_line, mac->md_end_idx, (unsigned int)(pzEnd - pz));
     }
 #endif
@@ -309,6 +309,44 @@ find_macro(templ_t * tpl, macro_t ** ppm, char const ** pscan)
     return pzMark;
 }
 
+#if defined(DEBUG_ENABLED)
+ static void
+print_indentation(templ_t * tpl, macro_t * mac, int idx)
+{
+    static char const fmt_fmt[] = "%%%us";
+    char fmt[16];
+
+    if (idx < 0)
+        fputs("    ", trace_fp);
+    else fprintf(trace_fp, "%3u ", (unsigned int)idx);
+    snprintf(fmt, sizeof(fmt), fmt_fmt, tpl_next_lvl);
+    fprintf(trace_fp, fmt, "");
+}
+
+ static void
+print_ag_defs(templ_t * tpl, macro_t * mac)
+{
+    mac_func_t ft  = mac->md_code;
+    int        ln  = mac->md_line;
+    int idx = (mac->md_code == FTYP_BOGUS) ? -1 : (int)(mac - tpl->td_macros);
+
+    print_indentation(tpl, mac, idx);
+
+    if (mac->md_code == FTYP_BOGUS)
+        fprintf(trace_fp, zTUndef, ag_fun_names[ ft ], ft, ln);
+    else {
+        char const * pz;
+        if (ft >= FUNC_CT)
+            ft = FTYP_SELECT;
+        pz = (mac->md_txt_off == 0)
+            ? zNil
+            : (tpl->td_text + mac->md_txt_off);
+        fprintf(trace_fp, tpl_def_fmt, ag_fun_names[ft], mac->md_code,
+                ln, mac->md_end_idx, (unsigned int)strlen(pz));
+    }
+}
+#endif
+
 /**
  * Parse the template.
  * @param[out]    mac     array of macro descriptors to fill in
@@ -325,13 +363,12 @@ parse_tpl(macro_t * mac, char const ** p_scan)
 
     #define DEBUG_DEC(l)  l--
 
-    if (  ((tplNestLevel++) > 0)
+    if (  ((tpl_nest_lvl++) > 0)
        && HAVE_OPT(SHOW_DEFS)) {
-        int ct = tplNestLevel;
-        macro_t * m = mac-1;
+        int     idx = (int)(mac - tpl->td_macros);
+        macro_t * m = mac - 1;
 
-        fprintf(trace_fp, "%3u ", (unsigned int)(m - tpl->td_macros));
-        do { fputs("  ", trace_fp); } while (--ct > 0);
+        print_indentation(tpl, m, idx);
 
         fprintf(trace_fp, zTUndef, ag_fun_names[m->md_code],
                 m->md_code, m->md_line);
@@ -346,47 +383,23 @@ parse_tpl(macro_t * mac, char const ** p_scan)
          *  THEN some block has completed.  The returned scanning pointer
          *       will be non-NULL.
          */
-        {
-            load_proc_p_t const fn = load_proc_table[mac->md_code];
-            macro_t *   nxt_mac = fn(tpl, mac, &scan);
+        load_proc_p_t const fn = load_proc_table[mac->md_code];
+        macro_t *   nxt_mac = fn(tpl, mac, &scan);
 
 #if defined(DEBUG_ENABLED)
-            if (HAVE_OPT(SHOW_DEFS)) {
-                mac_func_t ft  = mac->md_code;
-                int        ln  = mac->md_line;
-                int ct = tplNestLevel;
-                if (mac->md_code == FTYP_BOGUS)
-                     fputs("    ", trace_fp);
-                else fprintf(trace_fp, "%3u ",
-                             (unsigned int)(mac - tpl->td_macros));
-
-                do { fputs("  ", trace_fp); } while (--ct > 0);
-
-                if (mac->md_code == FTYP_BOGUS)
-                     fprintf(trace_fp, zTUndef, ag_fun_names[ ft ], ft, ln);
-                else {
-                    char const * pz;
-                    if (ft >= FUNC_CT)
-                        ft = FTYP_SELECT;
-                    pz = (mac->md_txt_off == 0)
-                        ? zNil
-                        : (tpl->td_text + mac->md_txt_off);
-                    fprintf(trace_fp, zTDef, ag_fun_names[ft], mac->md_code,
-                            ln, mac->md_end_idx, (unsigned int)strlen(pz));
-                }
-            }
+        if (HAVE_OPT(SHOW_DEFS))
+            print_ag_defs(tpl, mac);
 #endif
 
-            if (nxt_mac == NULL) {
-                *p_scan = scan;
-                DEBUG_DEC(tplNestLevel);
-                return mac;
-            }
-            mac = nxt_mac;
+        if (nxt_mac == NULL) {
+            *p_scan = scan;
+            DEBUG_DEC(tpl_nest_lvl);
+            return mac;
         }
+        mac = nxt_mac;
     }
 
-    DEBUG_DEC(tplNestLevel);
+    DEBUG_DEC(tpl_nest_lvl);
 
     /*
      *  We reached the end of the input string.

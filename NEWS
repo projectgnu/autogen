@@ -1,10 +1,5 @@
 New in __CURRENT_VERSION__ February 2013
 
-* i18n updates -- the translatable strings were not very.
-  The stuff was reworked so that usage text can be constructed
-  in English, specified as the full usage text and then
-  readily translated a paragraph at a time.
-
 * "for-each" main procedures may now be specified as processing
   standard input as a data file instead of being replacement
   operands.  Users can always have "stdin" treated as data by using
@@ -12,10 +7,21 @@ New in __CURRENT_VERSION__ February 2013
 
 * configuration fixes.
 
+* i18n updates -- the translatable strings were not very.
+  The stuff was reworked so that usage text can be constructed
+  in English, specified as the full usage text and then
+  readily translated a paragraph at a time.
+
 * larger blocks of help text are now broken down into paragraphs
   when NLS support has been specified.  These paragraphs are also
   emitted into an xgettext extractable form so translators have
   matching text to work from.
+
+* Autogen tries to catch most signals.  This is done so that it can
+  emit appropriate messages before dying.  However, "SIGPROF" is
+  often signaled extremely early, before initialization is complete.
+  Cleanup is no longer performed before initialzation is complete.
+  "SIGPROF" is exempted from capture.
 
 New in 5.17.1 January, 2013
 

@@ -1,5 +1,8 @@
 2013-02-03  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/autogen.c (cleanup_and_abort): call _exit() immediately if
+	autogen is still in the initialization phase.
+	(setup_signals): exempt SIGPROF from capture.
 	* autoopts/options_h.tpl (opt_usage_t): enumeration of AutoOpts
 	supported options.  The "reserved" field of each option structure
 	is now initialized with this value.
@@ -20,6 +23,12 @@
 	* agen5/mk-stamps.sh (top_builddir): add a default for it
 	(make_directive): use a dispatching enumeration instead of a
 	special purpose template.
+	* agen5/autogen.h: doxy-comment some variables
+	* agen5/opts.def (signal): reassign the exit code to 128.
+	* agen5/tpLoad.c (load_macs): remove unneeded parameter.
+	* agen5/tpParse.c (print_indentation) new
+	(print_ag_defs): also new
+	(parse_tpl): remove debug printing code to new procedures
 
 2013-01-26  Bruce Korb  <bkorb@gnu.org>
 

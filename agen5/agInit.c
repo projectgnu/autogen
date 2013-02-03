@@ -55,7 +55,7 @@ add_sys_env(char * env_name);
  * @param arg_vec the program name plus its arguments
  */
 LOCAL void
-initialize(int arg_ct, char** arg_vec)
+initialize(int arg_ct, char ** arg_vec)
 {
     putenv(C(char *, ld_lib_path));
 

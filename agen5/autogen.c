@@ -203,6 +203,12 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
 static void
 cleanup_and_abort(int sig)
 {
+    int sig_exit_code = AUTOGEN_EXIT_SIGNAL + sig;
+    if (processing_state == PROC_STATE_INIT) {
+        fprintf(stderr, AG_NEVER_STARTED, sig, strsignal(sig));
+        _exit(sig_exit_code);
+    }
+
     if (*oops_pfx != NUL) {
         fputs(oops_pfx, stderr);
         oops_pfx = zNil;
@@ -214,7 +220,7 @@ cleanup_and_abort(int sig)
 
     if (processing_state == PROC_STATE_ABORTING) {
         exit_cleanup(EXIT_PCLOSE_NOWAIT);
-        _exit(sig + 128);
+        _exit(sig_exit_code);
     }
 
     processing_state = PROC_STATE_ABORTING;
@@ -279,14 +285,14 @@ catch_sig_and_bail(int sig)
 {
     switch (processing_state) {
     case PROC_STATE_ABORTING:
-        exit_code = AUTOGEN_EXIT_SIGNAL;
+        exit_code = AUTOGEN_EXIT_SIGNAL + sig;
 
     case PROC_STATE_DONE:
         break;
 
     default:
         abend_sig = sig;
-        exit_code = AUTOGEN_EXIT_SIGNAL;
+        exit_code = AUTOGEN_EXIT_SIGNAL + sig;
         siglongjmp(abend_env, sig);
     }
 }
@@ -536,6 +542,9 @@ setup_signals(sighandler_proc_t * chldHandler,
              */
 #ifdef SIGTSTP
         case SIGTSTP:
+#endif
+#ifdef SIGPROF
+        case SIGPROF:
 #endif
             continue;
 

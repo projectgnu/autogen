@@ -32,8 +32,7 @@ static size_t
 cnt_macros(char const * pz);
 
 static void
-load_macs(templ_t * pT, char const * pzF, char const * pzN,
-          char const * pzData);
+load_macs(templ_t * tpl, char const * fname, char const * pzData);
 
 static templ_t *
 digest_tpl(tmap_info_t * minfo, char * fname);
@@ -292,36 +291,34 @@ cnt_macros(char const * pz)
     return ct;
 }
 
-
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
  *  Load the macro array and file name.
+ *  @param[in,out]  tpl     the template to load
+ *  @param[in]      fname   the source file name of the template
+ *  @param[in]      pzN     someting
+ *  @param[in]      data    the template text
  */
 static void
-load_macs(templ_t * pT, char const * pzF, char const * pzN,
-          char const * pzData)
+load_macs(templ_t * tpl, char const * fname, char const * pzData)
 {
-    macro_t * pMac = pT->td_macros;
+    macro_t * pMac = tpl->td_macros;
 
     {
-        char *  pzText = (char *)(pMac + pT->td_mac_ct);
-        size_t  len;
+        char *  txt = (char *)(pMac + tpl->td_mac_ct);
 
-        AGDUPSTR(pT->td_file, pzF, "templ file");
+        AGDUPSTR(tpl->td_file, fname, "templ file");
 
-        len = strlen(pzN) + 1;
-        memcpy((void*)pzText, (void*)pzN, len);
-        pT->td_name = pzText;
-        pzText     += len;
-        pT->td_text = pzText;
-        pT->td_scan = pzText + 1;
+        memcpy(txt, PSEUDO_MAC_TPL_FILE, PSEUDO_MAC_TPL_FILE_LEN+1);
+        tpl->td_name = txt;
+        tpl->td_text = (txt += PSEUDO_MAC_TPL_FILE_LEN);
+        tpl->td_scan = txt + 1;
     }
 
-    current_tpl = pT;
+    current_tpl = tpl;
 
     {
-        macro_t* pMacEnd = parse_tpl(pMac, &pzData);
+        macro_t * e_mac = parse_tpl(pMac, &pzData);
         int     ct;
 
         /*
@@ -330,29 +327,29 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
         if (pzData != NULL)
             AG_ABEND(LOAD_MACS_BAD_PARSE);
 
-        ct = (int)(pMacEnd - pMac);
+        ct = (int)(e_mac - pMac);
 
         /*
          *  IF there are empty macro slots,
          *  THEN pack the text
          */
-        if (ct < pT->td_mac_ct) {
+        if (ct < tpl->td_mac_ct) {
             int     delta =
-                (int)(sizeof(macro_t) * (size_t)(pT->td_mac_ct - ct));
+                (int)(sizeof(macro_t) * (size_t)(tpl->td_mac_ct - ct));
             void *  data  =
-                (pT->td_name == NULL) ? pT->td_text : pT->td_name;
-            size_t  size  = (size_t)(pT->td_scan - (char *)data);
-            memmove((void*)pMacEnd, data, size);
+                (tpl->td_name == NULL) ? tpl->td_text : tpl->td_name;
+            size_t  size  = (size_t)(tpl->td_scan - (char *)data);
+            memmove((void*)e_mac, data, size);
 
-            pT->td_text  -= delta;
-            pT->td_scan  -= delta;
-            pT->td_name  -= delta;
-            pT->td_mac_ct = ct;
+            tpl->td_text  -= delta;
+            tpl->td_scan  -= delta;
+            tpl->td_name  -= delta;
+            tpl->td_mac_ct = ct;
         }
     }
 
-    pT->td_size = (size_t)(pT->td_scan - (char *)pT);
-    pT->td_scan = NULL;
+    tpl->td_size = (size_t)(tpl->td_scan - (char *)tpl);
+    tpl->td_scan = NULL;
 
     /*
      *  We cannot reallocate a smaller array because
@@ -364,7 +361,7 @@ load_macs(templ_t * pT, char const * pzF, char const * pzN,
         static char const zSum[] =
             "loaded %d macros from %s\n"
             "\tBinary template size:  0x%zX\n\n";
-        fprintf(trace_fp, zSum, pT->td_mac_ct, pzF, pT->td_size);
+        fprintf(trace_fp, zSum, tpl->td_mac_ct, fname, tpl->td_size);
     }
 #endif
 }
@@ -390,7 +387,7 @@ digest_tpl(tmap_info_t * minfo, char * fname)
      *  by comments.
      */
     char const * dta =
-        loadPseudoMacro((char const *)minfo->txt_data, fname);
+        load_pseudo_mac((char const *)minfo->txt_data, fname);
 
     size_t mac_ct   = cnt_macros(dta);
     size_t alloc_sz = (sizeof(*res) + (mac_ct * sizeof(macro_t))
@@ -411,7 +408,7 @@ digest_tpl(tmap_info_t * minfo, char * fname)
 
     strcpy(res->td_start_mac, st_mac_mark); /* must fit */
     strcpy(res->td_end_mac,   end_mac_mark);   /* must fit */
-    load_macs(res, fname, PSEUDO_MAC_TPL_FILE, dta);
+    load_macs(res, fname, dta);
 
     res->td_name -= (long)res;
     res->td_text -= (long)res;

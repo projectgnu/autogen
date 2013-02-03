@@ -29,6 +29,9 @@ string = { nm = AG_MAKE_DEP_NAME;
 string = { nm = AG_MARK;
    str = "autogen5"; };
 
+string = { nm = AG_NEVER_STARTED;
+   str = "AutoGen caught signal %d (%s) before initialization completed\n"; };
+
 string = { nm = AG_SIG_ABORT_FMT;
    str = "AutoGen aborting on signal %d (%s) in state %s\n"; };
 

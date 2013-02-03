@@ -116,13 +116,15 @@ exit-name[3]  = bad_definitions;
 exit-desc[3]  = 'The definitions could not be deciphered.';
 exit-name[4]  = load-error;
 exit-desc[4]  = 'An error was encountered during the load phase.';
-exit-name[5]  = signal;
-exit-desc[5]  = <<- _EndDesc_
+exit-name[128] = signal;
+exit-desc[128] = <<- _EndDesc_
 	#PROG# exited due to catching a signal.  If your template includes
 	string formatting, a number argument to a "%s" formatting element will
 	trigger a segmentation fault.  Autogen will catch the seg fault signal
 	and exit with @code{AUTOGEN_EXIT_SIGNAL(5)}.  Alternatively, AutoGen
 	may have been interrupted with a @code{kill(2)} signal.
+
+	Subtract 128 from the actual exit code to detect the signal number.
 	_EndDesc_;
 
 flag = {
