@@ -3,13 +3,6 @@
  *
  *  This module processes definition file directives.
  *
- *  blocksort spacing=2 \
- *    output=defDirect-sorted.c \
- *    input=defDirect.c \
- *    pat='^/\*=directive' \
- *    start='^doDir_IGNORE' \
- *    trail='\+\+\+ End of Directives'
- *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -31,9 +24,6 @@ AG_ABEND(aprf(DIRECT_NOMATCH_FMT, cctx->scx_fname, cctx->scx_line, _typ))
 
 static int  ifdefLevel = 0;
 
-static teDirectives
-findDirective(char * dir_name);
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  processDirective
@@ -47,7 +37,6 @@ findDirective(char * dir_name);
 LOCAL char *
 processDirective(char * scan)
 {
-    char * dirtv;
     char * eodir;
 
     /*
@@ -84,133 +73,66 @@ processDirective(char * scan)
 
     scan = SPN_WHITESPACE_CHARS(scan);
     if (! IS_ALPHABETIC_CHAR(*scan))
-        goto bad_directive;
-
-    dirtv  = scan;
-    scan = SPN_ALPHABETIC_CHARS(scan+1);
-
-    /*
-     *  IF there is anything that follows the name, ...
-     */
-    if (*scan != NUL) {
-        char * pz;
-
-        if (! IS_WHITESPACE_CHAR(*scan))
-            goto bad_directive;
-
-        *scan = NUL;
-        scan  = SPN_WHITESPACE_CHARS(scan+1);
-
-        pz  = SPN_WHITESPACE_BACK(scan, NULL);
-        *pz = NUL;
-    }
-
-    /*
-     * Dispatch the directive handling function
-     */
-    {
-        teDirectives dix = findDirective(dirtv);
-        const tDirTable * pTbl;
-        if (dix >= DIRECTIVE_CT) {
-            scan = dirtv;
-            goto bad_directive;
-        }
-        pTbl = dirTable + (int)findDirective(dirtv);
-        return (*(pTbl->pDirProc))(scan, eodir);
-    }
-
- bad_directive:
-    {
-        char ch;
-        if (strlen(scan) > 32) {
-            ch = scan[32];
-            scan[32] = NUL;
-        } else {
-            ch = NUL;
-        }
-
-        fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
-                cctx->scx_line, scan);
-
-        if (ch != NUL)
-            scan[32] = ch;
-    }
-    return eodir;
+        return doDir_invalid(DIR_INVALID, scan, eodir);
+    
+    return doDir_directive_disp(scan, eodir);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Figure out the index of a directive.  We will return the directive
- *  count if it is a bogus name.
- */
-
-static teDirectives
-findDirective(char * dir_name)
+static int
+count_lines(char const * start, char const * end)
 {
-    teDirectives res = (teDirectives)0;
-    const tDirTable *  dte = dirTable;
-
-    do  {
-        if (strneqvcmp(dir_name, dte->pzDirName, (int)dte->nameSize) != 0)
-            continue;
-
-        /*
-         *  A directive name ends with either white space or a NUL
-         */
-        if (IS_END_TOKEN_CHAR(dir_name[ dte->nameSize ]))
-            return res;
-
-    } while (dte++, ++res < DIRECTIVE_CT);
-
-    return DIRECTIVE_CT;
+    int res = 0;
+    while (start < end) {
+        char const * nxt = strchr(start, NL);
+        if ((nxt == NULL) || (nxt > end))
+            break;
+        res++;
+        start = nxt + 1;
+    }
+    return res;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Support routines for the directives
- *
- *  skipToEndif
- *
+/**
  *  Skip through the text to a matching "#endif".  We do this when we
  *  have processed the allowable text (found an "#else" after
  *  accepting the preceeding text) or when encountering a "#if*def"
  *  while skipping a block of text due to a failed test.
  */
-static char*
-skipToEndif(char* pzStart)
+static char *
+skip_to_endif(char * start)
 {
-    char* pzScan = pzStart;
-    char* pzRet;
+    char * scan = start;
+    char * dirv_end;
 
     for (;;) {
         /*
-         *  'pzScan' is pointing to the first character on a line.
+         *  'scan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
-        if (*pzScan == '#')
-            pzScan++;
+        if (*scan == '#')
+            scan++;
         else {
-            char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
+            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
                 AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
                               cctx->scx_line));
 
-            pzScan = pz + 2;
+            scan = pz + 2;
         }
 
-        pzScan = SPN_WHITESPACE_CHARS(pzScan);
+        scan = SPN_WHITESPACE_CHARS(scan);
 
-        switch (findDirective(pzScan)) {
+        switch (find_directive(scan)) {
         case DIR_ENDIF:
         {
             /*
              *  We found the endif we are interested in
              */
-            char* pz = strchr(pzScan, NL);
+            char * pz = strchr(scan, NL);
             if (pz != NULL)
-                 pzRet = pz+1;
-            else pzRet = pzScan + strlen(pzScan);
+                 dirv_end = pz+1;
+            else dirv_end = scan + strlen(scan);
             goto leave_func;
         }
 
@@ -219,7 +141,7 @@ skipToEndif(char* pzStart)
             /*
              *  We found a nested ifdef/ifndef
              */
-            pzScan = skipToEndif(pzScan);
+            scan = skip_to_endif(scan);
             break;
 
         default:
@@ -227,96 +149,90 @@ skipToEndif(char* pzStart)
              *  We do not care what we found
              */
             break; /* ignore it */
-        }  /* switch (findDirective(pzScan)) */
+        }  /* switch (find_directive(scan)) */
     }
 
  leave_func:
-    while (pzStart < pzRet) {
-        if (*(pzStart++) == NL)
-            cctx->scx_line++;
-    }
-    return pzRet;
+    cctx->scx_line += count_lines(start, dirv_end);
+    return dirv_end;
 }
 
-
-static char*
-skipToEndmac(char* pzStart)
+/**
+ *  Skip through the text to a "#endmac".
+ */
+static char *
+skip_to_endmac(char * start)
 {
-    char* pzScan = pzStart;
-    char* pzRet;
+    char * scan = start;
+    char * res;
 
     for (;;) {
         /*
-         *  'pzScan' is pointing to the first character on a line.
+         *  'scan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
-        if (*pzScan == '#')
-            pzScan++;
+        if (*scan == '#')
+            scan++;
         else {
-            char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
+            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
                 AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
                               cctx->scx_line));
 
-            pzScan = pz + 2;
+            scan = pz + DIRECT_CK_LIST_MARK_LEN;
         }
 
-        pzScan = SPN_WHITESPACE_CHARS(pzScan);
+        scan = SPN_WHITESPACE_CHARS(scan);
 
-        if (findDirective(pzScan) == DIR_ENDMAC) {
+        if (find_directive(scan) == DIR_ENDMAC) {
             /*
              *  We found the endmac we are interested in
              */
-            char* pz = strchr(pzScan, NL);
+            char * pz = strchr(scan, NL);
             if (pz != NULL)
-                 pzRet = pz+1;
-            else pzRet = pzScan + strlen(pzScan);
+                 res = pz+1;
+            else res = scan + strlen(scan);
             break;
         }
     }
 
-    while (pzStart < pzRet) {
-        if (*(pzStart++) == NL)
-            cctx->scx_line++;
-    }
-    return pzRet;
+    cctx->scx_line += count_lines(start, res);
+    return res;
 }
 
 
-/*
- *  skipToElseEnd
- *
+/**
  *  Skip through the text to a matching "#endif" or "#else" or
  *  "#elif*def".  We do this when we are skipping code due to a failed
  *  "#if*def" test.
  */
-static char*
-skipToElseEnd(char* pzStart)
+static char *
+skip_to_else_end(char * start)
 {
-    char* pzScan = pzStart;
-    char* pzRet;
+    char * scan = start;
+    char * res;
 
     for (;;) {
         /*
-         *  'pzScan' is pointing to the first character on a line.
+         *  'scan' is pointing to the first character on a line.
          *  Check for a directive on the current line before scanning
          *  later lines.
          */
-        if (*pzScan == '#')
-            pzScan++;
+        if (*scan == '#')
+            scan++;
         else {
-            char* pz = strstr(pzScan, DIRECT_CK_LIST_MARK);
+            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
             if (pz == NULL)
                 AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
                               cctx->scx_line));
 
-            pzScan = pz + 2;
+            scan = pz + 2;
         }
 
-        pzScan = SPN_WHITESPACE_CHARS(pzScan);
+        scan = SPN_WHITESPACE_CHARS(scan);
 
-        switch (findDirective(pzScan)) {
+        switch (find_directive(scan)) {
         case DIR_ELSE:
             /*
              *  We found an "else" directive for an "ifdef"/"ifndef"
@@ -332,10 +248,10 @@ skipToElseEnd(char* pzStart)
              *  skipping (or we dropped in from above).
              *  Start processing the text.
              */
-            char* pz = strchr(pzScan, NL);
+            char * pz = strchr(scan, NL);
             if (pz != NULL)
-                 pzRet = pz+1;
-            else pzRet = pzScan + strlen(pzScan);
+                 res = pz+1;
+            else res = scan + strlen(scan);
             goto leave_func;
         }
 
@@ -343,10 +259,10 @@ skipToElseEnd(char* pzStart)
         case DIR_IFNDEF:
             /*
              *  We have found a nested "ifdef"/"ifndef".
-             *  Call "skipToEndif()" to find *its* end, then
+             *  Call "skip_to_endif()" to find *its* end, then
              *  resume looking for our own "endif" or "else".
              */
-            pzScan = skipToEndif(pzScan);
+            scan = skip_to_endif(scan);
             break;
 
         default:
@@ -354,17 +270,40 @@ skipToElseEnd(char* pzStart)
              *  We either don't know what it is or we do not care.
              */
             break;
-        }  /* switch (findDirective(pzScan)) */
+        }  /* switch (find_directive(scan)) */
     }
 
  leave_func:
-    while (pzStart < pzRet) {
-        if (*(pzStart++) == NL)
-            cctx->scx_line++;
-    }
-    return pzRet;
+    cctx->scx_line += count_lines(start, res);
+    return res;
 }
 
+static void
+check_assert_str(char const * pz, char const * pzArg)
+{
+    pz = SPN_WHITESPACE_CHARS(pz);
+
+    if (IS_FALSE_TYPE_CHAR(*pz))
+        AG_ABEND(aprf(DIRECT_ASSERT_FMT, pz, pzArg));
+}
+
+static size_t
+file_size(char const * fname)
+{
+    struct stat stbf;
+    if (stat(fname, &stbf) != 0) {
+        fprintf(trace_fp, DIRECT_INC_CANNOT_STAT, errno, strerror(errno),
+                fname);
+        return 0;
+    }
+    if (! S_ISREG(stbf.st_mode)) {
+        fprintf(trace_fp, DIRECT_INC_NOT_REG, fname);
+        return 0;
+    }
+    if (outfile_time < stbf.st_mtime)
+        outfile_time = stbf.st_mtime;
+    return stbf.st_size;
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -379,19 +318,71 @@ skipToElseEnd(char* pzStart)
  *  needs or may take arguments (e.g. '#define'), then there should
  *  also be an 'arg:' section describing the argument(s).
  */
-static char *
-doDir_IGNORE(char * arg, char * scan)
+char *
+doDir_invalid(directive_enum_t id, char const * dir, char * scan_next)
 {
-    (void)arg;
-    return scan;
+    char z[32];
+
+    strncpy(z, dir, 31);
+    z[31] = NUL;
+    fprintf(trace_fp, FIND_DIRECT_UNKNOWN, cctx->scx_fname,
+            cctx->scx_line, z);
+
+    (void)id;
+    return scan_next;
 }
 
+#if 0
+/*
+ * Ignored directives:
 
-/*=directive assert
- *
- *  arg:  `shell-script` | (scheme-expr) | <anything else>
- *
- *  text:
+doDir_let(     directive_enum_t id, char const * dir, char * scan_next);
+doDir_pragma(  directive_enum_t id, char const * dir, char * scan_next);
+doDir_ident(   directive_enum_t id, char const * dir, char * scan_next);
+
+ * always an error directives
+
+doDir_endshell(directive_enum_t id, char const * dir, char * scan_next);
+doDir_elif(    directive_enum_t id, char const * dir, char * scan_next);
+doDir_endmac(  directive_enum_t id, char const * dir, char * scan_next);
+
+ * handled by doDir_ifdef:
+
+doDir_ifndef(  directive_enum_t id, char const * dir, char * scan_next);
+
+ */
+#endif
+
+/**
+ * Ident, let and pragma directives are ignored.
+ */
+char *
+ignore_directive(directive_enum_t id, char const * arg, char * scan_next)
+{
+    (void)arg;
+    (void)id;
+    return scan_next;
+}
+
+/**
+ *  @code{#endshell}, @code{#elif} and @code{#endmac} directives, when found
+ *  via a non-nested scan, are always in error.  They should only be found
+ *  during the handling of @code{#shell}, @code{#if} and @code{#macdef}
+ *  directives.  @code{#else} and @code{#endif} are in error if not matched
+ *  with a previous @code{#ifdef} or @code{#ifndef} directive.
+ */
+char *
+bad_dirv_ctx(directive_enum_t id, char const * arg, char * scan_next)
+{
+    AG_ABEND(aprf(DIRECT_BAD_CTX_FMT, directive_name(id),
+                  cctx->scx_fname, cctx->scx_line));
+    (void)arg;
+    (void)id;
+    /* NOTREACHED */
+    return scan_next;
+}
+
+/**
  *  If the @code{shell-script} or @code{scheme-expr} do not yield @code{true}
  *  valued results, autogen will be aborted.  If @code{<anything else>} or
  *  nothing at all is provided, then this directive is ignored.
@@ -403,42 +394,34 @@ doDir_IGNORE(char * arg, char * scan)
  *  The result is @code{false} (and fails) if the result is empty, the
  *  number zero, or a string that starts with the letters 'n' or 'f' ("no"
  *  or "false").
-=*/
-static void
-check_assert_str(char const* pz, char const* pzArg)
+ */
+char *
+doDir_assert(directive_enum_t id, char const * dir, char * scan_next)
 {
-    pz = SPN_WHITESPACE_CHARS(pz);
-
-    if (IS_FALSE_TYPE_CHAR(*pz))
-        AG_ABEND(aprf(DIRECT_ASSERT_FMT, pz, pzArg));
-}
-
-static char*
-doDir_assert(char* pzArg, char* pzScan)
-{
-    switch (*pzArg) {
+    (void)id;
+    dir = SPN_WHITESPACE_CHARS(dir);
+    switch (*dir) {
     case '`':
     {
-        char* pzS = pzArg+1;
-        char* pzR;
+        char * pzS = (char *)dir+1;
+        char * pzR = SPN_WHITESPACE_BACK(pzS, NULL);
 
-        pzR = strrchr(pzS, '`');
-        if (pzR == NULL)
+        if (*(--pzR) != '`')
             break; /* not a valid script */
 
         *pzR = NUL;
         pzS = shell_cmd((char const*)pzS);
-        check_assert_str(pzS, pzArg);
-        free(pzS);
+        check_assert_str(pzS, dir);
+        AGFREE(pzS);
         break;
     }
 
     case '(':
     {
         SCM res = ag_scm_c_eval_string_from_file_line(
-            pzArg, cctx->scx_fname, cctx->scx_line );
+            dir, cctx->scx_fname, cctx->scx_line);
 
-        check_assert_str(scm2display(res), pzArg);
+        check_assert_str(scm2display(res), dir);
         break;
     }
 
@@ -446,41 +429,37 @@ doDir_assert(char* pzArg, char* pzScan)
         break;
     }
 
-    return pzScan;
+    return scan_next;
 }
 
-
-/*=directive define
- *
- *  arg:  name [ <text> ]
- *
- *  text:
+/**
  *  Will add the name to the define list as if it were a DEFINE program
  *  argument.  Its value will be the first non-whitespace token following
  *  the name.  Quotes are @strong{not} processed.
  *
  *  After the definitions file has been processed, any remaining entries
  *  in the define list will be added to the environment.
-=*/
-static char*
-doDir_define(char* pzArg, char* pzScan)
+ */
+char *
+doDir_define(directive_enum_t id, char const * dir, char * scan_next)
 {
-    char*  pzName = pzArg;
+    char * def_name = SPN_WHITESPACE_CHARS(dir);
+    (void)id;
 
     /*
      *  Skip any #defines that do not look reasonable
      */
-    if (! IS_VAR_FIRST_CHAR(*pzArg))
-        return pzScan;
+    if (! IS_VAR_FIRST_CHAR(*def_name))
+        return scan_next;
 
-    pzArg = SPN_VARIABLE_NAME_CHARS(pzArg);
+    dir = SPN_VARIABLE_NAME_CHARS(def_name);
 
     /*
      *  IF this is a macro definition (rather than a value def),
      *  THEN we will ignore it.
      */
-    if (*pzArg == '(')
-        return pzScan;
+    if (*dir == '(')
+        return scan_next;
 
     /*
      *  We have found the end of the name.
@@ -489,14 +468,16 @@ doDir_define(char* pzArg, char* pzScan)
      *       Therefore, move the name back over the "#define"
      *       directive itself, giving us the space needed.
      */
-    if (! IS_WHITESPACE_CHAR(*pzArg)) {
-        char* pzS = pzName;
-        char* pzD = (pzName -= 6);
+    if (! IS_WHITESPACE_CHAR(*dir)) {
+        char * pzS = (char *)dir;
+        char * pzD = (def_name - 6);
 
-        *pzArg = NUL;
+        *pzS = NUL; // whatever it used to be, it is a NUL now.
+        pzS = def_name;
         while ((*(pzD++) = *(pzS++)) != NUL)   ;
         pzD[-1] = '=';
         pzD[ 0] = NUL;
+        def_name -= 6;
 
     } else {
         /*
@@ -504,249 +485,134 @@ doDir_define(char* pzArg, char* pzScan)
          *  We only accept one name-type, space separated token.
          *  We are not ANSI-C.  ;-)
          */
-        char*  pz = pzArg+1;
-        *pzArg++ = '=';
-        pz = SPN_WHITESPACE_CHARS(pz);
+        char * pz = (char *)(dir++);
+        *pz++ = '=';
+        dir = SPN_WHITESPACE_CHARS(dir);
 
+        /*
+         * Copy chars for so long as it is not NUL and does not require quoting
+         */
         for (;;) {
-            if ((*pzArg++ = *pz++) == NUL)
+            if ((*pz++ = *dir++) == NUL)
                 break;
-            if (! IS_UNQUOTABLE_CHAR(*pz)) {
-                *pzArg = NUL;
+            if (! IS_UNQUOTABLE_CHAR(*dir)) {
+                *pz = NUL;
                 break;
             }
         }
     }
 
-    SET_OPT_DEFINE(pzName);
-    return pzScan;
+    SET_OPT_DEFINE(def_name);
+    return scan_next;
 }
 
-
-/*=directive elif
- *
- *  text:
- *  This must follow an @code{#if}
- *  otherwise it will generate an error.
- *  It will be ignored.
-=*/
-static char *
-doDir_elif(char * arg, char * scan)
-{
-    (void)arg;
-    (void)scan;
-    AG_ABEND(aprf(DIRECT_ELIF_BAD_FMT, cctx->scx_fname, cctx->scx_line));
-    /* NOTREACHED */
-    return NULL;
-}
-
-
-/*=directive else
- *
- *  text:
+/**
  *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
  *  If it follows the @code{#if}, then it will be ignored.  Otherwise,
  *  it will change the processing state to the reverse of what it was.
-=*/
-static char *
-doDir_else(char * arg, char * scan)
+ */
+char *
+doDir_else(directive_enum_t id, char const * arg, char * scan_next)
 {
-    (void)arg;
     if (--ifdefLevel < 0)
-        NO_MATCH_ERR(DIRECT_ELSE_BAD);
-
-    return skipToEndif(scan);
+        return bad_dirv_ctx(id, arg, scan_next);
+    
+    return skip_to_endif(scan_next);
 }
 
-
-/*=directive endif
- *
- *  text:
+/**
  *  This must follow an @code{#if}, @code{#ifdef} or @code{#ifndef}.
  *  In all cases, this will resume normal processing of text.
-=*/
-static char *
-doDir_endif(char * arg, char * scan)
+ */
+char *
+doDir_endif(directive_enum_t id, char const * arg, char * scan_next)
 {
-    (void)arg;
     if (--ifdefLevel < 0)
-        NO_MATCH_ERR(DIRECT_ENDIF_BAD);
+        return bad_dirv_ctx(id, arg, scan_next);
 
-    return scan;
+    return scan_next;
 }
 
-
-/*=directive endmac
- *
- *  text:
- *  This terminates a "macdef", but must not ever be encountered directly.
-=*/
-static char *
-doDir_endmac(char * arg, char * scan)
-{
-    NO_MATCH_ERR(DIRECT_ENDMAC_BAD);
-    (void)arg;
-    (void)scan;
-    /* NOTREACHED */
-    return NULL;
-}
-
-
-/*=directive endshell
- *
- *  text:
- *  Ends the text processed by a command shell into autogen definitions.
-=*/
-static char *
-doDir_endshell(char * arg, char * scan)
-{
-    /*
-     *  In actual practice, the '#endshell's must be consumed inside
-     *  the 'doDir_shell()' procedure.
-     */
-    NO_MATCH_ERR(DIRECT_ENDSHELL_BAD);
-    (void)arg;
-    (void)scan;
-    /* NOTREACHED */
-    return NULL;
-}
-
-
-/*=directive error
- *
- *  arg:  [ <descriptive text> ]
- *
- *  text:
+/**
  *  This directive will cause AutoGen to stop processing
  *  and exit with a status of EXIT_FAILURE.
-=*/
-static char *
-doDir_error(char * arg, char * scan)
+ */
+char *
+doDir_error(directive_enum_t id, char const * arg, char * scan_next)
 {
-    (void)scan;
-
+    (void)scan_next;
+    (void)id;
+    arg = SPN_WHITESPACE_CHARS(arg);
     AG_ABEND(aprf(DIRECT_ERROR_FMT, cctx->scx_fname, cctx->scx_line, arg));
     /* NOTREACHED */
     return NULL;
 }
 
-
-/*=directive ident
- *
- *  dummy:  Ident directives are ignored.
-=*/
-
-
-/*=directive if
- *
- *  arg:  [ <ignored conditional expression> ]
- *
- *  text:
+/**
  *  @code{#if} expressions are not analyzed.  @strong{Everything} from here
  *  to the matching @code{#endif} is skipped.
-=*/
-static char *
-doDir_if(char * arg, char * pzScan)
+ */
+char *
+doDir_if(directive_enum_t id, char const * arg, char * scan_next)
 {
     (void)arg;
-
-    return skipToEndif(pzScan);
+    (void)id;
+    return skip_to_endif(scan_next);
 }
 
-
-/*=directive ifdef
- *
- *  arg:  name-to-test
- *
- *  text:
+/**
  *  The definitions that follow, up to the matching @code{#endif} will be
  *  processed only if there is a corresponding @code{-Dname} command line
  *  option or if a @code{#define} of that name has been previously encountered.
-=*/
-static char *
-doDir_ifdef(char * pzArg, char * pzScan)
+ */
+char *
+doDir_ifdef(directive_enum_t id, char const * dir, char * scan_next)
 {
-    if (get_define_str(pzArg, false) == NULL)
-        return skipToElseEnd(pzScan);
+    char const * defstr = get_define_str(SPN_WHITESPACE_CHARS(dir), false);
+    bool ok = (id == DIR_IFDEF) ? (defstr != NULL) : (defstr == NULL);
+    if (! ok)
+        return skip_to_else_end(scan_next);
+
     ifdefLevel++;
-    return pzScan;
+    return scan_next;
 }
 
-
-/*=directive ifndef
- *
- *  arg:  name-to-test
- *
- *  text:
- *  The definitions that follow, up to the matching @code{#endif} will be
- *  processed only if there is @strong{not} a corresponding @code{-Dname}
- *  command line option or there was a canceling @code{-Uname} option.
-=*/
-static char *
-doDir_ifndef(char * pzArg, char * pzScan)
-{
-    if (get_define_str(pzArg, false) != NULL)
-        return skipToElseEnd(pzScan);
-    ifdefLevel++;
-    return pzScan;
-}
-
-
-/*=directive include
- *
- *  arg:  unadorned-file-name
- *
- *  text:
+/**
  *  This directive will insert definitions from another file into
  *  the current collection.  If the file name is adorned with
  *  double quotes or angle brackets (as in a C program), then the
  *  include is ignored.
-=*/
-static char*
-doDir_include(char* pzArg, char* pzScan)
+ */
+char *
+doDir_include(directive_enum_t id, char const * dir, char * scan_next)
 {
     static char const * const apzSfx[] = { DIRECT_INC_DEF_SFX, NULL };
-    scan_ctx_t * pCtx;
+    scan_ctx_t * new_ctx;
     size_t     inc_sz;
-    char       zFullName[ AG_PATH_MAX + 1 ];
+    char       full_name[ AG_PATH_MAX + 1 ];
+    (void)id;
 
+    dir = SPN_WHITESPACE_CHARS(dir);
     /*
      *  Ignore C-style includes.  This allows "C" files to be processed
      *  for their "#define"s.
      */
-    if ((*pzArg == '"') || (*pzArg == '<'))
-        return pzScan;
-    cctx->scx_scan  = pzScan;
+    if ((*dir == '"') || (*dir == '<'))
+        return scan_next;
 
     if (! SUCCESSFUL(
-            find_file(pzArg, zFullName, apzSfx, cctx->scx_fname))) {
-        fprintf(trace_fp, DIRECT_INC_CANNOT_FIND,
-                pzArg);
-        return pzScan;
+            find_file(dir, full_name, apzSfx, cctx->scx_fname))) {
+        fprintf(trace_fp, DIRECT_INC_CANNOT_FIND, dir);
+        return scan_next;
     }
 
     /*
      *  Make sure the specified file is a regular file and we can get
      *  the correct size for it.
      */
-    {
-        struct stat stbf;
-        if (stat(zFullName, &stbf) != 0) {
-            fprintf(trace_fp, DIRECT_INC_CANNOT_STAT, errno, strerror(errno),
-                    zFullName);
-            return pzScan;
-        }
-        if (! S_ISREG(stbf.st_mode)) {
-            fprintf(trace_fp, DIRECT_INC_NOT_REG, zFullName);
-            return pzScan;
-        }
-        inc_sz = (size_t)stbf.st_size;
-        if (outfile_time < stbf.st_mtime)
-            outfile_time = stbf.st_mtime;
-    }
-
+    inc_sz = file_size(full_name);
     if (inc_sz == 0)
-        return pzScan;
+        return scan_next;
 
     /*
      *  Get the space for the output data and for context overhead.
@@ -755,42 +621,43 @@ doDir_include(char* pzArg, char* pzScan)
      */
     {
         size_t sz = sizeof(scan_ctx_t) + 4 + inc_sz;
-        pCtx = (scan_ctx_t*)AGALOC(sz, "inc def head");
+        new_ctx = (scan_ctx_t*)AGALOC(sz, "inc def head");
 
-        memset((void*)pCtx, 0, sz);
-        pCtx->scx_line = 1;
+        memset((void*)new_ctx, 0, sz);
+        new_ctx->scx_line = 1;
     }
 
     /*
      *  Link it into the context stack
      */
-    pCtx->scx_next  = cctx;
-    cctx            = pCtx;
-    AGDUPSTR(pCtx->scx_fname, zFullName, "def file");
+    cctx->scx_scan     = scan_next;
+    new_ctx->scx_next  = cctx;
+    cctx               = new_ctx;
+    AGDUPSTR(new_ctx->scx_fname, full_name, "def file");
 
-    pCtx->scx_scan  =
-    pCtx->scx_data  =
-    pzScan          = (char *)(pCtx + 1);
+    new_ctx->scx_scan  =
+    new_ctx->scx_data  =
+    scan_next          = (char *)(new_ctx + 1);
 
     /*
      *  Read all the data.  Usually in a single read, but loop
      *  in case multiple passes are required.
      */
     {
-        FILE*  fp = fopen(zFullName, "r" FOPEN_TEXT_FLAG);
-        char*  pz = pzScan;
+        FILE * fp = fopen(full_name, "r" FOPEN_TEXT_FLAG);
+        char * pz = scan_next;
 
         if (fp == NULL)
-            AG_CANT(DIRECT_INC_CANNOT_OPEN, zFullName);
+            AG_CANT(DIRECT_INC_CANNOT_OPEN, full_name);
 
         if (dep_fp != NULL)
-            add_source_file(zFullName);
+            add_source_file(full_name);
 
         do  {
             size_t rdct = fread((void*)pz, (size_t)1, inc_sz, fp);
 
             if (rdct == 0)
-                AG_CANT(DIRECT_INC_CANNOT_READ, zFullName);
+                AG_CANT(DIRECT_INC_CANNOT_READ, full_name);
 
             pz += rdct;
             inc_sz -= rdct;
@@ -800,81 +667,63 @@ doDir_include(char* pzArg, char* pzScan)
         *pz = NUL;
     }
 
-    return pzScan;
+    return scan_next;
 }
 
-
-/*=directive let
- *
- *  dummy:  let directives are ignored.
-=*/
-
-
-/*=directive line
- *
- *  text:
- *
+/**
  *  Alters the current line number and/or file name.  You may wish to
  *  use this directive if you extract definition source from other files.
  *  @command{getdefs} uses this mechanism so AutoGen will report the correct
  *  file and approximate line number of any errors found in extracted
  *  definitions.
-=*/
-static char*
-doDir_line(char* pzArg, char* pzScan)
+ */
+char *
+doDir_line(directive_enum_t id, char const * dir, char * scan_next)
 {
+    (void)id;
     /*
      *  The sequence must be:  #line <number> "file-name-string"
      *
      *  Start by scanning up to and extracting the line number.
      */
-    pzArg = SPN_WHITESPACE_CHARS(pzArg);
-    if (! IS_DEC_DIGIT_CHAR(*pzArg))
-        return pzScan;
+    dir = SPN_WHITESPACE_CHARS(dir);
+    if (! IS_DEC_DIGIT_CHAR(*dir))
+        return scan_next;
 
-    cctx->scx_line = (int)strtol(pzArg, &pzArg, 0);
+    cctx->scx_line = (int)strtol(dir, (char **)&dir, 0);
 
     /*
      *  Now extract the quoted file name string.
      *  We dup the string so it won't disappear on us.
      */
-    pzArg = SPN_WHITESPACE_CHARS(pzArg);
-    if (*(pzArg++) != '"')
-        return pzScan;
+    dir = SPN_WHITESPACE_CHARS(dir);
+    if (*(dir++) != '"')
+        return scan_next;
     {
-        char* pz = strchr(pzArg, '"');
+        char * pz = strchr(dir, '"');
         if (pz == NULL)
-            return pzScan;
+            return scan_next;
         *pz = NUL;
     }
 
-    AGDUPSTR(cctx->scx_fname, pzArg, "#line");
+    AGDUPSTR(cctx->scx_fname, dir, "#line");
 
-    return pzScan;
+    return scan_next;
 }
 
-
-/*=directive macdef
- *
- *  text:
+/**
  *  This is a new AT&T research preprocessing directive.  Basically, it is
  *  a multi-line #define that may include other preprocessing directives.
-=*/
-static char*
-doDir_macdef(char* arg, char* pzScan)
+ */
+char *
+doDir_macdef(directive_enum_t id, char const * arg, char * scan_next)
 {
     (void)arg;
-
-    return skipToEndmac(pzScan);
+    (void)id;
+    return skip_to_endmac(scan_next);
 }
 
-
-/*=directive option
- *
- *  arg:  opt-name [ <text> ]
- *
- *  text:
- *
+/**
  *  This directive will pass the option name and associated text to the
  *  AutoOpts optionLoadLine routine (@pxref{libopts-optionLoadLine}).  The
  *  option text may span multiple lines by continuing them with a backslash.
@@ -891,38 +740,32 @@ doDir_macdef(char* arg, char* pzScan)
  *  directories are searched in most recently supplied first order, search
  *  directories supplied in this way will be searched before any supplied on
  *  the command line.
-=*/
-static char*
-doDir_option(char* pzArg, char* pzScan)
+ */
+char *
+doDir_option(directive_enum_t id, char const * dir, char * scan_next)
 {
-    optionLoadLine(&autogenOptions, pzArg);
-    return pzScan;
+    dir = SPN_WHITESPACE_CHARS(dir);
+    optionLoadLine(&autogenOptions, dir);
+    (void)id;
+    return scan_next;
 }
 
-
-/*=directive pragma
- *
- *  dummy:  pragma directives are ignored.
-=*/
-
-
-/*=directive shell
- *
- *  text:
+/**
  *  Invokes @code{$SHELL} or @file{/bin/sh} on a script that should
  *  generate AutoGen definitions.  It does this using the same server
  *  process that handles the back-quoted @code{`} text.
  *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
-=*/
-static char *
-doDir_shell(char * arg, char * pzScan)
+ */
+char *
+doDir_shell(directive_enum_t id, char const * arg, char * scan_next)
 {
     static size_t const endshell_len = sizeof("\n#endshell") - 1;
 
     scan_ctx_t * pCtx;
-    char *       pzText = pzScan;
+    char *       pzText = scan_next;
 
     (void)arg;
+    (void)id;
 
     /*
      *  The output time will always be the current time.
@@ -936,19 +779,19 @@ doDir_shell(char * arg, char * pzScan)
      *  ELSE we have to find the end of the data.
      */
     if (strncmp(pzText, DIRECT_SHELL_END_SHELL+1, endshell_len-1) == 0)
-        return pzScan;
+        return scan_next;
 
     {
-        char* pz = strstr(pzScan, DIRECT_SHELL_END_SHELL);
+        char * pz = strstr(scan_next, DIRECT_SHELL_END_SHELL);
         if (pz == NULL)
             AG_ABEND(aprf(DIRECT_SHELL_NOEND, cctx->scx_fname,
                           cctx->scx_line));
 
-        while (pzScan < pz) {
-            if (*(pzScan++) == NL) cctx->scx_line++;
+        while (scan_next < pz) {
+            if (*(scan_next++) == NL) cctx->scx_line++;
         }
 
-        *pzScan = NUL;
+        *scan_next = NUL;
     }
 
     /*
@@ -956,14 +799,14 @@ doDir_shell(char * arg, char * pzScan)
      *  IF there is no such line,
      *  THEN the scan will resume on a zero-length string.
      */
-    pzScan = strchr(pzScan + endshell_len, NL);
-    if (pzScan == NULL)
-        pzScan = (void*)zNil;
+    scan_next = strchr(scan_next + endshell_len, NL);
+    if (scan_next == NULL)
+        scan_next = (void*)zNil;
 
     /*
      *  Save the scan pointer into the current context
      */
-    cctx->scx_scan  = pzScan;
+    cctx->scx_scan  = scan_next;
 
     /*
      *  Run the shell command.  The output text becomes the
@@ -971,11 +814,11 @@ doDir_shell(char * arg, char * pzScan)
      */
     pzText = shell_cmd(pzText);
     if (pzText == NULL)
-        return pzScan;
+        return scan_next;
 
     if (*pzText == NUL) {
         AGFREE(pzText);
-        return pzScan;
+        return scan_next;
     }
 
     /*
@@ -1005,22 +848,18 @@ doDir_shell(char * arg, char * pzScan)
     return pCtx->scx_scan;
 }
 
-
-/*=directive undef
- *
- *  arg:  name-to-undefine
- *
- *  text:
+/**
  *  Will remove any entries from the define list
  *  that match the undef name pattern.
-=*/
-static char*
-doDir_undef(char* pzArg, char* pzScan)
+ */
+char *
+doDir_undef(directive_enum_t id, char const * dir, char * scan_next)
 {
-    SET_OPT_UNDEFINE(pzArg);
-    return pzScan;
+    dir = SPN_WHITESPACE_CHARS(dir);
+    SET_OPT_UNDEFINE(dir);
+    (void)id;
+    return scan_next;
 }
-
 
 /*+++ End of Directives +++*/
 /*

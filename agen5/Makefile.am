@@ -21,7 +21,7 @@
 SUBDIRS         = test
 INCLUDES        = @INCLIST@
 FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
-TEMPLATES       = directive.tpl snarf.tpl $(FSMTPL)
+TEMPLATES       = snarf.tpl $(FSMTPL)
 DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
 GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
 pkgdata_DATA    = $(FSMTPL)
@@ -36,7 +36,7 @@ FUNCLIST        = \
 
 # The list of source files with Guile expression functions defined
 #
-EXPRLIST        = \
+EXPRLIST        = directive.c \
     expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
     expOutput.c  expPrint.c  expState.c expString.c agShell.c \
     $(FUNCLIST)
@@ -82,7 +82,8 @@ STAMPENV = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \
 	DEPDIR="$(DEPDIR)" AG_TIMEOUT=$(AG_TIMEOUT)
 
-MAKE_STAMP  = $(STAMPENV) $(POSIX_SHELL) $(srcdir)/mk-stamps.sh $@
+stamp-env :
+	$(STAMPENV) $(POSIX_SHELL) $(srcdir)/mk-stamps.sh
 
 ../snprintfv/snprintfv.h :
 	@if [ ! -f ../snprintfv/snprintfv.h ] ; then cd ../snprintfv ; \

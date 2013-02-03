@@ -192,21 +192,9 @@ string = { nm = DIRECT_ASSERT_FMT;
 string = { nm = DIRECT_CK_LIST_MARK;
    str = "\n#"; };
 
-string = { nm = DIRECT_ELIF_BAD_FMT;
-   str = "'#elif' directive encountered out of context\n"
+string = { nm = DIRECT_BAD_CTX_FMT;
+   str = "'#%s' directive encountered out of context\n"
          "\tin %s on line %d\n"; };
-
-string = { nm = DIRECT_ELSE_BAD;
-   str = "else"; };
-
-string = { nm = DIRECT_ENDIF_BAD;
-   str = "endif"; };
-
-string = { nm = DIRECT_ENDMAC_BAD;
-   str = "endmac"; };
-
-string = { nm = DIRECT_ENDSHELL_BAD;
-   str = "endshell"; };
 
 string = { nm = DIRECT_ERROR_FMT;
    str = "#error directive -- in %s on line %d\n\t%s\n"; };

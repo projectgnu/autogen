@@ -79,14 +79,14 @@ _EOF_
 echo creating ${testname}.def
 cat > ${testname}.def <<'_EOF_'
 autogen definitions alist;
-#error The definitions file has a `#error' directive
+#error The definitions file has a '#error' directive
 _EOF_
 
 echo creating ${testname}.base1
 # this is the output we should expect to see
 cat > ${testname}.base1 <<'_EOF_'
 #error directive -- in error.def on line 3
-	The definitions file has a `#error' directive
+	The definitions file has a '#error' directive
 _EOF_
 
 ag_err 1 ${testname}.def
