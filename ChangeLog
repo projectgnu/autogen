@@ -14,6 +14,12 @@
 	* autoopts/find.c (get_opt_arg_may): likewise
 	(get_opt_arg): simplify code
 	* agen5/defDirect.c (processDirective): Correctly handle bad directives
+	Basically, rework the thing.
+	* agen5/directive.tpl: remove
+	* agen5/ag-text.def: remove obsolete strings
+	* agen5/mk-stamps.sh (top_builddir): add a default for it
+	(make_directive): use a dispatching enumeration instead of a
+	special purpose template.
 
 2013-01-26  Bruce Korb  <bkorb@gnu.org>
 
