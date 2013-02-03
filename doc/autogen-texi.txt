@@ -1757,18 +1757,24 @@ This text will be inserted into the generated .c file.
 This string should be readily translatable.  Provision will be made
 to translate it if this is provided, if the source code is compiled with
 @code{ENABLE_NLS} defined, and @code{no-xlate} has not been set to the
-value @emph{anything}.
+value @emph{anything}.  The untranslated text will be handed to
+@code{dgettext("libopts", @i{txt})} and then @code{gettext(@i{txt})}
+for translation, one paragraph at a time.
+
+To facilitate the creation and maintenance of this text, you can
+force the string to be ignored and recomputed by specifying
+@example
+AUTOOPTS_USAGE=compute
+@end example
+@noindent
+in the environment and requesting help or usage information.
+See @xref{Caveats, Developer and User Notes}.
 
 @item short-usage
 @vindex short-usage
 If this attribute is provided, it is used to specify an abbreviated
 version of the usage text.  This text is constructed in the same way
 as the @code{full-usage}, described above.
-
-Both @code{full-usage} and @code{short-usage} can be regenerated
-by setting the environment variable @env{AUTOOPTS_USAGE} to the
-string @i{compute}, or add that to whatever else is needed.
-See @xref{Caveats, Developer and User Notes}.
 
 @item gnu-usage
 @vindex gnu-usage
