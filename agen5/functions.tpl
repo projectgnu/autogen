@@ -26,6 +26,60 @@
 (define func-name        "")
 (define func-str-off     0)
 (define output-file-name (out-name))
+(define enum-list        "\n")
+(define chk-mac-func (lambda () (begin
+
+  (if (and (exist? ".alias") (exist? ".unnamed"))
+      (error (string-append
+         "The " (get "name") " function is unnamed, but has aliases?!?!")) )
+
+  (if (and (not (exist? ".load-proc"))
+           (exist? ".in-context")
+           (exist? ".handler-proc") )
+      (error (string-append
+         "The " (get "name") " function is situational and has a handler.")) )
+
+  (if (exist? "handler-proc") (begin
+      (set! temp-txt (get "handler-proc"))
+
+      (if (< 0 (string-length temp-txt))
+          (set! temp-txt (string-capitalize! temp-txt))
+          (set! temp-txt func-name) )
+
+      (set! handle-list (string-append handle-list
+                       "\nmFunc_" temp-txt ))
+  )   )
+
+  (if (exist? "load-proc") (begin
+      (set! temp-txt (get "load-proc"))
+
+      (if (< 0 (string-length temp-txt))
+          (set! temp-txt (string-capitalize! temp-txt))
+          (set! temp-txt func-name) )
+
+      (set! load-list (string-append load-list
+                       "\nmLoad_" temp-txt ))
+  )   )
+
+  (set! temp-txt    (string-upcase! (get "name")))
+  (set! enum-list   (string-append enum-list "FTYP_" temp-txt "\n"))
+
+  (string-append
+     "\n *  "
+     (if (exist? "alias")          "A "
+         (if (exist? "unnamed")    "U " "  "))
+
+     (if (exist? "load-proc")      "L "
+         (if (exist? "in-context") "C " "  "))
+
+     (if (exist? "unload-proc")    "R " "  ")
+
+     (if (exist? "handler-proc")   "H"  " ")
+
+     (sprintf " - %-10s" temp-txt)
+     (get "what")
+  )
+)))
 
 (dne "-d" " *  " "/*  ")=]
  *
@@ -59,76 +113,25 @@
  *  H - has a handler procedure defined.  Only these procedures should
  *      be encountered by the dispatcher during processing.
  *[=
-FOR macfunc =]
- *  [=
-
-  IF (exist? "alias")          =]A[=
-    IF (exist? "unnamed") =][=
-      ERROR % name
-         "The %s function is unnamed, but has aliases?!?!" =][=
-    ENDIF =][=
-  ELIF (exist? "unnamed")      =]U[=
-  ELSE                         =] [=
-  ENDIF =] [=
-
-  IF   (exist? "load-proc")    =]L[=
-  ELIF (exist? "in-context")   =]C[=
-    IF (exist? "handler-proc") =][=
-      ERROR % name
-         "The %s function is situational and has a handler" =][=
-    ENDIF =][=
-  ELSE                         =] [=
-  ENDIF =] [=
-
-  (if (exist? "unload-proc") "R" " ") =][=
-
-  IF (exist? "handler-proc")   =]H[=
-  ELSE                         =] [=
-  ENDIF =] - [=
-
-  % name (string-upcase! "%-12s") =][=what=][=
+FOR macfunc =][=
+  (define func-name (string-capitalize! (get "name")))
+  (chk-mac-func) =][=
 ENDFOR macfunc =]
  */
 [= (make-header-guard "autogen") =]
-
+/**
+ * The number of native AutoGen functions, omitting the
+ * comparison type / selection functions.
+ */
 #define FUNC_CT    [= (count "macfunc") =]
 
 /**
  *  Enumerate all the AutoGen macro types.
  */
-typedef enum {[=
-
-FOR macfunc                             =][=
-
-   (define func-name (string-capitalize! (get "name")))
-
-   (if (exist? "handler-proc") (begin
-       (set! temp-txt (get "handler-proc"))
-
-       (if (< 0 (string-length temp-txt))
-           (set! temp-txt (string-capitalize! temp-txt))
-           (set! temp-txt func-name) )
-
-       (set! handle-list (string-append handle-list
-                        "\nmFunc_" temp-txt ))
-   )   )
-
-   (if (exist? "load-proc") (begin
-       (set! temp-txt (get "load-proc"))
-
-       (if (< 0 (string-length temp-txt))
-           (set! temp-txt (string-capitalize! temp-txt))
-           (set! temp-txt func-name) )
-
-       (set! load-list (string-append load-list
-                        "\nmLoad_" temp-txt ))
-   )   )
-
-   (sprintf "\n    FTYP_%-10s /* %-50s */"
-    (string-upcase! (string-append func-name ","))
-    (get "what") )                      =][=
-
-ENDFOR                                  =]
+typedef enum {
+[=
+(shell "columns -I4 -S, --ending ',' <<\\_EOF_" enum-list
+       "_EOF_")                         =]
 
     FTYP_SELECT_COMPARE_FULL          = 0x8000,  /* *==* */
     FTYP_SELECT_COMPARE_SKP_START     = 0x8001,  /* *==  */
@@ -179,20 +182,20 @@ load_proc_t
 /**
  *  Parsing function tables for load processing (template scanning phase).
  */
-static load_proc_p_t const base_load_table[ FUNC_CT ] = {[=
+static load_proc_p_t const base_load_table[FUNC_CT] = {[=
 FOR macfunc "," =]
-    /* [=% name "%-10s" =]*/ mLoad_[=
-  IF   (> (len "load-proc") 0)=][=% load-proc (string-capitalize! "%s") =][=
-  ELIF (exist? "load-proc")   =][=% name (string-capitalize! "%s") =][=
-  ELIF (exist? "in-context")  =]Bogus   /*dynamic*/[=
-  ELSE                        =]Unknown /*default*/[=
+    /* [=% name "%-8s" =] */ mLoad_[=
+  IF   (> (len "load-proc") 0)=][=(string-capitalize! (get "load-proc"))=][=
+  ELIF (exist? "load-proc")   =][=(string-capitalize! (get "name"))=][=
+  ELIF (exist? "in-context")  =]Bogus    /*dynamic*/[=
+  ELSE                        =]Unknown  /*default*/[=
   ENDIF =][=
 ENDFOR macfunc =]
 };
 
 /**
- *  This global pointer is used to switch parsing tables.
- *  The block functions (CASE, DEFINE, FOR, and IF) change this to point
+ *  This global pointer is used to switch parsing tables.  The block
+ *  functions (CASE, DEFINE, FOR, and IF) change this to point
  *  to their tables that include relevant additional functions.
  */
 load_proc_p_t const * load_proc_table = base_load_table;
@@ -204,9 +207,9 @@ load_proc_p_t const * load_proc_table = base_load_table;
  */
 typedef struct fn_name_type fn_name_type_t;
 struct fn_name_type {
-    size_t        cmpLen;  /*!< compare length (sans NUL) */
-    char const *  pName;   /*!< ptr to name */
-    mac_func_t    fType;   /*!< function type enum */
+    size_t        cmpLen;  //!< compare length (sans NUL)
+    char const *  pName;   //!< ptr to name
+    mac_func_t    fType;   //!< function type enum
 };
 
 /**
@@ -218,7 +221,8 @@ struct fn_name_type {
  (set! decl-list "")          =][=
 
 FOR macfunc                   =][=
-  IF (not (exist? "unnamed")) =][=
+  IF (exist? "unnamed")       =][= CONTINUE =][= ENDIF =][=
+
     IF (exist? "alias")       =][=
       FOR alias               =][=
 
@@ -248,47 +252,53 @@ FOR macfunc                   =][=
       =][=
 
     ENDIF                     =][=
-  ENDIF                       =][=
 ENDFOR macfunc
 
-=][=
-
- (shellf "file=%s.tmp ; cat > ${file} <<\\_EOF_\n%s_EOF_" (out-name) decl-list)
- (ag-fprintf 0 "\nstatic char const zFnStrg[%d] =\n" func-str-off)
- (shellf "columns -I4 --spread=1<<\\_EOF_\n%s_EOF_" func-name)
-
-=];
-
-/**
- *  The number of names by which the macros go.
- *  Some have multiple names (aliases, e.g. selection clauses).
- */
-[= `
-hict=\`egrep '^[A-Z]' $file | wc -l\`
-loct=\`egrep -v '^[A-Z]' $file | wc -l\`
-cat <<_EOF_
-#define FUNC_ALIAS_LOW_INDEX    0
-#define FUNC_ALIAS_HIGH_INDEX   \`expr $loct - 1\`
-#define FUNC_NAMES_LOW_INDEX    \`echo $loct\`
-#define FUNC_NAMES_HIGH_INDEX   \`expr $hict + $loct - 1\`
-#define FUNCTION_NAME_CT        \`expr $hict + $loct\`
-
-/* * * * * * * * tpParse.c use only * * * * * * * * * * * * * * */
-/**
- *  And now, the table separated by aliasing and then sorted by string content
- */
-static fn_name_type_t const fn_name_types[ FUNCTION_NAME_CT ] = {
-_EOF_
-egrep -v '^[A-Z]' $file | sort | sed -e 's/^.*:://'
+=][= (out-push-new)           =]
 echo
-egrep    '^[A-Z]' $file | sort | sed -e 's/^.*:://' -e '$s/,$//'
+echo 'static char const zFnStrg[[=(. func-str-off)=]] ='
+columns -I4 --spread=1 --end=';'<<\_EOF_
+[=(. func-name)=]_EOF_
 
-rm -f $file ` =] };
+file="[=(base-name)=]-$$.tmp"
+cat > "${file}" <<\_EOF_
+[=(. decl-list)=]_EOF_
+hict=`egrep    '^[A-Z]' "${file}" | wc -l`
+loct=`egrep -v '^[A-Z]' "${file}" | wc -l`
 
-static char const * const ag_fun_names[ FUNC_CT ] = {
-[=(out-push-new) =][=
+cat <<- _EOF_
 
-FOR macfunc "\n"    =]echo [=
+	/**
+	 *  The number of names by which the macros go.
+	 *  Some have multiple names (aliases, e.g. selection clauses).
+	 */
+	#define FUNC_ALIAS_LOW_INDEX    0
+	#define FUNC_ALIAS_HIGH_INDEX   `expr $loct - 1`
+	#define FUNC_NAMES_LOW_INDEX    `echo $loct`
+	#define FUNC_NAMES_HIGH_INDEX   `expr $hict + $loct - 1`
+	#define FUNCTION_NAME_CT        `expr $hict + $loct`
+
+	/* * * * * * * * tpParse.c use only * * * * * * * * * * * * * * */
+	/**
+	 *  The table separated by aliasing and then sorted by string content
+	 */
+	static fn_name_type_t const fn_name_types[FUNCTION_NAME_CT] = {
+	_EOF_
+{
+    egrep -v '^[A-Z]' "$file" | sort
+    echo
+    egrep    '^[A-Z]' "$file" | sort
+} | sed -e 's/^.*:://' -e '$s/,$/ };/'
+
+rm -f "$file"
+
+echo
+echo 'static char const * const ag_fun_names[FUNC_CT] = {'
+
+{[=
+
+FOR macfunc    =]
+  echo [=
 
   (if (exist? "unnamed")
       (string-append "\\\"" (string-capitalize! (get "name")) "\\\"")
@@ -299,11 +309,9 @@ FOR macfunc "\n"    =]echo [=
 
 =][=
 
-ENDFOR macfunc      =][=
-
-(shell (string-append "( " (out-pop #t) " ) | columns -I4 -S, --spread=1"))
-
-=] };
+ENDFOR macfunc      =]
+} | columns -I4 -S, --spread=1 --end=' };'
+[= (shell (out-pop #t)) =]
 
 /* * * * * * * * tpProcess.c use only * * * * * * * * * * * * * */
 /**
@@ -312,15 +320,32 @@ ENDFOR macfunc      =][=
  *  Pointers to the procedure to call when the function code
  *  is encountered.
  */
-static hdlr_proc_p_t const load_procs[ FUNC_CT ] = {[=
-FOR macfunc "," =]
-    /* [=% name "%-10s"=]*/ mFunc_[=
+static hdlr_proc_p_t const load_procs[FUNC_CT] = {[=
+  (define set-unload-proc (lambda () (begin
+     (set! func-name (string-append
+           "mUnload_" (string-capitalize (get "name"))))
+
+     (if (exist? "unload-proc")
+         (begin
+           (set! unload-procs (string-append unload-procs ", " func-name))
+           (set! unload-table (string-append unload-table func-name "\n"))
+         )
+         (set! unload-table (string-append unload-table "NULL\n"))
+     )
+  )))
+  (define unload-procs "") (define unload-table "") =][=
+
+FOR macfunc "," =][=
+  (set-unload-proc)
+  (sprintf "\n    /* %-8s */ mFunc_" (get "name")) =][=
+
   CASE handler-proc =][=
-  !E     =]Bogus[=
-  == ''  =][= (string-capitalize! (get "name")) =][=
-  *      =][= (string-capitalize! (get "handler-proc")) =][=
-  ESAC   =][=
-ENDFOR macfunc =]
+  !E            =]Bogus[=
+  == ''         =][= (string-capitalize! (get "name")) =][=
+  *             =][= (string-capitalize! (get "handler-proc")) =][=
+  ESAC          =][=
+
+ENDFOR macfunc  =]
 };
 
 /* * * * * * * * * * tpLoad.c use only * * * * * * * * * * * * * */
@@ -329,34 +354,16 @@ ENDFOR macfunc =]
  *
  *  Pointers to the procedure to call when the function code
  *  is encountered in a template being unloaded.
- */[=
-    (set! decl-list "") (set! temp-txt "") =][=
+ */
+unload_proc_t [= (substring unload-procs 2) =];
 
-FOR macfunc     =][=
-    (set! func-name (string-append
-          "mUnload_" (string-capitalize (get "name"))))
+static unload_proc_p_t const unload_procs[FUNC_CT] = {
+[= (shell "columns -I4 --sep=, --spread=1 --end=' };'<<_EOF_\n"
+      unload-table "_EOF_") =]
 
-    (if (exist? "unload-proc")
-        (begin
-	  (set! decl-list (string-append decl-list func-name ", "))
-	  (set! temp-txt  (string-append temp-txt  func-name "\n"))
-	)
-        (set! temp-txt (string-append temp-txt "NULL\n"))
-    )           =][=
-ENDFOR
-
-=]
-unload_proc_t [= (shellf "echo '%s'|sed 's/, $//'" decl-list) =];
-
-static unload_proc_p_t const unload_procs[ FUNC_CT ] = {
-[= (shellf "columns -I4 --sep=, --spread=1<<_EOF_\n%s_EOF_" temp-txt) =]
-};
-
-[= (out-push-new) =]
-set -- `sum [=(. output-file-name)=]`
-sum=`echo $1 | sed 's/^0*\([0-9]\)/\1/'`
-printf '#define FUNCTION_CKSUM ((unsigned short)0x%04X)\n' ${sum}
-[= (shell (out-pop #t)) =]
+[=(shell "set -- `sha1sum " output-file-name " | \
+    sed 's/\\(.\\{4\\}\\).*/\\1/' | tr a-z A-Z`
+    echo '#define FUNCTION_CKSUM 0x'${1}") =]
 
 #endif /* [= (. header-guard) =] */
 /* [=(. output-file-name)=] ends here */[=

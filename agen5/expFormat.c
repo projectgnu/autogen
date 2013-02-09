@@ -28,6 +28,57 @@ typedef enum {
     LSEG_NAME   = 4
 } lic_segment_e_t;
 
+/**
+ * Remove horizontal white space at the ends of lines.
+ * "dne" and licensing text passes through this before
+ * making an SCM out of the result.
+ *
+ * @param[in,out] text  the text to work on.
+ */
+static void
+trim_trailing_white(char * text)
+{
+    char * start = text++;
+    if (*start == NUL)
+        return;
+
+    for (;;) {
+        switch (*text++) {
+        case NUL:
+            return;
+        case NL:
+            if (IS_HORIZ_WHITE_CHAR(text[-2]))
+                goto doit;
+        default:
+            break;
+        }
+    }
+
+ doit:
+    start = SPN_HORIZ_WHITE_BACK(start, text - 2);
+    *(start++) = NL;
+    {
+        char * dest = start;
+
+        for (;;) {
+            switch (*(dest++) = *(text++)) {
+            case NUL:
+                return;
+
+            case NL:
+                if (IS_HORIZ_WHITE_CHAR(dest[-2])) {
+                    dest  = SPN_HORIZ_WHITE_BACK(start, dest - 2);
+                    start = dest;
+                    *(dest++) = NL;
+                }
+
+            default:
+                break;
+            }
+        }
+    }
+}
+
 /*=gfunc dne
  *
  * what:  '"Do Not Edit" warning'
@@ -67,28 +118,27 @@ SCM
 ag_scm_dne(SCM prefix, SCM first, SCM opt)
 {
     char const *  date_str;
-    char const *  pzRes;
     char const *  pzFirst;
-    size_t        pfxLen;
     char const *  pzPrefix;
-    SCM           res;
 
     if (! AG_SCM_STRING_P(prefix))
         return SCM_UNDEFINED;
 
     date_str = NULL;
     pzFirst  = zNil;
-    pfxLen   = AG_SCM_STRLEN(prefix);
-    pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
 
-    /*
-     *  Check for the ``-d'' option
-     */
-    if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
-        date_str = zNil;
-        pfxLen   = AG_SCM_STRLEN(first);
-        pzPrefix = ag_scm2zchars(first, "dne-prefix");
-        first    = opt;
+    {
+        size_t pfxLen   = AG_SCM_STRLEN(prefix);
+        pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
+
+        /*
+         *  Check for the '-d' option
+         */
+        if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
+            date_str = zNil;
+            pzPrefix = ag_scm2zchars(first, "dne-prefix");
+            first    = opt;
+        }
     }
 
     /*
@@ -97,7 +147,7 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
      */
     if (AG_SCM_STRING_P(first))
         pzFirst = aprf(ENABLED_OPT(WRITABLE) ? "%s\n" : EXP_FMT_DNE1,
-                       ag_scm2zchars(first, "first-prefix"), pzPrefix);
+                       ag_scm2zchars(first, "pfx-1"), pzPrefix);
 
     if (date_str == NULL) {
         static char const tim_fmt[] =
@@ -105,16 +155,16 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
 
         size_t const  tsiz = sizeof(tim_fmt) + sizeof("september") * 2;
         time_t     curTime = time(NULL);
-        struct tm*   pTime = localtime(&curTime);
+        struct tm *  pTime = localtime(&curTime);
 
         date_str = ag_scribble((ssize_t)tsiz);
         strftime((char *)date_str, tsiz, tim_fmt, pTime);
     }
 
     {
-        char const * pz;
-        out_stack_t *   pfp = cur_fpstack;
-        char const * tpl_name = strrchr(tpl_fname, DIRCH);
+        char const  * pz;
+        out_stack_t * pfp = cur_fpstack;
+        char const  * tpl_name = strrchr(tpl_fname, DIRCH);
         if (tpl_name == NULL)
             tpl_name = tpl_fname;
         else
@@ -133,25 +183,27 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
                 pz = "stdin";
         }
 
-        pzRes = aprf(ENABLED_OPT(WRITABLE) ? EXP_FMT_DNE2 : EXP_FMT_DNE,
-                     pzPrefix, pfp->stk_fname, date_str,
-                     pz, tpl_name, pzFirst);
+        pz = aprf(ENABLED_OPT(WRITABLE) ? EXP_FMT_DNE2 : EXP_FMT_DNE,
+                  pzPrefix, pfp->stk_fname, date_str,
+                  pz, tpl_name, pzFirst);
+        if (pz == NULL)
+            AG_ABEND("Allocating Do-Not-Edit string");
+        trim_trailing_white(C(char *, pz));
+        date_str = pz;
     }
-
-    if (pzRes == NULL)
-        AG_ABEND("Allocating Do-Not-Edit string");
-
-    res = AG_SCM_STR02SCM(pzRes);
 
     /*
      *  Deallocate any temporary buffers.  pzFirst either points to
      *  the zNil string, or to an allocated buffer.
      */
-    AGFREE((void*)pzRes);
     if (pzFirst != zNil)
-        AGFREE((void*)pzFirst);
+        AGFREE((void *)pzFirst);
+    {
+        SCM res = AG_SCM_STR02SCM(date_str);
+        AGFREE((void *)date_str);
 
-    return res;
+        return res;
+    }
 }
 
 
@@ -485,6 +537,7 @@ construct_license(
 
     do_multi_subs(&lic_text, &text_len, subs, vals);
 
+    trim_trailing_white(lic_text);
     return AG_SCM_STR02SCM(lic_text);
 }
 

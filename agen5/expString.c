@@ -503,16 +503,20 @@ ag_scm_prefix(SCM prefx, SCM txt)
         char ch = *(text++);
         switch (ch) {
         case NUL:
-            if (rem_size != 0)
-                AG_ABEND(PREFIX_FAIL);
-
-            return AG_SCM_STR2SCM(r_str, out_size);
+            return AG_SCM_STR2SCM(r_str, out_size - rem_size);
 
         case NL:
             *data    = ch;
             strcpy(data+1, prefix);
             data    += pfx_size;
             rem_size -= pfx_size;
+            if (*text == NL) {
+                char * p = SPN_WHITESPACE_BACK(data - pfx_size, data-1);
+                if (p < data - 1) {
+                    rem_size += data - p;
+                    data = p;
+                }
+            }
             break;
 
         default:

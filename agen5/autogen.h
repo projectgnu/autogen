@@ -176,11 +176,10 @@ struct tlib_mark {
 };
 
 /**
- *  Defines for conditional expressions.
- *  The first four are an enumeration that appear in the
- *  low four bits and the next-to-lowest four bits.
- *  "PRIMARY_TYPE" and "SECONDARY_TYPE" are masks for
- *  extracting this enumeration.  The rest are flags.
+ *  Defines for conditional expressions.  The first four are an enumeration
+ *  that appear in the low four bits and the next-to-lowest four bits.
+ *  "PRIMARY_TYPE" and "SECONDARY_TYPE" are masks for extracting this
+ *  enumeration.  The rest are flags.
  */
 #define EMIT_VALUE          0x0000  //!< emit value of variable
 #define EMIT_EXPRESSION     0x0001  //!< Emit Scheme result
