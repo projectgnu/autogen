@@ -66,7 +66,7 @@ clean_help > ${testname}.hbase <<- _EOF_
 	  Flg Arg Option-Name    Description
 	   -V KWd verbose        run program with progress info
 
-	version, usage and configuration options:
+	Version, usage and configuration options:
 
 	  Flg Arg Option-Name    Description
 	   -? no  help           display extended usage information and exit

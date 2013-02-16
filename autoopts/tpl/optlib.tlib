@@ -798,7 +798,7 @@ DEFINE   emit-alias-option
 =]
 #define [= (. UP-name) =]_DESC    ([=
     (set! tmp-val (string-append
-          "an alias for '" (get "aliases") "'"))
+          "an alias for the '" (get "aliases") "' option"))
     (if xlate-desc-p
         (put-xget "pOptDesc->pzText" tmp-val) )
     (string-table-add-ref opt-strs tmp-val) =])

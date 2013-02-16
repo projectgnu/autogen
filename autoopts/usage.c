@@ -317,7 +317,7 @@ ao_bug(char const * msg)
 static void
 print_offer_usage(tOptions * opts)
 {
-    char help[64];
+    char help[24];
 
     if (HAS_opt_usage_t(opts)) {
         int ix = opts->presetOptCt;
@@ -326,6 +326,23 @@ print_offer_usage(tOptions * opts)
             if (++ix >= opts->optCt)
                 ao_bug(zmissing_help_msg);
             od++;
+        }
+        switch (opts->fOptSet & (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)) {
+        case OPTPROC_SHORTOPT:
+            help[0] = '-';
+            help[1] = od->optValue;
+            help[2] = NUL;
+            break;
+
+        case OPTPROC_LONGOPT:
+        case (OPTPROC_LONGOPT | OPTPROC_SHORTOPT):
+            help[0] = help[1] = '-';
+            strncpy(help + 2, od->pz_Name, 20);
+            break;
+        
+        case 0:
+            strncpy(help, od->pz_Name, 20);
+            break;
         }
 
     } else {

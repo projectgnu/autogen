@@ -1,5 +1,13 @@
 New in __CURRENT_VERSION__ February 2013
 
+* AutoOpts translatability improvements.  The translatable strings
+  are now inserted into a dummy procedure in the option processing
+  code file.  These can be extracted by xgettext, translated and
+  then displayed when the libopts library encounters any processing
+  issues.  Also, if the client code provides the full usage text
+  string, it will be broken up into "paragraphs" that are easier
+  for the translators to do their jobs.
+
 * "for-each" main procedures may now be specified as processing
   standard input as a data file instead of being replacement
   operands.  Users can always have "stdin" treated as data by using

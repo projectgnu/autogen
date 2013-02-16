@@ -146,7 +146,7 @@ This option introduces the options for the zzyzx library:
   Flg Arg Option-Name    Description
    -c no  library        library test
 
-version, usage and configuration options:
+Version, usage and configuration options:
 
   Flg Arg Option-Name    Description
    -? no  help           display extended usage information and exit

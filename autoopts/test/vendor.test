@@ -92,7 +92,7 @@ The following options modify how output is handled:
 				- may not be preset
 The following options are often useful while debugging new templates:
    -t num     Limit server shell operations to SECONDS
-				- It must be in the range:
+				- it must be in the range:
 				  0 to 3600
        --- show-defs      This option has been disabled
    -C         Leave a core dump on a failure exit
@@ -114,7 +114,7 @@ This option is used to automate dependency tracking:
    -M [arg]   emit make dependency file
 				- may not be preset
 				- may appear multiple times
-version, usage and configuration options:
+Version, usage and configuration options:
    -R str     reset an option's state
    -v [arg]   output version information and exit
    -h         display extended usage information and exit
@@ -139,7 +139,7 @@ The next option supports vendor supported extra options:
 				- disabled as --not-writable
       loop-limit=num   Limit on increment loops
 				- is scalable with a suffix: k/K/m/M/g/G/t/T
-				- It must lie in one of the ranges:
+				- it must lie in one of the ranges:
 				  -1 exactly, or
 				  1 to 16777216
       trace=KWd        tracing level of detail

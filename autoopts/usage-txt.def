@@ -123,7 +123,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = bad_alias_id;
-         ut-text = "Aliasing option is out of range.";
+         ut-text = "aliasing option is out of range.";
 };
 
 utxt = { ut-i18n = msg;
@@ -177,7 +177,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = DisabledErr;
-   ut-text = "%s: The '%s' option has been disabled";
+   ut-text = "%s: The '%s' option has been disabled.";
 };
 
 utxt = { ut-i18n = msg;
@@ -237,7 +237,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = MisArg;
-         ut-text = "%s: option '%s' requires an argument\n";
+         ut-text = "%s: The '%s' option requires an argument.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -253,12 +253,12 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = NoArg;
-         ut-text = "%s: option '%s' cannot have an argument\n";
+         ut-text = "%s: The '%s' option cannot have an argument.\n";
 };
 
 utxt = { ut-i18n = msg;
          ut-name = NoArgs;
-         ut-text = "%s: Command line arguments not allowed\n";
+         ut-text = "%s: Command line arguments are not allowed.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -268,12 +268,12 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = NoKey;
-         ut-text = "%s error:  '%s' does not match any %s keywords\n";
+         ut-text = "%s error:  '%s' does not match any %s keywords.\n";
 };
 
 utxt = { ut-i18n = msg;
          ut-name = reset_arg;
-         ut-text = "%s error: The '%s' option requires an argument\n";
+         ut-text = "%s error: The '%s' option requires an argument.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -288,12 +288,12 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = NotCmdOpt;
-         ut-text = "'%s' is not a command line option\n";
+         ut-text = "'%s' is not a command line option.\n";
 };
 
 utxt = { ut-i18n = msg;
          ut-name = NotDate;
-         ut-text = "%s error:  '%s' is not a recognizable date/time\n";
+         ut-text = "%s error:  '%s' is not a recognizable date/time.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -303,7 +303,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = NotDuration;
-         ut-text = "%s error:  '%s' is not a recognizable time duration\n";
+         ut-text = "%s error:  '%s' is not a recognizable time duration.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -313,7 +313,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = NotNumber;
-         ut-text = "%s error:  '%s' is not a recognizable number\n";
+         ut-text = "%s error:  '%s' is not a recognizable number.\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -323,7 +323,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = offer_usage_fmt;
-         ut-text = "More info with: \"%s %s\"\n";
+         ut-text = "more info with: \"%s %s\"\n";
 };
 
 utxt = { ut-i18n = msg;
@@ -372,7 +372,7 @@ utxt = { ut-i18n = use;
 
 utxt = { ut-i18n = use;
          ut-name = Auto;
-         ut-text = "version, usage and configuration options:";
+         ut-text = "Version, usage and configuration options:";
 };
 
 utxt = { ut-i18n = use;
@@ -533,12 +533,12 @@ utxt = { ut-i18n = use;
 
 utxt = { ut-i18n = use;
          ut-name = RangeLie;
-         ut-text = "%sIt must lie in one of the ranges:\n";
+         ut-text = "%sit must lie in one of the ranges:\n";
 };
 
 utxt = { ut-i18n = use;
          ut-name = RangeOnly;
-         ut-text = "%sIt must be in the range:\n";
+         ut-text = "%sit must be in the range:\n";
 };
 
 utxt = { ut-i18n = use;

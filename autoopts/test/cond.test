@@ -151,7 +151,7 @@ Usage:  cond [ -<flag> [<val>] ]...
    -o Str option         The option option descrip
    -s Num second         The second option descrip
    -c Num condition      cond test
-				- It must be in the range:
+				- it must be in the range:
 				  0 to 1000
    -I Num interfere      cond interference test
    -? no  help           display extended usage information and exit

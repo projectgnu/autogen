@@ -111,7 +111,7 @@ Usage:  argument2 [ -<flag> [<val>] ]...
    -o Str option         The option option descrip
    -s Num second         The second option descrip
 				- is scalable with a suffix: k/K/m/M/g/G/t/T
-				- It must lie in one of the ranges:
+				- it must lie in one of the ranges:
 				  -1 exactly, or
 				  3 to 17, or
 				  32 to 8191

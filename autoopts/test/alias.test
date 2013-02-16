@@ -64,8 +64,8 @@ Usage:  alias [ -<flag> [<val>] | --<name>[{=| }<val>] ]... arg [...]
   Flg Arg Option-Name    Description
    -o Str option         The option option descrip
    -s Num second         The second option descrip
-   -a Str a-opt          an alias for 'option'
-   -b Num b-second       an alias for 'second'
+   -a Str a-opt          an alias for the 'option' option
+   -b Num b-second       an alias for the 'second' option
    -? no  help           display extended usage information and exit
    -! no  more-help      extended usage information passed thru pager
 
