@@ -300,7 +300,8 @@ ENDFOR flag
     (out-push-new)
     (out-suspend "xget")
 )   )
-(define field-name-fmt (string-append "\n  /* " pname "Options.%s */\n"))
+(define field-name-fmt (string-append
+        "\n  /* referenced via " pname "Options.%s */\n"))
 (define put-xget (lambda (nm st) (begin
     (out-resume      "xget")
     (ag-fprintf 0    field-name-fmt nm)
@@ -799,14 +800,17 @@ DEFINE   emit-alias-option
 #define [= (. UP-name) =]_DESC    ([=
     (set! tmp-val (string-append
           "an alias for the '" (get "aliases") "' option"))
+    (if (exist? "deprecated")
+        (set! tmp-val (string-append tmp-val " (deprecated)")) )
     (if xlate-desc-p
-        (put-xget "pOptDesc->pzText" tmp-val) )
+        (put-xget "pOptDesc->pzText" tmp-val)  )
     (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_NAME    NULL
 #define [= (. UP-name) =]_name    ([=
     (string-table-add-ref opt-strs (get "name")) =])
 #define [=(. UP-name)=]_FLAGS     ([=
-    (get-up-name "aliases") =]_FLAGS | OPTST_ALIAS)[=
+    (get-up-name "aliases") =]_FLAGS | OPTST_ALIAS[=
+    (if (exist? "deprecated") " | OPTST_DEPRECATED") =])[=
 
 ENDDEF   emit-alias-option
 
@@ -822,6 +826,8 @@ DEFINE   emit-nondoc-option     =][=
       " */" )  ) =]
 #define [= (. UP-name) =]_DESC      ([=
   (define tmp-val (get-text "descrip"))
+  (if (exist? "deprecated")
+      (set! tmp-val (string-append tmp-val " (deprecated)")) )
   (if xlate-desc-p
       (put-xget "pOptDesc->pzText" tmp-val) )
   (string-table-add-ref opt-strs tmp-val) =])

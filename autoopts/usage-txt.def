@@ -323,7 +323,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = offer_usage_fmt;
-         ut-text = "more info with: \"%s %s\"\n";
+         ut-text = "Try '%s %s' for more information.\n";
 };
 
 utxt = { ut-i18n = msg;

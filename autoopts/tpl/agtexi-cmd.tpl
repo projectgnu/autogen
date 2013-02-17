@@ -279,7 +279,7 @@ ENDDEF emit-exit-status
 
 DEFINE emit-aliases             =]
 
-This is an alias for the [= aliases =] option,
+This is an alias for the @code{[= aliases =]} option,
 [= (sprintf "@pxref{%1$s %2$s, the %2$s option documentation}.\n"
       down-prog-name (get "aliases")) =][=
 

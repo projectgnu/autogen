@@ -148,10 +148,7 @@ ENDIF
 #ifdef  __cplusplus
 extern "C" {
 #endif
-extern FILE * option_usage_fp;
-
-/* TRANSLATORS: choose the translation for option names wisely because you
-                cannot ever change your mind. */[=
+extern FILE * option_usage_fp;[=
 
 IF (not (exist? "copyright"))
 
@@ -630,19 +627,23 @@ translate_option_strings(void)
 #endif /* ENABLE_NLS */
 
 #ifdef DO_NOT_COMPILE_THIS_CODE_IT_IS_FOR_GETTEXT
-/*
- * TRANSLATORS: The following dummy function was crated solely so that
- * xgettext can extract the correct strings.  These strings are actually
- * referenced by a field name in the [=(. pname)=]Options structure
- * noted in the comments below.  The literal text is defined in
- * [=(. pname)=]_opt_strs.
- *
- * NOTE: the strings below are segmented with respect to the source string
- * [=(. pname)=]_opt_strs.  The strings above are handed off for translation
- * at run time a paragraph at a time.  Consequently, they are presented here
- * for translation a paragraph at a time.
- */
-static void bogus_function(void) {[=
+static void bogus_function(void) {
+  /* TRANSLATORS:
+
+     The following dummy function was crated solely so that xgettext can extract
+     the correct strings.  These strings are actually referenced by a field name
+     in the [=(. pname)=]Options structure noted in the comments below.  The
+     literal text is defined in [=(. pname)=]_opt_strs.
+   
+     NOTE: the strings below are segmented with respect to the source string
+     [=(. pname)=]_opt_strs.  The strings above are handed off for translation
+     at run time a paragraph at a time.  Consequently, they are presented here
+     for translation a paragraph at a time.
+   
+     ALSO: often the description for an option will reference another option
+     by name.  These are set off with apostrophe quotes (I hope).  Do not
+     translate option names.
+   */[=
 (out-resume "xget") (out-pop #t) \=]
 
 [=(out-push-new)=]

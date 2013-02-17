@@ -319,7 +319,7 @@ print_indentation(templ_t * tpl, macro_t * mac, int idx)
     if (idx < 0)
         fputs("    ", trace_fp);
     else fprintf(trace_fp, "%3u ", (unsigned int)idx);
-    snprintf(fmt, sizeof(fmt), fmt_fmt, tpl_next_lvl);
+    snprintf(fmt, sizeof(fmt), fmt_fmt, tpl_nest_lvl);
     fprintf(trace_fp, fmt, "");
 }
 

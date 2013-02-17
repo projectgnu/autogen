@@ -155,22 +155,21 @@ parse_usage_flags(ao_flag_names_t const * fnt, char const * txt)
         int ix = 0;
 
         for (;;) {
-            if (strneqvcmp(txt, fnt->fnm_name, (int)fnt->fnm_len) == 0)
+            if (strneqvcmp(txt, fnt[ix].fnm_name, (int)fnt[ix].fnm_len) == 0)
                 break;
             if (++ix >= AOUF_COUNT)
                 return 0;
-            fnt++;
         }
 
         /*
          *  Make sure we have a full match.  Look for whitespace,
          *  a comma, or a NUL byte.
          */
-        if (! IS_END_LIST_ENTRY_CHAR(txt[fnt->fnm_len]))
+        if (! IS_END_LIST_ENTRY_CHAR(txt[fnt[ix].fnm_len]))
             return 0;
 
         res |= 1U << ix;
-        txt = SPN_WHITESPACE_CHARS(txt + fnt->fnm_len);
+        txt = SPN_WHITESPACE_CHARS(txt + fnt[ix].fnm_len);
 
         switch (*txt) {
         case NUL:

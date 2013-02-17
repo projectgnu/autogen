@@ -357,7 +357,8 @@ DEFINE set-std-value =]
 
    == "'"  =]'\''[=
    ~~ .    =]'[=(get tmp-val)=]'[=
-   *       =][=(error "value (flag) codes must be single characters") =][=
+   *       =][= (error (sprintf "option %s has multiple character flag value"
+                    (get "val-name")))  =][=
    ESAC    =][=
 ENDDEF set-std-value                    =][=
 

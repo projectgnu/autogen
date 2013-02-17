@@ -1,3 +1,9 @@
+2013-02-17  Bruce Korb  <bkorb@gnu.org>
+
+	* autoopts/tpl/optcode.tlib: correctly locate TRANSLATORS: comment
+	* autoopts/tpl/optlib.tlib: mark deprecated options
+	* autoopts/usage.c: use index instead of scanning pointer
+
 2013-02-03  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/autogen.c (cleanup_and_abort): call _exit() immediately if
