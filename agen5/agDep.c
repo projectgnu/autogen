@@ -1,9 +1,13 @@
 
 /**
- * @file tpDep.c
+ * @file agDep.c
  *
  *  This module will load a template and return a template structure.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  * This file is part of AutoGen.
  * Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -442,3 +446,13 @@ wrap_up_depends(void)
 #endif
     tidy_dep_file();
 }
+
+/**
+ * @}
+ *
+ * Local Variables:
+ * mode: C
+ * c-file-style: "stroustrup"
+ * indent-tabs-mode: nil
+ * End:
+ * end of agen5/agDep.c */

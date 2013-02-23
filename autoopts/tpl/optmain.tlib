@@ -72,8 +72,8 @@ extern void [= (. option-emitter-proc) =](tOptions*);[=
  * Generated main procedure.  This will emit text that a Bourne shell can
  * process to handle its command line arguments.
  *
- * @param argc argument count
- * @param argv argument vector
+ * @param[in] argc argument count
+ * @param[in] argv argument vector
  * @returns program exit code
  */
 int
@@ -158,8 +158,8 @@ ENDIF
  * is read for a list of file names to process.  stdin must not be a terminal.
  * It must be a pipe or a file.
  *
- * @param argc argument count
- * @param argv argument vector
+ * @param[in] argc argument count
+ * @param[in] argv argument vector
  * @returns program exit code
  */
 int
@@ -450,9 +450,9 @@ DEFINE emit-trim-input          =]
  * The returned address is that of the first character after the
  * leading white space.  Characters are not moved.
  *
- * @param pz_s source text pointer
- * @returns pointer to the same text buffer, but after finding the
- * first non-white space character.
+ * @param[in,out] pz_s source text pointer
+ * @returns pointer to the same text buffer, but after skipping over the
+ * leading white space characters.
  */
 static char *
 trim_input_line(char * pz_s)
@@ -578,7 +578,7 @@ DEFINE decl-callbacks
    This is the test for whether or not to emit callback handling code:
 
 =]
-/*
+/**
  *  Declare option callback procedures
  */[=
   (define undef-proc-names "")
@@ -716,7 +716,7 @@ DEFINE decl-callbacks
 
   IF (> (string-length static-proc-list) 0) =]
 
-/*
+/**
  *  #define map the "normal" callout procs
  */
 [= (. static-proc-list)                         =][=
@@ -813,9 +813,9 @@ DEFINE callback-proc-header     =]
   ENDIF ifdef / ifndef
 
 =].
- *
- * @param pOptions the [=(. prog-name)=] options data structure
- * @param pOptDesc the option descriptor for this option.
+[= (prefix " * " (get "doc")) =]
+ * @param[in] pOptions the [=(. prog-name)=] options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */[= (. ifdef-text) =]
 static void
 doOpt[= (set! endif-test-main (string-append "\n}" endif-test-main))
@@ -1215,8 +1215,8 @@ DEFINE emit-option-callbacks        =]
  * The callout function that invokes the [= (. usage-proc)
    =] function.
  *
- * @param pOptions the AutoOpts option description structure
- * @param pOptDesc the descriptor for the "help" (usage) option.
+ * @param[in] pOptions the AutoOpts option description structure
+ * @param[in] pOptDesc the descriptor for the "help" (usage) option.
  * @noreturn
  */
 static void
@@ -1299,7 +1299,7 @@ IF (exist? "die-code")
 
 =]
 /**
- * Print a fatal error message and die
+ * Print a fatal error message and die, \a va_list style.
  *
  * @param[in] exit_code  the value to call exit(3) with
  * @param[in] fmt        the death rattle message
@@ -1322,7 +1322,7 @@ void
 }
 
 /**
- * Print a fatal error message and die
+ * Print a fatal error message and die, var-arg style.
  *
  * @param[in] exit_code  the value to call exit(3) with
  * @param[in] fmt        the death rattle message
@@ -1340,7 +1340,7 @@ void
 }
 
 /**
- * Print a file system error fatal error message and die
+ * Print a file system error fatal error message and die.
  *
  * @param[in] exit_code  the value to call exit(3) with.
  * @param[in] op         the operation that failed.

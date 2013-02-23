@@ -84,7 +84,7 @@ test_immediate - Test AutoOpts for immediate - Ver. 1.0
 Usage:  immediate [ <option-name>[{=| }<val>] ]...
    Arg Option-Name    Description
    Str second         The second option descrip
-				- disabled as --not-second
+				- disabled as '--not-second'
    opt version        output version information and exit
    no  help           display extended usage information and exit
    no  more-help      extended usage information passed thru pager

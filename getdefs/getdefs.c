@@ -1,6 +1,10 @@
+
 /**
- * \file getdefs.c
- *
+ *  @file getdefs.c
+ *  @addtogroup getdefs
+ *  @{
+ */
+/*
  *  getdefs Copyright (C) 1999-2013 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
@@ -1189,7 +1193,8 @@ update_db(void)
 #endif
 }
 
-/* emacs
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

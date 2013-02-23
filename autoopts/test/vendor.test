@@ -83,37 +83,36 @@ Usage:  ${testname} [ -<flag> [<val>] ]... [ <def-file> ]
 The following options select definitions, templates and scheme functions
 to use:
    -L str     Search for templates in DIR
-				- may appear multiple times
+		- may appear multiple times
    -T str     Use TPL-FILE for the template
-				- may not be preset
+		- may not be preset
    -m         Do not use in-mem streams
 The following options modify how output is handled:
    -b str     Specify NAME as the base name for output
-				- may not be preset
+		- may not be preset
 The following options are often useful while debugging new templates:
    -t num     Limit server shell operations to SECONDS
-				- it must be in the range:
-				  0 to 3600
+		- it must be in the range:
+		  0 to 3600
        --- show-defs      This option has been disabled
    -C         Leave a core dump on a failure exit
 These options can be used to control what gets processed in the
 definitions files and template files:
    -s str     Skip the file with this SUFFIX
-				- prohibits these options:
-				select-suffix
-				- may not be preset
-				- may appear multiple times
+		- prohibits the option 'select-suffix'
+		- may not be preset
+		- may appear multiple times
    -o str     specify this output suffix
-				- may not be preset
-				- may appear multiple times
+		- may not be preset
+		- may appear multiple times
    -D str     name to add to definition list
-				- may appear multiple times
+		- may appear multiple times
    -U str     definition list removal pattern
-				- an alternate for define
+		- an alternate for 'define'
 This option is used to automate dependency tracking:
    -M [arg]   emit make dependency file
-				- may not be preset
-				- may appear multiple times
+		- may not be preset
+		- may appear multiple times
 Version, usage and configuration options:
    -R str     reset an option's state
    -v [arg]   output version information and exit
@@ -122,37 +121,36 @@ Version, usage and configuration options:
    -u         abbreviated usage to stdout
    -S [arg]   save the option state to a config file
    -P str     load options from a config file
-				- disabled as --no-load-opts
-				- may appear multiple times
+		- disabled as '--no-load-opts'
+		- may appear multiple times
 The next option supports vendor supported extra options:
    -W str     vendor supported additional options
-				These additional options are:
+		These additional options are:
       definitions=str  Read definitions from FILE
-				- disabled as --no-definitions
-				- enabled by default
-				- may not be preset
+			- disabled as '--no-definitions'
+			- enabled by default
+			- may not be preset
       shell=str        name or path name of shell to use
       equate=str       characters considered equivalent
       source-time      set mod times to latest source
-				- disabled as --no-source-time
+			- disabled as '--no-source-time'
       writable         Allow output files to be writable
-				- disabled as --not-writable
+			- disabled as '--not-writable'
       loop-limit=num   Limit on increment loops
-				- is scalable with a suffix: k/K/m/M/g/G/t/T
-				- it must lie in one of the ranges:
-				  -1 exactly, or
-				  1 to 16777216
+			- is scalable with a suffix: k/K/m/M/g/G/t/T
+			- it must lie in one of the ranges:
+			  -1 exactly, or
+			  1 to 16777216
       trace=KWd        tracing level of detail
       trace-out=str    tracing output file or filter
       used-defines     Show the definitions used
-				- may not be preset
+			- may not be preset
 ${testname} creates text files from templates using external definitions.
 
 The following option preset mechanisms are supported:
  - reading file \$HOME/.${testname}rc
  - reading file ./.${testname}rc
- - examining environment variables named `
-    echo ${testname} | tr 'a-z' 'A-Z'`_*
+ - examining environment variables named VENDOR_*
 
 The valid "trace" option keywords are:
   nothing       debug-message server-shell  templates     block-macros

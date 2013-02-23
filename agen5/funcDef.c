@@ -4,6 +4,10 @@
  *
  *  This module implements the DEFINE text function.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -888,7 +892,9 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
     current_tpl     = ori_tpl;
     return mac;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

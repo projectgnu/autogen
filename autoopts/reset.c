@@ -2,6 +2,12 @@
 /**
  * \file reset.c
  *
+ *  Reset the option state to the compiled state.
+ *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -125,7 +131,8 @@ optionResetOpt(tOptions * pOpts, tOptDesc * pOD)
     optionReset(pOpts, opt_state.pOD);
     reset_active = false;
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

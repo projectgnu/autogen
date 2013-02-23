@@ -1,10 +1,14 @@
 
 /**
- * \file xml2ag.c
+ *  @file xml2ag.c
  *
  *  This is the main routine for xml2ag.
- *  xml2ag Copyright (C) 2002-2013 by Bruce Korb - all rights reserved
  *
+ *  @group xml2ag
+ *  @{
+ */
+/*
+ *  xml2ag Copyright (C) 2002-2013 by Bruce Korb - all rights reserved
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *

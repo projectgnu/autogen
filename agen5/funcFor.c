@@ -4,6 +4,10 @@
  *
  *  This module implements the FOR text macro.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -947,7 +951,9 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
         return next_mac;
     }
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

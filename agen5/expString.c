@@ -5,6 +5,10 @@
  *  This module implements expression functions that
  *  manipulate string values.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -456,72 +460,76 @@ ag_scm_join(SCM sep, SCM list)
  *
  * doc:
  *  Prefix every line in the second string with the first string.
+ *  This includes empty lines, though trailing white space will
+ *  be removed if the line consists only of the "prefix".
+ *  Also, if the last character is a newline, then *two* prefixes will
+ *  be inserted into the result text.
  *
  *  For example, if the first string is "# " and the second contains:
  *  @example
- *  two
- *  lines
+ *  "two\nlines\n"
  *  @end example
  *  @noindent
  *  The result string will contain:
  *  @example
  *  # two
  *  # lines
+ *  #
  *  @end example
+ *
+ *  The last line will be incomplete:  no newline and no space after the
+ *  hash character, either.
 =*/
 SCM
 ag_scm_prefix(SCM prefx, SCM txt)
 {
-    char *   prefix = ag_scm2zchars(prefx, "pfx");
-    char *   text   = ag_scm2zchars(txt,   "txt");
-    char *   data  = text;
-    size_t   rem_size;
+    char *   prefix   = ag_scm2zchars(prefx, "pfx");
+    char *   text     = ag_scm2zchars(txt,   "txt");
+    char *   scan     = text;
     size_t   pfx_size = strlen(prefix);
-    size_t   out_size = pfx_size;
-    char *   r_str;
+    char *   r_str;   /* result string */
 
-    for (;;) {
-        switch (*(text++)) {
-        case NUL:
-            goto exit_count;
-        case NL:
-            out_size += pfx_size;
-            /* FALLTHROUGH */
-        default:
-            out_size++;
-        }
-    } exit_count:;
+    {
+        size_t out_size = pfx_size + 1; // NUL or NL byte adjustment
+        for (;;) {
+            switch (*(scan++)) {
+            case NUL:
+                out_size += scan - text;
+                goto exit_count;
+            case NL:
+                out_size += pfx_size;
+            }
+        } exit_count:;
 
-    text     = data;
-    rem_size = out_size;
-    r_str    = data = ag_scribble((ssize_t)out_size);
-    strcpy(data, prefix);
-    data     += pfx_size;
-    rem_size -= pfx_size++;
+        r_str = scan = ag_scribble((ssize_t)out_size);
+    }
+
+    memcpy(scan, prefix, pfx_size);
+    scan += pfx_size;
+    pfx_size++;
 
     for (;;) {
         char ch = *(text++);
         switch (ch) {
         case NUL:
-            return AG_SCM_STR2SCM(r_str, out_size - rem_size);
+            /*
+             * Trim trailing white space on the final line.
+             */
+            scan = SPN_HORIZ_WHITE_BACK(r_str, scan);
+            return AG_SCM_STR2SCM(r_str, scan - r_str);
 
         case NL:
-            *data    = ch;
-            strcpy(data+1, prefix);
-            data    += pfx_size;
-            rem_size -= pfx_size;
-            if (*text == NL) {
-                char * p = SPN_WHITESPACE_BACK(data - pfx_size, data-1);
-                if (p < data - 1) {
-                    rem_size += data - p;
-                    data = p;
-                }
-            }
+            /*
+             * Trim trailing white space on previous line first.
+             */
+            scan  = SPN_HORIZ_WHITE_BACK(r_str, scan);
+            *scan = NL;
+            memcpy(scan+1, prefix, pfx_size - 1);
+            scan += pfx_size;  // prefix length plus 1 for new line
             break;
 
         default:
-            rem_size--;
-            *(data++) = ch;
+            *(scan++) = ch;
             break;
         }
     }
@@ -975,7 +983,9 @@ ag_scm_time_string_to_number(SCM time_spec)
     return AG_SCM_INT2SCM((int)time_period);
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

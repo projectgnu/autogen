@@ -2,8 +2,12 @@
 /**
  * \file boolean.c
  *
- *   Automated Options Paged Usage module.
+ * Handle options with true/false values for arguments.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This routine will run run-on options through a pager so the
  *  user may examine, print or edit them at their leisure.
  *
@@ -86,7 +90,8 @@ optionBooleanVal(tOptions * pOpts, tOptDesc * pOD )
     }
     pOD->optArg.argBool = res;
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

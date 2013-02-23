@@ -2,8 +2,12 @@
 /**
  * \file alias.c
  *
- *   Automated Options Paged Usage module.
+ * Handle options that are aliases for another option.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This routine will forward an option alias to the correct option code.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
@@ -102,7 +106,8 @@ optionAlias(tOptions * opts, tOptDesc * old_od, unsigned int alias)
     return 0;
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

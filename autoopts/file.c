@@ -2,6 +2,12 @@
 /**
  * \file file.c
  *
+ * Handle options that have file names for arguments.
+ *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -159,11 +165,11 @@ optionFileCheck(tOptions * pOpts, tOptDesc * pOD,
 
         switch (ftype & FTYPE_MODE_EXIST_MASK) {
         case FTYPE_MODE_MUST_NOT_EXIST:
-            fputs(zFileCannotExist, option_usage_fp);
+            fputs(zFileCannotExist + tab_skip_ct, option_usage_fp);
             break;
 
         case FTYPE_MODE_MUST_EXIST:
-            fputs(zFileMustExist, option_usage_fp);
+            fputs(zFileMustExist + tab_skip_ct, option_usage_fp);
             break;
         }
         return;
@@ -184,7 +190,9 @@ optionFileCheck(tOptions * pOpts, tOptDesc * pOD,
     case FTYPE_MODE_FOPEN_FP: fopen_file_fp(pOpts, pOD, mode); break;
     }
 }
-/*
+
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

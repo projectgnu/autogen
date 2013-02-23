@@ -3,8 +3,22 @@
  * @file autogen.h
  *
  *  Global header file for AutoGen
+ */
+/**
+ * @mainpage
+ * @section Introduction
+ * Autogen is a multi-component project.  There is the basic engine itself
+ * ("autogen"), a library ("libopts") and its support templates (collectively,
+ * "AutoOpts"), several support and utility programs ("columns", "getdefs" and
+ * "xml2ag"), *plus* several handy embedded utility templates.  They are all
+ * bundled together because they all require each other.  They each do completely
+ * separate things, but they each are not useful without the other.  Thus,
+ * they are bundled together.
  *
- *  This file is part of AutoGen.
+ * @group autogen
+ * @{
+ */
+/*  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
@@ -591,7 +605,8 @@ static inline SCM ag_eval(char const * str)
 
 #define LOCAL static
 #endif /* AUTOGEN_BUILD */
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

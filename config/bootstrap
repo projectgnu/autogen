@@ -69,18 +69,14 @@ config_tools()
     #  Check for AutoGen version 5.
     #
     AGexe=$(command -v autogen)
-    case "${AGexe}" in
-    ( /* )
-        v=$($AGexe --version || :)
-        case "$(echo $v | sed 's/.* //')" in
-        5.* ) : ;;
-        * ) die "OUT OF DATE AutoGen: $v" ;;
-        esac
-        ;;
-
-    ( * )
+    test -x "$AGexe" || \
         die "AutoGen requires autogen to bootstrap"
-        ;;
+
+    v="$($AGexe --version || :)"
+    v=$(echo "$v" | sed 's/.* //;1q')
+    case "$v" in
+    5.* ) : ;;
+    * ) die "OUT OF DATE AutoGen: $v" ;;
     esac
 
     GDexe=$(command -v getdefs)

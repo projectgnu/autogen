@@ -1,3 +1,10 @@
+/** \file tokenize.c
+ *
+ *  Tokenize a string, accommodating quoted strings.
+ *
+ * @addtogroup autoopts
+ * @{
+ */
 /*
  *  This file defines the string_tokenize interface
  *  This file is part of AutoOpts, a companion to AutoGen.
@@ -322,7 +329,8 @@ main(int argc, char** argv)
 }
 #endif
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

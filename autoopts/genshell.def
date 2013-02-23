@@ -33,7 +33,7 @@ copyright = {
     date  = "1999-2012";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
-    type  = gpl;
+    type  = lgpl;
 };
 
 owner          = "Bruce Korb";

@@ -64,7 +64,9 @@ CASE    (suffix)            =][=
   (if (exist? "flag.extract-code")
       (shellf "test -f %1$s.c && rm -f %1$s.c.save" (base-name)))  =][=
 
-ESAC =]
+ESAC =][=
+IF (exist? "addtogroup")    =]
+/** @} */[= ENDIF           =]
 /* [= (out-name) =] ends here */[=
 
 # options.tpl ends here     =]

@@ -116,8 +116,8 @@ cat > ${testname}.sample <<\_EOF_
 /**
  * The callout function that invokes the optionUsage function.
  *
- * @param pOptions the AutoOpts option description structure
- * @param pOptDesc the descriptor for the "help" (usage) option.
+ * @param[in] pOptions the AutoOpts option description structure
+ * @param[in] pOptDesc the descriptor for the "help" (usage) option.
  * @noreturn
  */
 static void
@@ -133,8 +133,8 @@ doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
 /**
  * Code to handle the first option.
  *
- * @param pOptions the handler options data structure
- * @param pOptDesc the option descriptor for this option.
+ * @param[in] pOptions the handler options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */
 static void
 doOptFirst(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -150,8 +150,8 @@ SampleCode();
 /**
  * Code to handle the second option.
  *
- * @param pOptions the handler options data structure
- * @param pOptDesc the option descriptor for this option.
+ * @param[in] pOptions the handler options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */
 static void
 doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -175,8 +175,8 @@ doOptSecond(tOptions* pOptions, tOptDesc* pOptDesc)
 /**
  * Code to handle the third option.
  *
- * @param pOptions the handler options data structure
- * @param pOptDesc the option descriptor for this option.
+ * @param[in] pOptions the handler options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */
 static void
 doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -197,8 +197,8 @@ doOptThird(tOptions* pOptions, tOptDesc* pOptDesc)
 /**
  * Code to handle the fourth option.
  *
- * @param pOptions the handler options data structure
- * @param pOptDesc the option descriptor for this option.
+ * @param[in] pOptions the handler options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */
 static void
 doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -224,8 +224,8 @@ doOptFourth(tOptions* pOptions, tOptDesc* pOptDesc)
 /**
  * Code to handle the sixth option.
  *
- * @param pOptions the handler options data structure
- * @param pOptDesc the option descriptor for this option.
+ * @param[in] pOptions the handler options data structure
+ * @param[in,out] pOptDesc the option descriptor for this option.
  */
 static void
 doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
@@ -244,9 +244,8 @@ doOptSixth(tOptions* pOptions, tOptDesc* pOptDesc)
  * The directory containing the data associated with handler.
  */
 _EOF_
-
-cmp -s ${testname}.test ${testname}.sample || {
-  failure "`diff -c ${testname}.test ${testname}.sample`" ; }
+pair="${testname}.test ${testname}.sample"
+cmp -s ${pair} || failure "`diff -c ${pair}`"
 
 cleanup
 

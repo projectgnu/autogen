@@ -4,6 +4,10 @@
  *
  *  This module will load a template and return a template structure.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  * This file is part of AutoGen.
  * Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -22,6 +26,8 @@
  */
 
 #if defined(DEBUG_ENABLED)
+static char const zTUndef[] = "%-10s (%d) line %d - MARKER\n";
+
 static int tpl_nest_lvl = 0;
 
 static char const tpl_def_fmt[] = "%-10s (%d) line %d end=%d, strlen=%d\n";
@@ -359,7 +365,6 @@ parse_tpl(macro_t * mac, char const ** p_scan)
     templ_t *    tpl  = current_tpl;
 
 #if defined(DEBUG_ENABLED)
-    static char const zTUndef[] = "%-10s (%d) line %d - MARKER\n";
 
     #define DEBUG_DEC(l)  l--
 
@@ -408,7 +413,9 @@ parse_tpl(macro_t * mac, char const ** p_scan)
     *p_scan = NULL;
     return mac;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

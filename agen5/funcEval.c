@@ -4,6 +4,10 @@
  *
  *  This module evaluates macro expressions.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -646,7 +650,9 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
     tpl->td_scan = copy;
     return mac + 1;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

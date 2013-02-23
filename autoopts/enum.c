@@ -2,8 +2,13 @@
 /**
  * \file enumeration.c
  *
- *   Automated Options Paged Usage module.
+ *  Handle options with enumeration names and bit mask bit names
+ *  for their arguments.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This routine will run run-on options through a pager so the
  *  user may examine, print or edit them at their leisure.
  *
@@ -36,12 +41,8 @@ enum_err(tOptions * pOpts, tOptDesc * pOD,
          char const * const * paz_names, int name_ct);
 
 static uintptr_t
-find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
+find_name(char const * name, tOptions * pOpts, tOptDesc * pOD,
           char const * const *  paz_names, unsigned int name_ct);
-
-static void
-set_memb_usage(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
-               unsigned int name_ct);
 
 static void
 set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
@@ -168,14 +169,14 @@ enum_err(tOptions * pOpts, tOptDesc * pOD,
  * Convert a name or number into a binary number.
  * "~0" and "-1" will be converted to the largest value in the enumeration.
  *
- * @param pzName     the keyword name (number) to convert
+ * @param name       the keyword name (number) to convert
  * @param pOpts      the program's option descriptor
  * @param pOD        the option descriptor for this option
  * @param paz_names  the list of keywords for this option
  * @param name_ct    the count of keywords
  */
 static uintptr_t
-find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
+find_name(char const * name, tOptions * pOpts, tOptDesc * pOD,
           char const * const *  paz_names, unsigned int name_ct)
 {
     /*
@@ -183,11 +184,11 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
      *  The result gets stashed in a char* pointer.
      */
     uintptr_t   res = name_ct;
-    size_t      len = strlen((char*)pzName);
+    size_t      len = strlen((char*)name);
     uintptr_t   idx;
 
-    if (IS_DEC_DIGIT_CHAR(*pzName)) {
-        char * pz = (char *)(void *)pzName;
+    if (IS_DEC_DIGIT_CHAR(*name)) {
+        char * pz = (char *)(void *)name;
         unsigned long val = strtoul(pz, &pz, 0);
         if ((*pz == NUL) && (val < name_ct))
             return (uintptr_t)val;
@@ -197,9 +198,9 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
         return name_ct;
     }
 
-    if (IS_INVERSION_CHAR(*pzName) && (pzName[2] == NUL)) {
-        if (  ((pzName[0] == '~') && (pzName[1] == '0'))
-           || ((pzName[0] == '-') && (pzName[1] == '1')))
+    if (IS_INVERSION_CHAR(*name) && (name[2] == NUL)) {
+        if (  ((name[0] == '~') && (name[1] == '0'))
+           || ((name[0] == '-') && (name[1] == '1')))
         return (uintptr_t)(name_ct - 1);
         goto oops;
     }
@@ -209,7 +210,7 @@ find_name(char const * pzName, tOptions * pOpts, tOptDesc * pOD,
      *  Multiple partial matches means we have an ambiguous match.
      */
     for (idx = 0; idx < name_ct; idx++) {
-        if (strncmp((char*)paz_names[idx], (char*)pzName, len) == 0) {
+        if (strncmp((char*)paz_names[idx], (char*)name, len) == 0) {
             if (paz_names[idx][len] == NUL)
                 return idx;  /* full match */
 
@@ -335,17 +336,6 @@ optionEnumerationVal(tOptions * pOpts, tOptDesc * pOD,
 }
 
 static void
-set_memb_usage(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
-               unsigned int name_ct)
-{
-    /*
-     *  print the list of enumeration names.
-     */
-    (void)pOpts;
-    enum_err(OPTPROC_EMIT_USAGE, pOD, paz_names, (int)name_ct );
-}
-
-static void
 set_memb_shell(tOptions * pOpts, tOptDesc * pOD, char const * const * paz_names,
                unsigned int name_ct)
 {
@@ -444,7 +434,7 @@ optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
      */
     switch ((uintptr_t)pOpts) {
     case (uintptr_t)OPTPROC_EMIT_USAGE:
-        set_memb_usage(pOpts, pOD, paz_names, name_ct);
+        enum_err(OPTPROC_EMIT_USAGE, pOD, paz_names, name_ct);
         return;
 
     case (uintptr_t)OPTPROC_EMIT_SHELL:
@@ -536,10 +526,11 @@ optionSetMembers(tOptions * pOpts, tOptDesc * pOD,
     }
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"
  * indent-tabs-mode: nil
  * End:
- * end of autoopts/enumeration.c */
+ * end of autoopts/enum.c */

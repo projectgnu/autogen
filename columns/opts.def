@@ -1,6 +1,7 @@
 /* -*- Mode: conf -*- */
 
 autogen definitions options;
+addtogroup = columns;
 
 /*
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved

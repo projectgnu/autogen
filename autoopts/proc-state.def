@@ -34,71 +34,71 @@ omit-test-n-set;
  *  the autoopts interface will also have to be changed.  The result is
  *  incompatible.
  */
-cmd[ 0] = longopt;
-wht[ 0] = 'Process long style options';
+cmd[  0] = longopt;
+what[ 0] = 'Process long style options';
 
-cmd[ 1] = shortopt;
-wht[ 1] = 'Process short style "flags"';
+cmd[  1] = shortopt;
+what[ 1] = 'Process short style "flags"';
 
-cmd[ 2] = errstop;
-wht[ 2] = 'Stop on argument errors';
+cmd[  2] = errstop;
+what[ 2] = 'Stop on argument errors';
 
-cmd[ 3] = disabledopt;
-wht[ 3] = 'Current option is disabled';
-
-
-cmd[ 4] = no-req-opt;
-wht[ 4] = 'no options are required';
-
-cmd[ 5] = num-opt;
-wht[ 5] = 'there is a number option';
-
-cmd[ 6] = initdone;
-wht[ 6] = 'have inits been done?';
-
-cmd[ 7] = negations;
-wht[ 7] = 'any negation options?';
-
-cmd[ 8] = environ;
-wht[ 8] = 'check environment?';
-
-cmd[ 9] = no-args;
-wht[ 9] = 'Disallow remaining arguments';
-
-cmd[10] = args-req;
-wht[10] = 'Require args after options';
-
-cmd[11] = reorder;
-wht[11] = 'reorder operands after opts';
+cmd[  3] = disabledopt;
+what[ 3] = 'Current option is disabled';
 
 
-cmd[12] = gnuusage;
-wht[12] = 'emit usage in GNU style';
+cmd[  4] = no-req-opt;
+what[ 4] = 'no options are required';
 
-cmd[13] = translate;
-wht[13] = 'Translate strings in tOptions';
+cmd[  5] = num-opt;
+what[ 5] = 'there is a number option';
 
-cmd[14] = misuse;
-wht[14] = 'no usage on usage error';
+cmd[  6] = initdone;
+what[ 6] = 'have inits been done?';
 
-cmd[15] = immediate;
-wht[15] = 'immediate options active';
+cmd[  7] = negations;
+what[ 7] = 'any negation options?';
+
+cmd[  8] = environ;
+what[ 8] = 'check environment?';
+
+cmd[  9] = no-args;
+what[ 9] = 'Disallow remaining arguments';
+
+cmd[ 10] = args-req;
+what[10] = 'Require args after options';
+
+cmd[ 11] = reorder;
+what[11] = 'reorder operands after opts';
 
 
-cmd[16] = nxlat-opt-cfg;
-wht[16] = 'suppress for config only';
+cmd[ 12] = gnuusage;
+what[12] = 'emit usage in GNU style';
 
-cmd[17] = nxlat-opt;
-wht[17] = 'suppress xlation always';
+cmd[ 13] = translate;
+what[13] = 'Translate strings in tOptions';
 
-cmd[18] = vendor-opt;
-wht[18] = 'vendor options active';
+cmd[ 14] = misuse;
+what[14] = 'no usage on usage error';
 
-cmd[19] = presetting;
-wht[19] = 'opt processing in preset state';
+cmd[ 15] = immediate;
+what[15] = 'immediate options active';
 
-cmd[20] = compute;
-wht[20] = 'Ignore pzFullUsage, compute usage text';
+
+cmd[ 16] = nxlat-opt-cfg;
+what[16] = 'suppress for config only';
+
+cmd[ 17] = nxlat-opt;
+what[17] = 'suppress xlation always';
+
+cmd[ 18] = vendor-opt;
+what[18] = 'vendor options active';
+
+cmd[ 19] = presetting;
+what[19] = 'opt processing in preset state';
+
+cmd[ 20] = compute;
+what[20] = 'Ignore pzFullUsage, compute usage text';
 
 
 mask = {

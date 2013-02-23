@@ -121,7 +121,7 @@ Usage:  shell [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
   Flg Arg Option-Name    Description
    -o Str script         Output Script File
    -s Str shell          Shell name (follows "#!" magic)
-				- disabled as --no-shell
+				- disabled as '--no-shell'
 				- enabled by default
    -v opt version        output version information and exit
    -? no  help           display extended usage information and exit

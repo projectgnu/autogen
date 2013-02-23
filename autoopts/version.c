@@ -1,9 +1,12 @@
 
-/*
+/** \file version.c
+ *
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
+ *
+ * @addtogroup autoopts
+ * @{
  */
-
 /*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -206,7 +209,8 @@ optionVersionStderr(tOptions * opts, tOptDesc * od)
     print_ver(opts, od, stderr);
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

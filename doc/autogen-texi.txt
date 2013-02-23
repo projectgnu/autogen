@@ -2406,7 +2406,10 @@ This is done by specifying a global structured value for
 the one value it must have: @code{main-type}.
 
 @vindex main-type
-The recognized values for @code{main-type} are:
+The recognized values for @code{main-type} are @code{guile},
+@code{shell-process}, @code{shell-parser}, @code{main}, @code{include},
+@code{invoke}, and @code{for-each}.
+
 @menu
 * main guile::              guile: main and inner_main procedures
 * main shell-process::      shell-process: emit Bourne shell results
@@ -2414,17 +2417,13 @@ The recognized values for @code{main-type} are:
 * main main::               main: user supplied main procedure
 * main include::            include: code emitted from included template
 * main invoke::             invoke: code emitted from AutoGen macro
+
 * main for-each::           for-each: perform function on each operand
+* main-for-each-proc::          procedure to handle each argument
+* main-for-each-type::          handler procedure type
+* main-for-each-code::          code for handler procedure
+* main-for-each-opts::          for-each main procedure options
 @end menu
-
-Here is an example of an @code{include} variation:
-
-@example
-main = @{
-  main-type = include;
-  tpl       = "main-template.tpl";
-@};
-@end example
 
 @node main guile
 @subsubsection guile: main and inner_main procedures
@@ -2555,6 +2554,15 @@ within the @code{main} AutoOpts specification.  Since you are coding
 the template for this, the attributes needed for this variation would
 be dictated by your template.
 
+Here is an example of an @code{include} variation:
+
+@example
+main = @{
+  main-type = include;
+  tpl       = "main-template.tpl";
+@};
+@end example
+
 @node main invoke
 @subsubsection invoke: code emitted from AutoGen macro
 
@@ -2578,10 +2586,16 @@ The @code{argument} program attribute (@pxref{program attributes})
 must begin with the @code{[} character, to indicate that there are
 command operands, but that they are optional.
 
-There are a number of attributes to @code{main} that may be used:
+@noindent
+For an example of the produced main procedure, in the @file{autoopts/test}
+build directory, type the following command and look at @file{main.c}:
+@example
+make verbose TESTS=main.test
+@end example
 
-@table @code
-@item  handler-proc
+@node main-for-each-proc
+@unnumberedsubsubsec procedure to handle each argument
+
 @vindex handler-proc
 This attribute is required.  It is used to name the procedure to call.
 That procedure is presumed to be external, but if you provide the code
@@ -2608,7 +2622,9 @@ here is part of the emitted code:
   @} else @{ ...
 @end example
 
-@item handler-type
+@node main-for-each-type
+@unnumberedsubsubsec handler procedure type
+
 @vindex handler-type
 If you do not supply this attribute, your handler procedure must be
 the default type.  The profile of the procedure must be:
@@ -2686,7 +2702,9 @@ That is, something other than @code{failure}.  You may choose @code{success},
 in which case file access issues will not affect the exit code and the error
 message will not be printed.
 
-@item @var{my_handler}-code
+@node main-for-each-code
+@unnumberedsubsubsec code for handler procedure
+
 @vindex MYHANDLER-code
 With this attribute, you provide the code for your handler procedure
 in the option definition file.  In this case, your @code{main()}
@@ -2716,6 +2734,13 @@ static int
 @}
 @end example
 
+@node main-for-each-opts
+@unnumberedsubsubsec for-each main procedure options
+
+These attributes affect the main procedure and how it processes
+each argument or input line.
+
+@table @samp
 @item interleaved
 If this attribute is specified, then options and operands may be
 interleaved.  Arguments or input lines beginning with a hyphen will
@@ -2740,13 +2765,6 @@ start with a character other than a hash (@code{#}) character, then
 specify one character with this attribute.  If string value is empty,
 then only blank lines will be considered comments.
 @end table
-
-@noindent
-For an example of the produced main procedure, in the @file{autoopts/test}
-build directory, type the following command and look at @file{main.c}:
-@example
-make verbose TESTS=main.test
-@end example
 
 @node option attributes
 @subsection Option Attributes
@@ -3668,12 +3686,17 @@ and for producing the invoking section of an info document.  To take
 advantage of these templates, you must add several attributes to your
 option definitions.
 
-@table @samp
-@item cmd-section
-@vindex cmd-section
-If your command is a game or a system management command,
-specify this attribute with the value @code{5} or @code{8}, respectively.
+@menu
+* per option attributes::       Per option documentation attributes
+* global option attributes::    Global documentation attributes
+@end menu
 
+@node per option attributes
+@subsubsection Per option documentation attributes
+
+These attributes are sub-attributes (@i{sub-stanzas}) of the @code{flag} stanzas.
+
+@table @samp
 @item arg-name
 @vindex arg-name
 If an option has an argument, the argument should have a name for
@@ -3699,6 +3722,39 @@ order to document the usage of the option in the generated man pages.
 Since these blocks of text are inserted into all output forms,
 any markup text included in these blocks must be massaged for each
 output format.  By default, it is presumed to be @file{texi} format.
+@end table
+
+@node global option attributes
+@subsubsection Global documentation attributes
+@table @samp
+@item cmd-section
+@vindex cmd-section
+If your command is a game or a system management command,
+specify this attribute with the value @code{5} or @code{8}, respectively.
+The default is a user command (section 1).
+
+@item detail
+@vindex detail
+This attribute is used to add a very short explanation about what
+a program is used for when the @code{title} attribute is insufficient.
+If there is no @code{doc-section} stanza of type @code{DESCRIPTION}, then
+this text is used for the man page DESCRIPTION section, too.
+
+@item addtogroup
+@vindex addtogroup
+This attribute tells the template that the generated code should be
+surrounded with the following doxygen comments:
+@example
+/** @@file <header-or-code-file-name>
+ *  @@addtogroup <value-of-addtogroup>
+ *  @@@{
+ */
+@end example
+@noindent
+and
+@example
+/** @@@} */
+@end example
 
 @item option-format
 @vindex option-format
@@ -3826,21 +3882,6 @@ doc-section = @{
 	_EOText_;
 @};
 @end example
-
-@item prog-man-descrip
-@itemx prog-info-descrip
-@vindex prog-man-descrip
-@vindex prog-info-descrip
-These attributes are now deprecated.
-Please use a @code{doc-section} stanza with a @code{ds-type}
-attribute set to @code{DESCRIPTION} instead.
-
-@item detail
-@vindex detail
-This attribute is used to add a very short explanation about what
-a program is used for when the @code{title} attribute is insufficient.
-If there is no @code{doc-section} stanza of type @code{DESCRIPTION}, then
-this text is used for the man page DESCRIPTION section, too.
 
 @item doc-sub
 @vindex doc-sub

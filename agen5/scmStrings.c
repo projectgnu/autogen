@@ -4,6 +4,10 @@
  *
  *  Temporary SCM strings.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  * This file is part of AutoGen.
  * AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -192,7 +196,9 @@ ag_scm2zchars(SCM s, const char * type)
 #endif
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

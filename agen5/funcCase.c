@@ -4,6 +4,10 @@
  *
  *  This module implements the CASE text function.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -1375,7 +1379,9 @@ mUnload_Select(macro_t * mac)
     }
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

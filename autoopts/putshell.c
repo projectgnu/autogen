@@ -6,6 +6,10 @@
  *  structure and print them to standard out in a fashion that
  *  will allow them to be interpreted by the Bourne or Korn shells.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -324,9 +328,9 @@ print_membership(tOptions * pOpts, tOptDesc * pOD)
 static void
 print_stacked_arg(tOptions * pOpts, tOptDesc * pOD)
 {
-    tArgList*    pAL = (tArgList*)pOD->optCookie;
-    tCC**        ppz = pAL->apzArgs;
-    int          ct  = pAL->useCt;
+    tArgList*       pAL = (tArgList*)pOD->optCookie;
+    char const **   ppz = pAL->apzArgs;
+    int             ct  = pAL->useCt;
 
     printf(zOptCookieCt, pOpts->pzPROGNAME, pOD->pz_NAME, ct);
 
@@ -502,7 +506,8 @@ optionPutShell(tOptions* pOpts)
     fflush(stdout);
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

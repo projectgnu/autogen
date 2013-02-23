@@ -3,8 +3,11 @@
  *  @file autogen.c
  *
  *  This is the main routine for autogen.
- *
- *  This file is part of AutoGen.
+ *  @addtogroup autogen
+ *  @{
+ */
+
+/*  This file is part of AutoGen.
  *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
  * AutoGen is free software: you can redistribute it and/or modify it
@@ -641,7 +644,9 @@ ao_strdup (char const * str)
         (void)option_load_mode, (void)program_pkgdatadir;
     }
 #endif
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

@@ -1,3 +1,19 @@
+2013-02-23  Bruce Korb  <bkorb@gnu.org>
+
+	* agen5/snarf.tpl: support addtogroup doxygen markup
+	* autoopts/tpl/str2enum.tpl: likewise
+	* autoopts/tpl/options.tpl: likewise
+	* autoopts/tpl/optlib.tlib: likewise
+	* */*opts.def: tag appropriately
+	* autoopts/genshell.def: lgpl the output
+	* autoopts/options_h.tpl: get license information from template header
+	* autoopts/usage-txt.tpl: likewise
+	* compat/compat.h: dual license the file (GPL + mBSD)
+	* autoopts/test/nls.test: disable test when we don't have libintl.
+	* agen5/test/snarf.test: adjust
+	* agen5/test/str2m.test: exit 0 when gperf not installed
+	* autoopts/tpl/str2init.tlib: fail-exit when gperf not installed
+
 2013-02-17  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/tpl/optcode.tlib: correctly locate TRANSLATORS: comment

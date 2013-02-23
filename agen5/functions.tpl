@@ -82,6 +82,8 @@
 )))
 
 (dne "-d" " *  " "/*  ")=]
+ */
+/** \file [= (out-name) =]
  *
  *  Tables of Text Functions for AutoGen
  *
@@ -117,6 +119,9 @@ FOR macfunc =][=
   (define func-name (string-capitalize! (get "name")))
   (chk-mac-func) =][=
 ENDFOR macfunc =]
+ *
+ * @addtogroup autogen
+ * @{
  */
 [= (make-header-guard "autogen") =]
 /**
@@ -366,6 +371,7 @@ static unload_proc_p_t const unload_procs[FUNC_CT] = {
     echo '#define FUNCTION_CKSUM 0x'${1}") =]
 
 #endif /* [= (. header-guard) =] */
+/** @} */
 /* [=(. output-file-name)=] ends here */[=
 
 # functions.tpl ends here =]

@@ -3,6 +3,10 @@
  *
  *  This module implements a file extraction function.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -362,7 +366,9 @@ ag_scm_find_file(SCM file, SCM suffix)
     return res;
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

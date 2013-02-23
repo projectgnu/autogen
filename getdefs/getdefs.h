@@ -1,3 +1,9 @@
+
+/**
+ *  @file getdefs.h
+ *  @group columns
+ *  @{
+ */
 /*  -*- Mode: C -*-
  *
  *    getdefs Copyright (C) 1999-2013 by Bruce Korb - all rights reserved
@@ -110,7 +116,8 @@ pid_t   agPid      = -1;
 #define LOCAL static
 #endif /* GETDEFS_HEADER */
 
-/* emacs
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

@@ -6,6 +6,10 @@
  *  and then makes a fixup pass to point all children definitions to
  *  their parent definition.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -558,7 +562,9 @@ unload_defs(void)
 {
     return;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

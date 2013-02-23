@@ -215,8 +215,8 @@ ENDIF "copyright"               =][=
 #  define NULL 0
 #endif
 
-/*
- *  [= prog-name =] option static const strings
+/**
+ *  static const strings for [= prog-name =] options
  */[=
  (out-resume "home-list")      \=][=
 
@@ -258,11 +258,10 @@ ENDIF  there is a version
 =]
 [= INVOKE emit-option-desc-table =]
 [= (. lib-externs) =]
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  Define the [= prog-name =] Option Environment
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/** Reference to the upper cased version of [= prog-name =]. */
 #define zPROGNAME       ([= (string-table-add-ref opt-strs pname-up)   =])
+/** Reference to the title line for [= prog-name =] usage. */
 #define zUsageTitle     ([=
  (define homerc-ct   0)
  (define homerc-txt "")
@@ -280,17 +279,22 @@ FOR homerc              =][=
   )   )                 =][=
 ENDFOR homerc           =][=
 IF (> homerc-ct 0)     \=]
+/** [= prog-name =] configuration file name. */
 #define zRcName         ([=
  (set! tmp-text (if (exist? "rcfile") (get "rcfile")
        (string-append "." pname-down "rc") ))
  (string-table-add-ref opt-strs tmp-text) =])
+/** Directories to search for [= prog-name =] config files. */
 static char const * const apzHomeList[=
   (sprintf "[%u] = {%s\n    NULL };" (+ 1 homerc-ct) homerc-txt) =][=
 
 ELSE                    \=]
+/** There is no [= prog-name =] configuration file. */
 #define zRcName         NULL
+/** There are no directories to search for [= prog-name =] config files. */
 #define apzHomeList     NULL[=
 ENDIF                   =]
+/** The [= prog-name =] program bug email address. */
 #define zBugsAddr       ([=
 (out-push-new)         \=]
 s/@[a-z]*{\([^{@}]*\)}/'\1'/g
@@ -318,6 +322,7 @@ s/^@item *$/\
         (string-table-add-ref opt-strs (get "eaddr"))
         "NULL"
 )   )                   =])
+/** Clarification/explanation of what [= prog-name =] does. */
 #define zExplain        ([=
 
 (if (or (exist? "explain") (== (get "main.main-type") "for-each"))
@@ -343,6 +348,7 @@ one per line; blank and '"
     )
     "NULL"
 )                       =])
+/** Extra detail explaining what [= prog-name =] does. */
 #define zDetail         ([=
 
 (if (exist? "detail")
@@ -354,6 +360,7 @@ one per line; blank and '"
     )
     "NULL"
 )                       =])
+/** The full version string for [= prog-name =]. */
 #define zFullVersion    ([=
 
 (if (exist? "version") (begin
@@ -386,11 +393,13 @@ ESAC   no-xlate             =]
 #ifndef optArgBucket_t
 #define opt_arg_union_t optArgBucket_t
 #endif
+/** Compiled-in initial values for [= prog-name =] options. */
 static opt_arg_union_t const original_[=(. pname-down)=]_defaults[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [= (shell (string-append
       "sed '$s@},@} @' <<\\_EOF_" default-text "\n_EOF_\n")) =]
 };
+/** Compiled-in initial values for [= prog-name =] option cookies. */
 static void * const original_[=(. pname-down)=]_cookies[ [=
 (. UP-prefix) =]OPTION_CT ] = {
 [=
@@ -416,6 +425,7 @@ static void * const original_[=(. pname-down)=]_cookies[ [=
 #ifndef  WITH_PACKAGER
 # define [=(. pname)=]_packager_info NULL
 #else
+/** Packager information for [= prog-name =]. */
 static char const [=(. pname)=]_packager_info[] =
     "Packaged by " WITH_PACKAGER
 
@@ -515,7 +525,7 @@ DEFINE emit-nls-code
 
 =]
 #if ENABLE_NLS
-/*
+/**
  * This code is designed to translate translatable option text for the
  * [= prog-name =] program.  These translations happen upon entry
  * to optionProcess().
@@ -627,6 +637,7 @@ translate_option_strings(void)
 #endif /* ENABLE_NLS */
 
 #ifdef DO_NOT_COMPILE_THIS_CODE_IT_IS_FOR_GETTEXT
+/** I18N function strictly for xgettext.  Do not compile. */
 static void bogus_function(void) {
   /* TRANSLATORS:
 
@@ -647,7 +658,7 @@ static void bogus_function(void) {
 (out-resume "xget") (out-pop #t) \=]
 
 [=(out-push-new)=]
-incdir=[= (if (defined? 'inc-dir) inc-dir "") =]
+incdir=[= (if (defined? 'inc-dir) inc-dir "") ;;' 4emacs =]
 test -d $incdir || incdir=`dirname [=(tpl-file #t)=]`/..
 incdir=`cd $incdir/autoopts >/dev/null && pwd`
 test -f ${incdir}/usage-txt.h && {

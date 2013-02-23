@@ -4,6 +4,10 @@
  *
  *  This module implements the _IF text function.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -503,7 +507,9 @@ ag_scm_set_writable(SCM set)
 
     return SCM_UNDEFINED;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

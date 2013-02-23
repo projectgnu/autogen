@@ -66,6 +66,7 @@ string = { nm = zStdReqArg;       str = "YES"; };
 string = { nm = zStdStrArg;       str = "Str"; };
 string = { nm = zStdTimeArg;      str = "Tim"; };
 string = { nm = zTabHyp;          str = "\t\t\t\t- "; };
+string = { nm = zTabSpace;        str = "\t\t\t\t  "; };
 string = { nm = zTabHypAnd;       str = "\t\t\t\t-- and "; };
 string = { nm = zTabout;          str = "\t\t\t\t%s\n"; };
 string = { nm = zSixSpaces;       str = "      "; };
@@ -80,8 +81,6 @@ string = { nm = zAll;             str = "all"; };
  */
 string = { nm = ARG_BREAK_STR;    str  = " \t\n:="; };
 string = { nm = ARG_BY_NUM_FMT;   str  = "%s_%s_%d="; };
-string = { nm = BULLET_STR;       str  = "\t\t\t\t- "; };
-string = { nm = DEEP_INDENT_STR;  str  = "\t\t\t\t  "; };
 string = { nm = EMPTY_ARG;        str  = "''"; };
 string = { nm = END_OPT_SEL_STR;  str  = "        ;;\n\n"; };
 string = { nm = END_SET_TEXT;     str  = "'\n\n"; };

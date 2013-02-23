@@ -3,6 +3,10 @@
  *
  *  configuration/rc/ini file handling.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -1348,7 +1352,8 @@ parse_value(char * txt, tOptionValue * typ)
     return txt + len;
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

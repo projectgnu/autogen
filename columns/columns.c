@@ -1,7 +1,10 @@
 
+/**
+ *  @file columns.c
+ *  @group columns
+ *  @{
+ */
 /*
- *  \file columns.c
- *
  *  Columns Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *  Columns is free software.
  *  This file is part of AutoGen.
@@ -758,7 +761,8 @@ compProc(const void * p1, const void * p2)
     char const * pz2 = *(char* const*)p2;
     return strcmp(pz1, pz2);
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

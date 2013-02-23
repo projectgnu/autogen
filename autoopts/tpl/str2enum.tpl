@@ -25,14 +25,17 @@
 
 =][=
 
-(emit (dne " *  " "/*  ")) (emit "\n * \n")
-(if (exist? "copyright")
-    (license-description
-        (get "copyright.type" "unknown")
-        (get "package" (shell "basename `pwd`"))
-        " * "
-        (get "copyright.owner" (get "copyright.author" "unknown")) )
-    (license-description "mbsd" "str2enum" " * " "Bruce Korb")
+(emit
+  (dne " *  " "/*  ")
+  "\n *\n"
+  (if (exist? "copyright")
+      (license-description
+          (get "copyright.type" "unknown")
+          (get "package" (shell "basename `pwd`"))
+          " * "
+          (get "copyright.owner" (get "copyright.author" "unknown")) )
+      (license-description "mbsd" "str2enum" " * " "Bruce Korb")
+  )
 )
 
 =][=
@@ -45,7 +48,14 @@ CASE (suffix)                   =][= #
 ;;;
 ;;;=][=
 == h                            =][=
-INVOKE init-header              =]
+INVOKE init-header              =][=
+  IF (exist? "addtogroup")      =]
+/** \file [= (out-name) =]
+ * Header for string to enumeration values and back again.
+ * @addtogroup [= addtogroup =]
+ * @{
+ */[=
+  ENDIF addtogroup              =]
 #include <sys/types.h>
 #ifndef MISSING_INTTYPES_H
 # include <inttypes.h>
@@ -99,7 +109,8 @@ extern char const *
     ENDIF dispatch exists
 
 =]
-[=ENDIF exist/not    "no-code" \=]
+[=ENDIF exist/not    "no-code"  =][=
+(if (exist? "addtogroup") "\n/** @} */") \=]
 #endif /* [=(. header-guard)    =] */[= #
 
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -117,6 +128,13 @@ extern char const *
         (out-move (string-append base-file-name ".c")))
     header-file                 =]"[=#"=][=
   (. extra-c-incl)              =][=
+  IF (exist? "addtogroup")      =]
+/** \file [= (out-name) =]
+ * Code for string to enumeration values and back again.
+ * @addtogroup [= addtogroup =]
+ * @{
+ */
+[=ENDIF addtogroup              =][=
 
   INVOKE run-gperf              =][=
   INVOKE mk-finder              =][=
@@ -132,6 +150,7 @@ extern char const *
 [= ao-text                      =][=
     ENDIF correct type          =][=
   ENDFOR add-on-text            =][=
+(if (exist? "addtogroup") "\n/** @} */") \=][=
 
 ESAC  suffix c/h
 

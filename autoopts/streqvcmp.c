@@ -9,6 +9,10 @@
  *  the characters "-", "_" and "^" all need to be equivalent
  *  (because they are treated so by different development environments).
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -256,7 +260,8 @@ strtransform(char* d, char const* s)
     } while (*(s++) != NUL);
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

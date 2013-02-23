@@ -5,6 +5,10 @@
  *  This module scans the template variable declarations and passes
  *  tokens back to the parser.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -727,7 +731,9 @@ build_here_str(char* scan)
 
     return scan + markLen;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

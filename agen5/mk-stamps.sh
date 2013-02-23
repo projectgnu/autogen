@@ -131,12 +131,13 @@ make_exprini()
     exec 3> expr.cfg
     cat >&3 <<- _EOConfig_
 	defs-to-get gfunc
-	template    snarf
+	template    snarf.tpl
 	srcfile
-	assign      two-phase = yes
-	assign      group     = ag
+	assign      two-phase   = yes
+	assign      group       = ag
+	assign      addtogroup  = "autogen"
 	output      expr.def
-	subblock    exparg    = arg_name,arg_desc,arg_optional,arg_list
+	subblock    exparg      = arg_name,arg_desc,arg_optional,arg_list
 	_EOConfig_
 
     test ${#DEBUG_ENABLED} -gt 0 && \
@@ -174,6 +175,7 @@ make_directive()
 		prefix = dir;
 		type   = '';
 		length = '';
+		addtogroup = 'autogen';
 		add-on-text = { ao-file = enum-header;
 		   ao-text  = "/* #ident, #let and #pragma are ignored */\n"
 		              "#define doDir_let        ignore_directive\n"

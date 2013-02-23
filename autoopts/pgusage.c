@@ -4,6 +4,10 @@
  *
  *   Automated Options Paged Usage module.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This routine will run run-on options through a pager so the
  *  user may examine, print or edit them at their leisure.
  *
@@ -122,7 +126,8 @@ optionPagedUsage(tOptions * opts, tOptDesc * od)
 #endif
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

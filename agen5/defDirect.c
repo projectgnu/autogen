@@ -1,8 +1,13 @@
+
 /**
  * @file defDirect.c
  *
  *  This module processes definition file directives.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -862,7 +867,9 @@ doDir_undef(directive_enum_t id, char const * dir, char * scan_next)
 }
 
 /*+++ End of Directives +++*/
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

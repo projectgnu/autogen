@@ -367,7 +367,7 @@ utxt = { ut-i18n = msg;
  */
 utxt = { ut-i18n = use;
          ut-name = alt_opt;
-         ut-text = "\t\t\t\t- an alternate for %s\n";
+         ut-text = "\t\t\t\t- an alternate for '%s'\n";
 };
 
 utxt = { ut-i18n = use;
@@ -382,7 +382,7 @@ utxt = { ut-i18n = use;
 
 utxt = { ut-i18n = use;
          ut-name = Dis;
-         ut-text = "\t\t\t\t- disabled as --%s\n";
+         ut-text = "\t\t\t\t- disabled as '--%s'\n";
 };
 
 utxt = { ut-i18n = use;
@@ -517,6 +517,11 @@ utxt = { ut-i18n = use;
 };
 
 utxt = { ut-i18n = use;
+         ut-name = ProhibOne;
+         ut-text = "prohibits the option '%s'\n";
+};
+
+utxt = { ut-i18n = use;
          ut-name = Range;
          ut-text = "%s%ld to %ld";
 };
@@ -560,6 +565,11 @@ utxt = { ut-i18n = use;
          ut-name = Reorder;
          ut-text = "Operands and options may be intermixed.  "
             "They will be reordered.\n";
+};
+
+utxt = { ut-i18n = use;
+         ut-name = ReqOne;
+         ut-text = "requires the option '%s'\n";
 };
 
 utxt = { ut-i18n = use;

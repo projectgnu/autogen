@@ -2,6 +2,10 @@
 /**
  * \file time.c
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -132,7 +136,8 @@ optionTimeDate(tOptions * pOpts, tOptDesc * pOD)
     if (pOD->optArg.argInt != BAD_TIME)
         pOD->optArg.argInt += (long)time(NULL);
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

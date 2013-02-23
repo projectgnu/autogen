@@ -1,8 +1,13 @@
+
 /**
  * @file agUtils.c
  *
  * Various utilities for AutoGen.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -552,7 +557,9 @@ skip_expr(char const * pzSrc, size_t len)
     pzSrc = BRK_WHITESPACE_CHARS(pzSrc);
     return (pzSrc > pzEnd) ? pzEnd : pzSrc;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

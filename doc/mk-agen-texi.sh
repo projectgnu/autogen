@@ -204,7 +204,9 @@ build_agdoc() {
   sanity_check
   run_getdefs
 
-  env >&2
+  {
+    sh -c set | sed '/^BASH/d'
+  } >&2
   {
     cat <<- _EOF_
 	timeout     ${timer}
@@ -217,6 +219,7 @@ build_agdoc() {
     ${VERBOSE} && {
       echo 'trace       every'
       echo "trace-out   >>${TMPDIR}/ag.log"
+      export VERBOSE
     }
   } > ${TMPDIR}/ag.ini
 

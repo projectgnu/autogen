@@ -1,6 +1,10 @@
+
 /**
- * \file gdemit.c
- *
+ *  @file gdemit.c
+ *  @addtogroup columns
+ *  @{
+ */
+/*
  *  getdefs Copyright (C) 1999-2013 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
@@ -591,7 +595,8 @@ subblock_str(char ** ppzText, uint_t sepChar, char * pzOut)
     return pzOut;
 }
 
-/* emacs
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

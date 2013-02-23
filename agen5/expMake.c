@@ -4,6 +4,10 @@
  *
  *  This module implements Makefile construction functions.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -418,7 +422,9 @@ ag_scm_makefile_script(SCM text_scm)
     }
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

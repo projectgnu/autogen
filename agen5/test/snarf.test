@@ -96,6 +96,10 @@ ${SED} "${sed_omit_license}" ${testname}.h > ${testname}.h.tst1
 
 echo creating ${testname}.ini.OK1
 cat > ${testname}.ini.OK1 <<'_EOF_'
+/** \file snarf.ini
+ *
+ * Guile Initializations - snarf_grp Global Variables
+ */
 #include "snarf.h"
 typedef SCM (*scm_callback_t)(void);
 void Chosen_init(void);
@@ -112,7 +116,7 @@ static SCM snarf_grp_scm_sym_mumble_check       = SCM_BOOL_F;
                    _Ar, _Ao, _Ax)
 #endif
 
-/*
+/**
  * snarf_grp Initialization procedure.
  */
 void
@@ -138,8 +142,12 @@ cmp ${testname}.ini.tst1 ${testname}.ini.OK1 || \
 
 echo creating ${testname}.h.OK
 cat > ${testname}.h.OK <<_EOF_
+/** \file snarf.h
+ *  Guile Implementation Routines - for the snarf_grp group
+ */
 #ifndef GUILE_PROCS_SNARF_H_GUARD
 #define GUILE_PROCS_SNARF_H_GUARD 1
+
 #if GUILE_VERSION >= 108000
 # include <libguile.h>
 #else
@@ -191,6 +199,10 @@ ${SED} "${sed_omit_license}" ${testname}.h > ${testname}.h.tst2
 
 echo creating ${testname}.ini.OK2
 cat > ${testname}.ini.OK2 <<'_EOF_'
+/** \file snarf.ini
+ *
+ * Guile Initializations - snarf_grp Global Variables
+ */
 #include "snarf.h"
 typedef SCM (*scm_callback_t)(void);
 void Chosen_init(void);
@@ -231,7 +243,7 @@ agrelay_scm_test_to_example_x(SCM scm0)
 #endif
 #endif /* DEBUG_ENABLED */
 
-/*
+/**
  * snarf_grp Initialization procedure.
  */
 void

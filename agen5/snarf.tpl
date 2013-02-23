@@ -35,6 +35,7 @@ init       the name of the created initialization routine.  This defaults
            You must specify this for shared libraries.
 init-code  code to put at the start of the init routine
 fini-code  code to put at the end of the init routine
+addtogroup The doxygen group to add definitions to
 
 gfunc      this is a compound definition containing the following definitions
   name     the name of the function.  The Scheme string name will normally be
@@ -98,10 +99,18 @@ way.  If you are extracting them from `getdefs(1AG)' comments, then:
  *  Copyright (C) [=(. date-range)=] Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
+ */
+/** \file [= (define group-name (get "addtogroup" (get "group")))
+             (out-name) =]
+ *  Guile Implementation Routines - for the [= (. group-name) =] group[=
+IF (exist? "addtogroup") =]
  *
- *  Guile Implementation Routines[=% group " - for the %s group" =]
+ * @addtogroup [= addtogroup =]
+ * @{[=
+ENDIF =]
  */
 [=(make-header-guard  "GUILE_PROCS")=]
+
 #if GUILE_VERSION >= 108000
 # include <libguile.h>
 #else
@@ -137,7 +146,7 @@ FOR symbol      =][=
 extern SCM [= (string-append scm-prefix "sym_" (get "name") ";") =][=
   ENDIF         =][=
 ENDFOR symbol   =]
-
+[= (if (exist? "addtogroup") "/** @} */") =]
 #endif /* [=(. header-guard)=] */
 [=
 
@@ -160,9 +169,15 @@ ENDFOR symbol   =]
           (get "name")  )  ) ) ))
 
 (gpl "AutoGen" " *  ")=]
+ */
+/** \file [= (out-name) =]
  *
- *  Guile Initializations - [=% group (string-capitalize! "%s ")
-                            =]Global Variables
+ * Guile Initializations - [=(. group-name)=] Global Variables[=
+IF (exist? "addtogroup") =]
+ *
+ * @addtogroup [= addtogroup =]
+ * @{[=
+ENDIF =]
  */
 #include "[= (. header-file) =]"
 typedef SCM (*scm_callback_t)(void);
@@ -236,8 +251,8 @@ ENDIF debug-enabled exists
                    _Ar, _Ao, _Ax)
 #endif
 [= (if (exist? "debug-enabled") "#endif /* DEBUG_ENABLED */\n") =]
-/*
- * [=group=] Initialization procedure.
+/**
+ * [=(get "addtogroup" (get "group"))=] Initialization procedure.
  */
 void
 [=(. init-proc)=](void)
@@ -275,6 +290,7 @@ void
       (prefix "    " (get "fini-code")) "") =]
 }
 #undef NEW_PROC
+[= (if (exist? "addtogroup") "/** @} */") =]
 /* end of [= (out-name) =] */
 [= #
 

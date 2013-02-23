@@ -32,96 +32,96 @@ omit-test-n-set;
  *  the autoopts interface will also have to be changed.  The result is
  *  incompatible.  The first 8 bits are mutable, tho 7 are used.
  */
-cmd[ 0] = set;
-wht[ 0] = 'Set via the "SET_OPT()" macro';
+cmd[  0] = set;
+what[ 0] = 'Set via the "SET_OPT()" macro';
 
-cmd[ 1] = preset;
-wht[ 1] = 'Set via an RC/INI file';
+cmd[  1] = preset;
+what[ 1] = 'Set via an RC/INI file';
 
-cmd[ 2] = defined;
-wht[ 2] = 'Set via a command line option';
+cmd[  2] = defined;
+what[ 2] = 'Set via a command line option';
 
-cmd[ 3] = reset;
-wht[ 3] = 'Reset via command line option';
+cmd[  3] = reset;
+what[ 3] = 'Reset via command line option';
 
 
-cmd[ 4] = equivalence;
-wht[ 4] = 'selected by equiv\'ed option';
+cmd[  4] = equivalence;
+what[ 4] = 'selected by equiv\'ed option';
 
-cmd[ 5] = disabled;
-wht[ 5] = 'option is in disabled state';
+cmd[  5] = disabled;
+what[ 5] = 'option is in disabled state';
 
-cmd[ 6] = alloc-arg;
-wht[ 6] = 'pzOptArg was allocated';
+cmd[  6] = alloc-arg;
+what[ 6] = 'pzOptArg was allocated';
 
 
 /*
  * The rem must not change
  */
-cmd[ 8] = no-init;
-wht[ 8] = 'option cannot be preset';
+cmd[  8] = no-init;
+what[ 8] = 'option cannot be preset';
 
-cmd[ 9] = number-opt;
-wht[ 9] = 'opt value (flag) is any digit';
+cmd[  9] = number-opt;
+what[ 9] = 'opt value (flag) is any digit';
 
-cmd[10] = stacked;
-wht[10] = 'opt uses optionStackArg proc';
+cmd[ 10] = stacked;
+what[10] = 'opt uses optionStackArg proc';
 
-cmd[11] = initenabled;
-wht[11] = 'option defaults to enabled';
+cmd[ 11] = initenabled;
+what[11] = 'option defaults to enabled';
 
 add-on-text = { ao-file = mask-header;
     ao-text = '#define OPTST_ARG_TYPE_SHIFT 12'; };
-cmd[12] = arg-type-1;
-wht[12] = 'bit 1 of arg type enum';
+cmd[ 12] = arg-type-1;
+what[12] = 'bit 1 of arg type enum';
 
-cmd[13] = arg-type-2;
-wht[13] = 'bit 2 of arg type enum';
+cmd[ 13] = arg-type-2;
+what[13] = 'bit 2 of arg type enum';
 
-cmd[14] = arg-type-3;
-wht[14] = 'bit 3 of arg type enum';
+cmd[ 14] = arg-type-3;
+what[14] = 'bit 3 of arg type enum';
 
-cmd[15] = arg-type-4;
-wht[15] = 'bit 4 of arg type enum';
-
-
-cmd[16] = arg-optional;
-wht[16] = 'the option arg not required';
-
-cmd[17] = imm;
-wht[17] = 'process opt on first pass';
-
-cmd[18] = disable-imm;
-wht[18] = 'process disablement immed.';
-
-cmd[19] = omitted;
-wht[19] = 'compiled out of program';
+cmd[ 15] = arg-type-4;
+what[15] = 'bit 4 of arg type enum';
 
 
-cmd[20] = must-set;
-wht[20] = 'must be set or pre-set';
+cmd[ 16] = arg-optional;
+what[16] = 'the option arg not required';
 
-cmd[21] = document;
-wht[21] = 'opt is for doc only';
+cmd[ 17] = imm;
+what[17] = 'process opt on first pass';
 
-cmd[22] = twice;
-wht[22] = 'process opt twice - imm + reg';
+cmd[ 18] = disable-imm;
+what[18] = 'process disablement immed.';
 
-cmd[23] = disable-twice;
-wht[23] = 'process disabled option twice';
+cmd[ 19] = omitted;
+what[19] = 'compiled out of program';
 
 
-cmd[24] = scaled-num;
-wht[24] = 'scaled integer value';
+cmd[ 20] = must-set;
+what[20] = 'must be set or pre-set';
 
-cmd[25] = no-command;
-wht[25] = 'disable from cmd line';
+cmd[ 21] = document;
+what[21] = 'opt is for doc only';
 
-cmd[26] = deprecated;
-wht[26] = 'support is being removed';
+cmd[ 22] = twice;
+what[22] = 'process opt twice - imm + reg';
 
-cmd[27] = alias;
-wht[27] = 'alias for other option';
+cmd[ 23] = disable-twice;
+what[23] = 'process disabled option twice';
+
+
+cmd[ 24] = scaled-num;
+what[24] = 'scaled integer value';
+
+cmd[ 25] = no-command;
+what[25] = 'disable from cmd line';
+
+cmd[ 26] = deprecated;
+what[26] = 'support is being removed';
+
+cmd[ 27] = alias;
+what[27] = 'alias for other option';
 
 
 mask = {

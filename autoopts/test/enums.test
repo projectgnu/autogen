@@ -251,13 +251,13 @@ Usage:  ${testname} { -<flag> [<val>] | --<name>[{=| }<val>] }... [ <node> ]
   Flg Arg Option-Name   Req?  Description
    -p KWd print          YES  Print operational info
    -D no  dump-log       opt  Dump the program log
-				- an alternate for print
+				- an alternate for 'print'
    -A no  all-dump       opt  Dump everything we've got
-				- an alternate for print
+				- an alternate for 'print'
    -s Mbr set            opt  set options
-				- an alternate for print
+				- an alternate for 'print'
    -u Str unset          opt  unset debug options
-				- an alternate for print
+				- an alternate for 'print'
    -m Str msg-num        opt  message number
 				- may not be preset
 				- may appear multiple times

@@ -1,10 +1,15 @@
 
 /**
  *  \file load.c
+ *
  *  This file contains the routines that deal with processing text strings
  *  for options, either from a NUL-terminated string passed in or from an
  *  rc/ini file.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -516,7 +521,8 @@ optionLoadLine(tOptions * opts, char const * line)
     loadOptionLine(opts, &st, pz, DIRECTION_PROCESS, OPTION_LOAD_COOKED);
     AGFREE(pz);
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

@@ -5,6 +5,10 @@
  *  This is a special option processing routine that will save the
  *  argument to an option in a FIFO queue.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -129,8 +133,8 @@ optionUnstackArg(tOptions * pOpts, tOptDesc * pOptDesc)
          *  we are keeping a define.
          */
         for (i = 0, dIdx = 0, ct = pAL->useCt; --ct >= 0; i++) {
-            tCC*      pzSrc = pAL->apzArgs[ i ];
-            char*     pzEq  = strchr(pzSrc, '=');
+            const char ** pzSrc = pAL->apzArgs[ i ];
+            char *        pzEq  = strchr(pzSrc, '=');
 
             if (pzEq != NULL)
                 *pzEq = NUL;
@@ -258,7 +262,8 @@ optionStackArg(tOptions * pOpts, tOptDesc * pOD)
         addArgListEntry(&(pOD->optCookie), (void*)pz);
     }
 }
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

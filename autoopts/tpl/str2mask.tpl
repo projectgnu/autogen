@@ -69,6 +69,8 @@ while read -u4 n C
 do
     C=$(echo $C | tr '[a-z]' '[A-Z]')
     v=$(( 1 << n ))
+    desc=${desc_what[$n]}
+    test -z "$desc" || echo "/** ${mask_name} - $desc */"
     printf "$def_fmt" $C $v
     (( all_mask += v ))
 done

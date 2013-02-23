@@ -5,6 +5,10 @@
  *  index values for a list of provided names.  It also documents how
  *  to incorporate that hashing function into a generated C program.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -145,7 +149,9 @@ ag_scm_gperf(SCM name, SCM str)
     return str;
 }
 #endif
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

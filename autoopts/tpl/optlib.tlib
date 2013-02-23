@@ -573,6 +573,14 @@ ENDIF "copyright exists"                =]
  */
 [=
 
+IF (exist? "addtogroup")               \=]
+/** \file [= (out-name)                 =]
+ *  \addtogroup [= addtogroup           =]
+ *  @{
+ */
+[=
+ENDIF                                   =][=
+
 ENDDEF option-copyright
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -765,8 +773,10 @@ DEFINE option-defines             =]
   INVOKE emit-value-defines       =][=
 
   IF (== (get-up-name "equivalence") UP-name) =]
+/** Define the option value [= name =] is equivalenced to */
 #define WHICH_[=(sprintf "%-18s" opt-name)
                  =] ([=(. descriptor)=].optActualValue)
+/** Define the index of the option [= name =] is equivalenced to */
 #define WHICH_[=(. UP-prefix)=]IDX_[=(sprintf "%-14s" UP-name)
      =] ([=(. descriptor)=].optActualIndex)[=
   ENDIF                           =][=
@@ -797,6 +807,7 @@ ENDDEF Option_Defines
 DEFINE   emit-alias-option
 
 =]
+/** Descriptive text for the [= name =] option */
 #define [= (. UP-name) =]_DESC    ([=
     (set! tmp-val (string-append
           "an alias for the '" (get "aliases") "' option"))
@@ -806,13 +817,15 @@ DEFINE   emit-alias-option
         (put-xget "pOptDesc->pzText" tmp-val)  )
     (string-table-add-ref opt-strs tmp-val) =])
 #define [= (. UP-name) =]_NAME    NULL
+/** Unmodified name string for the [= name =] option */
 #define [= (. UP-name) =]_name    ([=
     (string-table-add-ref opt-strs (get "name")) =])
+/** Compiled in flag settings for the [= name =] option */
 #define [=(. UP-name)=]_FLAGS     ([=
     (get-up-name "aliases") =]_FLAGS | OPTST_ALIAS[=
     (if (exist? "deprecated") " | OPTST_DEPRECATED") =])[=
 
-ENDDEF   emit-alias-option
+ENDDEF   emit-alias-option "
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -824,6 +837,7 @@ DEFINE   emit-nondoc-option     =][=
         "${CLexe} -I16 --fill --first='/* TRANSLATORS:' <<\\_EOF_\n"
         (get "translators") "\n_EOF_")
       " */" )  ) =]
+/** Descriptive text for the [= name =] option */
 #define [= (. UP-name) =]_DESC      ([=
   (define tmp-val (get-text "descrip"))
   (if (exist? "deprecated")
@@ -831,6 +845,7 @@ DEFINE   emit-nondoc-option     =][=
   (if xlate-desc-p
       (put-xget "pOptDesc->pzText" tmp-val) )
   (string-table-add-ref opt-strs tmp-val) =])
+/** Upper-cased name for the [= name =] option */
 #define [= (. UP-name) =]_NAME      ([=
     (string-table-add-ref opt-strs UP-name) =])[=
 
@@ -838,6 +853,7 @@ DEFINE   emit-nondoc-option     =][=
   #  THEN we must create the string for the disabled version
   #  =][=
   IF (> (len "disable") 0) =]
+/** disablement name for the [= name =] option */
 #define NOT_[= (. UP-name) =]_name  ([=
     (hash-create-handle! disable-name   flg-name (string-append
         "NOT_" UP-name "_name" ))
@@ -846,8 +862,10 @@ DEFINE   emit-nondoc-option     =][=
     (string-table-add-ref opt-strs
         (string-tr! (string-append (get "disable") "-" flg-name)
                    optname-from optname-to)) =])
+/** disablement prefix for the [= name =] option */
 #define NOT_[= (. UP-name) =]_PFX   ([=
     (string-table-add-ref opt-strs (string-downcase! (get "disable"))) =])
+/** Name string for the [= name =] option */
 #define [= (. UP-name) =]_name      ([=
     (if (> (len "enable") 0)
         (string-table-add-ref opt-strs
@@ -862,6 +880,7 @@ DEFINE   emit-nondoc-option     =][=
     (hash-create-handle! disable-name   flg-name "NULL")
     (hash-create-handle! disable-prefix flg-name "NULL") ""
   =]
+/** Name string for the [= name =] option */
 #define [= (. UP-name) =]_name      ([=
     (string-table-add-ref opt-strs
         (string-tr! (string-append
@@ -869,7 +888,7 @@ DEFINE   emit-nondoc-option     =][=
              (get "name"))
          optname-from optname-to)) =])[=
 
-  ENDIF (> (len "disable") 0) =][=
+  ENDIF (> (len "disable") 0)
 
   #  Check for special attributes:  a default value
   #  and conflicting or required options
@@ -877,6 +896,7 @@ DEFINE   emit-nondoc-option     =][=
   IF (define def-arg-name (sprintf "%-28s "
              (string-append UP-name "_DFT_ARG" )))
      (exist? "arg-default")   =]
+/** The compiled in default value for the [= name =] option argument */
 #define [= (. UP-name) =]_DFT_ARG   ([=
      CASE arg-type            =][=
      =* num                   =](char const*)[= arg-default =][=
@@ -918,6 +938,7 @@ DEFINE   emit-nondoc-option     =][=
 
 
     IF (exist? "flags-must") =]
+/** Other options that are required by the [= name =] option */
 static int const a[=(. cap-name)=]MustList[] = {[=
       FOR flags-must =]
     [= (index-name "flags-must") =],[=
@@ -926,11 +947,13 @@ static int const a[=(. cap-name)=]MustList[] = {[=
 
 
     IF (exist? "flags-cant") =]
+/** Other options that appear in conjunction with the [= name =] option */
 static int const a[=(. cap-name)=]CantList[] = {[=
       FOR flags-cant =]
     [= (index-name "flags-cant") =],[=
       ENDFOR flags-cant =] NO_EQUIVALENT };[=
     ENDIF =]
+/** Compiled in flag settings for the [= name =] option */
 #define [= (. UP-name) =]_FLAGS     ([=
          ? enabled      "OPTST_INITENABLED"
                         "OPTST_DISABLED"       =][=
@@ -995,7 +1018,7 @@ Define the arrays of values associated with an option (strings, etc.) =][=
 DEFINE emit-opt-strs
 
 =]
-/*
+/**
  *  [= (set-flag-names) flg-name =] option description[=
   IF (or (exist? "flags_must") (exist? "flags_cant")) =] with
  *  "Must also have options" and "Incompatible options"[=
@@ -1007,6 +1030,7 @@ DEFINE emit-opt-strs
   ENDIF  ifdef-ed                       =][=
 
   IF (exist? "documentation")           =]
+/** [= name =] option separation text */
 #define [= (. UP-name) =]_DESC      ([=
     (define tmp-val (string-append (get-text "descrip") ":"))
     (if xlate-desc-p
@@ -1038,6 +1062,7 @@ DEFINE emit-opt-strs
 #define [= (. UP-name) =]_NAME      NULL[=
 
     IF (exist? "omitted-usage") =]
+/** Descriptive text for the [= name =] option */
 #define [= (. UP-name) =]_DESC      ([=
     (set! tmp-text (get "omitted-usage"))
     (if (> (string-length tmp-text) 1) (begin

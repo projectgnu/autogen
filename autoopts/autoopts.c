@@ -7,6 +7,10 @@
  *  routines are in separately compiled modules so that they will not
  *  necessarily be linked in.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -42,6 +46,11 @@ static tOptionLoadMode option_load_mode  = OPTION_LOAD_UNCOOKED;
 static tePagerState pagerState           = PAGER_STATE_INITIAL;
 
        FILE *       option_usage_fp      = NULL;
+
+/**
+ * The number of tab characters to skip when printing continuation lines.
+ */
+static unsigned int tab_skip_ct          = 0;
 
 LOCAL void *
 ao_malloc(size_t sz)
@@ -117,19 +126,19 @@ handle_opt(tOptions * opts, tOptState * o_st)
      *  Save a copy of the option procedure pointer.
      *  If this is an equivalence class option, we still want this proc.
      */
-    tOptDesc* pOD = o_st->pOD;
-    tOptProc* pOP = pOD->pOptProc;
-    if (pOD->fOptState & OPTST_ALLOC_ARG)
-        AGFREE(pOD->optArg.argString);
+    tOptDesc *  od = o_st->pOD;
+    tOptProc *  opt_proc = od->pOptProc;
+    if (od->fOptState & OPTST_ALLOC_ARG)
+        AGFREE(od->optArg.argString);
 
-    pOD->optArg.argString = o_st->pzOptArg;
+    od->optArg.argString = o_st->pzOptArg;
 
     /*
      *  IF we are presetting options, then we will ignore any un-presettable
      *  options.  They are the ones either marked as such.
      */
     if (  ((opts->fOptSet & OPTPROC_PRESETTING) != 0)
-       && ((pOD->fOptState & OPTST_NO_INIT) != 0)
+       && ((od->fOptState & OPTST_NO_INIT) != 0)
        )
         return PROBLEM;
 
@@ -137,19 +146,19 @@ handle_opt(tOptions * opts, tOptState * o_st)
      *  IF this is an equivalence class option,
      *  THEN
      *      Save the option value that got us to this option
-     *      entry.  (It may not be pOD->optChar[0], if this is an
+     *      entry.  (It may not be od->optChar[0], if this is an
      *      equivalence entry.)
      *      set the pointer to the equivalence class base
      */
-    if (pOD->optEquivIndex != NO_EQUIVALENT) {
-        tOptDesc* p = opts->pOptDesc + pOD->optEquivIndex;
+    if (od->optEquivIndex != NO_EQUIVALENT) {
+        tOptDesc * eqv_od = opts->pOptDesc + od->optEquivIndex;
 
         /*
          * IF the current option state has not been defined (set on the
          *    command line), THEN we will allow continued resetting of
          *    the value.  Once "defined", then it must not change.
          */
-        if ((pOD->fOptState & OPTST_DEFINED) != 0) {
+        if ((od->fOptState & OPTST_DEFINED) != 0) {
             /*
              *  The equivalenced-to option has been found on the command
              *  line before.  Make sure new occurrences are the same type.
@@ -158,9 +167,9 @@ handle_opt(tOptions * opts, tOptState * o_st)
              *     it was not the same equivalenced-to option,
              *  THEN we have a usage problem.
              */
-            if (p->optActualIndex != pOD->optIndex) {
-                fprintf(stderr, zmultiway_bug, p->pz_Name, pOD->pz_Name,
-                        (opts->pOptDesc + p->optActualIndex)->pz_Name);
+            if (eqv_od->optActualIndex != od->optIndex) {
+                fprintf(stderr, zmultiway_bug, eqv_od->pz_Name, od->pz_Name,
+                        (opts->pOptDesc + eqv_od->optActualIndex)->pz_Name);
                 return FAILURE;
             }
         } else {
@@ -170,46 +179,46 @@ handle_opt(tOptions * opts, tOptState * o_st)
              *  never have been selected before, or else it was selected by
              *  some sort of "presetting" mechanism.
              */
-            p->optActualIndex = NO_EQUIVALENT;
+            eqv_od->optActualIndex = NO_EQUIVALENT;
         }
 
-        if (p->optActualIndex != pOD->optIndex) {
+        if (eqv_od->optActualIndex != od->optIndex) {
             /*
              *  First time through, copy over the state
              *  and add in the equivalence flag
              */
-            p->optActualValue = pOD->optValue;
-            p->optActualIndex = pOD->optIndex;
+            eqv_od->optActualValue = od->optValue;
+            eqv_od->optActualIndex = od->optIndex;
             o_st->flags |= OPTST_EQUIVALENCE;
         }
 
         /*
          *  Copy the most recent option argument.  set membership state
-         *  is kept in ``p->optCookie''.  Do not overwrite.
+         *  is kept in 'eqv_od->optCookie'.  Do not overwrite.
          */
-        p->optArg.argString = pOD->optArg.argString;
-        pOD = p;
+        eqv_od->optArg.argString = od->optArg.argString;
+        od = eqv_od;
 
     } else {
-        pOD->optActualValue = pOD->optValue;
-        pOD->optActualIndex = pOD->optIndex;
+        od->optActualValue = od->optValue;
+        od->optActualIndex = od->optIndex;
     }
 
-    pOD->fOptState &= OPTST_PERSISTENT_MASK;
-    pOD->fOptState |= (o_st->flags & ~OPTST_PERSISTENT_MASK);
+    od->fOptState &= OPTST_PERSISTENT_MASK;
+    od->fOptState |= (o_st->flags & ~OPTST_PERSISTENT_MASK);
 
     /*
      *  Keep track of count only for DEFINED (command line) options.
      *  IF we have too many, build up an error message and bail.
      */
-    if (  (pOD->fOptState & OPTST_DEFINED)
-       && (++pOD->optOccCt > pOD->optMaxCt)  )
-        return too_many_occurrences(opts, pOD);
+    if (  (od->fOptState & OPTST_DEFINED)
+       && (++od->optOccCt > od->optMaxCt)  )
+        return too_many_occurrences(opts, od);
     /*
      *  If provided a procedure to call, call it
      */
-    if (pOP != NULL)
-        (*pOP)(opts, pOD);
+    if (opt_proc != NULL)
+        (*opt_proc)(opts, od);
 
     return SUCCESS;
 }
@@ -393,7 +402,8 @@ optionProcess(tOptions * opts, int a_ct, char ** a_v)
     return (int)opts->curOptIdx;
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

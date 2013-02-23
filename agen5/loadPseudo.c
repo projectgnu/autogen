@@ -5,8 +5,12 @@
  *  Find the start and end macro markers.  In btween we must find the
  *  "autogen" and "template" keywords, followed by any suffix specs.
  *
- *  This module processes the "pseudo" macro
+ *  This module processes the "pseudo" macro.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -490,7 +494,9 @@ load_pseudo_mac(char const * text, char const * fname)
 #   undef BAD_MARKER
     return NULL;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

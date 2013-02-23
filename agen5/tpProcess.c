@@ -4,6 +4,10 @@
  *
  *  Parse and process the template data descriptions
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  * This file is part of AutoGen.
  * AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -414,7 +418,9 @@ open_output(out_spec_t * spec)
     open_output_file(out_file, strlen(out_file), write_mode, 0);
     free((void *)out_file);
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

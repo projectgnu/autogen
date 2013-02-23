@@ -1,6 +1,7 @@
 /* -*- Mode: conf -*- */
 
 autogen definitions options;
+addtogroup = 'autogen';
 
 /*
  *  This file is part of AutoGen.

@@ -5,6 +5,10 @@
  *  This module implements the expression functions that should
  *  be part of Guile.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -509,7 +513,9 @@ ag_scm_string_to_camelcase(SCM str)
 
     return AG_SCM_STR2SCM(res, (size_t)(pzd - res));
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

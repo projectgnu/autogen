@@ -30,7 +30,7 @@ MAKEINFOFLAGS   = -I$(top_srcdir)/autoopts -I../autoopts
 passenv         = MAKE=$(MAKE) srcdir="$(srcdir)" SHELL="$(POSIX_SHELL)" \
 	top_builddir="$(top_builddir)" top_srcdir="$(top_srcdir)"
 
-run_mktexi      = $(passenv) $(POSIX_SHELL) mk-agen-texi.sh
+run_mktexi      = $(passenv) $(POSIX_SHELL) $${dashx} mk-agen-texi.sh
 all : $(INFO_DEPS)
 
 BUILT_SOURCES   = autogen.texi

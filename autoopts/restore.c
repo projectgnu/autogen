@@ -6,6 +6,10 @@
  *  and restore it.  If saved prior to the initial optionProcess call,
  *  then the initial state will be restored.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -208,7 +212,9 @@ optionFree(tOptions* pOpts)
         goto free_saved_state;
     }
 }
-/*
+
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

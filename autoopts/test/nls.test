@@ -28,6 +28,8 @@
 # ----------------------------------------------------------------------
 
 . ./defs
+grep "#define.*HAVE_LIBINTL_H" ${top_builddir}/config.h >/dev/null || \
+    exit 0
 AUTOGEN_TEMPL_DIRS=`cd ${srcdir}/..;pwd`
 export AUTOGEN_TEMPL_DIRS
 

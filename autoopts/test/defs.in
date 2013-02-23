@@ -83,7 +83,7 @@ cfg_vals()
   ) || eval 'local() { : ; }'
 
   vars=`set | ${SED} -n '/^\(LANG\|LC_[A-Z_]*\)=/s/=.*//p'` 2>/dev/null
-  test "X$vars" = X || unset $vars
+  unset AUTOOPTS_USAGE $vars
 }
 
 #  If only the "rm(1)" command could be relied upon....

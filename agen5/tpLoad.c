@@ -4,6 +4,10 @@
  *
  *  This module will load a template and return a template structure.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  * This file is part of AutoGen.
  * Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -549,7 +553,9 @@ cleanup(templ_t * tpl)
     unload_defs();
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

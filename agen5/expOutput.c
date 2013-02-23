@@ -4,6 +4,10 @@
  *
  *  This module implements the output file manipulation function
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -930,7 +934,9 @@ ag_scm_make_header_guard(SCM name)
     return (name);
 }
 
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

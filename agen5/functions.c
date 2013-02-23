@@ -4,6 +4,10 @@
  *
  *  This module implements text functions.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -534,7 +538,9 @@ mLoad_Bogus(templ_t * tpl, macro_t * mac, char const ** p_scan)
     /* NOTREACHED */
     return NULL;
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

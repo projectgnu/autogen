@@ -10,8 +10,7 @@ New in __CURRENT_VERSION__ February 2013
 
 * "for-each" main procedures may now be specified as processing
   standard input as a data file instead of being replacement
-  operands.  Users can always have "stdin" treated as data by using
-  a single hyphen on the command line.
+  operands.
 
 * configuration fixes.
 
@@ -30,6 +29,10 @@ New in __CURRENT_VERSION__ February 2013
   often signaled extremely early, before initialization is complete.
   Cleanup is no longer performed before initialzation is complete.
   "SIGPROF" is exempted from capture.
+
+* Doxyfication: the attribute "addtogroup" is now recognized in
+  the option definitions.  This will cause the emitted code to
+  be surrounded by doxygen "addtogroup"-ing comments.
 
 New in 5.17.1 January, 2013
 

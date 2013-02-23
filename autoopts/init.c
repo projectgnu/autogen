@@ -3,6 +3,10 @@
  *
  *  initialize the libopts data structures.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -283,7 +287,8 @@ ao_initialize(tOptions * opts, int a_ct, char ** a_v)
     return true;
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

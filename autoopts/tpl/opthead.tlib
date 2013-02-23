@@ -21,7 +21,7 @@
 ##  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
 
 =]
-/*
+/**
  *  This file contains the programmatic interface to the Automated
  *  Options generated for the [=prog-name=] program.
  *  These macros are documented in the AutoGen info file in the
@@ -47,7 +47,7 @@
   ) ) )
 
   (not (exist? "library"))          =]
-/*
+/**
  *  Ensure that the library used for compiling this generated header is at
  *  least as new as the version current when the header template was released
  *  (not counting patch version increments).  Also ensure that the oldest
@@ -61,8 +61,8 @@
   Choke Me.
 #endif
 [= ENDIF not a library =]
-/*
- *  Enumeration of each option:
+/**
+ *  Enumeration of each option type for [= prog-name =]
  */
 typedef enum {[=
 FOR flag                                =][=
@@ -91,14 +91,16 @@ ELSE not exists library                 =][=
   )   )                                 =][=
 ENDIF  not exist library                =]
 } te[=(. Cap-prefix)=]OptIndex;
-
+/** count of all options for [= prog-name =] */
 #define [=(. UP-prefix)=]OPTION_CT    [= (. option-ct) =][=
 IF (exist? "version") =]
+/** [= prog-name =] version */
 #define [=(. pname-up)=]_VERSION       [=(c-string (get "version"))=]
+/** Full [= prog-name =] version text */
 #define [=(. pname-up)=]_FULL_VERSION  [=(c-string version-text) =][=
 ENDIF (exist? version) =]
 
-/*
+/**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED
  *  option name (as in the te[=(. Cap-prefix)=]OptIndex enumeration above).
  *  e.g. HAVE_[=(. UP-prefix)=]OPT([= (get-up-name "flag[].name") =])
@@ -107,6 +109,7 @@ ENDIF (exist? version) =]
 IF (exist? "library")
 
 =]
+/** pointer to the library handling procedure. */
 extern tOptDesc * const [= (. lib-opt-ptr) =];[=
 
 ENDIF is a library                    =][=
@@ -140,15 +143,30 @@ ESAC                                  =][=
 IF (> 1 (string-length UP-prefix))
 
 =]
+/** 'true' if an option has been specified in any way */
 #define     HAVE_OPT(n) (! UNUSED_OPT(& DESC(n)))
+/** The string argument to an option. The argument type must be "string". */
 #define      OPT_ARG(n) (DESC(n).optArg.argString)
+/** Mask the option state revealing how an option was specified.
+ *  It will be one and only one of \a OPTST_SET, \a OPTST_PRESET,
+ * \a OPTST_DEFINED, \a OPTST_RESET or zero.
+ */
 #define    STATE_OPT(n) (DESC(n).fOptState & OPTST_SET_MASK)
+/** Count of option's occurrances *on the command line*. */
 #define    COUNT_OPT(n) (DESC(n).optOccCt)
+/** mask of \a OPTST_SET and \a OPTST_DEFINED. */
 #define    ISSEL_OPT(n) (SELECTED_OPT(&DESC(n)))
+/** 'true' if \a HAVE_OPT would yield 'false'. */
 #define ISUNUSED_OPT(n) (UNUSED_OPT(& DESC(n)))
+/** 'true' if OPTST_DISABLED bit not set. */
 #define  ENABLED_OPT(n) (! DISABLED_OPT(& DESC(n)))
+/** number of stacked option arguments.
+ *  Valid only for stacked option arguments. */
 #define  STACKCT_OPT(n) (((tArgList*)(DESC(n).optCookie))->useCt)
+/** stacked argument vector.
+ *  Valid only for stacked option arguments. */
 #define STACKLST_OPT(n) (((tArgList*)(DESC(n).optCookie))->apzArgs)
+/** Reset an option. */
 #define    CLEAR_OPT(n) STMTS( \
                 DESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \
                 if ((DESC(n).fOptState & OPTST_INITENABLED) == 0) \
@@ -158,15 +176,30 @@ IF (> 1 (string-length UP-prefix))
 ELSE we have a prefix:
 
 =][=  (sprintf "
+/** 'true' if an option has been specified in any way */
 #define     HAVE_%1$sOPT(n) (! UNUSED_OPT(& %1$sDESC(n)))
+/** The string argument to an option. The argument type must be \"string\". */
 #define      %1$sOPT_ARG(n) (%1$sDESC(n).optArg.argString)
+/** Mask the option state revealing how an option was specified.
+ *  It will be one and only one of \\a OPTST_SET, \\a OPTST_PRESET,
+ * \\a OPTST_DEFINED, \\a OPTST_RESET or zero.
+ */
 #define    STATE_%1$sOPT(n) (%1$sDESC(n).fOptState & OPTST_SET_MASK)
+/** Count of option's occurrances *on the command line*. */
 #define    COUNT_%1$sOPT(n) (%1$sDESC(n).optOccCt)
+/** mask of \\a OPTST_SET and \\a OPTST_DEFINED. */
 #define    ISSEL_%1$sOPT(n) (SELECTED_OPT(&%1$sDESC(n)))
+/** 'true' if \\a HAVE_OPT would yield 'false'. */
 #define ISUNUSED_%1$sOPT(n) (UNUSED_OPT(& %1$sDESC(n)))
+/** 'true' if OPTST_DISABLED bit not set. */
 #define  ENABLED_%1$sOPT(n) (! DISABLED_OPT(& %1$sDESC(n)))
+/** number of stacked option arguments.
+ *  Valid only for stacked option arguments. */
 #define  STACKCT_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->useCt)
+/** stacked argument vector.
+ *  Valid only for stacked option arguments. */
 #define STACKLST_%1$sOPT(n) (((tArgList*)(%1$sDESC(n).optCookie))->apzArgs)
+/** Reset an option. */
 #define    CLEAR_%1$sOPT(n) STMTS( \\
                 %1$sDESC(n).fOptState &= OPTST_PERSISTENT_MASK;   \\
                 if ((%1$sDESC(n).fOptState & OPTST_INITENABLED) == 0) \\
@@ -177,8 +210,8 @@ ELSE we have a prefix:
 
 ENDIF prefix/not    =]
 
-/* * * * * *
- *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  *  Enumeration of [= prog-name =] exit codes
  */
 typedef enum {[=
@@ -264,8 +297,9 @@ CASE guard-option-names               =][=
 
 
 =* no-warn                            =]
-/*
+/**
  *  Make sure there are no #define name conflicts with the option names
+ * @{
  */[=
     FOR flag                          =]
 #undef [= (get-up-name "name")        =][=
@@ -281,7 +315,8 @@ CASE guard-option-names               =][=
    "\n# endif" ))
 
 =]
-/*
+/** @} */
+/**
  *  Make sure there are no #define name conflicts with the option names
  */
 #ifndef     NO_OPTION_NAME_WARNINGS[=
@@ -301,13 +336,14 @@ CASE guard-option-names               =][=
 ESAC on guard-option-names
 
 =]
-/* * * * * *
- *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  *  Interface defines for specific options.
+ * @{
  */[=
 
 FOR flag =][=
-            (define flag-index (for-index)) =][=
+  (define flag-index (for-index)) =][=
 
   INVOKE save-name-morphs   =][=
 
@@ -319,6 +355,7 @@ FOR flag =][=
    =][=
    IF (hash-ref have-cb-procs flg-name)
 =]
+/** call the handler procedure for setting the [= name =] option. */
 #define SET_[= (string-append OPT-pfx UP-name) =]   STMTS( \
         (*([=(. descriptor)=].pOptProc))(&[=(. pname)=]Options, \
                 [=(. pname)=]Options.pOptDesc + [=(for-index)=])[=
@@ -341,26 +378,6 @@ There are no documentation strings because these defines
 are used identically to the user-generated VALUE defines.
 
 =][=
-
-DEFINE set-std-value =]
-#define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
-  CASE (define tmp-val (get "val-name"))
-       (get tmp-val)        =][=
-   == ""   =][=
-
-     (if (exist? tmp-val)
-         (if (not (exist? "long-opts"))
-             (error (sprintf "'%s' may not be empty" tmp-val))
-             (string-append INDEX-pfx (get "val-UPNAME"))  )
-         (sprintf "'%s'" (get "std-value"))
-     )     =][=
-
-   == "'"  =]'\''[=
-   ~~ .    =]'[=(get tmp-val)=]'[=
-   *       =][= (error (sprintf "option %s has multiple character flag value"
-                    (get "val-name")))  =][=
-   ESAC    =][=
-ENDDEF set-std-value                    =][=
 
 IF (exist? "flag.value")                =][=
 
@@ -429,9 +446,10 @@ IF (exist? "flag.value")                =][=
 ELSE  NO "flag.value"                   =]
 [=
 (set! index-fmt (string-append
+      "\n/** option value for %2$s option */"
       "\n#define " VALUE-pfx "%1$-16s " INDEX-pfx "%1$s"))
 (define std-vals (lambda (std-nm)
-                  (ag-fprintf 0 index-fmt std-nm) ))
+        (ag-fprintf 0 index-fmt std-nm (string-downcase std-nm)) ))
 
 (if (exist? "resettable")       (std-vals "RESET_OPTION"))
 (if (exist? "version")          (std-vals "VERSION"))
@@ -455,7 +473,29 @@ IF (and (exist? "homerc") (not (exist? "disable-save")))
         [=(. UP-prefix)=]DESC(SAVE_OPTS).fOptState |= OPTST_SET; \
         [=(. UP-prefix)=]DESC(SAVE_OPTS).optArg.argString = (char const*)(a))[=
 ENDIF
+
 =][=
+
+DEFINE set-std-value =]
+/** option flag (value) for " (get "val-name") " option */
+#define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
+  CASE (define tmp-val (get "val-name"))
+       (get tmp-val)        =][=
+   == ""   =][=
+
+     (if (exist? tmp-val)
+         (if (not (exist? "long-opts"))
+             (error (sprintf "'%s' may not be empty" tmp-val))
+             (string-append INDEX-pfx (get "val-UPNAME"))  )
+         (sprintf "'%s'" (get "std-value"))
+     )     =][=
+
+   == "'"  =]'\''[=
+   ~~ .    =]'[=(get tmp-val)=]'[=
+   *       =][= (error (sprintf "option %s has multiple character flag value"
+                    (get "val-name")))  =][=
+   ESAC    =][=
+ENDDEF set-std-value                    =][=
 
 IF (not (exist? "library"))
 

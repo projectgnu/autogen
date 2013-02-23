@@ -5,6 +5,10 @@
  *  Do all the initialization stuff.  For daemon mode, only
  *  children will return.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
  *
@@ -730,7 +734,9 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
     /* We are a daemon now */
 }
 #endif /* DAEMON_ENABLED */
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

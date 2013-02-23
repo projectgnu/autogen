@@ -4,6 +4,10 @@
  *
  *  This module implements formatting expression functions.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -918,7 +922,9 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         return AG_SCM_STR2SCM(pzSaveRes, (size_t)((pzOut - pzSaveRes) - 1));
     }
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

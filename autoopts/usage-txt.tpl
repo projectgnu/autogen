@@ -2,7 +2,7 @@
 
   h
 
-(define time-stamp "2013-01-24 13:48:26")
+(define time-stamp "2013-02-21 12:11:23")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -29,8 +29,11 @@
 (make-tmp-dir)
 (define ref-list "")
 (define cch-ct   0)
-(dne " *  " "/** ") =]
- *  @file [= (out-name) =]
+(dne " * " "/* ") =]
+ *
+[= (shell "sed -n 's/^##/ */p' " (tpl-file #t)) =]
+ */
+/** @file [= (out-name) =]
  *
  *  This file handles all the bookkeeping required for tracking all the little
  *  tiny strings used by the AutoOpts library.  There are [= (count "utxt") =]
@@ -38,9 +41,6 @@
  *  library and accessed by client code only in a very well-controlled way:
  *  they may substitute translated strings using a procedure that steps through
  *  all the string pointers.
- *
-[= (license-full "lgpl" "AutoOpts" " *  " "Bruce Korb" (shell "date +1992-%Y"))
- =]
  */
 [=
 (make-header-guard "autoopts")

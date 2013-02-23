@@ -2,6 +2,12 @@
 /**
  * \file nested.c
  *
+ *  Handle options with arguments that contain nested values.
+ *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *   Automated Options Nested Values module.
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
@@ -905,7 +911,8 @@ emit_special_char(FILE * fp, int ch)
     fprintf(fp, XML_HEX_BYTE_FMT, (ch & 0xFF));
 }
 
-/*
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

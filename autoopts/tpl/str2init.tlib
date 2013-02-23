@@ -74,6 +74,7 @@
 
 (make-tmp-dir)
 (out-push-new (string-append tmp-dir "/commands"))
+(define finish-commands "chmod a+w ${tmp_dir}/commands")
 
 =][=
 
@@ -87,12 +88,18 @@
 
 =][= # END-BUILDTREE-ISMS
 
-  (shell "CLexe=${AGexe%/autogen}/columns")
+  (shell
+    "gperf=`command -v gperf` 2>/dev/null\n"
+    "test -x \"$gperf\" || die 'gperf not installed'\n"
+    "CLexe=${AGexe%/autogen}/columns")
 
 # END-INSTALL-ONLY-CODE =][=
 
 FOR cmd                 =][=
-
+  (set! tmp-str (sprintf "what[%d]" (for-index)))
+  (if (exist? tmp-str)
+      (set! finish-commands (string-append finish-commands
+            "\ndesc_" tmp-str "=" (raw-shell-str (get tmp-str)) )) )
   (set! tmp-str (string-downcase! (string->c-name! (get "cmd"))))
   (if (= tmp-str invalid-name)
       (error (string-append "You cannot specify a cmd of " invalid-name)) )
@@ -104,7 +111,7 @@ FOR cmd                 =][=
 ENDFOR cmd              =][=
 
 (out-pop)
-(shell "chmod a+w ${tmp_dir}/commands")
+(shell finish-commands)
 (if (< max-cmd-width 8) (set! max-cmd-width 8))
 
                         =][=

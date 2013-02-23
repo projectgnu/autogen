@@ -91,11 +91,11 @@ Usage:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -s Num second         The second option descrip
       opt alpha          alpha opt
       Num beta           beta opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
       T/F gamma          gamma opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
       opt omega          omega opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
    -? no  help           display extended usage information and exit
    -! no  more-help      extended usage information passed thru pager
 
@@ -175,16 +175,16 @@ Usage:  equiv [ -<flag> [<val>] | --<name>[{=| }<val>] ]...
    -s Num second         The second option descrip
       opt alpha          alpha opt
       Num beta           beta opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
       T/F gamma          gamma opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
       opt omega          omega opt
-				- an alternate for alpha
+				- an alternate for 'alpha'
    -? no  help           display extended usage information and exit
    -! no  more-help      extended usage information passed thru pager
    -> opt save-opts      save the option state to a config file
    -< Str load-opts      load options from a config file
-				- disabled as --no-load-opts
+				- disabled as '--no-load-opts'
 				- may appear multiple times
 
 Options are specified by doubled hyphens and their name or by a single

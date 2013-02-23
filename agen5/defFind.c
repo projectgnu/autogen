@@ -1,8 +1,13 @@
+
 /**
  * @file defFind.c
  *
  *  This module locates definitions.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -933,7 +938,9 @@ find_def_ent_list(char * name)
 {
     return get_def_list(name, &curr_def_ctx);
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

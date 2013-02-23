@@ -8,6 +8,10 @@
  *  against the fault so an error message can be emitted instead of
  *  a core dump :-)
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -334,7 +338,9 @@ ag_scm_format_arg_count(SCM fmt)
 
     return AG_SCM_INT2SCM(ct);
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

@@ -5,6 +5,10 @@
  *  This module implements expression functions that
  *  query and get state information from AutoGen data.
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -816,7 +820,9 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
 
     return AG_SCM_STR02SCM(buf);
 }
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

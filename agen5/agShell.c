@@ -1,8 +1,13 @@
+
 /**
  * @file agShell.c
  *
  *  Manage a server shell process
  *
+ * @addtogroup autogen
+ * @{
+ */
+/*
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -702,7 +707,9 @@ shell_cmd(char const * cmd)
 }
 
 #endif /* ! SHELL_ENABLED */
-/*
+/**
+ * @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

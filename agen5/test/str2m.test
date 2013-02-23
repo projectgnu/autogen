@@ -24,6 +24,11 @@
 # ----------------------------------------------------------------------
 
 . ./defs
+gperf=`command -v gperf`
+test -x "$gperf" || {
+    echo "$0 - cannot run without gperf installed" >&2
+    exit 0
+}
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 

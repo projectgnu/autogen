@@ -5,6 +5,10 @@
  *  This module implements the default usage procedure for
  *  Automated Options.  It may be overridden, of course.
  *
+ * @addtogroup autoopts
+ * @{
+ */
+/*
  *  Sort options:
     --start=END-[S]TATIC-FORWARD --patt='^/\*($|[^:])' \
     --out=xx.c key='^[a-zA-Z0-9_]+\(' --trail='^/\*:' \
@@ -83,18 +87,17 @@ static void
 print_one_paragraph(char const * text, bool plain, FILE * fp);
 
 static void
-prt_conflicts(tOptions * opts, tOptDesc * pOD);
+prt_conflicts(tOptions * opts, tOptDesc * od);
 
 static void
-prt_one_vendor(tOptions * opts, tOptDesc * pOD,
-               arg_types_t * pAT, char const * usefmt);
+prt_one_vendor(tOptions *    opts,  tOptDesc *   od,
+               arg_types_t * argtp, char const * usefmt);
 
 static void
-prt_vendor_opts(tOptions * opts, char const * pOptTitle);
+prt_vendor_opts(tOptions * opts, char const * title);
 
 static void
-prt_extd_usage(tOptions * opts, tOptDesc * pOD,
-               char const * pOptTitle);
+prt_extd_usage(tOptions * opts, tOptDesc * od, char const * title);
 
 static void
 prt_ini_list(char const * const * papz, bool * need_intro,
@@ -375,17 +378,18 @@ print_usage_details(tOptions * opts, int exit_code)
 {
     {
         char const * pOptTitle = NULL;
+        int flen;
 
         /*
          *  Determine which header and which option formatting strings to use
          */
         if (do_gnu_usage(opts)) {
-            int flen = setGnuOptFmts(opts, &pOptTitle);
+            flen = setGnuOptFmts(opts, &pOptTitle);
             sprintf(line_fmt_buf, zFmtFmt, flen);
             fputc(NL, option_usage_fp);
         }
         else {
-            int flen = setStdOptFmts(opts, &pOptTitle);
+            flen = setStdOptFmts(opts, &pOptTitle);
             sprintf(line_fmt_buf, zFmtFmt, flen);
 
             /*
@@ -399,6 +403,9 @@ print_usage_details(tOptions * opts, int exit_code)
                 fputs(pOptTitle, option_usage_fp);
         }
 
+        flen = 4 - ((flen + 15) / 8);
+        if (flen > 0)
+            tab_skip_ct = flen;
         prt_opt_usage(opts, exit_code, pOptTitle);
     }
 
@@ -649,61 +656,73 @@ optionUsage(tOptions * opts, int usage_exit_code)
  * print option conflicts.
  *
  * @param opts the program option descriptor
- * @param pOD      the option descriptor
- * @param pAT      names of the option argument types
+ * @param od   the option descriptor
  */
 static void
-prt_conflicts(tOptions * opts, tOptDesc * pOD)
+prt_conflicts(tOptions * opts, tOptDesc * od)
 {
-
-    fputs(zTabHyp, option_usage_fp);
+    const int * opt_no;
+    fputs(zTabHyp + tab_skip_ct, option_usage_fp);
 
     /*
      *  REQUIRED:
      */
-    if (pOD->pOptMust != NULL) {
-        const int * opt_no = pOD->pOptMust;
+    if (od->pOptMust != NULL) {
+        opt_no = od->pOptMust;
 
-        fputs(zReqThese, option_usage_fp);
-        for (;;) {
-            fprintf(option_usage_fp, zTabout,
+        if (opt_no[1] == NO_EQUIVALENT) {
+            fprintf(option_usage_fp, zReqOne,
                     opts->pOptDesc[*opt_no].pz_Name);
-            if (*++opt_no == NO_EQUIVALENT)
-                break;
+        } else {
+            fputs(zReqThese, option_usage_fp);
+            for (;;) {
+                fprintf(option_usage_fp, zTabout + tab_skip_ct,
+                        opts->pOptDesc[*opt_no].pz_Name);
+                if (*++opt_no == NO_EQUIVALENT)
+                    break;
+            }
         }
 
-        if (pOD->pOptCant != NULL)
-            fputs(zTabHypAnd, option_usage_fp);
+        if (od->pOptCant != NULL)
+            fputs(zTabHypAnd + tab_skip_ct, option_usage_fp);
     }
 
     /*
      *  CONFLICTS:
      */
-    if (pOD->pOptCant != NULL) {
-        const int * opt_no = pOD->pOptCant;
+    if (od->pOptCant == NULL)
+        return;
 
-        fputs(zProhib, option_usage_fp);
-        for (;;) {
-            fprintf(option_usage_fp, zTabout,
-                    opts->pOptDesc[*opt_no].pz_Name);
-            if (*++opt_no == NO_EQUIVALENT)
-                break;
-        }
+    opt_no = od->pOptCant;
+
+    if (opt_no[1] == NO_EQUIVALENT) {
+        fprintf(option_usage_fp, zProhibOne,
+                opts->pOptDesc[*opt_no].pz_Name);
+        return;
+    }
+
+    fputs(zProhib, option_usage_fp);
+    for (;;) {
+        fprintf(option_usage_fp, zTabout + tab_skip_ct,
+                opts->pOptDesc[*opt_no].pz_Name);
+        if (*++opt_no == NO_EQUIVALENT)
+            break;
     }
 }
 
 /**
  *  Print the usage information for a single vendor option.
  *
- * @param pOpts     the program option descriptor
- * @param pOD       the option descriptor
- * @param pAT       names of the option argument types
+ * @param[in] opts    the program option descriptor
+ * @param[in] od      the option descriptor
+ * @param[in] argtp   names of the option argument types
+ * @param[in] usefmt  format for primary usage line
  */
 static void
-prt_one_vendor(tOptions * opts, tOptDesc * pOD,
-               arg_types_t * pAT, char const * usefmt)
+prt_one_vendor(tOptions *    opts,  tOptDesc *   od,
+               arg_types_t * argtp, char const * usefmt)
 {
-    prt_preamble(opts, pOD, pAT);
+    prt_preamble(opts, od, argtp);
 
     {
         char z[ 80 ];
@@ -714,40 +733,40 @@ prt_one_vendor(tOptions * opts, tOptDesc * pOD,
          *  when the option argument is required, base the type string on the
          *  argument type.
          */
-        if (pOD->fOptState & OPTST_ARG_OPTIONAL) {
-            pzArgType = pAT->pzOpt;
+        if (od->fOptState & OPTST_ARG_OPTIONAL) {
+            pzArgType = argtp->pzOpt;
 
-        } else switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
-        case OPARG_TYPE_NONE:        pzArgType = pAT->pzNo;   break;
-        case OPARG_TYPE_ENUMERATION: pzArgType = pAT->pzKey;  break;
-        case OPARG_TYPE_FILE:        pzArgType = pAT->pzFile; break;
-        case OPARG_TYPE_MEMBERSHIP:  pzArgType = pAT->pzKeyL; break;
-        case OPARG_TYPE_BOOLEAN:     pzArgType = pAT->pzBool; break;
-        case OPARG_TYPE_NUMERIC:     pzArgType = pAT->pzNum;  break;
-        case OPARG_TYPE_HIERARCHY:   pzArgType = pAT->pzNest; break;
-        case OPARG_TYPE_STRING:      pzArgType = pAT->pzStr;  break;
-        case OPARG_TYPE_TIME:        pzArgType = pAT->pzTime; break;
+        } else switch (OPTST_GET_ARGTYPE(od->fOptState)) {
+        case OPARG_TYPE_NONE:        pzArgType = argtp->pzNo;   break;
+        case OPARG_TYPE_ENUMERATION: pzArgType = argtp->pzKey;  break;
+        case OPARG_TYPE_FILE:        pzArgType = argtp->pzFile; break;
+        case OPARG_TYPE_MEMBERSHIP:  pzArgType = argtp->pzKeyL; break;
+        case OPARG_TYPE_BOOLEAN:     pzArgType = argtp->pzBool; break;
+        case OPARG_TYPE_NUMERIC:     pzArgType = argtp->pzNum;  break;
+        case OPARG_TYPE_HIERARCHY:   pzArgType = argtp->pzNest; break;
+        case OPARG_TYPE_STRING:      pzArgType = argtp->pzStr;  break;
+        case OPARG_TYPE_TIME:        pzArgType = argtp->pzTime; break;
         default:                     goto bogus_desc;
         }
 
         pzArgType = SPN_WHITESPACE_CHARS(pzArgType);
         if (*pzArgType == NUL)
-            snprintf(z, sizeof(z), "%s", pOD->pz_Name);
+            snprintf(z, sizeof(z), "%s", od->pz_Name);
         else
-            snprintf(z, sizeof(z), "%s=%s", pOD->pz_Name, pzArgType);
-        fprintf(option_usage_fp, usefmt, z, pOD->pzText);
+            snprintf(z, sizeof(z), "%s=%s", od->pz_Name, pzArgType);
+        fprintf(option_usage_fp, usefmt, z, od->pzText);
 
-        switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+        switch (OPTST_GET_ARGTYPE(od->fOptState)) {
         case OPARG_TYPE_ENUMERATION:
         case OPARG_TYPE_MEMBERSHIP:
-            displayEnum = (pOD->pOptProc != NULL) ? true : displayEnum;
+            displayEnum = (od->pOptProc != NULL) ? true : displayEnum;
         }
     }
 
     return;
 
  bogus_desc:
-    fprintf(stderr, zbad_od, opts->pzProgName, pOD->pz_Name);
+    fprintf(stderr, zbad_od, opts->pzProgName, od->pz_Name);
     ao_bug(zbad_arg_type_msg);
 }
 
@@ -756,10 +775,10 @@ prt_one_vendor(tOptions * opts, tOptDesc * pOD,
  * ones that do *not* have flag characters.
  *
  * @param opts  the program option descriptor
- * @param pOD   the option descriptor
+ * @param title the title for the options
  */
 static void
-prt_vendor_opts(tOptions * opts, char const * pOptTitle)
+prt_vendor_opts(tOptions * opts, char const * title)
 {
     static unsigned int const not_vended_mask =
         OPTST_NO_USAGE_MASK | OPTST_DOCUMENT;
@@ -772,50 +791,56 @@ prt_vendor_opts(tOptions * opts, char const * pOptTitle)
      *  "presetOptCt", so we won't loop/recurse indefinitely.
      */
     int          ct     = opts->presetOptCt;
-    tOptDesc *   pOD    = opts->pOptDesc;
-    size_t       nmlen  = 0;
+    tOptDesc *   od     = opts->pOptDesc;
+    fprintf(option_usage_fp, zTabout + tab_skip_ct, zVendOptsAre);
 
-    fprintf(option_usage_fp, zTabout, zVendOptsAre);
+    {
+        size_t   nmlen  = 0;
+        do  {
+            size_t l;
+            if (  ((od->fOptState & not_vended_mask) != 0)
+               || IS_GRAPHIC_CHAR(od->optValue))
+                continue;
+
+            l = strlen(od->pz_Name);
+            if (l > nmlen)  nmlen = l;
+        } while (od++, (--ct > 0));
+
+        snprintf(vfmt, sizeof(vfmt), vfmtfmt, (unsigned int)nmlen + 4);
+    }
+
+    if (tab_skip_ct > 0)
+        tab_skip_ct--;
+
+    ct    = opts->presetOptCt;
+    od    = opts->pOptDesc;
 
     do  {
-        size_t l;
-        if (  ((pOD->fOptState & not_vended_mask) != 0)
-           || IS_GRAPHIC_CHAR(pOD->optValue))
+        if (  ((od->fOptState & not_vended_mask) != 0)
+           || IS_GRAPHIC_CHAR(od->optValue))
             continue;
 
-        l = strlen(pOD->pz_Name);
-        if (l > nmlen)  nmlen = l;
-    } while (pOD++, (--ct > 0));
+        prt_one_vendor(opts, od, &argTypes, vfmt);
+        prt_extd_usage(opts, od, title);
 
-    sprintf(vfmt, vfmtfmt, (unsigned int)nmlen + 4);
-    ct     = opts->presetOptCt;
-    pOD    = opts->pOptDesc;
+    } while (od++, (--ct > 0));
 
-    do  {
-        if (  ((pOD->fOptState & not_vended_mask) != 0)
-           || IS_GRAPHIC_CHAR(pOD->optValue))
-            continue;
-
-        prt_one_vendor(opts, pOD, &argTypes, vfmt);
-        prt_extd_usage(opts, pOD, pOptTitle);
-
-    } while (pOD++, (--ct > 0));
+    /* no need to restore "tab_skip_ct" - options are done now */
 }
 
 /**
  * Print extended usage.  Usage/help was requested.
  *
  * @param opts  the program option descriptor
- * @param pOD   the option descriptor
- * @param pAT   names of the option argument types
+ * @param od   the option descriptor
+ * @param title the title for the options
  */
 static void
-prt_extd_usage(tOptions * opts, tOptDesc * pOD,
-               char const * pOptTitle)
+prt_extd_usage(tOptions * opts, tOptDesc * od, char const * title)
 {
     if (  ((opts->fOptSet & OPTPROC_VENDOR_OPT) != 0)
-       && (pOD->optActualValue == VENDOR_OPTION_VALUE)) {
-        prt_vendor_opts(opts, pOptTitle);
+       && (od->optActualValue == VENDOR_OPTION_VALUE)) {
+        prt_vendor_opts(opts, title);
         return;
     }
 
@@ -823,34 +848,33 @@ prt_extd_usage(tOptions * opts, tOptDesc * pOD,
      *  IF there are option conflicts or dependencies,
      *  THEN print them here.
      */
-    if (  (pOD->pOptMust != NULL)
-       || (pOD->pOptCant != NULL) )
-        prt_conflicts(opts, pOD);
+    if ((od->pOptMust != NULL) || (od->pOptCant != NULL))
+        prt_conflicts(opts, od);
 
     /*
      *  IF there is a disablement string
      *  THEN print the disablement info
      */
-    if (pOD->pz_DisableName != NULL )
-        fprintf(option_usage_fp, zDis, pOD->pz_DisableName);
+    if (od->pz_DisableName != NULL )
+        fprintf(option_usage_fp, zDis + tab_skip_ct, od->pz_DisableName);
 
     /*
      *  Check for argument types that have callbacks with magical properties
      */
-    switch (OPTST_GET_ARGTYPE(pOD->fOptState)) {
+    switch (OPTST_GET_ARGTYPE(od->fOptState)) {
     case OPARG_TYPE_NUMERIC:
         /*
          *  IF the numeric option has a special callback,
          *  THEN call it, requesting the range or other special info
          */
-        if (  (pOD->pOptProc != NULL)
-           && (pOD->pOptProc != optionNumericVal) ) {
-            (*(pOD->pOptProc))(OPTPROC_EMIT_USAGE, pOD);
+        if (  (od->pOptProc != NULL)
+           && (od->pOptProc != optionNumericVal) ) {
+            (*(od->pOptProc))(OPTPROC_EMIT_USAGE, od);
         }
         break;
 
     case OPARG_TYPE_FILE:
-        (*(pOD->pOptProc))(OPTPROC_EMIT_USAGE, pOD);
+        (*(od->pOptProc))(OPTPROC_EMIT_USAGE, od);
         break;
     }
 
@@ -858,18 +882,18 @@ prt_extd_usage(tOptions * opts, tOptDesc * pOD,
      *  IF the option defaults to being enabled,
      *  THEN print that out
      */
-    if (pOD->fOptState & OPTST_INITENABLED)
-        fputs(zEnab, option_usage_fp);
+    if (od->fOptState & OPTST_INITENABLED)
+        fputs(zEnab + tab_skip_ct, option_usage_fp);
 
     /*
      *  IF  the option is in an equivalence class
      *        AND not the designated lead
      *  THEN print equivalence and leave it at that.
      */
-    if (  (pOD->optEquivIndex != NO_EQUIVALENT)
-       && (pOD->optEquivIndex != pOD->optActualIndex )  )  {
-        fprintf(option_usage_fp, zalt_opt,
-                 opts->pOptDesc[ pOD->optEquivIndex ].pz_Name);
+    if (  (od->optEquivIndex != NO_EQUIVALENT)
+       && (od->optEquivIndex != od->optActualIndex )  )  {
+        fprintf(option_usage_fp, zalt_opt + tab_skip_ct,
+                 opts->pOptDesc[ od->optEquivIndex ].pz_Name);
         return;
     }
 
@@ -879,32 +903,33 @@ prt_extd_usage(tOptions * opts, tOptDesc * pOD,
      *    AND it is not an auto-managed option (e.g. --help, et al.)
      *  THEN advise that this option may not be preset.
      */
-    if (  ((pOD->fOptState & OPTST_NO_INIT) != 0)
+    if (  ((od->fOptState & OPTST_NO_INIT) != 0)
        && (  (opts->papzHomeList != NULL)
           || (opts->pzPROGNAME != NULL)
           )
-       && (pOD->optIndex < opts->presetOptCt)
+       && (od->optIndex < opts->presetOptCt)
        )
 
-        fputs(zNoPreset, option_usage_fp);
+        fputs(zNoPreset + tab_skip_ct, option_usage_fp);
 
     /*
      *  Print the appearance requirements.
      */
-    if (OPTST_GET_ARGTYPE(pOD->fOptState) == OPARG_TYPE_MEMBERSHIP)
-        fputs(zMembers, option_usage_fp);
+    if (OPTST_GET_ARGTYPE(od->fOptState) == OPARG_TYPE_MEMBERSHIP)
+        fputs(zMembers + tab_skip_ct, option_usage_fp);
 
-    else switch (pOD->optMinCt) {
+    else switch (od->optMinCt) {
     case 1:
     case 0:
-        switch (pOD->optMaxCt) {
-        case 0:       fputs(zPreset, option_usage_fp); break;
-        case NOLIMIT: fputs(zNoLim, option_usage_fp);  break;
+        switch (od->optMaxCt) {
+        case 0:       fputs(zPreset + tab_skip_ct, option_usage_fp); break;
+        case NOLIMIT: fputs(zNoLim  + tab_skip_ct, option_usage_fp); break;
         case 1:       break;
             /*
              * IF the max is more than one but limited, print "UP TO" message
              */
-        default:      fprintf(option_usage_fp, zUpTo, pOD->optMaxCt);  break;
+        default:
+            fprintf(option_usage_fp, zUpTo + tab_skip_ct, od->optMaxCt); break;
         }
         break;
 
@@ -912,12 +937,13 @@ prt_extd_usage(tOptions * opts, tOptDesc * pOD,
         /*
          *  More than one is required.  Print the range.
          */
-        fprintf(option_usage_fp, zMust, pOD->optMinCt, pOD->optMaxCt);
+        fprintf(option_usage_fp, zMust + tab_skip_ct,
+                od->optMinCt, od->optMaxCt);
     }
 
     if (  NAMED_OPTS(opts)
-       && (opts->specOptIdx.default_opt == pOD->optIndex))
-        fputs(zDefaultOpt, option_usage_fp);
+       && (opts->specOptIdx.default_opt == od->optIndex))
+        fputs(zDefaultOpt + tab_skip_ct, option_usage_fp);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1314,8 +1340,8 @@ setStdOptFmts(tOptions * opts, char const ** ptxt)
     return flen;
 }
 
-
-/*:
+/** @}
+ *
  * Local Variables:
  * mode: C
  * c-file-style: "stroustrup"

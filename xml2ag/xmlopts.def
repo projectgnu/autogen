@@ -1,6 +1,7 @@
 /* -*- Mode: conf -*- */
 
 autogen definitions options;
+addtogroup = xml2ag;
 
 /*
  *  This file is part of AutoGen.
