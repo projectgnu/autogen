@@ -118,27 +118,32 @@ add_files_to_mf() {
 make_funcs_def()
 {
     $noag && exit 1
-
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
     ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
 
-    ${AGexe} -Ltpl <<- _EOF_
+    declare cmd_list=$(
+        sed -n '/case *XAT_CMD_/{;s/.*XAT_CMD_/cmd = /;s/:/;/;p;}' \
+            configfile.c | tr A-Z_ a-z-)
+
+    ${AGexe} <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-xat-attribute;
 	prefix    = xat;
 	no-name;
-	cmd = type, words, members, cooked, uncooked, keep;
+	$cmd_list
 	_EOF_
     test $? -eq 0 || \
         die "FAILED: option-xat-attribute enumeration"
 
-    ${AGexe} -Ltpl <<- _EOF_
+    cmd_list=$(
+        sed -n '/case *VTP_CMD_/{;s/.*VTP_CMD_/cmd = /;s/:/;/;p;}' \
+            configfile.c | tr A-Z_ a-z-)
+    ${AGexe} <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-value-type;
 	prefix    = vtp;
 	no-name;
-	cmd = string, integer, boolean, bool, keyword,
-	      set, set-membership, nested, hierarchy;
+	$cmd_list
 	_EOF_
     test $? -eq 0 || \
         die "FAILED: ${s2enum} --base-name=option-value-type"
@@ -148,6 +153,7 @@ make_funcs_def()
     test -d po       || mkdir po
     ${AGexe} genshell.def  || \
         die "FAILED: ${AGexe} genshell.def"
+
     ${AGexe} usage-txt.def || \
         die "FAILED: ${AGexe} usage-txt.def"
     mv usage-txt.h   autoopts/.
@@ -156,6 +162,7 @@ make_funcs_def()
     files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
         sed '/^CSRC/d;s/[=\\]//'
     )
+
     getdefs linenum srcfile template=options_h output=funcs.def $files
     chmod u+w funcs.def
     vers_min=$(expr '(' $AO_CURRENT - $AO_AGE ')' '*' 4096)
@@ -175,10 +182,12 @@ make_funcs_def()
 	 *  this.  It should be constructed after all binaries are built.
 	 */
 	_END_VERS_INFO_
+
     ${AGexe} funcs.def || die "FAILED: ${AGexe} funcs.def"
     test -f options.h || die "options.h not created"
     mv options.h autoopts/.
     cp project.h autoopts/.
+
     add_files_to_mf
     make_proto
 
@@ -186,11 +195,13 @@ make_funcs_def()
 }
 
 test "X${mainpid}" = X && {
+    echo SOURCING BOOTSTRAP.SHLIB
     \cd ${top_srcdir-..}
     top_srcdir=`pwd`
     . config/bootstrap.shlib
     cd autoopts
     free_trap=true
+    echo DONE SOURCING BOOTSTRAP.SHLIB
 } || {
     free_trap=false
 }

@@ -2,7 +2,7 @@
 
   h
 
-(define time-stamp "2013-02-21 12:11:23")
+(define time-stamp "2013-02-23 06:16:33")
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -199,8 +199,8 @@ emit_puts z%s >&${%s}[=
 (out-push-new)
 
 =]
-exec 4>${tmp_dir}/pot 5>${tmp_dir}/msg 6>${tmp_dir}/use
-msg='5' use='6'
+exec 4>${tmp_dir}/pot 5>${tmp_dir}/msg 6>${tmp_dir}/use 7>/dev/null
+msg=5 use=6 no=7
 printf '\n  /* LIBOPTS-MESSAGES: */\n'  >&$msg
 printf '  /* END-LIBOPTS-MESSAGES */\n\n  /* USAGE-TEXT: */\n' >&$use
 

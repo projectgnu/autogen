@@ -13,6 +13,10 @@
 	* agen5/test/snarf.test: adjust
 	* agen5/test/str2m.test: exit 0 when gperf not installed
 	* autoopts/tpl/str2init.tlib: fail-exit when gperf not installed
+	* autoopts/bootstrap.dir: derive keyword lists from configfile.c
+	* autoopts/configfile.c: constify some text scanning variables
+	* autoopts/nested.c (scan_xml_name): remove redundant NULL checks
+	* autoopts/usage-txt.tpl: redirect "no output" values to /dev/null
 
 2013-02-17  Bruce Korb  <bkorb@gnu.org>
 

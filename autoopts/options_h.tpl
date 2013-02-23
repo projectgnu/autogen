@@ -208,9 +208,9 @@ mk_mask() {
         die "Cannot process ${hdr}"
     sed -e '1,/#define.*GUARD *1/d;/^#include/d;/^#endif/,$d' $hdr
 }
-/** @} */
 
 mk_mask opt-state.def` =]
+/** @} */
 
 #ifdef NO_OPTIONAL_OPT_ARGS
 # undef  OPTST_ARG_OPTIONAL
