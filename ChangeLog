@@ -1,3 +1,14 @@
+2013-02-24  Bruce Korb  <bkorb@gnu.org>
+
+	* */Makefile.am: replace "INCLUDES" with "AM_CPPFLAGS"
+	* autoopts/usage.c (print_one_paragraph): undefine gettext IFF
+	DEBUG_ENABLED has been defined.  Also, omit the bother of gettext
+	if ENABLE_NLS has not been defined.
+	(optionPrintParagraphs): print usage text as a single blob when
+	ENABLE_NLS is not defined.
+	* autoopts/test/nls.test: disable the test if DEBUG_ENABLED not defined
+	* config/libopts.def: add --enable-nls, defaulting to "yes".
+
 2013-02-23  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/snarf.tpl: support addtogroup doxygen markup

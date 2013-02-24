@@ -26,7 +26,7 @@
 
 ## Code:
 
-INCLUDES                = -I$(top_srcdir)
+AM_CPPFLAGS             = -I$(top_srcdir)
 noinst_HEADERS          = mem.h filament.h stream.h printf.h compat.h
 dist_noinst_DATA        = filament.stamp stream.stamp printf.stamp
 noinst_LTLIBRARIES      = libsnprintfv.la

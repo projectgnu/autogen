@@ -286,6 +286,12 @@ do-first = <<-_EOF_
 	#endif
 	])
 
+	AC_ARG_ENABLE([nls],
+		AS_HELP_STRING([--disable-nls],[disable nls support in libopts]))
+	AS_IF([test "x$enable_nls" != "xno" && \
+		test "X${ac_cv_header_libintl_h+set}" = Xset], [
+		AC_DEFINE([ENABLE_NLS],[1],[nls support in libopts])])
+
 	# --------------------------------------------
 	# Verify certain entries from AC_CHECK_HEADERS
 	# --------------------------------------------

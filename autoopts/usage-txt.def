@@ -243,7 +243,7 @@ utxt = { ut-i18n = msg;
 utxt = { ut-i18n = msg;
          ut-name = multiway_bug;
          ut-text = "(AutoOpts bug):  Equivalenced option '%s' was "
-                   "equivalenced to both\n\t'%s' and '%s'";
+                   "equivalenced to both\n\t'%s' and '%s'.";
 };
 
 utxt = { ut-i18n = msg;
@@ -308,7 +308,7 @@ utxt = { ut-i18n = msg;
 
 utxt = { ut-i18n = msg;
          ut-name = need_more;
-         ut-text = "%s error:  The %s option must appear %d times\n";
+         ut-text = "%s error:  The %s option must appear %d times.\n";
 };
 
 utxt = { ut-i18n = msg;

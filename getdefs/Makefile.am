@@ -50,7 +50,7 @@ getdefs_LDADD   = $(top_builddir)/autoopts/libopts.la
 man_MANS        = $(TARG).1
 DOCFILES        = $(TARG).texi $(TARG).menu $(TARG).1
 DISTCLEANFILES  = $(DOCFILES) $(nodist_getdefs_SOURCES) *-stamp
-INCLUDES        = @INCLIST@
+AM_CPPFLAGS     = @INCLIST@
 AG_ENV          = top_builddir=$(top_builddir) \
   top_srcdir=$(top_srcdir) PATH=`cd ../columns >/dev/null && pwd`:$$PATH ; \
   export top_builddir top_srcdir PATH

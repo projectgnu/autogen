@@ -23,7 +23,7 @@
 ##  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
 
 SUBDIRS         = @OPTS_TESTDIR@
-INCLUDES        = @INCLIST@
+AM_CPPFLAGS     = @INCLIST@
 libsrc          = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
 LIBOPTS_VER     = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 

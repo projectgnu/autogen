@@ -28,8 +28,13 @@
 # ----------------------------------------------------------------------
 
 . ./defs
-grep "#define.*HAVE_LIBINTL_H" ${top_builddir}/config.h >/dev/null || \
-    exit 0
+for f in HAVE_LIBINTL_H DEBUG_ENABLED
+do
+    grep "#define.*$f" ${top_builddir}/config.h >/dev/null || {
+	echo "$f is not defined -- skiping $0"
+        exit 0
+    }
+done
 AUTOGEN_TEMPL_DIRS=`cd ${srcdir}/..;pwd`
 export AUTOGEN_TEMPL_DIRS
 

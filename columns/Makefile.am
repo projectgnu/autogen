@@ -33,7 +33,7 @@ RUNAG           = $(AGexe) -L$(top_srcdir)/autoopts/tpl \
 	-L$(top_builddir)/autoopts/tpl -MF$@
 man_MANS        = columns.1
 
-INCLUDES        = @INCLIST@
+AM_CPPFLAGS     = @INCLIST@
 
 CONFIG_CLEAN_FILES = $(BUILT_SOURCES) stamp-*
 MAINTAINERCLEANFILES = $(CONFIG_CLEAN_FILES)

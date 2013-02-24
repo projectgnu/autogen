@@ -152,11 +152,6 @@ post_local()
 
 filter_autotool_chaff() {
     set +x
-    local unsetx=
-    case ":$SHELLOPTS:" in
-    *:xtrace:* ) unsetx='' ;;
-    * ) unsetx='set -x' ; set +x ;;
-    esac
     pat='^configure.ac:.*warning'
     while IFS='' read line
     do
@@ -170,14 +165,12 @@ filter_autotool_chaff() {
         echo "$line"
     done > autotool-chaff.txt
     local chaffct=$(wc -l < autotool-chaff.txt)
-    if grep -i -w error autotool-chaff.txt >/dev/null
+    if (( chaffct <= 4 )) || grep -i -w error autotool-chaff.txt >/dev/null
     then cat autotool-chaff.txt
     else
-        (( chaffct > 4 )) && \
-            echo "<< $chaffct lines of autotool chaff deleted >>"
+        echo "<< $chaffct lines of autotool chaff deleted >>"
     fi
     echo "$line"
-    $unsetx
     cat
 }
 

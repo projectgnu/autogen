@@ -33,7 +33,7 @@ xml2ag_LDADD    = $(top_builddir)/autoopts/libopts.la $(LIBXML2_LIBS)
 man_MANS        = $(TARG).1
 DOCFILES        = invoke-$(TARG).texi invoke-$(TARG).menu $(TARG).1
 DISTCLEANFILES  = $(DOCFILES) $(nodist_xml2ag_SOURCES) stamp-*
-INCLUDES        = @INCLIST@ $(LIBXML2_CFLAGS)
+AM_CPPFLAGS     = @INCLIST@ $(LIBXML2_CFLAGS)
 AGexe           = $(top_builddir)/agen5/autogen
 CLexe           = $(top_builddir)/columns/columns
 BOOTENV     = top_srcdir="$(top_srcdir)" top_builddir="$(top_builddir)" \
