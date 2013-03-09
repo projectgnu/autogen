@@ -327,4 +327,4 @@ trap '' 0
 # indent-tabs-mode: nil
 # End:
 
-# end of agen5/bootstrap.dir
+# end of agen5/mk-stamps.sh

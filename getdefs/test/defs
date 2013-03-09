@@ -81,4 +81,4 @@ failure()
   echo "$*"
   exit 1
 }
-# defs ends here
+# end of defs

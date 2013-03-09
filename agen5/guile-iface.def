@@ -201,3 +201,4 @@ iface = {
   i-impl    = { i-end = '107'; i-code = 'SCM_VECTORP(_v)'; };
   i-impl    = { i-end = '201'; i-code = 'scm_is_vector(_v)'; };
 };
+/* end of guile-iface.def */

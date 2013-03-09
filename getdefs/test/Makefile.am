@@ -38,4 +38,4 @@ $(TESTS) : perm-stamp
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test
 
-# Makefile.am ends here
+# end of Makefile.am

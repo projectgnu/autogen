@@ -1,9 +1,10 @@
 /* -*- Mode: conf -*- */
 
-autogen definitions options;
+AutoGen definitions options;
 addtogroup = getdefs;
 
-/*
+/* opts.def:  option definitons for getdefs
+ *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -467,3 +468,5 @@ arg = @{ type = int; name = this; doc = what-it-is; @};
 @end example
 @end enumerate
 _EOF_;
+
+/* end of opts.def */

@@ -102,4 +102,4 @@ ${GDexe} output=${testname}.out ${testname}.c || \
 cmp -s ${testname}.test ${testname}.out || \
 	failure "`diff ${testname}.test ${testname}.out`"
 
-# option.test ends here
+# end of option.test

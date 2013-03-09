@@ -3,7 +3,8 @@
 autogen definitions options;
 addtogroup = xml2ag;
 
-/*
+/* xmlopts.def: option definitions for xml2ag
+ *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
@@ -176,4 +177,4 @@ prog-info-descrip = <<-  END_DETAIL
 	it becomes impossible to have the definitions be the same type
 	(compound or text values).
 	END_DETAIL ;
-/* end of opts.def */
+/* end of xmlopts.def */

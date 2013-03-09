@@ -2,7 +2,7 @@
 
 ## Author:          Bruce Korb <bkorb@gnu.org>
 ##
-## Copyright (C) 2011-2012 Bruce Korb, all rights reserved.
+## Copyright (C) 2011-2013 Bruce Korb, all rights reserved.
 ## This is free software. It is licensed for use, modification and
 ## redistribution under the terms of the
 ## Modified (3 clause) Berkeley Software Distribution License
@@ -35,15 +35,13 @@
 =]
 [= INCLUDE "tpl-config.tlib" =][=
 
-(define copy-years (shellf
-   "year=`sed -n '/Time-stamp[:]/ {
-      s/[^\"]*\"//
-      s/-.*//
+(define copy-years (shell
+   "sed -n '/Copyright (C)/ {
+      s/.*(C) *//
+      s/ *Bruce.*//
       p
       q
-   }' %s`
-   test X$year = X2011 || year=2011-$year
-   echo $year" (tpl-file #t)))  \=]
+   }' " (tpl-file #t) ))  \=]
 [= INVOKE leader guard = false  \=]
 [= (out-push-new (string-append (base-name) ".h")) \=]
 [= INVOKE leader guard = true    =]

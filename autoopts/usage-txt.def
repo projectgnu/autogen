@@ -498,7 +498,7 @@ utxt = { ut-i18n = use;
 
 utxt = { ut-i18n = use;
          ut-name = PlsSendBugs;
-         ut-text = "\nplease send bug reports to:  <%s>\n";
+         ut-text = "\nPlease send bug reports to:  <%s>\n";
 };
 
 utxt = { ut-i18n = use;

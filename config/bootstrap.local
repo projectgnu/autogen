@@ -142,7 +142,7 @@ config_versions()
 	--symlink
 	--m4-base=config
         --lgpl=2'
-    glmods='parse-duration gendocs gettext-h'
+    glmods='parse-duration gendocs gettext-h extensions'
     GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
     GNULIBTOOL=${GNULIBDIR}/gnulib-tool
     for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath
@@ -154,6 +154,7 @@ config_versions()
     sed -i 's/do_not_make_me_.*_SOURCES/EXTRA_DIST/;/do_not_make_me/d' \
         autoopts/gnulib.mk
     cp ${GNULIBDIR}/build-aux/config.rpath ${GNULIBDIR}/m4/lib-link.m4 config/.
+    echo GNULIB-TOOL-DONE
 }
 
 check_tools()

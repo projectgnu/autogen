@@ -100,4 +100,4 @@ ${GDexe} subblock=exparg=arg_name,arg_desc,arg_optional,arg_list \
 cmp -s $testname.test $testname.out || \
 	failure "`diff $testname.test $testname.out`"
 
-# subblock.test ends here
+# end of subblock.test

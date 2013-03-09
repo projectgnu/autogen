@@ -1,7 +1,7 @@
 #! /bin/sh
 #  -*- Mode: Shell-script -*-
 #
-# subblock.test --- test the subblock parameter to getdefs
+# index.test --- test the subblock parameter to getdefs
 #
 # Author:	     Bruce Korb <bkorb@gnu.org>
 ##  This file is part of AutoGen.
@@ -125,4 +125,4 @@ ${GDexe} output=$testname.out $testname.c || \
 cmp -s $testname.test $testname.out || \
 	failure "`diff $testname.test $testname.out`"
 
-# subblock.test ends here
+# end of index.test

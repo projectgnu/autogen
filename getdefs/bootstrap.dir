@@ -54,4 +54,4 @@ ${free_trap} && trap '' 0
 # indent-tabs-mode: nil
 # End:
 
-# bootstrap.dir ends here
+# end of bootstrap.dir

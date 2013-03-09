@@ -37,6 +37,4 @@ $(TESTS) : perm-stamp
 perm-stamp :
 	cd $(srcdir) ; chmod +x *.test
 
-# Makefile.am ends here
-
- XML2AG=
+# end of Makefile.am

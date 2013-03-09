@@ -1,5 +1,6 @@
 [= AutoGen5 Template c=fork.c -*- Mode: C -*- =]
 [= #
+ *  fork.tpl: template for passing arguments to autogen forked process.
  *
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -220,4 +221,4 @@ DEFINE handle-option =]
 
 ENDDEF handle-option
 
-\=]
+end of fork.tpl \=]

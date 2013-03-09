@@ -3,7 +3,8 @@
 autogen definitions options;
 addtogroup = columns;
 
-/*
+/* opts.def:  option definitons for columns
+ *
  *  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
@@ -356,3 +357,5 @@ prog_descrip = <<- _EndOfMan_
 	A side benefit is that you can use it outside of @code{autogen} to
 	columnize input, a la the @code{ls} command.
 	_EndOfMan_;
+
+/* end of opts.def */

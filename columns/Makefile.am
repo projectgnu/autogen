@@ -67,4 +67,4 @@ stamp-agman  : opts.def columns$(EXEEXT)
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# end of Makefile.am

@@ -289,23 +289,13 @@ do-first = <<-_EOF_
 	AC_ARG_ENABLE([nls],
 		AS_HELP_STRING([--disable-nls],[disable nls support in libopts]))
 	AS_IF([test "x$enable_nls" != "xno" && \
-		test "X${ac_cv_header_libintl_h+set}" = Xset], [
+		test "X${ac_cv_header_libintl_h}" = Xyes], [
 		AC_DEFINE([ENABLE_NLS],[1],[nls support in libopts])])
 
 	# --------------------------------------------
 	# Verify certain entries from AC_CHECK_HEADERS
 	# --------------------------------------------
-	[for f in sys_types sys_mman sys_param sys_stat sys_wait \
-	         string errno stdlib memory setjmp
-	do eval as_ac_var=\${ac_cv_header_${f}_h+set}
-	   test "${as_ac_var}" = set || {
-	     ]AC_MSG_ERROR([you must have ${f}.h on your system])[
-	   }
-	done
-	test "X${ac_cv_header_inttypes_h-no}" = Xyes || \
-	  echo '#include <stdint.h>' > inttypes.h
-
-	${lo_have_arg_hdr} || \
+	[${lo_have_arg_hdr} || \
 	  ]AC_MSG_ERROR([you must have stdarg.h or varargs.h on your system])[
 
 	${lo_have_str_hdr} || \
@@ -316,7 +306,17 @@ do-first = <<-_EOF_
 	    [you must have one of limits.h, sys/limits.h or values.h])[
 
 	${lo_have_typ_hdr} || \
-	  ]AC_MSG_ERROR([you must have inttypes.h or stdint.h on your system])
+	  ]AC_MSG_ERROR([you must have inttypes.h or stdint.h on your system])[
+
+	for f in sys_types sys_mman sys_param sys_stat sys_wait \
+	         string errno stdlib memory setjmp
+	do eval as_ac_var=\${ac_cv_header_${f}_h}
+	   test "X${as_ac_var}" = Xyes || {
+	     ]AC_MSG_ERROR([you must have ${f}.h on your system])[
+	   }
+	done
+	test "X${ac_cv_header_inttypes_h-no}" = Xyes || \
+	  echo '#include <stdint.h>' > inttypes.h]
 
 	# ----------------------------------------------------------------------
 	# Checks for typedefs

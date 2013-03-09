@@ -1,3 +1,4 @@
+/* ag-text.def: autogen text strings */
 
 AutoGen Definitions strings;
 
@@ -1435,3 +1436,5 @@ string = { nm = YYLEX_UNENDING_QUOTE;
 
 string = { nm = zNil;
    str = ""; };
+
+/* end of ag-text.def */

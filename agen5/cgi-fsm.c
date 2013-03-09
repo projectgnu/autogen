@@ -42,6 +42,10 @@
  */
 /* START === USER HEADERS === DO NOT CHANGE THIS COMMENT */
 
+/*  This file is part of AutoGen.
+ *  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
+ */
+
 #include "autogen.h"
 
 /* END   === USER HEADERS === DO NOT CHANGE THIS COMMENT */

@@ -1,8 +1,9 @@
 [= AutoGen5 template h   -*- Mode: C -*-
 
-##
+# functions.tpl
+#
 ## This file is part of AutoGen.
-## Copyright (C) 1992-2012 Bruce Korb - all rights reserved
+## Copyright (C) 1992-2013 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -372,6 +373,6 @@ static unload_proc_p_t const unload_procs[FUNC_CT] = {
 
 #endif /* [= (. header-guard) =] */
 /** @} */
-/* [=(. output-file-name)=] ends here */[=
+/* end of [=(. output-file-name)=][=
 
-# functions.tpl ends here =]
+# end of functions.tpl =] */

@@ -87,4 +87,4 @@ x.c 	    : $(gsrcs) $(csrcs)
 
 .NOTPARALLEL:
 
-# Makefile.am ends here
+# end of Makefile.am

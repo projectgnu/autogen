@@ -97,3 +97,5 @@ cmp -s ${testname}.samp ${testname}.out || \
 	failure "`diff ${testname}.samp ${testname}.out`"
 
 ${VERBOSE} || { cd ${srcdir} ; rm -rf ${testsubdir} ; }
+
+# end of convert.test

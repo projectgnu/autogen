@@ -46,7 +46,7 @@ compile_getopt() {
   ${SED} "${sed_omit_license}"'
 	/Packaged by /d
 	s@^Report .* bugs to.*"@\\n"@
-	s@^please send bug.*"@\\n"@
+	s@^Please send bug.*"@\\n"@
 	s@\\n\\n\\n\\$@\\n\\n\\@
 	s@\(and the flag character\.\\n.\)n\\$@\1@' ${testname}${1}-getopt.c \
          >  ${testname}${1}-res.c

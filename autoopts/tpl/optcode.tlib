@@ -655,12 +655,14 @@ static void bogus_function(void) {
      by name.  These are set off with apostrophe quotes (I hope).  Do not
      translate option names.
    */[=
-(out-resume "xget") (out-pop #t) \=]
 
-[=(out-push-new)=]
+(out-resume "xget")
+(emit (out-pop #t))
+
+(out-push-new) \=]
 incdir=[= (if (defined? 'inc-dir) inc-dir "") ;;' 4emacs =]
-test -d $incdir || incdir=`dirname [=(tpl-file #t)=]`/..
-incdir=`cd $incdir/autoopts >/dev/null && pwd`
+test -d "$incdir" || incdir=`dirname [=(tpl-file #t)=]`/..
+incdir=`cd $incdir/autoopts >/dev/null 2>&1 && pwd`
 test -f ${incdir}/usage-txt.h && {
     sedcmd='/LIBOPTS-MESSAGES:/,/END-[=
 

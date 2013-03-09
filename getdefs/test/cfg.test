@@ -111,4 +111,4 @@ ${GDexe} load=${testname}.cfg ${testname}.c || \
 cmp -s ${testname}.test ${testname}.out || \
 	failure "`diff ${testname}.test ${testname}.out`"
 
-# cfg.test ends here
+# end of cfg.test

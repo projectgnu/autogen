@@ -67,4 +67,4 @@ verbose     : defs
 	rm -rf FAILURES *-testd ; \
 	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
 
-# Makefile.am ends here
+# end of Makefile.am

@@ -89,4 +89,4 @@ stamp-doc :
 local-maintainer-clean : clean-stamp-opts clean-stamp-doc clean-stamp-man
 	rm -f *~
 
-# getdefs/Makefile.am ends here
+# end of getdefs/Makefile.am
