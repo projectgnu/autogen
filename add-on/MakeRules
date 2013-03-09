@@ -2,7 +2,7 @@
 
 AO_LIBS         := $(shell autoopts-config ldflags)
 AO_CFLAGS       := $(shell autoopts-config cflags)
-CFLAGS          =  -std=c99
+CFLAGS          =  -g3 -O0 -std=c99
 
 CLOBBER_LIST    =  $(TARGET)
 HEADER_LIST     =  $(LCLHDR)

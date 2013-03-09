@@ -20,12 +20,24 @@ copyright = {
     type  = mbsd;
 };
 
-version         = "0.4";
+version         = "0.5";
 long-opts;
 environrc;
 rcfile          = '.crightrc';
 homerc          = '$@/cright.cfg', '$HOME', '.';
 die-code;
+
+include = <<- _EOInc_
+	unsigned long first_yr = 0;
+	_EOInc_;
+
+export  = <<- _EOExp_
+	#ifndef NUL
+	#define NUL '\0'
+	#endif
+
+	extern unsigned long first_yr;
+	_EOExp_;
 
 main = {
     main-type    = for-each;
@@ -73,7 +85,7 @@ flag = {
     value       = c;
     arg-type    = string;
     arg-name    = mark;
-    arg-default = 'Copyright \(C\) +([12][90][0-9][0-9])';
+    arg-default = 'Copyright  *\(C\) +([12][90][0-9][0-9])';
     descrip     = "Copyright extended regex";
 
     doc = <<- EODoc
@@ -116,8 +128,40 @@ flag = {
     descrip     = "fix all copyright years";
 
     doc = <<- EODoc
-	By default, the program will stop after fixing up one copyright notice.
-	With this option, the program will process them all.
+	By default, the program will stop after fixing up one copyright notice
+	in each file.  With this option, the program will process them all.
+	EODoc;
+};
+
+flag = {
+    name        = dry-run;
+    value       = d;
+    descrip     = "print names of files needing updates";
+
+    doc = <<- EODoc
+	Use this option to check to see if any files need updating.
+	EODoc;
+};
+
+flag = {
+    name        = backup;
+    value       = b;
+    arg-type    = string;
+    arg-name    = suffix;
+    descrip     = "preserve the original with a suffix";
+
+    doc = <<- EODoc
+	This option will preserve the original contents by renaming the
+	file to a name with the specified suffix appended.
+	EODoc;
+};
+
+flag = {
+    name        = diff;
+    descrip     = "Show the changes that would be made";
+
+    doc = <<- EODoc
+	Use this option to check to see what updating would take place.
 	EODoc;
 };
 
@@ -127,6 +171,7 @@ flag = {
     disable     = no;
     enabled;
     descrip     = "join sequential years with hyphens";
+    equivalence = join-years;
 
     doc = <<- EODoc
 	If the final year of the year list is the previous year, this program
@@ -135,6 +180,18 @@ flag = {
 	intervening years are examined for sequences and any found are joined
 	as a year range.  If specified with the "no-" prefix, then the current
 	year will always be appended with a comma separator.
+	EODoc;
+};
+
+flag = {
+    name        = collapse-years;
+    value       = C;
+    descrip     = "collapse all years to <first>-<current>";
+    equivalence = join-years;
+
+    doc = <<- EODoc
+	Replace all the individual and ranged years with one range:
+	<first-year>-<current-year>.  e.g. 1991-2013.
 	EODoc;
 };
 
