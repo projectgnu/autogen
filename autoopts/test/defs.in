@@ -49,24 +49,25 @@ cfg_vals()
     ;;
   esac
 
-  script_name=$1
   set -a
   TESTS=''
-  . ${top_builddir:-@top_builddir@}/config/shdefs
-  progname=`echo "$script_name" | ${SED} 's,^.*/,,'`
+  builddir=`pwd`
+  top_builddir=`cd ${top_builddir=@top_builddir@} >/dev/null ; pwd`
+  . ${top_builddir}/config/shdefs "${builddir}/`
+        echo $0|${SED:-sed} 's@.*/@@'`"
+  progname=`echo "$1" | ${SED} 's,^.*/,,'`
   testname=`echo "$progname" | ${SED} 's,\..*$,,'`
+  testsubdir=${testname}-testd
+  tstdir=${builddir}/${testsubdir}
+  PS4=">${testname}-\${FUNCNAME}> "
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
   : ${srcdir=$top_srcdir/autoopts/test}
   srcdir=`cd $srcdir >/dev/null && pwd`
-  testsubdir=${testname}-testd
-  PS4=">${testname}-\${FUNCNAME}> "
   ( exec 2>/dev/null; ulimit -c unlimited ) && \
     ulimit -c unlimited
 
   CFLAGS="${CFLAGS} ${DEFS}"
   : ${PAGER=more}
-  nl='
-' ht='	'
 
   stdopts=${top_srcdir}/autoopts/test/stdopts.def
   test_main=yes
@@ -97,37 +98,25 @@ purge()
   done
   test -z "$bad" && return 0
 
+  # NFS "busy" files and MS-DOS fs sometimes fail.
+  #
   set -- $bad
   test "x${RANDOM}" = "x${RANDOM}" && RANDOM=`expr 0${RANDOM} + 1 2>/dev/null`
 
   f=ZZPURGE-${1}-${RANDOM}-$$
   if test $# -gt 1
-  then mkdir ${f}
-       mv $* ${f}/.
-  else mv $1 ${f}
+  then mkdir "${f}"
+       mv $* "${f}/."
+  else mv $1 "${f}"
   fi
 }
 
 init_tests()
 {
-  builddir=`pwd`
-  logfile="$builddir/$testsubdir/${testname}.log"
-  exec 8>&2 1>${logfile} 2>&1
+  exec 8>&2
 
-  TMPDIR="$builddir/$testsubdir/${testname}-tmpd"
-  if test -d ${TMPDIR}
-  then
-    test -f ${TMPDIR}/pid && {
-      local pid=`cat ${TMPDIR}/pid`
-      ps h $pid >/dev/null 2>&1 && {
-        echo "${testname} is running"
-        exit 1
-      } 1>&2
-    }
-  else
-    mkdir -p ${TMPDIR}
-  fi
-  echo $$ > ${TMPDIR}/pid
+  TMPDIR="${tstdir}/${testname}-tmpd"
+  mkdir -p ${TMPDIR}
 
   f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
   PATH=${f}:${PATH}
@@ -178,15 +167,7 @@ be_silent()
 {
   setx=:
   VERBOSE=false
-  purge $testsubdir
-
-  # Sometimes, MSDos FS cannot even rename the directory!!
-  #
-  if test -d ${testsubdir}
-  then purge ${testsubdir}/* ${testsubdir}/.??*
-  else msg=echo
-       mkdir ${testsubdir} || exit 1
-  fi
+  purge ${testsubdir}
 
   run_ag()
   {
@@ -234,10 +215,9 @@ cfg_inc()
 {
   test_src=$srcdir/${testname}.test
   cd ${testsubdir} || {
-    echo "Cannot make or change into ${testsubdir}" >&8
+    echo "Cannot make or change into ${testsubdir}"
     exit 1
   }
-  testsubdir=`pwd`
 
   dirs=`
   for f in ${top_builddir} ${top_srcdir}
@@ -257,12 +237,24 @@ cfg_inc()
   ${VERBOSE} && SHELLX="${SHELL} -x" || SHELLX="${SHELL}"
 }
 
+# # # #
+#
+# "clean_help" -- remove variable parts so results can be compared
+#
+nl='
+'
+ht='	'
+basic_help_clean="/^Packaged by/d
+/^Report .* bugs to/d
+/[Pp]lease send bug reports/d
+/^[ ${ht}]*\$/d"
+export   nl ht basic_help_clean
+readonly nl ht basic_help_clean
+
 clean_help() {
-  test -z "$sedcmd" && s= || s="${sedcmd}${nl}"
-  s="${s}/^Packaged by/d${nl}"
-  s="${s}/^Report .* bugs to/d${nl}"
-  s="${s}/[Pp]lease send bug reports/d${nl}"
-  s="${s}/^[ ${ht}]*\$/d"
+  test -z "$sedcmd" && \
+    s=${basic_help_clean} || \
+    s="${sedcmd}${nl}${basic_help_clean}"
 
   ${SED} "${s}"
 }
@@ -294,11 +286,8 @@ cleanup()
   ${VERBOSE} || {
     cd ${builddir}
     purge ${testsubdir}
-
-    # to defeat nfs "busy" files:
-    test -d ${testsubdir} && mv ${testsubdir} ZZJUNK-$$
   }
-  ${msg} ${testname} done >&8
+  ${msg} ${testname} done
   exit 0
 }
 
@@ -316,12 +305,11 @@ failure()
   else mkdir FAILURES
   fi
 
-  cat ${logfile} >&2
   mv $tdir FAILURES/$tdir
 
   echo FAILURE: "$*"
   exit 1
-} 1>&8 2>&1
+}
 
 thumper()
 {
@@ -342,7 +330,7 @@ thumper()
   test -d "$bdir" && {
     test -d ${bdir}/FAILURES || \
       mkdir ${bdir}/FAILURES
-    mv -f `dirname $logfile` ${bdir}/FAILURES/.
+    mv -f "${tstdir}" "${bdir}/FAILURES/."
   }
   kill -9 ${rpid}
 }

@@ -32,8 +32,8 @@ AUTOOPTS_TRACE_OUT=">>`pwd`/${testname}-ag-trace.txt"
 export AUTOOPTS_TRACE AUTOOPTS_TRACE_OUT
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
-
-: "creating ${testname}.def in `pwd`"
+startdir=`pwd`
+: "creating ${testname}.def in $startdir"
 
 TESTNAME=RC
 export TESTNAME
@@ -195,7 +195,7 @@ cmp  ${testname}.cmds ${testname}.test || {
 
 # # # # # # # # # # THIRD TEST OUTPUT FILE # # # # # # # # #
 
-cd ${testsubdir}
+cd ${startdir}
 
 echo 'disable-save;' >> ${testname}.def
 

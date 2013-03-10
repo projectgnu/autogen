@@ -157,7 +157,7 @@ functions are available for saving text or values for later use.
 This is just one simple example that shows a few basic features.
 If you are interested, you also may run "make check" with the
 @code{VERBOSE} environment variable set and see a number of other
-examples in the @file{agen5/test/testdir} directory.
+examples in the @file{agen5/test} directory.
 
 Assume you have an enumeration of names and you wish to associate some
 string with each name.  Assume also, for the sake of this example,
