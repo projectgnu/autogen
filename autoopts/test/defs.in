@@ -288,11 +288,14 @@ compile()
 
 cleanup()
 {
+  kill -9 $THUMPER_PID
   trap '' 15
   ${setx}
   ${VERBOSE} || {
     cd ${builddir}
     purge ${testsubdir}
+
+    # to defeat nfs "busy" files:
     test -d ${testsubdir} && mv ${testsubdir} ZZJUNK-$$
   }
   ${msg} ${testname} done >&8
@@ -303,6 +306,7 @@ cleanup()
 #
 failure()
 {
+  kill -9 $THUMPER_PID
   trap '' 15
   set -x
   tdir=`basename $testsubdir`
@@ -318,6 +322,30 @@ failure()
   echo FAILURE: "$*"
   exit 1
 } 1>&8 2>&1
+
+thumper()
+{
+  exec > /dev/null 2>&1 </dev/null
+  bdir=`cd "$builddir" >/dev/null ; pwd`
+  cd /
+  rpid=$$
+  test -z "${kill_delay}" && kill_delay=3
+  kill_delay=`expr $kill_delay '*' $AG_TIMEOUT`
+  while test ${kill_delay} -gt 0
+  do  sleep 1
+      ps -p ${rpid} || exit 0
+      kill_delay=`expr $kill_delay - 1`
+  done
+  kill -15 ${rpid}
+  sleep 1
+  ps -p ${rpid} || exit
+  test -d "$bdir" && {
+    test -d ${bdir}/FAILURES || \
+      mkdir ${bdir}/FAILURES
+    mv -f `dirname $logfile` ${bdir}/FAILURES/.
+  }
+  kill -9 ${rpid}
+}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -337,23 +365,11 @@ case "${VERBOSE}" in
     esac
 esac
 
+thumper &
+THUMPER_PID=$!
 cfg_inc
 
 trap "failure 'test ${testname} killed on timeout'" 15
-( ( exec > /dev/null 2>&1 </dev/null
-    test -z "${kill_delay}" && kill_delay=3
-    kill_delay=`expr $kill_delay '*' $AG_TIMEOUT`
-    sleep ${kill_delay}
-    ps -p $$ || exit
-    kill -15 $$
-    sleep 1
-    ps -p $$ || exit
-    test -d ${builddir}/FAILURES || \
-      mkdir ${builddir}/FAILURES
-    mv -f `dirname $logfile` ${builddir}/FAILURES/.
-    kill -9 $$
-) &
-)
 
 ## Local Variables:
 ## mode: shell-script
