@@ -170,6 +170,7 @@ init_tests()
 be_silent()
 {
   setx=:
+  msg=echo
   VERBOSE=false
   purge ${testsubdir}
 
