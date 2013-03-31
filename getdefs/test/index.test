@@ -21,14 +21,8 @@
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Common definitions
-if test -z "$srcdir"; then
-    srcdir=`echo "$0" | ${SED} 's,[^/]*$,,'`
-    test -z "$srcdir" && srcdir=.
-    test "$srcdir" = "$0" && srcdir=.
-    test "${VERBOSE+set}" != set && VERBOSE=1
-fi
-. $srcdir/defs
 
+. ./defs
 
 # Create the files we need in the test environment
 cat > ${testname}.c <<EOF
@@ -72,7 +66,7 @@ cat > ${testname}.test <<_EOF_
  *
  *      index.c
  */
-autogen definitions testdir;
+autogen definitions index-testd;
 
 #line 14 "index.c"
 gfunc[2] = {

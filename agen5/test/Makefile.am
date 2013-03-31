@@ -50,15 +50,14 @@ TESTS_ENVIRONMENT = TERM='' \
 	top_srcdir="$(top_srcdir)"
 
 distclean-local:
-	-rm -rf *-testd FAILURES
+	-rm -rf *-testd FAILURES defs
 
 $(TESTS)    : defs
 
 defs        : ${top_builddir}/autoopts/test/defs
-	@$(SED) -e '/^ *srcdir=/s@".*"@"$(srcdir)"@' \
-	    -e '/^ *top_srcdir=/s@".*"@"$(top_srcdir)"@' \
-	   ${top_builddir}/autoopts/test/defs > $@ ; \
-	cd $(srcdir) ; chmod +x *.test || :
+	$(TESTS_ENVIRONMENT) $(SHELL) \
+		$(top_srcdir)/config/install-defs.sh \
+			$(top_builddir)/autoopts/test/defs
 
 ${top_builddir}/autoopts/test/defs :
 	cd ${top_builddir}/autoopts/test ; $(MAKE) defs

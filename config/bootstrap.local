@@ -182,9 +182,13 @@ tweak_Makefile_am()
             s/.*/misc_extra     = \\/
             q
         }' Makefile.am
-        find VERSION NOTES config/bootstrap* config/*.m4 config/config.rpath \
-               autoopts/parse-duration.[ch] autoopts/gettext.h doc/gendocs* \
-            -type f | \
+        {
+            find VERSION \
+                config/bootstrap* config/*.m4 config/config.rpath config/*.sh \
+                autoopts/parse-duration.[ch] autoopts/gettext.h doc/gendocs* \
+                -type f
+            echo config/gnulib-cache.m4
+        } | sort | \
             columns --spread=1 -I4 --line=' \'
 
         sed -n '/^EXTRA_DIST /,$p' Makefile.am

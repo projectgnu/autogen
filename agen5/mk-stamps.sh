@@ -149,11 +149,12 @@ make_exprini()
 
     echo ${GDexe} load=expr.cfg
     set +e
-    ( SHELL=sh ${GDexe} load=expr.cfg ${files} 2>&1 ) | \
-      ${EGREP} -v 'no copies of pattern' >&2
+    {
+        SHELL=sh ${GDexe} load=expr.cfg ${files} 2>&1
+    } | ${GREP} -v 'no copies of pattern' >&2
     set -e
     run_ag exprini expr.def
-    rmlist=${rmlist}\ expr.cfg
+    rm -f expr.cfg
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -195,7 +196,7 @@ make_directive()
     } > directive.def
 
     run_ag dirtv directive.def
-    rmlist=${rmlist}\ directive.cfg
+    echo directive.cfg >&5
 }
 
 # # # # # # # # # # # # # # # # # # #
@@ -262,7 +263,8 @@ dispatch()
     then DEPFILE=./${DEPDIR}/stamp-${1}.d
     else DEPFILE=''
     fi
-    eval make_${1}
+    eval make_${1} '&'
+    pid_list="$pid_list $!"
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -271,6 +273,14 @@ dispatch()
 #
 PS4='>stmp-${FUNCNAME}> '
 set_defaults ${1+"$@"}
+rmlist=`mktemp ${TMPDIR:-/tmp}/rmlist-XXXXXX`
+test -f "$rmlist" || {
+    rmlist=${TMPDIR:-/tmp}/rmlist-$$
+    rm -f $rmlist
+}
+exec 5> $rmlist
+echo $rmlist >&5
+pid_list=''
 
 #  FOR each output target,
 #   DO the appropriate rule...
@@ -316,6 +326,8 @@ do
     esac
 done
 
+wait $pid_list
+rmlist=`cat $rmlist`
 rm -f $rmlist ag-*.log
 
 trap '' 0

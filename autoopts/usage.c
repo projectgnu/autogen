@@ -38,8 +38,8 @@
  */
 
 #define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
-#ifdef HAVE_LIBINTL_H
-#include <libintl.h>
+#if defined(ENABLE_NLS) && defined(HAVE_LIBINTL_H)
+# include <libintl.h>
 #endif
 
 typedef struct {

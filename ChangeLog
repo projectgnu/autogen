@@ -9,6 +9,19 @@
 	* autoopts/streqvcmp.c (streqvcmp): do not transform character
 	before having tested for the same character.
 	(strneqvcmp): likewise
+	* agen5/mk-stamps.sh: run code generation in parallel
+	* agen5/test/Makefile.am: use install-defs.sh to make "defs".
+	* agen5/test/error.test: ban the "Failing Guile command" message
+	* agen5/tpParse.c (print_indentation): warning patrol
+	* autoopts/test/defs.in: added uniformity for sedding into place
+	* config/bootstrap.local: remove some exceptionalism.
+	* config/install-defs.sh: script for installing "defs" files (new)
+	* getdefs/test/Makefile.am: use the "defs" file so the tests can
+	run in parallel
+	* getdefs/test/*.test: use the "defs" from autoopts testing,
+	tweaking the sample test output as needed.
+	* autoopts/usage.c: guard inclusion of <libintl.h> with
+	defined(ENABLE_NLS) && defined(HAVE_LIBINTL_H)
 
 2013-02-24  Bruce Korb  <bkorb@gnu.org>
 

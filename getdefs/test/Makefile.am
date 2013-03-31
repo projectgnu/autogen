@@ -22,20 +22,26 @@
 
 TESTS      = cfg.test index.test option.test subblock.test
 EXTRA_DIST = defs $(TESTS)
-testsubdir = ./testdir
 
 TESTS_ENVIRONMENT = top_srcdir=$(top_srcdir) \
-	testsubdir=$(testsubdir) srcdir=$(srcdir) \
+	srcdir=$(srcdir) top_builddir=$(top_builddir) \
 	GDexe=$(GDexe) AGexe=$(AGexe) CLexe=$(CLexe)
 
 distclean-local:
-	-rm -rf $(testsubdir) FAILURES
+	-rm -rf *-testd FAILURES defs
 
-check : perm-stamp
+$(TESTS)    : defs
 
-$(TESTS) : perm-stamp
+defs        : ${top_builddir}/autoopts/test/defs
+	$(TESTS_ENVIRONMENT) $(SHELL) \
+		$(top_srcdir)/config/install-defs.sh \
+			$(top_builddir)/autoopts/test/defs
 
-perm-stamp :
-	cd $(srcdir) ; chmod +x *.test
+${top_builddir}/autoopts/test/defs :
+	cd ${top_builddir}/autoopts/test ; $(MAKE) defs
+
+verbose     : defs
+	rm -rf FAILURES *-testd ; \
+	VERBOSE=true $(MAKE) check TESTS="$(TESTS)"
 
 # end of Makefile.am

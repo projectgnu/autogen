@@ -38,7 +38,7 @@ endif
 endif
 
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tlib config/liboptschk.m4
-EXTRA_DIST     = $(misc_extra) $(pkgdata_DATA) config/gnulib-cache.m4
+EXTRA_DIST     = $(misc_extra) $(pkgdata_DATA)
 DISTCLEANFILES = stamp-h
 
 distcleancheck_listfiles = \

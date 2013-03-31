@@ -161,7 +161,8 @@ ag_err 4 ${testname}2.def
 test -f ${testname}-task4-OK \
   && failure unexpected success for test-4
 
-${EGREP} -v "$omit_pat" ${testname}.err4 > ${testname}.res4
+${EGREP} -v "$omit_pat" ${testname}.err4 | \
+  ${SED} -n '/Failing Guile command:/q;p' > ${testname}.res4
 cmp -s  ${testname}.res4 ${testname}.base4 \
   || failure "expected->actual${nl}`diff -c ${testname}.base4 ${testname}.res4`"
 

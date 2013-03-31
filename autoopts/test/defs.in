@@ -53,7 +53,12 @@ cfg_vals()
   TESTS=''
   builddir=`pwd`
   progpid=$$
-  top_builddir=`cd ${top_builddir=@top_builddir@} >/dev/null ; pwd`
+  : ${top_builddir=@top_builddir@}
+  top_builddir=`cd ${top_builddir} >/dev/null ; pwd`
+  : ${top_srcdir=@top_srcdir@}
+  top_srcdir=`cd ${top_srcdir} >/dev/null ; pwd`
+  : ${srcdir=@srcdir@}
+  srcdir=`cd $srcdir >/dev/null && pwd`
   . ${top_builddir}/config/shdefs "${builddir}/`
         echo $0|${SED:-sed} 's@.*/@@'`"
   progname=`echo "$1" | ${SED} 's,^.*/,,'`
@@ -62,8 +67,6 @@ cfg_vals()
   tstdir=${builddir}/${testsubdir}
   PS4=">${testname}-\${FUNCNAME}> "
   test_name=`echo ${testname} | ${SED} 's/-/_/g'`
-  : ${srcdir=$top_srcdir/autoopts/test}
-  srcdir=`cd $srcdir >/dev/null && pwd`
   ( exec 2>/dev/null; ulimit -c unlimited ) && \
     ulimit -c unlimited
 
@@ -197,19 +200,23 @@ be_verbose()
 
   run_ag()
   {
-    local tfile= opts= tr=
-    tfile=${testname}-aglog-${1}-${progpid}.log
-    opts=''
-    ${verb_ok:-true} && \
-      tr="--trace=every --trace-out=>>${tfile}"
+    local opts= tfile=${testname}-aglog-${1}-${progpid}.log
+    ${verb_ok:-true} && {
+      case " $* " in
+      *' --trace'* ) : ;;
+      * )
+        opts="--trace=every --trace-out=>>${tfile}"
+        ;;
+      esac
+    }
     shift
 
     case " $* " in
     *' -L'* ) : ;;
-    * ) opts="${agl_opts}" ;;
+    * ) opts="${opts} ${agl_opts}" ;;
     esac
 
-    MALLOC_CHECK_=2 ${AGexe} ${opts} ${tr} "$@"
+    MALLOC_CHECK_=2 ${AGexe} ${opts} "$@"
   }
 
   init_tests
