@@ -1,7 +1,14 @@
-2013-03-09  Bruce Korb  <bkorb@gnu.org>
+2013-03-23  Bruce Korb  <bkorb@gnu.org>
 
 	* everywhere: file start and end markers.
 	* add-on/cright-update: updating it.
+	* autoopts/tpl/lgplv2.lic: new license file
+	* autoopts/genshell.def: use it
+	* agen5/autogen.c (done_check): use "exit" not "_exit".
+	(cleanup_and_abort): likewise
+	* autoopts/streqvcmp.c (streqvcmp): do not transform character
+	before having tested for the same character.
+	(strneqvcmp): likewise
 
 2013-02-24  Bruce Korb  <bkorb@gnu.org>
 

@@ -27,26 +27,18 @@ verb_ok=true
 
 ag_err()
 {
-  (
-    set +x
-    if ${VERBOSE} && ${verb_ok}
-    then
-      AUTOGEN_TRACE=everything
-      AUTOGEN_TRACE_OUT=${testname}-task${seq}-aglog.txt
-      VERBOSE=false
-      export AUTOGEN_TRACE AUTOGEN_TRACE_OUT
-    else
-      unset AUTOGEN_TRACE AUTOGEN_TRACE_OUT
-    fi
+  if ${VERBOSE} && ${verb_ok}
+  then
+    AUTOGEN_TRACE=everything
+    AUTOGEN_TRACE_OUT='>>'${testname}-task${seq}-aglog.txt
+    export AUTOGEN_TRACE AUTOGEN_TRACE_OUT
+  else
+    unset AUTOGEN_TRACE AUTOGEN_TRACE_OUT
+  fi
 
-    seq=${1} ; shift
-    exec 2> ${testname}.err${seq}
-    touch ${testname}-task${seq}-running
-    run_ag x${seq} "$@"
-    res=$?
-    rm -f ${testname}-task${seq}-running
-    exit $res
-  ) && touch ${testname}-task${seq}-OK
+  seq=${1} ; shift
+  ${AGexe} ${agl_opts} "$@" 2> ${testname}.err${seq} && \
+    touch ${testname}-task${seq}-OK
 }
 
 # # # # # # # # # # # # # TEST 1 # # # # # # # # # # # #

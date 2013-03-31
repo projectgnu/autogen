@@ -52,6 +52,7 @@ cfg_vals()
   set -a
   TESTS=''
   builddir=`pwd`
+  progpid=$$
   top_builddir=`cd ${top_builddir=@top_builddir@} >/dev/null ; pwd`
   . ${top_builddir}/config/shdefs "${builddir}/`
         echo $0|${SED:-sed} 's@.*/@@'`"
@@ -103,7 +104,7 @@ purge()
   set -- $bad
   test "x${RANDOM}" = "x${RANDOM}" && RANDOM=`expr 0${RANDOM} + 1 2>/dev/null`
 
-  f=ZZPURGE-${1}-${RANDOM}-$$
+  f=ZZPURGE-${1}-${RANDOM}-${progpid}
   if test $# -gt 1
   then mkdir "${f}"
        mv $* "${f}/."
@@ -171,7 +172,8 @@ be_silent()
 
   run_ag()
   {
-    local opts=''
+    local opts=
+    opts=''
     shift
 
     case " $* " in
@@ -195,10 +197,12 @@ be_verbose()
 
   run_ag()
   {
-    local tfile=${testname}-aglog-${1}-$$.log
+    local tfile= opts= tr=
+    tfile=${testname}-aglog-${1}-${progpid}.log
+    opts=''
+    ${verb_ok:-true} && \
+      tr="--trace=every --trace-out=>>${tfile}"
     shift
-    local opts=''
-    local tr="--trace=every --trace-out=>>${tfile}"
 
     case " $* " in
     *' -L'* ) : ;;
@@ -298,15 +302,18 @@ failure()
   kill -9 $THUMPER_PID
   trap '' 15
   set -x
-  tdir=`basename $testsubdir`
-  cd ${testsubdir}/..
+  cd ${tstdir}/..
   if test -d FAILURES
-  then test -d FAILURES/$tdir && rm -rf FAILURES/$tdir
+  then test -d "FAILURES/${testsubdir}" && \
+    purge "FAILURES/${testsubdir}"
   else mkdir FAILURES
   fi
 
-  mv $tdir FAILURES/$tdir
-
+  mv "${testsubdir}" "FAILURES/${testsubdir}"
+  test -f "${testname}.log" && {
+    mv "${testname}.log" "FAILURES/${testsubdir}/amtest-${testname}.log"
+    ln -s "FAILURES/${testsubdir}/amtest-${testname}.log" "${testname}.log"
+  }
   echo FAILURE: "$*"
   exit 1
 }
@@ -316,7 +323,7 @@ thumper()
   exec > /dev/null 2>&1 </dev/null
   bdir=`cd "$builddir" >/dev/null ; pwd`
   cd /
-  rpid=$$
+  rpid=${progpid}
   test -z "${kill_delay}" && kill_delay=3
   kill_delay=`expr $kill_delay '*' $AG_TIMEOUT`
   while test ${kill_delay} -gt 0

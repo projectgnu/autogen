@@ -1,4 +1,12 @@
-New in __CURRENT_VERSION__ February 2013
+New in __CURRENT_VERSION__ March 2013
+
+* lgplv2.lic: new license file for genshell:
+  the GNU Lesser General Public License, version 2.0 or later
+* automake cleanups
+* debugging needs have been disentangled from installed use of
+  gettext.
+
+New in 5.17.2 February 2013
 
 * AutoOpts translatability improvements.  The translatable strings
   are now inserted into a dummy procedure in the option processing
@@ -7,12 +15,6 @@ New in __CURRENT_VERSION__ February 2013
   issues.  Also, if the client code provides the full usage text
   string, it will be broken up into "paragraphs" that are easier
   for the translators to do their jobs.
-
-* "for-each" main procedures may now be specified as processing
-  standard input as a data file instead of being replacement
-  operands.
-
-* configuration fixes.
 
 * i18n updates -- the translatable strings were not very.
   The stuff was reworked so that usage text can be constructed
@@ -30,33 +32,19 @@ New in __CURRENT_VERSION__ February 2013
   Cleanup is no longer performed before initialzation is complete.
   "SIGPROF" is exempted from capture.
 
-* Doxyfication: the attribute "addtogroup" is now recognized in
-  the option definitions.  This will cause the emitted code to
-  be surrounded by doxygen "addtogroup"-ing comments.
-
 New in 5.17.1 January, 2013
 
 * Added a documentation substitution stanza so that texi, man
   and mdoc documents may be massaged before being finalized.
 
-* Many, many picky warning fixes
-
 * Section 5 man pages and mdoc pages can now be emitted
   with the templates.  They still need work, though.
-
-* The enumeration and bitmask management templates are now rigged
-  so they work in the build tree without autogen being installed.
 
 New in 5.17 - December 2012
 
 * Bit Map and Enumeration templates are now fully integrated.
   They have their own section in the texi docs and the
   templates produce more easily used output.
-
-* Guile adjustments.  Early 2.0.x Guile fiddles the
-  LD_LIBRARY_PATH variable, causing problems when you are
-  trying to run programs that use not-yet-installed libraries.
-  The LD_LIBRARY_PATH is now preserved.
 
 New in 5.16 May 2012
 

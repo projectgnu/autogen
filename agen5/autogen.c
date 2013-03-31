@@ -209,7 +209,7 @@ cleanup_and_abort(int sig)
     int sig_exit_code = AUTOGEN_EXIT_SIGNAL + sig;
     if (processing_state == PROC_STATE_INIT) {
         fprintf(stderr, AG_NEVER_STARTED, sig, strsignal(sig));
-        _exit(sig_exit_code);
+        exit(sig_exit_code);
     }
 
     if (*oops_pfx != NUL) {
@@ -223,7 +223,7 @@ cleanup_and_abort(int sig)
 
     if (processing_state == PROC_STATE_ABORTING) {
         exit_cleanup(EXIT_PCLOSE_NOWAIT);
-        _exit(sig_exit_code);
+        exit(sig_exit_code);
     }
 
     processing_state = PROC_STATE_ABORTING;
@@ -449,7 +449,7 @@ done_check(void)
      *  of inner_main().)
      */
     if (processing_state != PROC_STATE_OPTIONS)
-        _exit(exit_code);
+        exit(exit_code);
 }
 
 

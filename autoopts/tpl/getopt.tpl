@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2013-01-15 15:53:52 bkorb"
+  Time-stamp:        "2013-03-11 10:57:00 bkorb"
 _EOF_
 \` `            +][+
 
@@ -489,13 +489,18 @@ DEFINE emit-usage-string    +][+
 
   (out-push-new)            +][+
   INCLUDE "usage.tlib"      +][+
-  (kr-string (string-append (shell
-  "sed -e '/version information/s/ -v \\[arg\\]/ -v      /' \
-       -e '/: illegal option --/d' \
-       -e 's/ --version\\[=arg\\]/ --version      /' <<_EOF_\n"
-  (out-pop #t)
-  "\n_EOF_"
-  ) "\n" ))                 +][+
+  (out-suspend "use-text")
+  (out-push-new)           \+]
+sed -e '/version information/s/ -v \[arg\]/ -v      /' \
+    -e '/: illegal option --/d' \
+    -e 's/ --version\[=arg\]/ --version      /' <<_EOF_
+[+ (out-resume "use-text") (out-pop #t) +]
+_EOF_[+
+
+ (kr-string (string-append (shell (out-pop #t)) "\n" )
+ )
+
++][+
 
 ENDDEF
 

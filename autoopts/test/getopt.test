@@ -77,9 +77,9 @@ go_init()
   *' -lgen '* ) aolib=${aolib}\ -lgen ;;
   esac
 
-  cp ${top_srcdir}/autoopts/tpl/*.* ${TMPDIR}/.
+  cp ${top_srcdir}/autoopts/tpl/* ${TMPDIR}/.
   test "X${top_srcdir}" = "X${top_builddir}" || \
-    cp ${top_builddir}/autoopts/tpl/*.* ${TMPDIR}/.
+    cp ${top_builddir}/autoopts/tpl/* ${TMPDIR}/.
   chmod u+w ${TMPDIR}/*
 
   ${SED} -e "/^cflags=/s@=.*@='-I${TMPDIR}/autoopts -I${top_builddir}'@" \
