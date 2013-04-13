@@ -162,13 +162,13 @@ mk_empty_text(char const * start, char const * end, SCM def)
     char * pzOut;
 
     if (! AG_SCM_STRING_P(def)) {
-        pzOut = ag_scribble(mlen);
+        pzOut = scribble_get(mlen);
         sprintf(pzOut, LINE_CONCAT3_FMT+3, start, end);
 
     } else {
         char const * pzDef = ag_scm2zchars(def, "dft extr str");
         mlen += (ssize_t)AG_SCM_STRLEN(def) + 1;
-        pzOut = ag_scribble(mlen);
+        pzOut = scribble_get(mlen);
         sprintf(pzOut, LINE_CONCAT3_FMT, start, pzDef, end);
     }
 

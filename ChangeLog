@@ -1,5 +1,21 @@
 2013-03-23  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/scmStrings.c: remove scribbling code to scribble.c and move
+	ag_scm2zchars() to expGuile.c.
+	* agen5/scribble.c: new -- extracted scribble code
+	* agen5/scribble.h: new
+	* agen5/Makefile.am: accommodate these changes
+	* agen5/*: replace 'ag_scribble' with just 'scribble'.
+	* agen5/expGuile.c (ag_scm2zchars): moved here from scmStrings.c
+	* agen5/test/error.test: strip off all trailing Guile messages from
+	test output -- they change all the time.
+	* autoopts/tpl/cmd-doc.tlib: clarify behavior of --save-opts option
+	* autoopts/tpl/agtexi-cmd.tpl: likewise
+
+2013-03-23  Bruce Korb  <bkorb@gnu.org>
+
+	5.17.3 release
+
 	* everywhere: file start and end markers.
 	* add-on/cright-update: updating it.
 	* autoopts/tpl/lgplv2.lic: new license file

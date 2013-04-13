@@ -277,7 +277,7 @@ ag_scm_hide_email(SCM display, SCM eaddr)
         (strlen(end_adr) * HTML_DEC_DIGIT_LEN)
         + (size_t)st_len + HIDE_EMAIL_END_FMT_LEN + strlen(disp));
 
-    char *  res  = ag_scribble(str_size);
+    char *  res  = scribble_get(str_size);
     char *  scan = res;
 
     memcpy(scan, HIDE_EMAIL_START_STR, (size_t)st_len);

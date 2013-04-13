@@ -221,7 +221,7 @@ handle_hash_line(char const * pz)
         pzScn = SPN_FILE_NAME_CHARS(pzScn);
 
         len   = (size_t)(pzScn - (pz + 2));
-        nmbuf = ag_scribble((ssize_t)len);
+        nmbuf = scribble_get((ssize_t)len);
         memcpy(nmbuf, pz+2, len);
         nmbuf[len] = NUL;
 

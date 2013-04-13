@@ -69,6 +69,7 @@
 #include "autoopts/autoopts.h"
 #include "directive.h"
 #include "snprintfv/printf.h"
+#include "scribble.h"
 
 #define  LOG10_2to32  10  /* rounded up */
 

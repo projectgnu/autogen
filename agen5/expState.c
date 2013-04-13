@@ -700,7 +700,7 @@ do_tpl_file_line(int line_delta, char const * fmt)
 
     {
         ssize_t sz = (ssize_t)(strlen(fmt) + strlen(args[0]) + 24);
-        buf = ag_scribble(sz);
+        buf = scribble_get(sz);
     }
 
     sprintfv(buf, fmt, (snv_constpointer*)args);
@@ -814,7 +814,7 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
 
         maxlen = (ssize_t)(
             strlen(args[0]) + strlen(pzFmt) + LOG10_2to32 + 1);
-        buf    = ag_scribble(maxlen);
+        buf    = scribble_get(maxlen);
         sprintfv(buf, pzFmt, (snv_constpointer*)args);
     }
 

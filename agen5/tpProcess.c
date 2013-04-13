@@ -59,12 +59,12 @@ gen_block(templ_t * tpl, macro_t * mac, macro_t * emac)
         if (fc >= FUNC_CT)
             fc = FTYP_BOGUS;
 
+        scribble_free();
         if (OPT_VALUE_TRACE >= TRACE_EVERYTHING)
             trace_macro(tpl, mac);
 
         cur_macro = mac;
         mac = (*(load_procs[ fc ]))(tpl, mac);
-        ag_scribble_free();
     }
 }
 

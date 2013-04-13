@@ -661,6 +661,7 @@ IF (exist? "home-rc")                   =][=
 Saves the final, configured option state to the specified file (the optional
 option argument).  If no file is specified, then it will be saved to the
 highest priority (last named) @file{rc-file} in the search list.
+The command will exit after updating this file.
 [=
   ENDIF disable-save                    =][=
 

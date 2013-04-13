@@ -435,7 +435,7 @@ done_check(void)
         cgi_stderr = NULL;
     }
 
-    ag_scribble_deinit();
+    scribble_deinit();
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
         fprintf(trace_fp, DONE_CHECK_DONE);

@@ -255,6 +255,7 @@ Pass the extended usage information through a pager.
 .BR \-> " [\fIrcfile\fP]," " \-\-save-opts" "[=\fIrcfile\fP]"
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
+The command will exit after updating the config file.
 .TP
 .BR \-< " \fIrcfile\fP," " \-\-load-opts" "=\fIrcfile\fP," " \-\-no-load-opts"
 Load options from \fIrcfile\fP.
@@ -379,6 +380,7 @@ Pass the extended usage information through a pager.
 .It \-> " [\fIrcfile\fP]," " \-\-save\-opts" "[=\fIrcfile\fP]"
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
+The command will exit after updating the config file.
 .It \-< " \fIrcfile\fP," " \-\-load\-opts" "=\fIrcfile\fP," " \-\-no\-load\-opts"
 Load options from \fIrcfile\fP.
 The \fIno\-load\-opts\fP form will disable the loading

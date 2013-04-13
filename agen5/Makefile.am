@@ -21,9 +21,12 @@
 SUBDIRS         = test
 AM_CPPFLAGS     = @INCLIST@
 FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
-TEMPLATES       = snarf.tpl $(FSMTPL)
-DEFINITIONS     = cgi.def opts.def pseudo.def defParse.def
-GEN_CSRC        = opts.h directive.h expr.ini expr.h proto.h pseudo-fsm.h
+templates       = snarf.tpl $(FSMTPL) guile-iface.tpl
+definitions     = cgi.def opts.def pseudo.def guile-iface.def defParse.def \
+		  ag-text.def
+ghdr            = ag-text.h cgi-fsm.h defParse-fsm.h directive.h expr.h \
+		  functions.h guile-iface.h opts.h proto.h pseudo-fsm.h
+gen_csrc        = expr.ini defParse.x $(ghdr)
 pkgdata_DATA    = $(FSMTPL)
 man_MANS        = autogen.1
 DISTCLEANFILES  = stamp-* ag.c
@@ -31,35 +34,32 @@ bin_PROGRAMS    = autogen
 
 # The list of source files with AutoGen functions
 #
-FUNCLIST        = \
-	funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
+FUNCLIST = funcCase.c funcDef.c funcEval.c funcFor.c funcIf.c functions.c
 
-# The list of source files with Guile expression functions defined
+# The list of source files with Guile expression functions defined,
+# plus the parse/lex modules that must be in this order.
 #
-EXPRLIST        = directive.c \
+exprlist	= defParse-fsm.c defLex.c directive.c $(FUNCLIST) \
     expExtract.c expFormat.c expGperf.c expGuile.c  expMake.c \
-    expOutput.c  expPrint.c  expState.c expString.c agShell.c \
-    $(FUNCLIST)
+    expOutput.c  expPrint.c  expState.c expString.c agShell.c
 
-FSMLIST         = cgi-fsm.c defParse-fsm.c
-csrc = \
-    autogen.c    ag-text.c $(FSMLIST) $(EXPRLIST)  agCgi.c \
-    agDep.c      agInit.c  agUtils.c  defDirect.c  defFind.c \
-    defLex.c     defLoad.c fmemopen.c loadPseudo.c opts.c \
-    scmStrings.c tpLoad.c  tpParse.c  tpProcess.c
+csrc = autogen.c $(exprlist) \
+    ag-text.c    agCgi.c      agDep.c      agInit.c     agUtils.c \
+    cgi-fsm.c    defDirect.c  defFind.c    defLoad.c    fmemopen.c \
+    loadPseudo.c opts.c       scribble.c   tpLoad.c     tpParse.c \
+    tpProcess.c
 
-hsrc = ag-text.h autogen.h defParse-fsm.h functions.h cgi-fsm.h guile-iface.h
+all_src     = $(csrc) $(gen_csrc) autogen.h scribble.h
 
-EXTRA_DIST = $(csrc) $(hsrc) $(DEFINITIONS) $(TEMPLATES) $(man_MANS) \
-		defParse.x bootstrap.dir schemedef.scm \
-		guile-iface.def guile-iface.tpl ag-text.def \
+EXTRA_DIST  = $(all_src) $(definitions) $(templates) $(man_MANS) \
+		bootstrap.dir schemedef.scm \
 		invoke-autogen.texi mk-stamps.sh
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
 SNV_LIB         = $(top_builddir)/snprintfv/libsnprintfv.la
 
 nodist_autogen_SOURCES = ag.c
-autogen_SOURCES = $(GEN_CSRC)
+autogen_SOURCES = $(gen_csrc)
 autogen_LDADD   = $(LO_LIB) $(SNV_LIB) $(LIBGUILE_LIBS)
 autogen_LDFLAGS = $(DYNAMIC_AG)
 autogen_CFLAGS  = $(LIBGUILE_CFLAGS)

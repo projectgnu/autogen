@@ -63,7 +63,7 @@ initialize(int arg_ct, char ** arg_vec)
 {
     putenv(C(char *, ld_lib_path));
 
-    ag_scribble_init();
+    scribble_init();
 
     /*
      *  Initialize all the Scheme functions.

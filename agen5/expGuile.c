@@ -26,6 +26,58 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ *  As of Guile 1.7.x, access to the NUL terminated string referenced by
+ *  an SCM is no longer guaranteed.  Therefore, we must extract the string
+ *  into one of our "scribble" buffers.
+ *
+ * @param  s     the string to convert
+ * @param  type  a string describing the string
+ * @return a NUL terminated string, or it aborts.
+ */
+LOCAL char *
+ag_scm2zchars(SCM s, const char * type)
+{
+#if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
+
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf(NOT_STR_FMT, type));
+
+    if (SCM_SUBSTRP(s))
+        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
+    return SCM_CHARS(s);
+
+#else
+    size_t len;
+    char * buf;
+
+    if (! AG_SCM_STRING_P(s))
+        AG_ABEND(aprf(NOT_STR_FMT, type));
+
+    len = scm_c_string_length(s);
+    if (len == 0) {
+        static char z = NUL;
+        return &z;
+    }
+
+    buf = scribble_get((ssize_t)len);
+
+    {
+        size_t buflen = scm_to_locale_stringbuf(s, buf, len);
+        if (buflen != len)
+            AG_ABEND(aprf(SCM2ZCHARS_BAD_VAL, buflen, len));
+    }
+
+    buf[len] = NUL;
+    return buf;
+#endif
+}
+
+/**
+ * convert complex Guile type to an enum value.
+ * @param typ the SCM for which we wish to know the type
+ * @returns teGuileType -- our own enumeration, since Guile does not have one.
+ */
 LOCAL teGuileType
 ag_scm_type_e(SCM typ)
 {
@@ -483,7 +535,7 @@ ag_scm_string_to_camelcase(SCM str)
         return SCM_UNDEFINED;
 
     len = (int)AG_SCM_STRLEN(str);
-    res = pzd = ag_scribble(len + 1);
+    res = pzd = scribble_get(len + 1);
     pzs = C(char *, AG_SCM_CHARS(str));
 
     while (--len >= 0) {

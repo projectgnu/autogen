@@ -228,7 +228,7 @@ EOF
 # print file and line, but it was made just too hard.  Strip out all
 # the Guile library error messages.  :(
 #
-${SED} -n '/^Scheme evaluation error./,$p' ${testname}.err6 | \
+${SED} -n '/^Scheme evaluation error./,/^==========/p' ${testname}.err6 | \
   ${SED} "/^${testname}\.tpl6:7:4:/d" > ${testname}.res6
 
 cmp -s  ${testname}.base6  ${testname}.res6 || \

@@ -346,7 +346,7 @@ ag_scm_makefile_script(SCM text_scm)
     if (sz == 0)
         return AG_SCM_STR02SCM(zNil);
 
-    bol = out = res_str = ag_scribble((ssize_t)sz);
+    bol = out = res_str = scribble_get((ssize_t)sz);
 
     /*
      *  Force the initial line to start with a real tab.

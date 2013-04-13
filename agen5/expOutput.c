@@ -83,7 +83,7 @@ do_output_file_line(int line_delta, char const * fmt)
 
     {
         ssize_t sz = (ssize_t)(strlen(fmt) + strlen(fname) + 24);
-        buf = ag_scribble(sz);
+        buf = scribble_get(sz);
     }
 
     {
@@ -304,7 +304,7 @@ ag_scm_out_pop(SCM ret_contents)
             pos = 0;
 
         } else {
-            pz = ag_scribble((ssize_t)pos + 1);
+            pz = scribble_get((ssize_t)pos + 1);
             rewind(cur_fpstack->stk_fp);
             if (fread(pz, (size_t)pos, (size_t)1, cur_fpstack->stk_fp) != 1)
                 AG_CANT(SCM_OUT_POP_NO_REREAD, cur_fpstack->stk_fname);
@@ -564,7 +564,7 @@ ag_scm_make_tmp_dir(void)
     if (pz_temp_tpl == NULL) {
         char * tmpdir = shell_cmd(MK_TMP_DIR_CMD);
         char * cmdbf  =
-            ag_scribble(SET_TMP_DIR_CMD_LEN + 2 * MK_TMP_DIR_CMD_LEN);
+            scribble_get(SET_TMP_DIR_CMD_LEN + 2 * MK_TMP_DIR_CMD_LEN);
 
         pz_temp_tpl = tmpdir;
         temp_tpl_dir_len = strlen(tmpdir) - 9;    // "ag-XXXXXX"
@@ -650,7 +650,7 @@ ag_scm_out_push_new(SCM new_file)
             ag_scm_make_tmp_dir();
 
         tmplen  = temp_tpl_dir_len + 10;
-        tmp_fnm = ag_scribble((ssize_t)tmplen + 1);
+        tmp_fnm = scribble_get((ssize_t)tmplen + 1);
         memcpy(tmp_fnm, pz_temp_tpl, tmplen + 1);
         tmpfd   = mkstemp(tmp_fnm);
 
@@ -922,7 +922,7 @@ ag_scm_make_header_guard(SCM name)
         size_t sz1 = MK_HEAD_GUARD_SCM_LEN + gsz + osz;
         size_t sz2 = MK_HEAD_GUARD_GUARD_LEN + 2 * gsz;
         size_t sz  = (sz1 < sz2) ? sz2 : sz1;
-        char * p   = ag_scribble((ssize_t)sz);
+        char * p   = scribble_get((ssize_t)sz);
         sprintf(p, MK_HEAD_GUARD_SCM, opz, gpz);
         (void)ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
 

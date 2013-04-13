@@ -192,7 +192,7 @@ do_substitution(
     }
 
     {
-        char * dest = ag_scribble(str_len + 1);
+        char * dest = scribble_get(str_len + 1);
         *ppz_res = dest;
         *res_len = str_len;
 
@@ -416,7 +416,7 @@ ag_scm_join(SCM sep, SCM list)
     }
 
     l_len = sv_l_len;
-    pzRes = pzScan = ag_scribble((ssize_t)str_len);
+    pzRes = pzScan = scribble_get((ssize_t)str_len);
 
     /*
      *  Now, copy each one into the output
@@ -501,7 +501,7 @@ ag_scm_prefix(SCM prefx, SCM txt)
             }
         } exit_count:;
 
-        r_str = scan = ag_scribble((ssize_t)out_size);
+        r_str = scan = scribble_get((ssize_t)out_size);
     }
 
     memcpy(scan, prefix, pfx_size);

@@ -512,6 +512,7 @@ IF (exist? "homerc") :+]
   ENDIF    :+]
 Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
+The command will exit after updating the config file.
 .It [+:
 
   IF (. use-flags)  :+]\-[+: ?% load-opts-value "%s" "<"

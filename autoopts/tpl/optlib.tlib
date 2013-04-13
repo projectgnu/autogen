@@ -1121,8 +1121,8 @@ DEFINE help-strs
     (string-table-add-ref opt-strs "more-help")=])
 #define MORE_HELP_FLAGS (OPTST_IMM | OPTST_NO_INIT)
 #else
-#define MORE_HELP_DESC  NULL
-#define MORE_HELP_name  NULL
+#define MORE_HELP_DESC  HELP_DESC
+#define MORE_HELP_name  HELP_name
 #define MORE_HELP_FLAGS (OPTST_OMITTED | OPTST_NO_INIT)
 #endif[=
 

@@ -161,7 +161,7 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         time_t     curTime = time(NULL);
         struct tm *  pTime = localtime(&curTime);
 
-        date_str = ag_scribble((ssize_t)tsiz);
+        date_str = scribble_get((ssize_t)tsiz);
         strftime((char *)date_str, tsiz, tim_fmt, pTime);
     }
 
@@ -453,7 +453,7 @@ find_lic_text(
         flen = stbf.st_size;
     }
 
-    ftext    = ag_scribble(flen + EXP_FMT_BAD_LIC_LEN + 1);
+    ftext    = scribble_get(flen + EXP_FMT_BAD_LIC_LEN + 1);
     *txt_len = flen;
 
     {
@@ -891,7 +891,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         /*
          *  Create our output buffer and insert the first prefix
          */
-        pzOut = pzSaveRes = ag_scribble(out_size);
+        pzOut = pzSaveRes = scribble_get(out_size);
 
         strcpy(pzOut, prefx);
         pzOut += pfx_size;
