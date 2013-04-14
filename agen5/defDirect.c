@@ -100,7 +100,7 @@ count_lines(char const * start, char const * end)
 /**
  *  Skip through the text to a matching "#endif".  We do this when we
  *  have processed the allowable text (found an "#else" after
- *  accepting the preceeding text) or when encountering a "#if*def"
+ *  accepting the preceding text) or when encountering a "#if*def"
  *  while skipping a block of text due to a failed test.
  */
 static char *
