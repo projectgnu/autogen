@@ -58,7 +58,6 @@ CSRC            = parse-duration.c $(GEN_SRC) \
     stack.c    streqvcmp.c text_mmap.c time.c       tokenize.c \
     usage.c    version.c   init.c
 
-
 SRC             = $(HDRS) $(CSRC) $(GENSRC)
 DEF_FILES       = genshell.def $(srcdir)/funcs.def ao-strs.def
 pkgconfigdir    =$(libdir)/pkgconfig

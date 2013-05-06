@@ -133,6 +133,7 @@ do_line() {
     case "${line}" in
     '@subheading'* ) echo "$line" | sed 's/@subheading/.SS /' ;;
     '@*' ) echo .br ;;
+    '@sp') echo echo "${line}" | sed 's/@sp/.sp/' ;;
     ''   ) echo .sp ;;
     '@'[{}]* ) echo "${line}" | sed 's/@\([{}]\)/\1/g' ;;
     '@'* )

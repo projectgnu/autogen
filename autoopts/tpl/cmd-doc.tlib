@@ -599,6 +599,9 @@ the configuration files.[+:
     ~~ '\.|\$HOME'                    :+]
 The file "\fI[+: (string-append (get "homerc") "/" rc-file)
 :+]\fP" will be used, if present.[+:
+
+    == ""                             :+][+:
+
     *                                 :+]
 The \fIhomerc\fP file is "\fI[+:homerc:+]\fP", unless that is a directory.
 In that case, the file "\fI[+: (. rc-file) :+]\fP"

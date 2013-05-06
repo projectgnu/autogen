@@ -108,7 +108,9 @@ FOR flag                        =][=
 ENDFOR flag                     =][=
 
 IF
-   (define home-rc-files (exist? "homerc"))
+   (define home-rc-files (> (count "homerc") 0))
+   (if (and (not home-rc-files) (exist? "homerc"))
+       (set! home-rc-files (> (string-length (get "homerc")) 0)) )
    (define environ-init  (exist? "environrc"))
    (or home-rc-files environ-init)
    =][=

@@ -292,6 +292,7 @@ print_enumeration(tOptions * pOpts, tOptDesc * pOD)
 static void
 print_membership(tOptions * pOpts, tOptDesc * pOD)
 {
+    char const * svstr = pOD->optArg.argString;
     char const * pz;
     uintptr_t val = 1;
     printf(zOptNumFmt, pOpts->pzPROGNAME, pOD->pz_NAME,
@@ -299,13 +300,9 @@ print_membership(tOptions * pOpts, tOptDesc * pOD)
     pOD->optCookie = (void*)(uintptr_t)~0UL;
     (*(pOD->pOptProc))(OPTPROC_RETURN_VALNAME, pOD);
 
-    /*
-     *  We are building the typeset list.  The list returned starts with
-     *  'none + ' for use by option saving stuff.  We must ignore that.
-     */
-    pz = pOD->optArg.argString + 7;
+    pz = pOD->optArg.argString;
     while (*pz != NUL) {
-        printf("typeset -x -i %s_", pOD->pz_NAME);
+        printf("readonly %s_", pOD->pz_NAME);
         pz = SPN_PLUS_N_SPACE_CHARS(pz);
 
         for (;;) {
@@ -321,8 +318,7 @@ print_membership(tOptions * pOpts, tOptDesc * pOD)
     }
 
     AGFREE(pOD->optArg.argString);
-    pOD->optArg.argString = NULL;
-    pOD->fOptState &= ~OPTST_ALLOC_ARG;
+    pOD->optArg.argString = svstr;
 }
 
 static void

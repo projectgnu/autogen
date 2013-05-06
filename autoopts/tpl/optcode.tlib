@@ -272,7 +272,7 @@ ENDIF  there is a version
 [=
 FOR homerc              =][=
   (set! tmp-text (get "homerc"))
-  (if (> (string-length tmp-text)) (begin
+  (if (> (string-length tmp-text) 0) (begin
       (set! homerc-ct  (+ 1 homerc-ct))
       (set! homerc-txt (string-append homerc-txt
             "\n    " (string-table-add-ref opt-strs tmp-text) "," ))
@@ -281,7 +281,7 @@ ENDFOR homerc           =][=
 IF (> homerc-ct 0)     \=]
 /** [= prog-name =] configuration file name. */
 #define zRcName         ([=
- (set! tmp-text (if (exist? "rcfile") (get "rcfile")
+ (set! tmp-text (get "rcfile"
        (string-append "." pname-down "rc") ))
  (string-table-add-ref opt-strs tmp-text) =])
 /** Directories to search for [= prog-name =] config files. */

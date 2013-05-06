@@ -1,3 +1,28 @@
+2013-05-04  Bruce Korb  <bkorb@gnu.org>
+
+
+	* autoopts/enum.c: (set_memb_names) omit superfluous "none" at start of
+	membership list.
+	(check_membership_start): new function broken out of optionSetMembers
+	(find_member_bit): likewise
+	* autoopts/putshell.c: (print_membership): adjust for fixes
+	* autoopts/test/cfg-edit.test: likewise
+	* autoopts/test/keyword.test: likewise
+	* autoopts/tpl/optlib.tlib: add a macro for invoking the member list
+	* autoopts/save.c: (prt_set_arg): remove redundant test
+	* doc/autogen-texi.txt: (arg-type set membership) clarify exactly how
+	the first character of a set membership string is treated.
+	* autoopts/stack.c: (optionUnstackArg): fix Windows code
+	* autoopts/tpl/optcode.tlib: simplify expression
+	* autoopts/tpl/texi2man.sh: handle @sp texi command
+	* autoopts/tpl/texi2mdoc.sh: likewise
+	* autoopts/autogen.map: add "-" and "!" to "set-separator".
+	* config/libopts.def: add check for gettext function
+	* agen5/opts.def: copyright date
+	* autoopts/tpl/agtexi-cmd.tpl: fix check-for-no-homerc attribute
+	* autoopts/tpl/cmd-doc.tlib: omit clause when the only homerc string
+	is empty.
+
 2013-03-23  Bruce Korb  <bkorb@gnu.org>
 
 	* agen5/scmStrings.c: remove scribbling code to scribble.c and move

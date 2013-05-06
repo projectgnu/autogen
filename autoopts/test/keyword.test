@@ -126,20 +126,6 @@ cmp -s ${pair} || \
 ./${testname} --trace=expr --set=thirteen,ninth,third > ${testname}.t1-s || \
   failure "${testname} did not handle its options"
 
-./${testname} --trace=expr --set=thirteen,ninth,third --save=${testname}.cfg || \
-  failure "${testname} could not save its options"
-
-${EGREP} -v '^#' ${testname}.cfg > ${testname}res.cfg || \
-  failure "${testname} could not create ${testname}.cfg"
-
-cat > ${testname}base.cfg <<- \_EndIni_
-	trace               expressions
-	sets                none + second + third + fourth + ninth + thirteenth
-	_EndIni_
-
-cmp -s ${testname}base.cfg ${testname}res.cfg || \
-  failure "`diff ${testname}base.cfg ${testname}res.cfg`"
-
 cat > ${testname}.t1-b <<- \_EndTst_
 	OPTION_CT=2
 	export OPTION_CT
@@ -147,28 +133,45 @@ cat > ${testname}.t1-b <<- \_EndTst_
 	export TEST_KEYWORD_TRACE
 	TEST_KEYWORD_SETS=4366 # 0x110E
 	export TEST_KEYWORD_SETS
-	typeset -x -i SETS_FIRST=1 # 0x1
-	typeset -x -i SETS_SECOND=2 # 0x2
-	typeset -x -i SETS_THIRD=4 # 0x4
-	typeset -x -i SETS_FOURTH=8 # 0x8
-	typeset -x -i SETS_FIFTH=16 # 0x10
-	typeset -x -i SETS_SIXTH=32 # 0x20
-	typeset -x -i SETS_SEVENTH=64 # 0x40
-	typeset -x -i SETS_EIGHTH=128 # 0x80
-	typeset -x -i SETS_NINTH=256 # 0x100
-	typeset -x -i SETS_TENTH=512 # 0x200
-	typeset -x -i SETS_ELEVENTH=1024 # 0x400
-	typeset -x -i SETS_TWELFTH=2048 # 0x800
-	typeset -x -i SETS_THIRTEENTH=4096 # 0x1000
-	typeset -x -i SETS_FOURTEENTH=8192 # 0x2000
-	typeset -x -i SETS_FIFTEENTH=16384 # 0x4000
-	typeset -x -i SETS_SIXTEENTH=32768 # 0x8000
-	typeset -x -i SETS_SEVENTEENTH=65536 # 0x10000
-	typeset -x -i SETS_EIGHTEENTH=131072 # 0x20000
+	readonly SETS_FIRST=1 # 0x1
+	readonly SETS_SECOND=2 # 0x2
+	readonly SETS_THIRD=4 # 0x4
+	readonly SETS_FOURTH=8 # 0x8
+	readonly SETS_FIFTH=16 # 0x10
+	readonly SETS_SIXTH=32 # 0x20
+	readonly SETS_SEVENTH=64 # 0x40
+	readonly SETS_EIGHTH=128 # 0x80
+	readonly SETS_NINTH=256 # 0x100
+	readonly SETS_TENTH=512 # 0x200
+	readonly SETS_ELEVENTH=1024 # 0x400
+	readonly SETS_TWELFTH=2048 # 0x800
+	readonly SETS_THIRTEENTH=4096 # 0x1000
+	readonly SETS_FOURTEENTH=8192 # 0x2000
+	readonly SETS_FIFTEENTH=16384 # 0x4000
+	readonly SETS_SIXTEENTH=32768 # 0x8000
+	readonly SETS_SEVENTEENTH=65536 # 0x10000
+	readonly SETS_EIGHTEENTH=131072 # 0x20000
 	_EndTst_
 
-cmp -s ${testname}.t1-* || \
-  failure "`diff ${testname}.t1-*`"
+pair="${testname}.t1-b ${testname}.t1-s"
+cmp -s ${pair} || \
+  failure "miscompare${nl}`diff -c ${pair}`"
+
+rm -f ${testname}.cfg
+./${testname} --trace=expr --set=+thirteen,ninth,third --save=${testname}.cfg || \
+  failure "${testname} could not save its options"
+
+${EGREP} -v '^#' ${testname}.cfg > ${testname}res.cfg || \
+  failure "${testname} could not create ${testname}.cfg"
+
+cat > ${testname}base.cfg <<- \_EndIni_
+	trace =             expressions
+	sets =              =second + third + fourth + ninth + thirteenth
+	_EndIni_
+
+pair="${testname}base.cfg ${testname}res.cfg"
+cmp -s $pair || \
+  failure "miscompare${nl}`diff -c $pair`"
 
 ${AG_L} -T agman-cmd.tpl ${testname}.def
 test -f test_${testname}.1 || \
@@ -289,8 +292,9 @@ option definitions.
 _EOMan_
 
 ${SED} '1,/^\.SH NAME/d' ${testname}.1 > ${testname}-res.1
-cmp -s ${testname}-base.1 ${testname}-res.1 || \
-  failure "`diff ${testname}-base.1 ${testname}-res.1`"
+pair="${testname}-base.1 ${testname}-res.1"
+cmp -s $pair || \
+  failure "mismatched:${nl}`diff $pair`"
 
 # # # # # # # # # # CHECK OUT MDOC # # # # # # # # # # #
 

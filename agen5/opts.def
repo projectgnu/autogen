@@ -22,7 +22,7 @@ addtogroup = 'autogen';
  */
 
 copyright = {
-    date  = "1992-2012";
+    date  = "1992-2013";
     owner = "Bruce Korb";
     eaddr = 'autogen-users@lists.sourceforge.net';
     type  = gpl;

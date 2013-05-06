@@ -75,7 +75,7 @@ false-type      "nNfF0"       +nul-byte
 file-name       +dir-sep      +suffix
 end-token       +nul-byte     +whitespace
 end-list-entry  +comma        +end-token
-set-separator   "|+"          +end-list-entry
+set-separator   "|+-!"        +end-list-entry
 signed-number   +inversion    +dec-digit
 make-script     +dollar       +newline
 load-line-skip  +horiz-white  +option-marker

@@ -212,10 +212,11 @@ pair="${basehelp} ${testname}.help"
 cmp -s ${pair} || \
   failure "$testname help mismatch$nl`diff ${pair}`"
 
-./${testname} -m 'one + three + seven' '->'
-members=`${SED} -n 's/^members *//p' ${cfg_file}`
+rm -f ${testname}.cfg
+./${testname} -m '+ one + three + seven' '->'
+members=`${SED} -n 's/^members *= *=//p' ${cfg_file}`
 case "${members}" in
-'none + one + three + five + seven' ) : ;;
+'one + three + five + seven' ) : ;;
 * ) failure "members not set to one, three, five and seven" ;;
 esac
 
@@ -255,16 +256,16 @@ cat > ${testname}.sample-cfg <<- \_EOF_
 	    <two>2</two>
 	  </gr>
 	</struct>
-	members             none + one + three + five + seven
-	enumerate           ocho
-	number              -200
-	boolean             true
+	members =           =one + three + five + seven
+	enumerate =         ocho
+	number =            -200
+	boolean =           true
 	_EOF_
 
 cat >> ${testname}.sample-cfg <<- _EOF_
-	in-file             ${srcdir}/${testname}.test
-	out-file            ${out_file}
-	test-file           ${dir}/${testname}-test-file
+	in-file =           ${srcdir}/${testname}.test
+	out-file =          ${out_file}
+	test-file =         ${dir}/${testname}-test-file
 	_EOF_
 pair=${testname}.sample-cfg\ ${cfg_file}
 cmp ${pair} || \
@@ -306,9 +307,9 @@ done
 ./${testname} -k alpha -k beta -k omega ${cfg_file}-XX
 ${SED} '/^#/d' ${cfg_file}-XX > ${cfg_file}-2
 cat > ${cfg_file}-3 <<- _EOF_
-	stacking            alpha
-	stacking            beta
-	stacking            omega
+	stacking =          alpha
+	stacking =          beta
+	stacking =          omega
 	_EOF_
 cmp ${cfg_file}-[23] || \
     failure "missing stacking args:${nl}`diff -c ${cfg_file}-[23]`"

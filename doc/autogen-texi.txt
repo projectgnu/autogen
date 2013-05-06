@@ -3346,14 +3346,29 @@ specifying the last keyword.
 @code{arg-type = set;}
 
 The argument must be a list of names each of which must match the strings
-"@code{all}", "@code{none}" or one of the keywords (@pxref{arg-keyword})
+``@code{all}'', ``@code{none}'' or one of the keywords (@pxref{arg-keyword})
 specified for this option.  @code{all} will turn on all membership bits and
-@code{none} will turn them all off.  Specifying one of the keywords will turn
-on the corresponding set membership bit.  Literal numbers may also be used and
-may, thereby, set or clear more than one bit.  Preceding a keyword or literal
-number with a bang (@code{!}  - exclamation point) will turn the bit(s) off.
+@code{none} will turn them all off.  Specifying one of the keywords will set
+the corresponding set membership bit on (or off, if negated) .  Literal
+numbers may also be used and may, thereby, set or clear more than one bit.
+
+The membership result starts with the previous (or initialized) result.  To
+clear previous results, either start the membership string with @samp{none +}
+or with the equals character (@samp{=}).  To invert (bit flip) the final
+result (regardless of whether the previous result is carried over or not),
+start the string with a carat character (@samp{^}).  If you wish to invert the
+result and start without a carried over value, use one of the following:
+@code{=^} or @code{^none+}.  These are equivalent.
+
+The list of names or numbers must be separated by one of the following
+characters: @samp{+-|!,} or whitespace.  The comma is equivalent to
+whitespace, except that only one may appear between two entries and it may not
+appear in conjunction with the @var{or} bar (@samp{|}).  The @samp{+|} leading
+characters or unadorned name signify adding the next named bit to the mask,
+and the @samp{-!}  leading characters indicate removing it.
+
 The number of keywords allowed is constrained by the number of bits in a
-pointer, as the bit set is kept in a @code{void*}.
+pointer, as the bit set is kept in a @code{void *} pointer.
 
 If, for example, you specified @code{first} in your list of keywords,
 then you can use the following code to test to see if either @code{first}

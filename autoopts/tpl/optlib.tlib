@@ -660,6 +660,9 @@ DEFINE emit-member-mask           =][=
              (- (ash 1 (count "keyword")) 1) )  =]
 #define [=(sprintf "%sVALUE_%-14s ((uintptr_t)%s.optCookie)"
                    OPT-pfx UP-name value-desc)
+                 =]
+#define [=(sprintf "%1$sMEMLST_%2$-13s optionMemberList(&%3$s)"
+                   OPT-pfx UP-name value-desc)
                  =][=
 
 ENDDEF emit-member-mask
