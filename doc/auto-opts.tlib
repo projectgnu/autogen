@@ -55,13 +55,11 @@ configuration file options, and the documentation that should go with your
 program as well.
 [=
 
-INVOKE  get-text tag = autoopts
-
-=][=
-
+INVOKE  get-text tag = autoopts  =][=
 (out-push-new (string-append tmp-dir "/check.def" ))
 
-=]AutoGen Definitions options;
+=]
+AutoGen Definitions options;
 prog-name     = check;
 prog-title    = "Checkout Automated Options";
 long-opts;

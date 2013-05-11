@@ -519,7 +519,7 @@ Save the option state to \fIcfgfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
 The command will exit after updating the config file.
 .It [+:
-  ENDIF                               :+][+:
+  ENDIF  saving not disabled          :+][+:
 
   (define tmp-val (get "load-opts-value" "<"))
   (define tmp-str (if (exist? "long-opts") "\\-\\-" ""))
@@ -530,7 +530,7 @@ The command will exit after updating the config file.
              (string-append ",\" \" " tmp-str "load-opts\" \"=\\fIcfgfile\\fP"
                             ",\" \" " tmp-str "no-load-opts\"" )
              "\"") )
-      (string-append tmp-str "load-opts \"=\\fIcfgfile\\fP\",\" \" "
+      (string-append tmp-str "load-opts \"=\\fIcfgfile\\fP,\" \" "
                      tmp-str "no-load-opts\"" )
   )       \:+]
 

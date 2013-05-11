@@ -1,5 +1,15 @@
 New in __CURRENT_VERSION__ March 2013
 
+* --save-opts documentation cleanup
+* optionMemberList() will return an allocated string containing
+  the names of the bits set in the option.
+* OPT_MEMLST_option_name is a new macro that invokes that function
+  for "option_name"
+* Set membership strings are now more forgiving in their syntax.
+  See "Arg Type Set Membership" in the docs.
+
+New in 5.17.3 March 2013
+
 * lgplv2.lic: new license file for genshell:
   the GNU Lesser General Public License, version 2.0 or later
 * automake cleanups
@@ -39,21 +49,3 @@ New in 5.17.1 January, 2013
 
 * Section 5 man pages and mdoc pages can now be emitted
   with the templates.  They still need work, though.
-
-New in 5.17 - December 2012
-
-* Bit Map and Enumeration templates are now fully integrated.
-  They have their own section in the texi docs and the
-  templates produce more easily used output.
-
-New in 5.16 May 2012
-
-* AutoGen now supports the "-MP" option.  The "phony" rule generated
-  in the make dependency file will remove all generated files, except
-  for the dependency file itself.  Please see the docs for "-MF".
-
-* "break", "continue", and "return" macros implemented.
-  "return" works in included templates and invoked macros (user defined
-  macros).  "break" and "continue" work within "for" and "while"
-  loops, though they cannot be used to leave invoked or included
-  templates.
