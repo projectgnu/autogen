@@ -1554,6 +1554,24 @@ really need.  For more extensive examples, you can also examine the help
 output and option definitions for the commands @command{columns},
 @command{getdefs} and @command{autogen} itself.
 
+If you are looking for a more extensive example,
+you may search the autogen sources for files named @file{*opts.def}.
+@command{xml2ag} is ridiculous and @command{autogen} is very lengthy,
+but @command{columns} and @command{getdefs} are not too difficult.
+The @command{sharutils} sources are fairly reasonable, too.
+
+@menu
+* quick ao problem::    Example option requirements
+* quick ao def::        Example option definitions
+* quick ao build::      Build the example options
+* quick ao help::       Example option help text
+* quick ao usage::      Using the example options
+* quick ao docs::       Example option documentation
+@end menu
+
+@node quick ao problem
+@subsection Example option requirements
+
 For our simple example, assume you have a program named @command{check}
 that takes two options:
 
@@ -1568,6 +1586,14 @@ An option to show or not show the definition tree being used.
 Only one occurrence is to be allowed, specifying one or the other.
 @end enumerate
 
+@node quick ao def
+@subsection Example option definitions
+
+@noindent
+First, specify your program attributes and its options to AutoOpts,
+as with the following example.
+
+@example
 @ignore
 END   == AUTOOPTS == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore's
 Extraction from autogen.texi
@@ -1578,7 +1604,9 @@ START == AUTOOPTS-MAIN == DO NOT CHANGE THIS COMMENT or the surrounding 'ignore'
 Extraction from autogen.texi
 @end ignore
 
-@noindent
+@node quick ao usage
+@subsection Using the example options
+
 Normally, however, you would not use the @code{main} clause.  Instead,
 the file would be named something like @file{checkopt.def}, you would
 compile @file{checkopt.c} the usual way, and link the object with the rest
@@ -1611,11 +1639,14 @@ The options are tested and used as in the following fragment.
       ...
 @end example
 
-The @code{doc} clauses are used in the flag stanzas for man pages and
-texinfo invoking documentation.  With the above definition file, the
-two following commands will produce the two documentation files
-@file{check.1} and @file{invoke-check.texi}.  The latter file will
-be generated as a chapter, rather than a section or subsection.
+@node quick ao docs
+@subsection Example option documentation
+
+The @code{doc} clauses are used in the flag stanzas for man pages and texinfo
+invoking documentation.  With the definition file described above, the two
+following commands will produce the two documentation files @file{check.1} and
+@file{invoke-check.texi}.  The latter file will be generated as a chapter,
+rather than a section or subsection.
 
 @example
 autogen -Tagman-cmd check.def

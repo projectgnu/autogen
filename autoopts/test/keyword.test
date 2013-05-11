@@ -255,15 +255,15 @@ Display usage information and exit.
 .BR \-! , " \-\-more-help"
 Pass the extended usage information through a pager.
 .TP
-.BR \-> " [\fIrcfile\fP]," " \-\-save-opts" "[=\fIrcfile\fP]"
-Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
+.BR \-> " [\fIcfgfile\fP]," " \-\-save-opts" "[=\fIcfgfile\fP]"
+Save the option state to \fIcfgfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
 The command will exit after updating the config file.
 .TP
-.BR \-< " \fIrcfile\fP," " \-\-load-opts" "=\fIrcfile\fP," " \-\-no-load-opts"
-Load options from \fIrcfile\fP.
+.BR \-< " \fIcfgfile\fP," " \-\-load-opts" "=\fIcfgfile\fP," " \-\-no-load-opts"
+Load options from \fIcfgfile\fP.
 The \fIno-load-opts\fP form will disable the loading
-of earlier RC/INI files.  \fI\-\-no-load-opts\fP is handled early,
+of earlier config/rc/ini files.  \fI\-\-no-load-opts\fP is handled early,
 out of order.
 .SH "OPTION PRESETS"
 Any option that is not marked as \fInot presettable\fP may be preset
@@ -381,14 +381,14 @@ This option has not been fully documented.
 Display usage information and exit.
 .It \-! , " \-\-more\-help"
 Pass the extended usage information through a pager.
-.It \-> " [\fIrcfile\fP]," " \-\-save\-opts" "[=\fIrcfile\fP]"
-Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
+.It \-> " [\fIcfgfile\fP]," " \-\-save\-opts" "[=\fIcfgfile\fP]"
+Save the option state to \fIcfgfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
 The command will exit after updating the config file.
-.It \-< " \fIrcfile\fP," " \-\-load\-opts" "=\fIrcfile\fP," " \-\-no\-load\-opts"
-Load options from \fIrcfile\fP.
+.It \-< " \fIcfgfile\fP," " \-\-load\-opts" "=\fIcfgfile\fP," " \-\-no\-load\-opts"
+Load options from \fIcfgfile\fP.
 The \fIno\-load\-opts\fP form will disable the loading
-of earlier RC/INI files.  \fI\-\-no\-load\-opts\fP is handled early,
+of earlier config/rc/ini files.  \fI\-\-no\-load\-opts\fP is handled early,
 out of order.
 .El
 .Sh "OPTION PRESETS"

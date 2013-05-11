@@ -188,6 +188,7 @@ start_dep_file(void)
     {
         char * tfile_name;
         size_t dep_name_len;
+        int    fd;
 
         if (dep_file == NULL) {
             dep_name_len = strlen(OPT_ARG(BASE_NAME));
@@ -214,14 +215,16 @@ start_dep_file(void)
             q[dep_name_len] = NUL;
         }
 
-        mkstemp(tfile_name);
+        fd = mkstemp(tfile_name);
+        if (fd < 0)
+            AG_CANT(START_DEP_FOPEN_MSG, tfile_name);
         dep_file = tfile_name;
-    }
 
-    /*
-     * Create the file and write the leader.
-     */
-    dep_fp = fopen(dep_file, "w");
+        /*
+         * Create the file and write the leader.
+         */
+        dep_fp = fdopen(fd, "w");
+    }
 
     if (dep_fp == NULL)
         AG_CANT(START_DEP_FOPEN_MSG, dep_file);

@@ -1,5 +1,25 @@
-2013-05-04  Bruce Korb  <bkorb@gnu.org>
+2013-05-11  Bruce Korb  <bkorb@gnu.org>
 
+	* agen5/agCgi.c (loadCgi): silence warning error triggered by ignoring
+	fdopen of STDERR_FILENO.
+	* agen5/agDep.c (start_dep_file): use open fd with fdopen
+	* agen5/cgi-fsm.c: update with current template
+	* autoopts/load.c (assemble_arg_val): If the arg value for
+	optionLoadLine() is quoted, then quote process it
+	* config/confmacs.tlib: for lib macros, enclose the value caching
+	in the disablement guard, too.
+	* getdefs/test/defs: rendered redundant.  Remove.
+	* autoopts/tpl/agtexi-cmd.tpl: do not interfere with previously
+	existing .texi files.  Also refactor some code so that config file
+	enabled, but no config file defined, programs read correctly.
+	* autoopts/tpl/cmd-doc.tlib: skip the blather about saving config files
+	when "disable-save" is active.
+	* autogen-texi.txt: break up the autoopts quick example
+	* doc/auto-opts.tlib: some @subsections go here, too.
+	* ChangeLog: last update.  A one year change log will be derived
+	hereafter.
+
+2013-05-04  Bruce Korb  <bkorb@gnu.org>
 
 	* autoopts/enum.c: (set_memb_names) omit superfluous "none" at start of
 	membership list.

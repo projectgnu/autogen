@@ -94,7 +94,7 @@ do_suffix(char const * const text, char const * fname, int lineNo)
      *  also allow a format specification to follow the suffix,
      *  separated by an '=' character.
      */
-    out_spec_t   *       pOS;
+    out_spec_t *       pOS;
     char const *       pzSfxFmt;
     char const *       pzResult;
     size_t             spn;

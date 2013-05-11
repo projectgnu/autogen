@@ -89,15 +89,16 @@ DEFINE  emit-macro                              =][=
 
 =]
 AC_DEFUN([[=
+
   (define fcn-name (string-append "try-" (get "type")))
-  (define c-text (get "code"))  =][=
+  (define c-text (get "code"))
+  (define end-requested-disablement "")
 
-  IF (= (get "code-mode") "body")               =][=
+  (if (= (get "code-mode") "body")
     (set! c-text (string-append "int main(int argc,char** argv) {\n"
-          c-text "\nreturn 0; }" )) =][=
-  ENDIF                         =][=
+          c-text "\nreturn 0; }" )) )
 
-  (. mac-name)                  =]],[[=
+  mac-name                      =]],[[=
 
   IF (ag-function? fcn-name)    =][=
     INVOKE (. fcn-name)         =][=
@@ -192,10 +193,12 @@ DEFINE start-feat-test =][=
 ENDDEF start-feat-test =][=
 
 DEFINE  end-feat-test  =][=
-
-  (. pop-language)     =]
-  ]) # end of AC_CACHE_VAL for [=(. cv-name)=]
-  AC_MSG_RESULT([${[=(. cv-name)=]}])[=
+  (string-append
+     pop-language
+     "\n  ]) # end of AC_CACHE_VAL for " cv-name
+     end-requested-disablement
+     "\n  AC_MSG_RESULT([${" cv-name "}])")
+  =][=
   emit-results         =][=
 
 ENDDEF  end-feat-test
@@ -582,11 +585,10 @@ DEFINE  try-withlib             =][=
 
   ENDIF (exist? "config")
 
-  =][= # # # # set cflags/libs # # # #
+  =][= ;; # # # # set cflags/libs # # # #
 
+  (define end-requested-disablement "\n  fi ## disabled by request")
 =]
-  fi ## disabled by request
-
   case "X${[=(. cv-name)=]_cflags}" in
   Xyes|Xno|X )
     [=(. cv-name)=]_cflags="" ;;

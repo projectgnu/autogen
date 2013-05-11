@@ -57,13 +57,7 @@ program as well.
 
 INVOKE  get-text tag = autoopts
 
-=]
-@noindent
-First, specify your program attributes and its options to AutoOpts,
-as with the following example.
-
-@example
-[=
+=][=
 
 (out-push-new (string-append tmp-dir "/check.def" ))
 
@@ -95,15 +89,17 @@ flag = {
 [= (texi-escape-encode (out-pop #t)) \=]
 @end example
 
-@noindent
+@node quick ao build
+@subsection Build the example options
+
 This program will produce a program that digests its options and
 writes the values as shell script code to stdout.
 Run the following short script to produce this program:[= #
 
 Developer note:  the following only works when AutoGen has been installed.
 Since this may be being built on a system where it has not been installed,
-the code below ensures we are running out tools out of the build directory =]
-
+the code below ensures we are running out tools out of the build directory
+=]
 @example
 [=
 
@@ -120,8 +116,10 @@ cc -o ${base} -g ${cflags} ${base}.c ${ldflags}
 [= (texi-escape-encode (out-pop #t)) \=]
 @end example
 
-@noindent
-Running those commands yields:
+@node quick ao help
+@subsection Example option help text
+
+Running the build commands yields:
 
 @example
 [= (out-push-new) \=]

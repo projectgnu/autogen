@@ -471,12 +471,13 @@ ENDFOR flag
 
 :+]
 .It [+:
+  (define tmp-val (get "help-value" "?"))
+  (if (and use-flags (> (string-length tmp-val) 0))
+      (string-append "\\-" tmp-val
+            (if (exist? "long-opts") " , \" \\-\\-help\"" "") )
+      (string-append (if (exist? "long-opts") "\\-\\-" "") "help" )
+  )  \:+]
 
-  IF (. use-flags)  :+]\-[+: (get "help-value" "?") :+][+:
-     (if (exist? "long-opts") " , \" \\-\\-help\"") :+][+:
-  ELSE   :+][+:
-     (if (exist? "long-opts") "\\-\\-") :+]help[+:
-  ENDIF  :+]
 Display usage information and exit.[+:#
 
 .\" = = = = = = = = = = = = = = = = =
@@ -485,12 +486,13 @@ Display usage information and exit.[+:#
 
   IF (not (exist? "no-libopts")) :+]
 .It [+:
+  (define tmp-val (get "more-help-value" "!"))
+  (if (and use-flags (> (string-length tmp-val) 0))
+      (string-append "\\-" tmp-val
+            (if (exist? "long-opts") " , \" \\-\\-more-help\"" "") )
+      (string-append (if (exist? "long-opts") "\\-\\-" "") "more-help" )
+  )       \:+]
 
-  IF (. use-flags)  :+]\-[+: ?% more-help-value "%s" "!" :+][+:
-     IF (exist? "long-opts") :+] , " \-\-more-help"[+: ENDIF :+][+:
-  ELSE   :+][+:
-     IF (exist? "long-opts") :+]\-\-[+: ENDIF :+]more-help[+:
-  ENDIF  :+]
 Pass the extended usage information through a pager.[+:
 
 ENDIF no no-libopts
@@ -502,32 +504,41 @@ ENDIF no no-libopts
 IF (exist? "homerc") :+]
 .It [+:
 
-  IF (. use-flags)  :+]\-[+: ?% save-opts-value "%s" ">"
-     :+] " [\fIrcfile\fP][+:
-     IF (exist? "long-opts") :+]," " \-\-save-opts" "[=\fIrcfile\fP][+:
-     ENDIF :+]"[+:
-  ELSE     :+][+:
-     IF (exist? "long-opts") :+]\-\-[+:
-     ENDIF :+]save-opts "[=\fIrcfile\fP]"[+:
-  ENDIF    :+]
-Save the option state to \fIrcfile\fP.  The default is the \fIlast\fP
+  IF (not (exist? "disable-save"))    :+][+:
+
+  (define tmp-val (get "save-opts-value" ">"))
+  (if (and use-flags (> (string-length tmp-val) 0))
+      (string-append "\\-" tmp-val " \" [\\fIcfgfile\\fP]"
+            (if (exist? "long-opts")
+                ",\" \" \\-\\-save-opts\" \"[=\\fIcfgfile\\fP]" ) "\"")
+      (string-append (if (exist? "long-opts") "\\-\\-" "")
+            "save-opts \"[=\\fIcfgfile\\fP]\"" )
+  )       \:+]
+
+Save the option state to \fIcfgfile\fP.  The default is the \fIlast\fP
 configuration file listed in the \fBOPTION PRESETS\fP section, below.
 The command will exit after updating the config file.
 .It [+:
+  ENDIF                               :+][+:
 
-  IF (. use-flags)  :+]\-[+: ?% load-opts-value "%s" "<"
-     :+] " \fIrcfile\fP[+:
-     IF (exist? "long-opts")
-           :+]," " \-\-load-opts" "=\fIrcfile\fP," " \-\-no-load-opts[+:
-     ENDIF :+]"[+:
-  ELSE     :+][+:
-     IF (exist? "long-opts") :+]\-\-[+:
-     ENDIF :+]load-opts "=\fIrcfile\fP," " \-\-no-load-opts"[+:
-  ENDIF    :+]
-Load options from \fIrcfile\fP.
+  (define tmp-val (get "load-opts-value" "<"))
+  (define tmp-str (if (exist? "long-opts") "\\-\\-" ""))
+
+  (if (and use-flags (> (string-length tmp-val) 0))
+      (string-append "\\-" tmp-val " \" \\fIcfgfile\\fP"
+         (if (exist? "long-opts")
+             (string-append ",\" \" " tmp-str "load-opts\" \"=\\fIcfgfile\\fP"
+                            ",\" \" " tmp-str "no-load-opts\"" )
+             "\"") )
+      (string-append tmp-str "load-opts \"=\\fIcfgfile\\fP\",\" \" "
+                     tmp-str "no-load-opts\"" )
+  )       \:+]
+
+Load options from \fIcfgfile\fP.
 The \fIno-load-opts\fP form will disable the loading
-of earlier RC/INI files.  \fI\-\-no-load-opts\fP is handled early,
+of earlier config/rc/ini files.  \fI\-\-no-load-opts\fP is handled early,
 out of order.[+:
+
 ENDIF (exist? "homerc")
 
 .\" = = = = = = = = = = = = = = = = =
@@ -537,14 +548,15 @@ ENDIF (exist? "homerc")
 IF (exist? "version") :+]
 .It [+:
 
-  IF (. use-flags)  :+]\-[+: ?% version-value "%s" "v"
-     :+] " [{\fIv|c|n\fP}][+:
-     IF (exist? "long-opts") :+]," " \-\-version" "[=\fI{v|c|n}\fP][+:
-     ENDIF :+]"[+:
-  ELSE     :+][+:
-     IF (exist? "long-opts") :+]\-\-[+:
-     ENDIF :+]version "[=\fI{v|c|n}\fP]"[+:
-  ENDIF    :+]
+  (define tmp-val (get "version-value" "v"))
+  (if (and use-flags (> (string-length tmp-val) 0))
+      (string-append "\\-" tmp-val " \" [{\\fIv|c|n\\fP}]"
+            (if (exist? "long-opts")
+                ",\" \" \\-\\-version\" \"[={\\fIv|c|n\\fP}]" ) "\"")
+      (string-append (if (exist? "long-opts") "\\-\\-" "")
+            "version \"[={\\fIv|c|n\\fP}]\"" )
+  )       \:+]
+
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.[+:

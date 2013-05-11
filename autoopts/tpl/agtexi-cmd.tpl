@@ -1,6 +1,6 @@
 [= AutoGen5 template -*- Mode: texinfo -*-
 
-texi
+texi=invoke_PROGRAMNAME.texi
 
 #  Documentation template
 #
@@ -447,19 +447,21 @@ ENDDEF set-home-rc-vars
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE emit-multiple-rc         \=]
-[=
+DEFINE emit-multiple-rc         =]
+@noindent
+@code{libopts} will search in [=
+
   (define explain-pkgdatadir #f)
   (define env-var-list       "")
   rc-count =] places for configuration files:
 @itemize @bullet[=
-FOR homerc                       =][=
-  INVOKE set-home-rc-vars        =][=
+FOR homerc                      =][=
+  INVOKE set-home-rc-vars       =][=
   (if (> (string-length cfg-file-name) 0)
       (sprintf "\n@item\n%s"  cfg-file-name ))
   =][=
 
-ENDFOR homerc                    =]
+ENDFOR homerc                   =]
 @end itemize[=
  (if explain-pkgdatadir (ag-fprintf 0
 "\nThe value for @code{$(pkgdatadir)} is recorded at package configure time
@@ -486,13 +488,15 @@ ENDDEF emit-multiple-rc
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE emit-one-rc-dir              =][=
+DEFINE emit-one-rc-dir          =]
+@noindent
+@code{libopts} will search in [=
   (define env-var-list       "")
-  (define explain-pkgdatadir #f)    =][=
+  (define explain-pkgdatadir #f)=][=
   INVOKE set-home-rc-vars
 
-=]@file{[=(. cfg-file-name) =]} for configuration (option) data.[=
-  IF (. explain-pkgdatadir)         =]
+=]@file{[=(. cfg-file-name)     =]} for configuration (option) data.[=
+  IF (. explain-pkgdatadir)     =]
 The value for @code{$(pkgdatadir)} is recorded at package configure time
 and replaced by @file{libopts} when @file{[=prog-name=]} runs.
 [=ENDIF=][=
@@ -504,16 +508,15 @@ If this is a plain file, it is simply processed.
 If it is a directory, then a file named @file{[=
 (if (exist? "rcfile") (get "rcfile")
      (string-append "." program-name "rc"))
-=]} is searched for within that directory.[=
+=]} is searched for within that directory.
+[=
 
 ENDDEF emit-one-rc-dir
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 DEFINE emit-rc-file-info                =]
-
-@noindent
-@code{libopts} will search in [=
+[=
 
     IF (define rc-count (count "homerc"))
        (define cfg-file-name "")
@@ -521,12 +524,12 @@ DEFINE emit-rc-file-info                =]
 
        INVOKE emit-multiple-rc  =][=
 
-    ELSE                        =][=
+    ELIF (> (string-length (get "homerc")) 1)
+       =][=
        INVOKE emit-one-rc-dir   =][=
     ENDIF (> rc-count 1)
 
 =]
-
 Configuration files may be in a wide variety of formats.
 The basic format is an option name followed by a value (argument) on the
 same line.  Values may be separated from the option name with a colon,
@@ -657,7 +660,7 @@ The option argument may be either the option flag character or its long name.
 ENDIF resettable                        =][=
 
 IF (exist? "home-rc")                   =][=
-  IF (exist? "disable-save")            =]
+  IF (not (exist? "disable-save"))      =]
 @[= (. head-level) =] save-opts[= (flag-string "save-opts-value" ">") =]
 
 Saves the final, configured option state to the specified file (the optional
@@ -667,7 +670,7 @@ The command will exit after updating this file.
 [=
   ENDIF disable-save                    =][=
 
-  IF (exist? "disable-load")            =]
+  IF (not (exist? "disable-load"))      =]
 @[= (. head-level) =] load-opts[= (flag-string "load-opts-value" "<") =]
 
 Loads the named configuration file.
@@ -894,34 +897,33 @@ DEFINE initialization                   =][=
   ))
 
   (define exit-sts-fmt "\n\n@node %1$s %2$s\n@%3$s %1$s %2$s\n")
-  =][=
+  (if (not (== doc-level "document"))
+      (set! file-name (string-append "invoke-" file-name)) )
 
-  IF (not (== doc-level "document"))    =][=
-     (set! file-name (string-append "invoke-" file-name))
-       \=]
+  (out-move file-name)
+
+  (out-push-new (string-substitute (out-name) ".texi" ".menu"))
+
+  (ag-fprintf 0 "* %-32s Invoking %s\n"
+      (string-append program-name " Invocation::")
+      program-name )
+
+  (out-pop)
+
+\=]
 @node [= prog-name      =] Invocation
 @[=(. doc-level)        =] Invoking [= prog-name =]
 @pindex [= prog-name    =]
 @cindex [= prog-title   =][=
 
-FOR concept =]
+  FOR concept           =]
 @cindex [= concept      =][=
-ENDFOR                  =][=
-
-  ENDIF document component
+  ENDFOR
 
 =]
 @ignore
 [=
 
-(out-move file-name)
-(out-push-new (string-substitute (out-name) ".texi" ".menu"))
-
-(ag-fprintf 0 "* %-32s Invoking %s\n"
-    (string-append program-name " Invocation::")
-    program-name )
-
-(out-pop)
 (dne "# " "# ")
 
 =]

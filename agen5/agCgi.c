@@ -83,10 +83,13 @@ loadCgi(void)
      *  we stumble before we're done with this.
      */
     dup2(STDOUT_FILENO, STDERR_FILENO);
-    (void)fdopen(STDERR_FILENO, "w" FOPEN_BINARY_FLAG);
-    oops_pfx = CGI_ERR_MSG_FMT;
+    {
+        FILE * fp = fdopen(STDERR_FILENO, "w" FOPEN_BINARY_FLAG);
+        (void)fp;
+    }
     {
         int tmpfd;
+        oops_pfx = CGI_ERR_MSG_FMT;
         AGDUPSTR(cgi_stderr, CGI_TEMP_ERR_FILE_STR, "stderr file");
         tmpfd = mkstemp(cgi_stderr);
         if (tmpfd < 0)
