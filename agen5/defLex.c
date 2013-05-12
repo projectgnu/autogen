@@ -698,7 +698,7 @@ build_here_str(char* scan)
     next_line:
         if (no_tabs) {
             while (*scan == TAB)  ++scan;
-            if ((scan[0] == '\\') && (scan[1] == TAB))
+            if ((scan[0] == '\\') && IS_HORIZ_WHITE_CHAR(scan[1]))
                 ++scan;
         }
 

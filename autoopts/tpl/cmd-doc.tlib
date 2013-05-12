@@ -365,12 +365,16 @@ ENDDEF cond-section
 
 DEFINE mk-description                   :+][+:
 
-   (if (exist? "prog-man-descrip")
-       (stack-join "\n.Pp\n" "prog-man-descrip")
-       (if (exist? "detail")
-           (stack-join "\n.Pp\n" "detail")
-           "There is no description for this command."
-   )   )
+   (out-push-new)
+   (emit
+     (if (exist? "prog-man-descrip")
+         (stack-join "\n.Pp\n" "prog-man-descrip")
+         (if (exist? "detail")
+             (stack-join "\n.Pp\n" "detail")
+             "There is no description for this command."
+   ) )   )
+   (shell "sed 's/^$/.sp/' <<\\_EODesc_\n" (out-pop #t) "\n_EODesc_")
+
    :+][+:
    INVOKE append-description            :+][+:
 
