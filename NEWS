@@ -7,6 +7,8 @@ New in __CURRENT_VERSION__ March 2013
   for "option_name"
 * Set membership strings are now more forgiving in their syntax.
   See "Arg Type Set Membership" in the docs.
+* tab stripped "here strings" include stripping the backslash
+  escape character when it precedes any whitespace character.
 
 New in 5.17.3 March 2013
 
