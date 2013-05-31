@@ -105,7 +105,7 @@ the code below ensures we are running out tools out of the build directory
 
 \=]
 base=check
-BASE=`echo $base | tr a-z- A-Z_`
+BASE=`echo $base | tr '[a-z-]' '[A-Z_]'`
 cflags="-DTEST_${BASE} `autoopts-config cflags`"
 ldflags="`autoopts-config ldflags`"
 autogen ${base}.def

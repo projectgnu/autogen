@@ -368,7 +368,7 @@ static unload_proc_p_t const unload_procs[FUNC_CT] = {
       unload-table "_EOF_") =]
 
 [=(shell "set -- `sha1sum " output-file-name " | \
-    sed 's/\\(.\\{4\\}\\).*/\\1/' | tr a-z A-Z`
+    sed 's/\\(.\\{4\\}\\).*/\\1/' | tr '[a-z]' '[A-Z]'`
     echo '#define FUNCTION_CKSUM 0x'${1}") =]
 
 #endif /* [= (. header-guard) =] */

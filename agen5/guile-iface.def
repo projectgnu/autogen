@@ -191,8 +191,8 @@ iface = {
 iface = {
   i-name    = to_ulong;
   i-args    = '_v';
-  i-impl    = { i-end = '107'; i-code = 'gh_scm2ulong(_v)'; };
-  i-impl    = { i-end = '201'; i-code = 'scm_to_ulong(_v)'; };
+  i-impl    = { i-end = '107'; i-code = '((unsigned long)gh_scm2ulong(_v))'; };
+  i-impl    = { i-end = '201'; i-code = '((unsigned long)scm_to_ulong(_v))'; };
 };
 
 iface = {

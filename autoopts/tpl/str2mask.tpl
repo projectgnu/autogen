@@ -96,7 +96,7 @@ emit_mask_def() {
     done
     $INVERT && (( v ^= all_mask ))
     printf "$def_fmt" ${mname} $v
-    eval $(echo val_${mname}=$v | tr 'A-Z' 'a-z')
+    eval $(echo val_${mname}=$v | tr '[A-Z]' '[a-z]')
 }
 [=
 

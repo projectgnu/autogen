@@ -84,7 +84,7 @@ do_enum() {
         .El* )           echo '.in -4'
                          return 0          ;;
 
-        * )              echo "$line"      ;;
+        * )              printf '%s\n' "$line" ;;
         esac
     done
     die "EOF reached processing '.Bl -enum'"
@@ -109,7 +109,7 @@ do_nest_tag() {
         .El* )           echo '.in -4'
                          return 0          ;;
 
-        * )              echo "$line"      ;;
+        * )              printf '%s\n' "$line" ;;
         esac
     done
     die "EOF reached processing '.Bl -tag'"
@@ -130,7 +130,7 @@ do_tag() {
         .Fl' '* )        do_nest_flag      ;;
         .Ar' '* )        do_nest_arg       ;;
         .El* )           return 0          ;;
-        * )              echo "$line"      ;;
+        * )              printf '%s\n' "$line" ;;
         esac
     done
     die "EOF reached processing '.Bl -tag'"
@@ -160,7 +160,7 @@ do_bullet() {
         .El* )           echo '.in -4'
                          return 0          ;;
 
-        * )              echo "$line"      ;;
+        * )              printf '%s\n' "$line" ;;
         esac
     done
     die "EOF reached processing '.Bl -bullet'"
@@ -181,7 +181,7 @@ do_block() {
                echo .fi
                return 0          ;;
 
-        * )    echo "$line"      ;;
+        * )    printf '%s\n' "$line" ;;
         esac
     done
     die "EOF reached processing '.Bd'"
@@ -247,7 +247,7 @@ do_nest_arg() {
 
 do_arg() {
     line=`echo ${line#.Ar}`
-    echo "\\fI${line}\\fR"
+    printf "\\fI${line}\\fR\n"
 }
 
 do_NmName() {
@@ -281,7 +281,7 @@ do_line() {
     .Ar' '* )        do_arg       ;;
     .Nm' '* )        do_NmName    ;;
     .Nm     )        do_NmName    ;;
-    * )              echo "$line" ;;
+    * )              printf '%s\n' "$line" ;;
     esac
     return 0
 }

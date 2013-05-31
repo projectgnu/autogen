@@ -62,7 +62,7 @@ fill_in() {
 }
 
 emit_iface_macro() {
-  NM=$(echo $i | tr a-z- A-Z_)
+  NM=$(echo $i | tr '[a-z-]' '[A-Z_]')
   eval NM=\"$NM\(\${${i}_args}\)\"
   if test ${#code} -lt 40 -a ${#NM} -lt 22
   then
@@ -73,7 +73,7 @@ emit_iface_macro() {
 }
 
 emit_iface_type() {
-  local nm=ag_scm_$(echo $i | tr A-Z- a-z_)
+  local nm=ag_scm_$(echo $i | tr '[a-z-]' '[A-Z_]')
   printf '# define %-28s %s\n' $nm "$code"
 }
 

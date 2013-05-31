@@ -126,25 +126,25 @@ do_itemize() {
 }
 
 do_item() {
-    echo "$line" | sed 's/@item/.It/'
+    printf '%s\n' "$line" | sed 's/@item/.It/'
 }
 
 do_line() {
     case "${line}" in
-    '@subheading'* ) echo "$line" | sed 's/@subheading/.SS /' ;;
+    '@subheading'* ) printf '%s\n' "$line" | sed 's/@subheading/.SS /' ;;
     '@*' ) echo .br ;;
     '@sp') echo echo "${line}" | sed 's/@sp/.sp/' ;;
     ''   ) echo .sp ;;
-    '@'[{}]* ) echo "${line}" | sed 's/@\([{}]\)/\1/g' ;;
+    '@'[{}]* ) printf '%s\n' "${line}" | sed 's/@\([{}]\)/\1/g' ;;
     '@'* )
-        typ=`echo "$line" | egrep '@[a-z]*\{'`
-        test ${#typ} -gt 0 && echo "$line" && return 0
-        typ=`echo "$line" | sed 's/@ *//;s/[^a-z].*//'`
+        typ=`printf '%s\n' "$line" | egrep '@[a-z]*\{'`
+        test ${#typ} -gt 0 && printf '%s\n' "$line" && return 0
+        typ=`printf '%s\n' "$line" | sed 's/@ *//;s/[^a-z].*//'`
         eval do_${typ} || die "do_${typ} failed"
         ;;
 
     * )
-        echo "$line"
+        printf '%s\n' "$line"
         ;;
     esac
     return 0

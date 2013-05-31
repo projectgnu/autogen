@@ -123,7 +123,7 @@ make_funcs_def()
 
     declare cmd_list=$(
         sed -n '/case *XAT_CMD_/{;s/.*XAT_CMD_/cmd = /;s/:/;/;p;}' \
-            configfile.c | tr A-Z_ a-z-)
+            configfile.c | tr '[A-Z_]' '[a-z-]')
 
     ${AGexe} <<- _EOF_
 	AutoGen Definitions str2enum;
@@ -137,7 +137,7 @@ make_funcs_def()
 
     cmd_list=$(
         sed -n '/case *VTP_CMD_/{;s/.*VTP_CMD_/cmd = /;s/:/;/;p;}' \
-            configfile.c | tr A-Z_ a-z-)
+            configfile.c | tr '[A-Z_]' '[a-z-]')
     ${AGexe} <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-value-type;

@@ -415,6 +415,11 @@ test = {
 
 do-always = <<- _END_ALWAYS_
 	INVOKE_LIBOPTS_MACROS
+
+	[echo 'test "X${ac_cv_header_sys_wait_h}" = Xyes' 1>&2
+	test "X${ac_cv_header_sys_wait_h}" = Xyes || \
+	    ]AC_MSG_ERROR([you must have sys/wait.h on your system])
+
 	AC_CHECK_FUNCS([fopencookie funopen], [break])
 	case "${ac_cv_func_fopencookie}${ac_cv_func_funopen}" in
 	*yes* )

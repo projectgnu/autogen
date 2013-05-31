@@ -72,14 +72,9 @@ string = { nm = BAD_RE_FMT;
 string = { nm = BASE_NAME_TOO_LONG;
    str = "--base-name name is too long"; };
 
-string = { nm = BOGUS_TAG;
-   str = "** BOGUS **"; };
-
-string = { nm = BREAK_STR;
-   str = "break"; };
-
-string = { nm = BUILD_DEFS_LONG_FMT;
-   str = "%ld"; };
+string = { nm = BOGUS_TAG;  str = "** BOGUS **"; };
+string = { nm = BREAK_STR;  str = "break"; };
+string = { nm = ULONG_FMT;  str = "%lu"; };
 
 string = { nm = CANNOT_FMT;
    str = "fserr %d: cannot %s %s:  %s\n"; };
@@ -280,7 +275,7 @@ string = { nm = DUP_VALUE_INDEX;
    str = "Duplicate value index for %s:  %d"; };
 
 string = { nm = EMIT_INVAL_PORT;
-   str = "invalid emission port: %d"; };
+   str = "invalid emission port: %lu"; };
 
 string = { nm = END_C_COMMENT;
    str = "*/"; };
@@ -977,9 +972,6 @@ string = { nm = RESOLVE_SCM_INEXACT;
 
 string = { nm = RESOLVE_SCM_LIST;
    str = "** LIST **"; };
-
-string = { nm = RESOLVE_SCM_NUMBER;
-   str = "%ld"; };
 
 string = { nm = RESOLVE_SCM_PAIR;
    str = "** Pair **"; };

@@ -67,7 +67,7 @@ scm2display(SCM s)
         res = RESOLVE_SCM_PAIR; break;
 
     case GH_TYPE_NUMBER:
-        snprintf(z, sizeof(z), RESOLVE_SCM_NUMBER, AG_SCM_TO_ULONG(s)); break;
+        snprintf(z, sizeof(z), ULONG_FMT, AG_SCM_TO_ULONG(s)); break;
 
     case GH_TYPE_PROCEDURE:
 #ifdef SCM_SUBR_ENTRY

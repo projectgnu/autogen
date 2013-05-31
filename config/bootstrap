@@ -97,7 +97,7 @@ config_tools()
         eval ${f}_reqver=$(
             set -- $(${tool} --version | sed 1q)
             eval echo \${$#})
-        eval $(echo $f | tr a-z A-Z)=${tool}
+        eval $(echo $f | tr '[a-z]' '[A-Z]')=${tool}
     done
 
     char_mapper=$(command -v char-mapper) 2>/dev/null

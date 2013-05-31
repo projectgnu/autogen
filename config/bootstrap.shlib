@@ -174,7 +174,7 @@ make_proto()
     local files=`ls -1 *.c | grep -v 'fsm\.c$'`
     local locs=
     local base_dir=`basename \`pwd\``
-    local marker=`echo ${base_dir} | tr a-z A-Z`_PROTO_H_GUARD
+    local marker=`echo ${base_dir} | tr '[a-z]' '[A-Z]'`_PROTO_H_GUARD
     local ct=0
 
     cat >&5 <<- _EOF_
