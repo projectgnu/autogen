@@ -1355,7 +1355,6 @@ void
     /* NOTREACHED */
 }
 [=
-
 ENDIF die-code              =][=
 
 ENDDEF emit-option-callbacks

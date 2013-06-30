@@ -460,11 +460,9 @@ FOR flag                              :+][+:
 
   ELSE                                :+]
 .Ss "[+: (get "descrip" "") :+]"[+:
-
-    IF (set! tmp-str (get "documentation" ""))
-       (> (string-length tmp-str) 3)  :+]
-[+: (. tmp-str) :+]
-[+: ENDIF                             :+][+:
+(set! tmp-str (get "documentation" ""))
+(if (> (string-length tmp-str) 3) (string-append
+    "\n" tmp-str "\n" ))              :+][+:
 
   ENDIF                               :+][+:
 ENDFOR flag

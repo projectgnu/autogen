@@ -41,6 +41,9 @@ add_env_val(char * buf, int buf_sz, char const * name);
 
 static char *
 assemble_arg_val(char * txt, tOptionLoadMode mode);
+
+static char *
+trim_quotes(char * arg);
 /* = = = END-STATIC-FORWARD = = = */
 
 /*=export_func  optionMakePath

@@ -62,6 +62,7 @@ INVOKE emit-usage-opt   =][=
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
 FOR flag                        =][=
+  IF (and (last-for?) (exist? "documentation")) =][= BREAK =][= ENDIF =][=
 
   (set! opt-name (string-tr! (get "name") optname-from optname-to))
   (if (exist? "documentation")

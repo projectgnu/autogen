@@ -1995,6 +1995,13 @@ typedef enum @{
 @noindent
 which will be augmented by any @code{exit-name} definitions beyond @samp{1}.
 
+Some of the generated code will exit non-zero if there is an allocation error.
+This exit will always be code @samp{1}, unless there is an exit named @samp{no_mem}
+or @samp{nomem}.  In that case, that value will be used.  Additionally, if
+there is such a value, and if @code{die-code} is specified, then a function
+@code{nomem_err(size_t len, char const * what)} will be emitted as an inline
+function for reporting out-of-memory conditions.
+
 @item usage-message
 @vindex usage-message
 This attribute will cause two procedures to be added to the code file:
@@ -2011,10 +2018,12 @@ function with the exit code set to @code{1} (@code{EXIT_FAILURE}).
 
 @item die-code
 @vindex die-code
-This tells AutoOpts templates to emit code for @code{vdie()}, @code{die()} and
-@code{fserr()} functions.  If the @code{die-code} is assigned a text value,
-then that code will be inserted in the @code{vdie} function immediately
-before it prints the death rattle message.
+This tells AutoOpts templates to emit code for @code{vdie()}, @code{die()},
+@code{fserr()}, and, possibly the @code{nomem_err()} functions.  The latter is
+emitted if an exit name of @samp{no-mem} or @samp{nomem} is specified.  If the
+@code{die-code} is assigned a text value, then that code will be inserted in
+the @code{vdie} function immediately before it prints the death rattle
+message.
 
 The profiles for these functions are:
 @example
@@ -5935,35 +5944,38 @@ actually used.  There may be a few that are used but not exercised in my
 testing.  If so, I need to ferret those out and test them, too.
 
 @example
-aliases          allow-errors  arg-default
-arg-optional     arg-range     arg-type
-argument         call-proc     code
-config-header    copyright     default
-deprecated       descrip       detail
-disable          documentation eaddr
-enable           enabled       environrc
-equivalence      exit-name     explain
-export           extract-code  field
-file-fail-code   flag          flag-code
-flag-proc        flags-cant    flags-must
-full-usage       gnu-usage     guard-option-names
-help-value       homerc        ifdef
-ifndef           immed-disable immediate
-include          lib-name      library
-long-opts        main          main-text
-main-type        max           min
-more-help-value  must-set      name
-no-command       no-libopts    no-misuse-usage
-no-preset        no-xlate      nomem-fail-code
-omitted-usage    package       prefix
-prefix-enum      preserve-case prog-name
-prog-title       reorder-args  resettable
-scaled           settable      short-usage
-stack-arg        std-value     test-main
-translators      unstack-arg   usage
-usage-message    usage-opt     usage-type
-val-name         val-upname    value
-version
+addtogroup         aliases          allow_errors  arg_default
+arg_name           arg_optional     arg_range     arg_type
+argument           author           call_proc     cmd_section
+comment_char       concept          config_header copyright
+date               default          deprecated    descrip
+detail             die_code         disable       disable_load
+disable_save       doc              doc_section   doc_sub
+doc_sub_cmd        documentation    ds_format     ds_text
+ds_type            eaddr            enable        enabled
+environrc          equivalence      exit_desc     exit_name
+explain            export           extract_code  field
+file_fail_code     flag             flag_code     flag_proc
+flags_cant         flags_must       full_usage    gnu_usage
+guard_option_names handler_proc     handler_type  help_type
+help_value         home_rc          homerc        ifdef
+ifndef             immed_disable    immediate     include
+interleaved        keyword          lib_name      library
+load_opts_value    long_opts        main_fini     main_init
+main_type          max              min           more_help_value
+must_set           name             no_command    no_libopts
+no_misuse_usage    no_preset        no_xlate      omit_texi
+omitted_usage      open_file        opt_state     option_format
+option_info        owner            package       prefix
+prefix_enum        preserve_case    prog_descrip  prog_info_descrip
+prog_man_descrip   prog_name        prog_title    rcfile
+reorder_args       reset_value      resettable    save_opts_value
+scaled             set_desc         set_index     settable
+short_usage        stack_arg        stdin_input   sub_name
+sub_text           sub_type         test_main     translators
+type               unshar_file_code unstack_arg   usage
+usage_message      usage_opt        usage_value   value
+vendor_opt         version          version_proc  version_value
 @end example
 
 @node Option Define Names
