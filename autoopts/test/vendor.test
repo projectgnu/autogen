@@ -113,7 +113,7 @@ This option is used to automate dependency tracking:
    -M [arg]   emit make dependency file
 		- may not be preset
 		- may appear multiple times
-Version, usage and configuration options:
+help, version and option handling:
    -R str     reset an option's state
    -v [arg]   output version information and exit
    -h         display extended usage information and exit

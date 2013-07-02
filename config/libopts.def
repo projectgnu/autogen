@@ -83,7 +83,7 @@ test   = {
 		_EOText_;
   };
   doc =
-  "AutoGen won't work without a POSIX compliant regular expression library.";
+  "AutoGen a POSIX compliant regular expression library is useful.";
 };
 
 test = {

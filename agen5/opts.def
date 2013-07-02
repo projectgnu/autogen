@@ -779,6 +779,14 @@ flag = {
 #endif
 };
 
+#ifndef XML2AG
+flag = {
+    name        = autoopts-opts;
+    documentation;
+    descrip = 'help, version and option handling';
+};
+#endif
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  *  Program Documentation

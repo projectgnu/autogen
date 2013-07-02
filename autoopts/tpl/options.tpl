@@ -38,7 +38,7 @@ c
 )
 =][= # END-BUILDTREE-ISMS
 
-(shell "CLexe=${AGexe%/autogen}/columns")
+(shell "CLexe=`echo ${AGexe} | sed 's@/autogen@/columns@`")
 
 # END-INSTALL-ONLY-CODE     =][=
 

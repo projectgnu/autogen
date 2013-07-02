@@ -203,10 +203,6 @@ ENDDEF header
 
 DEFINE initialization                   =][=
 
-
-  (shell "CLexe=${AGexe%/autogen}/columns")
-
-
   ;; divert-convert  divert text for conversion to .texi format
   ;; convert-divert  convert the diversion done with divert-convert
   ;;
@@ -241,7 +237,9 @@ DEFINE initialization                   =][=
   (define program-name      (get "prog-name"))
   (define down-prog-name    (string-downcase program-name))
   (define UP-PROG-NAME      (string-upcase   program-name))
-  (shellf "export AG_DEF_PROG_NAME=%s" program-name)
+  (shell "export AG_DEF_PROG_NAME=" program-name
+         "\nCLexe=`echo ${AGexe} | sed 's@/autogen@/columns@`")
+
   (define doc-level         (getenv "LEVEL"))
   (if (not (string? doc-level))
       (set! doc-level "section"))
