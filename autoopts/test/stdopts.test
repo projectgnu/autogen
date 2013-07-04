@@ -39,7 +39,15 @@ cat > ${testname}.def <<- _EOF_
 	prog-name = test_${testname};
 	prog-title = "${testname} test";
 	config-header = 'config.h';
-	test-main;
+	no-xlate = anything;
+	main = {
+	    main-type = main;
+	    main-text = <<- _EndMain_
+		\    (void)optionProcess(&test_${testname}Options, argc, argv);
+		\    optionPutShell(&test_${testname}Options);
+		\    return ferror(stdout) ? 1 : 0;
+		_EndMain_;
+	};
 	long-opts;
 
 	#define VERBOSE_ENUM
@@ -105,7 +113,8 @@ cmp -s ${testname}.o* || \
 
 # # # # # # # # # # USAGE OPTION # # # # # # # # # # #
 
-( ${SED} "s/${testname}/${testname}-2/g" ${testname}.def
+( ${SED} "s/${testname}/${testname}-2/g
+	s/-2Options/_2Options/g" ${testname}.def
   echo 'usage-opt;'
 ) > ${testname}-2.def
 

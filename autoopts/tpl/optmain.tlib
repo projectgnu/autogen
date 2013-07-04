@@ -655,7 +655,7 @@ DEFINE decl-callbacks
                        static-proc-list tmp-val "\n" ))
      )  )  )
 
-     (if make-test-main (begin
+     (if guarded-test-main (begin
          (set! tmp-val (hash-ref test-proc-name flg-name))
          (if (hash-ref is-ext-cb-proc flg-name)
              (set! extern-test-list (string-append extern-test-list
@@ -689,11 +689,11 @@ DEFINE decl-callbacks
 
   ENDFOR flag   =][=
 
-  IF (. make-test-main)                         =][=
+  IF (. guarded-test-main)                      =][=
     (set! extern-proc-list (string-append extern-proc-list
           "optionVersionStderr\n"))             =][=
     INVOKE emit-testing-defines                 =][=
-  ENDIF make-test-main                          =][=
+  ENDIF guarded-test-main                       =][=
 
   (if (not (exist? "no-libopts"))
       (set! extern-proc-list (string-append extern-proc-list
@@ -725,7 +725,7 @@ DEFINE decl-callbacks
 
 =][=
 
-  (if make-test-main
+  (if guarded-test-main
       (ag-fprintf 0 "\n#endif /* defined(%s) */" main-guard) )
 
   undef-proc-names                              =][=
@@ -1096,7 +1096,7 @@ IF (not (or (exist? "extract-code") (exist? "flag-code")))
    =][=  RETURN                     =][=
 ENDIF                               =][=
 
-(if make-test-main
+(if guarded-test-main
     (begin
       (set! endif-test-main
             (sprintf "\n#endif /* defined(%s) */" main-guard))
@@ -1215,29 +1215,42 @@ DEFINE emit-option-callbacks        =]
  * The callout function that invokes the [= (. usage-proc)
    =] function.
  *
- * @param[in] pOptions the AutoOpts option description structure
- * @param[in] pOptDesc the descriptor for the "help" (usage) option.
+ * @param[in] opts the AutoOpts option description structure
+ * @param[in] od   the descriptor for the "help" (usage) option.
  * @noreturn
  */
 static void
-doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
-{[=
-  IF (exist? "resettable") =]
-    if ((pOptDesc->fOptState & OPTST_RESET) != 0)
-        return;
-[=ENDIF=][=
-  IF (exist? "usage-opt") =]
-    int ex_code = (pOptDesc->optIndex == [= (. INDEX-pfx) =]HELP)
-        ? [=(. succ-exit-code)=] : AO_EXIT_REQ_USAGE;
-    [= (string-append usage-proc "(&" pname "Options, ex_code);") =]
-    /* NOTREACHED */[=
+doUsageOpt(tOptions * opts, tOptDesc * od)
+{
+    int ex_code;[=
 
-  ELSE   =]
-    [= (string-append usage-proc "(&" pname "Options, " succ-exit-code ");") =]
+  IF (define od-used #f)
+     (exist? "resettable") =]
+    if ((od->fOptState & OPTST_RESET) != 0)
+        return;[= (set! od-used #t) =][=
+
+  ENDIF                         =][=
+
+  IF (exist? "usage-opt") =]
+    ex_code = (od->optIndex == [= (set! od-used #t) INDEX-pfx =]HELP)
+        ? [=(. succ-exit-code)=] : AO_EXIT_REQ_USAGE;[=
+
+  ELSE                          =]
+    ex_code = [=(. succ-exit-code)=];[=
+  ENDIF                         =][=
+
+  IF (. put-shell-main) =]
+#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
+    fputs("exit 0\n", stdout);
+    fflush(stdout);
+    dup2(STDERR_FILENO, STDOUT_FILENO);
+#endif /* defined TEST_MAIN_PROCEDURE */[=
+
+  ENDIF                         =][=
+  (string-append "\n    " usage-proc "(&" pname "Options, ex_code);") =]
     /* NOTREACHED */
-    (void)pOptDesc;[=
-  ENDIF  =]
-    (void)pOptions;
+    (void)opts;[=
+    (if od-used "" "\n    (void)od;") =]
 }[=
 
 INVOKE define-option-callbacks  =][=
@@ -1245,7 +1258,7 @@ INVOKE define-option-callbacks  =][=
 IF (exist? "main")              =][=
   INVOKE build-main             =][=
 
-ELIF (. make-test-main)         =][=
+ELIF (. guarded-test-main)      =][=
   INVOKE build-test-main        =][=
 
 ENDIF

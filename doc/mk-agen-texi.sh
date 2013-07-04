@@ -228,7 +228,7 @@ build_agdoc() {
   echo "${PS4:-+} " ${cmd} >&8
 
   timeout ${timer}s ${cmd} || {
-    cat ${TMPDIR}/ag.ini ${TMPDIR}/ag.log
+    head -n999999 ${TMPDIR}/ag.ini ${TMPDIR}/*.log
     die could not regenerate doc
   } >&2
 

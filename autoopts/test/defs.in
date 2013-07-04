@@ -118,6 +118,7 @@ purge()
 init_tests()
 {
   exec 8>&2
+  BASH_XTRACEFD=8
 
   TMPDIR="${tstdir}/${testname}-tmpd"
   mkdir -p ${TMPDIR}
@@ -259,6 +260,7 @@ ht='	'
 basic_help_clean="/^Packaged by/d
 /^Report .* bugs to/d
 /[Pp]lease send bug reports/d
+/^exit 0/d
 /^[ ${ht}]*\$/d"
 export   nl ht basic_help_clean
 readonly nl ht basic_help_clean
@@ -268,7 +270,7 @@ clean_help() {
     s=${basic_help_clean} || \
     s="${sedcmd}${nl}${basic_help_clean}"
 
-  ${SED} "${s}"
+  ${SED} "${s}" ${1+"$@"}
 }
 
 compile()
@@ -284,9 +286,12 @@ compile()
     failure cannot compile ${Csrc}.c
   if test $# -gt 0
   then
-    ./${Cexe} ${*} ${dosed} || \
-      failure cannot obtain help output for ${Csrc}
-  fi | clean_help > ${Csrc}.help
+    ( set +xe
+      exec 2>&1
+      ./${Cexe} ${*} ${dosed}
+    ) || failure cannot obtain help output for ${Csrc}
+  fi > ${Cexe}.RAW-HELP
+  clean_help ${Cexe}.RAW-HELP > ${Csrc}.help
   Csrc='' Cexe='' Dnam=''
 }
 

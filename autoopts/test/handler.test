@@ -116,17 +116,19 @@ cat > ${testname}.sample <<\_EOF_
 /**
  * The callout function that invokes the optionUsage function.
  *
- * @param[in] pOptions the AutoOpts option description structure
- * @param[in] pOptDesc the descriptor for the "help" (usage) option.
+ * @param[in] opts the AutoOpts option description structure
+ * @param[in] od   the descriptor for the "help" (usage) option.
  * @noreturn
  */
 static void
-doUsageOpt(tOptions * pOptions, tOptDesc * pOptDesc)
+doUsageOpt(tOptions * opts, tOptDesc * od)
 {
-    optionUsage(&handlerOptions, HANDLER_EXIT_SUCCESS);
+    int ex_code;
+    ex_code = HANDLER_EXIT_SUCCESS;
+    optionUsage(&handlerOptions, ex_code);
     /* NOTREACHED */
-    (void)pOptDesc;
-    (void)pOptions;
+    (void)opts;
+    (void)od;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

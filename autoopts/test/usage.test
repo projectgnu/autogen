@@ -27,7 +27,7 @@
 #
 # ----------------------------------------------------------------------
 
-${VERBOSE} && kill_delay=10 || kill_delay=5
+${VERBOSE} && kill_delay=15 || kill_delay=8
 . ./defs
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #

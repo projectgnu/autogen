@@ -121,38 +121,30 @@ Running the build commands yields:
 
 @example
 [= (out-push-new) \=]
-cd ${tmp_dir}
 base=check
-exec 4>&2 5>&1 1> ${base}.err 2>&1
-
-  case "$-" in
-  *x* ) clear_x=: ;;
-  * ) clear_x='set +x' ;;
-  esac
+cd ${tmp_dir}
+(
+  PS4='>ck> '
+  BASH_XTRACEFD=2
+  exec 2> ${base}-msg.log 1>&2
   set -x
 
   test -f ${base}.def || die "cannot locate ${base}.def"
   test ! -f ${base} || rm -f ${base}
   echo "include = '#include \"compat/compat.h\"';" >> ${base}.def
   f='@="@="'`echo ${INCLUDES} ${CFLAGS}`' @'
-  {
-    echo set -x
-    sed -e "s@^cc @${CC:-cc} -include ${top_builddir}/config.h @" \
-        -e '/^cflags="/s'"${f}" \
-        -e 's@^autogen @run_ag @' \
-            mk-${base}.sh
-  } > mk-${base}
+  sed -e "s@^cc @${CC:-cc} -include ${top_builddir}/config.h @" \
+      -e '/^cflags="/s'"${f}" \
+      -e 's@^autogen @run_ag @' \
+            mk-${base}.sh > mk-${base}
 
   . ./mk-${base}
-
-  $clear_x
-
-exec 1>&5 5>&- 2>&4 4>&-
-
+)
 test -x ./${base} || {
   cat mk-${base}
   printf '\n\nFAILURE LOG:\n\n'
-  cat ${base}.err
+  cat ${base}-msg.log
+  tar czf /tmp/ck-fail.tgz .
   die cannot create ${base} program
 } >&2
 
@@ -368,13 +360,20 @@ INVOKE  get-text tag = "ao-data2"
 
  (out-push-new)
 
-=]fn() { ( BASH_XTRACEFD=2 ; set -x
-    cd ${top_builddir}/autoopts/test || return
+=](
+    exec 4>&2 2> ${tmp_dir}/err-test-log.txt
+    BASH_XTRACEFD=2
+    PS4='>etl> '
+    set -x
+    cd ${top_builddir}/autoopts/test || \
+        die "cannot cd into ${top_builddir}/autoopts/test"
     VERBOSE=true AUTOGEN_TRACE=every AUTOGEN_TRACE_OUT=">>$PWD/ag-log.txt"
     export VERBOSE AUTOGEN_TRACE AUTOGEN_TRACE_OUT
-    ${MAKE:-make} check TESTS=errors.test >/tmp/errors.log 2>&1
+    ${MAKE:-make} check TESTS=errors.test 1>&2 || :
     if test ! -x errors-testd/errors
     then
+      exec 2>&4
+      cat ${tmp_dir}/err-test-log.txt >&2
       die "no error usage in $PWD/errors-testd"
     fi
     cat <<-EOF
@@ -400,10 +399,7 @@ EOF
 	`./errors-testd/${cmd}`
 	@end example
 EOF
-)
-}
-fn
-[=
+)[=
 
 (shell (out-pop #t))
 
@@ -441,8 +437,10 @@ log=${tmp_dir}/../genshellopt.log
   test $? -eq 0 || die "could not compile genshellopt.c - See ${log}"
 ) > ${log} 2>&1
 
-test -x ${tmp_dir}/genshellopt || \
+test -x ${tmp_dir}/genshellopt || {
+  ( cd ${tmp_dir} ; tar czf /tmp/no-genshell.tgz . )
   die "NO GENSHELLOPT PROGRAM - See ${log}"
+}
 
 ${tmp_dir}/genshellopt --help > ${tmp_dir}/genshellopt.hlp
 

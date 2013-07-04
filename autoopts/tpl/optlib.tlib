@@ -125,15 +125,25 @@ DEFINE init-and-validate                =][=
 ;;  Establish a number of variations on the spelling of the
 ;;  program name.  Use these Scheme defined values throughout.
 ;;
-(define pname           (get-c-name "prog-name"))
-(define pname-cap       (string-capitalize  pname))
-(define pname-up        (string-upcase      pname))
-(define pname-down      (string-downcase    pname))
-(define main-guard      (string-append "TEST_" pname-up "_OPTS" ))
-(define number-opt-index  -1)
-(define default-opt-index -1)
-(define make-test-main  (if (exist? "test-main") #t
-                            (string? (getenv "TEST_MAIN")) ))
+(define pname               (get-c-name "prog-name"))
+(define pname-cap           (string-capitalize  pname))
+(define pname-up            (string-upcase      pname))
+(define pname-down          (string-downcase    pname))
+(define number-opt-index    -1)
+(define default-opt-index   -1)
+
+(define guarded-test-main   (or (exist? "test-main")
+                                (string? (getenv "TEST_MAIN"))))
+(define main-guard          (string-append "TEST_" pname-up "_OPTS" ))
+(define make-main-proc
+  (if (exist? "main")
+      (~~ (get "main[].main-type" "") "shell-process|shell-parser|main")
+      guarded-test-main ) )
+(if (not make-main-proc) (set! guarded-test-main #f))
+(define put-shell-main
+  (or (~~ (get "main.main-type") "shell-process")
+      (and (not (exist? "main")) guarded-test-main)
+) )
 
 (define descriptor "")
 (define opt-name   "")
@@ -325,7 +335,7 @@ DEFINE save-name-morphs
    "call-proc" is specified.  Finally, we insert the specified code for
    options with "flag-code" or "extract-code" attributes.
 
-   This all changes, however, if "make-test-main" is set.  It is set if
+   This all changes, however, if "guarded-test-main" is set.  It is set if
    either "test-main" is specified as a program/global attribute, or if
    the TEST_MAIN environment variable is defined.  This should be set
    if either the program is intended to digest options for an incorporating
@@ -450,7 +460,7 @@ DEFINE save-name-morphs
   ;;  option descriptor table.  Never a need to mess with it if we are
   ;;  not building a "test main" procedure.
   ;;
-  (if (not make-test-main)
+  (if (not guarded-test-main)
       (set! test-name proc-name))
 
   (if have-proc
@@ -1305,7 +1315,7 @@ DEFINE emit-opt-desc    =][=
      ;;  If there is a difference between what gets invoked under test and
      ;;  what gets invoked "normally", then there must be a #define name
      ;;  for the procedure.  There will only be such a difference if
-     ;;  make-test-main is #t
+     ;;  guarded-test-main is #t
      ;;
      (if (= (hash-ref cb-proc-name   flg-name)
             (hash-ref test-proc-name flg-name))

@@ -41,20 +41,22 @@ test_main="${test_main}"    \
 long_opts=true  \
 ${SHELLX} ${stdopts} option: second || failure "Could not run stdopts.def"
 mv ${testname}.def ${testname}.def-ori
-${SED} '/value = .s/i\
-min = 1; max = 2;
-' ${testname}.def-ori > ${testname}.def
+{
+    ${SED} '/value = .s/i\
+	min = 1; max = 2;
+    ' ${testname}.def-ori
+    echo 'detail = "exit 99 ; oops.";'
+} > ${testname}.def
 
-echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
   failure AutoGen could not process
 
-compile "-?"
+compile "-?" 2> ${testname}.hlp
 
 # # # # # # # # # # HELP OUTPUT FILE # # # # # # # # #
 
 echo creating ${testname}.hlp
-clean_help > ${testname}.hlp <<'_EOF_'
+cat > ${testname}.hlp <<'_EOF_'
 test_shell - Test AutoOpts for shell
 Usage:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
 		reg-arg [ ... ]
@@ -66,6 +68,7 @@ Usage:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
    -! no  more-help      opt  extended usage information passed thru pager
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
+exit 99 ; oops.
 _EOF_
 
 pair="${testname}.hlp ${testname}.help"
@@ -81,6 +84,13 @@ cmp -s ${pair} || \
 
 ./${testname} 2> /dev/null && \
   failure ${testname} must have an argument
+
+(
+    PS4='>st> '
+    set -- --help
+    eval "`exec 2>/dev/null ; ./${testname} \"$@\"`"
+    exit 1
+) || failure "improper --help exit"
 
 # # # # # # # # # # SHELL OUTPUT FILE # # # # # # # # #
 
@@ -448,12 +458,12 @@ exec 3>&-
 rm -f ${testname}.sh
 ./${testname} -o ${testname}.sh
 
-sedcmd='2,/From the.*option def/d'
+sedcmd='2,/From the.*option def/d;/^exit 99/d'
 ${FGREP} 'Packaged by '  ${testname}.sh >/dev/null && {
     sedcmd=${sedcmd}${nl}'/^Packaged by /d
-    /^Report .* bugs to /d
-    /and the flag character\.$/s/$/'"'/"
+    /^Report .* bugs to /d'
 }
+sedcmd=${sedcmd}${nl}'/and the flag character\.$/s/$/'"'/"
 
 ${SED} "$sedcmd"  ${testname}.sh > ${testname}.shx
 

@@ -101,7 +101,7 @@ INCLUDE "optmain.tlib"
 IF (or (= "shell-process"  (get "main.main-type"))
        (= "shell-parser"   (get "main.main-type"))
        (exist? "main.code")) =]
-#define [= (set! make-test-main #t) main-guard =] 1[=
+#define [= (. main-guard) =] 1[=
 ENDIF
 =]
 #ifndef __doxygen__
@@ -131,6 +131,9 @@ ELSE
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>[=
+
+ (if put-shell-main
+     (emit "\n#include <unistd.h>"))
 
  (if (exist? "flag.arg-range")
      (emit "\n#include <errno.h>"))
@@ -243,7 +246,7 @@ IF (exist? "version")   =][=
 
   IF (exist? "version-proc") =]
 #define VER_PROC        [= (get "version-proc") =][=
-  ELIF (. make-test-main) =]
+  ELIF (. guarded-test-main) =]
 #ifdef [=(. main-guard) =]
 # define VER_PROC       optionVersionStderr
 #else
@@ -251,7 +254,7 @@ IF (exist? "version")   =][=
 #endif /* [=(. main-guard)=] */[=
   ELSE                  =]
 #define VER_PROC        optionPrintVersion[=
-  ENDIF  make-test-main =][=
+  ENDIF  guarded-test-main =][=
 
 ENDIF  there is a version
 

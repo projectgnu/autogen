@@ -416,7 +416,8 @@ done_check(void)
     if (cgi_stderr != NULL) {
         do {
             long pos = ftell(stderr);
-            char* pz;
+            char * pz;
+            size_t rdlen;
 
             /*
              *  Don't bother with the overhead if there is no work to do.
@@ -425,8 +426,8 @@ done_check(void)
                 break;
             pz = AGALOC(pos, "stderr redir");
             rewind(stderr);
-            fread( pz, (size_t)1, (size_t)pos, stderr);
-            fwrite(pz, (size_t)1, (size_t)pos, stdout);
+            rdlen = fread( pz, (size_t)1, (size_t)pos, stderr);
+            fwrite(pz, (size_t)1, rdlen, stdout);
             AGFREE(pz);
         } while (false);
 

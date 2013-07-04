@@ -41,8 +41,9 @@ prog-title = "Test AutoOpts for ${testname}";
 include    = "#include <stdio.h>\nint invocation_ct = 0;";
 config-header = 'config.h';
 version    = '1.0';
+omit-nls-code;
 copyright = {
-    date  = "1992-2012";
+    date  = "1992-2013";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
     type  = gpl;
@@ -67,7 +68,7 @@ _EOF_
 
 INC=`echo ${INC} | ${SED} 's/-lguile//;s/-lqthreads//'`
 CFLAGS="-g`echo ' '${CFLAGS}' ' | \
-  ${SED} 's, -O2 , ,;s/ -g[^ ]* / /'`"
+  ${SED} 's, -O2 , -O0 ,;s/ -g[^ ]* / /'`"
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
