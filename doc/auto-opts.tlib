@@ -437,10 +437,8 @@ log=${tmp_dir}/../genshellopt.log
   test $? -eq 0 || die "could not compile genshellopt.c - See ${log}"
 ) > ${log} 2>&1
 
-test -x ${tmp_dir}/genshellopt || {
-  ( cd ${tmp_dir} ; tar czf /tmp/no-genshell.tgz . )
+test -x ${tmp_dir}/genshellopt || \
   die "NO GENSHELLOPT PROGRAM - See ${log}"
-}
 
 ${tmp_dir}/genshellopt --help > ${tmp_dir}/genshellopt.hlp
 

@@ -1,4 +1,4 @@
-[= AutoGen5 Template -*- Mode: text -*-
+[= AutoGen5 Template -*- Mode: C -*-
 
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
@@ -41,11 +41,14 @@ ck_flag_code() {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
-DEFINE build-test-main
+DEFINE build-test-main          =][=
 
-=][= (tpl-file-line extract-fmt) \=]
+  IF (emit (tpl-file-line extract-fmt))
+     guarded-test-main
+=]
+#if defined([=(. main-guard)=]) /* TEST-MAIN-PROCEDURE: */[=
 
-#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */[=
+  ENDIF guarded-test-main       =][=
 
   IF (= (get "test-main") "optionParseShell")
 
@@ -115,8 +118,10 @@ main(int argc, char ** argv)
         fputs("output error writing to stdout\n", stderr);[=
   ENDIF=]
     return res;
-}
-#endif  /* defined [= (. main-guard) =] */[=
+}[=
+
+  (if guarded-test-main (emit
+      "\n#endif  /* " main-guard " END-TEST-MAIN-PROCEDURE */")) =][=
 
 ENDDEF  build-test-main
 
@@ -690,8 +695,6 @@ DEFINE decl-callbacks
   ENDFOR flag   =][=
 
   IF (. guarded-test-main)                      =][=
-    (set! extern-proc-list (string-append extern-proc-list
-          "optionVersionStderr\n"))             =][=
     INVOKE emit-testing-defines                 =][=
   ENDIF guarded-test-main                       =][=
 
@@ -726,18 +729,21 @@ DEFINE decl-callbacks
 =][=
 
   (if guarded-test-main
-      (ag-fprintf 0 "\n#endif /* defined(%s) */" main-guard) )
+      (emit "\n#endif /* " main-guard " */") )
 
   undef-proc-names                              =][=
 
-ENDDEF decl-callbacks                           =][=
+ENDDEF decl-callbacks
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE emit-testing-defines
 
-=]
-#if defined([=(tpl-file-line extract-fmt) main-guard =])
+=][=
+  (set! extern-proc-list (string-append extern-proc-list
+        "optionVersionStderr\n"))
+  (tpl-file-line extract-fmt)                   =]
+#if defined([=(. main-guard)=])
 /*
  *  Under test, omit argument processing, or call optionStackArg,
  *  if multiple copies are allowed.
@@ -776,17 +782,17 @@ DEFINE emit-testing-defines
 
 ENDDEF emit-testing-defines
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
    DEFINE OPTION CALLBACKS
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE callback-proc-header     =]
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /**
- * Code to handle the [=name=] option[=
+ * Code to handle the [=name=] option[= # */ =][=
 
   IF  (exist? "ifdef")
 
@@ -825,7 +831,7 @@ doOpt[= (set! endif-test-main (string-append "\n}" endif-test-main))
 
 ENDDEF   callback-proc-header
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE reset-clause =][=
 
@@ -840,7 +846,7 @@ DEFINE reset-clause =][=
 
 ENDDEF reset-clause
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 DEFINE range-option-code
 
@@ -1100,7 +1106,7 @@ ENDIF                               =][=
     (begin
       (set! endif-test-main
             (sprintf "\n#endif /* defined(%s) */" main-guard))
-      (sprintf "\n\n#if ! defined(%s)" main-guard)
+      (emit "\n\n#if ! defined(" main-guard ")")
 )   )                               =][=
 
 INVOKE callback-proc-header         =][=
@@ -1239,12 +1245,16 @@ doUsageOpt(tOptions * opts, tOptDesc * od)
     ex_code = [=(. succ-exit-code)=];[=
   ENDIF                         =][=
 
-  IF (. put-shell-main) =]
-#if defined([=(. main-guard)=]) /* TEST MAIN PROCEDURE: */
+  IF (. put-shell-main)         =][=
+     (if guarded-test-main
+      (emit "\n#if defined(" main-guard ") /* TEST-MAIN-PROCEDURE */")
+      "\n/* #if defined(*not-used*) TEST-MAIN-PROCEDURE */" ) =]
     fputs("exit 0\n", stdout);
     fflush(stdout);
-    dup2(STDERR_FILENO, STDOUT_FILENO);
-#endif /* defined TEST_MAIN_PROCEDURE */[=
+    dup2(STDERR_FILENO, STDOUT_FILENO);[=
+     (if guarded-test-main
+      (emit "\n#endif /* " main-guard " TEST-MAIN-PROCEDURE */")
+      "\n/* #endif *not-used* END-TEST-MAIN-PROCEDURE */" )   =][=
 
   ENDIF                         =][=
   (string-append "\n    " usage-proc "(&" pname "Options, ex_code);") =]

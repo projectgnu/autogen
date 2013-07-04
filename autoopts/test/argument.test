@@ -89,7 +89,7 @@ exec 3>&-
 ${AG_L} ${testname}2.def || \
   failure AutoGen could not process
 {
-  ${SED} '/^#if.*TEST MAIN PROCEDURE:/,/#endif.*defined TEST_/d
+  ${SED} '/#if.*TEST-MAIN-PROCEDURE:/,/#endif.*END-TEST-MAIN/d
          /^#/s/_ARGUMENT_/_ARGUMENT2_/' \
     ${testname}2.c
   cat <<EOF

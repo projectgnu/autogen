@@ -90,19 +90,12 @@
             (string-append " - Ver. " (get "version"))
             "" )
         "\n" usage-line "\n"
-))
+)) =][= #
 
-=][= # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
 
 INCLUDE "optmain.tlib"
 
-=][=
-
-IF (or (= "shell-process"  (get "main.main-type"))
-       (= "shell-parser"   (get "main.main-type"))
-       (exist? "main.code")) =]
-#define [= (. main-guard) =] 1[=
-ENDIF
 =]
 #ifndef __doxygen__
 #define OPTION_CODE_COMPILE 1
