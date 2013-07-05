@@ -126,7 +126,7 @@ string = { nm = SHOW_PROG_ENV;    str  = "\nenv | grep '^%s_'\n"; };
 string = { nm = SHOW_VAL_FMT;     str  = "=%1$lu # 0x%1$lX\n"; };
 string = { nm = STDOUT;           str  = "stdout"; };
 string = { nm = TIME_FMT;         str  = "%A %B %e, %Y at %r %Z"; };
-string = { nm = TMP_USAGE_FMT;    str  = "/tmp/use.%lu"; };
+string = { nm = TMP_USAGE_FMT;    str  = "%s/use-%u.XXXXXX"; };
 string = { nm = TRUE_STR;         str  = "true"; };
 string = { nm = TWO_SPACES_STR;   str  = "  "; };
 string = { nm = TYPE_ATR_FMT;     str  = "<%s type=%s>"; };
@@ -141,12 +141,10 @@ string = { nm = zOptionEndSelect; str  = "            ;;\n\n"; };
 string = { nm = zOptionFlag;      str  = "        '%c' )\n"; };
 string = { nm = zOptionFullName;  str  = "        '%s' )\n"; };
 string = { nm = zOptionPartName;  str  = "        '%s' | \\\n"; };
-
-string = { nm = PAGE_USAGE_FMT;
-  str  = "%1$s /tmp/use.%2$lu ; rm -f /tmp/use.%2$lu"; };
-
-string = { nm = PAGE_USAGE_FMT;
-  str  = "%1$s /tmp/use.%2$lu ; rm -f /tmp/use.%2$lu"; };
+string = { nm = TMPDIR;           str  = "TMPDIR"; };
+string = { nm = tmp_dir;          str  = "/tmp"; };
+string = { nm = TMP_FILE_FMT;     str  = "%s/use-%u.XXXXXX"; };
+string = { nm = PAGE_USAGE_FMT;   str  = "%1$s %2$s ; rm -f %2$s"; };
 
 string = { nm = BOOL_ATR_FMT;
   str  = "<%1$s type=boolean>%2$s</%1$s>\n"; };
