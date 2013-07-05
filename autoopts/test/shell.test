@@ -42,10 +42,14 @@ long_opts=true  \
 ${SHELLX} ${stdopts} option: second || failure "Could not run stdopts.def"
 mv ${testname}.def ${testname}.def-ori
 {
-    ${SED} '/value = .s/i\
+    ${SED} '/^test-main/d;/value = .s/i\
 	min = 1; max = 2;
     ' ${testname}.def-ori
-    echo 'detail = "exit 99 ; oops.";'
+    cat <<- _EOF_
+	detail   = "exit 99 ; oops.";
+	no-xlate = anything;
+	main     = { main-type = shell-process; };
+	_EOF_
 } > ${testname}.def
 
 ${AG_L} ${testname}.def || \
@@ -68,7 +72,6 @@ Usage:  shell { -<flag> [<val>] | --<name>[{=| }<val>] }... \
    -! no  more-help      opt  extended usage information passed thru pager
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
-exit 99 ; oops.
 _EOF_
 
 pair="${testname}.hlp ${testname}.help"
@@ -112,12 +115,12 @@ cmp -s $pair || \
   failure "SHELL PARSE OUTPUT CHANGED
 `diff ${pair}`"
 
-${SED} '/test-main/s/yes/optionParseShell/' ${testname}.def > XX
+${SED} '/main-type/s/process/parser/' ${testname}.def > XX
 mv -f XX ${testname}.def
 
 echo ${AG_L} ${testname}.def
 ${AG_L} ${testname}.def || \
-  failure AutoGen could not process
+  failure 'AutoGen could not process'
 
 sedcmd='/Note that.*is only useful/,/will be regenerated/d'
 compile "-?"

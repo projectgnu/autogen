@@ -1,6 +1,5 @@
-AutoGen Definitions str2mask.tpl;
-
-/*
+AutoGen Definitions str2mask.tpl; /* -*- Mode: C -*-
+ *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
  *  AutoOpts is Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
@@ -46,6 +45,7 @@ what[ 2] = 'Stop on argument errors';
 cmd[  3] = disabledopt;
 what[ 3] = 'Current option is disabled';
 
+/* === */
 
 cmd[  4] = no-req-opt;
 what[ 4] = 'no options are required';
@@ -59,6 +59,8 @@ what[ 6] = 'have inits been done?';
 cmd[  7] = negations;
 what[ 7] = 'any negation options?';
 
+/* === === */
+
 cmd[  8] = environ;
 what[ 8] = 'check environment?';
 
@@ -71,6 +73,7 @@ what[10] = 'Require args after options';
 cmd[ 11] = reorder;
 what[11] = 'reorder operands after opts';
 
+/* === */
 
 cmd[ 12] = gnuusage;
 what[12] = 'emit usage in GNU style';
@@ -84,6 +87,7 @@ what[14] = 'no usage on usage error';
 cmd[ 15] = immediate;
 what[15] = 'immediate options active';
 
+/* === === */
 
 cmd[ 16] = nxlat-opt-cfg;
 what[16] = 'suppress for config only';
@@ -97,8 +101,14 @@ what[18] = 'vendor options active';
 cmd[ 19] = presetting;
 what[19] = 'opt processing in preset state';
 
+/* === */
+
 cmd[ 20] = compute;
 what[20] = 'Ignore pzFullUsage, compute usage text';
+
+cmd[ 21] = shell-output;
+what[21] = "Program outputs digested option state for shell scripts.\n"
+           'Usage text always written to stderr';
 
 
 mask = {

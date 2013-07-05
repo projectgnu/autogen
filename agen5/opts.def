@@ -43,12 +43,12 @@ usage-message;
 resettable;
 config-header  = config.h;
 no-xlate       = anything;
-omit-nls-code;
 
 #else
 prog-name      = xml2ag;
 prog-title     = "XML to AutoGen Definiton Converter";
 #endif
+no-xlate       = anything;
 package        = 'GNU AutoGen';
 
 argument       = "[ <def-file> ]";

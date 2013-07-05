@@ -34,14 +34,14 @@ prog-title    = "AutoGen Definition Extraction Tool";
 package       = 'GNU AutoGen';
 version       = "1.5";
 homerc        = /dev/null;
+no-xlate      = anything;
+
 explain       = <<- EndExplanation
 	If no @code{input} argument is provided or is set to simply "-", and if
 	@code{stdin} is not a @code{tty}, then the list of input files will be
 	read from @code{stdin}.
 	EndExplanation;
 guard-option-names;
-no-xlate       = anything;
-omit-nls-code;
 
 flag = {
     name        = def-selection;

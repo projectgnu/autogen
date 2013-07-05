@@ -125,9 +125,6 @@ ELSE
 #include <stdio.h>
 #include <stdlib.h>[=
 
- (if put-shell-main
-     (emit "\n#include <unistd.h>"))
-
  (if (exist? "flag.arg-range")
      (emit "\n#include <errno.h>"))
 
@@ -449,20 +446,23 @@ static char const [=(. pname)=]_packager_info[] =
 tOptions [=(. pname)=]Options = {
     OPTIONS_STRUCT_VERSION,
     0, NULL,                    /* original argc + argv    */
-    ( OPTPROC_BASE[=                IF (not (exist? "allow-errors"))     =]
-    + OPTPROC_ERRSTOP[=    ENDIF=][=IF      (exist? "flag.value")        =]
-    + OPTPROC_SHORTOPT[=   ENDIF=][=IF      (exist? "long-opts")         =]
-    + OPTPROC_LONGOPT[=    ENDIF=][=IF (not (exist? "flag.min"))         =]
-    + OPTPROC_NO_REQ_OPT[= ENDIF=][=IF      (exist? "flag.disable")      =]
-    + OPTPROC_NEGATIONS[=  ENDIF=][=IF (>=   number-opt-index 0)         =]
-    + OPTPROC_NUM_OPT[=    ENDIF=][=IF      (exist? "environrc")         =]
-    + OPTPROC_ENVIRON[=    ENDIF=][=IF (not (exist? "argument"))         =]
-    + OPTPROC_NO_ARGS[=           ELIF (not (==* (get "argument") "[" )) =]
-    + OPTPROC_ARGS_REQ[=   ENDIF=][=IF      (exist? "reorder-args")      =]
-    + OPTPROC_REORDER[=    ENDIF=][=IF      (exist? "gnu-usage")         =]
-    + OPTPROC_GNUUSAGE[=   ENDIF=][=IF      (exist? "no-misuse-usage")   =]
-    + OPTPROC_MISUSE[=     ENDIF=][=IF      (exist? "vendor-opt")        =]
-    + OPTPROC_VENDOR_OPT[= ENDIF=] ),
+    ( OPTPROC_BASE[=
+    (define tmp-val "\n    + OPTPROC_")
+    (if (not (exist? "allow-errors"))       (emit tmp-val "ERRSTOP"))
+    (if (exist? "flag.value")               (emit tmp-val "SHORTOPT"))
+    (if (exist? "long-opts")                (emit tmp-val "LONGOPT"))
+    (if (not (exist? "flag.min"))           (emit tmp-val "NO_REQ_OPT"))
+    (if (exist? "flag.disable")             (emit tmp-val "NEGATIONS"))
+    (if (>=   number-opt-index 0)           (emit tmp-val "NUM_OPT"))
+    (if (exist? "environrc")                (emit tmp-val "ENVIRON"))
+    (if (not (exist? "argument"))           (emit tmp-val "NO_ARGS")
+       (if (not (==* (get "argument") "[")) (emit tmp-val "ARGS_REQ")))
+    (if (exist? "reorder-args")             (emit tmp-val "REORDER"))
+    (if (exist? "gnu-usage")                (emit tmp-val "GNUUSAGE"))
+    (if (exist? "no-misuse-usage")          (emit tmp-val "MISUSE"))
+    (if (exist? "vendor-opt")               (emit tmp-val "VENDOR_OPT"))
+    (if put-shell-main                      (emit tmp-val "SHELL_OUTPUT"))
+    =] ),
     0, NULL,                    /* current option index, current option */
     NULL,         NULL,         zPROGNAME,
     zRcName,      zCopyright,   zLicenseDescrip,

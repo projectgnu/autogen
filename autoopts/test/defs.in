@@ -260,7 +260,7 @@ ht='	'
 basic_help_clean="/^Packaged by/d
 /^Report .* bugs to/d
 /[Pp]lease send bug reports/d
-/^exit 0/d
+/^exit [0-9]/d
 /^[ ${ht}]*\$/d"
 export   nl ht basic_help_clean
 readonly nl ht basic_help_clean
@@ -333,6 +333,7 @@ failure()
 
 thumper()
 {
+  set +x
   exec > /dev/null 2>&1 </dev/null
   bdir=`cd "$builddir" >/dev/null ; pwd`
   cd /

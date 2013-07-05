@@ -110,7 +110,7 @@ go_samples() {
 
 	prog-name  = "test_${testname}";
 	prog-title = "Test AutoOpts for ${testname}";
-	test-main  = 'yes';
+	main       = { main-type = shell-process; };
 	config-header = 'config.h';
 
 	settable;

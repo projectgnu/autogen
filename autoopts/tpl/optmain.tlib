@@ -109,6 +109,8 @@ main(int argc, char ** argv)
   main-text         =][=
 
   ELSE test-main is not optionParseShell and main-text not exist
+       Above, we figure out which emitter procedure is to be used.
+       The default is optionPutShell.
 
 =]
     (void)optionProcess(&[=(. pname)=]Options, argc, argv);
@@ -1243,19 +1245,6 @@ doUsageOpt(tOptions * opts, tOptDesc * od)
 
   ELSE                          =]
     ex_code = [=(. succ-exit-code)=];[=
-  ENDIF                         =][=
-
-  IF (. put-shell-main)         =][=
-     (if guarded-test-main
-      (emit "\n#if defined(" main-guard ") /* TEST-MAIN-PROCEDURE */")
-      "\n/* #if defined(*not-used*) TEST-MAIN-PROCEDURE */" ) =]
-    fputs("exit 0\n", stdout);
-    fflush(stdout);
-    dup2(STDERR_FILENO, STDOUT_FILENO);[=
-     (if guarded-test-main
-      (emit "\n#endif /* " main-guard " TEST-MAIN-PROCEDURE */")
-      "\n/* #endif *not-used* END-TEST-MAIN-PROCEDURE */" )   =][=
-
   ENDIF                         =][=
   (string-append "\n    " usage-proc "(&" pname "Options, ex_code);") =]
     /* NOTREACHED */

@@ -100,8 +100,8 @@ static void
 prt_extd_usage(tOptions * opts, tOptDesc * od, char const * title);
 
 static void
-prt_ini_list(char const * const * papz, bool * need_intro,
-             char const * ini_file, char const * path_nm);
+prt_ini_list(char const * const * papz, char const * ini_file,
+             char const * path_nm);
 
 static void
 prt_preamble(tOptions * opts, tOptDesc * od, arg_types_t * at);
@@ -610,6 +610,9 @@ optionUsage(tOptions * opts, int usage_exit_code)
     displayEnum = false;
     set_usage_flags(opts, NULL);
 
+    if (opts->fOptSet & OPTPROC_SHELL_OUTPUT)
+        printf("\nexit %d\n", exit_code);
+
     /*
      *  Paged usage will preset option_usage_fp to an output file.
      *  If it hasn't already been set, then set it to standard output
@@ -626,7 +629,8 @@ optionUsage(tOptions * opts, int usage_exit_code)
                 ? opts->pzFullUsage : NULL;
 
             if (option_usage_fp == NULL)
-                option_usage_fp = stdout;
+                option_usage_fp =
+                    (opts->fOptSet & OPTPROC_SHELL_OUTPUT) ? stderr : stdout;
         } else {
             pz = (opts->structVersion >= 30 * 4096)
                 ? opts->pzShortUsage : NULL;
@@ -959,24 +963,24 @@ prt_extd_usage(tOptions * opts, tOptDesc * od, char const * title)
         fputs(zDefaultOpt + tab_skip_ct, option_usage_fp);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ * Figure out where all the initialization files might live.  This requires
+ * translating some environment variables and testing to see if a name is a
+ * directory or a file.  It's squishy, but important to tell users how to
+ * find these files.
  *
- *   Figure out where all the initialization files might live.
- *   This requires translating some environment variables and
- *   testing to see if a name is a directory or a file.  It's
- *   squishy, but important to tell users how to find these files.
+ * @param[in]  papz        search path
+ * @param[out] ini_file    an output buffer of AG_PATH_MAX+1 bytes
+ * @param[in]  path_nm     the name of the file we're hunting for
  */
 static void
-prt_ini_list(char const * const * papz, bool * need_intro,
-             char const * ini_file, char const * path_nm)
+prt_ini_list(char const * const * papz, char const * ini_file,
+             char const * path_nm)
 {
     char pth_buf[AG_PATH_MAX+1];
 
-    if (papz == NULL)
-        return;
-
     fputs(zPresetIntro, option_usage_fp);
-    *need_intro = false;
 
     for (;;) {
         char const * path   = *(papz++);
@@ -1021,7 +1025,13 @@ prt_ini_list(char const * const * papz, bool * need_intro,
     }
 }
 
-
+/**
+ *  Print the usage line preamble text
+ *
+ * @param opts  the program option descriptor
+ * @param od    the option descriptor
+ * @param at    names of the option argument types
+ */
 static void
 prt_preamble(tOptions * opts, tOptDesc * od, arg_types_t * at)
 {
@@ -1111,7 +1121,7 @@ prt_one_usage(tOptions * opts, tOptDesc * od, arg_types_t * at)
     exit(EX_SOFTWARE);
 }
 
-/*
+/**
  *  Print out the usage information for just the options.
  */
 static void
@@ -1196,20 +1206,22 @@ prt_opt_usage(tOptions * opts, int ex_code, char const * title)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *   PROGRAM DETAILS
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
+ *  Print program details.
+ * @param[in] opts  the program option descriptor
  */
 static void
 prt_prog_detail(tOptions * opts)
 {
-    bool need_intro = true;
+    bool need_intro = (opts->papzHomeList == NULL);
 
     /*
-     *  Display all the places we look for config files
+     *  Display all the places we look for config files, if we have
+     *  a list of directories to search.
      */
-    prt_ini_list(opts->papzHomeList, &need_intro,
-                 opts->pzRcName, opts->pzProgPath);
+    if (! need_intro)
+        prt_ini_list(opts->papzHomeList, opts->pzRcName, opts->pzProgPath);
 
     /*
      *  Let the user know about environment variable settings

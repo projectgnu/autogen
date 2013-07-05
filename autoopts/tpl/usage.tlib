@@ -45,6 +45,7 @@
 =]
 AutoGen Definitions options.tpl;
 no-libopts;
+no-xlate = anything;
 [=
 
 FOR var IN  prog-name  prog-title  argument
@@ -73,7 +74,7 @@ copyright = {[=
 };[=
 ENDFOR copyright            =]
 
-main = { main-type = shell-process; };
+main = { main-type = main; };
 [=
 
 FOR flag
@@ -194,8 +195,9 @@ cd -
 ${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \
     redirect_die cannot compile ${exe}.c
 mv -f TMPexe$$ ${exe}
-exec 1>&8 2>&9 9>&- 8>&-
-
+xtr_set=`set -o | awk '/^xtrace/{ print $2 }'`
+set +x
+exec 2>/dev/null 1>&8
 ${exe} [=
 
   (if (== (get "usage-type") "short")
@@ -210,7 +212,10 @@ ${exe} [=
           "--help"
           (string-append "-" (get "help-value" "?"))
    )  )   =] || \
-  die "cannot obtain ${exe} help in ${tmp_dir}"[=
+  redirect_die "cannot obtain ${exe} help in ${tmp_dir}"
+exec 1>&8 2>&9 8>&- 9>&-
+test X$xtr_set = Xon && set -x
+[=
 
 (shell (out-pop #t))
 

@@ -122,6 +122,12 @@ DEFINE init-and-validate                =][=
         (error "a library must only have one 'flag.lib-name'"))
 )   )
 
+(if (exist? "main") (begin
+    (if (> (count "main") 1)
+        (error "too many main procedures"))
+    (if (not (exist? "main.main-type"))
+        (error "main procedure does not have a type") ) ))
+
 ;;  Establish a number of variations on the spelling of the
 ;;  program name.  Use these Scheme defined values throughout.
 ;;
@@ -141,7 +147,7 @@ DEFINE init-and-validate                =][=
       guarded-test-main ) )
 (if (not make-main-proc) (set! guarded-test-main #f))
 (define put-shell-main
-  (or (~~ (get "main.main-type") "shell-process")
+  (or (== (get "main.main-type") "shell-process")
       (and (not (exist? "main")) guarded-test-main)
 ) )
 
