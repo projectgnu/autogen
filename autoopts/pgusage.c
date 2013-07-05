@@ -111,7 +111,7 @@ optionPagedUsage(tOptions * opts, tOptDesc * od)
 
     (*opts->pUsageProc)(opts, EXIT_SUCCESS);
 #else
-    static proc_state_mask_t pst = 0;
+    static bool sv_print_exit = false;
     static char * fil_name = NULL;
 
     /*
@@ -128,7 +128,8 @@ optionPagedUsage(tOptions * opts, tOptDesc * od)
         if (option_usage_fp == NULL)
             (*opts->pUsageProc)(opts, EXIT_SUCCESS);
 
-        pagerState = PAGER_STATE_READY;
+        pagerState    = PAGER_STATE_READY;
+        sv_print_exit = print_exit;
 
         /*
          *  Set up so this routine gets called during the exit logic
@@ -140,8 +141,7 @@ optionPagedUsage(tOptions * opts, tOptDesc * od)
          *  the temporary file we created above.  Keep any shell commands
          *  out of the result.
          */
-        pst = opts->fOptSet;
-        opts->fOptSet &= ~OPTPROC_SHELL_OUTPUT;
+        print_exit = false;
         (*opts->pUsageProc)(opts, EXIT_SUCCESS);
 
         /* NOTREACHED */
@@ -151,7 +151,8 @@ optionPagedUsage(tOptions * opts, tOptDesc * od)
     case PAGER_STATE_READY:
         fil_name = mk_pager_cmd(fil_name);
 
-        if (pst & OPTPROC_SHELL_OUTPUT) {
+        if (sv_print_exit) {
+            fputs("\nexit 0\n", stdout);
             fclose(stdout);
             dup2(STDERR_FILENO, STDOUT_FILENO);
 

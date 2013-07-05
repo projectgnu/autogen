@@ -33,8 +33,6 @@
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
-static char const * pz_enum_err_fmt;
-
 /* = = = START-STATIC-FORWARD = = = */
 static void
 enum_err(tOptions * pOpts, tOptDesc * pOD,

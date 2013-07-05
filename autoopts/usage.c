@@ -37,36 +37,6 @@
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
-#define OPTPROC_L_N_S  (OPTPROC_LONGOPT | OPTPROC_SHORTOPT)
-#if defined(ENABLE_NLS) && defined(HAVE_LIBINTL_H)
-# include <libintl.h>
-#endif
-
-typedef struct {
-    size_t          fnm_len;
-    uint32_t        fnm_mask;
-    char const *    fnm_name;
-} ao_flag_names_t;
-
-/**
- * Automated Options Usage Flags.
- * NB: no entry may be a prefix of another entry
- */
-#define AOFLAG_TABLE                            \
-    _aof_(gnu,             OPTPROC_GNUUSAGE )   \
-    _aof_(autoopts,        ~OPTPROC_GNUUSAGE)   \
-    _aof_(no_misuse_usage, OPTPROC_MISUSE   )   \
-    _aof_(misuse_usage,    ~OPTPROC_MISUSE  )   \
-    _aof_(compute,         OPTPROC_COMPUTE  )
-
-#define _aof_(_n, _f)   AOUF_ ## _n ## _ID,
-typedef enum { AOFLAG_TABLE AOUF_COUNT } ao_flag_id_t;
-#undef  _aof_
-
-#define _aof_(_n, _f)   AOUF_ ## _n = (1 << AOUF_ ## _n ## _ID),
-typedef enum { AOFLAG_TABLE } ao_flags_t;
-#undef  _aof_
-
 /* = = = START-STATIC-FORWARD = = = */
 static unsigned int
 parse_usage_flags(ao_flag_names_t const * fnt, char const * txt);
@@ -302,13 +272,6 @@ optionOnlyUsage(tOptions * pOpts, int ex_code)
     if (ferror(option_usage_fp) != 0)
         fserr_exit(pOpts->pzProgName, zwriting, (option_usage_fp == stderr)
                    ? zstderr_name : zstdout_name);
-}
-
-LOCAL void
-ao_bug(char const * msg)
-{
-    fprintf(stderr, zao_bug_msg, msg);
-    exit(EX_SOFTWARE);
 }
 
 /**
@@ -610,9 +573,6 @@ optionUsage(tOptions * opts, int usage_exit_code)
     displayEnum = false;
     set_usage_flags(opts, NULL);
 
-    if (opts->fOptSet & OPTPROC_SHELL_OUTPUT)
-        printf("\nexit %d\n", exit_code);
-
     /*
      *  Paged usage will preset option_usage_fp to an output file.
      *  If it hasn't already been set, then set it to standard output
@@ -629,8 +589,8 @@ optionUsage(tOptions * opts, int usage_exit_code)
                 ? opts->pzFullUsage : NULL;
 
             if (option_usage_fp == NULL)
-                option_usage_fp =
-                    (opts->fOptSet & OPTPROC_SHELL_OUTPUT) ? stderr : stdout;
+                option_usage_fp = print_exit ? stderr : stdout;
+
         } else {
             pz = (opts->structVersion >= 30 * 4096)
                 ? opts->pzShortUsage : NULL;
@@ -663,7 +623,7 @@ optionUsage(tOptions * opts, int usage_exit_code)
         fserr_exit(opts->pzProgName, zwriting, (option_usage_fp == stdout)
                    ? zstdout_name : zstderr_name);
 
-    exit(exit_code);
+    option_exits(exit_code);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1118,7 +1078,7 @@ prt_one_usage(tOptions * opts, tOptDesc * od, arg_types_t * at)
 
  bogus_desc:
     fprintf(stderr, zbad_od, opts->pzProgName, od->pz_Name);
-    exit(EX_SOFTWARE);
+    option_exits(EX_SOFTWARE);
 }
 
 /**

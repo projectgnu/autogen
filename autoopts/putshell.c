@@ -30,7 +30,6 @@
  *  4379e7444a0e2ce2b12dd6f5a52a27a4d02d39d247901d3285c88cf0d37f477b  COPYING.lgplv3
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
-#define APOSTROPHE '\''
 
 /* = = = START-STATIC-FORWARD = = = */
 static size_t
