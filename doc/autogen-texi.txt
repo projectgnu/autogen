@@ -2497,32 +2497,34 @@ shell script as follows:
 @example
 unset OPTION_CT
 eval "`opt_parser \"$@@\"`"
-test -z "$@{OPTION_CT@}" && exit 1
 test $@{OPTION_CT@} -gt 0 && shift $@{OPTION_CT@}
 @end example
 
-If the option parsing code detects an error or a request for usage,
-it will not emit an assignment to OPTION_CT and the script should just
-exit.  If the options are set consistently, then something along the
-lines of the following will be written to @file{stdout} and evaled:
+If the option parsing code detects an error or a request for usage or version,
+it will emit a command to exit with an appropriate exit code to @file{stdout}.
+This form of @code{main} will cause all messages, including requested usage
+and version information, to be emitted to @file{stderr}.  Otherwise, a numeric
+value for @code{OPTION_CT} is guaranteed to be emitted, along with assignments
+for all the options parsed, something along the lines of the following will be
+written to @file{stdout} and evaled:
 
 @example
-    OPTION_CT=4
-    export OPTION_CT
-    MYPROG_SECOND='first'
-    export MYPROG_SECOND
-    MYPROG_ANOTHER=1 # 0x1
-    export MYPROG_ANOTHER
+OPTION_CT=4
+export OPTION_CT
+MYPROG_SECOND='first'
+export MYPROG_SECOND
+MYPROG_ANOTHER=1 # 0x1
+export MYPROG_ANOTHER
 @end example
 
 @noindent
 If the arguments are to be reordered, however, then the resulting set
-of operands will be emitted and @env{OPTION_CT} gets set to zero.
+of operands will be emitted and @env{OPTION_CT} will be set to zero.
 For example, the following would be appended to the above:
 
 @example
-    set -- 'operand1' 'operand2' 'operand3'
-    OPTION_CT=0
+set -- 'operand1' 'operand2' 'operand3'
+OPTION_CT=0
 @end example
 
 @noindent
