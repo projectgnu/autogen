@@ -238,7 +238,7 @@ DEFINE initialization                   =][=
   (define down-prog-name    (string-downcase program-name))
   (define UP-PROG-NAME      (string-upcase   program-name))
   (shell "export AG_DEF_PROG_NAME=" program-name
-         "\nCLexe=`echo ${AGexe} | sed 's@/autogen@/columns@`")
+         "\nCLexe=`echo ${AGexe} | sed 's@/autogen@/columns@'`")
 
   (define doc-level         (getenv "LEVEL"))
   (if (not (string? doc-level))
