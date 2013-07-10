@@ -33,7 +33,7 @@ opthdrsrc=${srcdir}/autoopts/options.h
 usehdrsrc=${srcdir}/autoopts/usage-txt.h
 cfgf=${top_builddir}/config.h
 
-{
+emit_options_h(){
     sed '/^#include <stdio/q' ${opthdrsrc}
 
     if ${EGREP} 'define +HAVE_STDINT_H' ${cfgf} >/dev/null
@@ -84,7 +84,8 @@ cfgf=${top_builddir}/config.h
     else nopathfind='/HAVE_PATHFIND/d' ; fi
 
     sed "${sedcmd};${nopathfind}" ${opthdrsrc}
-} > ${DESTdestdir}/options.h
+}
+emit_options_h > ${DESTdestdir}/options.h
 
 sed '/#if.*AUTOOPTS_INTERNAL/,/#endif.*AUTOOPTS_INTERNAL/d' \
   ${usehdrsrc} > ${DESTdestdir}/usage-txt.h
@@ -97,8 +98,8 @@ test -d "${DESTpkgdatadir}" && {
     cd ${DESTpkgdatadir}
     for f in *
     do  case "$f" in
-        optlib.tlib    | getopt.tpl | usage.tlib | cmd-doc.tlib | \
-        agtexi-cmd.tpl | agman1.tpl | aginfo.tpl )
+        agtexi-cmd.tpl | cmd-doc.tlib | def2pot.tpl   | \
+        getopt.tpl     | options.tpl  | str2init.tlib | usage.tlib)
             sed "${rmbuild}" $f > $f.tmp
             mv -f $f.tmp $f
             ;;

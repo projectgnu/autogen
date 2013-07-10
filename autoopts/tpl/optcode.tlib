@@ -637,10 +637,10 @@ translate_option_strings(void)
 static void bogus_function(void) {
   /* TRANSLATORS:
 
-     The following dummy function was crated solely so that xgettext can extract
-     the correct strings.  These strings are actually referenced by a field name
-     in the [=(. pname)=]Options structure noted in the comments below.  The
-     literal text is defined in [=(. pname)=]_opt_strs.
+     The following dummy function was crated solely so that xgettext can
+     extract the correct strings.  These strings are actually referenced
+     by a field name in the [=(. pname)=]Options structure noted in the
+     comments below.  The literal text is defined in [=(. pname)=]_opt_strs.
    
      NOTE: the strings below are segmented with respect to the source string
      [=(. pname)=]_opt_strs.  The strings above are handed off for translation
@@ -816,7 +816,7 @@ IF (exist? "homerc")                    =][=
      /* equivalenced to  */ NO_EQUIVALENT,
      /* min, max, act ct */ 0, 1, 0,
      /* opt state flags  */ OPTST_SET_ARGTYPE(OPARG_TYPE_STRING)
-                          | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, AOUSE_SAVE_OPTS,
+                       | OPTST_ARG_OPTIONAL | OPTST_NO_INIT, AOUSE_SAVE_OPTS,
      /* last opt argumnt */ { NULL },
      /* arg list/cookie  */ NULL,
      /* must/cannot opts */ NULL,  NULL,

@@ -19,7 +19,7 @@ pathfind( char const * path,
           char const * fileName,
           char const * mode )
 {
-    return NULL;
+    return strdup(fileName);
 }
 #else
 

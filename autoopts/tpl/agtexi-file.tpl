@@ -213,7 +213,8 @@ DEFINE initialization                   =][=
          (set! cvt-script
                (find-file (string-append diversion-type "2texi")))
          (if (not (defined? 'cvt-script))
-             (error (sprintf "unknown source format type: %s" diversion-type)) )
+             (error (sprintf "unknown source format type: %s"
+                             diversion-type)) )
          (out-push-new) ))  )))
 
   (define heredoc-marker "_Unlikely_Here_Doc_Marker_\n")
