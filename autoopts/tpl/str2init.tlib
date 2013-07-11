@@ -91,7 +91,8 @@
   (shell
     "gperf=`command -v gperf` 2>/dev/null\n"
     "test -x \"$gperf\" || die 'gperf not installed'\n"
-    "CLexe=`echo ${AGexe} | sed 's@/autogen@/columns@'`")
+    "CLexe=`echo ${AGexe} | sed 's@/autogen@/columns@'`
+    test -x \"${CLexe}\" || CLexe=`which columns`")
 
 # END-INSTALL-ONLY-CODE =][=
 

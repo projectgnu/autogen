@@ -38,7 +38,8 @@ c
 )
 =][= # END-BUILDTREE-ISMS
 
-(shell "CLexe=`echo ${AGexe} | sed 's@/autogen@/columns@'`")
+(shell "CLexe=`echo ${AGexe} | sed 's@/autogen@/columns@'`
+       test -x \"${CLexe}\" || CLexe=`which columns`")
 
 # END-INSTALL-ONLY-CODE     =][=
 

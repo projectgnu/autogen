@@ -21,20 +21,21 @@ typeset -r prog=$(basename "$0" .sh)
 typeset -r progdir=$(\cd $(dirname "$0") && pwd -P)
 typeset -r program=${progdir}/$(basename "$0")
 typeset -r progpid=$$
-typeset -r parent_pid=$$
 
 builddir=`pwd`
 . ${top_builddir:-..}/config/shdefs
 
 die()
 {
-  exec 2>&8 1>&2 8>&-
+  exec 1> ${TMPDIR}/err-report.txt 2>&1
   echo "mk-agen-texi FAILED: $*"
   echo
   cat ${LOG_FILE}
+  exec 2>&8 1>&2 8>&-
+  cat ${TMPDIR}/err-report.txt
   trap : EXIT
   echo leaving ${TMPDIR} in place
-  kill -TERM ${parent_pid}
+  kill -TERM ${progpid}
   exit 1
 }
 

@@ -33,7 +33,7 @@ opthdrsrc=${srcdir}/autoopts/options.h
 usehdrsrc=${srcdir}/autoopts/usage-txt.h
 cfgf=${top_builddir}/config.h
 
-emit_options_h(){
+emit_options_h() {
     sed '/^#include <stdio/q' ${opthdrsrc}
 
     if ${EGREP} 'define +HAVE_STDINT_H' ${cfgf} >/dev/null

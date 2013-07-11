@@ -74,8 +74,8 @@ Usage:  main [ -<flag> [<val>] ]... [ <argument> ... ]
    -? no  help           display extended usage information and exit
    -! no  more-help      extended usage information passed thru pager
 
-
 This is some explanatory text.
+
 If no arguments are provided, input arguments are read from stdin,
 one per line; blank and '#'-prefixed lines are comments.
 Options may appear in the input interspersed with the 'normal' input.
@@ -89,12 +89,12 @@ cmp -s $pair || \
 
 # # # # # # # # # # TEST OPERATION # # # # # # # # # #
 sedcmd='/illegal option /d'
-echo '-?' | ./${testname} 2>&1 | clean_help > ${testname}.out
+echo '--help' | ./${testname} 2>&1 | clean_help > ${testname}.out
 
 pair="${testname}.hlp ${testname}.out"
 cmp -s $pair || \
   failure "DIFFER: $pair
-`diff ${testname}.base ${testname}.out`"
+`diff ${testname}.hlp ${testname}.out`"
 
 ./${testname} > ${testname}.out2 <<EOF
 the

@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2013-03-11 10:57:00 bkorb"
+  Time-stamp:        "2013-07-11 08:24:33 bkorb"
 _EOF_
 \` `            +][+
 
@@ -81,6 +81,7 @@ CASE (suffix) +][+
 # END-BUILDTREE-ISMS the following code is for installed version:
     agopts=
     aocfg=`echo ${AGexe} | sed 's@/[^/]*$@@'`/autoopts-config
+    test -x "${aocfg}" || aocfg=`which autoopts-config`
     tarfile=`${aocfg} libsrc`
 
 # END-INSTALL-ONLY-CODE +]
