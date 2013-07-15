@@ -1,5 +1,14 @@
 New in __CURRENT_VERSION__ March 2013
 
+* Many doc improvements
+* set membership option handling improved
+* fixes for Solaris antiquities
+* nomem_err() function gets emitted
+* version and usage messages for option handling programs wrote
+  the output to stdout, but stdout gets eval-ed.
+
+New in 5.17.4 March 2013
+
 * --save-opts documentation cleanup
 * optionMemberList() will return an allocated string containing
   the names of the bits set in the option.
