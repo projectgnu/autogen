@@ -193,7 +193,7 @@ a Bourne-compatible shell, thus digesting the options for the script.
 There is no description for this command.
 .SH "OPTIONS"
 .TP
-.BR \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP
+.BR  \-o " \fIstring\fP, " \-\-option "=" \fIstring\fP
 The option option descrip.
 The default \fIstring\fP for this option is:
 .ti +4
@@ -201,7 +201,7 @@ The default \fIstring\fP for this option is:
 .sp
 This option has not been fully documented.
 .TP
-.BR \-\-trace "=\fIlevel\fP"
+.BR  \-\-trace "=\fIlevel\fP"
 tracing level of detail.
 This option takes a keyword as its argument.  The argument sets an enumeration value that can
 be tested by comparing them against the option value macro.
@@ -221,7 +221,7 @@ The default \fIlevel\fP for this option is:
 .sp
 This option has not been fully documented.
 .TP
-.BR \-\-sets "=\fImember\-list\fP"
+.BR  \-\-sets "=\fImember\-list\fP"
 set membership testing.
 This option takes a keyword as its argument list.  Each entry turns on or off
 membership bits.  The bits are set by name or numeric value and cleared

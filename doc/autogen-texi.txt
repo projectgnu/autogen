@@ -2506,7 +2506,7 @@ This form of @code{main} will cause all messages, including requested usage
 and version information, to be emitted to @file{stderr}.  Otherwise, a numeric
 value for @code{OPTION_CT} is guaranteed to be emitted, along with assignments
 for all the options parsed, something along the lines of the following will be
-written to @file{stdout} and evaled:
+written to @file{stdout} for evaluation:
 
 @example
 OPTION_CT=4

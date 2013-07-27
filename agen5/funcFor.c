@@ -884,7 +884,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
 
     /*
      *  src points to the name of the iteration "variable"
-     *  Special hack:  if the name is preceeded by a `.',
+     *  Special hack:  if the name is preceded by a `.',
      *  then the lookup is local-only and we will accept it.
      */
     mac->md_name_off = (uintptr_t)(tpl->td_scan - tpl->td_text);

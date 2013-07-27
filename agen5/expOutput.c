@@ -911,7 +911,7 @@ ag_scm_make_header_guard(SCM name)
             *(scan_p++) = '_';
             lpz = BRK_ALPHANUMERIC_CHARS(lpz);
             while (IS_ALPHANUMERIC_CHAR(*lpz))
-                *(scan_p++) = (char)toupper((unsigned)*(lpz++));
+                *(scan_p++) = (char)toupper((unsigned char)*(lpz++));
         } while (*lpz != NUL);
 
         memcpy(scan_p, GUARD_SFX, GUARD_SFX_LEN + 1);

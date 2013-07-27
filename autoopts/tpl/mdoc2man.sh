@@ -95,8 +95,7 @@ do_nest_tag() {
     while IFS='' read -r line
     do
         case "${line}" in
-        .It* ) printf '.ti -4\n.IR '
-               echo ${line#.It} ;;
+        .It* ) printf '.ti -4\n.IR%s\n' "${line#.It}" ;;
 
         .Bl' '*enum* )   do_nest_enum      ;;
         .Bl' '*tag* )    do_nest_tag       ;;
@@ -119,8 +118,7 @@ do_tag() {
     while IFS='' read -r line
     do
         case "${line}" in
-        .It* ) printf '.TP\n.BR '
-               echo ${line#.It}            ;;
+        .It* ) printf '.TP\n.BR%s\n' "${line#.It}" ;;
 
         .Bl' '*enum* )   do_nest_enum      ;;
         .Bl' '*tag* )    do_nest_tag       ;;
@@ -145,8 +143,7 @@ do_bullet() {
     while IFS='' read -r line
     do
         case "${line}" in
-        .It* ) printf '.ti -4\n\\fB*\\fP\n'
-               echo ${line#.It}
+        .It* ) printf '.ti -4\n\\fB*\\fP\n%s\n' "${line#.It}"
                ;;
 
         .Bl' '*enum* )   do_nest_enum      ;;
@@ -238,7 +235,7 @@ do_nest_flag() {
 }
 
 do_flag() {
-    echo ${line#.Fl}
+    printf '%s\n' "${line#.Fl}"
 }
 
 do_nest_arg() {
@@ -252,7 +249,7 @@ do_arg() {
 
 do_NmName() {
     # do we want to downcase the line first?  Yes...
-    set -- `echo ${line#.Nm} | \
+    set -- `printf '%s\n' "${line#.Nm}" | \
         sed -e 's/-/\\-/g' \
             -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
     NmNameSfx=

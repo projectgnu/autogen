@@ -699,7 +699,7 @@ ag_scm_raw_shell_str(SCM obj)
 SCM
 ag_scm_shell_str(SCM obj)
 {
-    return shell_stringify(obj, (unsigned)'"');
+    return shell_stringify(obj, (unsigned char)'"');
 }
 
 /*=gfunc sub_shell_str
@@ -717,7 +717,7 @@ ag_scm_shell_str(SCM obj)
 SCM
 ag_scm_sub_shell_str(SCM obj)
 {
-    return shell_stringify(obj, (unsigned)'`');
+    return shell_stringify(obj, (unsigned char)'`');
 }
 
 

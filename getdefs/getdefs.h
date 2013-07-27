@@ -44,8 +44,8 @@
 #define COUNT(a)       (sizeof(a)/sizeof(a[0]))
 #define MARK_CHAR      ':'
 
-#define AG_NAME_CHAR(c) (zUserNameCh[(unsigned)(c)] & 2)
-#define USER_NAME_CH(c) (zUserNameCh[(unsigned)(c)] & 1)
+#define AG_NAME_CHAR(c) (zUserNameCh[(unsigned char)(c)] & 2)
+#define USER_NAME_CH(c) (zUserNameCh[(unsigned char)(c)] & 1)
 char zUserNameCh[ 256 ] = { '\0' };
 
 /*

@@ -477,11 +477,11 @@ validateOptions(void)
         char const * p = ag_nm_chars;
 
         while (*p)
-            zUserNameCh[(unsigned)(*p++)] = 3;
+            zUserNameCh[(unsigned char)(*p++)] = 3;
 
         p = usr_nm_chars;
         while (*p)
-            zUserNameCh[(unsigned)(*p++)] = 1;
+            zUserNameCh[(unsigned char)(*p++)] = 1;
     }
 }
 

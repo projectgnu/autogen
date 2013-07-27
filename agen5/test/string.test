@@ -120,7 +120,7 @@ int checkStr( char* pz, char const* pzWhat )
     for (ix = 0; ix < expectSize; ix++) {
         if (*(pzE++) != *(pzR++)) {
             fprintf(stderr, zNotMatch, pzWhat, ix, expectSize,
-                    (unsigned)pzE[-1], (unsigned)pzR[-1], zExpect, pz);
+                (unsigned char)pzE[-1], (unsigned char)pzR[-1], zExpect, pz);
             return 1;
         }
     }

@@ -20,41 +20,15 @@ AutoGen Definitions strings;
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-string = { nm = bad_directive;
-  str = "invalid directive: %s\n";
-};
-
-string = { nm = guard_fmt;
-  str = "%s_GUARD";
-};
-
-string = { nm = define_fmt;
-  str = "DEFINE_%s";
-};
-
-string = { nm = typedef_mask;
-  str = "\ntypedef %s %s;\n\n";
-};
-
-string = { nm = declare_tbl;
-  str = "extern %s const %s[%d];\n";
-};
-
-string = { nm = opterrmsg;
-  str = "char-mapper error:  %s:  %s\n";
-};
-
-string = { nm = input_is_tty;
-  str  = "input is from a TTY";
-};
-
-string = { nm = table_sfx;
-  str  = "_table";
-};
-
-string = { nm = must_be_file;
-  str  = "device must be file or pipe";
-};
+string = { nm = bad_directive;  str = "invalid directive: %s\n"; };
+string = { nm = guard_fmt;      str = "%s_GUARD"; };
+string = { nm = define_fmt;     str = "DEFINE_%s"; };
+string = { nm = typedef_mask;   str = "\ntypedef %s %s;\n\n"; };
+string = { nm = declare_tbl;    str = "extern %s const %s[%d];\n"; };
+string = { nm = opterrmsg;      str = "char-mapper error:  %s:  %s\n"; };
+string = { nm = input_is_tty;   str  = "input is from a TTY"; };
+string = { nm = table_sfx;      str  = "_table"; };
+string = { nm = must_be_file;   str  = "device must be file or pipe"; };
 
 string = { nm = leader_fmt;
   str = <<- _EOString_
@@ -145,7 +119,7 @@ string = { nm = inline_opt_functions;
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
-	    while (v[(unsigned)*p])  p++;
+	    while (v[(unsigned char)*p])  p++;
 	    return (char *)(uintptr_t)p;
 	}
 
@@ -155,7 +129,7 @@ string = { nm = inline_opt_functions;
 	    unsigned char const * v = %1$s_spanners[mask_ix];
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
-	    while ((*p != '\0') && (! v[(unsigned)*p]))  p++;
+	    while ((*p != '\0') && (! v[(unsigned char)*p]))  p++;
 	    return (char *)(uintptr_t)p;
 	}
 
@@ -172,7 +146,7 @@ string = { nm = inline_opt_backup;
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s >= e) e = s + strlen(s);
-	    while ((e > s) && v[(unsigned)e[-1]])  e--;
+	    while ((e > s) && v[(unsigned char)e[-1]])  e--;
 	    return (char *)(uintptr_t)e;
 	}
 
@@ -183,7 +157,7 @@ string = { nm = inline_opt_backup;
 	    if (v == NULL)
 	        v = calc_%1$s_spanners(mask_ix);
 	    if (s == e) e += strlen(e);
-	    while ((e > s) && (! v[(unsigned)e[-1]]))  e--;
+	    while ((e > s) && (! v[(unsigned char)e[-1]]))  e--;
 	    return (char *)(uintptr_t)e;
 	}
 
@@ -241,17 +215,11 @@ string = { nm = inline_backup;
 /*
  * "extra" text requested to be included in the output.
  */
-string = { nm = emit_text_fmt;
-  str = "\n/* emit text from map file: */\n\n%s\n";
-};
-
-string = { nm = start_static_table_fmt;
-  str = "static %s const %s[%d] = {\n ";
-};
-
-string = { nm = start_table_fmt;
-  str = "#ifdef %s\n%s const %s[%d] = {\n ";
-};
+string = { nm = emit_text_fmt;    str = "\n/* emit text from map file: */"
+           "\n\n%s\n"; };
+string = { nm = static_table_fmt; str = "static %s const %s[%d] = {\n "; };
+string = { nm = table_fmt;        str = "#ifdef %s\n%s const %s[%d] = {\n "; };
+string = { nm = no_locking;       str = "};\n#undef LOCK_SPANNER_TABLES\n"; };
 
 string = { nm = optimize_fmt;
   str = <<- _EOString_
@@ -282,15 +250,6 @@ string = { nm = pthread_locking;
 	#include <pthread.h>
 	static pthread_mutex_t %1$s_mutex = PTHREAD_MUTEX_INITIALIZER;
 	#define LOCK_SPANNER_TABLES 1
-
-	_EOString_;
-};
-
-string = { nm = no_locking;
-  str = <<- _EOString_
-	};
-
-	#undef  LOCK_SPANNER_TABLES
 
 	_EOString_;
 };
@@ -356,25 +315,13 @@ string = { nm = backup_def_fmt;
         "#define BRK_%1$s_BACK(s,e)%2$s brk_%3$s_back(s, e, %4$s)\n";
 };
 
-string = { nm = mask_fmt_fmt;
-  str = "0x%%0%dX";
-};
-
-string = { nm = char_map_gd;
-  str = "CHAR_MAPPER_H_GUARD";
-};
-
-string = { nm = end_table;
-  str = "\n};\n";
-};
-
-string = { nm = endif_fmt;
-  str = "#endif /* %s */\n";
-};
-
-string = { nm = tname_fmt;
-  str = "%s_table";
-};
+string = { nm = mask_fmt_fmt;       str = "0x%%0%dX"; };
+string = { nm = char_map_gd;        str = "CHAR_MAPPER_H_GUARD"; };
+string = { nm = end_table;          str = "\n};\n"; };
+string = { nm = endif_fmt;          str = "#endif /* %s */\n"; };
+string = { nm = tname_fmt;          str = "%s_table"; };
+string = { nm = testit_class_names; str = "\n        \"%02X == %s\\n\""; };
+string = { nm = testit_class_hdrs;  str = "\n        \"char is: "; };
 
 /*
  * Test main procedure formatting:
@@ -387,14 +334,6 @@ string = { nm = testit_fmt;
 	    int ix = 0;
 	    static char const header[] =
 	_EOString_;
-};
-
-string = { nm = testit_class_names;
-  str = "\n        \"%02X == %s\\n\"";
-};
-
-string = { nm = testit_class_hdrs;
-  str = "\n        \"char is: ";
 };
 
 string = { nm = test_loop;

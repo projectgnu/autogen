@@ -143,7 +143,7 @@ autoopts
 .SH DESCRIPTION
 \fBautoopts-config\fP is a tool that is used by configure to determine
 the compile and linker flags that should be used to compile and link
-programs that use autoopts.  \fIvalue-name\fPs may be preceeded by
+programs that use autoopts.  \fIvalue-name\fPs may be preceded by
 one or more hyphens.  They are silently ignored.
 .SH "VALUE NAMES"
 [=

@@ -29,7 +29,7 @@ where ``basename'' may be of your choosing.
 
 The following definitions are used:
 
-group      A module prefix that preceeds the "scm_" prefix to all symbols
+group      A module prefix that precedes the "scm_" prefix to all symbols
 init       the name of the created initialization routine.  This defaults
            to "scm_init" or "group_init", if "group" is specified.
            You must specify this for shared libraries.

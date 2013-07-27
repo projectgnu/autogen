@@ -414,9 +414,9 @@ emit_table(int bit_count)
     int  entry_ct = init_ct;
 
     if (table_is_static)
-        printf(start_static_table_fmt, mask_name, table_name, TABLE_SIZE);
+        printf(static_table_fmt, mask_name, table_name, TABLE_SIZE);
     else
-        printf(start_table_fmt, data_guard, mask_name, table_name, TABLE_SIZE);
+        printf(table_fmt, data_guard, mask_name, table_name, TABLE_SIZE);
 
     for (;;) {
         if (isprint(ix))

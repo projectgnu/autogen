@@ -430,7 +430,7 @@ It sets up a TLS connection and forwards data from the standard input
 to the secured socket and vice versa.
 .SH "OPTIONS"
 .TP
-.BR \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
+.BR  \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
 Enable \fBdebugging\fP.
 This option takes an integer number as its argument.
 The value of \fInumber\fP is constrained to being:
@@ -443,7 +443,7 @@ in the range  0 through 9999
 .sp
 really enable debugging
 .TP
-.BR \-\-mtu "=\fInumber\fP"
+.BR  \-\-mtu "=\fInumber\fP"
 Set MTU for datagram TLS.
 This option takes an integer number as its argument.
 The value of \fInumber\fP is constrained to being:
@@ -457,18 +457,18 @@ in the range  0 through 17000
 Really set MTU for datagram TLS
 .SS "second group of options"
 .TP
-.BR \-\-crlf
+.BR  \-\-crlf
 Send CR LF instead of LF.
 .sp
 Really send CR LF instead of LF
 .TP
-.BR \-\-x509fmtder
+.BR  \-\-x509fmtder
 Use DER format for certificates to read from.
 .sp
 Really use DER format for certificates to read from
 .SS "third group of options"
 .TP
-.BR \-\-recordsize "=\fInumber\fP"
+.BR  \-\-recordsize "=\fInumber\fP"
 The maximum record size to advertize.
 This option takes an integer number as its argument.
 The value of \fInumber\fP is constrained to being:
@@ -481,7 +481,7 @@ in the range  0 through 4096
 .sp
 Really the maximum record size to advertize
 .TP
-.BR \-\-priority "=\fIstring\fP"
+.BR  \-\-priority "=\fIstring\fP"
 Priorities string.
 .sp
 TLS algorithms and protocols to enable. You can

@@ -286,7 +286,7 @@ DEFINE mk-finder                =]
                    (string->c-name! (string-upcase! cmd))) =];[=
     ENDFOR alias                =]
   default:
-    if (! isalpha((unsigned)*str))
+    if (! isalpha((unsigned char)*str))
       return [=(. invalid-cmd)=];
     break;
   }
@@ -302,7 +302,7 @@ DEFINE mk-finder                =]
     static char const accept[] =
         [= (set! check-length (string-append
         check-length
-        "\n    if (isalnum((unsigned)str[clen]))"
+        "\n    if (isalnum((unsigned char)str[clen]))"
         "\n        return " invalid-cmd ";" ))
 
         (kr-string cmd-chars)
@@ -349,7 +349,7 @@ DEFINE cvt-chars                =][=
     /* too short, too long or followed immediately by a name char... */
     if (  ([=(sprintf "%s < %u" len-param-name min-len)=])
        || ([=(sprintf "%s > %u" len-param-name max-cmd-width)=])
-       || isalnum((unsigned)str[[=(. len-param-name)=]]) )
+       || isalnum((unsigned char)str[[=(. len-param-name)=]]) )
         return [=(. invalid-cmd)=];
 
     for (ix = 0; ix < [=(. len-param-name)=]; ix++) {
@@ -524,7 +524,7 @@ ELSE
     [= (define length-value "klen")
        enum-name =] id = [=(. find-func-name)=](str);
     unsigned int klen = [=
-  IF (exist? "alias") =](! isalnum((unsigned)*str)) ? 1 : [=
+  IF (exist? "alias") =](! isalnum((unsigned char)*str)) ? 1 : [=
   ENDIF  =]keywd_len[id];[=
 
 ENDIF

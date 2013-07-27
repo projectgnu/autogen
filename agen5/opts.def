@@ -494,7 +494,7 @@ flag = {
 	(@code{|}), a command that will receive the tracing output as standard
 	in.  For example, @code{--traceout='| less'} will run the trace output
 	through the @code{less} program.  Appending to a file is specified by
-	preceeding the file name with two greater-than characters (@code{>>}).
+	preceding the file name with two greater-than characters (@code{>>}).
 	_EOF_;
 
 #else
