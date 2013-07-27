@@ -1,13 +1,17 @@
-New in __CURRENT_VERSION__ March 2013
+New in __CURRENT_VERSION__ August 2013
 
-* Many doc improvements
+* fixed char casting issue that shows in UTF-8 files
+* fixed installation error for str2init
+
+New in 5.18 July 2013
+
 * set membership option handling improved
 * fixes for Solaris antiquities
 * nomem_err() function gets emitted
 * version and usage messages for option handling programs wrote
   the output to stdout, but stdout gets eval-ed.
 
-New in 5.17.4 March 2013
+New in 5.17.4 May 2013
 
 * --save-opts documentation cleanup
 * optionMemberList() will return an allocated string containing
@@ -29,29 +33,10 @@ New in 5.17.3 March 2013
 
 New in 5.17.2 February 2013
 
-* AutoOpts translatability improvements.  The translatable strings
-  are now inserted into a dummy procedure in the option processing
-  code file.  These can be extracted by xgettext, translated and
-  then displayed when the libopts library encounters any processing
-  issues.  Also, if the client code provides the full usage text
-  string, it will be broken up into "paragraphs" that are easier
-  for the translators to do their jobs.
-
-* i18n updates -- the translatable strings were not very.
-  The stuff was reworked so that usage text can be constructed
-  in English, specified as the full usage text and then
-  readily translated a paragraph at a time.
-
 * larger blocks of help text are now broken down into paragraphs
   when NLS support has been specified.  These paragraphs are also
   emitted into an xgettext extractable form so translators have
   matching text to work from.
-
-* Autogen tries to catch most signals.  This is done so that it can
-  emit appropriate messages before dying.  However, "SIGPROF" is
-  often signaled extremely early, before initialization is complete.
-  Cleanup is no longer performed before initialzation is complete.
-  "SIGPROF" is exempted from capture.
 
 New in 5.17.1 January, 2013
 
