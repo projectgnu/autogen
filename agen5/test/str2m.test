@@ -258,9 +258,8 @@ cat > $testname-c2.base <<- _EOF_
 	{
 	    static char const white[] = " \t\f";
 	    static char const name_chars[] =
-	        "abcdefghijklmnopqrstuvwxyz"
-	        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	        "0123456789_";
+	        "ehilnorstv"
+	        "EHILNORSTV";
 
 	    str2m_2_mask_t res = 0;
 	    int have_data = 0;

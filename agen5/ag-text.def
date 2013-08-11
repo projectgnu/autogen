@@ -1072,13 +1072,13 @@ string = { nm = SET_WRITE_WARN;
 string = { nm = SFX_FMT;
    str = "%s%s"; };
 
-string = { nm = SHELLF_BAD_ALIST_MSG;
-   str = "invalid alist to shellf"; };
+string = { nm = SHELL_RES_NULL_MSG;
+   str = "shell_cmd result is NULL"; };
 
 string = { nm = SHELL_CMD_FMT;
    str = "cd %s\n%s\n\necho\necho %s - %d\n"; };
 
-string = { nm = SHELL_DIE_ON_SIGNAL_FMT;
+string = { nm = SHELL_DIE_FMT;
    str = "Closing server:  %s signal (%d) received\n"; };
 
 string = { nm = SHELL_INIT_STR;

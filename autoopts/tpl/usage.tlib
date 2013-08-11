@@ -118,11 +118,11 @@ save_dir=`pwd`
 # redirect stdout.  We see this IFF there is a problem
 #
 redirect_log=${tmp_dir}/redirected.log
-exec 8>&1 9>&2 1> ${redirect_log} 2>&1
+exec 7>&1 9>&2 1> ${redirect_log} 2>&1
 redirect_die() {
-    exec 2>&9 1>&9 9>&- 8>&-
+    exec 2>&9 1>&9 9>&- 7>&-
     sed 's/^/## /' ${redirect_log}
-    die "$@"
+    die "$*"
 }
 
 inc_list="-I${PWD} -I[=(. inc-dir)=]"
@@ -173,7 +173,7 @@ do
     do
         d=`dirname $d`
         test "X$d" = X/ && \
-            redirect_die "cannot locate [= config-header =]"
+            redirect_die "cannot locate $h"
         h="$d/$g"
         test -f "$h" && break
         h="$d/$hdr"
@@ -198,7 +198,7 @@ ${CC:-cc} ${flags} -g -o TMPexe$$ ${exe}.c ${ldflags} || \
 mv -f TMPexe$$ ${exe}
 xtr_set=`set -o | awk '/^xtrace/{ print $2 }'`
 set +x
-exec 2>/dev/null 1>&8
+exec 2>/dev/null 1>&7
 ${exe} [=
 
   (if (== (get "usage-type") "short")
@@ -214,15 +214,14 @@ ${exe} [=
           (string-append "-" (get "help-value" "?"))
    )  )   =] || \
   redirect_die "cannot obtain ${exe} help in ${tmp_dir}"
-exec 1>&8 2>&9 8>&- 9>&-
+exec 1>&7 2>&9 7>&- 9>&-
 test X$xtr_set = Xon && set -x
 [=
 
 (shell (out-pop #t))
 
-=]
-[=
-
+=][=
+##
 ## Local Variables:
 ## Mode: shell-script
 ## indent-tabs-mode:       nil
@@ -232,5 +231,5 @@ test X$xtr_set = Xon && set -x
 ## sh-indent-for-case-label: 0
 ## sh-indent-for-case-alt:   4
 ## End:
-
-# end of usage.tlib \=]
+##
+# end of usage.tlib =]

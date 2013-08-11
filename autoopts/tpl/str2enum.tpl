@@ -273,8 +273,8 @@ DEFINE mk-finder                =]
  * @returns the enumeration value.
  * If not found, that value is [=(. invalid-cmd)=].
  */
-[= (. enum-name) =]
-[=(. find-func-name)=](char const * str[=(. len-arg)=])
+[= (string-append enum-name "\n" find-func-name)
+=](char const * str[=(. len-arg)=])
 {[=
   IF (exist? "alias")           =]
   switch (*str) {[=

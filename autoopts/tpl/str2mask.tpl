@@ -70,7 +70,11 @@ do
     C=$(echo $C | tr '[a-z]' '[A-Z]')
     v=$(( 1 << n ))
     desc=${desc_what[$n]}
-    test -z "$desc" || echo "/** ${mask_name} - $desc */"
+    test -z "$desc" || {
+        test ${#desc} -gt 72 && \
+            desc=$(echo "$desc" | fmt | sed '2,$s/^/  * /')
+        printf '/** %s */\n'  "$desc"
+    }
     printf "$def_fmt" $C $v
     (( all_mask += v ))
 done
@@ -204,9 +208,19 @@ exec 4<&-
 {
     static char const white[] = " \t\f";
     static char const name_chars[] =
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "0123456789_";
+[= (shell
+"name_chars=`echo '"
+   (string->c-name! (join "" (stack "cmd")))
+   "' | sed 's/\\(.\\)/\\1\\\\\n/g' | tr '[A-Z]' '[a-z]' | sort -u`
+
+alpha=`echo \"$name_chars\" | grep -E  '^[a-z]$' | tr -d ' \\n'`
+digit=`echo \"$name_chars\" | grep -Ev '^[a-z]$' | tr -d ' \\n'`
+fmt='        \"%s\"\\n'
+printf \"$fmt\" $alpha
+printf \"$fmt\" `echo $alpha | tr '[a-z]' '[A-Z]'`
+test -z \"${digit}\" || \
+    printf \"$fmt\" ${digit}
+") =];
 
     [=(. mask-name)=] res = 0;
     int have_data = 0;

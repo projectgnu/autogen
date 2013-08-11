@@ -193,6 +193,7 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
         }
     } while (false);
 
+    trace_fp = stderr;
     fflush(stdout);
     fflush(stderr);
 }

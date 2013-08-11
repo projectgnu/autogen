@@ -119,21 +119,16 @@ ag_scm_shell(SCM cmd)
 SCM
 ag_scm_shellf(SCM fmt, SCM alist)
 {
-    int   len = (int)scm_ilength(alist);
-    char* pz;
-
-#ifdef DEBUG_ENABLED
-    if (len < 0)
-        AG_ABEND(SHELLF_BAD_ALIST_MSG);
-#endif
-
-    pz  = ag_scm2zchars(fmt, "format");
+    int    len = (int)scm_ilength(alist);
+    char * pz  = ag_scm2zchars(fmt, "format");
     fmt = run_printf(pz, len, alist);
 
 #ifdef SHELL_ENABLED
-    pz  = shell_cmd(ag_scm2zchars(fmt, "shell script"));
+    pz = shell_cmd(ag_scm2zchars(fmt, "shell script"));
+    if (pz == NULL)
+        AG_ABEND(SHELL_RES_NULL_MSG);
     fmt = AG_SCM_STR02SCM(pz);
-    AGFREE((void*)pz);
+    AGFREE((void *)pz);
 #endif
     return fmt;
 }
@@ -243,7 +238,7 @@ handle_signal(int signo)
     if ((signo == SIGALRM) && (--timeout_limit <= 0))
         AG_ABEND(TOO_MANY_TIMEOUTS_MSG);
 
-    fprintf(trace_fp, SHELL_DIE_ON_SIGNAL_FMT, strsignal(signo), signo);
+    fprintf(trace_fp, SHELL_DIE_FMT, strsignal(signo), signo);
     was_close_err = true;
 
     (void)fputs(SHELL_LAST_CMD_MSG, trace_fp);

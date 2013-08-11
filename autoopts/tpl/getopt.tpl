@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2013-07-11 08:24:33 bkorb"
+  Time-stamp:        "2013-08-09 14:14:57 bkorb"
 _EOF_
 \` `            +][+
 
@@ -90,7 +90,8 @@ CASE (suffix) +][+
         AG_Dep_File=`dirname "${AG_Tracing}"`/ao-[+ (base-name) +].dep
         agopts="${agopts}-MF${AG_Dep_File} -MT${AG_Dep_File%.dep}.targ"
     fi
-    ${AGexe} -b[+ (base-name) +] ${agopts} -Toptions.tpl [+ (def-file) +]
+    cmd="${AGexe} -b[+(base-name)+] ${agopts} -Toptions.tpl [+(def-file)+]"
+    $cmd || die "COMMAND FAIL: $cmd"
     def_hdr=[+ (base-name) +].h
     sed 's@<autoopts/options.h>@"[+ (. header-file)
         +]"@' $def_hdr > XXX-$$
