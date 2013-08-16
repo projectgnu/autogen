@@ -210,6 +210,9 @@ be_verbose()
         opts="--trace=every --trace-out=>>${tfile}"
         ;;
       esac
+      AUTOGEN_TRACE=every
+      AUTOGEN_TRACE_OUT=">>`pwd`/${tfile}"
+      export AUTOGEN_TRACE_OUT AUTOGEN_TRACE
     }
     shift
 
@@ -218,7 +221,7 @@ be_verbose()
     * ) opts="${opts} ${agl_opts}" ;;
     esac
 
-    MALLOC_CHECK_=2 ${AGexe} ${opts} "$@"
+    MALLOC_CHECK_=3 ${AGexe} ${opts} "$@"
   }
 
   init_tests
@@ -333,8 +336,8 @@ failure()
 
 thumper()
 {
-  set +x
   exec > /dev/null 2>&1 </dev/null
+  set +x
   bdir=`cd "$builddir" >/dev/null ; pwd`
   cd /
   rpid=${progpid}

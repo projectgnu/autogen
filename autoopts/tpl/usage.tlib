@@ -214,6 +214,8 @@ ${exe} [=
           (string-append "-" (get "help-value" "?"))
    )  )   =] || \
   redirect_die "cannot obtain ${exe} help in ${tmp_dir}"
+test "X${VERBOSE:-false}" = Xtrue && \
+    cp -frp ${tmp_dir}/. ${save_dir}/TEMP-DIR
 exec 1>&7 2>&9 7>&- 9>&-
 test X$xtr_set = Xon && set -x
 [=

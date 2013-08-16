@@ -46,6 +46,9 @@ assemble_arg_val(char * txt, tOptionLoadMode mode);
 
 static char *
 trim_quotes(char * arg);
+
+static bool
+direction_ok(opt_state_mask_t f, int dir);
 /* = = = END-STATIC-FORWARD = = = */
 
 static bool

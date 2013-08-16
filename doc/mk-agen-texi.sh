@@ -281,6 +281,8 @@ mk_autogen_texi() {
   fi
 }
 
+PS4='>agt-${FUNCNAME}> '
+set -x
 GEN_BASE=agdoc
 test "X$1" = X--force && {
   rm -f agdoc.texi

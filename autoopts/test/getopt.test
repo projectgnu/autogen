@@ -104,80 +104,122 @@ go_init()
 go_samples() {
 
   echo "creating ${testname}.def in `pwd`"
-
-  ${SED} 's/^	//' >> ${testname}.def <<_EOF_
-	AutoGen definitions getopt;
-
-	prog-name  = "test_${testname}";
-	prog-title = "Test AutoOpts for ${testname}";
-	main       = { main-type = shell-process; };
-	config-header = 'config.h';
-
-	settable;
-	version = '1.2.3';
-	help-value = 'h';
-	gnu-usage;
-	no-libopts;
-
-	copyright = {
-	    date  = "2003-2012";
-	    owner = "Odyssey Computing Concepts, Inc.";
-	    author= "Bruce Korb";
-	    eaddr = "bkorb@gnu.org";
-	    type  = lgpl;
-	};
-
-	flag = {
-	    name = "option";
-	    descrip = "The option option descrip";
-	    value = 'o';
-	    arg_type = string; arg_default = 'opt init';
-	};
-
-	flag = {
-	    name = "second";
-	    descrip = "The second option descrip";
-	    value = 's';
-	    arg_type = string; arg_default = '020';
-	};
-
-	flag = {
-	   name    = no_val;
-	   descrip = 'option with no flag';
-	   value   = 'F'; /* REMOVE */
-	   flags-must = max_val;
-	};
-
-	flag = {
-	   name    = max_val;
-	   descrip = 'option with max ct';
-	   value   = 'X'; /* REMOVE */
-	   max     = '5';
-	};
-
-	flag = {
-	   name    = min2_val;
-	   descrip = 'option with min ct';
-	   value   = 'M'; /* REMOVE */
-	   max     = '50';
-	   flags-cant = max_val;
-	   min     = '5';
-	};
-
-	flag = {
-	   name    = min_val;
-	   descrip = 'option with min ct';
-	   value   = '2'; /* REMOVE */
-	   max     = '50';
-	   min     = '5';
-	};
-_EOF_
+  ${SED} -e '1,/^## *START-DEFS/d' \
+    -e '/^## *END-DEFS/{;s/.*//;q;}' \
+    ${srcdir}/getopt.test > ${testname}.def
 
   # # # # # # # # # # BASE-1 OUTPUT FILE # # # # # # # # #
 
   echo creating ${testname}1-base.c
+  ${SED} -e '1,/^## *START-SOURCE1/d' \
+    -e '/## *[E]ND-SOURCE1/{;s/ *#* *END-SOURCE1.*//;q;}' \
+    ${srcdir}/getopt.test > ${testname}1-base.c
 
-  cat > ${testname}1-base.c <<\_EndOfSample_
+  # # # # # # # # # # BASE-2 OUTPUT FILE # # # # # # # # #
+
+  echo creating ${testname}2-base.c
+  ${SED} -e '1,/^## *START-SOURCE2/d' \
+    -e '/## *[E]ND-SOURCE2/{;s/ *#* *END-SOURCE2.*//;q;}' \
+    ${srcdir}/getopt.test > ${testname}2-base.c
+}
+
+# # # # # # # # # # RESULTS TESTING # # # # # # # # #
+
+go_init
+go_samples
+compile_getopt 1
+
+${GREP} 'getopt_long' /usr/include/getopt.h >/dev/null && {
+    CFLAGS="${CFLAGS} -D_GNU_SOURCE=1"
+    ${SED} '/REMOVE/d;$a\
+long-opts;\
+version-value;
+' ${testname}.def > ${testname}2.def
+    mv -f ${testname}.def ${testname}1.def
+    mv -f ${testname}2.def ${testname}.def
+
+    compile_getopt 2
+}
+
+cleanup
+exit 0
+
+# # # # # # # # # # ==== DATA ==== # # # # # # # # #
+
+cat <<- _EODefs_
+## START-DEFS
+AutoGen definitions getopt;
+
+prog-name  = "test_getopt";
+prog-title = "Test AutoOpts for getopt";
+main       = { main-type = shell-process; };
+config-header = 'config.h';
+
+settable;
+version = '1.2.3';
+help-value = 'h';
+gnu-usage;
+no-libopts;
+
+copyright = {
+    date  = "2003-2013";
+    owner = "Odyssey Computing Concepts, Inc.";
+    author= "Bruce Korb";
+    eaddr = "bkorb@gnu.org";
+    type  = lgpl;
+};
+
+flag = {
+    name = "option";
+    descrip = "The option option descrip";
+    value = 'o';
+    arg_type = string; arg_default = 'opt init';
+};
+
+flag = {
+    name = "second";
+    descrip = "The second option descrip";
+    value = 's';
+    arg_type = string; arg_default = '020';
+};
+
+flag = {
+    name    = no_val;
+    descrip = 'option with no flag';
+    value   = 'F'; /* REMOVE */
+    flags-must = max_val;
+};
+
+flag = {
+    name    = max_val;
+    descrip = 'option with max ct';
+    value   = 'X'; /* REMOVE */
+    max     = '5';
+};
+
+flag = {
+    name    = min2_val;
+    descrip = 'option with min ct';
+    value   = 'M'; /* REMOVE */
+    max     = '50';
+    flags-cant = max_val;
+    min     = '5';
+};
+
+flag = {
+    name    = min_val;
+    descrip = 'option with min ct';
+    value   = '2'; /* REMOVE */
+    max     = '50';
+    min     = '5';
+};
+## END-DEFS
+_EODefs_
+
+# # # # # # # # #
+
+cat <<- _EOSource1_
+## START-SOURCE1
 #include "getopt-test_getopt.h"
 
 #include <sys/types.h>
@@ -233,7 +275,7 @@ optionPrintVersion (tOptions * pOptions, tOptDesc * pOptDesc)
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2012 Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2013 Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -387,14 +429,13 @@ process_test_getopt_opts (int argc, char** argv)
     usage_too_few (&DESC(MIN_VAL));
 
   return 0;
-}
-_EndOfSample_
+} ## END-SOURCE1
+_EOSource1_
 
-  # # # # # # # # # # BASE-2 OUTPUT FILE # # # # # # # # #
+# # # # # # # # #
 
-  echo creating ${testname}2-base.c
-
-  cat > ${testname}2-base.c <<\_EndOfSample_
+cat <<- _EOSource2_
+## START-SOURCE2
 #include "getopt-test_getopt.h"
 
 #include <sys/types.h>
@@ -468,7 +509,7 @@ optionPrintVersion (tOptions * pOptions, tOptDesc * pOptDesc)
   char const * pz_by =
     _("test_getopt 1.2.3\n\
 Written by Bruce Korb.\n\n\
-Copyright (C) 2003-2012 Odyssey Computing Concepts, Inc.\n\
+Copyright (C) 2003-2013 Odyssey Computing Concepts, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
 
@@ -622,29 +663,8 @@ process_test_getopt_opts (int argc, char** argv)
     usage_too_few (&DESC(MIN_VAL));
 
   return 0;
-}
-_EndOfSample_
-}
-
-# # # # # # # # # # RESULTS TESTING # # # # # # # # #
-
-go_init
-go_samples
-compile_getopt 1
-
-${GREP} 'getopt_long' /usr/include/getopt.h >/dev/null && {
-    CFLAGS="${CFLAGS} -D_GNU_SOURCE=1"
-    ${SED} '/REMOVE/d;$a\
-long-opts;\
-version-value;
-' ${testname}.def > ${testname}2.def
-    mv -f ${testname}.def ${testname}1.def
-    mv -f ${testname}2.def ${testname}.def
-
-    compile_getopt 2
-}
-
-cleanup
+} ## END-SOURCE2
+_EOSource2_
 
 ## Local Variables:
 ## mode: shell-script
