@@ -417,8 +417,7 @@ are used identically to the user-generated VALUE defines.
 
 */ =][=
 
-IF (define alt-value-idx 65520)
-   (exist? "flag.value")                =][=
+IF (exist? "flag.value")                =][=
 
   INVOKE set-std-value
        val-name    = "help-value"
@@ -485,10 +484,11 @@ IF (define alt-value-idx 65520)
 ELSE  NO "flag.value"                   =]
 [=
 (set! index-fmt (string-append
-      "\n/** option value for %2$s option */"
-      "\n#define " VALUE-pfx "%1$-16s " INDEX-pfx "%1$s"))
-(define std-vals (lambda (std-nm)
-        (ag-fprintf 0 index-fmt std-nm (string-downcase std-nm)) ))
+      "\n/** option value for %s option */"
+      "\n#define " VALUE-pfx "%-16s %s"))
+ (define std-vals (lambda (std-nm)
+   (ag-fprintf 0 index-fmt (string-downcase std-nm) std-nm (get-value-idx))
+ ) )
 
 (if (exist? "resettable")       (std-vals "RESET_OPTION"))
 (if (exist? "version")          (std-vals "VERSION"))
@@ -569,22 +569,23 @@ DEFINE set-std-value
 /** option flag (value) for " (get "val-name") " option */
 #define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
   CASE (define tmp-val (get "val-name"))
-       (set! alt-value-idx (+ 1 alt-value-idx))
-       (get tmp-val)        =][=
-   == ""   =][=
+       (get tmp-val)                    =][=
 
+   == ""    =][=
      (if (exist? tmp-val)
          (if (not (exist? "long-opts"))
              (error (sprintf "'%s' may not be empty" tmp-val))
-             alt-value-idx )
-         (sprintf "'%s'" (get "std-value"))
-     )     =][=
+             (get-value-idx)
+         )
 
-   == "'"  =]'\''[=
-   ~~ .    =]'[=(get tmp-val)=]'[=
-   *       =][= (error (sprintf "option %s has multiple character flag value"
+         (sprintf "'%s'" (get "std-value"))
+     )      =][=
+
+   == "'"   =]'\''[=
+   ~~ .     =]'[=(get tmp-val)=]'[=
+   *        =][= (error (sprintf "option %s has multiple character flag value"
                     (get "val-name")))  =][=
-   ESAC    =][=
+   ESAC     =][=
 
 ENDDEF set-std-value
 

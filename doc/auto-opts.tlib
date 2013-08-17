@@ -48,8 +48,8 @@ echo ${AO_CURRENT}.${AO_REVISION}
 
 =] is bundled with AutoGen.  It is a tool that virtually eliminates the
 hassle of processing options and keeping man pages, info docs and usage text
-up to date.  This package allows you to specify several program attributes, up
-to a hundred option types and many option attributes.  From this, it then
+up to date.  This package allows you to specify several program attributes,
+thousands of option types and many option attributes.  From this, it then
 produces all the code necessary to parse and handle the command line and
 configuration file options, and the documentation that should go with your
 program as well.

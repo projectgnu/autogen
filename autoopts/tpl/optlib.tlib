@@ -41,9 +41,6 @@ DEFINE init-and-validate                =][=
            prog-name)) )
 
 (make-tmp-dir)
-(define get-opt-value (lambda (val)
-        (if (<= val 32) val (+ val 96))  ))
-
 (define have-proc       #f)
 (define proc-name       "")
 (define test-name       "")
@@ -63,6 +60,10 @@ DEFINE init-and-validate                =][=
 (define make-callback-procs #f)
 (define omit-nls-code   (~ (get "no-xlate") "(any|no)thing"))
 (define xlate-desc-p    (and (not omit-nls-code) (not (exist? "full-usage"))))
+(define alt-value-idx   4096)
+(define get-value-idx   (lambda() (begin
+   (set! alt-value-idx (+ 1 alt-value-idx))
+   (sprintf "0x%X" alt-value-idx ))))
 
 (define need-stacking (lambda()
     (if (not (exist? "max"))
@@ -772,7 +773,7 @@ DEFINE option-defines             =]
   (sprintf "%-18s" opt-name)=] [=
 
   CASE  value    =][=
-  !E             =][= (get-opt-value flag-index) =][=
+  !E             =][= (get-value-idx) =][=
   ==  "'"        =]'\''[=
   ==  "\\"       =]'\\'[=
   ~~  "[ -~]"    =]'[=value=]'[=
@@ -781,7 +782,7 @@ DEFINE option-defines             =]
       (if (>= number-opt-index 0)
           (error "only one number option is allowed")  )
       (set! number-opt-index flag-index)
-      (get-opt-value flag-index)   =][=
+      (get-value-idx)             =][=
 
   *              =][=(error (sprintf
     "Error:  value for opt %s is `%s'\nmust be single char or 'NUMBER'"
