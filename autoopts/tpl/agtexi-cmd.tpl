@@ -294,8 +294,8 @@ DEFINE emit-opt-text            =]
 
 This is the ``[=(string-downcase! (get "descrip"))=]'' option.[=
     IF (exist? "arg-type")     =]
-This option takes an [= (if (exist? "arg-optional") "optional " "")
- =]argument [= arg-type =][=
+This option takes an[= (if (exist? "arg-optional") " optional" "")
+ =] [= arg-type =] argument[=
 (if (exist? "arg-name") (string-append " @file{"
     (string-substitute (get "arg-name") "@" "@@") "}"))
  =].[=
@@ -319,8 +319,15 @@ may appear [=
 [=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
+    IF (exist? "disable") =]@item
+can be disabled with --[=disable=]-[=(. opt-name)=][=
+      (if (exist? "enable") (emit
+          "\nand enabled with --" (get "enable") "-" opt-name)) =].
+[=    (set! extra-ct (+ extra-ct 1)) =][=
+    ENDIF=][=
+
     IF (exist? "enabled") =]@item
-is enabled by default.
+It is enabled by default.
 [=    (set! extra-ct (+ extra-ct 1)) =][=
     ENDIF=][=
 
@@ -390,17 +397,15 @@ or their numeric equivalent.[=
 
     ENDIF key/set arg =][=
 
-    IF (> extra-ct 0) =][=
-      (set! extra-text (out-pop #t)) =]
+    IF (set! extra-text (out-pop #t))
+       (> extra-ct 0) =]
 
 @noindent
 This option has some usage constraints.  It:
 @itemize @bullet
 [=(. extra-text)
 =]@end itemize
-[=  ELSE  =][=
-      (out-pop) =][=
-    ENDIF =][=
+[=  ENDIF =][=
 
 ?% doc "\n%s" "\nThis option has no @samp{doc} documentation." =][=
   IF (exist? "deprecated") =]

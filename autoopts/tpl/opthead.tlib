@@ -265,15 +265,20 @@ INVOKE join-or-expand  join-type = "export" =][=
 INVOKE nls-header-code                  =][=
 
   IF (exist? "usage-message")           =]
-extern void [=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap);
-extern void [=(. lc-prefix)=]usage_message(char const * fmt, ...);[=
+extern void [=(. lc-prefix)=]vusage_message(char const * fmt, va_list ap)[=
+     (if (exist? "no-return") (emit " _Noreturn")) =];
+extern void [=(. lc-prefix)=]usage_message(char const * fmt, ...)[=
+     (if (exist? "no-return") (emit " _Noreturn")) =];[=
   ENDIF have usage-message              =][=
 
   IF (exist? "die-code")                =]
-extern void [=(. lc-prefix)=]vdie( int exit_code, char const * fmt, va_list);
-extern void [=(. lc-prefix)=]die(  int exit_code, char const * fmt, ...);
+extern void [=(. lc-prefix)=]vdie( int exit_code, char const * fmt, va_list)[=
+     (if (exist? "no-return") (emit " _Noreturn")) =];
+extern void [=(. lc-prefix)=]die(  int exit_code, char const * fmt, ...)[=
+     (if (exist? "no-return") (emit " _Noreturn")) =];
 extern void [=(. lc-prefix)
-=]fserr(int exit_code, char const * op, char const * fname);[=
+=]fserr(int exit_code, char const * op, char const * fname)[=
+     (if (exist? "no-return") (emit " _Noreturn")) =];[=
 
     IF (. no-mem-func)                  =]
 

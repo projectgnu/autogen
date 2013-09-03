@@ -1248,6 +1248,7 @@ doUsageOpt(tOptions * opts, tOptDesc * od)
   ENDIF                         =][=
   (string-append "\n    " usage-proc "(&" pname "Options, ex_code);") =]
     /* NOTREACHED */
+    exit(1);
     (void)opts;[=
     (if od-used "" "\n    (void)od;") =]
 }[=
@@ -1284,6 +1285,7 @@ void
     vfprintf(stderr, fmt, ap);
     [= (string-append usage-proc "(&" pname "Options, " usage-err-name ");") =]
     /* NOTREACHED */
+    exit(1);
 }
 
 /**
