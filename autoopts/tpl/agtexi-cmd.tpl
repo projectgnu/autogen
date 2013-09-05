@@ -43,7 +43,6 @@ INVOKE emit-usage-opt   =][=
 ;;  FOR all options, ...
 ;;
 (define opt-name       "")
-(define extra-ct       0)
 (define extra-text     "")
 (define optname-from "A-Z_^")
 (define optname-to   "a-z--")
@@ -293,150 +292,149 @@ ENDDEF emit-aliases
 DEFINE emit-opt-text            =]
 
 This is the ``[=(string-downcase! (get "descrip"))=]'' option.[=
-    IF (exist? "arg-type")     =]
-This option takes an[= (if (exist? "arg-optional") " optional" "")
+    IF (exist? "arg-type")      =]
+This option takes a[= (if (exist? "arg-optional") "n optional" "")
  =] [= arg-type =] argument[=
 (if (exist? "arg-name") (string-append " @file{"
     (string-substitute (get "arg-name") "@" "@@") "}"))
  =].[=
-    ENDIF           =][=
+    ENDIF                       =][=
 
-    (set! extra-ct 0)
-    (out-push-new)  =][=
+    IF (out-push-new)
 
-    IF (exist? "min") =]@item
+       (exist? "min")           =]@item
 is required to appear on the command line.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "max") =]@item
+    IF (exist? "max")           =]@item
 may appear [=
       IF % max (== "%s" "NOLIMIT")
          =]an unlimited number of times[=
       ELSE
          =]up to [=max=] times[=
       ENDIF=].
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "disable") =]@item
+    IF (exist? "disable")       =]@item
 can be disabled with --[=disable=]-[=(. opt-name)=][=
       (if (exist? "enable") (emit
           "\nand enabled with --" (get "enable") "-" opt-name)) =].
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "enabled") =]@item
+    IF (exist? "enabled")       =]@item
 It is enabled by default.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "ifdef") =]@item
+    IF (exist? "ifdef")         =]@item
 must be compiled in by defining @code{[=(get "ifdef")
       =]} during the compilation.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF =][=
 
-    IF (exist? "ifndef") =]@item
+    IF (exist? "ifndef")        =]@item
 must be compiled in by @strong{un}-defining @code{[=(get "ifndef")
       =]} during the compilation.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "no_preset") =]@item
+    IF (exist? "no_preset")     =]@item
 may not be preset with environment variables or configuration (rc/ini) files.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "equivalence") =]@item
+    IF (exist? "equivalence")   =]@item
 is a member of the [=equivalence=] class of options.
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "flags_must") =]@item
+    IF (exist? "flags_must")    =]@item
 must appear in combination with the following options:
 [=    FOR flags_must ", " =][=flags_must=][=
       ENDFOR=].
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
-    IF (exist? "flags_cant") =]@item
+    IF (exist? "flags_cant")    =]@item
 must not appear in combination with any of the following options:
 [=    FOR flags_cant ", " =][=flags_cant=][=
       ENDFOR=].
-[=    (set! extra-ct (+ extra-ct 1)) =][=
+[=
     ENDIF=][=
 
     IF  (~* (get "arg-type") "key|set") =]@item
 This option takes a keyword as its argument[=
 
-      CASE arg-type   =][=
-      =* key          =][= (set! extra-ct (+ extra-ct 1)) =].
+      CASE arg-type             =][=
+      =* key                    =].
 The argument sets an enumeration value that can be tested by comparing[=
 
-      =* set          =][= (set! extra-ct (+ extra-ct 1)) =] list.
+      =* set                    =] list.
 Each entry turns on or off membership bits.  These bits can be tested
 with bit tests against[=
-      ESAC arg-type   =] the option value macro ([=
+      ESAC arg-type             =] the option value macro ([=
 (string-upcase (string-append
 (if (exist? "prefix") (string-append (get "prefix") "_") "")
-"OPT_VALUE_" (get "name")  )) =]).
+"OPT_VALUE_" (get "name")  ))   =]).
 The available keywords are:
 @example
 [= (shell (string-append
    "${CLexe:-columns} -I4 --spread=1 -W50 <<\\" heredoc-marker
    (join "\n" (stack "keyword") "\n")
    heredoc-marker
-   )  ) =]
+   )  )                         =]
 @end example
 [=
 
       IF (=* (get "arg-type") "key") =]
 or their numeric equivalent.[=
-      ENDIF =][=
+      ENDIF                     =][=
 
-    ENDIF key/set arg =][=
+    ENDIF key/set arg           =][=
 
     IF (set! extra-text (out-pop #t))
-       (> extra-ct 0) =]
+       (> (string-length extra-text) 2)
+                                =]
 
 @noindent
 This option has some usage constraints.  It:
 @itemize @bullet
-[=(. extra-text)
-=]@end itemize
-[=  ENDIF =][=
+[= (. extra-text)               =]@end itemize
+[=  ENDIF                       =][=
 
 ?% doc "\n%s" "\nThis option has no @samp{doc} documentation." =][=
   IF (exist? "deprecated") =]
 
 @strong{NOTE}@strong{: THIS OPTION IS DEPRECATED}[=
 
-  ENDIF     =][=
+  ENDIF                         =][=
 
 ENDDEF emit-opt-text
 
 @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =][=
 
-DEFINE set-home-rc-vars          =][=
-  CASE homerc                    =][=
-  ==*  '$@'                      =][=
+DEFINE set-home-rc-vars         =][=
+  CASE homerc                   =][=
+  ==*  '$@'                     =][=
        (set! explain-pkgdatadir #t)
        (set! cfg-file-name (string-substitute (get "homerc")
-          "$@" "$(pkgdatadir)")) =][=
+         "$@" "$(pkgdatadir)")) =][=
 
-  ==   '.'                       =][=
+  ==   '.'                      =][=
        (set! cfg-file-name "$PWD")
        (set! env-var-list (string-append env-var-list "PWD, "))
        =][=
 
-  ==*  './'                      =][=
+  ==*  './'                     =][=
        (set! explain-pkgdatadir #t)
        (set! env-var-list  (string-append env-var-list "PWD, "))
        (set! cfg-file-name (string-append "$PWD" (substring (get "homerc") 1)))
        =][=
 
-  ~~*  '\$[A-Za-z]'              =][=
+  ~~*  '\$[A-Za-z]'             =][=
        (set! cfg-file-name (get "homerc"))
        (set! env-var-list (string-append env-var-list
              (shellf "echo '%s' | sed 's/^.//;s#/.*##'" cfg-file-name)
@@ -445,9 +443,9 @@ DEFINE set-home-rc-vars          =][=
 
   == "" =][= (set! cfg-file-name "") =][=
 
-  *                              =][=
+  *                             =][=
        (set! cfg-file-name (get "homerc"))  =][=
-  ESAC                           =][=
+  ESAC                          =][=
 
 ENDDEF set-home-rc-vars
 

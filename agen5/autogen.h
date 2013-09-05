@@ -36,7 +36,7 @@
  */
 #ifndef AUTOGEN_BUILD
 #define AUTOGEN_BUILD 1
-
+#include <stdnoreturn.h>
 #include "compat/unlocked-io.h"
 
 #include REGEX_HEADER

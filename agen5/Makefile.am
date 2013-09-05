@@ -70,13 +70,10 @@ ag.c : Makefile
 	exec > $@ ; \
 	echo '#undef   PKGDATADIR' ; \
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
-	mk=`set -- $(MAKE) ; which $$1` ; \
-	echo 'static char const zMakeProg[] = "'$$mk'";' ; \
-	echo ; echo '#define  DEFINING' ; \
-	echo '#include "autoopts/project.h"' ; \
-	echo '#include "autoopts/ag-char-map.h"' ; \
-	echo '#include "autogen.h"' ; \
-	for f in $(csrc) ; do echo "#include \"$$f\"" ; done
+	mk=`set -- $(MAKE) ; command -v $$1` ; \
+	echo 'static char const make_prog[] = "'$$mk'";' ; \
+	printf '\n#define  DEFINING 1\n' ; \
+	printf '#include "%s"\n' autoopts/project.h autogen.h $(csrc)
 
 STAMPENV = top_srcdir=$(top_srcdir) top_builddir=$(top_builddir) \
 	srcdir=$(srcdir) AGexe=$(AGexe) GDexe=$(GDexe) CLexe=$(CLexe) \

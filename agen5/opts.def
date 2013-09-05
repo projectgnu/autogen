@@ -40,6 +40,7 @@ homerc         =  $HOME, ".";
 environrc;
 usage-opt;
 usage-message;
+no-return;
 resettable;
 config-header  = config.h;
 no-xlate       = anything;

@@ -142,7 +142,7 @@ config_versions()
 	--symlink
 	--m4-base=config
         --lgpl=2'
-    glmods='parse-duration gendocs gettext-h extensions'
+    glmods='parse-duration gendocs gettext-h extensions stdnoreturn'
     GNULIBDIR=${GNULIBDIR:-~gnu/proj/gnulib}
     GNULIBTOOL=${GNULIBDIR}/gnulib-tool
     for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath

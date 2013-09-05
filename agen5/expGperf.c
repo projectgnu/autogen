@@ -69,9 +69,9 @@ ag_scm_make_gperf(SCM name, SCM hlist)
 {
     static bool do_cleanup = true;
 
-    char const * pzName  = ag_scm2zchars(name, "gperf name");
-    char const * pzList;
-    SCM          newline = AG_SCM_STR2SCM(NEWLINE, (size_t)1);
+    char const * gp_nam = ag_scm2zchars(name, "gp nm");
+    char const * h_list;
+    SCM          nl_scm = AG_SCM_STR2SCM(NEWLINE, (size_t)1);
 
     if (! AG_SCM_STRING_P(name))
         return SCM_UNDEFINED;
@@ -79,24 +79,24 @@ ag_scm_make_gperf(SCM name, SCM hlist)
     /*
      *  Construct the newline separated list of values
      */
-    hlist  = ag_scm_join(newline, hlist);
-    pzList = ag_scm2zchars(hlist, "hash list");
+    hlist  = ag_scm_join(nl_scm, hlist);
+    h_list = ag_scm2zchars(hlist, "hash list");
 
     /*
      *  Stash the concatenated list somewhere, hopefully without an alloc.
      */
     {
-        char * cmd = aprf(MK_GPERF_SCRIPT, zMakeProg, pzName, pzList);
+        char * cmd = aprf(MK_GPERF_SCRIPT, make_prog, gp_nam, h_list);
 
         /*
          *  Run the command and ignore the results.
          *  In theory, the program should be ready.
          */
-        pzList = shell_cmd(cmd);
+        h_list = shell_cmd(cmd);
         AGFREE(cmd);
 
-        if (pzList != NULL)
-            free((void *)pzList);
+        if (h_list != NULL)
+            free((void *)h_list);
     }
 
     if (do_cleanup) {

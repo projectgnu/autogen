@@ -318,14 +318,14 @@ doc is unavailable - no --help
 @cindex doc-debug
 
 This is the ``enable @code{debugging}'' option.
-This option takes an argument number.
+This option takes a number argument.
 really enable debugging
 @subsubheading mtu option.
 @anchor{doc mtu}
 @cindex doc-mtu
 
 This is the ``set mtu for datagram tls'' option.
-This option takes an argument number.
+This option takes a number argument.
 Really set MTU for datagram TLS
 @node doc group-2
 @subsection group-2 options
@@ -350,14 +350,14 @@ third group of options.
 @cindex doc-recordsize
 
 This is the ``the maximum record size to advertize'' option.
-This option takes an argument number.
+This option takes a number argument.
 Really the maximum record size to advertize
 @subsubheading priority option.
 @anchor{doc priority}
 @cindex doc-priority
 
 This is the ``priorities string'' option.
-This option takes an argument string.
+This option takes a string argument.
 TLS algorithms and protocols to enable. You can
 use predefined sets of ciphersuites such as PERFORMANCE,
 NORMAL, SECURE128, SECURE256.

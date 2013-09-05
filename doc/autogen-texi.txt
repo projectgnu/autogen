@@ -2030,7 +2030,19 @@ The profiles for these functions are:
 extern void vdie( int exit_code, char const * fmt, va_list);
 extern void die(  int exit_code, char const * fmt, ...);
 extern void fserr(int exit_code, char const * op, char const * fname);
+static inline void
+nomem_err(size_t sz, char const * what) @{...@}
 @end example
+
+@item no-return
+@vindex no-return
+If @code{usage-message} or @code{die-code} are specified, you may also
+specify that the generated functions are marked as ``noreturn'' with
+this attribute.  If this attribute is not empty, then the specified string
+is used instead of ``noreturn''.  If ``noreturn'' has not been defined
+before these functions are declared, then it will be ``#define''-d to the
+empty string.  No such protection is made for any non-default value.
+These functions will be declared ``extern noreturn void''.
 
 @item export
 @vindex export

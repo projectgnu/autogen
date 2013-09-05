@@ -1,10 +1,11 @@
-New in __CURRENT_VERSION__ August 2013
+New in __CURRENT_VERSION__ September 2013
 
 * fixed char casting issue that shows in UTF-8 files
 * fixed installation error for str2init
 * fixed failure handling in the usage template
 * fix broken flag values for auto-supported options
 * various tweaks to make Coverity happy.
+* allow the fatal error message functions to be tagged "_Noreturn"
 
 New in 5.18 July 2013
 
