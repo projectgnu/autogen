@@ -136,4 +136,3 @@ AC_DEFUN([LIBOPTS_CHECK], [
   m4_popdef([AO_Libopts_Dir])dnl
 # end of AC_DEFUN of LIBOPTS_CHECK
 ])
-

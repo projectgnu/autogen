@@ -5,7 +5,8 @@ New in __CURRENT_VERSION__ September 2013
 * fixed failure handling in the usage template
 * fix broken flag values for auto-supported options
 * various tweaks to make Coverity happy.
-* allow the fatal error message functions to be tagged "_Noreturn"
+* allow the fatal error message functions to be tagged "noreturn"
+  and incorporate sysnoreturn.h technology into AutoGen.
 
 New in 5.18 July 2013
 
