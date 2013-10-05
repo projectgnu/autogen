@@ -3591,12 +3591,34 @@ process this enumeration value (@code{pOptDesc->optArg.argEnum}).
 @node arg-optional
 @subsubsection Option Argument Optional
 @vindex arg-optional
-This attribute indicates that the user does not have to supply an argument for
-the option.  This is only valid if the @var{arg-type} is @code{string}
-(@pxref{arg-type string}) or @code{keyword} (@pxref{arg-type keyword}).  If it
-is @code{keyword}, then this attribute may also specify the default keyword to
-assume when the argument is not supplied.  If left empty, @var{arg-default}
-(@pxref{arg-default}) or the zero-valued keyword will be used.
+The @code{arg-optional} attribute indicates that the argument to the option is
+optional (need not be specified on the command line).  This is only valid if
+the @var{arg-type} is @code{string} (@pxref{arg-type string}) or
+@code{keyword} (@pxref{arg-type keyword}).  If it is @code{keyword}, then this
+attribute may also specify the default keyword to assume when the argument is
+not supplied.  If left empty, @var{arg-default} (@pxref{arg-default}) or the
+zero-valued keyword will be used.
+
+The syntax rules for identifying the option argument are:
+@itemize @bullet
+@item
+If the option is specified with a flag character and there is a character
+following the flag character, then string following that flag character is the
+option argument.
+@item
+If the flag character is the last character in an argument, then
+the first character of the next argument is examined.  If it is a hyphen,
+then the option is presumed to not have an argument.  Otherwise, the entire
+next argument is the argument for the option.
+@item
+If the option is specified with a long option name and that name is ended with
+an equal sign character (@code{=}), then everything after that character is the
+option argument.
+@item
+If the long name is ended by the end of the argument, then the first character
+of the next argument is examined, just as with the flag character ending an
+argument string.
+@end itemize
 
 This is overridden and the options are required if the libopts library
 gets configured with @option{--disable-optional-args}.
@@ -3621,10 +3643,10 @@ specify that options are resettable (@pxref{automatic options}), then your
 option handling code @strong{must} look for the @samp{OPTST_RESET} bit in
 the @code{fOptState} field of the option descriptor.
 
-If the option takes a string argument, then you may specify that the option
-is to be handled by the @code{libopts} library procedures
-@code{stackOptArg()} or @code{unstackOptArg()} (see below).  In this case,
-you may not provide option handling code.
+If the option takes a string argument, then the @code{stack-arg} attribute can
+be used to specify that the option is to be handled by the @code{libopts}
+@code{stackOptArg()} and @code{unstackOptArg()} library procedures (see
+below).  In this case, you may not provide option handling code.
 
 Finally, @samp{documentation} options (@pxref{opt-attr documentation}) may
 also be marked as @option{settable} (@pxref{opt-attr settable}) and have
