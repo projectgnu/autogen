@@ -93,31 +93,9 @@ main(int argc, char ** argv)
     (void)optionProcess(&genshelloptOptions, argc, argv);
     optionParseShell(&[=(. pname)=]Options);[=
 
-  ELIF (exist? "main-text") =][=
-    IF (not (exist? "option-code")) =]
-    {
-        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
-        argc -= ct;
-        argv += ct;
-    }[=
-    ELSE            =][=
-      (def-file-line "option-code" extract-fmt) =][=
-      option-code   =][=
-    ENDIF           =][=
-
-  (def-file-line "main-text" extract-fmt) =][=
-  main-text         =][=
-
-  ELSE test-main is not optionParseShell and main-text not exist
-       Above, we figure out which emitter procedure is to be used.
-       The default is optionPutShell.
-
-=]
-    (void)optionProcess(&[=(. pname)=]Options, argc, argv);
-    [= (. option-emitter-proc) =](&[=(. pname)=]Options);
-    res = ferror(stdout);
-    if (res != 0)
-        fputs("output error writing to stdout\n", stderr);[=
+  ELSE  =][=
+  INVOKE emit-option-code  =][=
+  INVOKE emit-main-text  =][=
   ENDIF=]
     return res;
 }[=
@@ -1373,4 +1351,57 @@ ENDIF die-code              =][=
 
 ENDDEF emit-option-callbacks
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-option-code        =][=
+
+  IF (exist? "option-code") =][=
+      (def-file-line "option-code" extract-fmt) =][=
+      option-code   =][=
+
+  ELSE            =][=
+
+    IF (and (exist? "no-libopts") (not (exist? "autoopts-usage-tlib"))) =]
+    (void)process_[=(. pname)=]_opts(argc, argv);[= 
+    ELIF (exist? "main-text") =]
+    {
+        int ct = optionProcess(&[=(. pname)=]Options, argc, argv);
+        argc -= ct;
+        argv += ct;
+    }[=
+    ELSE =]
+    (void)optionProcess(&[=(. pname)=]Options, argc, argv);[=
+    ENDIF =][=
+
+  ENDIF           =][=
+
+ENDDEF emit-option-code
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=
+
+DEFINE emit-main-text        =][=
+
+  IF (exist? "main-text") =][=
+
+    (def-file-line "main-text" extract-fmt) =][=
+    main-text         =][=
+
+  ELSE            =][=
+
+    IF (and (exist? "no-libopts") (not (exist? "autoopts-usage-tlib"))) =]
+    /* When using AutoOpts with getopt(3C) or getopt_long(3GNU)
+       the main-text attribute of main _must_ be defined. */ 
+#error autoopts_with_getopt_must_define_main_text_attribute[=
+    ELSE test-main is not optionParseShell and main-text not exist
+         Above, we figure out which emitter procedure is to be used.
+         The default is optionPutShell.
 =]
+    [= (. option-emitter-proc) =](&[=(. pname)=]Options);
+    res = ferror(stdout);
+    if (res != 0)
+        fputs("output error writing to stdout\n", stderr);[=
+    ENDIF   =][=
+
+  ENDIF           =][=
+
+ENDDEF emit-main-text        =]

@@ -2563,7 +2563,8 @@ on the second line.
 @node main main
 @subsubsection main: user supplied main procedure
 
-You must supply a value for the @code{main-text} attribute.
+You must supply a value for the @code{main-text} attribute and the
+``test-main'' attribute must not be set to ``optionParseShell''.
 You may also supply a value for
 @vindex option-code
 @code{option-code}.  If you do, then the @code{optionProcess} invocation
@@ -2574,12 +2575,14 @@ inside of:
 int
 main( int argc, char** argv )
 @{
+    int res = <<success-exit-code>>;
     @{ // replaced by option-code, if that exists
-        int ct = optionProcess( &<<prog-name>>Options, argc, argv );
+        int ct = optionProcess( &<<prog-name>>Options, argc, argv);
         argc -= ct;
         argv += ct;
     @}
-<<your main-text goes here>>
+<<main-text>>
+    return res;
 @}
 @end example
 
@@ -5811,9 +5814,6 @@ argument with a callback procedure.
 Special disablement and/or enablement prefixes are not recognized.
 
 @item
-Generated @code{main()} procedures will not work.
-
-@item
 Option coordination with external libraries will not work.
 
 @item
@@ -5822,8 +5822,8 @@ depends upon the @code{SET_OPT_XXX} macros having been defined.
 Specify this as a global (program) attribute.
 
 @item
-You must specify a main procedure of type @code{main}.  The
-@file{getopt.tpl} template depends upon being able to compile the
+You must specify a main procedure attribute (@pxref{Generated main}).
+The @file{getopt.tpl} template depends upon being able to compile the
 traditional .c file into a program and get it to emit the usage text.
 
 @item

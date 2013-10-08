@@ -192,7 +192,7 @@ make_directive()
 		   d-arg = 'char * scan_next';
 		};
 		_EOF_
-        echo cmd = $(echo $dlist | tr ' ' ',') \;
+        echo cmd = $(echo $dlist | sed 's/ /, /g')\;
     } > directive.def
 
     run_ag dirtv directive.def

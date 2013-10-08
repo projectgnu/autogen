@@ -152,7 +152,7 @@ AutoGen definitions getopt;
 
 prog-name  = "test_getopt";
 prog-title = "Test AutoOpts for getopt";
-main       = { main-type = shell-process; };
+main       = { main-type = shell-process; main-text = "";};
 config-header = 'config.h';
 
 settable;

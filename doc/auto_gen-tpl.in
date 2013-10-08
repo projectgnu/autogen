@@ -160,31 +160,59 @@ and "run" the definitions file as if it were a direct invocation of
 AutoGen.  This was done for its hack value.
 
 The ignored directives are:
-[=
-
-FOR directive       =][=
-
-  (if (exist? "dummy")
-      (string-downcase! (sprintf "@code{#%s}, " (get "name")))) =][=
-
-ENDFOR directive    =]and @code{#if}.
+@code{let}, @code{pragma}, @code{ident} and @code{#if}.
 Note that when ignoring the @code{#if} directive, all intervening
 text through its matching @code{#endif} is also ignored,
-including the @code{#else} clause.
+including any @code{#else} clause.
 
 The AutoGen directives that affect the processing of
 definitions are:
 
-@table @code[=
-FOR directive "\n" =][=
-  IF (exist? "text") =]
-@item #[=% name (string-downcase! "%s") =][= % arg " %s" =]
-@cindex #[=% name (string-downcase! "%s") =]
-@cindex [=% name (string-downcase! "%s") =] directive
-[= id-file =]
-[=text     =][=
-  ENDIF    =][=
-ENDFOR directive=]
+@table @code[=`
+
+if test -z "$top_srcdir" || test ! -d "$top_srcdir"
+then top_srcdir=.. ; fi
+f=${top_srcdir}/agen5/defDirect.c
+test -f ${f} || die missing $f
+
+load_comment() {
+    comment_text=
+    nl=''
+    while IFS= read -r line
+    do
+        case "X$line" in
+        X*' */' ) return ;; esac
+
+        comment_text=${comment_text}${nl}$(
+            echo "$line" | sed 's/ *\\* *//')
+        nl='
+'
+    done
+    die 'end of comment not found'
+}
+
+while IFS= read -r line
+do
+    test "X$line" = "X/**" || continue
+    load_comment
+    IFS= read -r line || break
+    test "X$line" = "Xchar *" || continue
+    IFS= read -r line || die bad read
+    case "X$line" in
+    XdoDir_* )
+        line=${line%%(*}
+        line=${line#doDir_}
+        ;;
+    * )
+        continue
+        ;;
+    esac
+    printf '\n@item #%s\n@cindex %s\n@cindex %s directive\n' \
+           $line $line $line
+    echo "$comment_text"
+done < $f
+
+`=]
 @end table
 [=
 

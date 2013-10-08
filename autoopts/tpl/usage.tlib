@@ -47,6 +47,7 @@
 AutoGen Definitions options.tpl;
 no-libopts;
 no-xlate = anything;
+autoopts-usage-tlib;
 [=
 
 FOR var IN  prog-name  prog-title  argument
@@ -108,17 +109,24 @@ flag = {[=
 ENDFOR flag                 =][=
 
 (out-pop)
-(out-push-new)             \=][=
-(shell
-  "echo export tmp_dir=\\'$tmp_dir\\'\n"
-  "echo export top_builddir=\\'$top_builddir\\'\n"
-  "echo export CFLAGS=\\'$CFLAGS\\'\n"
-  "echo export CLexe=\\'$CLexe\\'\n" )=]
+(out-push-new)
+(out-push-new)              =][=
+
+# We are creating a shell script that needs to obtain values from the current
+# execution envronment for an execution environment that happens later.
+#                          \=]
+export tmp_dir="${tmp_dir}" \
+       top_builddir="${top_builddir}" \
+       CFLAGS="${CFLAGS}" \
+       CLexe="${CLexe}"[=
+
+(shell (out-pop #t))        =]
 save_dir=`pwd`
 # redirect stdout.  We see this IFF there is a problem
 #
 redirect_log=${tmp_dir}/redirected.log
-exec 7>&1 9>&2 1> ${redirect_log} 2>&1
+exec 7>&1 9>&2 1> ${redirect_log} 2>&1 || \
+   die "Redirection failure:  7>&1 9>&2 1> ${redirect_log} 2>&1"
 redirect_die() {
     exec 2>&9 1>&9 9>&- 7>&-
     sed 's/^/## /' ${redirect_log}
@@ -127,7 +135,7 @@ redirect_die() {
 
 inc_list="-I${PWD} -I[=(. inc-dir)=]"
 cfg_ldflags="[=(. libs)=]"
-cfg_cflags=${CFLAGS}
+cfg_cflags="${CFLAGS}"
 exe=${tmp_dir}/[= prog-name =]
 [= # START-BUILDTREE-ISMS:
 

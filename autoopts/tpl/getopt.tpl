@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2013-08-09 14:14:57 bkorb"
+  Time-stamp:        "2013-10-06 15:55:21 bkorb"
 _EOF_
 \` `            +][+
 
@@ -144,8 +144,9 @@ cat <<- _EOF_
 	#define CPLUSPLUS_CLOSER
 	#endif
 
-	extern int process_[+(. prog-name)+]_opts(int argc, char** argv);
-	extern void optionPrintVersion(tOptions* pOptions, tOptDesc* pOptDesc);
+	extern int process_[+(. prog-name)+]_opts(int argc, char ** argv);
+	extern void optionPrintVersion(tOptions * opts, tOptDesc * od);
+	extern void optionUsage(tOptions * opts, int exit_code);
 
 	CPLUSPLUS_CLOSER
 	_EOF_
