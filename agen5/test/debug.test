@@ -59,8 +59,8 @@ list[0] (block) from debug.def/2
   val[1] (text) from debug.def/2
 list[3] (block) from debug.def/3
   val[0] (text) from debug.def/3
-marker ``<='' loaded
-marker ``=>'' loaded
+marker '<=' loaded
+marker '=>' loaded
 Starting test template
 open_output_file 'debug.test' mode wb+
 Text       (15) in debug.tpl at line 2

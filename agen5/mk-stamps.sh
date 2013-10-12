@@ -171,28 +171,20 @@ make_directive()
             sort)
     test -f directive.def && rm -f directive.def
     {
-        cat <<- _EOF_
-		AutoGen Definitions str2enum;
-		prefix = dir;
-		type   = '';
-		length = '';
-		addtogroup = 'autogen';
-		add-on-text = { ao-file = enum-header;
-		   ao-text  = "/* #ident, #let and #pragma are ignored */\n"
-		              "#define doDir_let        ignore_directive\n"
-		              "#define doDir_ident      ignore_directive\n"
-		              "#define doDir_pragma     ignore_directive\n\n"
-		              "#define doDir_endshell   bad_dirv_ctx\n"
-		              "#define doDir_elif       bad_dirv_ctx\n"
-		              "#define doDir_endmac     bad_dirv_ctx\n"
-		              "#define doDir_ifndef     doDir_ifdef"; };
-		dispatch = {
-		   d-nam = 'doDir_%s';
-		   d-ret = 'char *';
-		   d-arg = 'char * scan_next';
-		};
-		_EOF_
-        echo cmd = $(echo $dlist | sed 's/ /, /g')\;
+      cat <<- _EOF_
+	AutoGen Definitions str2enum;
+	prefix = dir;
+	type   = '';
+	length = '';
+	addtogroup = 'autogen';
+
+	dispatch = {
+	   d-nam = 'doDir_%s';
+	   d-ret = 'char *';
+	   d-arg = 'char * scan_next';
+	};
+	_EOF_
+      echo cmd = $(echo $dlist | sed 's/ /, /g')\;
     } > directive.def
 
     run_ag dirtv directive.def

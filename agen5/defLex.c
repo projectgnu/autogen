@@ -39,14 +39,14 @@ KEYWORD_TABLE
 #undef _KW_
 
 #define _KW_(w) z ## w,
-static char const*  apzKeywords[] = { KEYWORD_TABLE };
+static char const * const kword_table[] = { KEYWORD_TABLE };
 #undef _KW_
 
 #define _KW_(w) DP_EV_ ## w,
-te_dp_event aKeywordTkn[] = { KEYWORD_TABLE };
+te_dp_event kword_tkns[] = { KEYWORD_TABLE };
 #undef _KW_
 
-#define KEYWORD_CT  (sizeof(apzKeywords) / sizeof(apzKeywords[0]))
+#define KEYWORD_CT  (sizeof(kword_table) / sizeof(kword_table[0]))
 
 #define ERROR  (-1)
 #define FINISH (-1)
@@ -80,7 +80,7 @@ static void
 alist_to_autogen_def(void);
 
 static char*
-gather_name(char * pzScan, te_dp_event * pRetVal);
+gather_name(char * scan, te_dp_event * ret_val);
 
 static char*
 build_here_str(char* scan);
@@ -566,67 +566,64 @@ alist_to_autogen_def(void)
  *  Figure out which.
  */
 static char*
-gather_name(char * pzScan, te_dp_event * pRetVal)
+gather_name(char * scan, te_dp_event * ret_val)
 {
     /*
      *  Check for a number.
-     *  Scan it in and advance "pzScan".
+     *  Scan it in and advance "scan".
      */
-    if (  IS_DEC_DIGIT_CHAR(*pzScan)
-       || (  (*pzScan == '-')
-          && IS_DEC_DIGIT_CHAR(pzScan[1])
-       )  )  {
-        token_str = pzScan;
-        (void)strtol(pzScan, &pzScan, 0);
-        *pRetVal = DP_EV_NUMBER;
-        return pzScan;
+    if (  IS_DEC_DIGIT_CHAR(*scan)
+       || ((*scan == '-') && IS_DEC_DIGIT_CHAR(scan[1])) ) {
+        token_str = scan;
+        *ret_val  = DP_EV_NUMBER;
+        return SPN_DEC_DIGIT_CHARS(scan + 1);
     }
 
-    if (! IS_UNQUOTABLE_CHAR(*pzScan))
-        AG_ABEND(aprf(ASSEMBLE_NAME_ERR, ag_pname, *pzScan, cctx->scx_fname,
+    if (! IS_UNQUOTABLE_CHAR(*scan))
+        AG_ABEND(aprf(ASSEMBLE_NAME_ERR, ag_pname, *scan, cctx->scx_fname,
                       cctx->scx_line));
 
     {
-        char* pz = SPN_VALUE_NAME_CHARS(pzScan);
+        char * pz = SPN_VALUE_NAME_CHARS(scan);
 
         if (IS_UNQUOTABLE_CHAR(*pz)) {
-            *pRetVal = DP_EV_OTHER_NAME;
+            *ret_val = DP_EV_OTHER_NAME;
             pz = SPN_UNQUOTABLE_CHARS(pz+1);
 
         } else
-            *pRetVal = DP_EV_VAR_NAME;
+            *ret_val = DP_EV_VAR_NAME;
 
         /*
          *  Return a NAME token, maybe.
          *  If the name is actually a keyword,
          *  we will return that token code instead.
          */
-        token_str = pzScan;
-        pzScan   = (char*)pz;
+        token_str = scan;
+        scan   = (char*)pz;
     }
 
     /*
      *  Now scan the keyword table.
      */
-    if (*pRetVal == DP_EV_VAR_NAME) {
-        char sv_ch = *pzScan;  /* preserve the following character */
+    if (*ret_val == DP_EV_VAR_NAME) {
+        char sv_ch = *scan;  /* preserve the following character */
         int  kw_ix = 0;
-        *pzScan = NUL;         /* NUL terminate the name           */
+        *scan = NUL;         /* NUL terminate the name           */
 
         do  {
-            if (streqvcmp(apzKeywords[ kw_ix ], (char*)token_str) == 0) {
+            if (streqvcmp(kword_table[ kw_ix ], (char*)token_str) == 0) {
                 /*
                  *  Return the keyword token code instead of DP_EV_NAME
                  */
-                *pRetVal = aKeywordTkn[ kw_ix ];
+                *ret_val = kword_tkns[ kw_ix ];
                 break;
             }
         } while (++kw_ix < (int)KEYWORD_CT);
 
-        *pzScan = sv_ch;         /* restore the following character  */
+        *scan = sv_ch;         /* restore the following character  */
     }
 
-    return pzScan;
+    return scan;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -635,13 +632,13 @@ gather_name(char * pzScan, te_dp_event * pRetVal)
  *  Find the end of it and compress any escape sequences.
  */
 static char*
-build_here_str(char* scan)
+build_here_str(char * scan)
 {
     bool     no_tabs = false;
-    char     zMark[ MAX_HEREMARK_LEN ];
     size_t   markLen = 0;
-    char*    dest;
+    char *   dest;
     int      here_str_line;
+    char     here_mark[MAX_HEREMARK_LEN];
 
     /*
      *  See if we are to strip leading tab chars
@@ -670,12 +667,12 @@ build_here_str(char* scan)
             AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MISS_MARK_STR,
                           cctx->scx_fname, cctx->scx_line));
 
-        if (markLen >= sizeof(zMark))
+        if (markLen >= sizeof(here_mark))
             AG_ABEND(aprf(DEF_ERR_FMT, ag_pname, HERE_MARK_TOO_LONG,
                           cctx->scx_fname, cctx->scx_line));
 
-        memcpy(zMark, scan, markLen);
-        zMark[markLen] = NUL;
+        memcpy(here_mark, scan, markLen);
+        here_mark[markLen] = NUL;
     }
 
     token_str = dest = scan;
@@ -706,7 +703,7 @@ build_here_str(char* scan)
          *  If we recognize the end mark, break out.
          */
         if (! IS_VARIABLE_NAME_CHAR(scan[markLen]))
-            if (strncmp(scan, zMark, markLen) == 0)
+            if (strncmp(scan, here_mark, markLen) == 0)
                 break;
 
         for (;;) {

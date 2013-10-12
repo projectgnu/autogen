@@ -27,7 +27,47 @@
 #define NO_MATCH_ERR(_typ) \
 AG_ABEND(aprf(DIRECT_NOMATCH_FMT, cctx->scx_fname, cctx->scx_line, _typ))
 
-static int  ifdefLevel = 0;
+/**
+ * "ifdef" processing level.  Blocks of text being skipped do not increment
+ * the value.  Thus, transitioning from skip mode to process mode increments it,
+ * and the reverse decrements it.
+ */
+static int  ifdef_lvl = 0;
+
+/**
+ * Set "true" when inside of a "#if" block making "#elif" directives
+ * ignorable.  When "false", "#elif" triggers an error.
+ */
+static bool skip_if_block = false;
+
+static char *
+end_of_directive(char * scan)
+{
+    /*
+     *  Search for the end of the #-directive.
+     *  Replace "\\\n" sequences with "  ".
+     */
+    for (;;) {
+        char * s = strchr(scan, NL);
+
+        if (s == NULL)
+            return scan + strlen(scan);
+        
+        cctx->scx_line++;
+
+        if (s[-1] != '\\') {
+            *(s++) = NUL;
+            return s;
+        }
+
+        /*
+         *  Replace the escape-newline pair with spaces and
+         *  find the next end of line
+         */
+        s[-1] = s[0] = ' ';
+        scan = s + 1;
+    }
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -42,32 +82,7 @@ static int  ifdefLevel = 0;
 LOCAL char *
 processDirective(char * scan)
 {
-    char * eodir;
-
-    /*
-     *  Search for the end of the #-directive.
-     *  Replace "\\\n" sequences with "  ".
-     */
-    for (;;) {
-        eodir = strchr(scan, NL);
-
-        if (eodir == NULL) {
-            eodir = scan + strlen(scan);
-            break;
-        }
-        cctx->scx_line++;
-
-        if (eodir[-1] != '\\') {
-            *(eodir++) = NUL;
-            break;
-        }
-
-        /*
-         *  Replace the escape-newline pair with spaces and
-         *  find the next end of line
-         */
-        eodir[-1] = eodir[0] = ' ';
-    }
+    char * eodir = end_of_directive(scan);
 
     /*
      *  Ignore '#!' as a comment, enabling a definition file to behave
@@ -79,7 +94,7 @@ processDirective(char * scan)
     scan = SPN_WHITESPACE_CHARS(scan);
     if (! IS_ALPHABETIC_CHAR(*scan))
         return doDir_invalid(DIR_INVALID, scan, eodir);
-    
+
     return doDir_directive_disp(scan, eodir);
 }
 
@@ -97,6 +112,23 @@ count_lines(char const * start, char const * end)
     return res;
 }
 
+static char *
+next_directive(char * scan)
+{
+    if (*scan == '#')
+        scan++;
+    else {
+        char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
+        if (pz == NULL)
+            AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
+                          cctx->scx_line));
+
+        scan = pz + 2;
+    }
+
+    return SPN_WHITESPACE_CHARS(scan);
+}
+
 /**
  *  Skip through the text to a matching "#endif".  We do this when we
  *  have processed the allowable text (found an "#else" after
@@ -106,27 +138,12 @@ count_lines(char const * start, char const * end)
 static char *
 skip_to_endif(char * start)
 {
+    bool   skipping_if = skip_if_block;
     char * scan = start;
     char * dirv_end;
 
     for (;;) {
-        /*
-         *  'scan' is pointing to the first character on a line.
-         *  Check for a directive on the current line before scanning
-         *  later lines.
-         */
-        if (*scan == '#')
-            scan++;
-        else {
-            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
-            if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
-                              cctx->scx_line));
-
-            scan = pz + 2;
-        }
-
-        scan = SPN_WHITESPACE_CHARS(scan);
+        scan = next_directive(scan);
 
         switch (find_directive(scan)) {
         case DIR_ENDIF:
@@ -141,12 +158,22 @@ skip_to_endif(char * start)
             goto leave_func;
         }
 
+        case DIR_ELIF:
+            if (! skip_if_block)
+                AG_ABEND(ELIF_CONTEXT_MSG);
+            break;
+
+        case DIR_IF:
+            skip_if_block = true;
+            /* FALLTHROUGH */
+
         case DIR_IFDEF:
         case DIR_IFNDEF:
             /*
-             *  We found a nested ifdef/ifndef
+             *  We found a nested conditional, so skip to endif nested, too.
              */
             scan = skip_to_endif(scan);
+            skip_if_block = skipping_if;
             break;
 
         default:
@@ -172,23 +199,7 @@ skip_to_endmac(char * start)
     char * res;
 
     for (;;) {
-        /*
-         *  'scan' is pointing to the first character on a line.
-         *  Check for a directive on the current line before scanning
-         *  later lines.
-         */
-        if (*scan == '#')
-            scan++;
-        else {
-            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
-            if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
-                              cctx->scx_line));
-
-            scan = pz + DIRECT_CK_LIST_MARK_LEN;
-        }
-
-        scan = SPN_WHITESPACE_CHARS(scan);
+        scan = next_directive(scan);
 
         if (find_directive(scan) == DIR_ENDMAC) {
             /*
@@ -219,39 +230,23 @@ skip_to_else_end(char * start)
     char * res;
 
     for (;;) {
-        /*
-         *  'scan' is pointing to the first character on a line.
-         *  Check for a directive on the current line before scanning
-         *  later lines.
-         */
-        if (*scan == '#')
-            scan++;
-        else {
-            char * pz = strstr(scan, DIRECT_CK_LIST_MARK);
-            if (pz == NULL)
-                AG_ABEND(aprf(DIRECT_NOENDIF_FMT, cctx->scx_fname,
-                              cctx->scx_line));
-
-            scan = pz + 2;
-        }
-
-        scan = SPN_WHITESPACE_CHARS(scan);
+        scan = next_directive(scan);
 
         switch (find_directive(scan)) {
         case DIR_ELSE:
             /*
              *  We found an "else" directive for an "ifdef"/"ifndef"
              *  that we were skipping over.  Start processing the text.
+             *  Let the @code{DIR_ENDIF} advance the scanning pointer.
              */
-            ifdefLevel++;
+            ifdef_lvl++;
             /* FALLTHROUGH */
 
         case DIR_ENDIF:
         {
             /*
-             *  We reached the end of the "ifdef"/"ifndef" we were
-             *  skipping (or we dropped in from above).
-             *  Start processing the text.
+             * We reached the end of the "ifdef"/"ifndef" (or transitioned to
+             * process-the-text mode via "else").  Start processing the text.
              */
             char * pz = strchr(scan, NL);
             if (pz != NULL)
@@ -260,13 +255,14 @@ skip_to_else_end(char * start)
             goto leave_func;
         }
 
+        case DIR_IF:
+            skip_if_block = true;
+            scan = skip_to_endif(scan);
+            skip_if_block = false;
+            break;
+
         case DIR_IFDEF:
         case DIR_IFNDEF:
-            /*
-             *  We have found a nested "ifdef"/"ifndef".
-             *  Call "skip_to_endif()" to find *its* end, then
-             *  resume looking for our own "endif" or "else".
-             */
             scan = skip_to_endif(scan);
             break;
 
@@ -284,12 +280,12 @@ skip_to_else_end(char * start)
 }
 
 static void
-check_assert_str(char const * pz, char const * pzArg)
+check_assert_str(char const * pz, char const * arg)
 {
     pz = SPN_WHITESPACE_CHARS(pz);
 
     if (IS_FALSE_TYPE_CHAR(*pz))
-        AG_ABEND(aprf(DIRECT_ASSERT_FMT, pz, pzArg));
+        AG_ABEND(aprf(DIRECT_ASSERT_FMT, pz, arg));
 }
 
 static size_t
@@ -323,6 +319,11 @@ file_size(char const * fname)
  *  needs or may take arguments (e.g. '#define'), then there should
  *  also be an 'arg:' section describing the argument(s).
  */
+
+/*!
+ * an unrecognized directive has been encountered.  It need not be
+ * #invalid, though that would get you here, too.
+ */
 char *
 doDir_invalid(directive_enum_t id, char const * dir, char * scan_next)
 {
@@ -337,36 +338,42 @@ doDir_invalid(directive_enum_t id, char const * dir, char * scan_next)
     return scan_next;
 }
 
-#if 0
-/*
- * Ignored directives:
-
-doDir_let(     directive_enum_t id, char const * dir, char * scan_next);
-doDir_pragma(  directive_enum_t id, char const * dir, char * scan_next);
-doDir_ident(   directive_enum_t id, char const * dir, char * scan_next);
-
- * always an error directives
-
-doDir_endshell(directive_enum_t id, char const * dir, char * scan_next);
-doDir_elif(    directive_enum_t id, char const * dir, char * scan_next);
-doDir_endmac(  directive_enum_t id, char const * dir, char * scan_next);
-
- * handled by doDir_ifdef:
-
-doDir_ifndef(  directive_enum_t id, char const * dir, char * scan_next);
-
- */
-#endif
-
 /**
  * Ident, let and pragma directives are ignored.
  */
-char *
+static char *
 ignore_directive(directive_enum_t id, char const * arg, char * scan_next)
 {
     (void)arg;
     (void)id;
     return scan_next;
+}
+
+/**
+ * Ignored directive.
+ */
+char *
+doDir_let(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return ignore_directive(id, arg, scan_next);
+}
+
+/**
+ * Ignored directive.
+ */
+char *
+doDir_pragma(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return ignore_directive(id, arg, scan_next);
+}
+
+/**
+ * Ignored directive.
+ */
+char *
+doDir_ident(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return ignore_directive(id, arg, scan_next);
 }
 
 /**
@@ -376,7 +383,7 @@ ignore_directive(directive_enum_t id, char const * arg, char * scan_next)
  *  directives.  @code{#else} and @code{#endif} are in error if not matched
  *  with a previous @code{#ifdef} or @code{#ifndef} directive.
  */
-char *
+static char *
 bad_dirv_ctx(directive_enum_t id, char const * arg, char * scan_next)
 {
     AG_ABEND(aprf(DIRECT_BAD_CTX_FMT, directive_name(id),
@@ -388,13 +395,43 @@ bad_dirv_ctx(directive_enum_t id, char const * arg, char * scan_next)
 }
 
 /**
+ * Marks the end of the #shell directive.  Error when out of context.
+ */
+char *
+doDir_endshell(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return bad_dirv_ctx(id, arg, scan_next);
+}
+
+/**
+ * Marks a transition in the #if directive.  Error when out of context.
+ * #if blocks are always ignored.
+ */
+char *
+doDir_elif(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return bad_dirv_ctx(id, arg, scan_next);
+}
+
+/**
+ * Marks the end of the #macdef directive.  Error when out of context.
+ */
+char *
+doDir_endmac(directive_enum_t id, char const * arg, char * scan_next)
+{
+    return bad_dirv_ctx(id, arg, scan_next);
+}
+
+/**
+ *  This directive @i{is} processed, but only if the expression begins with
+ *  either a back quote (@code{`}) or an open parenthesis (@code{(}).
+ *  Text within the back quotes are handed off to the shell for processing
+ *  and parenthesized text is handed off to Guile.  Multiple line expressions
+ *  must be joined with backslashes.
+ *
  *  If the @code{shell-script} or @code{scheme-expr} do not yield @code{true}
  *  valued results, autogen will be aborted.  If @code{<anything else>} or
  *  nothing at all is provided, then this directive is ignored.
- *
- *  When writing the shell script, remember this is on a preprocessing
- *  line.  Multiple lines must be backslash continued and the result is a
- *  single long line.  Separate multiple commands with semi-colons.
  *
  *  The result is @code{false} (and fails) if the result is empty, the
  *  number zero, or a string that starts with the letters 'n' or 'f' ("no"
@@ -519,9 +556,9 @@ doDir_define(directive_enum_t id, char const * dir, char * scan_next)
 char *
 doDir_else(directive_enum_t id, char const * arg, char * scan_next)
 {
-    if (--ifdefLevel < 0)
+    if (--ifdef_lvl < 0)
         return bad_dirv_ctx(id, arg, scan_next);
-    
+
     return skip_to_endif(scan_next);
 }
 
@@ -532,7 +569,7 @@ doDir_else(directive_enum_t id, char const * arg, char * scan_next)
 char *
 doDir_endif(directive_enum_t id, char const * arg, char * scan_next)
 {
-    if (--ifdefLevel < 0)
+    if (--ifdef_lvl < 0)
         return bad_dirv_ctx(id, arg, scan_next);
 
     return scan_next;
@@ -545,11 +582,11 @@ doDir_endif(directive_enum_t id, char const * arg, char * scan_next)
 char *
 doDir_error(directive_enum_t id, char const * arg, char * scan_next)
 {
-    (void)scan_next;
-    (void)id;
     arg = SPN_WHITESPACE_CHARS(arg);
     AG_ABEND(aprf(DIRECT_ERROR_FMT, cctx->scx_fname, cctx->scx_line, arg));
     /* NOTREACHED */
+    (void)scan_next;
+    (void)id;
     return NULL;
 }
 
@@ -560,9 +597,12 @@ doDir_error(directive_enum_t id, char const * arg, char * scan_next)
 char *
 doDir_if(directive_enum_t id, char const * arg, char * scan_next)
 {
+    skip_if_block = true;
+    scan_next = skip_to_endif(scan_next);
+    skip_if_block = false;
     (void)arg;
     (void)id;
-    return skip_to_endif(scan_next);
+    return scan_next;
 }
 
 /**
@@ -578,8 +618,19 @@ doDir_ifdef(directive_enum_t id, char const * dir, char * scan_next)
     if (! ok)
         return skip_to_else_end(scan_next);
 
-    ifdefLevel++;
+    ifdef_lvl++;
     return scan_next;
+}
+
+
+/**
+ *  The definitions that follow, up to the matching @code{#endif} will be
+ *  processed only if the named value has @strong{not} been defined.
+ */
+char *
+doDir_ifndef(directive_enum_t id, char const * dir, char * scan_next)
+{
+    return doDir_ifdef(id, dir, scan_next);
 }
 
 /**
@@ -719,6 +770,7 @@ doDir_line(directive_enum_t id, char const * dir, char * scan_next)
 /**
  *  This is a new AT&T research preprocessing directive.  Basically, it is
  *  a multi-line #define that may include other preprocessing directives.
+ *  Text between this line and a #endmac directive are ignored.
  */
 char *
 doDir_macdef(directive_enum_t id, char const * arg, char * scan_next)
@@ -759,6 +811,9 @@ doDir_option(directive_enum_t id, char const * dir, char * scan_next)
  *  Invokes @code{$SHELL} or @file{/bin/sh} on a script that should
  *  generate AutoGen definitions.  It does this using the same server
  *  process that handles the back-quoted @code{`} text.
+ *  The block of text handed to the shell is terminated with
+ *  the #endshell directive.
+ *
  *  @strong{CAUTION}@:  let not your @code{$SHELL} be @code{csh}.
  */
 char *
@@ -866,7 +921,6 @@ doDir_undef(directive_enum_t id, char const * dir, char * scan_next)
     return scan_next;
 }
 
-/*+++ End of Directives +++*/
 /**
  * @}
  *
