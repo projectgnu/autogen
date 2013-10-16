@@ -122,10 +122,6 @@ init_tests()
 
   TMPDIR="${tstdir}/${testname}-tmpd"
   mkdir -p ${TMPDIR}
-
-  f=`\cd ${LIBGUILE_PATH}/../bin && pwd`
-  PATH=${f}:${PATH}
-
   CFLAGS=`echo ${CFLAGS} | \
     ${SED} "s/-Werror[^ ${ht}]*//g;s/-Wextra//g"`
 
@@ -265,8 +261,11 @@ basic_help_clean="/^Packaged by/d
 /[Pp]lease send bug reports/d
 /^exit [0-9]/d
 /^[ ${ht}]*\$/d"
-export   nl ht basic_help_clean
-readonly nl ht basic_help_clean
+TR=`command -v tr`
+test -x "$TR" || die "cannot run tests without 'tr' program"
+
+export   nl ht basic_help_clean TR
+readonly nl ht basic_help_clean TR
 
 clean_help() {
   test -z "$sedcmd" && \
@@ -283,7 +282,7 @@ compile()
   test "X${Cexe}"  = "X" && Cexe="${Csrc}"
   test "X${Dnam}"  = "X" && Dnam="${testname}"
 
-  d=`echo TEST_TEST_${Dnam}_OPTS | /usr/bin/tr '[a-z]-' '[A-Z]_'`
+  d=`echo TEST_TEST_${Dnam}_OPTS | ${TR} '[a-z]-' '[A-Z]_'`
   cc_cmd="${CC} ${CFLAGS} -D$d ${INC} -o ${Cexe} ${Csrc}.c ${LIB}"
   eval ${cc_cmd} || \
     failure cannot compile ${Csrc}.c
