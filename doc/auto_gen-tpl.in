@@ -161,9 +161,7 @@ and "run" the definitions file as if it were a direct invocation of
 AutoGen.  This was done for its hack value.
 
 The AutoGen recognized directives are:
-
 @table @code[=`
-
 if test -z "$top_srcdir" || test ! -d "$top_srcdir"
 then top_srcdir=.. ; fi
 f=${top_srcdir}/agen5/defDirect.c
@@ -205,9 +203,9 @@ do
         printf '\n@item #%s\n@cindex %s\n@cindex %s directive\n' \
                $line $line $line
         echo "$comment_text"
-    } > ${tmpdir}/directive-$line
+    } > ${tmp_dir}/directive-$line
 done < $f
-cat ${tmpdir}/directive-*
+cat ${tmp_dir}/directive-*
 `=]
 @end table
 [=

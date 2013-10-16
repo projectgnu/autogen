@@ -1,4 +1,13 @@
-New in __CURRENT_VERSION__ September 2013
+New in __CURRENT_VERSION__ October 2013
+
+* documentation clarifications
+* properly create generated main procedures from user supplied code.
+* ChangeLog files have been removed from GIT sources
+  (though still obtainable with tagged checkouts).
+* LIBGUILE_PATH is not needed and its derivation is wrong on
+  where binaries and libraries have different prefixes.
+
+New in 5.18.1 September 2013
 
 * fixed char casting issue that shows in UTF-8 files
 * fixed installation error for str2init
