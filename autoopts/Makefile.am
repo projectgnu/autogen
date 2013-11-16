@@ -164,4 +164,10 @@ install-data-hook:
 
 .NOTPARALLEL:
 
+if GL_GENERATE_STDNORETURN_H
+$(STDNORETURN_H) : libguile/__scm.h
+libguile/__scm.h :
+	$(SHELL) $(srcdir)/fix-guile.sh $(LIBGUILE_CFLAGS)
+endif
+
 # Makefile.am ends here

@@ -57,7 +57,7 @@ add_files_to_mf() {
         pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
         edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
         edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
-        edta="${edta}install-hook.sh${nl}po${nl}"
+        edta="${edta}install-hook.sh${nl}po${nl}fix-guile.sh${nl}"
 
         for f in tpl/*.*
         do

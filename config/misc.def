@@ -414,6 +414,7 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
+	gl_STDNORETURN_H
 	INVOKE_LIBOPTS_MACROS
 
 	[echo 'test "X${ac_cv_header_sys_wait_h}" = Xyes' 1>&2
