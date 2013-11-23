@@ -83,7 +83,7 @@ static char*
 gather_name(char * scan, te_dp_event * ret_val);
 
 static char*
-build_here_str(char* scan);
+build_here_str(char * scan);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**

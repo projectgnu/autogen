@@ -38,9 +38,6 @@ typedef enum {
 static char const * const state_names[] = { STATE_TABLE };
 #undef _State_
 
-static sigjmp_buf  abend_env;
-static int         abend_sig = 0;
-
 typedef void (sighandler_proc_t)(int sig);
 static sighandler_proc_t ignore_signal, catch_sig_and_bail;
 
@@ -51,7 +48,7 @@ inner_main(void * closure, int argc, char ** argv);
 static void
 exit_cleanup(wait_for_pclose_enum_t cl_wait);
 
-static void
+static _Noreturn void
 cleanup_and_abort(int sig);
 
 static void
@@ -64,9 +61,9 @@ static void
 done_check(void);
 
 static void
-setup_signals(sighandler_proc_t * chldHandler,
-              sighandler_proc_t * abrtHandler,
-              sighandler_proc_t * dfltHandler);
+setup_signals(sighandler_proc_t * hdl_chld,
+              sighandler_proc_t * hdl_abrt,
+              sighandler_proc_t * hdl_dflt);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifndef HAVE_CHMOD
@@ -123,13 +120,6 @@ inner_main(void * closure, int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
-    /*
-     *  IF we've been kicked with a signal,
-     *  THEN abort, passing the signal that whacked us.
-     */
-    if (sigsetjmp(abend_env, 0) != 0)
-        cleanup_and_abort(abend_sig);
-
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
     optionSaveState(&autogenOptions);
     trace_fp = stderr;
@@ -204,13 +194,12 @@ exit_cleanup(wait_for_pclose_enum_t cl_wait)
  *
  *  @param[in] sig the signal number
  */
-static void
+static _Noreturn void
 cleanup_and_abort(int sig)
 {
-    int sig_exit_code = AUTOGEN_EXIT_SIGNAL + sig;
     if (processing_state == PROC_STATE_INIT) {
         fprintf(stderr, AG_NEVER_STARTED, sig, strsignal(sig));
-        exit(sig_exit_code);
+        exit(AUTOGEN_EXIT_SIGNAL + sig);
     }
 
     if (*oops_pfx != NUL) {
@@ -224,7 +213,7 @@ cleanup_and_abort(int sig)
 
     if (processing_state == PROC_STATE_ABORTING) {
         exit_cleanup(EXIT_PCLOSE_NOWAIT);
-        exit(sig_exit_code);
+        abort();
     }
 
     processing_state = PROC_STATE_ABORTING;
@@ -295,9 +284,7 @@ catch_sig_and_bail(int sig)
         break;
 
     default:
-        abend_sig = sig;
-        exit_code = AUTOGEN_EXIT_SIGNAL + sig;
-        siglongjmp(abend_env, sig);
+        cleanup_and_abort(sig);
     }
 }
 
@@ -455,10 +442,10 @@ done_check(void)
 }
 
 
-LOCAL void
-ag_abend_at(char const * pzMsg
+LOCAL _Noreturn void
+ag_abend_at(char const * msg
 #ifdef DEBUG_ENABLED
-            , char const * pzFile, int line
+            , char const * fname, int line
 #endif
     )
 {
@@ -468,23 +455,23 @@ ag_abend_at(char const * pzMsg
     }
 
 #ifdef DEBUG_ENABLED
-    fprintf(stderr, "Giving up in %s line %d\n", pzFile, line);
+    fprintf(stderr, "Giving up in %s line %d\n", fname, line);
 #endif
 
     if ((processing_state >= PROC_STATE_LIB_LOAD) && (current_tpl != NULL)) {
         int l_no = (cur_macro == NULL) ? -1 : cur_macro->md_line;
         fprintf(stderr, ERROR_IN_TPL_FMT, current_tpl->td_file, l_no);
     }
-    fputs(pzMsg, stderr);
-    pzMsg += strlen(pzMsg);
-    if (pzMsg[-1] != NL)
+    fputs(msg, stderr);
+    msg += strlen(msg);
+    if (msg[-1] != NL)
         fputc(NL, stderr);
 
     {
-        proc_state_t oldState = processing_state;
+        proc_state_t o_state = processing_state;
         processing_state = PROC_STATE_ABORTING;
 
-        switch (oldState) {
+        switch (o_state) {
         case PROC_STATE_EMITTING:
         case PROC_STATE_INCLUDING:
         case PROC_STATE_CLEANUP:
@@ -499,9 +486,9 @@ ag_abend_at(char const * pzMsg
 
 
 static void
-setup_signals(sighandler_proc_t * chldHandler,
-              sighandler_proc_t * abrtHandler,
-              sighandler_proc_t * dfltHandler)
+setup_signals(sighandler_proc_t * hdl_chld,
+              sighandler_proc_t * hdl_abrt,
+              sighandler_proc_t * hdl_dflt)
 {
     struct sigaction  sa;
     int    sigNo  = 1;
@@ -529,11 +516,11 @@ setup_signals(sighandler_proc_t * chldHandler,
 #  define SIGCHLD SIGCLD
 #endif
         case SIGCHLD:
-            sa.sa_handler = chldHandler;
+            sa.sa_handler = hdl_chld;
             break;
 
         case SIGABRT:
-            sa.sa_handler = abrtHandler;
+            sa.sa_handler = hdl_abrt;
             break;
 
             /*
@@ -592,7 +579,7 @@ setup_signals(sighandler_proc_t * chldHandler,
 #endif
 
         default:
-            sa.sa_handler = dfltHandler;
+            sa.sa_handler = hdl_dflt;
         }
         sigaction(sigNo,  &sa, NULL);
     } while (++sigNo < maxSig);
