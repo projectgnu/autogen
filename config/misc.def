@@ -1,4 +1,4 @@
-// -*- Mode: text -*-
+// -*- Mode: conf -*-
 
 autogen definitions conftest.tpl;
 

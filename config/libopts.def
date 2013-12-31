@@ -337,7 +337,7 @@ do-first = <<-_EOF_
 	  #endif
 	])
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
-			intptr_t, uintptr_t, uint_t, pid_t, size_t])
+			intptr_t, uintptr_t, uint_t, pid_t, size_t, ptrdiff_t])
 	AC_CHECK_SIZEOF(char*, 8)
 	AC_CHECK_SIZEOF(int,   4)
 	AC_CHECK_SIZEOF(long,  8)
