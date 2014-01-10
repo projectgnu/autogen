@@ -2,7 +2,7 @@
 
 texi
 
-## Copyright (C) 2006-2013 Bruce Korb, all rights reserved.
+## Copyright (C) 2006-2014 Bruce Korb, all rights reserved.
 
 =]
 [= `echo please note that this is obsolete >&2` =][=

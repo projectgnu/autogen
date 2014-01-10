@@ -2,7 +2,7 @@
 
 html =][=
 ##  This file is part of AutoGen.
-##  AutoGen Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
+##  AutoGen Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
 ##
 ##  AutoGen is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by the
@@ -126,7 +126,7 @@ Please send broken links and other corrections (or suggestions) to
 </p>
 
 <p>
-Copyright (C) 2003, 2012[=`date +%Y`
+Copyright (C) 2003, 2012, 2014[=`date +%Y`
 =] <a href="http://www.fsf.org">Free Software Foundation</a>, Inc.<br />
 Verbatim copying and distribution of this entire article is
 permitted in any medium, provided this notice is preserved.

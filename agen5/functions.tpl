@@ -3,7 +3,7 @@
 # functions.tpl
 #
 ## This file is part of AutoGen.
-## Copyright (C) 1992-2013 Bruce Korb - all rights reserved
+## Copyright (C) 1992-2014 Bruce Korb - all rights reserved
 ##
 ## AutoGen is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the
@@ -88,7 +88,7 @@
  *
  *  Tables of Text Functions for AutoGen
  *
- *  Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
+ *  Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
  *
 [=(gpl "AutoGen" " *  ")=]
  *

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#  cright-update Copyright (C) 1992-2013 by Bruce Korb - all rights reserved
+#  cright-update Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
 
 TMP=`mktemp -d ${TMPDIR:-/tmp}/test.XXXXXX`
 trap "rm -rf $TMP 2>/dev/null" EXIT
@@ -27,7 +27,7 @@ cat > ${sample} <<- _EOF_
 	 *  cright-update Copyright (C) 1992$ly by Bruce Korb - all rights reserved
 	 */
 
-	/* Copyright (C) 1990, 1993, 1996, 1997, 1998, 1999, 2000, 2002, 2003,
+	/* Copyright (C) 1990, 1993, 1996, 1997, 1998, 1999, 2000, 2002, 2003, 2014
 	 * 2004-2005, 2006, 2007, 2008,
 	 * 2009-$ly by Bruce Korb -- Free Software Foundation, Inc.
 	 * Contributed by John Carr (jfc@mit.edu).
@@ -41,7 +41,7 @@ cat > ${save} <<_EOF_
  *  cright-update Copyright (C) 1992$ty by Bruce Korb - all rights reserved
  */
 
-/* Copyright (C) 1990, 1993, 1996, 1997, 1998, 1999, 2000, 2002, 2003,
+/* Copyright (C) 1990, 1993, 1996, 1997, 1998, 1999, 2000, 2002, 2003, 2014
  * 2004-2005, 2006, 2007, 2008, 2009-$ty by Bruce Korb -- Free Software Foundation, Inc.
  * Contributed by John Carr (jfc@mit.edu).
  */

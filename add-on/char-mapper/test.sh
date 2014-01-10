@@ -3,7 +3,7 @@
 ## \file map-text.def
 ##
 ##  This file is part of char-mapper.
-##  Copyright (C) 2005-2013 Bruce Korb - all rights reserved
+##  Copyright (C) 2005-2014 Bruce Korb - all rights reserved
 ##
 ## char-mapper is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the

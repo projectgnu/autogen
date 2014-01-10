@@ -2,7 +2,7 @@ AutoGen Definitions options; /* -*- Mode: conf -*- */
 
 /*
  *  update-copyright is copyrighted
- *  Copyright (C) 2001-2013 Bruce Korb
+ *  Copyright (C) 2001-2014 Bruce Korb
  *  All rights reserved.
  */
 argument        = "[ <file-name> ... ]";
@@ -14,7 +14,7 @@ explain         = <<- _EOF_
 	_EOF_;
 
 copyright = {
-    date  = "2009-2013";
+    date  = "2009-2014";
     owner = "Bruce Korb";
     eaddr = "bkorb@gnu.org";
     type  = mbsd;
