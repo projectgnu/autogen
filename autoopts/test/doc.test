@@ -142,7 +142,7 @@ argument = "[hostname]";
 long-opts;
 
 copyright  = {
-    date   = "2000-2012";
+    date   = "2000-2014";
     owner  = "Free Software Foundation";
     author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; "
              "see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
@@ -705,7 +705,7 @@ gnutls\-cli\-debug(1), gnutls\-serv(1)
 .Sh "AUTHORS"
 Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
 .Sh "COPYRIGHT"
-Copyright (C) 2000, 2014 Free Software Foundation all rights reserved.
+Copyright (C) 2000\-2014 Free Software Foundation all rights reserved.
 This program is released under the terms of the GNU General Public License, version 3 or later.
 .Sh "BUGS"
 Please send bug reports to: bug\-gnutls@gnu.org

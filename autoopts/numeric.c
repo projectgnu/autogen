@@ -110,6 +110,13 @@ optionNumericVal(tOptions * opts, tOptDesc * od)
     long  val;
 
     /*
+     *  Guard against all the different ways this procedure might get invoked
+     *  when there is no string argument provided.
+     */
+    if (INQUERY_CALL(opts, od) || (od->optArg.argString == NULL))
+        return;
+
+    /*
      *  Numeric options may have a range associated with it.
      *  If it does, the usage procedure requests that it be
      *  emitted by passing a NULL od pointer.  Also bail out

@@ -162,7 +162,7 @@ gnu-usage;
 no-libopts;
 
 copyright = {
-    date  = "2003-2013";
+    date  = "2003-2014";
     owner = "Odyssey Computing Concepts, Inc.";
     author= "Bruce Korb";
     eaddr = "bkorb@gnu.org";

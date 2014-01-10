@@ -383,6 +383,16 @@ extern char* strrchr(char const *s, int c);
 #endif
 
 /**
+ * INQUERY_CALL() tests whether the option handling function has been
+ * called by an inquery (help text needed, or option being reset),
+ * or called by a set-the-option operation.
+ */
+#define INQUERY_CALL(_o, _d) (                  \
+    ((_o) <= OPTPROC_EMIT_LIMIT)                \
+    || ((_d) == NULL)                           \
+    || (((_d)->fOptState & OPTST_RESET) != 0) )
+
+/**
  *  Define and initialize all the user visible strings.
  *  We do not do translations.  If translations are to be done, then
  *  the client will provide a callback for that purpose.
