@@ -1,5 +1,18 @@
 New in __CURRENT_VERSION__ October 2013
 
+* Auto-edit Guile headers that depend upon configure values
+  most especially:  noreturn
+  but check for "ptrdiff_t" in our configure too, so that Guile does
+  not create its own duplicate definition.
+
+* Abort from the failing function so that stack traces are useful
+* The libopts m4 configure code must configure the libopts/Makefile
+* Happy 2014 New Year
+* make sure library option handling code does nothing when the
+  library is just tryint to get information about an option.
+
+New in 5.18.2 October 2013
+
 * documentation clarifications
 * properly create generated main procedures from user supplied code.
 * ChangeLog files have been removed from GIT sources

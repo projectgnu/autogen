@@ -58,6 +58,9 @@ static char const report_fmt[] = "%-11s %s\n";
 
 char * last_year = NULL;
 
+static int const regex_flags =
+    REG_EXTENDED | REG_ICASE | REG_NEWLINE;
+
 /**
  * find the line prefix before the current copyright mark.
  * When collecting year ranges, these get skipped over.
@@ -306,6 +309,9 @@ get_next_token(char ** plist, unsigned long * val)
     return CYR_EV_YEAR;
 }
 
+/**
+ * skip over a sequence of years
+ */
 static char *
 scan_past_years(char * scan, char const * pfx, size_t p_len)
 {
@@ -708,6 +714,7 @@ doit(char const * fname, char * ftext, size_t fsize,
     size_t p_len;
     char const * res_msg;
     char * start = ftext;
+    int    reres;
 
     cright_update_exit_code_t res = CRIGHT_UPDATE_EXIT_SUCCESS;
 
@@ -718,13 +725,13 @@ doit(char const * fname, char * ftext, size_t fsize,
     do  {
         cright_update_exit_code_t fixres;
 
-        regoff_t const so = match[1].rm_so;
-        fwrite(ftext, so, 1, fp);
+        regoff_t const eo = match[1].rm_eo;
+        fwrite(ftext, eo, 1, fp);
         if (prefix != NULL)
             free(prefix);
         prefix = find_prefix(ftext, match[0].rm_so);
         p_len  = strlen(prefix);
-        ftext += so;
+        ftext += eo;
         if (is_c && (prefix[0] == '/') && (prefix[1] == '*'))
             *prefix = ' ';
 
@@ -738,7 +745,8 @@ doit(char const * fname, char * ftext, size_t fsize,
         } else if (res == CRIGHT_UPDATE_EXIT_SUCCESS)
             res = fixres;
 
-    } while (regexec(preg, ftext, 2, match, 0) == 0);
+        reres = regexec(preg, ftext, 2, match, 0);
+    } while (reres == 0);
 
     /*
      * Write the remainder of the file -- if we're going to keep it.
@@ -782,15 +790,12 @@ doit(char const * fname, char * ftext, size_t fsize,
 static regex_t *
 initialize(void)
 {
-    static int const cr_flags =
-        REG_EXTENDED | REG_ICASE | REG_NEWLINE;
-
     regex_t * preg = malloc(sizeof(* preg));
     int       reres;
 
     if (preg == NULL)
         fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "regex struct");
-    reres = regcomp(preg, OPT_ARG(COPYRIGHT_MARK), cr_flags);
+    reres = regcomp(preg, OPT_ARG(COPYRIGHT_MARK), regex_flags);
 
     if (reres != 0)
         die(CRIGHT_UPDATE_EXIT_REGCOMP, "regcomp failed on:  %s\n",
@@ -819,10 +824,198 @@ initialize(void)
     return preg;
 }
 
+static char *
+assemble_cooked(char * p)
+{
+    char * res;
+    size_t len = 1;
+    char * ptr = p;
+
+    for (;;) {
+        char ch = *++p;
+        switch (ch) {
+        case NUL:
+        found_nul:
+            die(CRIGHT_UPDATE_EXIT_REGCOMP, "bad regex:  %s\n", ptr);
+
+        case '"':
+            goto len_done;
+
+        case '\\':
+            if (*++p == NUL)
+                goto found_nul;
+            
+        default:
+            len++;
+            break;
+        }
+    } len_done:;
+
+    res = malloc(len);
+    if (res == NULL)
+        fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
+
+    for (p = res;;) {
+        char ch = *++ptr;
+        switch (ch) {
+        case '"':
+            *p = NUL;
+            return res;
+
+        default:
+            *(p++) = ch;
+            break;
+
+        case '\\':
+            ch = *++ptr;
+            switch (ch) {
+            case 'a': *(p++) = '\a'; break;
+            case 'b': *(p++) = '\b'; break;
+            case 't': *(p++) = '\t'; break;
+            case 'n': *(p++) = '\n'; break;
+            case 'v': *(p++) = '\v'; break;
+            case 'f': *(p++) = '\f'; break;
+            case 'r': *(p++) = '\r'; break;
+            case 'x':
+            {
+                char buf[4];
+                int ix = 0;
+
+                for (;;) {
+                    if (! IS_HEX_DIGIT_CHAR(ptr[1]))
+                        break;
+
+                    buf[ix] = *++ptr;
+                    if (++ix >= 2)
+                        break;
+                }
+
+                buf[ix] = NUL;
+                *(p++) = 0xFF & strtoul(buf, 0, 16);
+                break;
+            }
+            case '0': case '1': case '2': case '3':
+            case '4': case '5': case '6': case '7':
+            {
+                char buf[4];
+                int ix = 0;
+
+                for (;;) {
+                    if (! IS_OCT_DIGIT_CHAR(ptr[1]))
+                        break;
+
+                    buf[ix] = *++ptr;
+                    if (++ix >= 3)
+                        break;
+                }
+
+                buf[ix] = NUL;
+                *(p++) = 0xFF & strtoul(buf, 0, 8);
+                break;
+            }
+            default:
+                *(p++) = ch;
+            }
+        }
+    }
+}
+
+static char *
+assemble_raw(char * p)
+{
+    die(CRIGHT_UPDATE_EXIT_REGCOMP, "raw regex-es not supported\n");
+}
+
+static char *
+assemble_xml(char * p)
+{
+    die(CRIGHT_UPDATE_EXIT_REGCOMP, "xml regex-es not supported\n");
+}
+
+static char *
+assemble_line(char * p)
+{
+    size_t res_size;
+    char * q = strchr(p, '\n');
+    char * res;
+
+    if (q == NULL)
+        return NULL;
+    q = SPN_HORIZ_WHITE_BACK(p, q);
+    res_size = q - p;
+    res = malloc(res_size + 1);
+    if (res == NULL)
+        fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
+    memcpy(res, p, res_size);
+    res[res_size] = NUL;
+    return res;
+}
+
+/**
+ * parse out and allocate a regex buffer
+ */
+static char *
+assemble_regex(char * p)
+{
+    p = SPN_HORIZ_WHITE_CHARS(p);
+    switch (*p) {
+    case ':': case '=':
+        p = SPN_HORIZ_WHITE_CHARS(p+1);
+    }
+
+    switch (*p) {
+    case '\n': return NULL;
+    case '"':  return assemble_cooked(p);
+    case '\'': return assemble_raw(p);
+    case '<':  return assemble_xml(p);
+    default:   return assemble_line(p);
+    }
+
+}
+
+/**
+ * see if the file text contains an alternate RE to use.
+ * @param [in] ftext  the text of that file
+ * @param [in] preg   the default RE
+ */
+static regex_t *
+choose_re(char * ftext, regex_t * preg)
+{
+    static char const mark[] = "--copyright-mark";
+    char * p = strstr(ftext, mark);
+    if (p == NULL)
+        return preg;
+
+    {
+        regex_t * res_reg = malloc(sizeof(* preg));
+        int       reres;
+
+        if (preg == NULL)
+            fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "regex struct");
+
+        p = assemble_regex(p + sizeof(mark) - 1);
+        reres = regcomp(res_reg, p, regex_flags);
+        if (reres != 0)
+            die(CRIGHT_UPDATE_EXIT_REGCOMP, "regcomp failed on:  %s\n",
+                OPT_ARG(COPYRIGHT_MARK));
+        free(p);
+
+        return res_reg;
+    }
+}
+
+/**
+ * Main callout procedure.
+ * @param [in]     fname  file name to (potentially) update
+ * @param [in,out] ftext  the text of that file
+ * @param [in]     fsize  the number of bytes of text
+ * @returns a cright-update exit code
+ */
 int
 fix_copyright(char const * fname, char * ftext, size_t fsize)
 {
     static regex_t * preg = NULL;
+    regex_t * re;
 
     int        reres;
     regmatch_t match[2];
@@ -830,7 +1023,14 @@ fix_copyright(char const * fname, char * ftext, size_t fsize)
     if (preg == NULL)
         preg = initialize();
 
-    reres = regexec(preg, ftext, 2, match, 0);
+    re = choose_re(ftext, preg);
+
+    reres = regexec(re, ftext, 2, match, 0);
+    if (re != preg) {
+        regfree(re);
+        free(re);
+    }
+
     switch (reres) {
     default:
         die(CRIGHT_UPDATE_EXIT_REGEXEC, "regexec failed in %s:  %s\n",

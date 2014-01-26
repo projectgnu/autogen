@@ -226,7 +226,10 @@ AC_CONFIG_FILES([autoopts/autoopts-config],
 
 AC_CONFIG_COMMANDS([stamp-h],
 [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
-[CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}]
+[CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
+f=`${CONFIG_SHELL} -c 'echo true | (
+    exec 2>/dev/null ; read -u0 line ; echo $line ; )'`
+test X$f = Xtrue || CONFIG_SHELL=`command -v bash`]
 AC_SUBST(CONFIG_SHELL)
 AC_DEFINE_UNQUOTED(CONFIG_SHELL,$CONFIG_SHELL,
                    [Define this to a working Bourne shell])

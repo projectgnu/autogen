@@ -26,7 +26,9 @@
 %
 
 alphabetic      "a-zA-Z"
+oct-digit       "0-7"
 dec-digit       "0-9"
+hex-digit       "a-fA-F"      +dec-digit
 name            "-_"          +alphabetic +dec-digit
 horiz-white     "\t "
 spacy-name      +horiz-white  +name
