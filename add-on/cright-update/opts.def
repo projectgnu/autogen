@@ -1,6 +1,8 @@
 AutoGen Definitions options; /* -*- Mode: conf -*- */
 
-/*
+/*--copyright-mark "(copyright \\(c\\)[ \t]+|date[ \t]*=[ \t]*\")" \
+ *  "([12][90][0-9][0-9])"
+ *
  *  update-copyright is copyrighted
  *  Copyright (C) 2001-2014 Bruce Korb
  *  All rights reserved.

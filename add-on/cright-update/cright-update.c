@@ -824,10 +824,11 @@ initialize(void)
     return preg;
 }
 
-static char *
+static regex_t *
 assemble_cooked(char * p)
 {
-    char * res;
+    regex_t * res;
+    char * res_str;
     size_t len = 1;
     char * ptr = p;
 
@@ -839,7 +840,15 @@ assemble_cooked(char * p)
             die(CRIGHT_UPDATE_EXIT_REGCOMP, "bad regex:  %s\n", ptr);
 
         case '"':
-            goto len_done;
+            p = strchr(p, '\n');
+            if (p == NULL)
+                goto found_nul;
+            if (p[-1] != '\\')
+                goto len_done;
+            p = strchr(p, '"');
+            if (p == NULL)
+                goto found_nul;
+            continue;
 
         case '\\':
             if (*++p == NUL)
@@ -851,14 +860,21 @@ assemble_cooked(char * p)
         }
     } len_done:;
 
-    res = malloc(len);
+    res = malloc(sizeof(*res) + len);
     if (res == NULL)
         fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
+    res_str = (char *)(res + 1);
 
-    for (p = res;;) {
+    for (p = res_str;;) {
         char ch = *++ptr;
         switch (ch) {
         case '"':
+            ptr = SPN_HORIZ_WHITE_CHARS(ptr+1);
+            if ((ptr[0] == '\\') && (ptr[1] == '\n')) {
+                ptr = strchr(ptr + 2, '"');
+                if (ptr != NULL)
+                    continue;
+            }
             *p = NUL;
             return res;
 
@@ -920,47 +936,50 @@ assemble_cooked(char * p)
     }
 }
 
-static char *
+static regex_t *
 assemble_raw(char * p)
 {
     die(CRIGHT_UPDATE_EXIT_REGCOMP, "raw regex-es not supported\n");
 }
 
-static char *
+static regex_t *
 assemble_xml(char * p)
 {
     die(CRIGHT_UPDATE_EXIT_REGCOMP, "xml regex-es not supported\n");
 }
 
-static char *
+static regex_t *
 assemble_line(char * p)
 {
-    size_t res_size;
+    regex_t * res;
+    size_t res_str_size;
     char * q = strchr(p, '\n');
-    char * res;
+    char * res_str;
 
     if (q == NULL)
         return NULL;
     q = SPN_HORIZ_WHITE_BACK(p, q);
-    res_size = q - p;
-    res = malloc(res_size + 1);
+    res_str_size = q - p;
+    res = malloc(sizeof(*res) + res_str_size + 1);
     if (res == NULL)
         fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
-    memcpy(res, p, res_size);
-    res[res_size] = NUL;
+    res_str = (char *)(res + 1);
+    memcpy(res_str, p, res_str_size);
+    res_str[res_str_size] = NUL;
     return res;
 }
 
 /**
  * parse out and allocate a regex buffer
  */
-static char *
+static regex_t *
 assemble_regex(char * p)
 {
     p = SPN_HORIZ_WHITE_CHARS(p);
     switch (*p) {
     case ':': case '=':
         p = SPN_HORIZ_WHITE_CHARS(p+1);
+        break;
     }
 
     switch (*p) {
@@ -987,18 +1006,19 @@ choose_re(char * ftext, regex_t * preg)
         return preg;
 
     {
-        regex_t * res_reg = malloc(sizeof(* preg));
+        regex_t * res_reg;
         int       reres;
+        char *    re_str;
 
         if (preg == NULL)
             fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "regex struct");
 
-        p = assemble_regex(p + sizeof(mark) - 1);
-        reres = regcomp(res_reg, p, regex_flags);
+        res_reg = assemble_regex(p + sizeof(mark) - 1);
+        re_str  = (char *)(res_reg + 1);
+        reres   = regcomp(res_reg, re_str, regex_flags);
         if (reres != 0)
             die(CRIGHT_UPDATE_EXIT_REGCOMP, "regcomp failed on:  %s\n",
                 OPT_ARG(COPYRIGHT_MARK));
-        free(p);
 
         return res_reg;
     }
@@ -1019,30 +1039,35 @@ fix_copyright(char const * fname, char * ftext, size_t fsize)
 
     int        reres;
     regmatch_t match[2];
+    char * re_text;
 
     if (preg == NULL)
         preg = initialize();
 
     re = choose_re(ftext, preg);
-
     reres = regexec(re, ftext, 2, match, 0);
-    if (re != preg) {
-        regfree(re);
-        free(re);
-    }
 
     switch (reres) {
     default:
         die(CRIGHT_UPDATE_EXIT_REGEXEC, "regexec failed in %s:  %s\n",
             fname, OPT_ARG(COPYRIGHT_MARK));
+        /* NOTREACHED */
 
     case 0:
-        if (match[1].rm_so > 0)
-            return doit(fname, ftext, fsize, preg, match);
+        if (match[1].rm_so > 0) {
+            reres = doit(fname, ftext, fsize, re, match);
+            break;
+        }
         /* FALLTHROUGH */
 
     case REG_NOMATCH:
         printf(report_fmt, no_match, fname);
-        return CRIGHT_UPDATE_EXIT_SUCCESS;
+        reres = CRIGHT_UPDATE_EXIT_SUCCESS;
     }
+
+    if (re != preg) {
+        regfree(re);
+        free(re);
+    }
+    return reres;
 }
