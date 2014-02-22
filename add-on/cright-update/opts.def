@@ -12,7 +12,7 @@ prog_name       = cright-update;
 prog_title      = "update copyright notices in text files";
 
 explain         = <<- _EOF_
-	updates the year list following a "Copyright (C)" string in text files.
+	updates the year list following a copyright mark string in text files.
 	_EOF_;
 
 copyright = {
@@ -47,19 +47,6 @@ main = {
     handler-type = text-of-file;
 };
 
-detail = <<- _EOF_
-	This program will add the current year to a list of copyright years
-	that appear between a copyright mark and the copyright owner name.
-	Comment markers at the start of each line are preserved on following
-	lines, should they be necessary.  A program name is allowed to appear
-	after comment markers and before the copyright mark.
-
-	The file modification time is left untouched.  Copyright lines are
-	constrained to 80 columns, unless @option{--width} is specified.  Any
-	prefix used on the first line must also used on any continuation
-	lines and will be added in if the result requires another line.
-	_EOF_;
-
 flag = {
     name        = new-year;
     value       = y;
@@ -87,26 +74,17 @@ flag = {
     value       = c;
     arg-type    = string;
     arg-name    = mark;
-    arg-default = 'Copyright  *\(C\) +([12][90][0-9][0-9])';
+    arg-default = '(Copyright  *\(C\) +)[12][90][0-9][0-9]';
     descrip     = "Copyright extended regex";
 
     doc = <<- EODoc
-	Replaces the latest year appearing in a copyright notice line.
-	Contiguous years of 2 or more years are replaced with a year range,
-	e.g. "2008-2011".  Copyright notices are detected via this @file{mark}
-	regex pattern.  If the program name precedes this on the line, it and
-	any intervening white space are copied to the output but are otherwise
-	ignored.  The text preceding that is the per-line prefix that must
-	start each successive copyright line.
+	This option specifies the regular expression to use to find a
+	copyright notation.  If the program name precedes this on the line, it
+	and any intervening white space are copied to the output but are
+	otherwise ignored.  The text preceding that is the per-line prefix
+	that must start each successive copyright line.
 
-	Any supplied regular expression should have at least one
-	subexpression, e.g. @samp{([12][90][0-9][0-9])}.  The first character
-	of the full match is presumed to be the start of the copyright mark
-	and the first non-whitespace character after the subexpression match
-	is presumed to be the start of the year list.
-
-	Two digit years will trigger a diagnostic and the copyright will not
-	get updated.
+	See further details below.
 	EODoc;
 };
 
@@ -206,6 +184,51 @@ flag = {
 	This option will cause the program to display lots of
 	information about its decision making.
 	_EODoc_;
+};
+
+detail = <<- _EOF_
+	This program will add the current year to a list of copyright years
+	that appear between a copyright mark and the copyright owner name.
+	Comment markers at the start of each line are preserved on following
+	lines, should they be necessary.  A program name is allowed to appear
+	after comment markers and before the copyright mark.  Contiguous years
+	of 2 or more years are replaced with a year range, e.g. "2008-2011".
+	Two digit years will trigger a diagnostic and the copyright will not
+	get updated.
+
+	The file modification time is left unchanged.  Copyright lines are
+	constrained to 80 columns, unless @option{--width} is specified.  Any
+	prefix used on the first line must also used on any continuation
+	lines and will be added in if the result requires additional lines.
+	_EOF_;
+
+doc-section = {
+    ds-type     = 'COPYRIGHT MARK';
+    ds-format   = texi;
+    ds-text     = <<- _EndOfDetail_
+	The @samp{--copyright-mark} option may be used to change the
+	default regular expression used to locate copyright marks.
+	The supplied regular expression should have at least one
+	subexpression, e.g. @i{(Copyright \\(c\\))}.  The first character
+	of the full match is presumed to be the start of the copyright mark
+	and the first non-whitespace character after the subexpression match
+	is presumed to be the start of the year list.
+
+	This option may also be embedded in the file to be updated.  The
+	string ``--copyright-mark'' is searched for.  If found, the option
+	argument is presumed to follow it.  That value may be separated from
+	this string by at least one of a colon, an equal sign or white space,
+	though the colon and equal sign may also be surrounded by white space.
+
+	The argument value may be quoted with double quotes or apostrophes.
+	The former will process backslashes the way they are done in C quoted
+	strings.  The latter will not process backslashes @strong{except} in
+	front of backslashes and apostrophes.  If quoted, the string may
+	continue on the next line by ending the line with a quote character,
+	white space, and a backslash.  Otherwise quoted text ends with a
+	matching quote and unquoted option arguments end with the end of the
+	line.
+	_EndOfDetail_;
 };
 
 /**
