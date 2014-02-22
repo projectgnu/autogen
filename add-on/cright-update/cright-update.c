@@ -57,6 +57,7 @@ static char const no_match[]   = "no cright";
 static char const report_fmt[] = "%-11s %s\n";
 
 char * last_year = NULL;
+unsigned long first_yr = 0;
 
 static int const regex_flags =
     REG_EXTENDED | REG_ICASE | REG_NEWLINE;

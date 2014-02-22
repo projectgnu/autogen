@@ -29,16 +29,10 @@ rcfile          = '.crightrc';
 homerc          = '$@/cright.cfg', '$HOME', '.';
 die-code;
 
-include = <<- _EOInc_
-	unsigned long first_yr = 0;
-	_EOInc_;
-
 export  = <<- _EOExp_
 	#ifndef NUL
 	#define NUL '\0'
 	#endif
-
-	extern unsigned long first_yr;
 	_EOExp_;
 
 main = {
