@@ -152,6 +152,7 @@ copyright  = {
 version       = "3.0.12";
 help-value    = h;
 more-help-value = M;
+option-format = texi;
 
 flag = {
     name      = debug;
@@ -494,13 +495,14 @@ information on allowed keywords
 .BR \-h , " \-\-help"
 Display usage information and exit.
 .TP
-.BR \-M , " \-\-more-help"
+.BR \-M , " \-\-more\-help"
 Pass the extended usage information through a pager.
 .TP
 .BR \-v " [{\fIv|c|n\fP}]," " \-\-version" "[={\fIv|c|n\fP}]"
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
+.sp
 .SH EXAMPLES
 To connect to a server using PSK authentication, you need to enable
 the choice of PSK by using a cipher priority parameter such as in the
@@ -580,7 +582,7 @@ cat <<_End_Of_MdocPage_
 .Nm
 .Op Fl flags
 .Op Fl flag Ar value
-.Op Fl \-option\-name Ar value
+.Op Fl \-option-name Ar value
 [hostname]
 .Pp
 Operands and options may be intermixed.  They will be reordered.
@@ -655,6 +657,7 @@ Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
 .El
+.sp
 .Sh EXAMPLES
 To connect to a server using PSK authentication, you need to enable
 the choice of PSK by using a cipher priority parameter such as in the
@@ -698,19 +701,19 @@ Successful program execution.
 The operation failed or the command syntax was not valid.
 .It 70 " (EX_SOFTWARE)"
 libopts had an internal operational error.  Please report
-it to autogen\-users@lists.sourceforge.net.  Thank you.
+it to autogen-users@lists.sourceforge.net.  Thank you.
 .El
 .Sh "SEE ALSO"
 gnutls\-cli\-debug(1), gnutls\-serv(1)
 .Sh "AUTHORS"
-Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
+Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.
 .Sh "COPYRIGHT"
-Copyright (C) 2000\-2014 Free Software Foundation all rights reserved.
+Copyright (C) 2000-2014 Free Software Foundation all rights reserved.
 This program is released under the terms of the GNU General Public License, version 3 or later.
 .Sh "BUGS"
-Please send bug reports to: bug\-gnutls@gnu.org
+Please send bug reports to: bug-gnutls@gnu.org
 .Sh "NOTES"
-This manual page was \fIAutoGen\fP\-erated from the \fBdoc\fP
+This manual page was \fIAutoGen\fP-erated from the \fBdoc\fP
 option definitions.
 ## END-MDOC
 _End_Of_MdocPage_
@@ -740,70 +743,54 @@ msgstr  ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
 #: doc.def:3
 msgid "GnuTLS client"
 msgstr ""
-
-#: doc.def:41
+#: doc.def:42
 msgid "Enable debugging"
 msgstr ""
-
-#: doc.def:42
+#: doc.def:43
 msgid "really enable debugging"
 msgstr ""
-
-#: doc.def:49
+#: doc.def:50
 msgid "Set MTU for datagram TLS"
 msgstr ""
-
-#: doc.def:50
+#: doc.def:51
 msgid "Really set MTU for datagram TLS"
 msgstr ""
-
-#: doc.def:55
+#: doc.def:56
 msgid "second group of options"
 msgstr ""
-
-#: doc.def:61
+#: doc.def:62
 msgid "Send CR LF instead of LF"
 msgstr ""
-
-#: doc.def:62
+#: doc.def:63
 msgid "Really send CR LF instead of LF"
 msgstr ""
-
-#: doc.def:67
+#: doc.def:68
 msgid "Use DER format for certificates to read from"
 msgstr ""
-
-#: doc.def:68
+#: doc.def:69
 msgid "Really use DER format for certificates to read from"
 msgstr ""
-
-#: doc.def:73
+#: doc.def:74
 msgid "third group of options"
 msgstr ""
-
-#: doc.def:81
+#: doc.def:82
 msgid "The maximum record size to advertize"
 msgstr ""
-
-#: doc.def:82
+#: doc.def:83
 msgid "Really the maximum record size to advertize"
 msgstr ""
-
-#: doc.def:88
+#: doc.def:89
 msgid "Priorities string"
 msgstr ""
-
-#: doc.def:90
+#: doc.def:91
 msgid "TLS algorithms and protocols to enable.  You can use predefined sets of\n"
        "ciphersuites such as PERFORMANCE, NORMAL, SECURE128, SECURE256.\n\n"
        "Check the GnuTLS manual on section ``Priority strings'' for more\n"
        "information on allowed keywords"
 msgstr ""
-
 #: doc.def:6
 msgid "Usage: gnutls-cli [options] hostname gnutls-cli --help for usage\n"
        "instructions."

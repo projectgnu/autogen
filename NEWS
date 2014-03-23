@@ -9,7 +9,8 @@ New in __CURRENT_VERSION__ October 2013
 * The libopts m4 configure code must configure the libopts/Makefile
 * Happy 2014 New Year
 * make sure library option handling code does nothing when the
-  library is just tryint to get information about an option.
+  library is just trying to get information about an option.
+* Only apply texi2mdoc when it is needed.
 
 New in 5.18.2 October 2013
 

@@ -44,9 +44,12 @@ ck_flag_code() {
 DEFINE build-test-main          =][=
 
   IF (emit (tpl-file-line extract-fmt))
+     (define end-test-main-guard "")
      guarded-test-main
 =]
-#if defined([=(. main-guard)=]) /* TEST-MAIN-PROCEDURE: */[=
+#if defined([=(set! end-test-main-guard (string-append
+                    "\n#endif  /* " main-guard " END-TEST-MAIN-PROCEDURE */"))
+              main-guard=]) /* TEST-MAIN-PROCEDURE: */[=
 
   ENDIF guarded-test-main       =][=
 
@@ -93,15 +96,12 @@ main(int argc, char ** argv)
     (void)optionProcess(&genshelloptOptions, argc, argv);
     optionParseShell(&[=(. pname)=]Options);[=
 
-  ELSE  =][=
-  INVOKE emit-option-code  =][=
-  INVOKE emit-main-text  =][=
-  ENDIF=]
+  ELSE                          =][=
+  INVOKE emit-option-code       =][=
+  INVOKE emit-main-text         =][=
+  ENDIF                         =]
     return res;
-}[=
-
-  (if guarded-test-main (emit
-      "\n#endif  /* " main-guard " END-TEST-MAIN-PROCEDURE */")) =][=
+}[=(. end-test-main-guard)      =][=
 
 ENDDEF  build-test-main
 

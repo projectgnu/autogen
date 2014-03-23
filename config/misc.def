@@ -2,7 +2,9 @@
 
 autogen definitions conftest.tpl;
 
-/*
+/*--copyright-mark "(copyright \\(c\\)[ \t]+|date[ \t]*=[ \t]*\")" \
+ *  "([12][90][0-9][0-9])"
+ *
  */ author =           "Bruce Korb <bkorb@gnu.org>";
 
 /*  This file is part of AutoGen.
@@ -348,7 +350,7 @@ test   = {
 	then echo '-Wl,-R${libdir}' ; rm -f conftest* ; exit 0 ; fi
 	LIBS="${libs} -R/tmp"
 	if (eval $ac_link) > /dev/null 2>&1
-	then echo '-R' ; rm -f conftest* ; exit 0 ; fi
+	then echo '-R${libdir}' ; rm -f conftest* ; exit 0 ; fi
 	rm -f conftest* ; exit 1
 	_END_OF_CODE_;
   code-quoting  = asis;

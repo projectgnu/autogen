@@ -146,16 +146,19 @@ DEFINE assemble-sections    :+][+:
 cvt_prog='[+:
 
     (define target-form   (if man-page "man" "mdoc"))
-    (define source-form   (get "option-format" "texi"))
-    (define converter     (string-append source-form "2" target-form ))
-    (set! tmp-str (find-file converter))
+    (define converter     (string-append "mdoc2" target-form ))
+    (set! tmp-str (if (= converter "mdoc2mdoc") "cat"
+                      (find-file converter)))
 
     (if (not (defined? 'tmp-str))
         (error (string-append "cannot locate " converter)))
     tmp-str
 :+]'
-cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
-         `/`basename "$cvt_prog"`
+cvt_prog=`exec 2>/dev/null ; command -v "$cvt_prog"`
+case "X$cvt_prog" in
+X/* ) : ;;
+* ) cvt_prog=`cd \`dirname $cvt_prog\` >/dev/null ; pwd`/`basename $cvt_prog`
+esac
 cd $tmp_dir
 test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
 {
