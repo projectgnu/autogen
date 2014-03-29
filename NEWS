@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ October 2013
+New in __CURRENT_VERSION__ April 2014
 
 * Auto-edit Guile headers that depend upon configure values
   most especially:  noreturn
@@ -11,6 +11,8 @@ New in __CURRENT_VERSION__ October 2013
 * make sure library option handling code does nothing when the
   library is just trying to get information about an option.
 * Only apply texi2mdoc when it is needed.
+* The aoGetsText() emitted i18n helper function needs its argument
+  to have the "format_arg" attribute.
 
 New in 5.18.2 October 2013
 

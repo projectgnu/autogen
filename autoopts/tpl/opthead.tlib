@@ -665,6 +665,11 @@ extern tOptions [=(. pname)=]Options;[=
 #     include <libintl.h>
 #   endif
 
+# ifndef __attribute__
+#   define __attribute__(_a)
+# endif
+
+static inline char* aoGetsText(char const* pz) __attribute__ ((format_arg(1)));
 static inline char* aoGetsText(char const* pz) {
     if (pz == NULL) return NULL;
     return (char*)gettext(pz);
