@@ -1062,7 +1062,7 @@ The default [+: (. opt-arg) :+] for this option is:
   ENDIF                               :+]
 .sp
 [+:
- (if (exist? "doc") (string-substitute (get "doc" "") "\n\n" "\n.sp\n")
+ (if (exist? "doc") (string-substitute (get "doc") "\n\n" "\n.sp\n")
      "This option has not been fully documented." ) :+][+:
   IF (exist? "deprecated")            :+]
 .sp

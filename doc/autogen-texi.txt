@@ -1396,6 +1396,12 @@ code will be localizable (@pxref{i18n}).  Provided also that you do not define
 the @code{no-xlate} attribute to @emph{anything}
 (@pxref{presentation attributes}).
 
+You should also ensure that the @code{ATTRIBUTE_FORMAT_ARG()} gets
+@code{#define}-ed to something useful.  There is an autoconf macro
+named @code{AG_COMPILE_FORMAT_ARG} in @file{ag_macros.m4} that will
+set it appropriately for you.  If you do not do this, then translated
+formatting strings may trigger GCC compiler warnings.
+
 @item
 Provides a callable routine to parse
 a text string as if it were from one of the rc/ini/config files,
@@ -5918,6 +5924,12 @@ compiled.  The strings returned by the translation function will be
 @code{strdup(3)-ed} and kept.  They will not be re-translated, even if the
 locale changes, but they will also not be dependent upon reused or unmappable
 memory.
+
+You should also ensure that the @code{ATTRIBUTE_FORMAT_ARG()} gets
+@code{#define}-ed to something useful.  There is an autoconf macro
+named @code{AG_COMPILE_FORMAT_ARG} in @file{ag_macros.m4} that will
+set it appropriately for you.  If you do not do this, then translated
+formatting strings may trigger GCC compiler warnings.
 
 To internationalize option processing, you should first internationalize your
 program.  Then, the option processing strings can be added to your translation

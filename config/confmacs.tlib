@@ -207,12 +207,17 @@ ENDDEF  end-feat-test
 
 DEFINE  collect-act   =][=
 
-  CASE
        (set! tmp-text (get "act-text"))
        (set! TMP-text (string-upcase tmp-text))
-       (string-append
-         (if (exist? "no") "no-" "yes-")
-         (get "act-type"))
+       (define action-type (get "no" "yes")) =][=
+       (if (<= (string-length action-type) 0)
+           (set! action-type "no")) =][=
+       (set! action-type (string-append action-type "-"
+           (get "act-type" "script"))) =][=
+
+  CASE
+       (. action-type)
+
     =][=
 
   == yes-define        =][=
@@ -254,6 +259,25 @@ DEFINE  collect-act   =][=
           (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
     =][=
 
+  == all-define        =][=
+    (set! all-text (string-append all-text
+          "\n    AC_DEFINE" (if (exist? "unquoted") "_UNQUOTED" "")
+          "([" (sprintf good-define-name up-name) "],["
+          (if (> (string-length tmp-text) 0) tmp-text "1")
+          "],\n        [Define this if " (protect-text (get "check")) "])" ))
+    =][=
+
+  == all-subst         =][=
+    (set! all-subst 1)
+    (set! all-text (string-append all-text
+                 "\n    " sub-name "=" (protect-text (shell-str tmp-text)) ))
+    =][=
+
+  == all-script        =][=
+    (set! all-text (string-append all-text "\n    "
+          (if (exist? "asis") tmp-text (protect-text tmp-text))  ))
+    =][=
+
   ESAC                 =][=
 
 ENDDEF  collect-act
@@ -264,6 +288,8 @@ DEFINE  emit-results   =][=
 
   (define good-subst 0 )
   (define bad-subst  0 )
+  (define all-subst  0 )
+  (define all-text   "")
   (define TMP-text   "")
   (define tmp-text   "") =][=
 
@@ -281,11 +307,11 @@ DEFINE  emit-results   =][=
       LIB%1$s_CFLAGS=''
       LIB%1$s_LIBS=''"  up-name )))  =][=
 
-  ENDIF  type is withlib =][=
+  ENDIF type is withlib =][=
 
-  FOR     action         =][=
-    INVOKE collect-act   =][=
-  ENDFOR  action         =][=
+  FOR     action        =][=
+    INVOKE collect-act  =][=
+  ENDFOR  action        =][=
 
   (if (> good-subst 0)
       (if (< bad-subst 1)
@@ -306,16 +332,17 @@ DEFINE  emit-results   =][=
        "\n  fi" )
     (emit "= Xno\n  then" bad-text "\n  fi") )
 
-  (if (> (+ good-subst bad-subst) 0)
-     (string-append "\n  AC_SUBST([" sub-name "])" ))  =][=
+  (if (> (+ good-subst bad-subst all-subst) 0)
+     (emit "\n  AC_SUBST([" sub-name "])" ))
+  (emit all-text)       =][=
 
-  FOR conditional =]
+  FOR conditional       =]
   AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" != Xno])[=
-  ENDFOR          =][=
+  ENDFOR                =][=
 
-  FOR affirmed    =]
+  FOR affirmed          =]
   AM_CONDITIONAL([[= conditional =]],[test "X${[=(. cv-name)=]}" = Xyes])[=
-  ENDFOR          =][=
+  ENDFOR                =][=
 
 ENDDEF  emit-results
 
@@ -661,12 +688,18 @@ DEFINE  try-link                =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_LINK([[= (protect-text (shellf
-    "egrep '^#' <<_EOF_\n%s\n_EOF_" c-text )) =]],
-    [[= (protect-text (shellf
-    "egrep -v '^#' <<_EOF_\n%s\n_EOF_" c-text )) =]],
-    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
-  ) # end of TRY_LINK[=
+  AC_LINK_IFELSE([=
+
+  IF (exist? "code")            =]
+    AC_LANG_SOURCE([[= (protect-text (get "code")) =]])[=
+
+  ELSE                          =]
+    AC_LANG_PROGRAM([[= (protect-text (get "code-pfx")) =]],
+      [[= (protect-text (get "code-bdy")) =]])[=
+  ENDIF                         =],
+    [[=(. cv-name)=]=yes],
+    [[=(. cv-name)=]=no]
+  ) # end of AC_LINK_IFELSE[=
   end-feat-test                 =][=
 
 ENDDEF  try-link                =][=
@@ -677,9 +710,18 @@ DEFINE  try-compile             =][=
 
   start-feat-test               =][=
   set-language                  =]
-  AC_TRY_COMPILE([= % includes "[%s]" =],[[=(protect-text c-text)=]],
-    [[=(. cv-name)=]=yes],[[=(. cv-name)=]=no]
-  ) # end of TRY_COMPILE[=
+  AC_COMPILE_IFELSE([=
+
+  IF (exist? "code")            =]
+    AC_LANG_SOURCE([[= (protect-text (get "code")) =]])[=
+
+  ELSE                          =]
+    AC_LANG_PROGRAM([[= (protect-text (get "code-pfx")) =]],
+      [[= (protect-text (get "code-bdy")) =]])[=
+  ENDIF                         =],
+    [[=(. cv-name)=]=yes],
+    [[=(. cv-name)=]=no]
+  ) # end of AC_COMPILE_IFELSE[=
   end-feat-test                 =][=
 
 ENDDEF  try-compile             =]

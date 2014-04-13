@@ -102,8 +102,8 @@ test   = {
   name     = setjmp;
   type     = link;
   check    = 'setjmp() links okay';
-  code     = <<- _EOCode_
-	#include <setjmp.h>
+  code-pfx = '#include <setjmp.h>';
+  code-bdy = <<- _EOCode_
 	jmp_buf bf;
 	if (setjmp(bf))
 	  return 0;
@@ -116,11 +116,41 @@ test   = {
 };
 
 test   = {
+  name     = format-arg;
+  type     = compile;
+  check    = '__attribute__((format_arg(n))) works';
+  code-pfx = <<- _EOCode_
+	#include <stdio.h>
+	char const * foo(char const * fmt, int v) __attribute__((format_arg(1)));
+	_EOCode_;
+  code-bdy = 'printf( foo("argc is %d\n", argc), argc);';
+
+  action = { asis;
+    act-type = script;
+    act-text = 'format_arg_expansion="__attribute__((format_arg(_a)))"';
+  };
+
+  action = { asis; no;
+    act-type = script;
+    act-text = 'format_arg_expansion=""';
+  };
+
+  action = { asis; no = all;
+    act-type = script;
+    act-text = <<- _EOF_
+	AC_DEFINE_UNQUOTED([ATTRIBUTE_FORMAT_ARG(_a)],
+	\	[${format_arg_expansion}],
+	\	[format_arg attribute wrapper])
+	_EOF_;
+  };
+};
+
+test   = {
   name     = sigsetjmp;
   type     = link;
   check    = 'sigsetjmp() links okay';
-  code     = <<- _EOCode_
-	#include <setjmp.h>
+  code-pfx = '#include <setjmp.h>';
+  code-bdy = <<- _EOCode_
 	sigjmp_buf bf;
 	if (sigsetjmp(bf,0))
 	  return 0;

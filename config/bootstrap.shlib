@@ -34,7 +34,7 @@ doit ()
     if test "x$1" != x:
     then
         echo "RUN:  $*"
-        eval "$@" || die "FAILURE:  $*"
+        eval "$@" || die "FAILURE $?:  $*"
     fi
 }
 
