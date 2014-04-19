@@ -1,5 +1,10 @@
 New in __CURRENT_VERSION__ April 2014
 
+* ATTRIBUTE_FORMAT_ARG is a configured attribute that wraps
+  __attribute__((__format_arg__(n))) procedure declaration attributes.
+  To configure it, the ag_macros.m4 has a new macroo,
+  AG_COMPILE_FORMAT_ARG (which is a compile only test probe).
+
 * Auto-edit Guile headers that depend upon configure values
   most especially:  noreturn
   but check for "ptrdiff_t" in our configure too, so that Guile does
