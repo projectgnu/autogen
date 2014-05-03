@@ -124,7 +124,7 @@ do_stdout_tpl(templ_t * tpl)
         return;
 
     default:
-        fprintf(stdout, DO_STDOUT_TPL_BADR, oops_pfx);
+        fserr(AUTOGEN_EXIT_FS_ERROR, DO_STDOUT_TPL_BADR, oops_pfx);
 
     case FAILURE:
         exit(EXIT_FAILURE);

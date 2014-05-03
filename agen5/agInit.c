@@ -75,7 +75,7 @@ initialize(int arg_ct, char ** arg_vec)
     processing_state = PROC_STATE_OPTIONS;
 
     process_ag_opts(arg_ct, arg_vec);
-    exit_code = AUTOGEN_EXIT_LOAD_ERROR;
+    ag_exit_code = AUTOGEN_EXIT_LOAD_ERROR;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
         SCM_EVAL_CONST(INIT_SCM_DEBUG_FMT);
@@ -528,7 +528,7 @@ spawnPipe(char const * pzFile)
 
 #   undef S_IRW_ALL
 
-    exit(EXIT_SUCCESS);
+    exit(AUTOGEN_EXIT_SUCCESS);
 }
 
 
@@ -612,7 +612,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
 
             if (! redoOptions) {
                 unlink(pzPort);
-                exit(EXIT_SUCCESS);
+                exit(AUTOGEN_EXIT_SUCCESS);
             }
 
             optionRestore(&autogenOptions);
@@ -678,9 +678,11 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
 
         switch (ret) {
         case -1:
-            fprintf(stderr, FORK_FAILED, errno, strerror(errno));
+            fserr(AUTOGEN_EXIT_FS_ERROR, "fork", "");
+            /* NOTREACHED */
+
         default:
-            exit(ret);
+            exit(AUTOGEN_EXIT_SUCCESS);
 
         case 0:
             break;
@@ -690,10 +692,8 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
     /*
      *  Now, become a process group and session group leader.
      */
-    if (setsid() == -1) {
-        fprintf(stderr, SETSID_FAIL, errno, strerror(errno));
-        exit(99);
-    }
+    if (setsid() == -1)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "setsid", "");
 
     /*
      *  There is now no controlling terminal.  However, if we open anything
@@ -703,14 +703,13 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
      */
     switch (fork()) {
     case -1:
-        fprintf(stderr, FORK_FAILED, errno, strerror(errno));
-        exit(99);
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fork", "");
+
+    default:
+        exit(AUTOGEN_EXIT_SUCCESS);  /* parent process - silently go away */
 
     case 0:
         break;
-
-    default:
-        exit(EXIT_SUCCESS);  /* parent process - silently go away */
     }
 
     umask(0);

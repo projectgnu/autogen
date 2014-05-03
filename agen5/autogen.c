@@ -104,7 +104,7 @@ inner_main(void * closure, int argc, char ** argv)
 
     processing_state = PROC_STATE_DONE;
     setup_signals(SIG_DFL, SIG_IGN, SIG_DFL);
-    exit_code = AUTOGEN_EXIT_SUCCESS;
+    ag_exit_code = AUTOGEN_EXIT_SUCCESS;
     done_check();
     /* NOTREACHED */
     (void)closure;
@@ -278,7 +278,7 @@ catch_sig_and_bail(int sig)
 {
     switch (processing_state) {
     case PROC_STATE_ABORTING:
-        exit_code = AUTOGEN_EXIT_SIGNAL + sig;
+        ag_exit_code = AUTOGEN_EXIT_SIGNAL + sig;
 
     case PROC_STATE_DONE:
         break;
@@ -360,11 +360,11 @@ done_check(void)
             out_close(true);
 #endif
         } while (cur_fpstack->stk_prev != NULL);
-        exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
+        ag_exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
         break; /* continue failure exit */
 
     case PROC_STATE_LOAD_DEFS:
-        exit_code = AUTOGEN_EXIT_BAD_DEFINITIONS;
+        ag_exit_code = AUTOGEN_EXIT_BAD_DEFINITIONS;
         /* FALLTHROUGH */
 
     default:
@@ -372,7 +372,7 @@ done_check(void)
         goto autogen_aborts;
 
     case PROC_STATE_ABORTING:
-        exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
+        ag_exit_code = AUTOGEN_EXIT_BAD_TEMPLATE;
 
     autogen_aborts:
         if (*oops_pfx != NUL) {
@@ -438,7 +438,7 @@ done_check(void)
      *  of inner_main().)
      */
     if (processing_state != PROC_STATE_OPTIONS)
-        exit(exit_code);
+        exit(ag_exit_code);
 }
 
 
@@ -597,10 +597,8 @@ LOCAL void *
 ao_malloc (size_t sz)
 {
     void * res = malloc(sz);
-    if (res == NULL) {
-        fprintf(stderr, MALLOC_FAIL_FMT, sz);
-        exit(EXIT_FAILURE);
-    }
+    if (res == NULL)
+        die(AUTOGEN_EXIT_FS_ERROR, MALLOC_FAIL_FMT, sz);
     return res;
 }
 
@@ -609,10 +607,8 @@ LOCAL void *
 ao_realloc (void *p, size_t sz)
 {
     void * res = (p == NULL) ? malloc(sz) : realloc(p, sz);
-    if (res == NULL) {
-        fprintf(stderr, REALLOC_FAIL_FMT, sz, p);
-        exit(EXIT_FAILURE);
-    }
+    if (res == NULL)
+        die(AUTOGEN_EXIT_FS_ERROR, REALLOC_FAIL_FMT, sz, p);
     return res;
 }
 
@@ -620,10 +616,8 @@ LOCAL char *
 ao_strdup (char const * str)
 {
     char * res = strdup(str);
-    if (res == NULL) {
-        fprintf(stderr, STRDUP_FAIL_FMT, (int)strlen(str));
-        exit(EXIT_FAILURE);
-    }
+    if (res == NULL)
+        die(AUTOGEN_EXIT_FS_ERROR, STRDUP_FAIL_FMT, (int)strlen(str));
     return res;
 }
 

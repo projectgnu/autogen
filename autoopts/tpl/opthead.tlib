@@ -34,8 +34,11 @@
 
   (emit "\n#include <autoopts/options.h>\n")
 
-  (if (or (exist? "usage-message") (exist? "die-code"))
-     (emit "#include <stdarg.h>\n"))
+  (if have-noret-funcs (begin
+     (emit "#include <stdarg.h>\n")
+     (if (exist? "no-return")
+         (emit "#include <stdnoreturn.h>\n"))
+  )  )
 
   (define option-ct      0)
   (define index-sep-str "")
@@ -265,10 +268,6 @@ INVOKE join-or-expand  join-type = "export" =][=
 INVOKE nls-header-code                  =][=
 
   IF
-
-     (define have-noret-funcs
-             (or (exist? "usage-message") (exist? "die-code")) )
-
      (define no-return-str "extern void")
      (if (and have-noret-funcs (exist? "no-return")) (begin
          (set! no-return-str (get "no-return"))
@@ -584,7 +583,7 @@ ENDDEF emit-option-guards
 DEFINE set-std-value
 
 =]
-/** option flag (value) for " (get "val-name") " option */
+/** option flag (value) for [= (get "val-name") =] option */
 #define [= (sprintf "%-23s " (string-append VALUE-pfx (get "val-UPNAME"))) =][=
   CASE (define tmp-val (get "val-name"))
        (get tmp-val)                    =][=

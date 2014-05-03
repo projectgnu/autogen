@@ -46,11 +46,13 @@ no-return;
 resettable;
 config-header  = config.h;
 no-xlate       = anything;
+die-code;
 
 #else
 prog-name      = xml2ag;
 prog-title     = "XML to AutoGen Definiton Converter";
 #endif
+
 no-xlate       = anything;
 package        = 'GNU AutoGen';
 
@@ -120,6 +122,11 @@ exit-name[3]  = bad_definitions;
 exit-desc[3]  = 'The definitions could not be deciphered.';
 exit-name[4]  = load-error;
 exit-desc[4]  = 'An error was encountered during the load phase.';
+exit-name[5]  = fs-error;
+exit-desc[5]  = 'a file system error stopped the program.';
+exit-name[6]  = no-mem;
+exit-desc[6]  = 'Insufficient memory to operate.';
+
 exit-name[128] = signal;
 exit-desc[128] = <<- _EndDesc_
 	#PROG# exited due to catching a signal.  If your template includes

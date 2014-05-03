@@ -114,6 +114,7 @@ $(GENSCRIPTS)   : tpl-config-stamp
 
 tpl-config-stamp: $(HDRS) $(CSRC) \
 	    $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
+	LGCFLAGS="$(LIBGUILE_CFLAGS)" \
 	$(BOOTENV) \
 	    $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 
@@ -163,11 +164,5 @@ install-data-hook:
 	$(POSIX_SHELL) $(srcdir)/install-hook.sh
 
 .NOTPARALLEL:
-
-if GL_GENERATE_STDNORETURN_H
-$(STDNORETURN_H) : libguile/__scm.h
-libguile/__scm.h :
-	$(SHELL) $(srcdir)/fix-guile.sh $(LIBGUILE_CFLAGS)
-endif
 
 # Makefile.am ends here

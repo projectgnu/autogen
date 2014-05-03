@@ -515,7 +515,7 @@ MODE def_ent_t *    dft_ent_stack[16] VALUE( { 0 } );
 MODE def_ent_t **   ent_stack        VALUE( dft_ent_stack );
 MODE def_ent_t *    curr_ent         VALUE( NULL );
 
-MODE autogen_exit_code_t exit_code   VALUE( AUTOGEN_EXIT_OPTION_ERROR );
+MODE autogen_exit_code_t ag_exit_code VALUE( AUTOGEN_EXIT_OPTION_ERROR );
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *

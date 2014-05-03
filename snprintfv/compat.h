@@ -263,7 +263,7 @@ typedef enum {
 #  define SNV_GNUC_PRINTF( args, format_idx, arg_idx )		\
   	args __attribute__((format (printf, format_idx, arg_idx)))
 #  define SNV_GNUC_NORETURN						\
-	__attribute__((noreturn))
+	__attribute__((__noreturn__))
 #  define SNV_ASSERT_FCN  	 " (", __PRETTY_FUNCTION__, ")"
 #else /* GCC_VERSION */
 #  define SNV_GNUC_PRINTF( args, format_idx, arg_idx ) args
