@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ April 2014
+New in __CURRENT_VERSION__ May 2014
 
 * ATTRIBUTE_FORMAT_ARG is a configured attribute that wraps
   __attribute__((__format_arg__(n))) procedure declaration attributes.
