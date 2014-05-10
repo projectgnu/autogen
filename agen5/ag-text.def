@@ -738,8 +738,12 @@ string = { nm = SHELL_INIT_STR;
 	  echo "Killing AutoGen ${AG_pid}"
 	  echo "FAILURE REASON:  $*"
 	  kill -15 ${AG_pid}
+	  sleep 1
 	  kill -1  ${AG_pid}
+	  sleep 1
 	  kill -2  ${AG_pid}
+	  sleep 1
+	  kill -9  ${AG_pid}
 	  exit 1
 	} >&8
 	test -z "${TMPDIR}" && TMPDIR=/tmp

@@ -176,8 +176,7 @@ scan_cflags() {
 
     libguiledir=/usr/include
     test -f $libguiledir/libguile/__scm.h && return 0
-    echo "The Guile header __scm.h cannot be found" 1>&2
-    exit 1
+    die "The Guile header __scm.h cannot be found"
 }
 
 find_libguiledir() {
@@ -201,8 +200,9 @@ fix_guile() {
     cd ${builddir}
     find_libguiledir "${LGCFLAGS}"
 
-    list=`find ${libguiledir}/libguile* -type f`
-    list=`grep -l -E '\<noreturn\>' $list`
+    list=`set +e ; exec 2>/dev/null
+        find ${libguiledir}/libguile* -type f | \
+            xargs grep -l -E '\<noreturn\>'`
 
     test -z "$list" && exit 0
 
@@ -219,6 +219,7 @@ fix_guile() {
     do
         g=libguile${f##*/libguile}
         sed "${sedex}" $f > $g
+        diff -u $f $g >&2 || :
     done
 
     test -f libguile.h || cp ${libguiledir}/libguile.h .
