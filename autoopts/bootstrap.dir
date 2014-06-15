@@ -25,7 +25,7 @@ burn_aover() {
     vers_curr=$(expr '(' $AO_CURRENT   '*' 4096 ')' + $AO_REVISION)
 
     cd tpl
-    for f in *.sh *.pl
+    for f in *.sh *.pl *.pm
     do  g=${f%.sh} ; g=${g%.pl}
         cat $f > $g
         chmod +x $g

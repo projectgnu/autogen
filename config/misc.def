@@ -123,7 +123,10 @@ test   = {
 	#include <stdio.h>
 	char const * foo(char const * fmt, int v) __attribute__((format_arg(1)));
 	_EOCode_;
-  code-bdy = 'printf( foo("argc is %d\n", argc), argc);';
+  code-bdy = <<- _EOBody_
+	  int i = 0;
+	  printf(foo("argc is %d\n", i), i);
+	_EOBody_;
 
   action = { asis;
     act-type = script;

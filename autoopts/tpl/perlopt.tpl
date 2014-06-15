@@ -159,7 +159,7 @@ sub processOptions {
 USAGE: [= prog-name =] [ -<flag> [<val>] | --<name>[{=| }<val>] ]... [= argument =]
 [= (. perl_usage)   =]
     -?, --help                   Display usage information and exit
-        --more-help              Pass the extended usage information through a pager
+        --more-help              Pass the extended usage text through a pager
 
 Options are specified by doubled hyphens and their name or by a single
 hyphen and the flag character.
