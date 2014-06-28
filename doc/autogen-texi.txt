@@ -5790,6 +5790,16 @@ it produces code ready for internationalization.  However, it also carries
 with it some limitations on the use of AutoOpts features and some requirements
 on the build environment.
 
+@strong{PLEASE NOTE}: in processing the option definitions to produce
+the usage text, it is necessary to compile some generated code in a
+temporary directory.  That means that all the include directories
+needed to compile the code must be full path names and not relative
+directory names.  ``.'' is a relative directory name.  To specify
+``-I.'' in the @code{CFLAGS} environment variable, you must expand it.
+For example, use:
+@example
+CFLAGS=-I`pwd`
+@end example
 
 @menu
 * getopt limitations::  getopt feature limitations

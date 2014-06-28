@@ -560,8 +560,8 @@ alist_to_autogen_def(void)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/**
  *  It may be a number, a name, a keyword or garbage.
  *  Figure out which.
  */
@@ -569,13 +569,19 @@ static char*
 gather_name(char * scan, te_dp_event * ret_val)
 {
     /*
-     *  Check for a number.
-     *  Scan it in and advance "scan".
+     *  Check for a number.  We don't care about leading zeros, that
+     *  is a user's problem, so no distinction between octal and decimal.
+     *  However, we look for "0x" and "0X" prefixes for hex numbers.
      */
     if (  IS_DEC_DIGIT_CHAR(*scan)
        || ((*scan == '-') && IS_DEC_DIGIT_CHAR(scan[1])) ) {
         token_str = scan;
         *ret_val  = DP_EV_NUMBER;
+
+        if (  (scan[0] == '0')
+           && ((scan[1] == 'x') || (scan[1] == 'X')) )
+            return SPN_HEX_DIGIT_CHARS(scan + 2);
+
         return SPN_DEC_DIGIT_CHARS(scan + 1);
     }
 

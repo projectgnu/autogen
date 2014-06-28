@@ -27,8 +27,10 @@ burn_aover() {
     cd tpl
     for f in *.sh *.pl *.pm
     do  g=${f%.sh} ; g=${g%.pl}
-        cat $f > $g
-        chmod +x $g
+        test "$f" = "$g" || {
+            cat $f > $g
+            chmod +x $g
+        }
     done
     cd -
 }

@@ -65,7 +65,8 @@ cat > $testname.tpl <<'_EOF_'
 
 DEFINE nest     =][=
   IF (exist? "name") =]
-level [=level=] iteration [=(for-index)=] Nested Name:  [=name=][=
+level [=(shell "printf '%u\\n' " (get "level"))
+=] iteration [=(for-index)=] Nested Name:  [=name=][=
   ENDIF         =][=
 
   FOR .nesting  =][=
@@ -107,10 +108,10 @@ nesting[1] = {
   level = 1;
   name = primary;
   nesting[1] = {
-    level = 2;
+    level = 0x2;
     name = secondary;
   }, {
-    level = 2;
+    level = 0x2;
     /* no name defined - default to primary level */
     nesting[1] = {
       level = 3;
