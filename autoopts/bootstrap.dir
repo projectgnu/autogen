@@ -72,7 +72,7 @@ add_files_to_mf() {
 
             ( *tpl-config.tlib | *tpl/usage* ) : ;;
 
-            ( *.tlib | *.tpl | *.def | *.lic )
+            ( *.tlib | *.tpl | *.def | *.lic | *.pm )
                 pdta=${pdta}${f}${nl} ;; # installed & distributed file
             esac
         done

@@ -6,7 +6,7 @@
 #
 #  This file is part of AutoOpts, a companion to AutoGen.
 #  AutoOpts is free software.
-#  Copyright (C) 1992-2014 Bruce Korb - all rights reserved
+#  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
 #
 #  AutoOpts is available under any one of two licenses.  The license
 #  in use must be one of these two and the choice is under the control
@@ -106,9 +106,11 @@
   "\nSee \\fBOPTION PRESETS\\fP for configuration environment variables.")
 
 (emit (head-line))
-(dne ".\\\"  ")                       :+][+:
-
-INCLUDE "tpl-config.tlib"             :+][+:#
+(dne ".\\\"  ")                       :+]
+.Sh NAME
+.Nm [+: prog-name                     :+]
+.Nd [+: prog-title                    :+]
+[+: INCLUDE "tpl-config.tlib"         :+][+:#
 
 .\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 .\"  B U I L D   D O C
@@ -146,19 +148,16 @@ DEFINE assemble-sections    :+][+:
 cvt_prog='[+:
 
     (define target-form   (if man-page "man" "mdoc"))
-    (define converter     (string-append "mdoc2" target-form ))
-    (set! tmp-str (if (= converter "mdoc2mdoc") "cat"
-                      (find-file converter)))
+    (define source-form   (get "option-format" "texi"))
+    (define converter     (string-append source-form "2" target-form ))
+    (set! tmp-str (find-file converter))
 
     (if (not (defined? 'tmp-str))
         (error (string-append "cannot locate " converter)))
     tmp-str
 :+]'
-cvt_prog=`exec 2>/dev/null ; command -v "$cvt_prog"`
-case "X$cvt_prog" in
-X/* ) : ;;
-* ) cvt_prog=`cd \`dirname $cvt_prog\` >/dev/null ; pwd`/`basename $cvt_prog`
-esac
+cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
+         `/`basename "$cvt_prog"`
 cd $tmp_dir
 test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
 {
@@ -477,11 +476,11 @@ ENDFOR flag
 
 :+]
 .It [+:
-  (define tmp-val (get "help-value" "?"))
+  (define tmp-val (get "help-value" "\\&?"))
   (if (and use-flags (> (string-length tmp-val) 0))
-      (string-append "\\-" tmp-val
-            (if (exist? "long-opts") " , \" \\-\\-help\"" "") )
-      (string-append (if (exist? "long-opts") "\\-\\-" "") "help" )
+      (string-append "Fl " tmp-val
+            (if (exist? "long-opts") " , Fl -help" "") )
+      (string-append (if (exist? "long-opts") "Fl -" "") "help" )
   )  \:+]
 
 Display usage information and exit.[+:#
@@ -492,11 +491,11 @@ Display usage information and exit.[+:#
 
   IF (not (exist? "no-libopts")) :+]
 .It [+:
-  (define tmp-val (get "more-help-value" "!"))
+  (define tmp-val (get "more-help-value" "\\&!"))
   (if (and use-flags (> (string-length tmp-val) 0))
-      (string-append "\\-" tmp-val
-            (if (exist? "long-opts") " , \" \\-\\-more-help\"" "") )
-      (string-append (if (exist? "long-opts") "\\-\\-" "") "more-help" )
+      (string-append "Fl " tmp-val
+            (if (exist? "long-opts") " , Fl -more-help" "") )
+      (string-append (if (exist? "long-opts") "Fl -" "") "more-help" )
   )       \:+]
 
 Pass the extended usage information through a pager.[+:
@@ -514,11 +513,11 @@ IF (exist? "homerc") :+]
 
   (define tmp-val (get "save-opts-value" ">"))
   (if (and use-flags (> (string-length tmp-val) 0))
-      (string-append "\\-" tmp-val " \" [\\fIcfgfile\\fP]"
+      (string-append "Fl " tmp-val " Oo Ar cfgfile Oc"
             (if (exist? "long-opts")
-                ",\" \" \\-\\-save-opts\" \"[=\\fIcfgfile\\fP]" ) "\"")
-      (string-append (if (exist? "long-opts") "\\-\\-" "")
-            "save-opts \"[=\\fIcfgfile\\fP]\"" )
+                " , Fl -save-opts Oo Ns = Ns Ar cfgfile Oc" ) "")
+      (string-append (if (exist? "long-opts") "Fl -" "")
+            "save-opts Oo Ns = Ns Ar cfgfile Oc" )
   )       \:+]
 
 Save the option state to \fIcfgfile\fP.  The default is the \fIlast\fP
@@ -528,16 +527,16 @@ The command will exit after updating the config file.
   ENDIF  saving not disabled          :+][+:
 
   (define tmp-val (get "load-opts-value" "<"))
-  (define tmp-str (if (exist? "long-opts") "\\-\\-" ""))
+  (define tmp-str (if (exist? "long-opts") "Fl -" ""))
 
   (if (and use-flags (> (string-length tmp-val) 0))
-      (string-append "\\-" tmp-val " \" \\fIcfgfile\\fP"
+      (string-append "Fl " tmp-val " Ar cfgfile"
          (if (exist? "long-opts")
-             (string-append ",\" \" " tmp-str "load-opts\" \"=\\fIcfgfile\\fP"
-                            ",\" \" " tmp-str "no-load-opts\"" )
-             "\"") )
-      (string-append tmp-str "load-opts \"=\\fIcfgfile\\fP,\" \" "
-                     tmp-str "no-load-opts\"" )
+             (string-append " , " tmp-str "load-opts Ns = Ns Ar cfgfile"
+                            " , " tmp-str "no-load-opts" )
+             "") )
+      (string-append tmp-str "load-opts Ns = Ns Ar cfgfile , "
+                     tmp-str "no-load-opts" )
   )       \:+]
 
 Load options from \fIcfgfile\fP.
@@ -556,11 +555,11 @@ IF (exist? "version") :+]
 
   (define tmp-val (get "version-value" "v"))
   (if (and use-flags (> (string-length tmp-val) 0))
-      (string-append "\\-" tmp-val " \" [{\\fIv|c|n\\fP}]"
+      (string-append "Fl " tmp-val " Op Brq Ar v|c|n"
             (if (exist? "long-opts")
-                ",\" \" \\-\\-version\" \"[={\\fIv|c|n\\fP}]" ) "\"")
-      (string-append (if (exist? "long-opts") "\\-\\-" "")
-            "version \"[={\\fIv|c|n\\fP}]\"" )
+                "  Fl -version Op Brq Ar v|c|n" ) "")
+      (string-append (if (exist? "long-opts") "Fl -" "")
+            "version Op Brq Ar v|c|n" )
   )       \:+]
 
 Output version of program and exit.  The default mode is `v', a simple
@@ -807,9 +806,9 @@ DEFINE emit-alias-opt                   :+]
 .It [+:
   IF (exist? "value")                   :+][+:
     IF (exist? "long-opts")            \:+]
- \-[+:value:+] ", " -\-[+: name         :+][+:
+ Fl [+:value:+] , Fl \-[+: name         :+][+:
     ELSE                               \:+]
- \-[+:value:+][+:
+ Fl [+:value:+][+:
     ENDIF  (exist? "long-opts")         :+][+:
 
   ELSE  value does not exist -- named option only  :+][+:
@@ -817,7 +816,7 @@ DEFINE emit-alias-opt                   :+]
     IF (not (exist? "long-opts"))      \:+]
  [+: name :+][+:
     ELSE                               \:+]
- \-\-[+: (get "name")                   :+][+:
+ Fl \-[+: (get "name")                   :+][+:
     ENDIF                               :+][+:
   ENDIF                                 :+]
 This is an alias for the \fI--[+: aliases :+]\fR option.[+:
@@ -848,11 +847,11 @@ DEFINE emit-flag-text                 :+][+:
 
   (if (not (exist? "arg-type"))
       (set! opt-arg "")
-      (set! opt-arg (string-append "\\fI"
+      (set! opt-arg (string-append "Ar "
             (fix-optname (if (exist? "arg-name")
                 (get "arg-name")
                 (string-downcase! (get "arg-type"))  ))
-            "\\fP" ))
+            ))
   )
 
 :+]
@@ -866,16 +865,16 @@ DEFINE emit-flag-text                 :+][+:
           *  the program uses long options
           *
           \:+]
- \-[+:value:+][+:
-      IF (not (exist? "arg-type"))      :+] ", " -\-[+:
-      ELSE  :+] " [+:(. opt-arg):+], " \-\-[+:
-      ENDIF :+][+: (. opt-name)         :+][+:
+ Fl [+:value:+][+:
+      IF (not (exist? "arg-type"))      :+] , Fl -[+:
+      ELSE  :+] [+:(. opt-arg):+] , Fl -[+:
+      ENDIF :+][+: (. opt-name)         :+] [+:
       IF (exist? "arg-type")            :+][+:
-              ? arg-optional " [ =" ' "=" '
-              :+][+:  (. opt-arg)       :+][+:
-              arg-optional " ]"         :+][+:
+              ? arg-optional Oo Ns = Ns
+              :+] [+:  (. opt-arg)      :+] [+:
+              arg-optional Oc           :+][+:
       ENDIF                             :+][+:
-      IF (exist? "disable") :+], " \fB\-\-[+:(. dis-name):+]\fP"[+:
+      IF (exist? "disable") :+] , Fl -[+:(. dis-name):+][+:
       ENDIF                             :+][+:
 
     ELSE                                :+][+:
@@ -886,10 +885,10 @@ DEFINE emit-flag-text                 :+][+:
           *  the program does _NOT_ use long options
           *
           \:+]
- \-[+:value:+][+:
+ Fl [+:value:+] [+:
       IF (exist? "arg-type")            :+][+:
-            arg-optional "["     :+] "[+:(. opt-arg):+][+:
-            arg-optional '"]"'          :+][+:
+            arg-optional Oo     :+] [+:(. opt-arg):+] [+:
+            arg-optional Oc     :+] [+:
       ENDIF "                           :+][+:
     ENDIF  (exist? "long-opts")         :+][+:
 
@@ -905,13 +904,13 @@ DEFINE emit-flag-text                 :+][+:
           *  Special magic:  All arguments are named options.
           *
           \:+]
- [+: (. opt-name) :+][+:
+ [+: (. opt-name) :+] [+:
       IF (exist? "arg-type")            :+] [+:
-         ? arg-optional " [ =" ' "=" '
-         :+][+:(. opt-arg)              :+][+:
-         arg-optional "]"               :+][+:
+         ? arg-optional ' Oo = Ns' ' Ns = Ns '
+         :+] [+:(. opt-arg)              :+] [+:
+         arg-optional Oc                :+] [+:
       ENDIF:+][+:
-      IF (exist? "disable") :+], " \fB[+:(. dis-name):+]\fP"[+:
+      IF (exist? "disable") :+] , Fl -[+:(. dis-name):+][+:
       ENDIF                             :+][+:
 
 
@@ -922,15 +921,15 @@ DEFINE emit-flag-text                 :+][+:
           *  The program, instead, only accepts long options.
           *
           \:+]
- \-\-[+: (. opt-name) :+][+:
+ Fl -[+: (. opt-name) :+] [+:
 
-      IF (exist? "arg-type") :+] "[+: #" :+][+:
-            arg-optional "[" :+]=[+:(. opt-arg):+][+:
-            arg-optional "]" :+]"[+: #" :+][+:
+      IF (exist? "arg-type") :+][+:
+            arg-optional Oo :+] Ns = Ns [+:(. opt-arg):+] [+:
+            arg-optional Oc :+][+:
       ENDIF                             :+][+:
 
       IF (exist? "disable")
-        :+], " \fB\-\-[+:(. dis-name):+]\fP"[+:
+        :+], " Fl \-[+:(. dis-name):+]"[+:
       ENDIF                             :+][+:
     ENDIF                               :+][+:
   ENDIF                                 :+]
@@ -1019,7 +1018,9 @@ or their numeric equivalent.
 This option takes an integer number as its argument.[+:
 
     IF  (exist? "arg-range")          :+]
-The value of [+:(. opt-arg):+] is constrained to being:
+The value of
+.[+:(. opt-arg):+]
+is constrained to being:
 .in +4
 .nf
 .na[+:FOR arg_range ", or"            :+]
@@ -1056,13 +1057,15 @@ esac"
   ENDIF  arg-type key/set/num         :+][+:
 
   IF (exist? "arg-default")           :+]
-The default [+: (. opt-arg) :+] for this option is:
+The default
+.[+: (. opt-arg) :+]
+for this option is:
 .ti +4
  [+: (join " + " (stack "arg-default" )) :+][+:
   ENDIF                               :+]
 .sp
 [+:
- (if (exist? "doc") (string-substitute (get "doc") "\n\n" "\n.sp\n")
+ (if (exist? "doc") (string-substitute (get "doc" "") "\n\n" "\n.sp\n")
      "This option has not been fully documented." ) :+][+:
   IF (exist? "deprecated")            :+]
 .sp
@@ -1071,6 +1074,99 @@ NOTE: THIS OPTION IS DEPRECATED
 [+:
   ENDIF                               :+][+:
 
-ENDDEF emit-flag-text
+ENDDEF emit-flag-text                 :+][+:
+
+DEFINE mk-synopsis                          :+][+:
+  (out-push-new file-name)                 \:+]
+.Sh SYNOPSIS
+.Nm[+:
+
+  IF (. use-flags)                          :+][+:
+    IF (exist? "long-opts")                 :+]
+.\" Mixture of short (flag) options and long options
+.Op Fl flags
+.Op Fl flag Op Ar value
+.Op Fl \-option-name Ns Oo Oo Ns "=| " Oc Ns Ar value Oc
+[+: ELSE no long options:                   :+]
+.Op Fl flags
+.Op Fl flag Op Ar value
+[+: ENDIF
+                                            :+][+:
+  ELIF (exist? "long-opts")
+                                            :+]
+.Op Fl \-option-name
+.Op Fl \-option-name Ar value
+[+:
+
+  ELIF  (not (exist? "argument"))           :+]
+.Op Ar option\-name Ar value
+.Pp
+All arguments are named options.
+[+:
+  ENDIF                                     :+][+:
+
+  IF (exist? "argument")                    :+][+:
+    argument                                :+][+:
+
+    IF (exist? "reorder-args")              :+]
+.Pp
+Operands and options may be intermixed.  They will be reordered.
+[+: ENDIF                                   :+][+:
+
+  ELIF (or (exist? "long-opts") use-flags)
+
+:+]
+.Pp
+All arguments must be options.
+[+:
+
+  ENDIF                                     :+][+:
+
+  IF (exist? "main")                        :+][+:
+  CASE main.main-type                       :+][+:
+  == shell-process                          :+]
+.Pp
+This program will emit text that is expected to be evaluated by
+a Bourne-compatible shell, thus digesting the options for the script.[+:
+
+  == shell-parser                           :+]
+.Pp
+This program is designed to produce output suitable for inclusion
+into a shell script that will parse the options described.[+:
+
+  == for-each                               :+]
+.Pp
+The operands that this program operates on may be specified either
+on the command line or read from standard input, one per line.
+In that input, leading and trailing white space is stripped,
+blank lines are ignored[+:
+
+    IF (define comment-char (get "comment-char" "#"))
+       (> (string-length comment-char) 1)  \:+]
+ and lines beginning with the character
+.I [+: (substring comment-char 1 0):+]
+are treated as comments[+:
+    ENDIF :+].[+:
+
+    IF (exist? "interleaved")               :+]
+Options may be interleaved with operands both on the command
+line and when operands are read from standard input.[+:
+    ENDIF  interleaved
+
+:+]
+Standard input may not be a terminal.[+:
+
+  ESAC  main-type                           :+][+:
+  ENDIF  main exists                        :+]
+.Pp
+[+:
+
+FOR explain   "\n.Pp\n"                     :+][+:
+  (get "explain" "")                        :+][+:
+ENDFOR                                      :+][+:
+
+(out-pop)                                   :+][+:
+
+ENDDEF mk-synopsis
 
 .\" cmd-doc.tlib ends here \:+]

@@ -6,7 +6,7 @@
 ##
 ##  This file is part of AutoOpts, a companion to AutoGen.
 ##  AutoOpts is free software.
-##  Copyright (C) 1992-2014 Bruce Korb - all rights reserved
+##  Copyright (C) 1992-2013 Bruce Korb - all rights reserved
 ##
 ##  AutoOpts is available under any one of two licenses.  The license
 ##  in use must be one of these two and the choice is under the control
@@ -36,20 +36,10 @@
         (shell "date '+%d %b %Y'") package-text section-name) ))
 
 (define man-page #t)
+(out-push-new)                              :+][+:
 
-:+][+:
-
-INCLUDE "cmd-doc.tlib"
-
-:+]
-.\"
-.SH NAME
-[+: prog-name :+] \- [+: prog-title :+]
-[+:
-
-(out-push-new)            :+][+:
-
-INVOKE build-doc          :+][+:
+INCLUDE "cmd-doc.tlib"                      :+][+:
+INVOKE build-doc                            :+][+:
 
   (shell (string-append
     "fn='" (find-file "mdoc2man") "'\n"
@@ -61,97 +51,6 @@ INVOKE build-doc          :+][+:
 :+][+:
 
 (out-move (string-append (get "prog-name") "."
-          man-sect))      :+][+: #
-
-.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-.\"  S Y N O P S I S
-.\" = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = :+][+:
-
-DEFINE mk-synopsis                          :+][+:
-  (out-push-new file-name)                 \:+]
-.SH SYNOPSIS
-.B [+: prog-name :+][+:
-
-  IF (. use-flags)                          :+][+:
-    IF (exist? "long-opts")                 :+]
-.\" Mixture of short (flag) options and long options
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP[+:#
-:+] "[[=| ]\fIvalue\fP]]..."[+:
-
-    ELSE no long options:                   :+]
-.\" Short (flag) options only
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]..."[+:
-    ENDIF
-                                            :+][+:
-  ELIF (exist? "long-opts")
-                                            :+]
-.\" Long options only
-.RB [ \-\-\fIopt\-name\fP [ = "| ] \fIvalue\fP]]..."[+:
-
-  ELIF  (not (exist? "argument"))           :+]
-.RI [ opt\-name "[\fB=\fP" value ]]...
-.PP
-All arguments are named options.[+:
-  ENDIF                                     :+][+:
-
-  IF (exist? "argument")
-    :+] " " "[+: argument                   :+]"[+:
-
-    IF (exist? "reorder-args")              :+]
-.PP
-Operands and options may be intermixed.  They will be reordered.
-[+: ENDIF                                   :+][+:
-
-  ELIF (or (exist? "long-opts") use-flags)
-
-:+]
-.PP
-All arguments must be options.[+:
-
-  ENDIF                                     :+][+:
-
-  IF (exist? "main")                        :+][+:
-  CASE main.main-type                       :+][+:
-  == shell-process                          :+]
-.PP
-This program will emit text that is expected to be evaluated by
-a Bourne-compatible shell, thus digesting the options for the script.[+:
-
-  == shell-parser                           :+]
-.PP
-This program is designed to produce output suitable for inclusion
-into a shell script that will parse the options described.[+:
-
-  == for-each                               :+]
-.PP
-The operands that this program operates on may be specified either
-on the command line or read from standard input, one per line.
-In that input, leading and trailing white space is stripped,
-blank lines are ignored[+:
-
-    IF (define comment-char (get "comment-char" "#"))
-       (> (string-length comment-char) 1)  \:+]
- and lines beginning with the character
-.I [+: (substring comment-char 1 0):+]
-are treated as comments[+:
-    ENDIF :+].[+:
-
-    IF (exist? "interleaved")               :+]
-Options may be interleaved with operands both on the command
-line and when operands are read from standard input.[+:
-    ENDIF  interleaved
-
-:+]
-Standard input may not be a terminal.[+:
-
-  ESAC  main-type                           :+][+:
-  ENDIF  main exists                        :+][+:
-
-(if (exist? "explain") (string-append "\n.PP\n"
-    (join "\n.PP\n" (get "explain" "")) )) :+][+:
-
-(out-pop)                                   :+][+:
-
-ENDDEF mk-synopsis
+          man-sect))      :+][+:
 
 agman-cmd.tpl ends here   :+]

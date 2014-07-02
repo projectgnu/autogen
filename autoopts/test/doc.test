@@ -67,7 +67,7 @@ sed "1,/^##* *BEGIN-MAN/d
 
 outfiles="${testname}-base.1 ${testname}-res.1"
 cmp -s ${outfiles} || \
-    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+    failure "Differences: ${outfiles}${nl}`diff -u ${outfiles}`"
 
 # # # # # # # # # # MDOC DOC CHECK # # # # # # # # #
 ${AGexe} ${agl_opts} -Tagmdoc-cmd ${testname}.def
@@ -84,7 +84,7 @@ sed "1,/^##* *BEGIN-MDOC/d
 
 outfiles="${testname}-mdoc-base.1 ${testname}-mdoc-res.1"
 cmp -s ${outfiles} || \
-    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+    failure "Differences: ${outfiles}${nl}`diff -u ${outfiles}`"
 
 # # # # # # # # # # POT CHECK # # # # # # # # #
 ${AGexe} ${agl_opts} -Tdef2pot ${testname}.def
@@ -106,7 +106,7 @@ sed "1,/^##* *BEGIN-POT/d
 
 outfiles="${testname}-base.pot ${testname}-res.pot"
 cmp -s ${outfiles} || \
-    failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
+    failure "Differences: ${outfiles}${nl}`diff -u ${outfiles}`"
 
 # # # # # # # # # # # FINISH # # # # # # # # # # #
 
@@ -417,24 +417,47 @@ _End_Of_TexInfo_
 
 cat <<_End_Of_ManPage_
 ## BEGIN-MAN
+.de1 NOP
+.  it 1 an-trap
+.  if \\n[.$] \,\\$*\/
+..
+.ie t \
+.ds B-Font [CB]
+.ds I-Font [CI]
+.ds R-Font [CR]
+.el \
+.ds B-Font B
+.ds I-Font I
+.ds R-Font R
 .TH doc 1
 .SH NAME
-doc \- GnuTLS client
+\f\*[B-Font]doc\fP
+\- GnuTLS client
 .SH SYNOPSIS
-.B doc
-.RB [ \-\fIflag\fP " [\fIvalue\fP]]... [" \-\-\fIopt\-name\fP "[[=| ]\fIvalue\fP]]..." " " "[hostname]"
-.PP
+\f\*[B-Font]doc\fP
+[\f\*[B-Font]\-flags\f[]]
+[\f\*[B-Font]\-flag\f[] [\f\*[I-Font]value\f[]]]
+[\f\*[B-Font]\-\-option-name\f[][[=| ]\f\*[I-Font]value\f[]]]
+[hostname]
+.sp \n(Ppu
+.ne 2
+
 Operands and options may be intermixed.  They will be reordered.
+.sp \n(Ppu
+.ne 2
+
 .SH "DESCRIPTION"
 Simple client program to set up a TLS connection to some other computer.
 It sets up a TLS connection and forwards data from the standard input
 to the secured socket and vice versa.
 .SH "OPTIONS"
 .TP
-.BR  \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
+.NOP \f\*[B-Font]\-d\f[] \f\*[I-Font]number\f[], \f\*[B-Font]\-\-debug\f[]=\f\*[I-Font]number\f[]
 Enable \fBdebugging\fP.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+\f\*[I-Font]number\f[]
+is constrained to being:
 .in +4
 .nf
 .na
@@ -444,10 +467,12 @@ in the range  0 through 9999
 .sp
 really enable debugging
 .TP
-.BR  \-\-mtu "=\fInumber\fP"
+.NOP \f\*[B-Font]\-\-mtu\f[]=\f\*[I-Font]number\f[]
 Set MTU for datagram TLS.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+\f\*[I-Font]number\f[]
+is constrained to being:
 .in +4
 .nf
 .na
@@ -458,21 +483,23 @@ in the range  0 through 17000
 Really set MTU for datagram TLS
 .SS "second group of options"
 .TP
-.BR  \-\-crlf
+.NOP \f\*[B-Font]\-\-crlf\f[]
 Send CR LF instead of LF.
 .sp
 Really send CR LF instead of LF
 .TP
-.BR  \-\-x509fmtder
+.NOP \f\*[B-Font]\-\-x509fmtder\f[]
 Use DER format for certificates to read from.
 .sp
 Really use DER format for certificates to read from
 .SS "third group of options"
 .TP
-.BR  \-\-recordsize "=\fInumber\fP"
+.NOP \f\*[B-Font]\-\-recordsize\f[]=\f\*[I-Font]number\f[]
 The maximum record size to advertize.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+\f\*[I-Font]number\f[]
+is constrained to being:
 .in +4
 .nf
 .na
@@ -482,7 +509,7 @@ in the range  0 through 4096
 .sp
 Really the maximum record size to advertize
 .TP
-.BR  \-\-priority "=\fIstring\fP"
+.NOP \f\*[B-Font]\-\-priority\f[]=\f\*[I-Font]string\f[]
 Priorities string.
 .sp
 TLS algorithms and protocols to enable. You can
@@ -492,16 +519,17 @@ NORMAL, SECURE128, SECURE256.
 Check the GnuTLS manual on section \(lqPriority strings\(rq for more
 information on allowed keywords
 .TP
-.BR \-h , " \-\-help"
+.NOP \f\*[B-Font]\-h\f[], \f\*[B-Font]\-\-help\f[]
 Display usage information and exit.
 .TP
-.BR \-M , " \-\-more\-help"
+.NOP \f\*[B-Font]\-M\f[], \f\*[B-Font]\-\-more\-help\f[]
 Pass the extended usage information through a pager.
 .TP
-.BR \-v " [{\fIv|c|n\fP}]," " \-\-version" "[={\fIv|c|n\fP}]"
+.NOP \f\*[B-Font]\-v\f[] [{\f\*[I-Font]v|c|n\f[] \f\*[B-Font]\-\-version\f[] [{\f\*[I-Font]v|c|n\f[]}]}]
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
+.PP
 .sp
 .SH EXAMPLES
 To connect to a server using PSK authentication, you need to enable
@@ -546,15 +574,16 @@ TLS_RSA_AES_256_CBC_SHA256          0x00, 0x3d	TLS1.2
 .SH "EXIT STATUS"
 One of the following exit values will be returned:
 .TP
-.BR 0 " (EXIT_SUCCESS)"
+.NOP 0 " (EXIT_SUCCESS)"
 Successful program execution.
 .TP
-.BR 1 " (EXIT_FAILURE)"
+.NOP 1 " (EXIT_FAILURE)"
 The operation failed or the command syntax was not valid.
 .TP
-.BR 70 " (EX_SOFTWARE)"
+.NOP 70 " (EX_SOFTWARE)"
 libopts had an internal operational error.  Please report
 it to autogen-users@lists.sourceforge.net.  Thank you.
+.PP
 .SH "SEE ALSO"
 gnutls\-cli\-debug(1), gnutls\-serv(1)
 .SH "AUTHORS"
@@ -575,14 +604,15 @@ _End_Of_ManPage_
 cat <<_End_Of_MdocPage_
 ## BEGIN-MDOC
 .Dt DOC 1 User Commands
+.Os
 .Sh NAME
 .Nm doc
 .Nd GnuTLS client
 .Sh SYNOPSIS
 .Nm
 .Op Fl flags
-.Op Fl flag Ar value
-.Op Fl \-option-name Ar value
+.Op Fl flag Op Ar value
+.Op Fl \-option\-name Ns Oo Oo Ns "=| " Oc Ns Ar value Oc
 [hostname]
 .Pp
 Operands and options may be intermixed.  They will be reordered.
@@ -593,10 +623,12 @@ It sets up a TLS connection and forwards data from the standard input
 to the secured socket and vice versa.
 .Sh "OPTIONS"
 .Bl -tag
-.It  \-d " \fInumber\fP, " \-\-debug "=" \fInumber\fP
+.It  Fl d Ar number , Fl \-debug Ns = Ns Ar number 
 Enable \fBdebugging\fP.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+.Ar number
+is constrained to being:
 .in +4
 .nf
 .na
@@ -605,10 +637,12 @@ in the range  0 through 9999
 .in -4
 .sp
 really enable debugging
-.It  \-\-mtu "=\fInumber\fP"
+.It  Fl \-mtu  Ns = Ns Ar number 
 Set MTU for datagram TLS.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+.Ar number
+is constrained to being:
 .in +4
 .nf
 .na
@@ -618,19 +652,21 @@ in the range  0 through 17000
 .sp
 Really set MTU for datagram TLS
 .Ss "second group of options"
-.It  \-\-crlf
+.It  Fl \-crlf 
 Send CR LF instead of LF.
 .sp
 Really send CR LF instead of LF
-.It  \-\-x509fmtder
+.It  Fl \-x509fmtder 
 Use DER format for certificates to read from.
 .sp
 Really use DER format for certificates to read from
 .Ss "third group of options"
-.It  \-\-recordsize "=\fInumber\fP"
+.It  Fl \-recordsize  Ns = Ns Ar number 
 The maximum record size to advertize.
 This option takes an integer number as its argument.
-The value of \fInumber\fP is constrained to being:
+The value of
+.Ar number
+is constrained to being:
 .in +4
 .nf
 .na
@@ -639,7 +675,7 @@ in the range  0 through 4096
 .in -4
 .sp
 Really the maximum record size to advertize
-.It  \-\-priority "=\fIstring\fP"
+.It  Fl \-priority  Ns = Ns Ar string 
 Priorities string.
 .sp
 TLS algorithms and protocols to enable. You can
@@ -648,11 +684,11 @@ NORMAL, SECURE128, SECURE256.
 .sp
 Check the GnuTLS manual on section \(lqPriority strings\(rq for more
 information on allowed keywords
-.It \-h , " \-\-help"
+.It Fl h , Fl \-help
 Display usage information and exit.
-.It \-M , " \-\-more\-help"
+.It Fl M , Fl \-more\-help
 Pass the extended usage information through a pager.
-.It \-v " [{\fIv|c|n\fP}]," " \-\-version" "[={\fIv|c|n\fP}]"
+.It Fl v Op Brq Ar v|c|n  Fl \-version Op Brq Ar v|c|n
 Output version of program and exit.  The default mode is `v', a simple
 version.  The `c' mode will print copyright information and `n' will
 print the full copyright notice.
@@ -701,19 +737,19 @@ Successful program execution.
 The operation failed or the command syntax was not valid.
 .It 70 " (EX_SOFTWARE)"
 libopts had an internal operational error.  Please report
-it to autogen-users@lists.sourceforge.net.  Thank you.
+it to autogen\-users@lists.sourceforge.net.  Thank you.
 .El
 .Sh "SEE ALSO"
 gnutls\-cli\-debug(1), gnutls\-serv(1)
 .Sh "AUTHORS"
-Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.
+Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
 .Sh "COPYRIGHT"
-Copyright (C) 2000-2014 Free Software Foundation all rights reserved.
+Copyright (C) 2000\-2014 Free Software Foundation all rights reserved.
 This program is released under the terms of the GNU General Public License, version 3 or later.
 .Sh "BUGS"
-Please send bug reports to: bug-gnutls@gnu.org
+Please send bug reports to: bug\-gnutls@gnu.org
 .Sh "NOTES"
-This manual page was \fIAutoGen\fP-erated from the \fBdoc\fP
+This manual page was \fIAutoGen\fP\-erated from the \fBdoc\fP
 option definitions.
 ## END-MDOC
 _End_Of_MdocPage_

@@ -90,19 +90,7 @@ extension_defines() {
     mv -f  tpl-config.$$  tpl-config.tlib
 }
 
-set_shell_prog() {
-    case `uname -s` in
-    SunOS )
-      while : ; do
-        POSIX_SHELL=`which bash`
-        test -x "${POSIX_SHELL}" && break
-        POSIX_SHELL=/usr/xpg4/bin/sh
-        test -x "${POSIX_SHELL}" && break
-        die "You are hosed.  You are on Solaris and have no usable shell."
-      done
-      ;;
-    esac
-
+fix_scripts() {
     for f in ${srcdir}/tpl/*.sh ${srcdir}/tpl/*.pl
     do
         d=`basename $f | sed 's/\.[sp][hl]$//'`
@@ -122,9 +110,30 @@ set_shell_prog() {
         esac > $d
         chmod 755 $d
     done
+
+    for f in ${srcdir}/tpl/*.pm
+    do
+        test -f ${f##*/} && continue
+        cp $f ${f##*/}
+        chmod 644 ${f##*/}
+    done
 }
 
-set_cat_prog() {
+find_shell_prog() {
+    case `uname -s` in
+    SunOS )
+      while : ; do
+        POSIX_SHELL=`which bash`
+        test -x "${POSIX_SHELL}" && break
+        POSIX_SHELL=/usr/xpg4/bin/sh
+        test -x "${POSIX_SHELL}" && break
+        die "You are hosed.  You are on Solaris and have no usable shell."
+      done
+      ;;
+    esac
+}
+
+find_cat_prog() {
     while :
     do
         \unalias -a
@@ -236,7 +245,8 @@ fix_guile() {
 init
 collect_src "$@" > ${builddir}/libopts.c
 extension_defines
-set_shell_prog
-set_cat_prog
+fix_scripts
+find_shell_prog
+find_cat_prog
 fix_guile
 touch ${sentinel_file}
