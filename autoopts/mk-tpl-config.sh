@@ -185,7 +185,15 @@ find_libguiledir() {
 
     if test -d "${libguiledir}"
     then
-        test -d ${libguiledir}/guile && libguiledir=${libguiledir}/guile
+        test -f ${libguiledir}/libguile.h || {
+            set -- ${libguiledir}/*guile*/.
+            if test -d "${2}"
+            then libguiledir=${2%/.}
+            elif test -d "$1"
+            then libguiledir=${1%/.}
+            fi
+        }
+
         v=`guile-config --version 2>&1 | sed 's/.* version //'`
         test -d ${libguiledir}/${v%.*} && v=${v%.*}
         test -d ${libguiledir}/${v} && libguiledir=${libguiledir}/$v
