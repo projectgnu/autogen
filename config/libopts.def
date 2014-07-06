@@ -280,6 +280,7 @@ do-first = <<-_EOF_
 	AC_CHECK_HEADERS([inttypes.h   stdint.h],
 	    [lo_have_typ_hdr=true;break],
 	    [lo_have_typ_hdr=false])
+	gl_STDNORETURN_H
 
 	# ----------------------------------------------------------------------
 	# check for various programs used during the build.

@@ -18,7 +18,7 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-set -e
+set -ex
 
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
@@ -39,7 +39,7 @@ tagd=`pwd`/${tag}
 #  WORKING IN SOURCE DIRECTORY
 #
 cd ${top_builddir}/autoopts
-files='libopts.c gettext.h parse-duration.c parse-duration.h '`
+files='libopts.c gettext.h parse-duration.c parse-duration.h stdnoreturn.in.h '`
     fgrep '#include' libopts.c | \
        sed -e 's,"$,,;s,#.*",,' \
            -e '/^compat\/compat\.h$/d' `
@@ -60,7 +60,7 @@ cp -f ${top_srcdir}/pkg/libopts/COPYING.* ${tagd}/.
 
 cd ${top_srcdir}/compat
 cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
-   ${tagd}/compat/.
+   ../config/snippet/_Noreturn.h ${tagd}/compat/.
 #
 #  END WORK IN SOURCE DIRECTORY
 #
@@ -68,7 +68,7 @@ cp windows-config.h compat.h pathfind.c snprintf.c strdup.c strchr.c \
 
 cd ${tagd}
 
-cp ${top_srcdir}/config/libopts*.m4 m4/.
+cp ${top_srcdir}/config/libopts*.m4 ${top_srcdir}/config/stdnoret*.m4 m4/.
 chmod u+w m4/libopts.m4
 cat ${top_srcdir}/pkg/libopts/libopts-add.m4 >> m4/libopts.m4
 test ! -f Makefile.am || rm -f Makefile.am
@@ -90,9 +90,10 @@ vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 	libopts_la_SOURCES      = libopts.c
 	libopts_la_CPPFLAGS     = -I\$(top_srcdir)
 	libopts_la_LDFLAGS      = -version-info ${AM_LDFLAGS} ${vers}
-	EXTRA_DIST              = \\
 	EOMakefile
 
+  cat ${top_srcdir}/pkg/libopts/stdnoreturn.mk
+  echo 'EXTRA_DIST              = \'
   find $(ls -A) -type f \
     | egrep -v '^(libopts\.c|Makefile\.am)$' \
     | ${CLexe} -I4 --spread=1 --line-sep="  \\"

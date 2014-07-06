@@ -599,7 +599,7 @@ option definitions.
 ## END-MAN
 _End_Of_ManPage_
 
-# # # # # # # # # # # MAN PAGE
+# # # # # # # # # # # MDOC PAGE
 
 cat <<_End_Of_MdocPage_
 ## BEGIN-MDOC
