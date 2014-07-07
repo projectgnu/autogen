@@ -155,7 +155,7 @@ fi
 run_ag x1 ${trace_args} ${testname}.def || failure AutoGen failed
 ${SED} \
     -e 's@from file .*agInit.*@from file agInit.c line XXX:@' \
-    -e '/ from debug\.def/s/ at 0x.*//' \
+    -e '/ from debug\.def/s/ at .*//' \
     -e '/Called ag_scm_for_index/d' \
     -e '/^AutoGen /s/[0-9][0-9]* starts:.*/NNNN starts:/' \
     -e 's/Guile Library Version .*/Guile Library Version X.X.X/' \

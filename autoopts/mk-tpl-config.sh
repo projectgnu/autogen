@@ -31,7 +31,6 @@ die() {
 
 init() {
     PS4='>tpc-${FUNCNAME}> '
-    set -e
     progpid=$$
     prog=`basename $0`
     progdir=`\cd \`dirname $0\` >/dev/null ; pwd`
@@ -217,7 +216,7 @@ fix_guile() {
     cd ${builddir}
     find_libguiledir "${LGCFLAGS}"
 
-    list=`set +e ; exec 2>/dev/null
+    list=`exec 2>/dev/null
         find ${libguiledir}/libguile* -type f | \
             xargs grep -l -E '\<noreturn\>'`
 
