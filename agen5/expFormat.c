@@ -96,9 +96,11 @@ trim_trailing_white(char * text)
  *  Which depends on whether or not the @code{--writable} command line
  *  option was set.
  *
- *  The first argument may be an option:  -d
+ *  The first argument may be an option:  -D  or  -d
+ *  -D will add date, timestamp and version information
+ *  -d is ignored, but still accepted for compatibility with older versions
  *
- *  This will suppress the variable text (date and version information).
+ *  Only one of these arguments may be given.
  *  If specified, then the "prefix" and "first" arguments are shifted
  *  to the next arguments.
  *
@@ -128,7 +130,7 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
     if (! AG_SCM_STRING_P(prefix))
         return SCM_UNDEFINED;
 
-    date_str = NULL;
+    date_str = zNil;
     pzFirst  = zNil;
 
     {
@@ -136,10 +138,15 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
 
         /*
-         *  Check for the '-d' option
+         *  Check for the '-D' option
+         *  Check for the deprecated '-d' option
          */
-        if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
-            date_str = zNil;
+        if ((pfxLen == 2) && (strncmp(pzPrefix, "-D", (size_t)2) == 0)) {
+            date_str = NULL;
+            pzPrefix = ag_scm2zchars(first, "dne-prefix");
+            first    = opt;
+        }
+        else if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
             pzPrefix = ag_scm2zchars(first, "dne-prefix");
             first    = opt;
         }
