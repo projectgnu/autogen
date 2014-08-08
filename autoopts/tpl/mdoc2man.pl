@@ -4,6 +4,9 @@
 # Properly implement -columns in the "my %lists" definition...
 #
 # .Xr requires at least 1 arg, the code here expects at least 2
+#
+# written by Harlan Stenn
+#
 ###
 
 package mdoc2man;

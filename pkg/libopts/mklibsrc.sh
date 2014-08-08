@@ -19,6 +19,7 @@
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -ex
+exec 2> /tmp/mklibsrc-log.tx
 
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
@@ -39,12 +40,12 @@ tagd=`pwd`/${tag}
 #  WORKING IN SOURCE DIRECTORY
 #
 cd ${top_builddir}/autoopts
-files='libopts.c gettext.h parse-duration.c parse-duration.h stdnoreturn.in.h '`
+files='libopts.c gettext.h parse-duration.c parse-duration.h
+	stdnoreturn.in.h '$(
     fgrep '#include' libopts.c | \
-       sed -e 's,"$,,;s,#.*",,' \
-           -e '/^compat\/compat\.h$/d' `
+       sed -e 's,"$,,;s,#.*",,' )
 
-for f in ${files}
+for f in ${files} intprops.h
 do
   test -f ${f} &&
     cp -f ${f} ${tagd}/${f} && continue
@@ -79,7 +80,7 @@ touch MakeDefs.inc
 
 vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 {
-  cat <<- EOMakefile
+  sed $'s/^\t//' << EOMakefile
 	## LIBOPTS Makefile
 	MAINTAINERCLEANFILES    = Makefile.in
 	if INSTALL_LIBOPTS
@@ -88,12 +89,21 @@ vers=${AO_CURRENT}:${AO_REVISION}:${AO_AGE}
 	noinst_LTLIBRARIES      = libopts.la
 	endif
 	libopts_la_SOURCES      = libopts.c
-	libopts_la_CPPFLAGS     = -I\$(top_srcdir)
+	libopts_la_CPPFLAGS     = -I\$(srcdir)
 	libopts_la_LDFLAGS      = -version-info ${AM_LDFLAGS} ${vers}
-	EOMakefile
+	EXTRA_DIST		=
+	BUILT_SOURCES		=
+	MOSTLYCLEANFILES	=
 
-  cat ${top_srcdir}/pkg/libopts/stdnoreturn.mk
-  echo 'EXTRA_DIST              = \'
+	libopts.c:		\$(BUILT_SOURCES)
+		@: do-nothing rule to avoid default SCCS get
+
+EOMakefile
+
+  printf '\n# Makefile fragment from gnulib-s stdnoreturn module:\n#\n'
+  sed '/^#/d;/^$/d;s/top_srcdir/srcdir/' \
+    ${top_srcdir}/pkg/libopts/stdnoreturn.mk
+  printf '\nEXTRA_DIST += \\\n'
   find $(ls -A) -type f \
     | egrep -v '^(libopts\.c|Makefile\.am)$' \
     | ${CLexe} -I4 --spread=1 --line-sep="  \\"

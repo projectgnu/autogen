@@ -6,7 +6,7 @@
 # - support for "-offset" 
 # - support for the header widths
 
-# 
+# written by Harlan Stenn
 
 ###
 

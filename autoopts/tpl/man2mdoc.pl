@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+#
+# written by Harlan Stenn
+#
+
 use strict;
 
 my ($taglist , $optlistold, $paraold, $parafirstval,$List,
