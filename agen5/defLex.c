@@ -55,6 +55,9 @@ te_dp_event kword_tkns[] = { KEYWORD_TABLE };
 static void
 pop_context(void);
 
+static int
+count_nl(char const * pz);
+
 static void
 trim_whitespace(void);
 
@@ -98,6 +101,26 @@ pop_context(void)
     end_ctx       = pCX;
 }
 
+/**
+ * Count the newlines in a NUL terminated string
+ */
+static int
+count_nl(char const * pz)
+{
+    int ct = 0;
+    for (;;) {
+        char const * p = strchr(pz, NL);
+        if (p == NULL)
+            break;
+        ct++;
+        pz = p + 1;
+    }
+    return ct;
+}
+
+/**
+ * Remove leading white space from the current scan point.
+ */
 static void
 trim_whitespace(void)
 {

@@ -32,6 +32,12 @@ define_base_name(void);
 static void
 put_defines_into_env(void);
 
+static void
+open_trace_file(char ** av, tOptDesc * odsc);
+
+static void
+check_make_dep_env(void);
+
 static char const *
 skip_quote(char const * qstr);
 /* = = = END-STATIC-FORWARD = = = */
@@ -146,7 +152,7 @@ put_defines_into_env(void)
  * @param[in] av    autogen's argument vector
  * @param[in] odsc  option descriptor with file name string argument
  */
-LOCAL void
+static void
 open_trace_file(char ** av, tOptDesc * odsc)
 {
     char const * fname = odsc->optArg.argString;
@@ -189,7 +195,7 @@ open_trace_file(char ** av, tOptDesc * odsc)
  * Furthermore, to specify a file name, the contents must not contain
  * some variation on "yes" or "true".
  */
-LOCAL void
+static void
 check_make_dep_env(void)
 {
     bool have_opt_string = false;
@@ -385,7 +391,6 @@ get_define_str(char const * de_name, bool check_env)
     return check_env ? getenv(de_name) : NULL;
 }
 
-
 /**
  *  The following routine scans over quoted text, shifting it in the process
  *  and eliminating the starting quote, ending quote and any embedded
@@ -508,54 +513,49 @@ skip_scheme(char const * scan,  char const * end)
     }
 }
 
-
-LOCAL int
-count_nl(char const * pz)
-{
-    int ct = 0;
-    for (;;) {
-        char const * p = strchr(pz, NL);
-        if (p == NULL)
-            break;
-        ct++;
-        pz = p + 1;
-    }
-    return ct;
-}
-
-
+/**
+ * scan past an expression.  An expression is either a Scheme
+ * expression starting and ending with balanced parentheses,
+ * or a quoted string or a sequence of non-whitespace characters.
+ * semicolons denote a comment that extends to the next newline.
+ *
+ * @param [in]  src  input text
+ * @param [in]  len  the maximum length to scan over
+ *
+ * @returns a pointer to the character next after the expression end.
+ */
 LOCAL char const *
-skip_expr(char const * pzSrc, size_t len)
+skip_expr(char const * src, size_t len)
 {
-    char const * pzEnd = pzSrc + len;
+    char const * end = src + len;
 
  guess_again:
 
-    pzSrc = SPN_WHITESPACE_CHARS(pzSrc);
-    if (pzSrc >= pzEnd)
-        return pzEnd;
-    switch (*pzSrc) {
+    src = SPN_WHITESPACE_CHARS(src);
+    if (src >= end)
+        return end;
+    switch (*src) {
     case ';':
-        pzSrc = strchr(pzSrc, NL);
-        if (pzSrc == NULL)
-            return pzEnd;
+        src = strchr(src, NL);
+        if (src == NULL)
+            return end;
         goto guess_again;
 
     case '(':
-        return skip_scheme(pzSrc, pzEnd);
+        return skip_scheme(src, end);
 
     case '"':
     case '\'':
     case '`':
-        pzSrc = skip_quote(pzSrc);
-        return (pzSrc > pzEnd) ? pzEnd : pzSrc;
+        src = skip_quote(src);
+        return (src > end) ? end : src;
 
     default:
         break;
     }
 
-    pzSrc = BRK_WHITESPACE_CHARS(pzSrc);
-    return (pzSrc > pzEnd) ? pzEnd : pzSrc;
+    src = BRK_WHITESPACE_CHARS(src);
+    return (src > end) ? end : src;
 }
 /**
  * @}
