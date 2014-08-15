@@ -138,19 +138,43 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
         pzPrefix = ag_scm2zchars(prefix, "dne-prefix");
 
         /*
-         *  Check for the '-D' option
-         *  Check for the deprecated '-d' option
+         * Check for a -d option (ignored) or a -D option (emit date)
+         * by default, "dne" will not emit a date in the output.
          */
-        if ((pfxLen == 2) && (strncmp(pzPrefix, "-D", (size_t)2) == 0)) {
-            date_str = NULL;
-            pzPrefix = ag_scm2zchars(first, "dne-prefix");
-            first    = opt;
-        }
-        else if ((pfxLen == 2) && (strncmp(pzPrefix, "-d", (size_t)2) == 0)) {
-            pzPrefix = ag_scm2zchars(first, "dne-prefix");
-            first    = opt;
+        if ((pfxLen == 2) && (*pzPrefix == '-')) {
+            switch (pzPrefix[1]) {
+            case 'D':
+                date_str = NULL;
+                pzPrefix = ag_scm2zchars(first, "dne-prefix");
+                first    = opt;
+                break;
+
+            case 'd':
+                pzPrefix = ag_scm2zchars(first, "dne-prefix");
+                first    = opt;
+                break;
+            }
         }
     }
+
+    do  {
+        char const * pz = getenv("AUTOGEN_DNE_DATE");
+        if (pz == NULL) break; /* use selection from template */
+
+        switch (*pz) {
+        case NUL:
+        case '0': /* zero */
+        case 'n':
+        case 'N': /* no */
+        case 'f':
+        case 'F': /* false */
+            date_str = zNil; /* template user says "no DNE date" */
+            break;
+
+        default:
+            date_str = NULL; /* template user says "INCLUDE DNE date" */
+        }
+    } while (0);
 
     /*
      *  IF we also have a 'first' prefix string,

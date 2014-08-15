@@ -31,7 +31,7 @@
 echo creating ${testname}.tpl
 cat > ${testname}.tpl <<_EOF_
 [++ AutoGen5 template test ++]
-[++ (dne "-d" "#  ") ++]
+[++ (dne "-D" "#  ") ++]
 [++
 
 FOR fmt "\n"
@@ -79,9 +79,17 @@ document.write('" >Bruce Korb</a>');
 </script>
 _EOF_
 
-run_ag x ${testname}.def || failure autogen failed
+AUTOGEN_DNE_DATE=false \
+    run_ag x ${testname}.def || failure autogen failed
 cmp -s ${testname}.base ${testname}.test || \
    failure "`diff ${testname}.base ${testname}.test`"
+
+AUTOGEN_DNE_DATE=true \
+    run_ag x ${testname}.def || failure autogen failed
+dte=`sed -n 's/.*It has been AutoGen-ed *//p' ${testname}.test`
+test "X${dte}" = "X" && \
+  failure "expected a date on the 'It has been AutoGen-ed' line${nl}`
+    cat ${testname}.test`"
 
 cleanup
 
