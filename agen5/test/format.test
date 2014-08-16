@@ -89,7 +89,7 @@ AUTOGEN_DNE_DATE=true \
 dte=`sed -n 's/.*It has been AutoGen-ed *//p' ${testname}.test`
 test "X${dte}" = "X" && \
   failure "expected a date on the 'It has been AutoGen-ed' line${nl}`
-    cat ${testname}.test`"
+    cat ${testname}.testln`"
 
 cleanup
 

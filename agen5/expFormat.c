@@ -96,29 +96,36 @@ trim_trailing_white(char * text)
  *  Which depends on whether or not the @code{--writable} command line
  *  option was set.
  *
- *  The first argument may be an option:  -D  or  -d
- *  -D will add date, timestamp and version information
- *  -d is ignored, but still accepted for compatibility with older versions
+ *  The first argument may be an option: @samp{-D} or @samp{-d}, causing the
+ *  second and (potentially) third arguments to be interpreted as the first
+ *  and second arguments.  The only useful option is @samp{-D}:
  *
- *  Only one of these arguments may be given.
- *  If specified, then the "prefix" and "first" arguments are shifted
- *  to the next arguments.
+ *  @table @samp
+ *  @item -D
+ *    will add date, timestamp and version information.
+ *  @item -d
+ *    is ignored, but still accepted for compatibility with older versions
+ *    of the "dne" function where emitting the date was the default.
+ *  @end table
  *
- *  The first argument is a per-line string prefix.  The optional second
- *  argument is a prefix for the first-line and, in read-only mode, activates
- *  the editor hints.
- *  @*
+ *  If one of these options is specified, then the "prefix" and "first"
+ *  arguments are obtained from the following arguments.  The presence (or
+ *  absence) of this option can be overridden with the environment variable,
+ *  @samp{AUTOGEN_DNE_DATE}.  The date is disabled if the value is empty or
+ *  starts with one of the characters, @samp{0nNfF} -- zero or the first
+ *  letter of "no" or "false".
+ *
+ *  The @code{prefix} argument is a per-line string prefix.  The optional
+ *  second argument is a prefix for the first line only and, in read-only
+ *  mode, activates editor hints.
+ *
  *  @example
  *  -*- buffer-read-only: t -*- vi: set ro:
  *  @end example
+ *
  *  @noindent
  *  The warning string also includes information about the template used
  *  to construct the file and the definitions used in its instantiation.
- *
- *  The optional third argument is used when the first argument is actually an
- *  invocation option and the prefix arguments get shifted.  The first
- *  argument must be, specifically, "@code{-d}".  That is used to signify that
- *  the date stamp should not be inserted into the output.
 =*/
 SCM
 ag_scm_dne(SCM prefix, SCM first, SCM opt)
