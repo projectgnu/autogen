@@ -43,6 +43,9 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent);
 
 static void
 load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac);
+
+static for_state_t *
+new_for_context(void);
 /* = = = END-STATIC-FORWARD = = = */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -313,7 +316,6 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
     def_ent_t   textDef;
     bool        invert    = (for_state->for_by < 0) ? true : false;
     t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
-    def_ctx_t   ctx       = curr_def_ctx;
     macro_t *   end_mac   = pT->td_macros + pMac->md_end_idx;
 
     /*
@@ -391,7 +393,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
          *  IF we have a non-base definition, use the old def context
          */
         if (for_state->for_not_found)
-            curr_def_ctx = ctx;
+            curr_def_ctx = for_state->for_ctx;
 
         /*
          *  ELSE IF this macro is a text type
@@ -402,7 +404,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
             textDef.de_next    = textDef.de_twin = NULL;
 
             curr_def_ctx.dcx_defent = &textDef;
-            curr_def_ctx.dcx_prev = &ctx;
+            curr_def_ctx.dcx_prev = &for_state->for_ctx;
         }
 
         /*
@@ -411,7 +413,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
          */
         else {
             curr_def_ctx.dcx_defent = found->de_val.dvu_entry;
-            curr_def_ctx.dcx_prev = &ctx;
+            curr_def_ctx.dcx_prev = &for_state->for_ctx;
         }
 
         for_state->for_islast = (invert)
@@ -450,7 +452,6 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
         for_state->for_index   = next_ix;
     } leave_loop:
 
-    curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
@@ -458,10 +459,8 @@ static int
 for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
 {
     int       loopCt  = 0;
-    def_ctx_t ctx     = curr_def_ctx;
     macro_t * end_mac = tpl->td_macros + mac->md_end_idx;
 
-    curr_def_ctx.dcx_prev = &ctx;
     mac++;
 
     for (;;) {
@@ -531,7 +530,6 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
         fflush(cur_fpstack->stk_fp);
     } leave_loop:;
 
-    curr_def_ctx = ctx;  /* Restore the def context */
     return loopCt;
 }
 
@@ -792,10 +790,7 @@ mFunc_For(templ_t * tpl, macro_t * mac)
             fprintf(trace_fp, TAB_FILE_LINE_FMT, tpl->td_file, mac->md_line);
     }
 
-    if (for_state->for_sep_str != NULL)
-        AGFREE(for_state->for_sep_str);
-
-    free_for_context(false);
+    free_for_context(1);
 
     return ret_mac;
 }
@@ -805,7 +800,7 @@ mFunc_For(templ_t * tpl, macro_t * mac)
  *
  * @returns the top of thecurr_ivk_info stack of contexts.
  */
-LOCAL for_state_t *
+static for_state_t *
 new_for_context(void)
 {
     for_state_t * res;
@@ -828,22 +823,37 @@ new_for_context(void)
     res = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
     memset((void*)res, 0, sizeof(for_state_t));
     res->for_isfirst = true;
+    res->for_ctx     = curr_def_ctx;
+    curr_def_ctx.dcx_prev = &res->for_ctx;
     return res;
 }
 
 /**
- * allocate and zero out a FOR macro context.
- *
- * @returns the top of thecurr_ivk_info stack of contexts.
+ * Free up for loop contexts.
+ * @param [in] pop_ct  the maximum number to free up
  */
 LOCAL void
-free_for_context(bool everything)
+free_for_context(int pop_ct)
 {
-    if ((--(curr_ivk_info->ii_for_depth) == 0) || everything) {
-        AGFREE(curr_ivk_info->ii_for_data);
-        curr_ivk_info->ii_for_data  = NULL;
-        curr_ivk_info->ii_for_alloc = 0;
-        curr_ivk_info->ii_for_depth = 0;
+    if (curr_ivk_info->ii_for_depth == 0)
+        return;
+
+    for_state = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
+
+    while (pop_ct-- > 0) {
+        if (for_state->for_sep_str != NULL)
+            AGFREE(for_state->for_sep_str);
+
+        curr_def_ctx = (for_state--)->for_ctx;
+
+        if (--(curr_ivk_info->ii_for_depth) <= 0) {
+            AGFREE(curr_ivk_info->ii_for_data);
+            curr_ivk_info->ii_for_data  = NULL;
+            curr_ivk_info->ii_for_alloc = 0;
+            curr_ivk_info->ii_for_depth = 0;
+            for_state = NULL;
+            break;
+        }
     }
 }
 

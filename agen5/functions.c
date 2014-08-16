@@ -112,7 +112,7 @@ mFunc_Return(templ_t * tpl, macro_t * mac)
 {
     (void)tpl;
     (void)mac;
-    free_for_context(true);
+    free_for_context(INT_MAX);
     if (curr_ivk_info->ii_prev == NULL)
         AG_ABEND_IN(tpl, mac, RETURN_FROM_NOWHERE);
     longjmp(curr_ivk_info->ii_env, 1);

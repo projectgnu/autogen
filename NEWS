@@ -1,5 +1,20 @@
 New in __CURRENT_VERSION__ May 2014
 
+* Do Not Edit (dne) warning:  the default of printing a date in the
+  warning has now changed to not doing so.  The "-d" option to
+  suppress the date is now deprecated (ignored).  A new option, "-D"
+  will cause the date to be included.  The environment variable,
+  "AUTOGEN_DNE_DATE" overrides everything.
+* The RETURN function was not completely implemented and only
+  partially worked.  It is working now.
+* optionPrintVersionAndReturn() is a new function for applications
+  that wish to extend the behavior of the "--version" option.
+* mdoc and man pages have been greatly improved.
+* libopts tear-off library used stdnoreturn.h and now includes
+  infrastructure for systems deficient in that area
+
+New in 5.18.3 May 2014
+
 * ATTRIBUTE_FORMAT_ARG is a configured attribute that wraps
   __attribute__((__format_arg__(n))) procedure declaration attributes.
   To configure it, the ag_macros.m4 has a new macroo,

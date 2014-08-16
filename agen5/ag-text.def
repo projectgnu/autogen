@@ -929,6 +929,7 @@ string = { nm = USED_DEFINES_FMT;
          "echo 'end of looked up definitions'"; };
 
 string = { nm = USED_DEFINES_LINE_FMT;  str = "%s\n"; };
+string = { nm = WARN_FMT;               str = "WARNING: %s\n"; };
 string = { nm = WARN_STR;               str = "Warning"; };
 string = { nm = WORD_FORMAT;            str = "format"; };
 string = { nm = YES_NAME_STR;           str = yes; };

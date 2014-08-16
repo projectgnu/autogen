@@ -549,7 +549,7 @@ cleanup(templ_t * tpl)
         named_tpls = C(templ_t *, (tpl->td_scan));
     }
 
-    free_for_context(true);
+    free_for_context(INT_MAX);
     unload_defs();
 }
 

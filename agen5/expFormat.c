@@ -249,11 +249,38 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
 }
 
 
+/*=gfunc warn
+ *
+ * what:  display warning message and continue
+ *
+ * exparg: @ message @ message to display @@
+ * doc:
+ *
+ *  The argument is a string that printed out to stderr.
+ *  The message is formed from the formatting string:
+ *
+ *  @example
+ *  @code{WARNING:}  %s\n
+ *  @end example
+ *
+ *  The template processing resumes after printing the message.
+=*/
+SCM
+ag_scm_warn(SCM res)
+{
+    char const * msg = ag_scm2zchars(res, "warn str");
+    if ((msg == NULL) || (*msg == NUL))
+        AG_ABEND("warn called without a message string");
+    fprintf(stderr, WARN_FMT, msg);
+    return SCM_UNDEFINED;
+}
+
+
 /*=gfunc error
  *
  * what:  display message and exit
  *
- * exparg: @message@message to display before exiting@@
+ * exparg: @ message @ message to display before exiting @@
  * doc:
  *
  *  The argument is a string that printed out as part of an error

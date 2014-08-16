@@ -318,13 +318,14 @@ struct out_stack {
  * The current state of each active FOR loop.
  */
 struct for_state {
-    bool          for_loading;  //!< the FOR macro is getting ready
+    def_ctx_t     for_ctx;      //!< saved def context for for loop
+    char *        for_sep_str;  //!< inter-iteration string (allocated)
+    char *        for_name;     //!< name of iterator (not allocated)
     int           for_from;     //!< the first index of loop
     int           for_to;       //!< the last index of loop
     int           for_by;       //!< the loop increment (usually 1)
     int           for_index;    //!< the current index
-    char *        for_sep_str;  //!< inter-iteration string (allocated)
-    char *        for_name;     //!< name of iterator (not allocated)
+    bool          for_loading;  //!< the FOR macro is getting ready
     bool          for_islast;   //!< true for last iteration
     bool          for_isfirst;  //!< true for first iteration
     bool          for_not_found;//!< usually false, true with sparse arrays

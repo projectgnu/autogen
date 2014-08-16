@@ -23,7 +23,7 @@
 SHELL_TESTS = define.test directives.test error.test expr.test extract.test \
 	include.test opts.test output.test snarf.test suffix.test shell.test
 
-NOSHELL_TESTS = \
+NOSHELL_TESTS = return.test \
     alist.test  case.test   columns.test  debug.test    defref.test \
     dynref.test endmac.test for.test      forfrom.test  forin.test  \
     format.test get.test    gperf.test    heredef.test  html.test   \

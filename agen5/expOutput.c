@@ -502,7 +502,14 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      */
     else if (AG_SCM_NUM_P(port)) {
         out_stack_t* pSaveFp = cur_fpstack;
-        unsigned long val = AG_SCM_TO_ULONG(port);
+        long val = AG_SCM_TO_LONG(port);
+
+        if (val < 0) {
+            char const * txt = ag_scm2zchars(res, "f-chars");
+            fputs(txt, stderr);
+            putc('\n', stderr);
+            return SCM_UNDEFINED;
+        }
 
         for (; val > 0; val--) {
             cur_fpstack = cur_fpstack->stk_prev;
