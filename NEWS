@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ May 2014
+New in __CURRENT_VERSION__ September 2014
 
 * Do Not Edit (dne) warning:  the default of printing a date in the
   warning has now changed to not doing so.  The "-d" option to
@@ -42,21 +42,3 @@ New in 5.18.2 October 2013
   (though still obtainable with tagged checkouts).
 * LIBGUILE_PATH is not needed and its derivation is wrong on
   where binaries and libraries have different prefixes.
-
-New in 5.18.1 September 2013
-
-* fixed char casting issue that shows in UTF-8 files
-* fixed installation error for str2init
-* fixed failure handling in the usage template
-* fix broken flag values for auto-supported options
-* various tweaks to make Coverity happy.
-* allow the fatal error message functions to be tagged "noreturn"
-  and incorporate sysnoreturn.h technology into AutoGen.
-
-New in 5.17.4 May 2013
-
-* --save-opts documentation cleanup
-* optionMemberList() will return an allocated string containing
-  the names of the bits set in the option.
-* tab stripped "here strings" include stripping the backslash
-  escape character when it precedes any whitespace character.
