@@ -33,9 +33,7 @@ compile_getopt() {
 
   # Remove the variable comments so we can test against the expected result
   #
-  ${SED} '2,/and the template file/d
-      /\$''Id.*\$/d
-      /Last template edit:/d' getopt-test_${testname}.c \
+  ${SED} '/Last template edit:/d' getopt-test_${testname}.c \
 	> ${testname}${1}-getopt.c
 
   # Finally, compile this thing:

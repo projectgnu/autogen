@@ -210,7 +210,7 @@ test ${GUILE_VERSION} -ge 108000 \
   -a "X${GCC}" = Xyes && \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
 	-Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
-	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=2 \
+	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=3 \
 	-Wextra
 `
 ]dnl -Wconversion -Wsign-conversion -Wstrict-overflow
