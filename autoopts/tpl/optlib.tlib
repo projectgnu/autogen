@@ -144,6 +144,9 @@ DEFINE init-and-validate                =][=
 
 (define guarded-test-main   (or (exist? "test-main")
                                 (string? (getenv "TEST_MAIN"))))
+(if guarded-test-main
+    (warn "'test-main' is obsolete and should not be used any more.  Use 'main'."))
+
 (define main-guard          (string-append "TEST_" pname-up "_OPTS" ))
 (define make-main-proc
   (if (exist? "main")
