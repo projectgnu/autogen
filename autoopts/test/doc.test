@@ -29,7 +29,7 @@
 
 # # # # # # # # # # DEFINITIONS FILE # # # # # # # # #
 echo make defs from test file
-sed "1,/^##* *BEGIN-DEFS/d
+${SED} "1,/^##* *BEGIN-DEFS/d
      /^prog-name/s/=.*/= ${testname};/
      \\@^// *END-DEFS@q" \
     ${test_src} > ${testname}.def
@@ -38,11 +38,11 @@ sed "1,/^##* *BEGIN-DEFS/d
 ${AGexe} ${agl_opts} -Tagtexi-cmd ${testname}.def
 test -f invoke-${testname}.menu -a -f invoke-${testname}.texi || \
     failure "invoke-${testname}.{menu,texi} not built"
-sed '/^@ignore/,/^@end ignore/d' \
+${SED} '/^@ignore/,/^@end ignore/d' \
     invoke-${testname}.texi > ${testname}-res.texi
 rm -f invoke-${testname}.menu invoke-${testname}.texi
 
-sed -n '1,/^##* *BEGIN-TEXI/d
+${SED} -n '1,/^##* *BEGIN-TEXI/d
     /^## END-TEXI/q
     /^/p' \
     ${test_src} > ${testname}-base.texi
@@ -57,12 +57,12 @@ test -f ${testname}.1 || \
     failure "${testname}.1 not built"
 
 {
-    sed '/^\.\\"/d;/^\.TH/s/ *".*//' ${testname}.1
+    ${SED} '/^\.\\"/d;/^$/d;/^\.TH/s/ *".*//' ${testname}.1
     rm -f ${testname}.1
     echo
 } > ${testname}-res.1
 
-sed "1,/^##* *BEGIN-MAN/d
+${SED} "1,/^##* *BEGIN-MAN/d
     /^## END-MAN/{;s/.*//;q;}" ${test_src} > ${testname}-base.1
 
 outfiles="${testname}-base.1 ${testname}-res.1"
@@ -75,11 +75,11 @@ test -f ${testname}.1 || \
     failure "${testname}.1 not built"
 
 {
-    ${EGREP} -v '^\.(Dd |Os |\\")' ${testname}.1
+    ${EGREP} -v '^\.(Dd |Os |\\")|^$' ${testname}.1
     echo
 } > ${testname}-mdoc-res.1
 
-sed "1,/^##* *BEGIN-MDOC/d
+${SED} "1,/^##* *BEGIN-MDOC/d
     /^## END-MDOC/{;s/.*//;q;}" ${test_src} > ${testname}-mdoc-base.1
 
 outfiles="${testname}-mdoc-base.1 ${testname}-mdoc-res.1"
@@ -92,7 +92,7 @@ test -s ${testname}.pot || \
     failure "${testname}.pot not built"
 
 {
-    sed -e '/^# *Copyright/s/).*/)/' \
+    ${SED} -e '/^# *Copyright/s/).*/)/' \
         -e '/^$/d' \
         -e 's/>, 20[0-9][0-9]\./>./' \
         -e '/POT-Creation-Date:/s/ 2[0-9].*/\\n"/' \
@@ -100,7 +100,7 @@ test -s ${testname}.pot || \
     echo
 } > ${testname}-res.pot
 
-sed "1,/^##* *BEGIN-POT/d
+${SED} "1,/^##* *BEGIN-POT/d
     /^$/d
     /^## END-POT/{;s/.*//;q;}" ${test_src} > ${testname}-base.pot
 
@@ -441,11 +441,9 @@ cat <<_End_Of_ManPage_
 [hostname]
 .sp \n(Ppu
 .ne 2
-
 Operands and options may be intermixed.  They will be reordered.
 .sp \n(Ppu
 .ne 2
-
 .SH "DESCRIPTION"
 Simple client program to set up a TLS connection to some other computer.
 It sets up a TLS connection and forwards data from the standard input

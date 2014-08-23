@@ -371,9 +371,6 @@ string = { nm = INIT_SCM_ERRS_FMT;
 string = { nm = LD_BOGUS_UNKNOWN;
    str = "Unknown macro or invalid context in %s line %d:\n\t%s%s"; };
 
-string = { nm = LD_EXTRACT_BAD_READ;
-   str = "Error %d (%s) reading %d bytes of %s\n"; };
-
 string = { nm = LD_FOR_NAMELESS;
    str = "FOR macro requires iterator name"; };
 

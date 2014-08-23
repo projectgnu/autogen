@@ -196,7 +196,10 @@ mv test_${testname}.1 ${testname}.mdoc
 ${SED} '1,/^## *BEGIN-MDOC/d
     /^## *END-MDOC/,$d' ${test_src} > ${testname}-base.mdoc
 
-${SED} '/DO NOT EDIT/,/and the template file/d;/^\.Os /d;/^\.Dd /d' \
+${SED} '/DO NOT EDIT/,/and the template file/d
+        /^\.Os /d
+        /^\.Dd /d
+        /^$/d' \
     ${testname}.mdoc > ${testname}-res.mdoc
 cmp -s ${testname}-base.mdoc ${testname}-res.mdoc || \
   failure "`diff -u ${testname}-base.mdoc ${testname}-res.mdoc`"

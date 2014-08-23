@@ -32,6 +32,9 @@ tpl_text(templ_t * tpl, macro_t * mac);
 static void
 tpl_warning(templ_t * tpl, macro_t * mac, char const * msg);
 
+static void
+emit_insertion_file(char const * fname, FILE * outfp);
+
 static int
 expr_type(char * pz);
 /* = = = END-STATIC-FORWARD = = = */
@@ -321,7 +324,6 @@ ag_scm_error_source_line(void)
     return SCM_UNDEFINED;
 }
 
-
 /*=gfunc emit
  *
  * what: emit the text for each argument
@@ -391,6 +393,126 @@ ag_scm_emit(SCM val)
             fputs(scm2display(val), fp);
             fflush(fp);
             break;
+        }
+
+        break;
+    }
+
+    depth--;
+    return SCM_UNDEFINED;
+}
+
+/**
+ * read in a file and write it to the passed in file pointer.
+ *
+ * @param [in]  fname  the name of the file to read
+ * @param [in]  outfp  the file pointer to write the data to.
+ */
+static void
+emit_insertion_file(char const * fname, FILE * outfp)
+{
+    FILE * infp = fopen(fname, "r");
+    char * buf, *p;
+    size_t fsize, remsize;
+
+    if (infp == NULL)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fopen", fname);
+
+    {
+        struct stat sb;
+        if (fstat(fileno(infp), &sb) < 0)
+            fserr(AUTOGEN_EXIT_FS_ERROR, "fstat", fname);
+        
+        if (sb.st_size == 0)
+            goto close_n_leave;
+        remsize = fsize = sb.st_size;
+    }
+
+    p = buf = scribble_get(fsize);
+    for (;;) {
+        size_t rsz = fread(p, 1, remsize, infp);
+        if (rsz == remsize)
+            break;
+        if (rsz == 0)
+            fserr(AUTOGEN_EXIT_FS_ERROR, "fread", fname);
+        remsize -= rsz;
+        p       += rsz;
+    }
+
+    if (fwrite(buf, fsize, 1, outfp) != 1)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fwrite", cur_fpstack->stk_fname);
+
+    if (fflush(outfp) < 0)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fflush", cur_fpstack->stk_fname);
+
+ close_n_leave:
+
+    if (fclose(infp) < 0)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fclose", fname);
+}
+
+/*=gfunc insert_file
+ *
+ * what: insert the contents of a (list of) files.
+ *
+ * exparg: alist, list of files to emit, , list
+ *
+ * doc:  Insert the contents of one or more files.
+=*/
+SCM
+ag_scm_insert_file(SCM val)
+{
+    static int depth = 0;
+    static FILE * fp;
+
+    switch (depth) {
+    case 1:
+    {
+        out_stack_t* pSaveFp;
+        unsigned long pnum;
+
+        if (! AG_SCM_NUM_P(val))
+            break;
+
+        pSaveFp = cur_fpstack;
+        pnum    = AG_SCM_TO_ULONG(val);
+
+        for (; pnum > 0; pnum--) {
+            pSaveFp = pSaveFp->stk_prev;
+            if (pSaveFp == NULL)
+                AG_ABEND(aprf(EMIT_INVAL_PORT, AG_SCM_TO_ULONG(val)));
+        }
+
+        fp = pSaveFp->stk_fp;
+        return SCM_UNDEFINED;
+    }
+
+    case 0:
+        fp = cur_fpstack->stk_fp; // initialize the first time through
+        break;
+    }
+
+    depth++;
+    for (;;) {
+        if (val == SCM_UNDEFINED)
+            break;
+
+        if (AG_SCM_NULLP(val))
+            break;
+
+        if (AG_SCM_STRING_P(val)) {
+            emit_insertion_file(ag_scm2zchars(val, "emit val"), fp);
+            break;
+        }
+
+        switch (ag_scm_type_e(val)) {
+        case GH_TYPE_LIST:
+        case GH_TYPE_PAIR:
+            ag_scm_insert_file(SCM_CAR(val));
+            val = SCM_CDR(val);
+            continue;
+
+        default: break;
         }
 
         break;

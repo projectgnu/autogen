@@ -2569,8 +2569,7 @@ on the second line.
 @node main main
 @subsubsection main: user supplied main procedure
 
-You must supply a value for the @code{main-text} attribute and the
-``test-main'' attribute must not be set to ``optionParseShell''.
+You must supply a value for the @code{main-text} attribute.
 You may also supply a value for
 @vindex option-code
 @code{option-code}.  If you do, then the @code{optionProcess} invocation

@@ -62,11 +62,8 @@ load_file(char const * fname)
         char * scan = res;
         do  {
             size_t sz = fread(scan, 1, fsz, fp);
-            if (sz == 0) {
-                fprintf(stderr, LD_EXTRACT_BAD_READ, errno, strerror(errno),
-                        (int)fsz, fname);
-                AG_ABEND(LD_EXTRACT_READ_FAIL);
-            }
+            if (sz == 0)
+                fserr(AUTOGEN_EXIT_FS_ERROR, "fread", fname);
 
             scan += sz;
             fsz  -= sz;

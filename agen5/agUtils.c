@@ -170,7 +170,7 @@ open_trace_file(char ** av, tOptDesc * odsc)
         trace_fp = fopen(fname, "w");
 
     if (trace_fp == NULL)
-        AG_ABEND(aprf(OPEN_ERROR_FMT, errno, strerror(errno), fname));
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fopen", fname);
 
 #ifdef _IONBF
     setvbuf(trace_fp, NULL, _IONBF, 0);

@@ -145,7 +145,8 @@ DEFINE assemble-sections    :+][+:
 #.\" Ensure a newline between them all.  We strip blank lines,
 #.\" so extra blank lines get removed.
 #:+]
-cvt_prog='[+:
+{
+    cvt_prog='[+:
 
     (define target-form   (if man-page "man" "mdoc"))
     (define source-form   (get "option-format" "texi"))
@@ -156,23 +157,30 @@ cvt_prog='[+:
         (error (string-append "cannot locate " converter)))
     tmp-str
 :+]'
-cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
+    cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
          `/`basename "$cvt_prog"`
-cd $tmp_dir
-test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
-{
+    cd $tmp_dir
+    test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
+
     list='synopsis description options option-presets'
-    for f in $list ; do cat $f ; echo ; done
+    for f in $list ; do test -f $f && {
+        cat $f ; echo
+    } ; done > .doc
     rm -f $list name
+
     list='implementation-notes environment files examples exit-status errors
         compatibility see-also conforming-to history authors copyright bugs
         notes'
-    for f in $list ; do cat $f ; echo ; done > .end-doc
+    for f in $list ; do test -f $f && {
+        cat $f ; echo
+    } ; done > .end-doc
     rm -f $list
+
     list=`ls -1 *`' .end-doc'
-    for f in $list ; do cat $f ; echo ; done
+    for f in $list ; do test -f $f && {
+        cat $f ; echo
+    } ; done >> .doc
     rm -f $list
-} 1>.doc 2>/dev/null
 [+:
 IF (exist? "doc-sub")       :+][+:
   (out-push-new (string-append tmp-dir "/.cmds")) :+][+:
@@ -193,14 +201,18 @@ IF (exist? "doc-sub")       :+][+:
   (out-pop)
   (define post-proc-cmd (string-append
           (get "doc-sub-cmd" "sed -f %s %s") " | "
-          egrep-prog " -v '^[ 	]*$' | $cvt_prog"))
+          egrep-prog " -v '^[ 	]*$'"))
   (sprintf post-proc-cmd ".cmds" ".doc")
   :+][+:
 ELSE                       \:+]
-[+:(. egrep-prog):+] -v '^[ 	]*$' .doc | $cvt_prog[+:
-ENDIF doc-sub exists        :+][+:
+[+:(. egrep-prog):+] -v '^[ 	]*$' .doc[+:
+ENDIF doc-sub exists        :+] | $cvt_prog > .final-doc
+}[+:
 
-(shell (out-pop #t))        :+][+:
+(shell (out-pop #t))
+(insert-file (string-append tmp-dir "/.final-doc"))
+
+:+][+:
 
 ENDDEF assemble-sections
 

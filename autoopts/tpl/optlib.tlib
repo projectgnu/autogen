@@ -348,15 +348,6 @@ DEFINE save-name-morphs
    "call-proc" is specified.  Finally, we insert the specified code for
    options with "flag-code" or "extract-code" attributes.
 
-   This all changes, however, if "guarded-test-main" is set.  It is set if
-   either "test-main" is specified as a program/global attribute, or if
-   the TEST_MAIN environment variable is defined.  This should be set
-   if either the program is intended to digest options for an incorporating
-   shell script, or else if the user wants a quick program to show off the
-   usage text and command line parsing.  For that environment, all callbacks
-   are disabled except "optionStackArg" for stacked arguments and the
-   keyword set membership options.
-
   =][=
 
   IF
