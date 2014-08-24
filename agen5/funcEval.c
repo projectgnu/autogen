@@ -411,44 +411,19 @@ ag_scm_emit(SCM val)
 static void
 emit_insertion_file(char const * fname, FILE * outfp)
 {
-    FILE * infp = fopen(fname, "r");
-    char * buf, *p;
-    size_t fsize, remsize;
-
-    if (infp == NULL)
-        fserr(AUTOGEN_EXIT_FS_ERROR, "fopen", fname);
-
-    {
-        struct stat sb;
-        if (fstat(fileno(infp), &sb) < 0)
-            fserr(AUTOGEN_EXIT_FS_ERROR, "fstat", fname);
-        
-        if (sb.st_size == 0)
-            goto close_n_leave;
-        remsize = fsize = sb.st_size;
+    char * txt = load_file(fname);
+    if (txt == NULL) {
+        if (errno == 0)
+            errno = ENOENT;
+        fswarn("loading", fname);
+        return;
     }
-
-    p = buf = scribble_get(fsize);
-    for (;;) {
-        size_t rsz = fread(p, 1, remsize, infp);
-        if (rsz == remsize)
-            break;
-        if (rsz == 0)
-            fserr(AUTOGEN_EXIT_FS_ERROR, "fread", fname);
-        remsize -= rsz;
-        p       += rsz;
-    }
-
-    if (fwrite(buf, fsize, 1, outfp) != 1)
-        fserr(AUTOGEN_EXIT_FS_ERROR, "fwrite", cur_fpstack->stk_fname);
+    if (fputs(txt, outfp) < 0)
+        fserr(AUTOGEN_EXIT_FS_ERROR, "fputs", cur_fpstack->stk_fname);
 
     if (fflush(outfp) < 0)
         fserr(AUTOGEN_EXIT_FS_ERROR, "fflush", cur_fpstack->stk_fname);
-
- close_n_leave:
-
-    if (fclose(infp) < 0)
-        fserr(AUTOGEN_EXIT_FS_ERROR, "fclose", fname);
+    AGFREE(txt);
 }
 
 /*=gfunc insert_file

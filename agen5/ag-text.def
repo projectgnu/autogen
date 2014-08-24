@@ -158,18 +158,12 @@ string = { nm = DIRECT_BAD_CTX_FMT;
 string = { nm = DIRECT_ERROR_FMT;
    str = "#error directive -- in %s on line %d\n\t%s\n"; };
 
-string = { nm = DIRECT_INC_CANNOT_FIND;
-   str = "WARNING:  cannot find `%s' definitions file\n"; };
-
 string = { nm = DIRECT_INC_CANNOT_OPEN; str = "open"; };
 string = { nm = DIRECT_INC_CANNOT_READ; str = "read"; };
 string = { nm = DIRECT_INC_DEF_SFX;     str = "def"; };
 
-string = { nm = DIRECT_INC_CANNOT_STAT;
-   str = "WARNING %d (%s):  cannot stat `%s' for include\n"; };
-
-string = { nm = DIRECT_INC_NOT_REG;
-   str = "WARNING:  `%s' must be regular file to include\n"; };
+string = { nm = FS_ERR_WARNING;
+   str = "WARNING: fserr %d (%s) performing '%s' on %s\n"; };
 
 string = { nm = DIRECT_NOENDIF_FMT;
    str = "Definition error:  in %s line %d, #endif not found\n"; };
@@ -307,7 +301,6 @@ string = { nm = FN_BOGUS_FMT;
 string = { nm = FN_BOGUS_HUH;           str = "? Say, what ?"; };
 string = { nm = FN_DEBUG_GRAPHIC;       str = " (%c)"; };
 string = { nm = FN_IF_ELSE;             str = "ELSE clause"; };
-string = { nm = FORK_FAILED;            str = "Error %d while forking: %s\n";};
 string = { nm = FOR_IN_LISTLESS;        str = "FOR x IN ... has no list"; };
 string = { nm = GUARD_SFX;              str = "_GUARD"; };
 
@@ -387,7 +380,6 @@ string = { nm = LD_EXPR_BAD_NAME;       str = "Invalid definition name"; };
 string = { nm = LD_EXPR_NEED_TWO;       str = "`?' needs two expressions"; };
 string = { nm = LD_EXPR_NO_SPACE;       str = "No space between expressions";};
 string = { nm = LD_EXPR_NO_TEXT;        str = "No text for unfound value"; };
-string = { nm = LD_EXTRACT_READ_FAIL;   str = "read failure"; };
 string = { nm = LD_FOR_IN;              str = "in"; };
 string = { nm = LD_FOR_INVALID_VAR;     str = "invalid FOR loop variable"; };
 string = { nm = LD_FOR_NO_ENDFOR;       str = "ENDFOR not found"; };
@@ -532,9 +524,6 @@ string = { nm = OUTPUT_NO_UNLINK;       str = "unlink"; };
 string = { nm = OUTPUT_TEMP_FILE;       str = "* temp file *"; };
 string = { nm = NAMED_VALUES_WHERE;     str = "On macro argument # %d:\n%s\n";};
 
-string = { nm = OPEN_ERROR_FMT;
-   str = "Error %d (%s) opening `%s' for output"; };
-
 string = { nm = OPEN_OUTPUT_BAD_FMT;
    str = "Cannot format file name:  \"%s\", %s, %s"; };
 
@@ -566,7 +555,6 @@ string = { nm = PIPE_MKFIFO_NAME;       str = "mkfifo"; };
 string = { nm = PIPE_POLL_NAME_STR;     str = "poll"; };
 string = { nm = PIPE_WRITE_NAME_STR;    str = "write"; };
 string = { nm = PORT_NUM_BAD;           str = "Invalid port number:  '%s'"; };
-string = { nm = PREFIX_FAIL;            str = "(prefix ...) failed"; };
 string = { nm = PROC_TPL_START;         str = "Starting %s template\n"; };
 string = { nm = PSEUDO_MACRO_NAME_STR;  str = "pseudo-macro"; };
 string = { nm = PSEUDO_MAC_BAD_FSM;     str = "BROKEN FSM STATE"; };
@@ -679,9 +667,6 @@ string = { nm = SCM_OUT_POP_EMPTY;
 string = { nm = SERV_RESTART;
    str = "SERVER RESTART:  serv_id is NULLPROCESS\n"; };
 
-string = { nm = SETSID_FAIL;
-   str = "Error %d setting session ID:  %s\n"; };
-
 string = { nm = SET_ORIG_DIR_NO_MEM_MSG;
    str = "cannot allocate path name"; };
 
@@ -711,6 +696,7 @@ string = { nm = SHELL_INIT_STR;
 
 	else case `set -o` in *posix*) set -o posix ;; esac
 	fi
+
 	trap_exit() {
 	    case "$1" in
 	    0 | 10 | 15 )
@@ -725,14 +711,7 @@ string = { nm = SHELL_INIT_STR;
 	            echo "temp directory has been retained:  ${tmp_dir}"
 	    esac
 	}
-	for f in 0 1 2 5 6 7 10 13 14 15
-	do trap "trap_exit ${f}" $f ; done
 
-	test -n "${CDPATH}" && {
-	  CDPATH=''
-	  unset CDPATH
-	}
-	( exec 1>&2 ; unalias cd ) && unalias cd
 	die() {
 	  echo "Killing AutoGen ${AG_pid}"
 	  echo "FAILURE REASON:  $*"
@@ -745,8 +724,7 @@ string = { nm = SHELL_INIT_STR;
 	  kill -9  ${AG_pid}
 	  exit 1
 	} >&8
-	test -z "${TMPDIR}" && TMPDIR=/tmp
-	tmp_dir=''
+
 	mk_tmp_dir() {
 	  test -d "${tmp_dir}" && return 0
 	  tmp_dir=`
@@ -760,10 +738,22 @@ string = { nm = SHELL_INIT_STR;
 	    echo ${t}
 	    ` 2>/dev/null
 	}
-	exec 2>&8
-	export AG_pid
+
+	for f in 0 1 2 5 6 7 10 13 14 15
+	do trap "trap_exit ${f}" $f ; done
+	test -n "${CDPATH}" && {
+	  CDPATH=''
+	  unset CDPATH
+	}
+	( unalias cd ) && unalias cd
+	( set +v     ) && set +v
+	test -z "${TMPDIR}" && TMPDIR=/tmp
+	tmp_dir=''
+	export AG_pid TMPDIR
 	AG_pid="%u"
 	AGexe='%s'
+
+	exec 2>&8
 	_EOF_;
 };
 

@@ -12,6 +12,8 @@ New in __CURRENT_VERSION__ September 2014
 * mdoc and man pages have been greatly improved.
 * libopts tear-off library used stdnoreturn.h and now includes
   infrastructure for systems deficient in that area
+* new function: insert-file  It will simply insert the contents of
+  a file (or list of files) into the output stream.
 
 New in 5.18.3 May 2014
 

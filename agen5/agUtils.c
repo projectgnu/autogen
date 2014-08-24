@@ -43,6 +43,19 @@ skip_quote(char const * qstr);
 /* = = = END-STATIC-FORWARD = = = */
 
 /**
+ * Print a file system error fatal error message and die.
+ *
+ * @param[in] op         the operation that failed.
+ * @param[in] fname      the file name the operation was on.
+ * @noreturn
+ */
+LOCAL void
+fswarn(char const * op, char const * fname)
+{
+    fprintf(stderr, FS_ERR_WARNING, errno, strerror(errno), op, fname);
+}
+
+/**
  * Allocating printf function.  It either works or kills the program.
  * @param[in] pzFmt the input format
  * @returns the allocated, formatted result string.

@@ -293,12 +293,11 @@ file_size(char const * fname)
 {
     struct stat stbf;
     if (stat(fname, &stbf) != 0) {
-        fprintf(trace_fp, DIRECT_INC_CANNOT_STAT, errno, strerror(errno),
-                fname);
+        fswarn("stat", fname);
         return 0;
     }
     if (! S_ISREG(stbf.st_mode)) {
-        fprintf(trace_fp, DIRECT_INC_NOT_REG, fname);
+        fswarn("regular file check", fname);
         return 0;
     }
     if (outfile_time < stbf.st_mtime)
@@ -658,7 +657,8 @@ doDir_include(directive_enum_t id, char const * dir, char * scan_next)
 
     if (! SUCCESSFUL(
             find_file(dir, full_name, apzSfx, cctx->scx_fname))) {
-        fprintf(trace_fp, DIRECT_INC_CANNOT_FIND, dir);
+        errno = ENOENT;
+        fswarn("search for", cctx->scx_fname);
         return scan_next;
     }
 

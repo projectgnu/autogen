@@ -148,39 +148,45 @@ DEFINE assemble-sections    :+][+:
 {
     cvt_prog='[+:
 
-    (define target-form   (if man-page "man" "mdoc"))
-    (define source-form   (get "option-format" "texi"))
-    (define converter     (string-append source-form "2" target-form ))
-    (set! tmp-str (find-file converter))
+        (define target-form   (if man-page "man" "mdoc"))
+        (define source-form   (get "option-format" "texi"))
+        (define converter     (string-append source-form "2" target-form ))
+        (set! tmp-str (find-file converter))
 
-    (if (not (defined? 'tmp-str))
-        (error (string-append "cannot locate " converter)))
-    tmp-str
-:+]'
+        (if (not (defined? 'tmp-str))
+            (error (string-append "cannot locate " converter)))
+        tmp-str :+]'
     cvt_prog=`cd \`dirname "$cvt_prog"\` >/dev/null && pwd
          `/`basename "$cvt_prog"`
     cd $tmp_dir
     test -x "$cvt_prog" || die "'$cvt_prog' is not executable"
 
     list='synopsis description options option-presets'
-    for f in $list ; do test -f $f && {
-        cat $f ; echo
-    } ; done > .doc
+    for f in $list
+    do  test -f $f && {
+            cat $f ; echo
+        }
+    done > .doc
     rm -f $list name
 
     list='implementation-notes environment files examples exit-status errors
         compatibility see-also conforming-to history authors copyright bugs
         notes'
-    for f in $list ; do test -f $f && {
-        cat $f ; echo
-    } ; done > .end-doc
+    for f in $list
+    do  test -f $f && {
+            cat $f ; echo
+        }
+    done > .end-doc
     rm -f $list
 
     list=`ls -1 *`' .end-doc'
-    for f in $list ; do test -f $f && {
-        cat $f ; echo
-    } ; done >> .doc
+    for f in $list
+    do  test -f $f && {
+            cat $f ; echo
+        }
+    done >> .doc
     rm -f $list
+} 2>/dev/null
 [+:
 IF (exist? "doc-sub")       :+][+:
   (out-push-new (string-append tmp-dir "/.cmds")) :+][+:
@@ -206,8 +212,7 @@ IF (exist? "doc-sub")       :+][+:
   :+][+:
 ELSE                       \:+]
 [+:(. egrep-prog):+] -v '^[ 	]*$' .doc[+:
-ENDIF doc-sub exists        :+] | $cvt_prog > .final-doc
-}[+:
+ENDIF doc-sub exists        :+] | $cvt_prog > .final-doc[+:
 
 (shell (out-pop #t))
 (insert-file (string-append tmp-dir "/.final-doc"))

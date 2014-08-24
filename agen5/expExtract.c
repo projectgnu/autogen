@@ -48,7 +48,9 @@ load_file(char const * fname)
     {
         struct stat stbf;
         if (fstat(fileno(fp), &stbf) != 0) {
+            int err = errno;
             fclose(fp);
+            errno = err;
             return NULL;
         }
 
