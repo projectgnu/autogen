@@ -153,10 +153,6 @@ DEFINE init-and-validate                =][=
       (~~ (get "main[].main-type" "") "shell-process|shell-parser|main")
       guarded-test-main ) )
 (if (not make-main-proc) (set! guarded-test-main #f))
-(define put-shell-main
-  (or (== (get "main.main-type") "shell-process")
-      (and (not (exist? "main")) guarded-test-main)
-) )
 
 (define descriptor "")
 (define opt-name   "")

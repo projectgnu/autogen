@@ -35,7 +35,7 @@ ${SED} "1,/^##* *BEGIN-DEFS/d
     ${test_src} > ${testname}.def
 
 # # # # # # # # # # TEXI DOC CHECK # # # # # # # # #
-${AGexe} ${agl_opts} -Tagtexi-cmd ${testname}.def
+run_ag tc -Tagtexi-cmd ${testname}.def
 test -f invoke-${testname}.menu -a -f invoke-${testname}.texi || \
     failure "invoke-${testname}.{menu,texi} not built"
 ${SED} '/^@ignore/,/^@end ignore/d' \
@@ -52,7 +52,7 @@ cmp -s ${outfiles} || \
     failure "Differences: ${outfiles}${nl}`diff ${outfiles}`"
 
 # # # # # # # # # # MAN DOC CHECK # # # # # # # # #
-${AGexe} ${agl_opts} -Tagman-cmd ${testname}.def
+run_ag mn -Tagman-cmd ${testname}.def
 test -f ${testname}.1 || \
     failure "${testname}.1 not built"
 
@@ -70,7 +70,7 @@ cmp -s ${outfiles} || \
     failure "Differences: ${outfiles}${nl}`diff -u ${outfiles}`"
 
 # # # # # # # # # # MDOC DOC CHECK # # # # # # # # #
-${AGexe} ${agl_opts} -Tagmdoc-cmd ${testname}.def
+run_ag md -Tagmdoc-cmd ${testname}.def
 test -f ${testname}.1 || \
     failure "${testname}.1 not built"
 
@@ -87,7 +87,7 @@ cmp -s ${outfiles} || \
     failure "Differences: ${outfiles}${nl}`diff -u ${outfiles}`"
 
 # # # # # # # # # # POT CHECK # # # # # # # # #
-${AGexe} ${agl_opts} -Tdef2pot ${testname}.def
+run_ag pt -Tdef2pot ${testname}.def
 test -s ${testname}.pot || \
     failure "${testname}.pot not built"
 

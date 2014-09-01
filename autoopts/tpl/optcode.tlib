@@ -433,9 +433,10 @@ static char const [=(. pname)=]_packager_info[] =
 #endif
 #ifndef __doxygen__
 [=
- (out-suspend  "home-list") =][=
- (emit-string-table opt-strs) =][=
- (out-resume   "home-list") =][=
+ (out-suspend  "home-list")
+ (emit-string-table opt-strs)
+ (out-resume   "home-list")
+ (define put-shell-main (== (get "main.main-type") "shell-process"))
  (out-pop      #t)
 =]
 #endif /* __doxygen__ */
