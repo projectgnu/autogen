@@ -18,6 +18,7 @@
 ## You should have received a copy of the GNU General Public License along
 ## with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+libdatadir       = $(libdir)/@PACKAGE@
 SUBDIRS         = test
 AM_CPPFLAGS     = @INCLIST@
 FSMTPL          = fsm.tpl  fsm-macro.tlib fsm-trans.tlib
@@ -70,6 +71,8 @@ ag.c : Makefile
 	exec > $@ ; \
 	echo '#undef   PKGDATADIR' ; \
 	echo '#define  PKGDATADIR "$(pkgdatadir)"' ; \
+	echo '#undef   LIBDATADIR' ; \
+	echo '#define  LIBDATADIR "$(libdatadir)"' ; \
 	mk=`set -- $(MAKE) ; command -v $$1` ; \
 	echo 'static char const make_prog[] = "'$$mk'";' ; \
 	printf '\n#define  DEFINING 1\n' ; \

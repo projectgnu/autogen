@@ -55,6 +55,8 @@ collect_src() {
 	#include "autoopts/project.h"
 	#define  LOCAL static
 	#include "ao-strs.h"
+	static char const ao_ver_string[] =
+	    "${AO_CURRENT}:${AO_REVISION}:${AO_AGE}\n";
 	_EOF_
 
     for f in "$@"

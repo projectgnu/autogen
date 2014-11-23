@@ -24,11 +24,11 @@
 
 BUILT_SOURCES  	    =
 MOSTLYCLEANFILES    =
-
-SUBDIRS         = @OPTS_TESTDIR@
-AM_CPPFLAGS     = @INCLIST@
-libsrc          = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
-LIBOPTS_VER     = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
+libdatadir          = $(libdir)/@PACKAGE@
+SUBDIRS             = @OPTS_TESTDIR@
+AM_CPPFLAGS         = @INCLIST@
+libsrc              = libopts-@AO_CURRENT@.@AO_REVISION@.@AO_AGE@.tar.gz
+LIBOPTS_VER         = @AO_CURRENT@:@AO_REVISION@:@AO_AGE@
 
 if  NEED_PATHFIND
 PATHFIND_MAN    = pathfind.3
@@ -99,9 +99,10 @@ nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
 BOOTENV         = AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
-	srcdir="$(srcdir)"     top_srcdir="$(top_srcdir)" \
+	srcdir="$(srcdir)"     top_srcdir="$(top_srcdir)"     \
 	builddir="$(builddir)" top_builddir="$(top_builddir)" \
-	POSIX_SHELL="$(POSIX_SHELL)"
+	AO_AGE="$(AO_AGE)"     AO_CURRENT="$(AO_CURRENT)"     \
+	AO_REVISION="$(AO_REVISION)" POSIX_SHELL="$(POSIX_SHELL)"
 
 ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##

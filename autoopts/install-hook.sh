@@ -104,6 +104,16 @@ test -d "${DESTpkgdatadir}" && {
             mv -f $f.tmp $f
             ;;
 
+        tpl-config.tlib )
+            sed '/define top-[a-z]*-dir/d' $f > $f.tmp
+            mv -f $f.tmp $f
+            test -n "${DESTlibdatadir}" && {
+                test -d ${DESTlibdatadir} || \
+                    mkdir -p ${DESTlibdatadir}
+                cp $f ${DESTlibdatadir}/.
+            }
+            ;;
+
         *.* ) : ;;
         * )
             chmod a+x $f

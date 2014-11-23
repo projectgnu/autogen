@@ -69,7 +69,7 @@ validate_struct(tOptions * opts, char const * pname)
          */
         if ((opts->fOptSet & OPTPROC_NO_XLAT_MASK) == OPTPROC_NXLAT_OPT)
             opts->fOptSet |= OPTPROC_NXLAT_OPT_CFG;
-        (*opts->pTransProc)();
+        opts->pTransProc();
     }
 
     /*
@@ -81,10 +81,6 @@ validate_struct(tOptions * opts, char const * pname)
        && (  (opts->structVersion > OPTIONS_STRUCT_VERSION  )
           || (opts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
-
-        static char const ao_ver_string[] =
-            STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
-
         fprintf(stderr, zwrong_ver, pname, NUM_TO_VER(opts->structVersion));
         if (opts->structVersion > OPTIONS_STRUCT_VERSION )
             fputs(ztoo_new, stderr);

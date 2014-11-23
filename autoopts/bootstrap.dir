@@ -45,27 +45,27 @@ add_files_to_mf() {
     local tmpl=$(
         ndst=""
         sfil=''
+        pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
+        edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
+        edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
+        edta="${edta}install-hook.sh${nl}po${nl}"
 
         for f in man mdoc texi
         do
             for g in man mdoc texi
             do
                 sfil=${sfil}tpl/${f}2${g}${nl}
-                test -f tpl/${f}2${g}.sh || \
-                    ndst=${ndst}tpl/${f}2${g}${nl}
             done
         done
-
-        pdta="autoopts.m4${nl}tpl/usage.tlib${nl}"
-        edta="bootstrap.dir${nl}autoopts-config.in${nl}autogen.map${nl}"
-        edta="${edta}mk-tpl-config.sh${nl}mk-autoopts-pc.in${nl}"
-        edta="${edta}install-hook.sh${nl}po${nl}"
 
         for f in tpl/*.*
         do
             case $f in
+            ( tpl-config* ) : ;;
+
             ( *.in | *.pl | *.sh )
-                g=$(echo $f | sed 's/\...$//;s/-tlib$/.tlib/')
+                g=${f%.??}
+                g=${g//-tlib/.tlib}
                 ndst=${ndst}${g}${nl}    # installed file
                 edta=${edta}${f}${nl}    # distributed file
                 ;;
@@ -92,6 +92,8 @@ add_files_to_mf() {
 
         printf '\nnodist_pkgdata_DATA = $(libsrc) \\\n'
         echo "${ndst}" | sort -u | columns -I4 --spread=1 --line=' \'
+
+        printf '\nnodist_libdata_DATA = %s\n' tpl/tpl-config.tlib
 
         printf '\npkgdata_DATA    = \\\n'
         echo "${pdta}" | sort -u | columns -I4 --spread=1 --line=' \'
