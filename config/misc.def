@@ -166,123 +166,6 @@ test   = {
 };
 
 test   = {
-  name     = guile;
-  type     = withlib;
-  check    = "prefix for a working libguile installation";
-  code     = <<- _END_OF_CODE_
-	#include <libguile.h>
-	#if ((SCM_MAJOR_VERSION * 100) + SCM_MINOR_VERSION) > 200
-	This has not been tested with Guile 2.1.  Remove this line to proceed.
-	#endif
-	int main () {
-	  SCM fumble = SCM_UNDEFINED;
-	  SCM bumble = SCM_UNDEFINED;
-	  SCM stumble= SCM_UNDEFINED;
-	  long lstumble;
-	  stumble = scm_display( fumble, bumble );
-	  lstumble = scm_ilength( fumble );
-	  stumble = scm_c_eval_string( "stumble" );
-	  scm_misc_error( "oops", "bad", bumble );
-	  stumble = scm_num_eq_p( fumble, bumble );
-	  scm_wrong_type_arg( "oops", 1, bumble );
-	  return 0; }
-	_END_OF_CODE_;
-  run-mode   =  link;
-
-  config   = { cflags-arg = 'compile'; libs-arg = 'link'; };
-  action = { yes; act-type = script;
-             act-text = <<- _EOF_
-		      CPPFLAGS="${ag_save_CPPFLAGS}"
-		      LIBS="${ag_save_LIBS}"
-		_EOF_;
-  };
-
-  action = { no; act-type = script; asis;
-      act-text = '  AC_MSG_ERROR([Cannot find libguile.  libguile is required.'
-                 '  Perhaps you need to install guile-devel?])';
-  };
-
-  doc = <<- _END_OF_DOC_
-	AutoGen won't work without Guile, so either the methods for finding the
-	header and libraries must be provided, or guile-config must be found in
-	the executable path, or we have to find the stuff in /usr or /usr/local.
-	Since the Guile interface changes from release to release, we have to
-	explicitly accept every new minor revision.  Sorry about that.
-	_END_OF_DOC_; // '
-};
-
-test   = {
-  name      = guile_ver;
-  type      = withconf;
-  check     = "the guile version is set";
-  action    = { yes; act-type = script; asis;
-    act-text = 'ag_cv_test_guile_version=${ag_cv_set_guile_ver}'; };
-};
-
-test   = {
-  name      = guile_version;
-  type      = test;
-  check     = "the guile version";
-  code      = <<- _END_OF_CODE_
-	v=`guile-config --version 2>&1`
-	test -n "${v}" && {
-	  echo "${v}" | sed 's/.*Guile version *//'
-	  exit 0
-	}
-	v=`guile --version`
-	test -n "${v}" && {
-	  echo "${v}" | sed 's/.*Guile *//;1q'
-	  exit 0
-	}
-	v=`rpm -q --list guile-devel 2>/dev/null | \
-	        grep '/version\.h' | \
-	        head -1`
-	test -n "${v}" && {
-	  v=`awk '/^#define SCM_M/{print $2 "=" $3}' $v`
-	  eval "$v"
-	  test "X$SCM_MICRO_VERSION" = X || \
-	    SCM_MINOR_VERSION=$SCM_MINOR_VERSION.$SCM_MICRO_VERSION
-	  echo "$SCM_MAJOR_VERSION.$SCM_MINOR_VERSION"
-	  exit 0
-	}
-	v=`dpkg --list 2>/dev/null | egrep 'guile-[0-9.]*-dev' | head -1`
-	test -n "${v}" && {
-	  echo "${v}" | sed 's/.*guile-//;s/-dev.*//'
-	  exit 0
-	}
-	exit 1
-	_END_OF_CODE_;
-  code-quoting  = asis;
-
-  action   = { yes;
-    act-type = script; asis;
-    act-text = <<- _END_OF_SCRIPT_
-	set -- `IFS=' .' ; echo ${ag_cv_test_guile_version}`
-	i=${3}
-	test -z "${i}" && i=0
-	GUILE_VERSION=`expr ${1} \* 100000 + ${2} \* 1000 + ${i}`
-	test ${GUILE_VERSION} -lt 107000 && \
-	    AC_MSG_ERROR([Guile must be no older than 1.7.x])
-	AC_DEFINE_UNQUOTED([GUILE_VERSION], [${GUILE_VERSION}],
-	         [define to Guile version expression])
-	AC_SUBST(GUILE_VERSION)
-	_END_OF_SCRIPT_;
-  };
-
-  action   = { no;
-    act-type = script;
-    act-text = <<- _END_OF_SCRIPT_
-	AC_MSG_ERROR([Cannot determine Guile version number])
-	_END_OF_SCRIPT_;
-  };
-
-  doc = <<- _END_OF_DOC_
-	We have to vary our interface all over the place because Guile keeps
-	changing.  Use a single version number.  Fail if we cannot determine it.
-	_END_OF_DOC_;
-};
-
-test   = {
   name     = xml2;
   type     = withlib;
   check    = "a working libxml2 can be found";
@@ -410,9 +293,9 @@ test = {
       act-text = <<- _EOF_
 	AC_DEFINE([DEBUG_ENABLED], [1],
 	          [Define this if debugging is enabled])
-	    CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
+	    [CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
 	    f=`which dmalloc 2>/dev/null`
-	    [ -n "$f" ] && LIBS="${LIBS} -ldmalloc"
+	    test -n "$f" && LIBS="${LIBS} -ldmalloc"]
 	_EOF_; };
 
     doc = <<-  _EOF_
@@ -449,6 +332,18 @@ test = {
 };
 
 do-always = <<- _END_ALWAYS_
+	GUILE_FLAGS
+	[ag_gv=`gdir=\`pkg-config --cflags-only-I \
+			guile-${GUILE_EFFECTIVE_VERSION}\`
+		gdir=\`echo ${gdir#-I}\`
+		gdir=\`awk '/SCM_MICRO_VERSION/{ print @S|@3 }' \
+			${gdir}/libguile/version.h\`
+		IFS=' .'
+		set -- ${GUILE_EFFECTIVE_VERSION}
+		printf '%u%02u%03u' ${1} ${2} ${gdir}
+	`]
+	AC_DEFINE_UNQUOTED(GUILE_VERSION, ${ag_gv},
+           [define to a single number for Guile version])
 	INVOKE_LIBOPTS_MACROS
 
 	[echo 'test "X${ac_cv_header_sys_wait_h}" = Xyes' 1>&2

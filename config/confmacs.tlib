@@ -555,7 +555,7 @@ DEFINE  try-withlib             =][=
   Xyes|Xno|X )
     case "X${[=(. cv-name)=]_root}" in
     Xyes|Xno|X ) [=(. cv-name)=]_cflags=no ;;
-    * )        [=(. cv-name)=]_cflags=-I${[=(. cv-name)=]_root}/include ;;
+    * ) [=(. cv-name)=]_cflags=-I${[=(. cv-name)=]_root}/include ;;
     esac
   esac
   case "X${[=(. cv-name)=]_libs}" in
@@ -563,7 +563,7 @@ DEFINE  try-withlib             =][=
     case "X${[=(. cv-name)=]_root}" in
     Xyes|Xno|X ) [=(. cv-name)=]_libs=no ;;
     * )        [=(. cv-name)=]_libs="-L${[=(. cv-name)
-               =]_root}/lib -l[=(. down-name)=]";;
+               =]_root}/lib -l[=(. down-name)=]" ;;
     esac
   esac
   [=(. group-pfx)=]save_CPPFLAGS="${CPPFLAGS}"

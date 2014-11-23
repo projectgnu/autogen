@@ -90,8 +90,20 @@ config_configurables()
     rm  -f configure.files
 }
 
-config_versions()
-{
+install_m4() {
+    local d= m4=$1 ; shift
+    set -- ${1+"$@"} /usr/local/share /usr/share
+    for d
+    do
+        test -f "$d/aclocal/$m4" || continue
+        echo "Installing $m4"
+        cp "$d/aclocal/$m4" config/.
+        return 0
+    done
+    return 1
+}
+
+config_versions() {
     set -a
     eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION)"
     set +a
@@ -115,11 +127,10 @@ config_versions()
     ${AGexe} -L. misc.def    || exit 1
     cd ..
     cp snprintfv/snprintfv.m4 config/.
-    for f in /usr/local/share/aclocal/guile.m4 /usr/share/aclocal/guile.m4
-    do  test -f "$f" || continue
-        cp $f config/.
-        break
-    done
+    f=$(exec 2>/dev/null ; commandd -v guile)
+    test ${#f} -gt 0 && f=${f%/guile} && f=${f%/bin}
+    install_m4 guile.m4 $f
+    install_m4 pkg.m4
 
     marker='=== Component Todo:'
     rm -f TODO

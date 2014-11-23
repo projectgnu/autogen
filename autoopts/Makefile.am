@@ -115,7 +115,7 @@ $(GENSCRIPTS)   : tpl-config-stamp
 
 tpl-config-stamp: $(HDRS) $(CSRC) \
 	    $(top_builddir)/config.h $(srcdir)/mk-tpl-config.sh
-	LGCFLAGS="$(LIBGUILE_CFLAGS)" \
+	LGCFLAGS="$(GUILE_CFLAGS)" \
 	$(BOOTENV) \
 	    $(POSIX_SHELL) $(srcdir)/mk-tpl-config.sh $@ $(HDRS) $(CSRC)
 

@@ -24,7 +24,7 @@ csrc            = opts.h columns.c opts.c
 nodist_columns_SOURCES = cols.c
 
 LO_LIB          = $(top_builddir)/autoopts/libopts.la
-columns_LDADD   = $(LO_LIB) $(LIBGUILE_LIBS)
+columns_LDADD   = $(LO_LIB) $(GUILE_LIBS)
 
 BUILT_SOURCES   = columns.menu columns.texi columns.1
 EXTRA_DIST      = opts.def $(csrc)
