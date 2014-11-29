@@ -98,7 +98,7 @@ lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
 
-BOOTENV         = AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
+BOOTENV = AGexe="$(AGexe)" GDexe="$(GDexe)" CLexe="$(CLexe)" \
 	srcdir="$(srcdir)"     top_srcdir="$(top_srcdir)"     \
 	builddir="$(builddir)" top_builddir="$(top_builddir)" \
 	AO_AGE="$(AO_AGE)"     AO_CURRENT="$(AO_CURRENT)"     \
@@ -158,6 +158,7 @@ pkgconfig/autoopts.pc : mk-autoopts-pc
 install-data-hook:
 	@DESTdestdir='$(DESTDIR)$(includedir)/autoopts' \
 	DESTpkgdatadir='$(DESTDIR)$(pkgdatadir)' \
+	DESTlibdatadir='$(DESTDIR)$(pkglibdir)' \
 	top_builddir='$(top_builddir)' \
 	LIBOPTS_VER='$(LIBOPTS_VER)' \
 	POSIX_SHELL='$(POSIX_SHELL)'  \

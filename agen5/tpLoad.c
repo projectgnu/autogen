@@ -46,11 +46,11 @@ digest_tpl(tmap_info_t * minfo, char * fname);
  * Return the template structure matching the name passed in.
  */
 LOCAL templ_t *
-find_tpl(char const * pzTemplName)
+find_tpl(char const * tpl_name)
 {
     templ_t * pT = named_tpls;
     while (pT != NULL) {
-        if (streqvcmp(pzTemplName, pT->td_name) == 0)
+        if (streqvcmp(tpl_name, pT->td_name) == 0)
             break;
         pT = C(templ_t *, (pT->td_scan));
     }
@@ -59,19 +59,19 @@ find_tpl(char const * pzTemplName)
 
 /**
  * the name is a regular file with read access.
- * @param[in] pzFName  file name to check
+ * @param[in] fname  file name to check
  * @returns \a true when the named file exists and is a regular file
  * @returns \a false otherwise.
  */
 static bool
-read_okay(char const * pzFName)
+read_okay(char const * fname)
 {
     struct stat stbf;
-    if (stat(pzFName, &stbf) != 0)
+    if (stat(fname, &stbf) != 0)
         return false;
     if (! S_ISREG(stbf.st_mode))
         return false;
-    return (access(pzFName, R_OK) == 0) ? true : false;
+    return (access(fname, R_OK) == 0) ? true : false;
 }
 
 /**

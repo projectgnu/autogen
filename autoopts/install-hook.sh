@@ -109,7 +109,9 @@ test -d "${DESTpkgdatadir}" && {
             mv -f $f.tmp $f
             test -n "${DESTlibdatadir}" && {
                 test -d ${DESTlibdatadir} || \
-                    mkdir -p ${DESTlibdatadir}
+                    mkdir -p ${DESTlibdatadir} || \
+                    continue
+
                 cp $f ${DESTlibdatadir}/.
             }
             ;;

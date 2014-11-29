@@ -353,9 +353,11 @@ prep_env(void)
      *  Set the last resort search directories first (lowest priority)
      *  The lowest of the low is the config time install data dir.
      *  Next is the *current* directory of this executable.
+     *  Last (highest priority) of the low priority is the library data dir.
      */
     SET_OPT_TEMPL_DIRS(DFT_TPL_DIR_DATA);
     SET_OPT_TEMPL_DIRS(DFT_TPL_DIR_RELATIVE);
+    SET_OPT_TEMPL_DIRS(LIBDATADIR);
 
     {
         char z[ SCRIBBLE_SIZE ] = "__autogen__";
