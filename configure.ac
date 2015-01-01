@@ -4,7 +4,7 @@ dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>
 dnl
 dnl  This file is part of AutoGen.
-dnl  AutoGen Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
+dnl  AutoGen Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
 dnl
 dnl AutoGen is free software: you can redistribute it and/or modify it
 dnl under the terms of the GNU General Public License as published by the

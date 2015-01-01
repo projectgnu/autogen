@@ -1,5 +1,5 @@
 #! /bin/sh
-
+# AutoGen Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
 sedcmd=
 nl='
 '

@@ -5,7 +5,7 @@
  *  @{
  */
 /*
- *  getdefs Copyright (C) 1999-2014 by Bruce Korb - all rights reserved
+ *  getdefs Copyright (C) 1999-2015 by Bruce Korb - all rights reserved
  *
  *  Author:            Bruce Korb <bkorb@gnu.org>
  *

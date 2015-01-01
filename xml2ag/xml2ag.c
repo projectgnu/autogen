@@ -8,7 +8,7 @@
  *  @{
  */
 /*
- *  xml2ag Copyright (C) 2002-2014 by Bruce Korb - all rights reserved
+ *  xml2ag Copyright (C) 2002-2015 by Bruce Korb - all rights reserved
  *  This file is part of AutoGen.
  *  AutoGen Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
  *

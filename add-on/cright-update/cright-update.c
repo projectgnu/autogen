@@ -2,7 +2,7 @@
 /**
  *  \file cright-update.c
  *
- *  cright-update Copyright (C) 1992-2014 by Bruce Korb - all rights reserved
+ *  cright-update Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
  *
  * cright-update is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -788,6 +788,20 @@ doit(char const * fname, char * ftext, size_t fsize,
     return res;
 }
 
+static void cu_regcomp(regex_t * preg, char const * re, int flags)
+{
+    int res = regcomp(preg, re, flags);
+    if (res == 0)
+        return;
+    {
+        char bf[64];
+        (void)regerror(res, preg, bf, sizeof(bf));
+        die(CRIGHT_UPDATE_EXIT_REGCOMP,
+            "regcomp error %d (%s) -- failed on:  ``%s''\n",
+            res, bf, re);
+    }
+}
+
 static regex_t *
 initialize(void)
 {
@@ -796,11 +810,7 @@ initialize(void)
 
     if (preg == NULL)
         fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "regex struct");
-    reres = regcomp(preg, OPT_ARG(COPYRIGHT_MARK), regex_flags);
-
-    if (reres != 0)
-        die(CRIGHT_UPDATE_EXIT_REGCOMP, "regcomp failed on:  %s\n",
-            OPT_ARG(COPYRIGHT_MARK));
+    cu_regcomp(preg, OPT_ARG(COPYRIGHT_MARK), regex_flags);
 
     if (OPT_ARG(NEW_YEAR) == NULL) {
         char *      pz;
@@ -838,7 +848,7 @@ assemble_cooked(char * p)
         switch (ch) {
         case NUL:
         found_nul:
-            die(CRIGHT_UPDATE_EXIT_REGCOMP, "bad regex:  %s\n", ptr);
+            die(CRIGHT_UPDATE_EXIT_REGCOMP, "bad regex string:  %s\n", ptr);
 
         case '"':
             p = strchr(p, '\n');
@@ -1001,7 +1011,7 @@ assemble_regex(char * p)
 static regex_t *
 choose_re(char * ftext, regex_t * preg)
 {
-    static char const mark[] = "--copyright-mark";
+    static char const mark[] = "--" "copyright-mark";
     char * p = strstr(ftext, mark);
     if (p == NULL)
         return preg;
@@ -1016,10 +1026,7 @@ choose_re(char * ftext, regex_t * preg)
 
         res_reg = assemble_regex(p + sizeof(mark) - 1);
         re_str  = (char *)(res_reg + 1);
-        reres   = regcomp(res_reg, re_str, regex_flags);
-        if (reres != 0)
-            die(CRIGHT_UPDATE_EXIT_REGCOMP, "regcomp failed on:  %s\n",
-                OPT_ARG(COPYRIGHT_MARK));
+        cu_regcomp(res_reg, re_str, regex_flags);
 
         return res_reg;
     }

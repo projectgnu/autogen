@@ -4,7 +4,7 @@ AutoGen Definitions options; /* -*- Mode: conf -*- */
  *  "([12][90][0-9][0-9])"
  *
  *  update-copyright is copyrighted
- *  Copyright (C) 2001-2014 Bruce Korb
+ *  Copyright (C) 2001-2015 Bruce Korb
  *  All rights reserved.
  */
 argument        = "[ <file-name> ... ]";
@@ -33,6 +33,8 @@ export  = <<- _EOExp_
 	#ifndef NUL
 	#define NUL '\0'
 	#endif
+
+	extern unsigned long first_yr;
 	_EOExp_;
 
 main = {

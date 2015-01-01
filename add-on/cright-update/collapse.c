@@ -7,7 +7,7 @@
  *
  *  Automated Finite State Machine
  *
- *  Copyright (C) 1992-2014 Bruce Korb - all rights reserved
+ *  Copyright (C) 1992-2015 Bruce Korb - all rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

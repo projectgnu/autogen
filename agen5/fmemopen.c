@@ -25,7 +25,7 @@ typedef struct {
 /**
  * @file fmemopen.c
  *
- * Copyright (C) 2004-2014 by Bruce Korb.  All rights reserved.
+ * Copyright (C) 2004-2015 by Bruce Korb.  All rights reserved.
  *
  * This code was inspired from software written by
  *   Hanno Mueller, kontakt@hanno.de
