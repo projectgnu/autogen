@@ -33,7 +33,7 @@ static for_state_t *
 find_for_state(SCM which_scm);
 
 static bool
-next_def(bool invert, def_ent_t** de_lst);
+next_def(bool invert, def_ent_t ** de_lst);
 
 static int
 for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found);
@@ -258,10 +258,10 @@ ag_scm_for_sep(SCM obj)
  * @param[in,out] de_lst  linked list of definitions
  */
 static bool
-next_def(bool invert, def_ent_t** de_lst)
+next_def(bool invert, def_ent_t ** de_lst)
 {
-    bool     haveMatch = false;
-    def_ent_t*  ent     = *de_lst;
+    bool     matched = false;
+    def_ent_t * ent  = *de_lst;
 
     while (ent != NULL) {
         /*
@@ -271,7 +271,7 @@ next_def(bool invert, def_ent_t** de_lst)
          *  THEN break out and use it
          */
         if (ent->de_index == for_state->for_index) {
-            haveMatch = true;
+            matched = true;
             break;
         }
 
@@ -290,7 +290,7 @@ next_def(bool invert, def_ent_t** de_lst)
              */
             if (for_state->for_by == 0) {
                 for_state->for_index = (int)ent->de_index;
-                haveMatch = true;
+                matched = true;
             }
             break;
         }
@@ -306,7 +306,7 @@ next_def(bool invert, def_ent_t** de_lst)
      *  Save our restart point and return the find indication
      */
     *de_lst = ent;
-    return haveMatch;
+    return matched;
 }
 
 static int
@@ -538,9 +538,9 @@ for_each(templ_t * tpl, macro_t * mac, def_ent_t * def_ent)
 static void
 load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
 {
-    char* pzName = pT->td_text + pMac->md_name_off;
-    int   ix     = 0;
-    char* pz;
+    char * pzName = pT->td_text + pMac->md_name_off;
+    int    ix     = 0;
+    char * pz;
     def_ent_t * prev_ent = NULL;
 
     /*
@@ -565,7 +565,7 @@ load_for_in(char const * pzSrc, size_t srcLen, templ_t * pT, macro_t * pMac)
     pz[srcLen] = NUL;
 
     do  {
-        def_ent_t* pDef = new_def_ent();
+        def_ent_t * pDef = new_def_ent();
 
         pDef->de_name    = pzName;
         pDef->de_index   = ix++;
@@ -821,7 +821,7 @@ new_for_context(void)
     }
 
     res = curr_ivk_info->ii_for_data + (curr_ivk_info->ii_for_depth - 1);
-    memset((void*)res, 0, sizeof(for_state_t));
+    memset(VOIDP(res), 0, sizeof(for_state_t));
     res->for_isfirst = true;
     res->for_ctx     = curr_def_ctx;
     curr_def_ctx.dcx_prev = &res->for_ctx;
@@ -866,8 +866,8 @@ macro_t *
 mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
     char *        scan_out = tpl->td_scan; /* next text dest   */
-    char const *  scan_in  = (char const*)mac->md_txt_off; /* macro text */
-    size_t        in_len   = (size_t)mac->md_res;          /* macro len  */
+    char const *  scan_in  = (char const *)mac->md_txt_off; /* macro text */
+    size_t        in_len   = (size_t)mac->md_res;           /* macro len  */
 
     /*
      *  Save the global macro loading mode
@@ -884,7 +884,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      *  functions that are enabled only while processing a FOR macro
      */
     if (load_for_macro_procs[0] == NULL) {
-        memcpy((void*)load_for_macro_procs, base_load_table,
+        memcpy(VOIDP(load_for_macro_procs), base_load_table,
                sizeof(base_load_table));
         load_for_macro_procs[ FTYP_ENDFOR ] = &mLoad_Ending;
     }
@@ -914,7 +914,7 @@ mLoad_For(templ_t * tpl, macro_t * mac, char const ** p_scan)
      *  Skip space to the start of the text following the iterator name
      */
     scan_in = SPN_WHITESPACE_CHARS(scan_in);
-    in_len -= (size_t)(scan_in - (char*)mac->md_txt_off);
+    in_len -= (size_t)(scan_in - (char *)mac->md_txt_off);
 
     /* * * * *
      *

@@ -51,9 +51,9 @@ char zUserNameCh[ 256 ] = { '\0' };
 /*
  *  Index database string pointers.
  */
-char*    pzIndexText = NULL; /* all the text    */
-char*    pzEndIndex  = NULL; /* end of current  */
-char*    pzIndexEOF  = NULL; /* end of file     */
+char *   pzIndexText = NULL; /* all the text    */
+char *   pzEndIndex  = NULL; /* end of current  */
+char *   pzIndexEOF  = NULL; /* end of file     */
 size_t   indexAlloc  = 0;    /* allocation size */
 
 /*
@@ -96,7 +96,7 @@ regex_t         attrib_re;
  *  The output file pointer.  It may be "stdout".
  *  It gets closed when we are done.
  */
-FILE * evtFp       = (FILE*)NULL;
+FILE * evtFp       = (FILE *)NULL;
 
 /*
  *  The output file modification time.  Only used if we
@@ -108,7 +108,7 @@ time_t modtime     = 0;
  *  The array of pointers to the output blocks.
  *  We build them first, then sort them, then print them out.
  */
-char**  papzBlocks = (char**)NULL;
+char ** papzBlocks = (char **)NULL;
 size_t  blkUseCt   = 0;
 size_t  blkAllocCt = 0;
 pid_t   agPid      = -1;

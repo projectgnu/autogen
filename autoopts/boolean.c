@@ -36,8 +36,8 @@
  * private:
  *
  * what:  Decipher a boolean value
- * arg:   + tOptions* + opts + program options descriptor +
- * arg:   + tOptDesc* + od  + the descriptor for this arg +
+ * arg:   + tOptions * + opts + program options descriptor +
+ * arg:   + tOptDesc * + od  + the descriptor for this arg +
  *
  * doc:
  *  Decipher a true or false value for a boolean valued option argument.
@@ -47,8 +47,8 @@
 void
 optionBooleanVal(tOptions * opts, tOptDesc * od)
 {
-    char* pz;
-    bool  res = true;
+    char * pz;
+    bool   res = true;
 
     if (INQUERY_CALL(opts, od))
         return;

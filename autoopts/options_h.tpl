@@ -86,6 +86,14 @@ h=options.h
  */
 #define AO_EXIT_REQ_USAGE 10064
 
+#undef  VOIDP
+/**
+ * Coerce a value into a void pointer with no const or volatile attributes.
+ * Somewhere along the line, the above set of includes need to set up
+ * the "uintptr_t" type.
+ */
+#define VOIDP(_a)  ((void *)(uintptr_t)(_a))
+
 /**
  *  PUBLIC DEFINES
  *
@@ -94,7 +102,7 @@ h=options.h
  *  to an option descriptor must be obtained.  There are two ways:
  *
  *  1. inside an option processing procedure, it is the second argument,
- *     conventionally "tOptDesc* pOD".
+ *     conventionally "tOptDesc * pOD".
  *
  *  2. Outside of an option procedure (or to reference a different option
  *     descriptor), use either "&DESC( opt_name )" or "&pfx_DESC( opt_name )".
@@ -151,7 +159,7 @@ typedef struct optionValue {
         unsigned int    boolVal;        ///< OPARG_TYPE_BOOLEAN
         unsigned long   setVal;         ///< OPARG_TYPE_MEMBERSHIP
         long            longVal;        ///< OPARG_TYPE_NUMERIC
-        void*           nestVal;        ///< OPARG_TYPE_HIERARCHY
+        void *          nestVal;        ///< OPARG_TYPE_HIERARCHY
     } v;
 } tOptionValue;
 
@@ -298,7 +306,7 @@ typedef tOptProc * tpOptProc;
  *  with the "exitCode" argument passed to it.
  */
 // coverity[+kill]
-typedef void (tUsageProc)(tOptions* pOpts, int exitCode);
+typedef void (tUsageProc)(tOptions * pOpts, int exitCode);
 
 /**
  * a pointer to a procedure that prints usage and exits.
@@ -543,7 +551,7 @@ struct options {
  */
 typedef struct {
     unsigned long   tkn_ct;      ///< number of tokens found
-    unsigned char*  tkn_list[1]; ///< array of pointers to tokens
+    unsigned char * tkn_list[1]; ///< array of pointers to tokens
 } token_list_t;
 
 /*
@@ -581,7 +589,7 @@ typedef struct {
 /**
  * mmap result wrapper that yields "true" when mmap has failed.
  */
-#define TEXT_MMAP_FAILED_ADDR(a)  ((void*)(a) ==  (void*)MAP_FAILED)
+#define TEXT_MMAP_FAILED_ADDR(a)  (VOIDP(a) == VOIDP(MAP_FAILED))
 
 #ifdef  __cplusplus
 #define CPLUSPLUS_OPENER extern "C" {

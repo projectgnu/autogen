@@ -33,7 +33,7 @@ static char const zTextFmt[] =
     "text = '%s';\n";
 
 
-static char const* typeName[] = {
+static char const * typeName[] = {
     "0 - inval",
     "ELEMENT_NODE",
     "ATTRIBUTE_NODE",
@@ -58,43 +58,43 @@ static char const* typeName[] = {
     "DOCB_DOCUMENT_NODE" };
 
 int   level = 0;
-FILE* outFp;
+FILE * outFp;
 
 #define CHUNK_SZ  4096
 
 /* = = = START-STATIC-FORWARD = = = */
 /* static forward declarations maintained by :mkfwd */
-static char*
-loadFile( FILE* fp, size_t* pzSize );
+static char *
+loadFile(FILE * fp, size_t * pzSize);
 
 static void
-emitIndentation( void );
+emitIndentation(void);
 
-static char*
-trim( char const* pzSrc, size_t* pSz );
+static char *
+trim(char const * pzSrc, size_t * pSz);
 
 static xmlNodePtr
-printHeader( xmlDocPtr pDoc );
+printHeader(xmlDocPtr pDoc);
 
 static void
-printAttrs( xmlAttrPtr pAttr );
+printAttrs(xmlAttrPtr pAttr);
 
 static void
-printNode( xmlNodePtr pNode );
+printNode(xmlNodePtr pNode);
 
 static void
-printChildren( xmlNodePtr pNode );
+printChildren(xmlNodePtr pNode);
 /* = = = END-STATIC-FORWARD = = = */
-#define TRIM(s,psz) trim( (char const*)(s), (size_t*)(psz) )
+#define TRIM(s,psz) trim( (char const *)(s), (size_t *)(psz) )
 
-extern void forkAutogen( char const* pzInput );
+extern void forkAutogen( char const * pzInput );
 
 
 int
-main( int argc, char** argv )
+main(int argc, char ** argv)
 {
     xmlDocPtr   pDoc;
-    char const* pzFile = NULL;
+    char const * pzFile = NULL;
 
     {
         int ct = optionProcess( &xml2agOptions, argc, argv );
@@ -135,7 +135,7 @@ main( int argc, char** argv )
     }
     else {
         size_t sz;
-        char*  pz = loadFile( stdin, &sz );
+        char * pz = loadFile( stdin, &sz );
         pDoc = xmlParseMemory( pz, (int)sz );
         fprintf( outFp, "/* Parsed from stdin */\n" );
     }
@@ -161,12 +161,12 @@ main( int argc, char** argv )
 }
 
 
-static char*
-loadFile( FILE* fp, size_t* pzSize )
+static char *
+loadFile(FILE * fp, size_t * pzSize)
 {
     size_t  asz = CHUNK_SZ;
     size_t  usz = 0;
-    char*   mem = malloc( asz );
+    char *  mem = malloc( asz );
 
     for (;;) {
 
@@ -201,11 +201,11 @@ emitIndentation( void )
 }
 
 
-static char*
-trim( char const* pzSrc, size_t* pSz )
+static char *
+trim(char const * pzSrc, size_t * pSz)
 {
     static char   zNil[1] = "";
-    static char*  pzData  = NULL;
+    static char * pzData  = NULL;
     static size_t dataLen = 0;
     size_t        strSize;
 
@@ -220,7 +220,7 @@ trim( char const* pzSrc, size_t* pSz )
     while (isspace( *pzSrc ))  pzSrc++;
 
     {
-        char const* pzEnd = pzSrc + strlen( pzSrc );
+        char const * pzEnd = pzSrc + strlen( pzSrc );
         while ((pzEnd > pzSrc) && isspace( pzEnd[-1] ))  pzEnd--;
 
         if (pzEnd <= pzSrc) {
@@ -235,7 +235,7 @@ trim( char const* pzSrc, size_t* pSz )
      *  big enough to hold the newly formed string.
      */
     {
-        char const* pz = pzSrc;
+        char const * pz = pzSrc;
         for (;;) {
             pz += strcspn( pz, "'\\" );
             if (*(pz++) == NUL)
@@ -261,7 +261,7 @@ trim( char const* pzSrc, size_t* pSz )
      *  single quotes and backslashes.
      */
     {
-        char* pzDest = pzData;
+        char * pzDest = pzData;
         for (;;) {
             switch (*(pzDest++) = *(pzSrc++)) {
             case '\'': pzDest[-1]  = '\\'; *(pzDest++) = '\''; break;
@@ -281,7 +281,7 @@ trim( char const* pzSrc, size_t* pSz )
 }
 
 static xmlNodePtr
-printHeader( xmlDocPtr pDoc )
+printHeader(xmlDocPtr pDoc)
 {
     static char const zDef[] = "AutoGen Definitions %s%s;\n";
     char const * pzSfx = ".tpl";
@@ -298,17 +298,17 @@ printHeader( xmlDocPtr pDoc )
     if (HAVE_OPT( OVERRIDE_TPL )) {
         if (strchr( OPT_ARG( OVERRIDE_TPL ), '.' ) != NULL)
             pzSfx = "";
-        pzTpl = (xmlChar*)(void*)OPT_ARG( OVERRIDE_TPL );
+        pzTpl = (xmlChar *)VOIDP(OPT_ARG( OVERRIDE_TPL ));
     }
     else {
-        pTpl = xmlGetProp( pRootNode, (xmlChar*)(void*)"template" );
+        pTpl = xmlGetProp(pRootNode, (xmlChar *)VOIDP("template"));
         if (pTpl == NULL) {
             fprintf( stderr, "No template was specified.\n" );
             exit( EXIT_FAILURE );
         }
 
         pzTpl = pTpl;
-        if (strchr( (char*)pzTpl, '.' ) != NULL)
+        if (strchr( (char *)pzTpl, '.' ) != NULL)
             pzSfx = "";
     }
 
@@ -335,13 +335,13 @@ printHeader( xmlDocPtr pDoc )
 }
 
 static void
-printAttrs( xmlAttrPtr pAttr )
+printAttrs(xmlAttrPtr pAttr)
 {
     while (pAttr != NULL) {
-        char* pzCont = (char*)pAttr->children->content;
+        char * pzCont = (char *)pAttr->children->content;
 
         emitIndentation();
-        fputs( (char*)(void*)pAttr->name, outFp );
+        fputs( (char *)VOIDP(pAttr->name), outFp );
         fputs( " = ", outFp );
         if (pAttr->children->children == NULL)
             fprintf( outFp, "'%s';\n", TRIM( pzCont, NULL ));
@@ -364,15 +364,15 @@ printAttrs( xmlAttrPtr pAttr )
 
 
 static void
-printNode( xmlNodePtr pNode )
+printNode(xmlNodePtr pNode)
 {
     switch (pNode->type) {
     case XML_ELEMENT_NODE:
     {
         size_t sz;
-        char*  pzTxt;
+        char * pzTxt;
         emitIndentation();
-        fputs( (char*)(void*)pNode->name, outFp );
+        fputs( (char *)VOIDP(pNode->name), outFp );
         pzTxt = TRIM( pNode->content, &sz );
 
         if (  (pNode->properties == NULL)
@@ -403,7 +403,7 @@ printNode( xmlNodePtr pNode )
     case XML_TEXT_NODE:
     {
         size_t sz;
-        char* pzTxt = TRIM( pNode->content, &sz );
+        char * pzTxt = TRIM( pNode->content, &sz );
         if (sz == 0)
             break;
         emitIndentation();
@@ -414,14 +414,14 @@ printNode( xmlNodePtr pNode )
     case XML_COMMENT_NODE:
     {
         size_t sz;
-        char* pzTxt = TRIM( pNode->content, &sz );
+        char * pzTxt = TRIM( pNode->content, &sz );
         if (sz == 0)
             break;
 
         emitIndentation();
         fputs( "/* ", outFp );
         for (;;) {
-            char* pz = strstr( pzTxt, "*/" );
+            char * pz = strstr( pzTxt, "*/" );
             if (pz == NULL)
                 break;
             fwrite(pzTxt, (size_t)((pz - pzTxt) + 1), (size_t)1, outFp);

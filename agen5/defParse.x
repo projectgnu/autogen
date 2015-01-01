@@ -22,7 +22,7 @@
  */
 
 #ifdef FSM_USER_HEADERS
-static char* pz_new_name = NULL;
+static char * pz_new_name = NULL;
 #endif /* FSM_USER_HEADERS */
 
 #ifdef FSM_FIND_TRANSITION
@@ -66,7 +66,7 @@ dp_do_end_block(te_dp_state initial, te_dp_state maybe_next,
                 te_dp_event trans_evt)
 {
     if (ent_stack_depth <= 0)
-        yyerror((void*)"Too many close braces");
+        yyerror(VOIDP("Too many close braces"));
 
     (void)initial; (void)trans_evt;
 
@@ -115,7 +115,7 @@ dp_do_invalid(te_dp_state initial, te_dp_state maybe_next,
 {
     (void)maybe_next;
     dp_invalid_transition(initial, trans_evt);
-    yyerror((void*)"invalid transition");
+    yyerror(VOIDP("invalid transition"));
     /* NOTREACHED */
     return DP_ST_INVALID;
 }
@@ -126,7 +126,7 @@ dp_do_need_name_end(te_dp_state initial, te_dp_state maybe_next,
 {
     (void)initial; (void)trans_evt;
     if (ent_stack_depth != 0)
-        yyerror((void*)"definition blocks were left open");
+        yyerror(VOIDP("definition blocks were left open"));
 
     /*
      *  We won't be using the parse stack any more.
@@ -170,21 +170,21 @@ dp_do_start_block(te_dp_state initial, te_dp_state maybe_next,
 {
     (void)initial; (void)trans_evt;
     if (curr_ent->de_type == VALTYP_TEXT)
-        yyerror((void*)"assigning a block value to text name");
+        yyerror(VOIDP("assigning a block value to text name"));
     curr_ent->de_type = VALTYP_BLOCK; /* in case not yet determined */
 
     if (OPT_VALUE_TRACE >= TRACE_EXPRESSIONS)
         print_ent(curr_ent);
 
     if (++ent_stack_depth >= ent_stack_sz) {
-        def_ent_t** ppDE;
+        def_ent_t ** ppDE;
         ent_stack_sz += ent_stack_sz / 2;
 
         if (ent_stack == dft_ent_stack) {
-            ppDE = AGALOC(ent_stack_sz * sizeof(void*), "def stack");
+            ppDE = AGALOC(ent_stack_sz * sizeof(void *), "def stack");
             memcpy(ppDE, dft_ent_stack, sizeof(dft_ent_stack));
         } else {
-            ppDE = AGREALOC(ent_stack, ent_stack_sz * sizeof(void*),
+            ppDE = AGREALOC(ent_stack, ent_stack_sz * sizeof(void *),
                             "stretch def stack");
         }
         ent_stack = ppDE;
@@ -200,7 +200,7 @@ dp_do_str_value(te_dp_state initial, te_dp_state maybe_next,
 {
     (void)initial; (void)trans_evt;
     if (curr_ent->de_type == VALTYP_BLOCK)
-        yyerror((void*)"assigning a block value to text name");
+        yyerror(VOIDP("assigning a block value to text name"));
 
     curr_ent->de_val.dvu_text = token_str;
     curr_ent->de_type = VALTYP_TEXT;
@@ -228,8 +228,8 @@ dp_do_tpl_name(te_dp_state initial, te_dp_state maybe_next,
     if (root_def_ctx.dcx_defent == NULL) {
         static char const zBogus[] = "@BOGUS@";
         static def_ent_t  seed = {
-            NULL, NULL, NULL, NULL, (char*)zBogus, 0, { NULL },
-            (char*)zBogus, 0, VALTYP_BLOCK };
+            NULL, NULL, NULL, NULL, (char *)zBogus, 0, { NULL },
+            (char *)zBogus, 0, VALTYP_BLOCK };
 
         root_def_ctx.dcx_defent = &seed;
 

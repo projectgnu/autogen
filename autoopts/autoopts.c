@@ -299,9 +299,9 @@ regular_opts(tOptions * opts)
  *
  * what: this is the main option processing routine
  *
- * arg:  + tOptions* + opts  + program options descriptor +
- * arg:  + int       + a_ct  + program arg count  +
- * arg:  + char**    + a_v   + program arg vector +
+ * arg:  + tOptions * + opts  + program options descriptor +
+ * arg:  + int        + a_ct  + program arg count  +
+ * arg:  + char **    + a_v   + program arg vector +
  *
  * ret_type:  int
  * ret_desc:  the count of the arguments processed

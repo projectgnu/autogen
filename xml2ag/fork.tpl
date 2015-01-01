@@ -38,18 +38,18 @@ add_arg(char const * arg, int ix)
 
     if (ix >= (int)arg_ct) {
         arg_ct += 5;
-        arg_vec = realloc(arg_vec, sizeof(void*) * (size_t)(arg_ct+1));
+        arg_vec = realloc(arg_vec, sizeof(void *) * (size_t)(arg_ct+1));
         if (arg_vec == NULL) {
             fprintf(stderr, "No memory for %d args\n", arg_ct);
             exit(EXIT_FAILURE);
         }
         xml2agOptions.origArgVect = arg_vec;
     }
-    arg_vec[ ix ] = (void*)arg;
+    arg_vec[ ix ] = VOIDP(arg);
 }
 
 static int
-become_child(int * fd, char const* pzInput)
+become_child(int * fd, char const * pzInput)
 {
     if (pipe(fd) != 0) {
         fprintf(stderr, zFsError, xml2agOptions.pzProgName,
@@ -92,7 +92,7 @@ become_child(int * fd, char const* pzInput)
         if (pzInput == NULL)
             pzInput = "stdin";
         else {
-            char* pz = strrchr(pzInput, '.');
+            char * pz = strrchr(pzInput, '.');
             if (pz != NULL) {
                 pzInput = pz = strdup(pzInput);
                 pz = strrchr(pz, '.');
@@ -106,7 +106,7 @@ become_child(int * fd, char const* pzInput)
 }
 
 void
-forkAutogen(char const* pzInput)
+forkAutogen(char const * pzInput)
 {
     int fd[2];
 
@@ -115,12 +115,12 @@ forkAutogen(char const* pzInput)
 
     {
         static char const zAg[] = "autogen";
-        char*  pzArg;
+        char * pzArg;
         int    ix    = 1;
 
         {
-            char* pz = malloc(strlen( xml2agOptions.pzProgPath ) + 7);
-            char* p  = strrchr(xml2agOptions.pzProgPath, '/');
+            char * pz = malloc(strlen( xml2agOptions.pzProgPath ) + 7);
+            char * p  = strrchr(xml2agOptions.pzProgPath, '/');
 
             if (p == NULL) {
                 strcpy(pz, zAg);

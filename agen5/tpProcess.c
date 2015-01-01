@@ -333,15 +333,15 @@ out_close(bool purge)
      *  Do not deallocate statically allocated names
      */
     if ((cur_fpstack->stk_flags & FPF_STATIC_NM) == 0)
-        AGFREE((void*)cur_fpstack->stk_fname);
+        AGFREE(cur_fpstack->stk_fname);
 
     /*
      *  Do not deallocate the root entry.  It is not allocated!!
      */
     if ((cur_fpstack->stk_flags & FPF_FREE) != 0) {
-        out_stack_t* p = cur_fpstack;
+        out_stack_t * p = cur_fpstack;
         cur_fpstack = p->stk_prev;
-        AGFREE((void*)p);
+        AGFREE(p);
     }
 }
 
@@ -416,7 +416,7 @@ open_output(out_spec_t * spec)
     }
 
     open_output_file(out_file, strlen(out_file), write_mode, 0);
-    free((void *)out_file);
+    free(VOIDP(out_file));
 }
 /**
  * @}

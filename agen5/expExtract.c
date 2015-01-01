@@ -55,7 +55,7 @@ load_file(char const * fname)
         }
 
         fsz = stbf.st_size;
-        res = (char*)AGALOC(fsz + 1, "load_file");
+        res = (char *)AGALOC(fsz + 1, "load_file");
         if (outfile_time < stbf.st_mtime)
             outfile_time = stbf.st_mtime;
     }
@@ -126,8 +126,8 @@ load_extract_file(char const * new_fil)
     }
 
     if (last_fname != NULL) {
-        AGFREE((void*)last_fname);
-        AGFREE((void*)file_text);
+        AGFREE(last_fname);
+        AGFREE(file_text);
         last_fname = file_text = NULL;
     }
 
@@ -140,10 +140,10 @@ load_extract_file(char const * new_fil)
     if (file_text != NULL)
         return file_text;
 
-    AGFREE((void*)last_fname);
+    AGFREE(last_fname);
     last_fname = NULL;
     if (file_text != NULL) {
-        AGFREE((void*)file_text);
+        AGFREE(file_text);
         file_text = NULL;
     }
     return NULL;
@@ -181,8 +181,8 @@ mk_empty_text(char const * start, char const * end, SCM def)
 static SCM
 get_text(char const * text, char const * start, char const * end, SCM def)
 {
-    char const* pzS = strstr(text, start);
-    char const* pzE;
+    char const * pzS = strstr(text, start);
+    char const * pzE;
 
     if (pzS == NULL)
         return mk_empty_text(start, end, def);
@@ -317,8 +317,8 @@ ag_scm_extract(SCM file, SCM marker, SCM caveat, SCM def)
              res = mk_empty_text(start, end, def);
         else res = get_text(text, start, end, def);
 
-        AGFREE((void*)start);
-        AGFREE((void*)end);
+        AGFREE(start);
+        AGFREE(end);
         return res;
     }
 }
@@ -352,7 +352,7 @@ ag_scm_find_file(SCM file, SCM suffix)
          *  The suffix is optional.  If provided, it will be a string.
          */
         if (AG_SCM_STRING_P(suffix)) {
-            char* apz[2];
+            char * apz[2];
             apz[0] = (char *)ag_scm2zchars(suffix, "file suffix");
             apz[1] = NULL;
             if (SUCCESSFUL(find_file(pz, z, (char const **)apz, NULL)))

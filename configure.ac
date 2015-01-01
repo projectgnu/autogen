@@ -211,7 +211,7 @@ test ${GUILE_VERSION} -ge 108000 \
     CFLAGS=`echo $CFLAGS -Wall -Werror -Wcast-align -Wmissing-prototypes \
 	-Wpointer-arith -Wshadow -Wstrict-prototypes -Wwrite-strings \
 	-Wno-format-contains-nul -fno-strict-aliasing -Wstrict-aliasing=3 \
-	-Wextra
+	-Wextra -Wno-cast-qual
 `
 ]dnl -Wconversion -Wsign-conversion -Wstrict-overflow
 AC_CONFIG_HEADER(config.h:config-h.in)

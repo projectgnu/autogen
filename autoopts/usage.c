@@ -240,7 +240,7 @@ skip_misuse_usage(tOptions * pOpts)
 /*=export_func  optionOnlyUsage
  *
  * what:  Print usage text for just the options
- * arg:   + tOptions*   + pOpts    + program options descriptor +
+ * arg:   + tOptions *  + pOpts    + program options descriptor +
  * arg:   + int         + ex_code  + exit code for calling exit(3) +
  *
  * doc:
@@ -435,7 +435,7 @@ print_one_paragraph(char const * text, bool plain, FILE * fp)
     else {
         char const * t = optionQuoteString(text, LINE_SPLICE);
         fprintf(fp, PUTS_FMT, t);
-        AGFREE((void *)t);
+        AGFREE(t);
     }
 }
  
@@ -546,15 +546,15 @@ optionPrintParagraphs(char const * text, bool plain, FILE * fp)
             buf = scan;
         }
     }
-    AGFREE((void *)text);
+    AGFREE(text);
 }
 
 /*=export_func  optionUsage
  * private:
  *
  * what:  Print usage text
- * arg:   + tOptions* + opts + program options descriptor +
- * arg:   + int       + exitCode + exit code for calling exit(3) +
+ * arg:   + tOptions * + opts + program options descriptor +
+ * arg:   + int        + exitCode + exit code for calling exit(3) +
  *
  * doc:
  *  This routine will print usage in both GNU-standard and AutoOpts-expanded

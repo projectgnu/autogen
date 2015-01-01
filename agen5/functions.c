@@ -235,7 +235,7 @@ mFunc_Include(templ_t * tpl, macro_t * mac)
     include_depth--;
 
     if (allocated_name)
-        AGFREE((void*)fname);
+        AGFREE(fname);
 
     return mac + 1;
 }
@@ -265,7 +265,7 @@ mFunc_Unknown(templ_t * pT, macro_t * pMac)
             fprintf(trace_fp, TRACE_FN_REMAPPED, TRACE_FN_REMAP_INVOKE,
                     pMac->md_code, pT->td_file, pMac->md_line);
         pMac->md_code    = FTYP_DEFINE;
-        pMac->md_pvt = (void*)pInv;
+        pMac->md_pvt = VOIDP(pInv);
         parse_mac_args(pT, pMac);
         return mFunc_Define(pT, pMac);
     }
@@ -282,7 +282,7 @@ mFunc_Unknown(templ_t * pT, macro_t * pMac)
         pMac->md_res = EMIT_VALUE;
 
     } else {
-        char* pzExpr = pT->td_text + pMac->md_txt_off;
+        char * pzExpr = pT->td_text + pMac->md_txt_off;
         switch (*pzExpr) {
         case ';':
         case '(':
@@ -318,8 +318,8 @@ mFunc_Unknown(templ_t * pT, macro_t * pMac)
  *  load_proc:
  *  unnamed:
 =*/
-macro_t*
-mFunc_Bogus(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_Bogus(templ_t * pT, macro_t * pMac)
 {
     char * pz = aprf(FN_BOGUS_FMT, pMac->md_code,
                      (pMac->md_code < FUNC_CT)
@@ -338,8 +338,8 @@ mFunc_Bogus(templ_t* pT, macro_t* pMac)
  *  handler_proc:
  *  unnamed:
 =*/
-macro_t*
-mFunc_Text(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_Text(templ_t * pT, macro_t * pMac)
 {
     fputs(pT->td_text + pMac->md_txt_off, cur_fpstack->stk_fp);
     fflush(cur_fpstack->stk_fp);
@@ -370,7 +370,7 @@ mLoad_Comment(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
     (void)tpl;
     (void)p_scan;
-    memset((void*)mac, 0, sizeof(*mac));
+    memset(VOIDP(mac), 0, sizeof(*mac));
     return mac;
 }
 
@@ -508,7 +508,7 @@ mLoad_Unknown(templ_t * tpl, macro_t * mac, char const ** unused)
 macro_t *
 mLoad_Bogus(templ_t * tpl, macro_t * mac, char const ** p_scan)
 {
-    char const * pzSrc = (char const*)mac->md_txt_off; /* macro text */
+    char const * pzSrc = (char const *)mac->md_txt_off; /* macro text */
     char const * pzMac;
 
     char z[ 64 ];

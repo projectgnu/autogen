@@ -43,11 +43,11 @@ export = <<-  EOExport
 	#include <libxml/parser.h>
 	#include <libxml/tree.h>
 
-	extern FILE* outFp;
+	extern FILE * outFp;
 	#ifndef NUL
 	#  define NUL '\0'
 	#endif
-	extern void forkAutogen( char const* pzInput );
+	extern void forkAutogen( char const * pzInput );
 	EOExport;
 
 flag = {

@@ -101,7 +101,7 @@ fserr_exit(char const * prog, char const * op, char const * fname)
  * private:
  *
  * what:  Decipher a boolean value
- * arg:   + tOptions* + pOpts    + program options descriptor +
+ * arg:   + tOptions * + pOpts    + program options descriptor +
  *
  * doc:
  *  Emit a shell script that will parse the command line options.
@@ -400,9 +400,9 @@ emit_usage(tOptions * opts)
                 break;
         }
 
-        pp  = (char **)(void *)&(opts->pzProgPath);
+        pp  = VOIDP(&(opts->pzProgPath));
         *pp = tm_nm_buf;
-        pp  = (char **)(void *)&(opts->pzProgName);
+        pp  = VOIDP(&(opts->pzProgName));
         *pp = tm_nm_buf;
     }
 
@@ -410,8 +410,8 @@ emit_usage(tOptions * opts)
     text_to_var(opts, TT_USAGE,     NULL);
 
     {
-        tOptDesc* pOptDesc = opts->pOptDesc;
-        int       optionCt = opts->optCt;
+        tOptDesc * pOptDesc = opts->pOptDesc;
+        int        optionCt = opts->optCt;
 
         for (;;) {
             if (pOptDesc->pOptProc == optionPrintVersion) {
@@ -601,8 +601,8 @@ emit_inaction(tOptions * opts, tOptDesc * od)
 static void
 emit_flag(tOptions * opts)
 {
-    tOptDesc* od = opts->pOptDesc;
-    int       opt_ct = opts->optCt;
+    tOptDesc * od = opts->pOptDesc;
+    int        opt_ct = opts->optCt;
 
     fputs(zOptionCase, stdout);
 
@@ -772,7 +772,7 @@ load_old_output(char const * fname, char const * pname)
      *  Read in all the data as fast as our OS will let us.
      */
     for (;;) {
-        size_t inct = fread((void*)scan, 1, (size_t)stbf.st_size, fp);
+        size_t inct = fread(VOIDP(scan), 1, (size_t)stbf.st_size, fp);
         if (inct == 0)
             break;
 
@@ -845,8 +845,8 @@ open_out(char const * fname, char const * pname)
  * private:
  * what: The usage function for the genshellopt generated program
  *
- * arg:  + tOptions* + opts    + program options descriptor +
- * arg:  + int       + exit_cd + usage text type to produce +
+ * arg:  + tOptions * + opts    + program options descriptor +
+ * arg:  + int        + exit_cd + usage text type to produce +
  *
  * doc:
  *  This function is used to create the usage strings for the option
@@ -901,7 +901,7 @@ genshelloptUsage(tOptions * opts, int exit_cd)
      */
     {
         char *  pz;
-        char ** pp = (char **)(void *)&(optionParseShellOptions->pzProgName);
+        char ** pp = VOIDP(&(optionParseShellOptions->pzProgName));
         AGDUPSTR(pz, optionParseShellOptions->pzPROGNAME, "prog name");
         *pp = pz;
         while (*pz != NUL) {

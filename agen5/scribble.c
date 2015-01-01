@@ -93,7 +93,7 @@ new_scribble_block(size_t min_size)
      *  The "sb_size" field is read-only.  Override this during allocation.
      */
     {
-        size_t * psz = (void *)&(res->sb_size);
+        size_t * psz = VOIDP(&(res->sb_size));
         *psz = min_size - hdr_sz;
     }
 
@@ -103,7 +103,7 @@ new_scribble_block(size_t min_size)
 /**
  * Get some scribble space.  Allocates a new scribble buffer, if needed.
  * The allocation gets incremented by one and then rounded to a multiple
- * of sizeof(void*).
+ * of sizeof(void *).
  *
  * @param size thesize required.
  * @returns the allocated chunk.
@@ -131,7 +131,7 @@ scribble_get(ssize_t size)
         sb   = sb->sb_next;
     }
 
-    buf = (char*)(sb->sb_buf + sb->sb_off);
+    buf = (char *)(sb->sb_buf + sb->sb_off);
     sb->sb_off += size;
     return buf;
 }

@@ -57,8 +57,8 @@ static tSelectProc
  */
 typedef struct case_stack tCaseStack;
 struct case_stack {
-    macro_t*  pCase;
-    macro_t*  pSelect;
+    macro_t *  pCase;
+    macro_t *  pSelect;
 };
 
 static tCaseStack current_case;
@@ -131,7 +131,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan);
 static void
 compile_re(regex_t * re, char const * pat, int flags)
 {
-    int rerr = regcomp(re, (void *)pat, flags);
+    int rerr = regcomp(re, VOIDP(pat), flags);
     if (rerr != 0) {
         char erbf[ SCRIBBLE_SIZE ];
         regerror(rerr, re, erbf, sizeof(erbf));
@@ -173,8 +173,8 @@ Select_Compare(char const * sample, char const * pattern)
 SCM
 ag_scm_string_contains_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
 
     return (strstr(pzText, pzSubstr) == NULL) ? SCM_BOOL_F : SCM_BOOL_T;
 }
@@ -212,8 +212,8 @@ Select_Compare_End(char const * sample, char const * pattern)
 SCM
 ag_scm_string_ends_with_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     return (SUCCESSFUL(Select_Compare_End(pzText, pzSubstr)))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
@@ -248,8 +248,8 @@ Select_Compare_Start(char const * sample, char const * pattern)
 SCM
 ag_scm_string_starts_with_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     return (SUCCESSFUL(Select_Compare_Start(pzText, pzSubstr)))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
@@ -277,8 +277,8 @@ Select_Compare_Full(char const * sample, char const * pattern)
 SCM
 ag_scm_string_equals_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
 
     return (strcmp(pzText, pzSubstr) == 0) ? SCM_BOOL_T : SCM_BOOL_F;
 }
@@ -303,13 +303,13 @@ ag_scm_string_equals_p(SCM text, SCM substr)
 static tSuccess
 Select_Equivalent(char const * sample, char const * pattern)
 {
-    char*    pz;
+    char *   pz;
     tSuccess res = SUCCESS;
     AGDUPSTR(pz, sample, "equiv chars");
     up_case(pz);
     if (strstr(pz, pattern) == NULL)
         res = FAILURE;
-    AGFREE((void*)pz);
+    AGFREE(pz);
 
     return res;
 }
@@ -327,7 +327,7 @@ ag_scm_string_contains_eqv_p(SCM text, SCM substr)
                                      pzSubstr)))
          res = SCM_BOOL_T;
     else res = SCM_BOOL_F;
-    AGFREE((void*)pzSubstr);
+    AGFREE(pzSubstr);
     return res;
 }
 
@@ -362,8 +362,8 @@ Select_Equivalent_End(char const * sample, char const * pattern)
 SCM
 ag_scm_string_ends_eqv_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     return (SUCCESSFUL(Select_Equivalent_End( pzText, pzSubstr )))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
@@ -395,8 +395,8 @@ Select_Equivalent_Start(char const * sample, char const * pattern)
 SCM
 ag_scm_string_starts_eqv_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     return (SUCCESSFUL(Select_Equivalent_Start(pzText, pzSubstr)))
         ? SCM_BOOL_T : SCM_BOOL_F;
 }
@@ -495,13 +495,13 @@ Select_Match(char const * sample, char const * pattern)
      *  On the first call for this macro, compile the expression
      */
     if (cur_macro->md_pvt == NULL) {
-        void *    mat = (void *)pattern;
-        regex_t*  re = AGALOC(sizeof(*re), "select match re");
+        void *    mat = VOIDP(pattern);
+        regex_t * re  = AGALOC(sizeof(*re), "select match re");
         compile_re(re, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)re;
+        cur_macro->md_pvt = VOIDP(re);
     }
 
-    if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)0,
+    if (regexec((regex_t *)cur_macro->md_pvt, sample, (size_t)0,
                  NULL, 0) != 0)
         return FAILURE;
     return SUCCESS;
@@ -527,8 +527,8 @@ ag_scm_string_has_match_p(SCM text, SCM substr)
 SCM
 ag_scm_string_has_eqv_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM      res;
     regex_t  re;
 
@@ -578,13 +578,13 @@ Select_Match_End(char const * sample, char const * pattern)
      *  On the first call for this macro, compile the expression
      */
     if (cur_macro->md_pvt == NULL) {
-        void *    mat = (void *)pattern;
-        regex_t*  re = AGALOC(sizeof(*re), "select match end re");
+        void *    mat = VOIDP(pattern);
+        regex_t * re  = AGALOC(sizeof(*re), "select match end re");
         compile_re(re, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)re;
+        cur_macro->md_pvt = VOIDP(re);
     }
 
-    if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
+    if (regexec((regex_t *)cur_macro->md_pvt, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
     if (m[0].rm_eo != (int)strlen(sample))
@@ -595,8 +595,8 @@ Select_Match_End(char const * sample, char const * pattern)
 SCM
 ag_scm_string_end_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -617,8 +617,8 @@ ag_scm_string_end_match_p(SCM text, SCM substr)
 SCM
 ag_scm_string_end_eqv_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -672,13 +672,13 @@ Select_Match_Start(char const * sample, char const * pattern)
      *  On the first call for this macro, compile the expression
      */
     if (cur_macro->md_pvt == NULL) {
-        void *    mat = (void *)pattern;
-        regex_t*  re = AGALOC(sizeof(*re), "select match start re");
+        void *    mat = VOIDP(pattern);
+        regex_t * re  = AGALOC(sizeof(*re), "select match start re");
         compile_re(re, mat, (int)cur_macro->md_res);
-        cur_macro->md_pvt = (void*)re;
+        cur_macro->md_pvt = VOIDP(re);
     }
 
-    if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
+    if (regexec((regex_t *)cur_macro->md_pvt, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
     if (m[0].rm_so != 0)
@@ -689,8 +689,8 @@ Select_Match_Start(char const * sample, char const * pattern)
 SCM
 ag_scm_string_start_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -711,8 +711,8 @@ ag_scm_string_start_match_p(SCM text, SCM substr)
 SCM
 ag_scm_string_start_eqv_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -768,8 +768,8 @@ Select_Match_Full(char const * sample, char const * pattern)
      *  On the first call for this macro, compile the expression
      */
     if (cur_macro->md_pvt == NULL) {
-        void *    mat = (void *)pattern;
-        regex_t*  re = AGALOC(sizeof(*re), "select match full re");
+        void *    mat = VOIDP(pattern);
+        regex_t * re  = AGALOC(sizeof(*re), "select match full re");
 
         if (OPT_VALUE_TRACE > TRACE_EXPRESSIONS) {
             fprintf(trace_fp, TRACE_SEL_MATCH_FULL,
@@ -779,7 +779,7 @@ Select_Match_Full(char const * sample, char const * pattern)
         cur_macro->md_pvt = re;
     }
 
-    if (regexec((regex_t*)cur_macro->md_pvt, sample, (size_t)2, m, 0)
+    if (regexec((regex_t *)cur_macro->md_pvt, sample, (size_t)2, m, 0)
         != 0)
         return FAILURE;
 
@@ -792,8 +792,8 @@ Select_Match_Full(char const * sample, char const * pattern)
 SCM
 ag_scm_string_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -815,8 +815,8 @@ ag_scm_string_match_p(SCM text, SCM substr)
 SCM
 ag_scm_string_eqv_match_p(SCM text, SCM substr)
 {
-    char* pzText   = ag_scm2zchars(text, "text to match");
-    char* pzSubstr = ag_scm2zchars(substr, "match expr");
+    char * pzText   = ag_scm2zchars(text, "text to match");
+    char * pzSubstr = ag_scm2zchars(substr, "match expr");
     SCM        res;
     regex_t    re;
     regmatch_t m[2];
@@ -951,7 +951,7 @@ Select_Match_NonExistence(char const * sample, char const * pattern)
  *    For a complete description, @xref{CASE}.
 =*/
 macro_t *
-mFunc_Case(templ_t* pT, macro_t* pMac)
+mFunc_Case(templ_t * pT, macro_t * pMac)
 {
     typedef tSuccess (t_match_proc)(char const *, char const *);
     /*
@@ -1058,7 +1058,7 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
     }
 
     if (free_txt)
-        AGFREE((void*)samp_text);
+        AGFREE(samp_text);
 
     return end_mac;
 }
@@ -1070,11 +1070,11 @@ mFunc_Case(templ_t* pT, macro_t* pMac)
  *  when the template is first read in (before processing).
  */
 macro_t *
-mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
+mLoad_Case(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     size_t         srcLen     = (size_t)pMac->md_res;   /* macro len  */
     tCaseStack     save_stack = current_case;
-    macro_t*        pEsacMac;
+    macro_t *      pEsacMac;
 
     /*
      *  Save the global macro loading mode
@@ -1109,7 +1109,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
         for (i=0; i < FUNC_CT; i++)
             apSelectOnly[i] = mLoad_Bogus;
 
-        memcpy((void*)apCaseLoad, base_load_table, sizeof( base_load_table ));
+        memcpy(VOIDP(apCaseLoad), base_load_table, sizeof( base_load_table ));
         apSelectOnly[ FTYP_COMMENT] = mLoad_Comment;
         apSelectOnly[ FTYP_SELECT ] = \
         apCaseLoad[   FTYP_SELECT ] = mLoad_Select;
@@ -1173,7 +1173,7 @@ mLoad_Case(templ_t* pT, macro_t* pMac, char const ** ppzScan)
 static bool
 selection_type_complete(templ_t * tpl, macro_t * mac, char const ** psrc)
 {
-    char const * src = (char*)mac->md_txt_off;
+    char const * src = (char *)mac->md_txt_off;
     mac_func_t fcode = FTYP_SELECT_COMPARE_FULL;
 
     /*
@@ -1352,7 +1352,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
          * process the string (backslash fixup).
          */
         if ((*svdest == '"') || (*svdest == '\''))
-            span_quote((void *)svdest);
+            span_quote(VOIDP(svdest));
     }
 
  selection_done:
@@ -1360,7 +1360,7 @@ mLoad_Select(templ_t * tpl, macro_t * mac, char const ** pscan)
      *  Link this selection macro to the list of selectors for CASE.
      */
     current_case.pSelect->md_sib_idx = (int)(mac - tpl->td_macros);
-    current_case.pSelect = (macro_t*)mac;
+    current_case.pSelect = (macro_t *)mac;
 
     return mac + 1;
 }
@@ -1373,7 +1373,7 @@ void
 mUnload_Select(macro_t * mac)
 {
     if (mac->md_pvt != NULL) {
-        regex_t * regexp = (regex_t*)mac->md_pvt;
+        regex_t * regexp = (regex_t *)mac->md_pvt;
         regfree(regexp);
         AGFREE(regexp);
     }

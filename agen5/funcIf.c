@@ -27,8 +27,8 @@
 
 typedef struct if_stack tIfStack;
 struct if_stack {
-    macro_t*  pIf;
-    macro_t*  pElse;
+    macro_t * pIf;
+    macro_t * pElse;
 };
 
 static tIfStack  current_if;
@@ -38,7 +38,7 @@ static load_proc_t mLoad_Elif, mLoad_Else;
 static bool
 eval_true(void);
 
-static macro_t*
+static macro_t *
 mLoad_Elif(templ_t * pT, macro_t * pMac, char const ** ppzScan);
 
 static macro_t *
@@ -140,11 +140,11 @@ eval_true(void)
  *    This macro ends the @code{IF} function template block.
  *    For a complete description @xref{IF}.
 =*/
-macro_t*
-mFunc_If(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_If(templ_t * pT, macro_t * pMac)
 {
-    macro_t* pRet = pT->td_macros + pMac->md_end_idx;
-    macro_t* pIf  = pMac;
+    macro_t * pRet = pT->td_macros + pMac->md_end_idx;
+    macro_t * pIf  = pMac;
 
     do  {
         /*
@@ -223,8 +223,8 @@ mFunc_If(templ_t* pT, macro_t* pMac)
  *    This macro ends the @code{WHILE} function template block.
  *    For a complete description @xref{WHILE}.
 =*/
-macro_t*
-mFunc_While(templ_t* pT, macro_t* pMac)
+macro_t *
+mFunc_While(templ_t * pT, macro_t * pMac)
 {
     macro_t * end = pT->td_macros + pMac->md_end_idx;
     int       ct  = 0;
@@ -269,7 +269,7 @@ mFunc_While(templ_t* pT, macro_t* pMac)
  *    @code{IF} function.  Its expression argument is evaluated as are
  *    the arguments to @code{IF}.  For a complete description @xref{IF}.
 =*/
-static macro_t*
+static macro_t *
 mLoad_Elif(templ_t * pT, macro_t * pMac, char const ** ppzScan)
 {
     if ((int)pMac->md_res == 0)
@@ -307,7 +307,7 @@ mLoad_Else(templ_t * pT, macro_t * pMac, char const ** ppzScan)
     (void)ppzScan;
 
     if (load_for_if_after_else_procs[0] == NULL) {
-        memcpy((void*)load_for_if_after_else_procs, base_load_table,
+        memcpy(VOIDP(load_for_if_after_else_procs), base_load_table,
                sizeof(base_load_table));
         load_for_if_after_else_procs[ FTYP_ENDIF ] = &mLoad_Ending;
     }
@@ -337,7 +337,7 @@ mLoad_Ending(templ_t * tpl, macro_t * mac, char const ** scan)
 {
     (void) tpl;
     (void) scan;
-    memset((void*)mac, 0, sizeof(*mac));
+    memset(VOIDP(mac), 0, sizeof(*mac));
     return NULL;
 }
 
@@ -374,7 +374,7 @@ mLoad_If(templ_t * tpl, macro_t * mac, char const ** ppzScan)
         AG_ABEND_IN(tpl, mac, NO_IF_EXPR);
 
     if (apIfLoad[0] == NULL) {
-        memcpy((void*)apIfLoad, base_load_table, sizeof(base_load_table));
+        memcpy(VOIDP(apIfLoad), base_load_table, sizeof(base_load_table));
         apIfLoad[ FTYP_ELIF ]  = &mLoad_Elif;
         apIfLoad[ FTYP_ELSE ]  = &mLoad_Else;
         apIfLoad[ FTYP_ENDIF ] = &mLoad_Ending;
@@ -447,7 +447,7 @@ mLoad_While(templ_t * pT, macro_t * mac, char const ** p_scan)
         AG_ABEND_IN(pT, mac, LD_WHILE_NO_EXPR);
 
     if (while_tbl[0] == NULL) {
-        memcpy((void*)while_tbl, base_load_table, sizeof(base_load_table));
+        memcpy(VOIDP(while_tbl), base_load_table, sizeof(base_load_table));
         while_tbl[ FTYP_ENDWHILE ] = &mLoad_Ending;
     }
 

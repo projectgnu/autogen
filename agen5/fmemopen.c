@@ -139,7 +139,7 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef TEST_FMEMOPEN
-  static fmem_cookie_t* saved_cookie = NULL;
+  static fmem_cookie_t * saved_cookie = NULL;
 #endif
 
 /**
@@ -200,7 +200,7 @@ fmem_extend(fmem_cookie_t *pFMC, size_t new_size)
          *  Previously, this was a user supplied buffer.  We now move to one
          *  of our own.  The user is responsible for the earlier memory.
          */
-        void* bf = malloc(ns);
+        void * bf = malloc(ns);
         if (bf == NULL)
             goto no_space;
 
@@ -209,7 +209,7 @@ fmem_extend(fmem_cookie_t *pFMC, size_t new_size)
         pFMC->mode  |= FLAG_BIT(allocated);
     }
     else {
-        void* bf = realloc(pFMC->buffer, ns);
+        void * bf = realloc(pFMC->buffer, ns);
         if (bf == NULL)
             goto no_space;
 
@@ -274,7 +274,7 @@ fmem_write(void *cookie, const void *pBuf, size_t sz)
     add_nul_char =
         (  ((pFMC->mode & FLAG_BIT(binary)) != 0)
         && (sz > 0)
-        && (((char*)pBuf)[sz - 1] != NUL)) ? 1 : 0;
+        && (((char *)pBuf)[sz - 1] != NUL)) ? 1 : 0;
 
     {
         size_t next_pos = (size_t)pFMC->next_ix + sz + add_nul_char;
@@ -419,7 +419,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
         return false;
     }
 
-    pFMC->buffer = (buf_bytes_t*)buf;
+    pFMC->buffer = (buf_bytes_t *)buf;
 
     /*  Figure out where our "next byte" and EOF are.
      *  Truncated files start at the beginning.
@@ -441,7 +441,7 @@ fmem_config_user_buf(fmem_cookie_t * pFMC, void * buf, ssize_t len)
          * append or read text mode -- find the end of the buffer
          * (the first NUL character)
          */
-        buf_bytes_t *p = (buf_bytes_t*)buf;
+        buf_bytes_t * p = (buf_bytes_t *)buf;
 
         pFMC->eof = 0;
         while ((*p != NUL) && (++(pFMC->eof) < (size_t)len))  p++;
@@ -498,12 +498,12 @@ fmem_alloc_buf(fmem_cookie_t * pFMC, ssize_t len)
  *
  *  what:  Open a stream to a string
  *
- *  arg: + void*   + buf  + buffer to use for i/o +
+ *  arg: + void *  + buf  + buffer to use for i/o +
  *  arg: + ssize_t + len  + size of the buffer +
- *  arg: + char*   + mode + mode string, a la fopen(3C) +
+ *  arg: + char *  + mode + mode string, a la fopen(3C) +
  *
- *  ret-type:  FILE*
- *  ret-desc:  a stdio FILE* pointer
+ *  ret-type:  FILE *
+ *  ret-desc:  a stdio FILE * pointer
  *
  *  err:  NULL is returned and errno is set to @code{EINVAL} or @code{ENOSPC}.
  *
@@ -624,10 +624,10 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
     {
         FILE * res;
 
-        cookie_read_function_t* pRd = (pFMC->mode & FLAG_BIT(read))
-            ?  (cookie_read_function_t*)fmem_read  : NULL;
-        cookie_write_function_t* pWr = (pFMC->mode & FLAG_BIT(write))
-            ? (cookie_write_function_t*)fmem_write : NULL;
+        cookie_read_function_t * pRd = (pFMC->mode & FLAG_BIT(read))
+            ?  (cookie_read_function_t *)fmem_read  : NULL;
+        cookie_write_function_t * pWr = (pFMC->mode & FLAG_BIT(write))
+            ? (cookie_write_function_t *)fmem_write : NULL;
 
 #ifdef HAVE_FOPENCOOKIE
         cookie_io_functions_t iof;
@@ -669,9 +669,9 @@ ag_fmemopen(void * buf, ssize_t len, char const * mode)
 
 /*=export_func ag_fmemioctl
  *
- *  what:  perform an ioctl on a FILE* descriptor
+ *  what:  perform an ioctl on a FILE * descriptor
  *
- *  arg: + FILE* + fp      + file pointer  +
+ *  arg: + FILE * + fp      + file pointer  +
  *  arg: + int   + req     + ioctl command +
  *  arg: + ...   + varargs + arguments for command +
  *
@@ -705,7 +705,7 @@ ag_fmemioctl(FILE * fp, int req, ...)
         for (;;) {
             if (mct-- == 0) {
                 /*
-                 *  fmemopen didn't create this FILE*, so it is invalid.
+                 *  fmemopen didn't create this FILE *, so it is invalid.
                  */
                 errno = EINVAL;
                 return -1;

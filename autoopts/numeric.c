@@ -33,10 +33,10 @@
  * private:
  *
  * what:  Show info about range constraints
- * arg:   + tOptions* + pOpts     + program options descriptor  +
- * arg:   + tOptDesc* + pOptDesc  + the descriptor for this arg +
- * arg:   + void *    + rng_table + the value range tables      +
- * arg:   + int       + rng_count + the number of entries       +
+ * arg:   + tOptions * + pOpts     + program options descriptor  +
+ * arg:   + tOptDesc * + pOptDesc  + the descriptor for this arg +
+ * arg:   + void *     + rng_table + the value range tables      +
+ * arg:   + int        + rng_count + the number of entries       +
  *
  * doc:
  *   Show information about a numeric option with range constraints.
@@ -97,8 +97,8 @@ optionShowRange(tOptions * pOpts, tOptDesc * pOD, void * rng_table, int rng_ct)
  * private:
  *
  * what:  process an option with a numeric value.
- * arg:   + tOptions* + opts + program options descriptor +
- * arg:   + tOptDesc* + od   + the descriptor for this arg +
+ * arg:   + tOptions * + opts + program options descriptor +
+ * arg:   + tOptDesc * + od   + the descriptor for this arg +
  *
  * doc:
  *  Decipher a numeric value.
@@ -106,8 +106,8 @@ optionShowRange(tOptions * pOpts, tOptDesc * pOD, void * rng_table, int rng_ct)
 void
 optionNumericVal(tOptions * opts, tOptDesc * od)
 {
-    char* pz;
-    long  val;
+    char * pz;
+    long   val;
 
     /*
      *  Guard against all the different ways this procedure might get invoked

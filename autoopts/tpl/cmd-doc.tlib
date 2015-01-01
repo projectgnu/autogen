@@ -404,14 +404,14 @@ DEFINE append-description               :+][+:
 IF (= (get "main.main-type") "for-each"):+][+:
 
   CASE main.handler-type                :+][+:
-  ~* ^(name|file)|.*text               \:+]
+  ~* ^(name|file)|.*text                :+]
 .Pp
 This program will perform its function for every file named on the command
 line or every file named in a list read from stdin.  The arguments or input
 names must be pre\-existing files.  The input list may contain comments,
 which[+:
 
-  !E                                   \:+]
+  !E                                    :+]
 .Pp
 This program will perform its function for every command line argument
 or every non\-comment line in a list read from stdin.

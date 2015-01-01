@@ -14,7 +14,7 @@ state  = lonum, dash, hinum;
 type   = looping;
 method = case;
 prefix = ex;
-cookie = "void* cookie";
+cookie = "void * cookie";
 
 dash   = "-";
 bang   = "!";

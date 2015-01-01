@@ -96,7 +96,7 @@ scm2display(SCM s)
         res = RESOLVE_SCM_EXACT; break;
 
     case GH_TYPE_UNDEFINED:
-        res = (char*)zNil; break;
+        res = (char *)zNil; break;
 
     default:
         res = RESOLVE_SCM_UNKNOWN; break;
@@ -202,12 +202,12 @@ eval_mac_expr(bool * allocated)
          */
         else {
             if ((code & EMIT_IF_ABSENT) != 0)
-                return (char*)zNil;
+                return (char *)zNil;
 
             if (  (ent->de_type != VALTYP_TEXT)
                && ((code & EMIT_PRIMARY_TYPE) == EMIT_VALUE)  ) {
                 tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
-                return (char*)zNil;
+                return (char *)zNil;
             }
 
             /*
@@ -227,7 +227,7 @@ eval_mac_expr(bool * allocated)
                  */
                 if (ent->de_type != VALTYP_TEXT) {
                     tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
-                    return (char*)zNil;
+                    return (char *)zNil;
                 }
 
                 *allocated = true;
@@ -243,7 +243,7 @@ eval_mac_expr(bool * allocated)
                  */
                 if (ent->de_type != VALTYP_TEXT) {
                     tpl_warning(tpl, mac, EVAL_EXPR_BLOCK_IN_EVAL);
-                    return (char*)zNil;
+                    return (char *)zNil;
                 }
 
                 text = ent->de_val.dvu_text;
@@ -260,7 +260,7 @@ eval_mac_expr(bool * allocated)
     case EMIT_VALUE:
         assert(ent != NULL);
         if (*allocated) {
-            AGFREE((void*)text);
+            AGFREE(text);
             *allocated = false;
         }
 
@@ -272,7 +272,7 @@ eval_mac_expr(bool * allocated)
         SCM res = ag_eval(text);
 
         if (*allocated) {
-            AGFREE((void*)text);
+            AGFREE(text);
             *allocated = false;
         }
 
@@ -282,10 +282,10 @@ eval_mac_expr(bool * allocated)
 
     case EMIT_SHELL:
     {
-        char* pz = shell_cmd(text);
+        char * pz = shell_cmd(text);
 
         if (*allocated)
-            AGFREE((void*)text);
+            AGFREE(text);
 
         if (pz != NULL) {
             *allocated = true;
@@ -293,7 +293,7 @@ eval_mac_expr(bool * allocated)
         }
         else {
             *allocated = false;
-            text = (char*)zNil;
+            text = (char *)zNil;
         }
         break;
     }
@@ -344,7 +344,7 @@ ag_scm_emit(SCM val)
     switch (depth) {
     case 1:
     {
-        out_stack_t* pSaveFp;
+        out_stack_t * pSaveFp;
         unsigned long pnum;
 
         if (! AG_SCM_NUM_P(val))
@@ -377,7 +377,7 @@ ag_scm_emit(SCM val)
             break;
 
         if (AG_SCM_STRING_P(val)) {
-            fputs((char*)ag_scm2zchars(val, "emit val"), fp);
+            fputs((char *)ag_scm2zchars(val, "emit val"), fp);
             fflush(fp);
             break;
         }
@@ -443,7 +443,7 @@ ag_scm_insert_file(SCM val)
     switch (depth) {
     case 1:
     {
-        out_stack_t* pSaveFp;
+        out_stack_t * pSaveFp;
         unsigned long pnum;
 
         if (! AG_SCM_NUM_P(val))
@@ -519,16 +519,16 @@ eval(char const * expr)
     switch (*expr) {
     case '(':
     case ';':
-        res = ag_eval((char*)expr);
+        res = ag_eval((char *)expr);
         break;
 
     case '`':
         AGDUPSTR(pzTemp, expr, "shell script");
         (void)span_quote(pzTemp);
         expr = shell_cmd(pzTemp);
-        AGFREE((void*)pzTemp);
-        res = AG_SCM_STR02SCM((char*)expr);
-        AGFREE((void*)expr);
+        AGFREE(pzTemp);
+        res = AG_SCM_STR02SCM((char *)expr);
+        AGFREE(expr);
         break;
 
     case '"':
@@ -540,9 +540,9 @@ eval(char const * expr)
         /* FALLTHROUGH */
 
     default:
-        res = AG_SCM_STR02SCM((char*)expr);
+        res = AG_SCM_STR02SCM((char *)expr);
         if (allocated)
-            AGFREE((void*)expr);
+            AGFREE(expr);
     }
 
     return res;
@@ -564,7 +564,7 @@ eval(char const * expr)
  *   macro is inferred.  The result of the expression evaluation
  *   (@pxref{expression syntax}) is written to the current output.
 =*/
-macro_t*
+macro_t *
 mFunc_Expr(templ_t * tpl, macro_t * mac)
 {
     bool allocated_str;
@@ -578,7 +578,7 @@ mFunc_Expr(templ_t * tpl, macro_t * mac)
     }
 
     if (allocated_str)
-        AGFREE((void*)pz);
+        AGFREE(pz);
 
     return mac + 1;
 }
@@ -623,7 +623,7 @@ macro_t *
 mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
 {
     char *        copy; /* next text dest   */
-    char const *  src     = (char const*)mac->md_txt_off; /* macro text */
+    char const *  src     = (char const *)mac->md_txt_off; /* macro text */
     size_t        src_len = (size_t)mac->md_res;          /* macro len  */
     char const *  end_src = src + src_len;
 
@@ -702,7 +702,7 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
         mac->md_txt_off = 0;
 
     } else {
-        char* pz = copy;
+        char * pz = copy;
         src_len = (size_t)(end_src - src);
 
         mac->md_txt_off = (uintptr_t)(copy - tpl->td_text);
@@ -718,7 +718,7 @@ mLoad_Expr(templ_t * tpl, macro_t * mac, char const ** ppzScan)
          *  THEN find the ending expression...
          */
         if ((mac->md_res & EMIT_ALWAYS) != 0) {
-            char* pzNextExpr = (char*)skip_expr(pz, src_len);
+            char * pzNextExpr = (char *)skip_expr(pz, src_len);
 
             /*
              *  The next expression must be within bounds and space separated

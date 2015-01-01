@@ -104,7 +104,7 @@ char *
 strsignal( int signo )
 {
     if (SIGNAL_IN_RANGE( signo ))
-        return (char*)SIGNAL_INFO( signo );
+        return (char *)SIGNAL_INFO( signo );
 
     return NULL;
 }

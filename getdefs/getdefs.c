@@ -36,8 +36,8 @@ typedef int (compar_func)(const void *, const void *);
 static compar_func compar_text, compar_defname;
 
 /* START-STATIC-FORWARD */
-static char*
-assignIndex(char*  pzOut,  char*  pzDef);
+static char *
+assignIndex(char * pzOut,  char * pzDef);
 
 static int
 awaitAutogen(void);
@@ -49,16 +49,16 @@ static tSuccess
 buildPreamble(char ** ppzDef, char ** ppzOut, char const * fname, int line);
 
 static int
-compar_defname(const void* p1, const void* p2);
+compar_defname(const void * p1, const void * p2);
 
 static int
-compar_text(const void* p1, const void* p2);
+compar_text(const void * p1, const void * p2);
 
 static void
-doPreamble(FILE* outFp);
+doPreamble(FILE * outFp);
 
 static void
-printEntries(FILE* fp);
+printEntries(FILE * fp);
 
 static void
 processFile(char const * fname);
@@ -66,16 +66,16 @@ processFile(char const * fname);
 static void
 set_first_idx(void);
 
-static FILE*
+static FILE *
 open_ag_file(char ** pzBase);
 
-static FILE*
+static FILE *
 open_ag_proc_pipe(char ** pzBase);
 
 static void
 exec_autogen(char ** pzBase);
 
-static FILE*
+static FILE *
 startAutogen(void);
 
 static void
@@ -92,12 +92,12 @@ update_db(void);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
- *   MAIN
+ *   Main
  */
 int
 main(int argc, char ** argv)
 {
-    FILE* outFp;
+    FILE * outFp;
 
     optionProcess(&getdefsOptions, argc, argv);
     validateOptions();
@@ -123,12 +123,12 @@ main(int argc, char ** argv)
      *  THEN alphabetize by definition name.
      */
     if ((pzIndexText == NULL) && HAVE_OPT(FIRST_INDEX)) {
-        qsort((void*)papzBlocks, blkUseCt, sizeof(char*), compar_defname);
+        qsort(VOIDP(papzBlocks), blkUseCt, sizeof(char *), compar_defname);
         set_first_idx();
     }
 
     else if (ENABLED_OPT(ORDERING) && (blkUseCt > 1))
-        qsort((void*)papzBlocks, blkUseCt, sizeof(char*), &compar_text);
+        qsort(VOIDP(papzBlocks), blkUseCt, sizeof(char *), &compar_text);
 
     printEntries(outFp);
 #ifdef HAVE_FCHMOD
@@ -143,7 +143,7 @@ main(int argc, char ** argv)
     if (  (WHICH_IDX_AUTOGEN == INDEX_OPT_OUTPUT)
        && (outFp != stdout) )  {
         struct utimbuf tbuf;
-        tbuf.actime  = time((time_t*)NULL);
+        tbuf.actime  = time((time_t *)NULL);
         tbuf.modtime = modtime + 1;
         utime(OPT_ARG(OUTPUT), &tbuf);
 #ifndef HAVE_CHMOD
@@ -169,10 +169,10 @@ main(int argc, char ** argv)
 /*
  *  assignIndex
  */
-static char*
-assignIndex(char*  pzOut,  char*  pzDef)
+static char *
+assignIndex(char * pzOut, char * pzDef)
 {
-    char*  pzMatch;
+    char * pzMatch;
     size_t len = strlen(pzDef);
     int    idx;
 
@@ -202,7 +202,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
         char * pz;
         indexAlloc +=  0x1FFF;
         indexAlloc &= (unsigned long)~0x0FFFUL;
-        pz = (char*)realloc((void*)pzIndexText, indexAlloc);
+        pz = (char *)realloc(VOIDP(pzIndexText), indexAlloc);
         if (pz == NULL) {
             fputs("Realloc of index text failed\n", stderr);
             exit(EXIT_FAILURE);
@@ -226,7 +226,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
     if (pzEndIndex == pzIndexText)
         idx = (int)OPT_VALUE_FIRST_INDEX;
     else do {
-        char* pz = strrchr(pzDef, ' ');
+        char * pz = strrchr(pzDef, ' ');
         *pz = NUL;
         len = strlen(pzDef);
 
@@ -244,7 +244,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
         }
 
         for (;;) {
-            char* pzn = strstr(pzMatch + len, pzDef);
+            char * pzn = strstr(pzMatch + len, pzDef);
             if (pzn == NULL)
                 break;
             pzMatch = pzn;
@@ -256,7 +256,7 @@ assignIndex(char*  pzOut,  char*  pzDef)
          */
         *pz = ' ';
         pzMatch = strchr(pzMatch + len, '[');
-        idx = (int)strtol(pzMatch+1, (char**)NULL, 0)+1;
+        idx = (int)strtol(pzMatch+1, (char **)NULL, 0)+1;
     } while (false);
 
     /*
@@ -312,7 +312,7 @@ buildDefinition(char * pzDef, char const * pzFile, int line, char * pzOut)
     bool    these_are_global_defs;
     tSuccess   preamble;
     int        re_res;
-    char*      pzNextDef = NULL;
+    char *     pzNextDef = NULL;
     regmatch_t match[2];
 
     if (*pzDef == '*') {
@@ -520,7 +520,7 @@ buildPreamble(char ** ppzDef, char ** ppzOut, char const * fname, int line)
  *  compar_defname
  */
 static int
-compar_defname(const void* p1, const void* p2)
+compar_defname(const void * p1, const void * p2)
 {
     char const * pzS1 = *(char const * const *)p1;
     char const * pz1  = strstr(pzS1, zNameTag);
@@ -561,13 +561,13 @@ compar_defname(const void* p1, const void* p2)
  *  string and EXIT_FAILURE.
  */
 static int
-compar_text(const void* p1, const void* p2)
+compar_text(const void * p1, const void * p2)
 {
-    char* pz1 = strstr(*(char const * const *)p1, zNameTag);
-    char* pe1;
-    char* pz2 = strstr(*(char const * const *)p2, zNameTag);
-    char* pe2;
-    int   res;
+    char * pz1 = strstr(*(char const * const *)p1, zNameTag);
+    char * pe1;
+    char * pz2 = strstr(*(char const * const *)p2, zNameTag);
+    char * pe2;
+    int    res;
 
     if (pz1 == NULL) {
         if (strncmp(*(char const * const *)p1, zGlobal, sizeof(zGlobal)-1) == 0)
@@ -616,7 +616,7 @@ compar_text(const void* p1, const void* p2)
  *  doPreamble
  */
 static void
-doPreamble(FILE* outFp)
+doPreamble(FILE * outFp)
 {
     /*
      *  Emit the "autogen definitions xxx;" line
@@ -681,7 +681,7 @@ doPreamble(FILE* outFp)
 /*
  *  loadFile
  */
-LOCAL char*
+LOCAL char *
 loadFile(char const * pzFname)
 {
     FILE * fp = fopen(pzFname, "r" FOPEN_BINARY_FLAG);
@@ -690,7 +690,7 @@ loadFile(char const * pzFname)
     char * pzRead;
     size_t rdsz;
 
-    if (fp == (FILE*)NULL)
+    if (fp == (FILE *)NULL)
         return NULL;
     /*
      *  Find out how much data we need to read.
@@ -717,7 +717,7 @@ loadFile(char const * pzFname)
     /*
      *  Allocate the space we need for the ENTIRE file.
      */
-    pzRead = pzText = (char*)malloc(rdsz + 1);
+    pzRead = pzText = (char *)malloc(rdsz + 1);
     if (pzText == NULL)
         die("Error: could not allocate %d bytes\n", (int)rdsz + 1);
 
@@ -725,7 +725,7 @@ loadFile(char const * pzFname)
      *  Read as much as we can get until we have read the file.
      */
     do  {
-        size_t rdct = fread((void*)pzRead, (size_t)1, rdsz, fp);
+        size_t rdct = fread(VOIDP(pzRead), (size_t)1, rdsz, fp);
 
         if (rdct == 0)
             fserr_die("reading file %s\n", pzFname);
@@ -744,7 +744,7 @@ loadFile(char const * pzFname)
  *  printEntries
  */
 static void
-printEntries(FILE* fp)
+printEntries(FILE * fp)
 {
     size_t  ct  = blkUseCt;
     char ** ppz = papzBlocks;
@@ -755,12 +755,12 @@ printEntries(FILE* fp)
     for (;;) {
         char * pz = *(ppz++);
         fputs(pz, fp);
-        free((void*)pz);
+        free(VOIDP(pz));
         if (--ct == 0)
             break;
         fputc('\n', fp);
     }
-    free((void*)papzBlocks);
+    free(VOIDP(papzBlocks));
 }
 
 
@@ -770,13 +770,13 @@ printEntries(FILE* fp)
 static void
 processFile(char const * fname)
 {
-    char* pzText = loadFile(fname); /* full text */
-    char* pzScan;  /* Scanning Pointer  */
-    char* pzDef;   /* Def block start   */
-    char* pzNext;  /* start next search */
-    char* pzDta;   /* data value        */
-    int   lineNo = 1;
-    char* pzOut;
+    char * pzText = loadFile(fname); /* full text */
+    char * pzScan;  /* Scanning Pointer  */
+    char * pzDef;   /* Def block start   */
+    char * pzNext;  /* start next search */
+    char * pzDta;   /* data value        */
+    int    lineNo = 1;
+    char * pzOut;
     regmatch_t  matches[MAX_SUBMATCH+1];
 
     if (pzText == NULL)
@@ -799,8 +799,8 @@ processFile(char const * fname)
          *  Make sure there is a subexpression match!!
          */
         if (matches[1].rm_so == -1) {
-            char* pz = NULL;
-            char  ch = NUL;
+            char * pz = NULL;
+            char   ch = NUL;
 
             pzDef = pzScan + matches[0].rm_so;
             if (strlen(pzDef) > 30) {
@@ -834,7 +834,7 @@ processFile(char const * fname)
             lineNo++;
         }
 
-        pzOut = pzDta = (char*)malloc(2 * strlen(pzDef) + 8000);
+        pzOut = pzDta = (char *)malloc(2 * strlen(pzDef) + 8000);
 
         /*
          *  Count the number of lines in the definition itself.
@@ -853,20 +853,20 @@ processFile(char const * fname)
          *  definition are and where we will resume our processing.
          */
         buildDefinition(pzDef, fname, lineNo, pzOut);
-        pzDta   = (char*)realloc((void*)pzDta, strlen(pzDta) + 1);
+        pzDta   = (char *)realloc(VOIDP(pzDta), strlen(pzDta) + 1);
         lineNo += linesInDef;
 
         if (++blkUseCt > blkAllocCt) {
             blkAllocCt += 32;
-            papzBlocks = (char**)realloc((void*)papzBlocks,
-                                         blkAllocCt * sizeof(char*));
-            if (papzBlocks == (char**)NULL)
+            papzBlocks = (char **)realloc(VOIDP(papzBlocks),
+                                         blkAllocCt * sizeof(char *));
+            if (papzBlocks == (char **)NULL)
                 die("Realloc error for %d pointers\n", (int)blkAllocCt);
         }
         papzBlocks[ blkUseCt-1 ] = pzDta;
     }
 
-    free((void*)pzText);
+    free(VOIDP(pzText));
 }
 
 
@@ -917,23 +917,23 @@ set_first_idx(void)
          *  supply our own new one.
          */
         if (*pzOld != '[') {
-            pzNew = (char*)malloc(strlen(pzOld) + nmLn + 10);
+            pzNew = (char *)malloc(strlen(pzOld) + nmLn + 10);
             sprintf(pzNew, "%s[%d]%s", zNm,
                     (int)OPT_VALUE_FIRST_INDEX, pzOld);
-            free((void*)(*ppz));
+            free(VOIDP(*ppz));
             *ppz = pzNew;
         }
     }
 }
 
-static FILE*
+static FILE *
 open_ag_file(char ** pzBase)
 {
     switch (WHICH_IDX_AUTOGEN) {
     case INDEX_OPT_OUTPUT:
     {
         static char const zFileFmt[] = " *      %s\n";
-        FILE*  fp;
+        FILE * fp;
 
         if (*pzBase != NULL)
             free(*pzBase);
@@ -975,7 +975,7 @@ open_ag_file(char ** pzBase)
     return NULL;
 }
 
-static FILE*
+static FILE *
 open_ag_proc_pipe(char ** pzBase)
 {
     FILE * agFp;
@@ -1004,11 +1004,11 @@ open_ag_proc_pipe(char ** pzBase)
     default:
         /*
          *  We are the parent.  Close the read end of the pipe
-         *  and get a FILE* pointer for the write file descriptor
+         *  and get a FILE * pointer for the write file descriptor
          */
         close(pfd[0]);
         agFp = fdopen(pfd[1], "w" FOPEN_BINARY_FLAG);
-        if (agFp == (FILE*)NULL)
+        if (agFp == (FILE *)NULL)
             fserr_die("fdopening pipe[1]\n");
         free(*pzBase);
         return agFp;
@@ -1031,7 +1031,7 @@ exec_autogen(char ** pzBase)
      *  ELSE insert each one into the arg list.
      */
     if (! HAVE_OPT(AGARG)) {
-        paparg = pparg = malloc((size_t)argCt * sizeof(char*));
+        paparg = pparg = malloc((size_t)argCt * sizeof(char *));
         *pparg++ = pzAutogen;
 
     } else {
@@ -1039,7 +1039,7 @@ exec_autogen(char ** pzBase)
         char const ** ppz = STACKLST_OPT(AGARG);
 
         argCt += ct;
-        paparg = pparg = malloc((size_t)argCt * sizeof(char*));
+        paparg = pparg = malloc((size_t)argCt * sizeof(char *));
         *pparg++ = pzAutogen;
 
         do  {
@@ -1065,7 +1065,7 @@ exec_autogen(char ** pzBase)
     fputc('\n', stderr);
 #endif
 
-    execvp(pzAutogen, (char**)(void*)paparg);
+    execvp(pzAutogen, (char **)VOIDP(paparg));
     fserr_die("exec of %s %s %s %s\n", paparg[0], paparg[1], paparg[2],
               paparg[3]);
 }
@@ -1073,12 +1073,12 @@ exec_autogen(char ** pzBase)
 /*
  *  startAutogen
  */
-static FILE*
+static FILE *
 startAutogen(void)
 {
-    char*  pz;
-    FILE*  agFp;
-    char*  pzBase = NULL;
+    char * pz;
+    FILE * agFp;
+    char * pzBase = NULL;
 
     /*
      *  Compute the base name.
@@ -1159,7 +1159,7 @@ startAutogen(void)
         return agFp;
 
     exec_autogen(&pzBase);
-    return (FILE*)NULL;
+    return (FILE *)NULL;
 }
 
 
@@ -1169,7 +1169,7 @@ startAutogen(void)
 static void
 update_db(void)
 {
-    FILE* fp;
+    FILE * fp;
 
     if (chmod(OPT_ARG(ORDERING), 0666) == 0) {
         fp = fopen(OPT_ARG(ORDERING), "a" FOPEN_BINARY_FLAG);
@@ -1180,7 +1180,7 @@ update_db(void)
         pzIndexEOF = pzIndexText;
     }
 
-    if (fp == (FILE*)NULL)
+    if (fp == (FILE *)NULL)
         fserr_die("opening %s for write/append\n", OPT_ARG(ORDERING));
 
     fwrite(pzIndexEOF, (size_t)(pzEndIndex - pzIndexEOF), (size_t)1, fp);

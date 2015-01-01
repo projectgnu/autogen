@@ -60,7 +60,7 @@ handle_eol(char ** ppzi, char ** ppzo, char tabch, char * bol)
      *  on the next non-empty line.
      */
     {
-        char* pz = pzScn;
+        char * pz = pzScn;
         while (IS_WHITESPACE_CHAR(*pz)) {
             if (*(pz++) == NL)
                 pzScn = pz;

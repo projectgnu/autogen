@@ -201,9 +201,9 @@ add_to_def_list(def_ent_t * ent, def_ent_list_t * del)
 {
     if (++(del->del_used_ct) > del->del_alloc_ct) {
         del->del_alloc_ct   += del->del_alloc_ct + 8; /* 8, 24, 56, ... */
-        del->del_def_ent_ary = (def_ent_t**)
-            AGREALOC((void*)del->del_def_ent_ary,
-                     del->del_alloc_ct * sizeof(void*), "add find");
+        del->del_def_ent_ary = (def_ent_t **)
+            AGREALOC(VOIDP(del->del_def_ent_ary),
+                     del->del_alloc_ct * sizeof(void *), "add find");
     }
 
     del->del_def_ent_ary[del->del_used_ct-1] = ent;
@@ -212,7 +212,7 @@ add_to_def_list(def_ent_t * ent, def_ent_list_t * del)
 static size_t
 bad_def_name(char * pzD, char const * pzS, size_t srcLen)
 {
-    memcpy((void*)pzD, (void*)pzS, srcLen);
+    memcpy(VOIDP(pzD), VOIDP(pzS), srcLen);
     pzD[srcLen] = NUL;
     fprintf(trace_fp, BAD_NAME_FMT, pzD,
             current_tpl->td_file, cur_macro->md_line);
@@ -249,9 +249,9 @@ canonical_name(char * pzD, char const * pzS, int srcLen)
 
     teConState state = CN_START_NAME;
 
-    char const* pzOri = pzS;
-    char*       pzDst = pzD;
-    size_t      stLen = (size_t)srcLen;
+    char const * pzOri = pzS;
+    char *       pzDst = pzD;
+    size_t       stLen = (size_t)srcLen;
 
     /*
      *  Before anything, skip a leading name_sep_ch as a special hack
@@ -589,7 +589,7 @@ find_def(char * name, def_ctx_t * def_ctx, bool * indexed)
         ctx.dcx_defent = ent->de_val.dvu_entry;
 
         for (;;) {
-            def_ent_t* res;
+            def_ent_t * res;
 
             res = find_def(name, &ctx, indexed);
             if ((res != NULL) || (br_ch == '[')) {
@@ -753,9 +753,9 @@ get_def_list(char * name, def_ctx_t * def_ctx)
 {
     static def_ent_list_t defList = { 0, 0, NULL, 0 };
 
-    char*      pcBrace;
-    char       breakCh;
-    def_ent_t* ent;
+    char *      pcBrace;
+    char        breakCh;
+    def_ent_t * ent;
     bool    noNesting = false;
 
     /*

@@ -103,7 +103,7 @@ cyr_run_fsm(
         } else
 #endif /* __COVERITY__ */
         {
-            const t_cyr_transition* pTT =
+            const t_cyr_transition * pTT =
             cyr_trans_table[ cyr_state ] + trans_evt;
             nxtSt = pTT->next_state;
             trans = pTT->transition;

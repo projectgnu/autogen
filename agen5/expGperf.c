@@ -96,7 +96,7 @@ ag_scm_make_gperf(SCM name, SCM hlist)
         AGFREE(cmd);
 
         if (h_list != NULL)
-            free((void *)h_list);
+            free(VOIDP(h_list));
     }
 
     if (do_cleanup) {
@@ -144,8 +144,8 @@ ag_scm_gperf(SCM name, SCM str)
     else
         str = AG_SCM_STR02SCM(key2hash);
 
-    AGFREE((void *)cmd);
-    AGFREE((void *)key2hash);
+    AGFREE(cmd);
+    AGFREE(key2hash);
     return str;
 }
 #endif

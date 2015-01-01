@@ -435,7 +435,7 @@ int
     char const * str)
 {[=
   IF (. is-array) =]
-    [= (. element-type) =] * const bits = (void*)bits_p;[=
+    [= (. element-type) =] * const bits = VOIDP(bits_p);[=
   ENDIF =]
     int    ct  = 0;
     int    res = 0;

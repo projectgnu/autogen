@@ -928,7 +928,7 @@ DEFINE   emit-nondoc-option     =][=
           (get-up-name "arg-default") =][=
 
      =* set                   =]NULL)
-#define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=](void*)([=
+#define [=(sprintf "%-28s " (string-append cap-name "CookieBits"))=]VOIDP([=
         IF (not (exist? "arg-default")) =]0[=
         ELSE =][=
           FOR    arg-default | =][=

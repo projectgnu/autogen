@@ -36,12 +36,12 @@
 
 typedef struct {
     char const *  pzSuspendName;
-    out_stack_t*     pOutDesc;
+    out_stack_t * pOutDesc;
 } tSuspendName;
 
 static int            suspendCt   = 0;
 static int            suspAllocCt = 0;
-static tSuspendName*  pSuspended  = NULL;
+static tSuspendName * pSuspended  = NULL;
 static int            outputDepth = 1;
 
 /**
@@ -88,8 +88,8 @@ do_output_file_line(int line_delta, char const * fmt)
 
     {
         void * args[2] = {
-            (void *)fname,
-            (void *)(uintptr_t)line_delta
+            VOIDP(fname),
+            VOIDP(line_delta)
         };
         sprintfv(buf, fmt, (snv_constpointer *)args);
     }
@@ -150,9 +150,9 @@ LOCAL void
 open_output_file(char const * fname, size_t nmsz, char const * mode, int flags)
 {
     char *    pz;
-    out_stack_t* p  = AGALOC(sizeof(*p), "out file stack");
+    out_stack_t * p  = AGALOC(sizeof(*p), "out file stack");
 
-    pz = (char*)AGALOC(nmsz + 1, "file name string");
+    pz = (char *)AGALOC(nmsz + 1, "file name string");
     memcpy(pz, fname, nmsz);
     pz[ nmsz ] = NUL;
     memset(p, NUL, sizeof(*p));
@@ -241,7 +241,7 @@ SCM
 ag_scm_out_move(SCM new_file)
 {
     size_t sz = AG_SCM_STRLEN(new_file);
-    char * pz = (char*)AGALOC(sz + 1, "file name");
+    char * pz = (char *)AGALOC(sz + 1, "file name");
     memcpy(pz, AG_SCM_CHARS(new_file), sz);
     pz[sz] = NUL;
 
@@ -259,7 +259,7 @@ ag_scm_out_move(SCM new_file)
         }
 
         if ((cur_fpstack->stk_flags & FPF_STATIC_NM) == 0) {
-            AGFREE((void*)cur_fpstack->stk_fname);
+            AGFREE(cur_fpstack->stk_fname);
             cur_fpstack->stk_flags &= ~FPF_STATIC_NM;
         }
 
@@ -300,7 +300,7 @@ ag_scm_out_pop(SCM ret_contents)
         char * pz;
 
         if (pos <= 0) {
-            pz  = (void*)zNil; // const-ness not important
+            pz  = VOIDP(zNil); // const-ness not important
             pos = 0;
 
         } else {
@@ -378,11 +378,11 @@ ag_scm_out_suspend(SCM susp_nm)
     if (++suspendCt > suspAllocCt) {
         suspAllocCt += 8;
         if (pSuspended == NULL)
-            pSuspended = (tSuspendName*)
+            pSuspended = (tSuspendName *)
                 AGALOC(suspAllocCt * sizeof(tSuspendName), "susp file list");
         else
-            pSuspended = (tSuspendName*)
-                AGREALOC((void *)pSuspended,
+            pSuspended = (tSuspendName *)
+                AGREALOC(VOIDP(pSuspended),
                          suspAllocCt * sizeof(tSuspendName), "add to susp f");
     }
 
@@ -418,7 +418,7 @@ ag_scm_out_resume(SCM susp_nm)
         if (strcmp(pSuspended[ ix ].pzSuspendName, pzName) == 0) {
             pSuspended[ ix ].pOutDesc->stk_prev = cur_fpstack;
             cur_fpstack = pSuspended[ ix ].pOutDesc;
-            free((void*)pSuspended[ ix ].pzSuspendName); /* Guile alloc */
+            free(VOIDP(pSuspended[ ix ].pzSuspendName)); /* Guile alloc */
             if (ix < --suspendCt)
                 pSuspended[ ix ] = pSuspended[ suspendCt ];
             ++outputDepth;
@@ -485,7 +485,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
 
         for (; ix < suspendCt; ix++) {
             if (strcmp(pSuspended[ ix ].pzSuspendName, pzName) == 0) {
-                out_stack_t* pSaveFp = cur_fpstack;
+                out_stack_t * pSaveFp = cur_fpstack;
                 cur_fpstack = pSuspended[ ix ].pOutDesc;
                 (void) ag_scm_emit(res);
                 cur_fpstack = pSaveFp;
@@ -501,7 +501,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      *  abend.
      */
     else if (AG_SCM_NUM_P(port)) {
-        out_stack_t* pSaveFp = cur_fpstack;
+        out_stack_t * pSaveFp = cur_fpstack;
         long val = AG_SCM_TO_LONG(port);
 
         if (val < 0) {
@@ -625,11 +625,11 @@ ag_scm_out_push_new(SCM new_file)
          *  This block is used IFF ENABLE_FMEMOPEN is defined and if
          *  --no-fmemopen is *not* selected on the command line.
          */
-        p = (out_stack_t*)AGALOC(sizeof(out_stack_t), "out file stack");
+        p = (out_stack_t *)AGALOC(sizeof(out_stack_t), "out file stack");
         p->stk_prev  = cur_fpstack;
         p->stk_flags  = FPF_FREE;
         p->stk_fp  = ag_fmemopen(NULL, (ssize_t)0, "w" FOPEN_BINARY_FLAG "+");
-        pzNewFile = (char*)MEM_FILE_STR;
+        pzNewFile = (char *)MEM_FILE_STR;
         p->stk_flags |= FPF_STATIC_NM | FPF_NOUNLINK | FPF_NOCHMOD;
 
         if (p->stk_fp == NULL)
@@ -687,7 +687,7 @@ SCM
 ag_scm_out_switch(SCM new_file)
 {
     struct utimbuf tbuf;
-    char*  pzNewFile;
+    char *  pzNewFile;
 
     if (! AG_SCM_STRING_P(new_file))
         return SCM_UNDEFINED;
@@ -702,7 +702,7 @@ ag_scm_out_switch(SCM new_file)
      *  IF no change, THEN ignore this
      */
     if (strcmp(cur_fpstack->stk_fname, pzNewFile) == 0) {
-        AGFREE((void*)pzNewFile);
+        AGFREE(pzNewFile);
         return SCM_UNDEFINED;
     }
 
@@ -757,9 +757,9 @@ ag_scm_out_depth(void)
 SCM
 ag_scm_out_name(void)
 {
-    out_stack_t* p = cur_fpstack;
+    out_stack_t * p = cur_fpstack;
     while (p->stk_flags & FPF_UNLINK)  p = p->stk_prev;
-    return AG_SCM_STR02SCM((void*)p->stk_fname);
+    return AG_SCM_STR02SCM(VOIDP(p->stk_fname));
 }
 
 
@@ -867,7 +867,7 @@ ag_scm_make_header_guard(SCM name)
     size_t       gsz;
 
     {
-        out_stack_t* p = cur_fpstack;
+        out_stack_t * p = cur_fpstack;
         while (p->stk_flags & FPF_UNLINK)  p = p->stk_prev;
         opz = p->stk_fname;
         osz = strlen(opz);

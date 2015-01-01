@@ -41,10 +41,10 @@ next_def_entry(char ** txt_pp, char const ** def_pp);
 static void
 emit_attribute(char const ** def_pp, char ** out_pp);
 
-static char*
+static char *
 emit_subblock(char const * pzDefList, char * pzText, char * pzOut);
 
-static char*
+static char *
 subblock_str(char ** ppzText, uint_t sepChar, char * pzOut);
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -187,8 +187,8 @@ compress_def(char * pz)
 /*
  *  emitDefinition
  */
-LOCAL char*
-emitDefinition(char* pzDef, char* pzOut)
+LOCAL char *
+emitDefinition(char * pzDef, char * pzOut)
 {
     char sep_char;
     char zEntryName[ MAXNAMELEN ];
@@ -197,7 +197,7 @@ emitDefinition(char* pzDef, char* pzOut)
      *  Indent attribute definitions four spaces
      */
     {
-        char*  p = zEntryName;
+        char * p = zEntryName;
         *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' '; *pzOut++ = ' ';
 
         while (AG_NAME_CHAR(*pzDef))
@@ -353,7 +353,7 @@ list_attrib(char * pzText, char * pzOut)
 static char *
 emit_quote(char ** ppzText, char * pzOut)
 {
-    char*  pzText = *ppzText;
+    char * pzText = *ppzText;
     char   svch   = (*pzOut++ = *pzText++);
 
     for (;;) {
@@ -428,7 +428,7 @@ emit_attribute(char const ** def_pp, char ** out_pp)
 /*
  *  emit_subblock
  */
-static char*
+static char *
 emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
 {
     static char const zStart[]  = " = {";
@@ -513,7 +513,7 @@ emit_subblock(char const * pzDefList, char * pzText, char * pzOut)
  *  Emit a string in a fashion that autogen will be able to
  *  correctly reconstruct it.
  */
-static char*
+static char *
 subblock_str(char ** ppzText, uint_t sepChar, char * pzOut)
 {
     char * pzText  = *ppzText;
@@ -553,7 +553,7 @@ subblock_str(char ** ppzText, uint_t sepChar, char * pzOut)
      *  last character in the string)
      */
     pcComma = strchr(pzText, (int)sepChar);
-    if (pcComma == (char*)NULL) {
+    if (pcComma == (char *)NULL) {
         pcEnd = pzText + strlen(pzText);
         pcComma = pcEnd-1;
     } else {

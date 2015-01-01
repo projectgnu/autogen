@@ -63,7 +63,7 @@ fswarn(char const * op, char const * fname)
 LOCAL char *
 aprf(char const * pzFmt, ...)
 {
-    char* pz;
+    char * pz;
     va_list ap;
     va_start(ap, pzFmt);
     (void)vasprintf(&pz, pzFmt, ap);
@@ -85,7 +85,7 @@ static void
 define_base_name(void)
 {
     char const *  pz;
-    char* pzD;
+    char * pzD;
 
     if (! ENABLED_OPT(DEFINITIONS)) {
         OPT_ARG(BASE_NAME) = DFT_BASE_NAME;
@@ -138,7 +138,7 @@ put_defines_into_env(void)
          */
         if (strchr(pz, '=') == NULL) {
             size_t siz = strlen(pz)+3;
-            char*  p   = AGALOC(siz, "env define");
+            char * p   = AGALOC(siz, "env define");
 
             strcpy(p, pz);
             strcpy(p+siz-3, DFT_ENV_VAL);
@@ -148,7 +148,7 @@ put_defines_into_env(void)
         /*
          *  Now put it in the environment
          */
-        putenv((char*)pz);
+        putenv((char *)pz);
     } while (--ct > 0);
 }
 

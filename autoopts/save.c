@@ -92,7 +92,7 @@ find_dir_name(tOptions * opts, int * p_free)
      *  we can stash the RC (INI) file.
      */
     {
-        char const * const* papz = opts->papzHomeList;
+        char const * const * papz = opts->papzHomeList;
         if (papz == NULL)
             return NULL;
 
@@ -183,7 +183,7 @@ find_file_name(tOptions * opts, int * p_free_name)
             fprintf(stderr, zsave_warn, opts->pzProgName);
             fprintf(stderr, zNoStat, errno, strerror(errno), pzDir);
             if (free_dir_name)
-                AGFREE((void*)pzDir);
+                AGFREE(pzDir);
             return NULL;
         }
 
@@ -216,14 +216,14 @@ find_file_name(tOptions * opts, int * p_free_name)
         size_t sz = strlen(pzDir) + strlen(opts->pzRcName) + 2;
 
         {
-            char * pzPath = (char*)AGALOC(sz, "file name");
+            char * pzPath = (char *)AGALOC(sz, "file name");
 #ifdef HAVE_SNPRINTF
             snprintf(pzPath, sz, "%s/%s", pzDir, opts->pzRcName);
 #else
             sprintf(pzPath, "%s/%s", pzDir, opts->pzRcName);
 #endif
             if (free_dir_name)
-                AGFREE((void*)pzDir);
+                AGFREE(pzDir);
             pzDir = pzPath;
             free_dir_name = 1;
         }
@@ -237,7 +237,7 @@ find_file_name(tOptions * opts, int * p_free_name)
                 fprintf(stderr, zsave_warn, opts->pzProgName);
                 fprintf(stderr, zNoStat, errno, strerror(errno),
                         pzDir);
-                AGFREE((void*)pzDir);
+                AGFREE(pzDir);
                 return NULL;
             }
 
@@ -255,7 +255,7 @@ find_file_name(tOptions * opts, int * p_free_name)
     if (! S_ISREG(stBuf.st_mode)) {
         fprintf(stderr, zsave_warn, opts->pzProgName, pzDir);
         if (free_dir_name)
-            AGFREE((void*)pzDir);
+            AGFREE(pzDir);
         return NULL;
     }
 
@@ -377,7 +377,7 @@ prt_value(FILE * fp, int depth, tOptDesc * pOD, tOptionValue const * ovp)
                     /*
                      *  set membership strings get allocated
                      */
-                    AGFREE((void*)pOD->optArg.argString);
+                    AGFREE(pOD->optArg.argString);
                 }
             }
 
@@ -534,12 +534,12 @@ open_sv_file(tOptions * opts)
             fprintf(stderr, zsave_warn, opts->pzProgName);
             fprintf(stderr, zNoCreat, errno, strerror(errno), pzFName);
             if (free_name)
-                AGFREE((void*) pzFName );
+                AGFREE(pzFName);
             return fp;
         }
 
         if (free_name)
-            AGFREE((void*)pzFName);
+            AGFREE(pzFName);
     }
 
     fputs("#  ", fp);
@@ -560,7 +560,7 @@ open_sv_file(tOptions * opts)
          *  normally point to static data that is overwritten by each call.
          *  The test to detect allocated ctime, so we leak the memory.
          */
-        AGFREE((void*)time_str);
+        AGFREE(time_str);
 #endif
     }
 
@@ -596,7 +596,7 @@ static void
 prt_str_arg(FILE * fp, tOptDesc * pOD)
 {
     if (pOD->fOptState & OPTST_STACKED) {
-        tArgList * pAL = (tArgList*)pOD->optCookie;
+        tArgList * pAL = (tArgList *)pOD->optCookie;
         int        uct = pAL->useCt;
         char const ** ppz = pAL->apzArgs;
 
@@ -629,7 +629,7 @@ prt_enum_arg(FILE * fp, tOptDesc * od)
      *  bit flag values back into a string suitable for printing.
      */
     (*(od->pOptProc))(OPTPROC_RETURN_VALNAME, od);
-    prt_entry(fp, od, (void*)(od->optArg.argString));
+    prt_entry(fp, od, VOIDP(od->optArg.argString));
 
     od->optArg.argEnum = val;
 }
@@ -689,7 +689,7 @@ prt_file_arg(FILE * fp, tOptDesc * od, tOptions * opts)
  *
  * what:  saves the option state to a file
  *
- * arg:   tOptions*,   opts,  program options descriptor
+ * arg:   tOptions *,   opts,  program options descriptor
  *
  * doc:
  *
@@ -765,7 +765,7 @@ optionSaveFile(tOptions * opts)
             break;
 
         case OPARG_TYPE_NUMERIC:
-            prt_entry(fp, p, (void*)(p->optArg.argInt));
+            prt_entry(fp, p, VOIDP(p->optArg.argInt));
             break;
 
         case OPARG_TYPE_STRING:

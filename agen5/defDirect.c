@@ -451,7 +451,7 @@ doDir_assert(directive_enum_t id, char const * dir, char * scan_next)
             break; /* not a valid script */
 
         *pzR = NUL;
-        pzS = shell_cmd((char const*)pzS);
+        pzS = shell_cmd((char const *)pzS);
         check_assert_str(pzS, dir);
         AGFREE(pzS);
         break;
@@ -677,9 +677,9 @@ doDir_include(directive_enum_t id, char const * dir, char * scan_next)
      */
     {
         size_t sz = sizeof(scan_ctx_t) + 4 + inc_sz;
-        new_ctx = (scan_ctx_t*)AGALOC(sz, "inc def head");
+        new_ctx = (scan_ctx_t *)AGALOC(sz, "inc def head");
 
-        memset((void*)new_ctx, 0, sz);
+        memset(VOIDP(new_ctx), 0, sz);
         new_ctx->scx_line = 1;
     }
 
@@ -710,7 +710,7 @@ doDir_include(directive_enum_t id, char const * dir, char * scan_next)
             add_source_file(full_name);
 
         do  {
-            size_t rdct = fread((void*)pz, (size_t)1, inc_sz, fp);
+            size_t rdct = fread(VOIDP(pz), (size_t)1, inc_sz, fp);
 
             if (rdct == 0)
                 AG_CANT(DIRECT_INC_CANNOT_READ, full_name);
@@ -861,7 +861,7 @@ doDir_shell(directive_enum_t id, char const * arg, char * scan_next)
      */
     scan_next = strchr(scan_next + endshell_len, NL);
     if (scan_next == NULL)
-        scan_next = (void*)zNil;
+        scan_next = VOIDP(zNil);
 
     /*
      *  Save the scan pointer into the current context
@@ -886,7 +886,7 @@ doDir_shell(directive_enum_t id, char const * arg, char * scan_next)
      *  This is an extra allocation and copy, but easier than rewriting
      *  'loadData()' for this special context.
      */
-    pCtx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t) + strlen(pzText) + 4,
+    pCtx = (scan_ctx_t *)AGALOC(sizeof(scan_ctx_t) + strlen(pzText) + 4,
                              "shell output");
 
     /*

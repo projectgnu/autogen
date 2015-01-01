@@ -55,7 +55,7 @@ test   = {
 	#include <sys/types.h>
 	#include REGEX_HEADER
 	static regex_t re;
-	void comp_re( char const* pzPat ) {
+	void comp_re(char const * pzPat) {
 	  int res = regcomp( &re, pzPat, REG_EXTENDED|REG_ICASE|REG_NEWLINE );
 	  if (res == 0) return;
 	  exit( res ); }
@@ -95,8 +95,8 @@ test = {
     code   = <<-  _EOF_
 	#include <string.h>
 	#include <stdlib.h>
-	int main (int argc, char** argv) {
-	   char* pz = pathfind( getenv( "PATH" ), "sh", "x" );
+	int main (int argc, char ** argv) {
+	   char * pz = pathfind( getenv( "PATH" ), "sh", "x" );
 	   return (pz == 0) ? 1 : 0;
 	}
 	_EOF_;
@@ -134,7 +134,7 @@ test = {
     code   = <<-  _EOF_
 	#include <limits.h>
 	#include <stdlib.h>
-	int main (int argc, char** argv) {
+	int main (int argc, char ** argv) {
 	#ifndef PATH_MAX
 	choke me!!
 	#else
@@ -195,8 +195,8 @@ test = {
                  "[fopen(3) accepts a 'b' in the mode flag])"; };
     code   = <<- _EOF_
 	#include <stdio.h>
-	int main (int argc, char** argv) {
-	FILE* fp = fopen("conftest.$ac_ext", "rb");
+	int main (int argc, char ** argv) {
+	FILE * fp = fopen("conftest.$ac_ext", "rb");
 	return (fp == NULL) ? 1 : fclose(fp); }
 	_EOF_;
     doc = <<- _END_OF_DOC_
@@ -219,8 +219,8 @@ test = {
                  "[fopen(3) accepts a 't' in the mode flag])"; };
     code   = <<- _EOF_
 	#include <stdio.h>
-	int main (int argc, char** argv) {
-	FILE* fp = fopen("conftest.$ac_ext", "rt");
+	int main (int argc, char ** argv) {
+	FILE * fp = fopen("conftest.$ac_ext", "rt");
 	return (fp == NULL) ? 1 : fclose(fp); }
 	_EOF_;
     doc = <<- _END_OF_DOC_
@@ -339,10 +339,10 @@ do-first = <<-_EOF_
 	])
 	AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t,
 			intptr_t, uintptr_t, uint_t, pid_t, size_t, ptrdiff_t])
-	AC_CHECK_SIZEOF(char*, 8)
-	AC_CHECK_SIZEOF(int,   4)
-	AC_CHECK_SIZEOF(long,  8)
-	AC_CHECK_SIZEOF(short, 2)
+	AC_CHECK_SIZEOF(char *, 8)
+	AC_CHECK_SIZEOF(int,    4)
+	AC_CHECK_SIZEOF(long,   8)
+	AC_CHECK_SIZEOF(short,  2)
 
 	# ------------
 	# AC_CHECK_LIB

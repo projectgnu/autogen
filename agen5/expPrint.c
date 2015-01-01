@@ -35,7 +35,7 @@ static int        printJumpSignal = 0;
 
 /* = = = START-STATIC-FORWARD = = = */
 static ssize_t
-safePrintf(char** ppzBuf, char const * pzFmt, void** argV);
+safePrintf(char ** ppzBuf, char const * pzFmt, void ** argV);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifndef DEBUG_ENABLED
@@ -47,7 +47,7 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV);
 #endif
 
 static ssize_t
-safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
+safePrintf(char ** ppzBuf, char const * pzFmt, void ** argV)
 {
 #if ! defined(DEBUG_ENABLED)
     /*
@@ -77,7 +77,7 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
      */
     if (sigsetjmp(printJumpEnv, 0) != 0) {
 #ifndef HAVE_STRSIGNAL
-        extern char* strsignal(int signo);
+        extern char * strsignal(int signo);
 #endif
         /*
          *  IF the fprintf command in the then clause has not failed yet,
@@ -95,7 +95,7 @@ safePrintf(char** ppzBuf, char const * pzFmt, void** argV)
 #endif /* ! defined(DEBUG_ENABLED) */
 
     {
-        int p_sz = asprintfv(ppzBuf, pzFmt, (snv_constpointer*)argV);
+        int p_sz = asprintfv(ppzBuf, pzFmt, (snv_constpointer *)argV);
         if (((unsigned)p_sz & ~0xFFFFFU) != 0) /* 1MB max */
             AG_ABEND(aprf(ASPRINTFV_FAIL_FMT, p_sz));
 
@@ -119,7 +119,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
     if (len < 8)
         arglist = argp = args;
     else {
-        size_t sz = (size_t)((unsigned)(len+1) * sizeof(void*));
+        size_t sz = (size_t)((unsigned)(len+1) * sizeof(void *));
         arglist = argp = malloc(sz);
     }
 
@@ -129,24 +129,24 @@ run_printf(char const * pzFmt, int len, SCM alist)
         switch (ag_scm_type_e(car)) {
         default:
         case GH_TYPE_UNDEFINED:
-            *(argp++) = (char*)RUN_PRINTF_HUH;
+            *(argp++) = (char *)RUN_PRINTF_HUH;
             break;
 
         case GH_TYPE_BOOLEAN:
-            *(argp++) = (void*)((car == SCM_BOOL_F)
-                                ? SCM_FALSE_STR : SCM_TRUE_STR);
+            *(argp++) = VOIDP((car == SCM_BOOL_F)
+                              ? SCM_FALSE_STR : SCM_TRUE_STR);
             break;
 
         case GH_TYPE_CHAR:
-            *(char*)(argp++) = (char)AG_SCM_CHAR(car);
+            *(char *)(argp++) = (char)AG_SCM_CHAR(car);
             break;
 
         case GH_TYPE_PAIR:
-            *(argp++) = (char*)(SCM_LIST_STR+1);
+            *(argp++) = (char *)(SCM_LIST_STR+1);
             break;
 
         case GH_TYPE_NUMBER:
-            *(unsigned long*)(argp++) = AG_SCM_TO_ULONG(car);
+            *(unsigned long *)(argp++) = AG_SCM_TO_ULONG(car);
             break;
 
         case GH_TYPE_SYMBOL:
@@ -155,12 +155,12 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_PROCEDURE:
-            *(argp++) = (char*)SCM_PROC_CAST;
+            *(argp++) = (char *)SCM_PROC_CAST;
             break;
 
         case GH_TYPE_VECTOR:
         case GH_TYPE_LIST:
-            *(argp++) = (char*)SCM_LIST_STR;
+            *(argp++) = (char *)SCM_LIST_STR;
             break;
         }
     }
@@ -177,7 +177,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
     }
 
     if (arglist != args)
-        AGFREE((void*)arglist);
+        AGFREE(arglist);
 
     return res;
 }
@@ -324,7 +324,7 @@ ag_scm_hide_email(SCM display, SCM eaddr)
 SCM
 ag_scm_format_arg_count(SCM fmt)
 {
-    char* pzFmt = ag_scm2zchars(fmt, WORD_FORMAT);
+    char * pzFmt = ag_scm2zchars(fmt, WORD_FORMAT);
     int   ct    = 0;
     for (;;) {
         switch (*(pzFmt++)) {

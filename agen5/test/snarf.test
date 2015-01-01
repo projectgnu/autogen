@@ -108,11 +108,11 @@ extern SCM snarf_grp_scm_sym_bumble_it          = SCM_BOOL_F;
 static SCM snarf_grp_scm_sym_mumble_check       = SCM_BOOL_F;
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
-  scm_c_define_gsubr((char*)(_As),          \
-                   _Ar, _Ao, _Ax, (scm_callback_t)(void*)ag_scm_ ## _An)
+  scm_c_define_gsubr((char *)(_As),          \
+                   _Ar, _Ao, _Ax, (scm_callback_t)VOIDP(ag_scm_ ## _An))
 #else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
-  gh_new_procedure((char*)(_As), (scm_callback_t)(void*)ag_scm_ ## _An,     \
+  gh_new_procedure((char *)(_As), (scm_callback_t)VOIDP(ag_scm_ ## _An),     \
                    _Ar, _Ao, _Ax)
 #endif
 
@@ -223,22 +223,22 @@ agrelay_scm_test_to_example_x(SCM scm0)
 
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
-  scm_c_define_gsubr((char*)(_As),          \
-                   _Ar, _Ao, _Ax, (scm_callback_t)(void*)agrelay_scm_ ## _An)
+  scm_c_define_gsubr((char *)(_As),          \
+                   _Ar, _Ao, _Ax, (scm_callback_t)VOIDP(agrelay_scm_ ## _An))
 #else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                    \
-  gh_new_procedure((char*)(_As), (scm_callback_t)(void*)agrelay_scm_ ## _An, \
+  gh_new_procedure((char *)(_As), (scm_callback_t)VOIDP(agrelay_scm_ ## _An), \
                    _Ar, _Ao, _Ax)
 #endif
 
 #else /* DEBUG_ENABLED *not* */
 #if GUILE_VERSION >= 108000
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)   \
-  scm_c_define_gsubr((char*)(_As),          \
-                   _Ar, _Ao, _Ax, (scm_callback_t)(void*)ag_scm_ ## _An)
+  scm_c_define_gsubr((char *)(_As),          \
+                   _Ar, _Ao, _Ax, (scm_callback_t)VOIDP(ag_scm_ ## _An))
 #else
 #define NEW_PROC(_As, _Ar, _Ao, _Ax, _An)                                   \
-  gh_new_procedure((char*)(_As), (scm_callback_t)(void*)ag_scm_ ## _An,     \
+  gh_new_procedure((char *)(_As), (scm_callback_t)VOIDP(ag_scm_ ## _An),     \
                    _Ar, _Ao, _Ax)
 #endif
 #endif /* DEBUG_ENABLED */

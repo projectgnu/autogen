@@ -55,19 +55,19 @@ copy_mark(char const * text, char * marker, size_t * ret_ct);
 static char const *
 do_scheme_expr(char const * text, char const * fname)
 {
-    char *    pzEnd = (char*)text + strlen(text);
+    char *    pzEnd = (char *)text + strlen(text);
     char      ch;
     macro_t * pCM   = cur_macro;
     macro_t   mac   = { (mac_func_t)~0, 0, 0, 0, 0, 0, 0, NULL };
 
     mac.md_line = tpl_line;
-    pzEnd       = (char*)skip_scheme(text, pzEnd);
+    pzEnd       = (char *)skip_scheme(text, pzEnd);
     ch          = *pzEnd;
     *pzEnd      = NUL;
     cur_macro   = &mac;
 
     ag_scm_c_eval_string_from_file_line(
-          (char*)text, fname, tpl_line );
+          (char *)text, fname, tpl_line );
 
     cur_macro = pCM;
     *pzEnd    = ch;
@@ -419,8 +419,8 @@ load_pseudo_mac(char const * text, char const * fname)
         switch (trans) {
         case PM_TR_SKIP_ED_MODE:
         {
-            char* pzEnd = strstr(text + 3, PSEUDO_MAC_MODE_MARK);
-            char* pzNL  = strchr(text + 3, NL);
+            char * pzEnd = strstr(text + 3, PSEUDO_MAC_MODE_MARK);
+            char * pzNL  = strchr(text + 3, NL);
             if ((pzEnd == NULL) || (pzNL < pzEnd))
                 BAD_MARKER(PSEUDO_MAC_BAD_MODE);
 

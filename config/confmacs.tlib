@@ -95,7 +95,7 @@ AC_DEFUN([[=
   (define end-requested-disablement "")
 
   (if (= (get "code-mode") "body")
-    (set! c-text (string-append "int main(int argc,char** argv) {\n"
+    (set! c-text (string-append "int main(int argc, char ** argv) {\n"
           c-text "\nreturn 0; }" )) )
 
   mac-name                      =]],[[=

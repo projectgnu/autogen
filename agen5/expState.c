@@ -56,7 +56,7 @@ static SCM
 find_entry_value(SCM op, SCM obj, SCM test);
 
 static ver_type_t
-str2int_ver(char* pz);
+str2int_ver(char * pz);
 
 static SCM
 do_tpl_file_line(int line_delta, char const * fmt);
@@ -113,8 +113,8 @@ static SCM
 find_entry_value(SCM op, SCM obj, SCM test)
 {
     bool     isIndexed;
-    def_ent_t*  pE;
-    char*       pzField;
+    def_ent_t * pE;
+    char *      pzField;
 
     {
         char * name = ag_scm2zchars(obj, "find name");
@@ -248,9 +248,9 @@ ag_scm_base_name(void)
  *       @end example
 =*/
 static ver_type_t
-str2int_ver(char* pz)
+str2int_ver(char * pz)
 {
-    char* pzStr = pz;
+    char * pzStr = pz;
     ver_type_t  val = 0;
     int ix = 4;
 
@@ -555,7 +555,7 @@ ag_scm_get_down_name(SCM agName)
 SCM
 ag_scm_high_lim(SCM obj)
 {
-    def_ent_t*  pE;
+    def_ent_t *  pE;
     bool     isIndexed;
 
     pE = find_def_ent(ag_scm2zchars(obj, "ag value"), &isIndexed);
@@ -610,7 +610,7 @@ ag_scm_len(SCM obj)
 SCM
 ag_scm_low_lim(SCM obj)
 {
-    def_ent_t*  pE;
+    def_ent_t * pE;
     bool     x;
 
     pE = find_def_ent(ag_scm2zchars(obj, "ag value"), &x);
@@ -654,7 +654,7 @@ ag_scm_set_option(SCM opt)
 SCM
 ag_scm_suffix(void)
 {
-    return AG_SCM_STR02SCM((char*)curr_sfx);
+    return AG_SCM_STR02SCM((char *)curr_sfx);
 }
 
 
@@ -691,8 +691,8 @@ do_tpl_file_line(int line_delta, char const * fmt)
 {
     unsigned int ln_no = (unsigned int)cur_macro->md_line;
     void * args[2] = {
-        [0] = (void *)current_tpl->td_file,
-        [1] = (void *)(uintptr_t)(ln_no + (unsigned)line_delta)
+        [0] = VOIDP(current_tpl->td_file),
+        [1] = VOIDP(ln_no + (unsigned)line_delta)
     };
     char * buf = strrchr(args[0], DIRCH);
     if (buf != NULL)
@@ -703,7 +703,7 @@ do_tpl_file_line(int line_delta, char const * fmt)
         buf = scribble_get(sz);
     }
 
-    sprintfv(buf, fmt, (snv_constpointer*)args);
+    sprintfv(buf, fmt, (snv_constpointer *)args);
     return AG_SCM_STR02SCM(buf);
 }
 
@@ -803,8 +803,8 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
 
     {
         void * args[2] = {
-            (void *)pE->de_file,
-            (void *)(uintptr_t)pE->de_line
+            VOIDP(pE->de_file),
+            VOIDP(pE->de_line)
         };
         ssize_t maxlen;
 
@@ -815,7 +815,7 @@ ag_scm_def_file_line(SCM obj, SCM fmt)
         maxlen = (ssize_t)(
             strlen(args[0]) + strlen(pzFmt) + LOG10_2to32 + 1);
         buf    = scribble_get(maxlen);
-        sprintfv(buf, pzFmt, (snv_constpointer*)args);
+        sprintfv(buf, pzFmt, (snv_constpointer *)args);
     }
 
     return AG_SCM_STR02SCM(buf);

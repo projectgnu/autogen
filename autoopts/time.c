@@ -31,8 +31,8 @@
  * private:
  *
  * what:  process an option with a time duration.
- * arg:   + tOptions* + opts + program options descriptor +
- * arg:   + tOptDesc* + od   + the descriptor for this arg +
+ * arg:   + tOptions * + opts + program options descriptor +
+ * arg:   + tOptDesc * + od   + the descriptor for this arg +
  *
  * doc:
  *  Decipher a time duration value.
@@ -64,8 +64,8 @@ optionTimeVal(tOptions * opts, tOptDesc * od)
  * private:
  *
  * what:  process an option with a time and date.
- * arg:   + tOptions* + opts + program options descriptor +
- * arg:   + tOptDesc* + od   + the descriptor for this arg +
+ * arg:   + tOptions * + opts + program options descriptor +
+ * arg:   + tOptDesc * + od   + the descriptor for this arg +
  *
  * doc:
  *  Decipher a time and date value.

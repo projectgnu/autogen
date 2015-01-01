@@ -74,7 +74,7 @@ gettext(char const* pzS)
     if (pzS == NULL)
         return NULL;
     if (strchr(pzS, '%') != NULL)
-        return (void *)pzS;
+        return VOIDP(pzS);
     *--pzD = '\0';
     while ((*pzS == ' ') || (*pzS == '\t'))  pzS++;
     for (;;) {

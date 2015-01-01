@@ -82,10 +82,10 @@ loadScheme(void);
 static void
 alist_to_autogen_def(void);
 
-static char*
+static char *
 gather_name(char * scan, te_dp_event * ret_val);
 
-static char*
+static char *
 build_here_str(char * scan);
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -95,7 +95,7 @@ build_here_str(char * scan);
 static void
 pop_context(void)
 {
-    scan_ctx_t* pCX = cctx;
+    scan_ctx_t * pCX = cctx;
     cctx          = cctx->scx_next;
     pCX->scx_next = end_ctx;
     end_ctx       = pCX;
@@ -172,7 +172,7 @@ static tSuccess
 lex_backquote(void)
 {
     int line_no = cctx->scx_line;
-    char* pz = ao_string_cook(cctx->scx_scan, &line_no);
+    char * pz = ao_string_cook(cctx->scx_scan, &line_no);
 
     if (pz == NULL)
         return FAILURE;
@@ -182,7 +182,7 @@ lex_backquote(void)
     cctx->scx_scan = pz;
 
     token_code = DP_EV_STRING;
-    pz = shell_cmd((char const*)token_str);
+    pz = shell_cmd((char const *)token_str);
     cctx->scx_line = line_no;
 
     if (pz == NULL)
@@ -201,9 +201,9 @@ lex_comment(void)
     switch (cctx->scx_scan[1]) {
     case '*':
     {
-        char* pz = strstr(cctx->scx_scan+2, END_C_COMMENT);
+        char * pz = strstr(cctx->scx_scan+2, END_C_COMMENT);
         if (pz != NULL) {
-            char* p = cctx->scx_scan+1;
+            char * p = cctx->scx_scan+1;
             for (;;) {
                 p = strchr(p+1, NL);
                 if ((p == NULL) || (p > pz))
@@ -217,7 +217,7 @@ lex_comment(void)
     }
     case '/':
     {
-        char* pz = strchr(cctx->scx_scan+2, NL);
+        char * pz = strchr(cctx->scx_scan+2, NL);
         if (pz != NULL) {
             cctx->scx_scan = pz+1;
             cctx->scx_line++;
@@ -287,7 +287,7 @@ lex_dollar(void)
 static tSuccess
 lex_here_string(void)
 {
-    char* pz;
+    char * pz;
     if (cctx->scx_scan[1] != '<')
         return FAILURE;
 
@@ -358,7 +358,7 @@ scan_again:
     case '\'':
     case '"':
     {
-        char* pz = ao_string_cook(cctx->scx_scan, &(cctx->scx_line));
+        char * pz = ao_string_cook(cctx->scx_scan, &(cctx->scx_line));
         if (pz == NULL)
             goto NUL_error;
 
@@ -440,7 +440,7 @@ scan_again:
 
 
 LOCAL void
-yyerror(char* s)
+yyerror(char * s)
 {
     char * pz;
 
@@ -469,8 +469,8 @@ yyerror(char* s)
 static void
 loadScheme(void)
 {
-    char*    pzText    = cctx->scx_scan;
-    char*    pzEnd     = (char *)skip_scheme(pzText, pzText + strlen(pzText));
+    char *   pzText    = cctx->scx_scan;
+    char *   pzEnd     = (char *)skip_scheme(pzText, pzText + strlen(pzText));
     char     endCh     = *pzEnd;
     int      schemeLen = (int)(pzEnd - pzText);
     int      next_ln;
@@ -521,12 +521,12 @@ loadScheme(void)
 static void
 alist_to_autogen_def(void)
 {
-    char*  pzText  = ++(cctx->scx_scan);
-    char*  pzEnd   = (char *)skip_scheme(pzText, pzText + strlen(pzText));
+    char * pzText  = ++(cctx->scx_scan);
+    char * pzEnd   = (char *)skip_scheme(pzText, pzText + strlen(pzText));
 
     SCM    res;
     size_t res_len;
-    scan_ctx_t*  pCtx;
+    scan_ctx_t * pCtx;
 
     /*
      *  Wrap the scheme expression with the `alist->autogen-def' function
@@ -560,7 +560,7 @@ alist_to_autogen_def(void)
      *  Now, push the resulting string onto the input stack
      *  and link the new scan data into the context stack
      */
-    pCtx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t) + 4 + res_len, "lex ctx");
+    pCtx = (scan_ctx_t *)AGALOC(sizeof(scan_ctx_t) + 4 + res_len, "lex ctx");
     pCtx->scx_next = cctx;
     cctx           = pCtx;
 
@@ -571,7 +571,7 @@ alist_to_autogen_def(void)
     pCtx->scx_scan = \
     pCtx->scx_data = (char *)(pCtx + 1);
     pCtx->scx_line = 0;
-    memcpy((void *)(pCtx->scx_scan), (void *)AG_SCM_CHARS(res), res_len);
+    memcpy(VOIDP(pCtx->scx_scan), VOIDP(AG_SCM_CHARS(res)), res_len);
     pCtx->scx_scan[ res_len ] = NUL;
 
     /*
@@ -588,7 +588,7 @@ alist_to_autogen_def(void)
  *  It may be a number, a name, a keyword or garbage.
  *  Figure out which.
  */
-static char*
+static char *
 gather_name(char * scan, te_dp_event * ret_val)
 {
     /*
@@ -628,7 +628,7 @@ gather_name(char * scan, te_dp_event * ret_val)
          *  we will return that token code instead.
          */
         token_str = scan;
-        scan   = (char*)pz;
+        scan   = (char *)pz;
     }
 
     /*
@@ -640,7 +640,7 @@ gather_name(char * scan, te_dp_event * ret_val)
         *scan = NUL;         /* NUL terminate the name           */
 
         do  {
-            if (streqvcmp(kword_table[ kw_ix ], (char*)token_str) == 0) {
+            if (streqvcmp(kword_table[ kw_ix ], (char *)token_str) == 0) {
                 /*
                  *  Return the keyword token code instead of DP_EV_NAME
                  */
@@ -660,7 +660,7 @@ gather_name(char * scan, te_dp_event * ret_val)
  *  A quoted string has been found.
  *  Find the end of it and compress any escape sequences.
  */
-static char*
+static char *
 build_here_str(char * scan)
 {
     bool     no_tabs = false;
@@ -751,7 +751,7 @@ build_here_str(char * scan)
     /*
      *  dest may still equal token_str, if no data were copied
      */
-    if (dest > (char*)token_str)
+    if (dest > (char *)token_str)
          dest[-1] = NUL;
     else dest[0]  = NUL;
 

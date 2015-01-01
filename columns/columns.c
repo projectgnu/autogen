@@ -29,7 +29,7 @@
 #endif
 
 struct print_list {
-    char**     papz;
+    char **    papz;
     int        index;
 };
 
@@ -42,7 +42,7 @@ int fillColumnCt  = 0;
 char zLine[ LINE_LIMIT ];
 char zFmtLine[ LINE_LIMIT ];
 
-char**       papzLines  = (char**)NULL;
+char **      papzLines  = (char **)NULL;
 char const * pzLinePfx  = "";
 char const * pzFirstPfx = NULL;
 size_t       allocCt    = 0;
@@ -115,7 +115,7 @@ main(int argc, char ** argv)
     readLines();
 
     if (HAVE_OPT( SORT ))
-        qsort( (void*)papzLines, usedCt, sizeof( char* ), &compProc );
+        qsort(VOIDP(papzLines), usedCt, sizeof(char *), &compProc);
 
     if (HAVE_OPT( BY_COLUMNS ))
         writeColumns();
@@ -274,8 +274,8 @@ readLines(void)
      *  Read the input text, stripping trailing white space
      */
     for (;;) {
-        char*   pzL;
-        char*   pzText = fgets(zLine, (int)sizeof( zLine ), stdin);
+        char *  pzL;
+        char *  pzText = fgets(zLine, (int)sizeof(zLine), stdin);
         size_t  len;
 
         if (pzText == NULL)
@@ -314,11 +314,11 @@ readLines(void)
          *  Allocate a string and space in the pointer array.
          */
         len += (size_t)sepLen + 1;
-        pzL = (char*)malloc_or_die( len );
+        pzL = (char *)malloc_or_die( len );
         if (++usedCt > allocCt) {
             allocCt += 128;
-            papzLines = (char**)realloc( (void*)papzLines,
-                                         sizeof( char* ) * allocCt );
+            papzLines = (char **)realloc(VOIDP(papzLines),
+                                         sizeof(char *) * allocCt );
         }
         papzLines[ usedCt-1 ] = pzL;
 
@@ -493,8 +493,8 @@ writeColumns(void)
      *  Now, actually print each row...
      */
     for ( row = 0 ;; ) {
-        char*  pzL;
-        char*  pzE;
+        char * pzL;
+        char * pzE;
 
         if (pzLinePfx != NULL)
             fputs( pzLinePfx, stdout );
@@ -525,7 +525,7 @@ writeColumns(void)
         while (++col < colCt) {
             pzL = *(pPL[col-1].papz++);
             fprintf( stdout, zFmt, pzL );
-            free( (void*)pzL );
+            free( VOIDP(pzL) );
         }
 
         /*
@@ -538,8 +538,8 @@ writeColumns(void)
              *  THEN remove it from the last entry.
              */
             if (HAVE_OPT( SEPARATION )) {
-                char* pz = pzE + strlen( pzE )
-                         - strlen( OPT_ARG(SEPARATION));
+                char * pz = pzE + strlen( pzE )
+                          - strlen( OPT_ARG(SEPARATION));
                 *pz = NUL;
             }
 
@@ -561,7 +561,7 @@ writeColumns(void)
             fputs( OPT_ARG( LINE_SEPARATION ), stdout );
 
         putc( '\n', stdout );
-        free( (void*)pzE );
+        free( VOIDP(pzE) );
     }
 
     free(pPL);
@@ -570,7 +570,7 @@ writeColumns(void)
 static void
 trim_last_separation(void)
 {
-    char* pz = papzLines[ usedCt-1 ];
+    char * pz = papzLines[ usedCt-1 ];
     pz += strlen(pz) - strlen( OPT_ARG(SEPARATION));
     *pz = NUL;
 }
@@ -593,7 +593,7 @@ writeRows(void)
     }
 
     {
-        char**  ppzLL = papzLines;
+        char ** ppzLL = papzLines;
         size_t  left  = usedCt;
         int     lnNo  = 0;
 
@@ -601,7 +601,7 @@ writeRows(void)
          *  FOR every entry we are to emit, ...
          */
         for (;;) {
-            char* pzL = *ppzLL++;
+            char * pzL = *ppzLL++;
 
             /*
              *  IF this is the last entry,
@@ -613,7 +613,7 @@ writeRows(void)
                     fputs(OPT_ARG(ENDING), stdout);
 
                 putc('\n', stdout);
-                free((void*)pzL);
+                free(VOIDP(pzL));
                 break;
             }
 
@@ -647,7 +647,7 @@ writeRows(void)
                 }
             }
 
-            free( (void*)pzL );
+            free( VOIDP(pzL) );
         }
     }
 }
@@ -688,7 +688,7 @@ emitWord(char const * word, size_t len, int col)
 static void
 writeFill(void)
 {
-    char**  ppzLL = papzLines;
+    char ** ppzLL = papzLines;
     size_t  left  = usedCt;
     int     colNo = 0;
 
@@ -702,7 +702,7 @@ writeFill(void)
      *  FOR every entry we are to emit, ...
      */
     while (left-- > 0) {
-        char* pzL = *ppzLL;
+        char * pzL = *ppzLL;
 
         while (isspace(*pzL))  pzL++;
 
@@ -757,8 +757,8 @@ writeFill(void)
 static int
 compProc(const void * p1, const void * p2)
 {
-    char const * pz1 = *(char* const*)p1;
-    char const * pz2 = *(char* const*)p2;
+    char const * pz1 = *(char * const *)p1;
+    char const * pz2 = *(char * const *)p2;
     return strcmp(pz1, pz2);
 }
 /** @}

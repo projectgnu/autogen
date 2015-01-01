@@ -301,10 +301,10 @@ flag = {
     arg-name    = file;
     descrip     = "Input file (if not stdin)";
     flag-code   = <<- _EODoc_
-	    FILE* fp = freopen(
+	    FILE * fp = freopen(
 	        pOptDesc->optArg.argString, "r" FOPEN_BINARY_FLAG, stdin);
 
-	    if (fp == (FILE*)NULL) {
+	    if (fp == (FILE *)NULL) {
 	        fprintf(stderr, OPEN_ERROR_FMT, errno, strerror(errno),
 	                pOptDesc->optArg.argString);
 	        USAGE(EXIT_FAILURE);

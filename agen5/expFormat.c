@@ -239,10 +239,10 @@ ag_scm_dne(SCM prefix, SCM first, SCM opt)
      *  the zNil string, or to an allocated buffer.
      */
     if (pzFirst != zNil)
-        AGFREE((void *)pzFirst);
+        AGFREE(pzFirst);
     {
         SCM res = AG_SCM_STR02SCM(date_str);
-        AGFREE((void *)date_str);
+        AGFREE(date_str);
 
         return res;
     }
@@ -358,13 +358,13 @@ ag_scm_error(SCM res)
      *  THEN print it.
      */
     if (*msg != NUL) {
-        char* pz = aprf(DEF_NOTE_FMT, (abrt != PROBLEM) ? ERROR_STR : WARN_STR,
-                        current_tpl->td_file, cur_macro->md_line,
-                        cur_fpstack->stk_fname, msg);
+        char * pz = aprf(DEF_NOTE_FMT, (abrt != PROBLEM) ? ERROR_STR : WARN_STR,
+                         current_tpl->td_file, cur_macro->md_line,
+                         cur_fpstack->stk_fname, msg);
         if (abrt != PROBLEM)
             AG_ABEND(pz);
         fputs(pz, trace_fp);
-        AGFREE((void*)pz);
+        AGFREE(pz);
     }
 
     longjmp(abort_jmp_buf, abrt);
@@ -865,7 +865,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
         tmap_info_t  mi;
     } lic = { NULL, { NULL, 0, 0, 0, 0, 0, 0, 0 }};
 
-    char*     pzRes;
+    char * pzRes;
 
     if (! AG_SCM_STRING_P(license))
         return SCM_UNDEFINED;
@@ -885,7 +885,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
 
         if ((lic.pzFN != NULL) && (strcmp(fname, lic.pzFN) != 0)) {
             text_munmap(&lic.mi);
-            AGFREE((void*)lic.pzFN);
+            AGFREE(lic.pzFN);
             lic.pzFN = NULL;
         }
 
@@ -905,8 +905,8 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
      *  Trim trailing white space.
      */
     {
-        char* pz = (char*)lic.mi.txt_data + lic.mi.txt_size;
-        while (  (pz > (char*)lic.mi.txt_data)
+        char * pz = (char *)lic.mi.txt_data + lic.mi.txt_size;
+        while (  (pz > (char *)lic.mi.txt_data)
               && IS_WHITESPACE_CHAR(pz[-1]))
             pz--;
         *pz = NUL;
@@ -929,7 +929,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
     /*
      *  Reformat the string with the given arguments
      */
-    pzRes = aprf((char*)lic.mi.txt_data, pname, ownrz);
+    pzRes = aprf((char *)lic.mi.txt_data, pname, ownrz);
     {
         int     pfx_size = (int)strlen(prefx);
         char *  pzScan   = pzRes;
@@ -982,7 +982,7 @@ ag_scm_license(SCM license, SCM prog_name, SCM owner, SCM prefix)
          *  We allocated a temporary buffer that has all the
          *  formatting done, but need the prefixes on each line.
          */
-        AGFREE((void*)pzRes);
+        AGFREE(pzRes);
 
         return AG_SCM_STR2SCM(pzSaveRes, (size_t)((pzOut - pzSaveRes) - 1));
     }

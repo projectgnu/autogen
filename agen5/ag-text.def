@@ -462,8 +462,8 @@ string = { nm = MK_GPERF_SCRIPT;
 
 	  cat << \_EOF_
 		%%%%
-		int main(int argc, char** argv) {
-		    char*    pz = argv[1];
+		int main(int argc, char ** argv) {
+		    char * pz = argv[1];
 		    struct %2$s_index const * pI = %2$s_find( pz, strlen( pz ));
 		    if (pI == NULL)
 		        return 1;

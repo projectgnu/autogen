@@ -25,20 +25,20 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef int (tCmpProc)(const void*, const void*);
+typedef int (tCmpProc)(const void *, const void *);
 
 typedef struct def_list def_list_t;
 struct def_list {
     def_ent_t  de;
-    char*      pzExpr;
+    char *     pzExpr;
 };
 
 /* = = = START-STATIC-FORWARD = = = */
 static int
-order_def_list(const void* p1, const void* p2);
+order_def_list(const void * p1, const void * p2);
 
 static def_list_t *
-link_twins(def_list_t * pDL, def_list_t * pNext, int* pCt);
+link_twins(def_list_t * pDL, def_list_t * pNext, int * pCt);
 
 static uint_t
 count_named_values(templ_t * pT, macro_t * mac);
@@ -63,10 +63,10 @@ load_define_tpl(templ_t * tpl, char const ** ppzScan);
 /* = = = END-STATIC-FORWARD = = = */
 
 static int
-order_def_list(const void* p1, const void* p2)
+order_def_list(const void * p1, const void * p2)
 {
-    def_ent_t * pDL1 = (def_ent_t*)p1;
-    def_ent_t * pDL2 = (def_ent_t*)p2;
+    def_ent_t * pDL1 = (def_ent_t *)p1;
+    def_ent_t * pDL2 = (def_ent_t *)p2;
     int cmp = streqvcmp(pDL1->de_name, pDL2->de_name);
 
     /*
@@ -79,7 +79,7 @@ order_def_list(const void* p1, const void* p2)
 }
 
 static def_list_t *
-link_twins(def_list_t * pDL, def_list_t * pNext, int* pCt)
+link_twins(def_list_t * pDL, def_list_t * pNext, int * pCt)
 {
     def_list_t * pN;
     int  ct  = *pCt;
@@ -131,7 +131,7 @@ count_named_values(templ_t * pT, macro_t * mac)
         if (*pzScan != '=')
             continue;
         pzScan = SPN_WHITESPACE_CHARS(pzScan+1);
-        pzScan = (char*)skip_expr(pzScan, strlen(pzScan));
+        pzScan = (char *)skip_expr(pzScan, strlen(pzScan));
         pzScan = SPN_WHITESPACE_CHARS(pzScan);
     }
 
@@ -146,7 +146,7 @@ gather_assigned_value(char * pzScan, def_list_t * pDL)
     strtransform(pDL->de.de_name, pDL->de.de_name);
     pDL->pzExpr = pzScan;
     pDL->de.de_type = VALTYP_TEXT;
-    pzScan = (char*)skip_expr(pzScan, strlen(pzScan));
+    pzScan = (char *)skip_expr(pzScan, strlen(pzScan));
 
     /*
      *  Figure out what kind of expression we have
@@ -161,14 +161,14 @@ gather_assigned_value(char * pzScan, def_list_t * pDL)
 
     case '`':
     {
-        char* pz;
+        char * pz;
         /*
          *  Process the quoted string, but leave a '`' marker, too
          */
         AGDUPSTR(pz, pDL->pzExpr, "macro arg expr");
         span_quote(pz);
         strcpy(pDL->pzExpr+1, pz);
-        AGFREE((void*)pz);
+        AGFREE(pz);
         break;
     }
     case '"':
@@ -177,8 +177,8 @@ gather_assigned_value(char * pzScan, def_list_t * pDL)
          *  Process the quoted strings now
          */
         if ((pzScan - pDL->pzExpr) < 24) {
-            char* pz = (char*)AGALOC(24, "quoted string");
-            memcpy((void*)pz, pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
+            char * pz = (char *)AGALOC(24, "quoted string");
+            memcpy(VOIDP(pz), pDL->pzExpr, (size_t)(pzScan - pDL->pzExpr));
             pDL->pzExpr = pz;
         }
         span_quote(pDL->pzExpr);
@@ -205,7 +205,7 @@ fill_in_values(def_list_t * pDL, char * pzScan, templ_t * pT, macro_t * mac)
 
         switch (*pzScan) {
         case NUL:
-            pDL->de.de_val.dvu_text = (char*)zNil;
+            pDL->de.de_val.dvu_text = (char *)zNil;
             return;
 
         default:
@@ -219,7 +219,7 @@ fill_in_values(def_list_t * pDL, char * pzScan, templ_t * pT, macro_t * mac)
              *  The name was separated by space, but has no value
              */
             if (*pzScan != '=') {
-                pDL->de.de_val.dvu_text = (char*)zNil;
+                pDL->de.de_val.dvu_text = (char *)zNil;
                 if (*pzScan == NUL)
                     return;
                 continue;
@@ -295,7 +295,7 @@ parse_mac_args(templ_t * pT, macro_t * mac)
      */
     pzScan = pT->td_text + mac->md_txt_off;
     pDL = (def_list_t *)AGALOC(ct * sizeof(def_list_t), "array of def desc");
-    memset((void*)pDL, 0, ct * sizeof(def_list_t));
+    memset(VOIDP(pDL), 0, ct * sizeof(def_list_t));
     mac->md_res = (uintptr_t)pDL;
 
     /*
@@ -311,7 +311,7 @@ parse_mac_args(templ_t * pT, macro_t * mac)
          *  if the strings compare equal.
          */
         pDL = (def_list_t *)mac->md_res;
-        qsort((void*)pDL, (size_t)ct, sizeof(def_list_t), order_def_list);
+        qsort(VOIDP(pDL), (size_t)ct, sizeof(def_list_t), order_def_list);
 
         /*
          *  Now, link them all together.  Singly linked list.
@@ -329,7 +329,7 @@ parse_mac_args(templ_t * pT, macro_t * mac)
              *  THEN it is a "twin".  Link twins on the twin list.
              */
             if (streqvcmp(pDL->de.de_name, pN->de.de_name) == 0) {
-                pN = link_twins(pDL, pN, (int*)&ct);
+                pN = link_twins(pDL, pN, (int *)&ct);
                 if (ct <= 0)
                     break;  /* pN is now invalid */
             }
@@ -360,7 +360,7 @@ prep_invoke_args(macro_t * mac)
         AG_ABEND_IN(pT, mac, PREP_INVOKE_NO_NAME);
     mac->md_name_off = mac->md_txt_off;
     pzText = pT->td_text + mac->md_txt_off;
-    pzText = (char*)skip_expr(pzText, strlen(pzText));
+    pzText = (char *)skip_expr(pzText, strlen(pzText));
 
     /*
      *  IF there is no more text,
@@ -478,7 +478,7 @@ build_defs(int def_ct, def_list_t * def_list)
         switch (*(def_list->pzExpr)) {
         case ';':
         {
-            char* pz = strchr(def_list->pzExpr, NL);
+            char * pz = strchr(def_list->pzExpr, NL);
             if (pz != NULL) {
                 pz = SPN_WHITESPACE_CHARS(pz + 1);
                 def_list->pzExpr = pz;
@@ -488,7 +488,7 @@ build_defs(int def_ct, def_list_t * def_list)
         }
         case NUL:
             def_list->pzExpr = NULL;
-            def_list->de.de_val.dvu_text = (char*)zNil;
+            def_list->de.de_val.dvu_text = (char *)zNil;
             break;
 
         case '(':
@@ -617,7 +617,7 @@ mFunc_Define(templ_t * tpl, macro_t * mac)
     def_ctx_t    ctx;
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING) {
-        tpl = (templ_t*)mac->md_pvt;
+        tpl = (templ_t *)mac->md_pvt;
 
         fprintf(trace_fp, TPL_INVOKED, tpl->td_name, defCt);
         if (OPT_VALUE_TRACE == TRACE_EVERYTHING)
@@ -634,7 +634,7 @@ mFunc_Define(templ_t * tpl, macro_t * mac)
         build_defs(defCt, pList);
     }
 
-    gen_new_block((templ_t*)mac->md_pvt);
+    gen_new_block((templ_t *)mac->md_pvt);
 
     if (defCt != 0)
         curr_def_ctx = ctx;
@@ -643,7 +643,7 @@ mFunc_Define(templ_t * tpl, macro_t * mac)
         pList = (def_list_t *)mac->md_res;
         while (defCt-- > 0) {
             if (pList->pzExpr != NULL) {
-                AGFREE((void*)pList->de.de_val.dvu_text);
+                AGFREE(pList->de.de_val.dvu_text);
                 pList->de.de_val.dvu_text = NULL;
             }
             pList++;
@@ -661,7 +661,7 @@ mFunc_Define(templ_t * tpl, macro_t * mac)
 void
 mUnload_Define(macro_t * mac)
 {
-    void * p = (void*)(mac->md_res);
+    void * p = VOIDP(mac->md_res);
     if (p != NULL)
         AGFREE(p);
 }
@@ -708,7 +708,7 @@ mFunc_Invoke(templ_t * tpl, macro_t * mac)
          */
         if (IS_VAR_FIRST_CHAR(tpl->td_text[ mac->md_name_off ])) {
             mac->md_code = FTYP_DEFINE;
-            mac->md_pvt  = (void*)find_tpl(tpl->td_text + mac->md_name_off);
+            mac->md_pvt  = VOIDP(find_tpl(tpl->td_text + mac->md_name_off));
 
             if (mac->md_pvt == NULL) {
                 char const * p = tpl->td_text + mac->md_name_off;
@@ -734,7 +734,7 @@ mFunc_Invoke(templ_t * tpl, macro_t * mac)
             /* NOTREACHED */
         }
 
-        mac->md_pvt = (void*)ntpl;
+        mac->md_pvt = VOIDP(ntpl);
     }
     return mFunc_Define(tpl, mac);
 }
@@ -768,14 +768,14 @@ new_template(templ_t * base_tpl, macro_t * mac, char const * scan)
     /*
      *  Allocate a new template block that is much larger than needed.
      */
-    ntpl = (templ_t*)AGALOC(aloc_sz, "new tpl");
-    memset((void*)ntpl, 0, aloc_sz);
+    ntpl = (templ_t *)AGALOC(aloc_sz, "new tpl");
+    memset(VOIDP(ntpl), 0, aloc_sz);
     ntpl->td_magic  = base_tpl->td_magic;
     ntpl->td_size   = aloc_sz;
     ntpl->td_mac_ct = ct;
     ntpl->td_file   = strdup(base_tpl->td_file);
 
-    copy = ntpl->td_name = (void*)(ntpl->td_macros + ct);
+    copy = ntpl->td_name = VOIDP(ntpl->td_macros + ct);
     if (! IS_VAR_FIRST_CHAR(*src))
         AG_ABEND_IN(base_tpl, mac, LD_DEF_NEED_NAME);
 
@@ -817,8 +817,8 @@ load_define_tpl(templ_t * tpl, char const ** ppzScan)
     if (ct < tpl->td_mac_ct) {
         int    delta = (int)sizeof(macro_t) * (int)(tpl->td_mac_ct - ct);
         void * data  = (tpl->td_name == NULL) ? tpl->td_text : tpl->td_name;
-        size_t size  = (size_t)(tpl->td_scan - (char*)data);
-        memmove((void*)last_mac, data, size);
+        size_t size  = (size_t)(tpl->td_scan - (char *)data);
+        memmove(VOIDP(last_mac), data, size);
 
         tpl->td_text  -= delta;
         tpl->td_scan  -= delta;
@@ -849,7 +849,7 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
      *  a DEFINE block (viz. "ENDDEF" and removing "DEFINE").
      */
     if (apDefineLoad[0] == NULL) {
-        memcpy((void*)apDefineLoad, base_load_table, sizeof(base_load_table));
+        memcpy(VOIDP(apDefineLoad), base_load_table, sizeof(base_load_table));
         apDefineLoad[ FTYP_ENDDEF ] = &mLoad_Ending;
         apDefineLoad[ FTYP_DEFINE ] = &mLoad_Bogus;
     }
@@ -865,12 +865,12 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
      *  size.  Restore the offsets to pointer values.
      */
     {
-        size_t sz = (size_t)(new_tpl->td_scan - (char*)new_tpl);
+        size_t sz = (size_t)(new_tpl->td_scan - (char *)new_tpl);
         if (sz < new_tpl->td_size) {
             new_tpl->td_size = sz;
             new_tpl->td_name -= (long)new_tpl;
             new_tpl->td_text -= (long)new_tpl;
-            new_tpl = AGREALOC((void*)new_tpl, new_tpl->td_size, "resize mac");
+            new_tpl = AGREALOC(VOIDP(new_tpl), new_tpl->td_size, "resize mac");
             new_tpl->td_name += (long)new_tpl;
             new_tpl->td_text += (long)new_tpl;
         }
@@ -885,10 +885,10 @@ mLoad_Define(templ_t * ori_tpl, macro_t * mac, char const ** p_scan)
     }
 #endif
 
-    new_tpl->td_scan = (char*)named_tpls;
+    new_tpl->td_scan = (char *)named_tpls;
     named_tpls      = new_tpl;
     load_proc_table = save_load_procs;
-    memset((void*)mac, 0, sizeof(*mac));
+    memset(VOIDP(mac), 0, sizeof(*mac));
     current_tpl     = ori_tpl;
     return mac;
 }

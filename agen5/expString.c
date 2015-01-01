@@ -110,10 +110,10 @@ stringify_for_sh(char * pzNew, uint_t qt, char const * pzDta)
 static SCM
 shell_stringify(SCM obj, uint_t qt)
 {
-    char*  pzNew;
+    char * pzNew;
     size_t dtaSize = 3;
-    char*  pzDta   = ag_scm2zchars(obj, "AG Object");
-    char*  pz      = pzDta;
+    char * pzDta   = ag_scm2zchars(obj, "AG Object");
+    char * pz      = pzDta;
 
     for (;;) {
         char c = *(pz++);
@@ -178,10 +178,10 @@ do_substitution(
     char **      ppz_res,
     ssize_t *    res_len)
 {
-    char* pzMatch  = ag_scm2zchars(match, "match text");
-    char* rep_str  = ag_scm2zchars(repl,  "repl text");
-    int   mark_len = (int)AG_SCM_STRLEN(match);
-    int   repl_len = (int)AG_SCM_STRLEN(repl);
+    char * pzMatch  = ag_scm2zchars(match, "match text");
+    char * rep_str  = ag_scm2zchars(repl,  "repl text");
+    int    mark_len = (int)AG_SCM_STRLEN(match);
+    int    repl_len = (int)AG_SCM_STRLEN(repl);
 
     {
         int ct = sub_count(src_str, pzMatch);
@@ -226,8 +226,8 @@ do_substitution(
 LOCAL void
 do_multi_subs(char ** ppzStr, ssize_t * pStrLen, SCM match, SCM repl)
 {
-    char* pzStr = *ppzStr;
-    char* pzNxt = pzStr;
+    char * pzStr = *ppzStr;
+    char * pzNxt = pzStr;
 
     /*
      *  Loop for as long as our list has more entries
@@ -434,7 +434,7 @@ ag_scm_join(SCM sep, SCM list)
             car = ag_scm_join(sep, car);
 
         cpy_len = AG_SCM_STRLEN(car);
-        memcpy((void*)pzScan, AG_SCM_CHARS(car), cpy_len);
+        memcpy(VOIDP(pzScan), AG_SCM_CHARS(car), cpy_len);
         pzScan += cpy_len;
 
         /*
@@ -442,7 +442,7 @@ ag_scm_join(SCM sep, SCM list)
          */
         if (--l_len <= 0)
             break;
-        memcpy((void*)pzScan, (void*)pzSep, sep_len);
+        memcpy(VOIDP(pzScan), VOIDP(pzSep), sep_len);
         pzScan += sep_len;
     }
 
@@ -733,11 +733,11 @@ ag_scm_sub_shell_str(SCM obj)
 SCM
 ag_scm_stack(SCM obj)
 {
-    SCM         res;
-    SCM *       pos = &res;
-    def_ent_t** ppDE;
-    def_ent_t*  pDE;
-    SCM         str;
+    SCM          res;
+    SCM *        pos = &res;
+    def_ent_t ** ppDE;
+    def_ent_t *  pDE;
+    SCM          str;
 
     res = SCM_EOL;
 
@@ -841,9 +841,9 @@ SCM
 ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
 {
     unsigned char ch_map[ 1 << 8 /* bits-per-byte */ ];
-    int   i    = sizeof(ch_map) - 1;
-    char* from = ag_scm2zchars(from_xform, "str");
-    char* to   = ag_scm2zchars(to_xform, "str");
+    int    i    = sizeof(ch_map) - 1;
+    char * from = ag_scm2zchars(from_xform, "str");
+    char * to   = ag_scm2zchars(to_xform, "str");
 
     do  {
         ch_map[i] = (unsigned char)i;
@@ -945,9 +945,9 @@ ag_scm_string_substitute(SCM str, SCM Match, SCM Repl)
     len   = (ssize_t)AG_SCM_STRLEN(str);
 
     if (AG_SCM_STRING_P(Match))
-        do_substitution(text, len, Match, Repl, (char**)&text, &len);
+        do_substitution(text, len, Match, Repl, (char **)&text, &len);
     else
-        do_multi_subs((char**)&text, &len, Match, Repl);
+        do_multi_subs((char **)&text, &len, Match, Repl);
 
     res = AG_SCM_STR2SCM(text, (size_t)len);
     return res;

@@ -156,18 +156,18 @@ typedef struct tlib_mark        tlib_mark_t;
  *
  *  Procedure for loading a template function
  */
-typedef macro_t * (load_proc_t)(templ_t*, macro_t*, char const** ppzScan);
+typedef macro_t * (load_proc_t)(templ_t *, macro_t *, char const ** ppzScan);
 typedef load_proc_t * load_proc_p_t;
 
-typedef void (unload_proc_t)(macro_t*);
-typedef unload_proc_t* unload_proc_p_t;
+typedef void (unload_proc_t)(macro_t *);
+typedef unload_proc_t * unload_proc_p_t;
 
 /*
  *  Procedure for handling a template function
  *  during the text emission phase.
  */
-typedef macro_t* (hdlr_proc_t)(templ_t*, macro_t*);
-typedef hdlr_proc_t* hdlr_proc_p_t;
+typedef macro_t * (hdlr_proc_t)(templ_t *, macro_t *);
+typedef hdlr_proc_t * hdlr_proc_p_t;
 
 /*
  *  This must be included after the function prototypes
@@ -423,7 +423,7 @@ MODE size_t         temp_tpl_dir_len VALUE( 0 );
 /**
  * dependency file file pointer.
  */
-MODE FILE*          dep_fp           VALUE( NULL );
+MODE FILE *         dep_fp           VALUE( NULL );
 /**
  * name of target of rule
  */
@@ -528,8 +528,8 @@ extern int    ag_fmemioctl(FILE * fp, int req, ...);
 #endif
 
 typedef union {
-    const void*  cp;
-    void*        p;
+    const void * cp;
+    void *       p;
 } v2c_t;
 MODE v2c_t p2p VALUE( { NULL } );
 

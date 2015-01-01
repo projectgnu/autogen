@@ -346,7 +346,7 @@ process_test_getopt_opts (int argc, char** argv)
      * This violates the const-ness of the pzProgName field.
      * The const-ness is to prevent accidents.  This is not accidental.
      */
-    char ** pp = (char **)(void *)&(test_getoptOptions.pzProgName);
+    char ** pp = VOIDP(&(test_getoptOptions.pzProgName));
 
     if (pz_prog != NULL)
       pz_prog++;
@@ -580,7 +580,7 @@ process_test_getopt_opts (int argc, char** argv)
      * This violates the const-ness of the pzProgName field.
      * The const-ness is to prevent accidents.  This is not accidental.
      */
-    char ** pp = (char **)(void *)&(test_getoptOptions.pzProgName);
+    char ** pp = VOIDP(&(test_getoptOptions.pzProgName));
 
     if (pz_prog != NULL)
       pz_prog++;

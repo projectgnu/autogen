@@ -77,7 +77,7 @@ include = <<-  _END_INCLUDE
 	# ifdef HAVE_DLFCN_H
 	#  include <dlfcn.h>
 	# else
-	   extern void* dlopen(char const*,int);
+	   extern void * dlopen(char const *,int);
 	# endif
 
 	# ifndef  RTLD_GLOBAL

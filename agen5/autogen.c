@@ -93,13 +93,13 @@ inner_main(void * closure, int argc, char ** argv)
     processing_state = PROC_STATE_LOAD_TPL;
 
     {
-        templ_t* pTF = tpl_load(tpl_fname, NULL);
+        templ_t * tpl = tpl_load(tpl_fname, NULL);
 
         processing_state = PROC_STATE_EMITTING;
-        process_tpl(pTF);
+        process_tpl(tpl);
 
         processing_state = PROC_STATE_CLEANUP;
-        cleanup(pTF);
+        cleanup(tpl);
     }
 
     processing_state = PROC_STATE_DONE;

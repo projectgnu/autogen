@@ -110,7 +110,7 @@ extern char * strsignal( int signo );
 #include <stdio.h>
 
 int
-main( int argc, char** argv )
+main(int argc, char ** argv)
 {
     int sig = 0;
     fputs( "Sig  Sig-Name    Description\n"

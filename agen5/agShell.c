@@ -52,7 +52,7 @@ ag_scm_chdir(SCM dir)
     {
         char const * pz = ag_scm2zchars(dir, zChdirDir);
         cur_dir = malloc(AG_SCM_STRLEN(dir) + 1);
-        strcpy((char*)cur_dir, pz);
+        strcpy((char *)cur_dir, pz);
     }
     return dir;
 }
@@ -97,9 +97,9 @@ ag_scm_shell(SCM cmd)
     }
 
     {
-        char* pz = shell_cmd(ag_scm2zchars(cmd, "command"));
+        char * pz = shell_cmd(ag_scm2zchars(cmd, "command"));
         cmd   = AG_SCM_STR02SCM(pz);
-        AGFREE((void*)pz);
+        AGFREE(pz);
         return cmd;
     }
 #endif
@@ -128,7 +128,7 @@ ag_scm_shellf(SCM fmt, SCM alist)
     if (pz == NULL)
         AG_ABEND(SHELL_RES_NULL_MSG);
     fmt = AG_SCM_STR02SCM(pz);
-    AGFREE((void *)pz);
+    AGFREE(pz);
 #endif
     return fmt;
 }
@@ -136,8 +136,8 @@ ag_scm_shellf(SCM fmt, SCM alist)
 #ifndef SHELL_ENABLED
 HIDE_FN(void closeServer(void) {;})
 
-HIDE_FN(char * shell_cmd(char const* pzCmd)) {
-     char* pz;
+HIDE_FN(char * shell_cmd(char const * pzCmd)) {
+     char * pz;
      AGDUPSTR(pz, pzCmd, "dummy shell command");
      return pz;
 }
@@ -183,7 +183,7 @@ server_fp_open(fp_pair_t * fp_pair, char const ** ppArgs);
 static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len);
 
-static char*
+static char *
 load_data(void);
 /* = = = END-STATIC-FORWARD = = = */
 
@@ -243,7 +243,7 @@ handle_signal(int signo)
 
     (void)fputs(SHELL_LAST_CMD_MSG, trace_fp);
     {
-        char const* pz = (last_cmd == NULL)
+        char const * pz = (last_cmd == NULL)
             ? SHELL_UNK_LAST_CMD_MSG : last_cmd;
         fprintf(trace_fp, SHELL_CMD_FMT, cur_dir, pz, SH_DONE_MARK, log_ct);
     }
@@ -303,7 +303,7 @@ start_server_cmd_trace(void)
         char * pz = load_data();
         fputs(SHELL_RES_DISCARD_MSG, trace_fp);
         fprintf(trace_fp, TRACE_TRAP_STATE_FMT, pz);
-        AGFREE((void*)pz);
+        AGFREE(pz);
     }
 }
 
@@ -326,7 +326,7 @@ send_server_init_cmds(void)
                 (dep_fp == NULL) ? "" : dep_file);
 
         if (send_cmd_ok(pzc))
-            AGFREE((void*)load_data());
+            AGFREE(load_data());
         AGFREE(pzc);
     }
 
@@ -403,7 +403,7 @@ chain_open(int in_fd, char const ** arg_v, pid_t * child_pid)
      *  Create a pipe it will be the child process' stdout,
      *  and the parent will read from it.
      */
-    if (pipe((int*)&out_pair) < 0) {
+    if (pipe((int *)&out_pair) < 0) {
         if (child_pid != NULL)
             *child_pid = NOPROCESS;
         return -1;
@@ -479,7 +479,7 @@ chain_open(int in_fd, char const ** arg_v, pid_t * child_pid)
         fflush(trace_fp);
     }
 
-    execvp((char*)shell, (char**)arg_v);
+    execvp((char *)shell, (char **)arg_v);
     AG_CANT("execvp", shell);
     /* NOTREACHED */
     return -1;
@@ -503,7 +503,7 @@ server_open(fd_pair_t * fd_pair, char const ** ppArgs)
      *  and vice versa, so the parent and child processes will
      *  read and write to opposite FD's.
      */
-    if (pipe((int*)fd_pair) < 0)
+    if (pipe((int *)fd_pair) < 0)
         return NOPROCESS;
 
     fd_pair->fd_read = chain_open(fd_pair->fd_read, ppArgs, &chId);
@@ -536,7 +536,7 @@ static inline void
 realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
 {
     *p_sz  = (*p_sz + need_len + 0xFFF) & (size_t)~0xFFF;
-    *p_txt = AGREALOC((void*)*p_txt, *p_sz, "expand text");
+    *p_txt = AGREALOC(VOIDP(*p_txt), *p_sz, "expand text");
 }
 
 /**
@@ -545,13 +545,13 @@ realloc_text(char ** p_txt, size_t * p_sz, size_t need_len)
  *  The read data are stored in a malloc-ed string that is truncated
  *  to size at the end.  Input is assumed to be an ASCII string.
  */
-static char*
+static char *
 load_data(void)
 {
-    char*   text;
+    char *  text;
     size_t  text_sz = 4096;
     size_t  used_ct = 0;
-    char*   scan;
+    char *  scan;
     char    zLine[ 1024 ];
     int     retry_ct = 0;
 #define LOAD_RETRY_LIMIT 4
@@ -627,7 +627,7 @@ load_data(void)
         fprintf(trace_fp, TRACE_SHELL_RESULT_MSG,
                 (int)text_sz, text, zLine);
 
-    return AGREALOC((void*)text, text_sz, "resize out");
+    return AGREALOC(VOIDP(text), text_sz, "resize out");
 #undef LOAD_RETRY_LIMIT
 }
 
@@ -666,7 +666,7 @@ shell_cmd(char const * cmd)
      *  THEN return the nil string.
      */
     if (serv_id <= 0) {
-        char* pz = (char*)AGALOC(1, "Text Block");
+        char * pz = (char *)AGALOC(1, "Text Block");
 
         *pz = NUL;
         return pz;
@@ -685,11 +685,11 @@ shell_cmd(char const * cmd)
      *  a sigpipe or sigalrm (timeout), we will return the nil string.
      */
     {
-        char* pz = load_data();
+        char * pz = load_data();
         if (pz == NULL) {
             fprintf(trace_fp, CMD_FAIL_FMT, cmd);
             close_server_shell();
-            pz = (char*)AGALOC(1, "Text Block");
+            pz = (char *)AGALOC(1, "Text Block");
 
             *pz = NUL;
 

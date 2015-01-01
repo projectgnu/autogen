@@ -4,7 +4,7 @@
    c=%s-temp.c  +][+
 
 `stamp=\`sed 's,.*stamp: *",,;s,".*,,' <<\_EOF_
-  Time-stamp:        "2013-10-06 15:55:21 bkorb"
+  Time-stamp:        "2015-01-01 11:08:35 bkorb"
 _EOF_
 \` `            +][+
 
@@ -374,7 +374,7 @@ process_[+(. prog-name)+]_opts (int argc, char** argv)
      * This violates the const-ness of the pzProgName field.
      * The const-ness is to prevent accidents.  This is not accidental.
      */
-    char ** pp = (char **)(void *)&([+ (. prog-name) +]Options.pzProgName);
+    char ** pp = VOIDP(&([+ (. prog-name) +]Options.pzProgName));
 
     if (pz_prog != NULL)
       pz_prog++;

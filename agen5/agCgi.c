@@ -24,8 +24,8 @@
  */
 
 typedef struct {
-    char const*  pzName;
-    char*        pzValue;
+    char const * pzName;
+    char *       pzValue;
 } tNameMap;
 
 #define ENV_TABLE \
@@ -69,8 +69,8 @@ typedef enum {
 #define pzCgiLength nameValueMap[ CONTENT_LENGTH_IDX ].pzValue
 
 /* = = = START-STATIC-FORWARD = = = */
-static char*
-parseInput(char* pzSrc, int len);
+static char *
+parseInput(char * pzSrc, int len);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void
@@ -103,22 +103,22 @@ loadCgi(void)
      *  gets an empty string default.
      */
     {
-        tNameMap* pNM = nameValueMap;
-        tNameIdx  ix  = (tNameIdx)0;
+        tNameMap * pNM = nameValueMap;
+        tNameIdx   ix  = (tNameIdx)0;
 
         do  {
             pNM->pzValue = getenv(pNM->pzName);
             if (pNM->pzValue == NULL)
-                pNM->pzValue = (char*)zNil;
+                pNM->pzValue = (char *)zNil;
         } while (pNM++, ++ix < NAME_CT);
     }
 
-    base_ctx = (scan_ctx_t*)AGALOC(sizeof(scan_ctx_t), "CGI ctx");
-    memset((void*)base_ctx, 0, sizeof(scan_ctx_t));
+    base_ctx = (scan_ctx_t *)AGALOC(sizeof(scan_ctx_t), "CGI ctx");
+    memset(VOIDP(base_ctx), 0, sizeof(scan_ctx_t));
 
     {
         size_t textLen = strtoul(pzCgiLength, NULL, 0);
-        char*  pzText;
+        char *  pzText;
 
         if (strcasecmp(pzCgiMethod, "POST") == 0) {
             if (textLen == 0)
@@ -153,14 +153,14 @@ loadCgi(void)
 }
 
 
-static char*
-parseInput(char* pzSrc, int len)
+static char *
+parseInput(char * pzSrc, int len)
 {
 #   define defLen   (sizeof("Autogen Definitions cgi;\n") - 1)
-    char*  pzRes  = AGALOC((len * 2) + defLen + 1, "CGI Definitions");
+    char * pzRes  = AGALOC((len * 2) + defLen + 1, "CGI Definitions");
 
     memcpy(pzRes, PARSE_INPUT_AG_DEF_STR, defLen);
-    (void)cgi_run_fsm(pzSrc, len, pzRes + defLen, len*2);
+    (void)cgi_run_fsm(pzSrc, len, pzRes + defLen, len * 2);
     return AGREALOC(pzRes, strlen(pzRes)+1, "CGI input");
 }
 

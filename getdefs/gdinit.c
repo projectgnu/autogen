@@ -28,10 +28,10 @@
 static char const zNoList[] = "ERROR:  block attr must have name list:\n\t%s\n";
 
 /* = = = START-STATIC-FORWARD = = = */
-static char*
-compressOptionText(char* pzS, char* pzE);
+static char *
+compressOptionText(char * pzS, char * pzE);
 
-static char*
+static char *
 fixupSubblockString(char const * pzSrc);
 
 static void
@@ -70,11 +70,11 @@ fserr_die(char const * fmt, ...)
 /*
  *  compressOptionText
  */
-static char*
-compressOptionText(char* pzS, char* pzE)
+static char *
+compressOptionText(char * pzS, char * pzE)
 {
-    char* pzR = pzS;  /* result      */
-    char* pzD = pzS;  /* destination */
+    char * pzR = pzS;  /* result      */
+    char * pzD = pzS;  /* destination */
 
     for (;;) {
         char ch;
@@ -117,7 +117,7 @@ compressOptionText(char* pzS, char* pzE)
 /*
  *  fixupSubblockString
  */
-static char*
+static char *
 fixupSubblockString(char const * pzSrc)
 {
     char *  pzString;
@@ -217,7 +217,7 @@ loadStdin(void)
     }
 
     while (fgets(z, (int)sizeof(z), stdin) != NULL) {
-        char* pz = z + strlen(z);
+        char * pz = z + strlen(z);
 
         if (pz[-1] != '\n') {
             static char const zErr[] =
@@ -249,15 +249,15 @@ loadStdin(void)
  *  option, it will need to be massaged for use.
  */
 LOCAL void
-processEmbeddedOptions(char* pzText)
+processEmbeddedOptions(char * pzText)
 {
     static char const zStStr[] = "/*=--";
     static char const zEndSt[] = "=*/";
 
     for (;;) {
-        char* pzStart = strstr(pzText, zStStr);
-        char* pzEnd;
-        int   sblct = 0;
+        char * pzStart = strstr(pzText, zStStr);
+        char * pzEnd;
+        int    sblct = 0;
 
         if (pzStart == NULL)
             return;
@@ -338,7 +338,7 @@ set_define_re(void)
         }
 
         if (free_pat)
-            free((void *)def_pat);
+            free(VOIDP(def_pat));
 
         rerr = regcomp(&attrib_re, zAttribRe, REG_EXTENDED | REG_ICASE);
         if (rerr != 0) {

@@ -43,8 +43,8 @@ add_sys_env(char * env_name);
 /* = = = END-STATIC-FORWARD = = = */
 
 #ifdef DAEMON_ENABLED
- static bool evalProto(char const ** ppzS, uint16_t* pProto);
- static void spawnPipe(char const* pzFile);
+ static bool evalProto(char const ** ppzS, uint16_t * pProto);
+ static void spawnPipe(char const * pzFile);
  static void spawnListens(char const * pzPort, sa_family_t af);
  static void daemonize(char const *, char const *, char const *,
                        char const *);
@@ -414,12 +414,12 @@ prep_env(void)
 #ifdef DAEMON_ENABLED
 
   static bool
-evalProto(char const ** ppzS, uint16_t* pProto)
+evalProto(char const ** ppzS, uint16_t * pProto)
 {
     char const * pzS = *ppzS;
 
     if (IS_ALPHABETIC_CHAR(*pzS)) {
-        inet_family_map_t* pMap = inet_family_map;
+        inet_family_map_t * pMap = inet_family_map;
         do  {
             if (strncmp(pzS, pMap->pz_name, pMap->nm_len) == 0) {
                 *pProto = pMap->family;
@@ -444,8 +444,8 @@ spawnPipe(char const * pzFile)
 #   define S_IRW_ALL \
         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
     fd_pair_t fdpair;
-    char* pzIn;
-    char* pzOut;
+    char * pzIn;
+    char * pzOut;
 
     {
         size_t len = 2 * (strlen(pzFile) + 5);
@@ -566,7 +566,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
     case AF_INET:
     {
         uint16_t port;
-        char* pz;
+        char * pz;
 
         sa.in_addr.sin_family      = AF_INET;
         sa.in_addr.sin_addr.s_addr = INADDR_ANY;
@@ -589,7 +589,7 @@ spawnListens(char const * pzPort, sa_family_t addr_family)
     }
 
     if (bind(socket_fd, &sa.addr, addr_len) < 0) {
-        char* pz = aprf(LISTEN_PORT_FMT, pzPort, addr_family);
+        char * pz = aprf(LISTEN_PORT_FMT, pzPort, addr_family);
         AG_CANT("bind", pz);
     }
 
@@ -715,7 +715,7 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
     }
 
     umask(0);
-    if (pzDaemonDir == (char*)NULL)
+    if (pzDaemonDir == (char *)NULL)
         pzDaemonDir = "/";
 
     chdir(pzDaemonDir);
@@ -723,13 +723,13 @@ daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
     /*
      *  Reopen the input, output and error files, unless we were told not to
      */
-    if (pzStdin != (char*)NULL)
+    if (pzStdin != (char *)NULL)
         freopen(pzStdin,  "r", stdin);
 
-    if (pzStdout != (char*)NULL)
+    if (pzStdout != (char *)NULL)
         freopen(pzStdout, "w", stdout);
 
-    if (pzStderr != (char*)NULL)
+    if (pzStderr != (char *)NULL)
         freopen(pzStderr, "w", stderr);
 
     /* We are a daemon now */

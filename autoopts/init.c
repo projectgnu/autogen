@@ -107,9 +107,9 @@ validate_struct(tOptions * opts, char const * pname)
 
         pz = pathfind(getenv("PATH"), (char *)pname, "rx");
         if (pz != NULL)
-            pname = (void *)pz;
+            pname = VOIDP(pz);
 
-        pp  = (char const **)(void **)&(opts->pzProgPath);
+        pp  = (char const **)VOIDP(&(opts->pzProgPath));
         *pp = pname;
 
         /*

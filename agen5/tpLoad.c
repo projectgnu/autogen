@@ -27,7 +27,7 @@
 
 /* = = = START-STATIC-FORWARD = = = */
 static bool
-read_okay(char const * pzFName);
+read_okay(char const * fname);
 
 static char const *
 expand_dir(char const ** dir_pp, char * name_buf);
@@ -83,7 +83,7 @@ read_okay(char const * fname)
 static char const *
 expand_dir(char const ** dir_pp, char * name_buf)
 {
-    char * res = (void *)*dir_pp;
+    char * res = VOIDP(*dir_pp);
 
     if (res[1] == NUL)
         AG_ABEND(aprf(LOAD_FILE_SHORT_NAME, res));
@@ -143,7 +143,7 @@ find_file(char const * in_name,
             return FAILURE;
 
         AGDUPSTR(in_name, res_name, "find file name");
-        free_me = (void*)in_name;
+        free_me = VOIDP(in_name);
 
         /*
          *  in_name now points to the name the file system can use.
@@ -343,7 +343,7 @@ load_macs(templ_t * tpl, char const * fname, char const * pzData)
             void *  data  =
                 (tpl->td_name == NULL) ? tpl->td_text : tpl->td_name;
             size_t  size  = (size_t)(tpl->td_scan - (char *)data);
-            memmove((void*)e_mac, data, size);
+            memmove(VOIDP(e_mac), data, size);
 
             tpl->td_text  -= delta;
             tpl->td_scan  -= delta;
@@ -400,8 +400,8 @@ digest_tpl(tmap_info_t * minfo, char * fname)
                        + strlen(fname) + 0x10)
                     & (size_t)(~0x0F);
 
-    res = (templ_t*)AGALOC(alloc_sz, "main template");
-    memset((void*)res, 0, alloc_sz);
+    res = (templ_t *)AGALOC(alloc_sz, "main template");
+    memset(VOIDP(res), 0, alloc_sz);
 
     /*
      *  Initialize the values:
@@ -416,7 +416,7 @@ digest_tpl(tmap_info_t * minfo, char * fname)
 
     res->td_name -= (long)res;
     res->td_text -= (long)res;
-    res = (templ_t*)AGREALOC((void*)res, res->td_size,
+    res = (templ_t *)AGREALOC(VOIDP(res), res->td_size,
                                 "resize template");
     res->td_name += (long)res;
     res->td_text += (long)res;
@@ -520,7 +520,7 @@ tpl_unload(templ_t * tpl)
         mac++;
     }
 
-    AGFREE((void*)(tpl->td_file));
+    AGFREE(tpl->td_file);
     AGFREE(tpl);
 }
 

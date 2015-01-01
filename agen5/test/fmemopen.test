@@ -79,7 +79,7 @@ main( int argc, char** argv )
 
     bf = NULL;
     fmem_ioctl( fp, FMEM_IOCTL_SAVE_BUF, &bf );
-    if ((void*)bf != (void*)saved_cookie->buffer) {
+    if (VOIDP(bf) != VOIDP(saved_cookie->buffer)) {
         fprintf( stderr, PROG_ERR "bad buf addr:  0x%lX != 0x%lX (actual)\n",
                  bf, saved_cookie->buffer );
         return 3;
