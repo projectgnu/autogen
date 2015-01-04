@@ -44,6 +44,15 @@
 #ifndef NUL
 #define NUL '\0'
 #endif
+
+#ifndef NL
+#define NL  '\n'
+#endif
+
+#define SQUOT '\''
+#define DQUOT '"'
+#define BACKS '\\'
+
 #define RIDICULOUS_YEAR_LEN 8192
 
 static char * scan_buffer  = NULL;
@@ -87,7 +96,7 @@ find_prefix(char const * ftext, regoff_t off)
     /*
      * Find the start of the line.  Make sure "end" follows any "dnl".
      */
-    while ((scan > ftext) && (scan[-1] != '\n'))    scan--;
+    while ((scan > ftext) && (scan[-1] != NL))    scan--;
 
     /*
      * "end" now points to the the end of the candidate prefix
@@ -172,7 +181,7 @@ emit_years(FILE * fp, char const * list, int cur_col, char const * pfx,
 
     {
         char * rest = *txt;
-        pe = strchr(rest, '\n');
+        pe = strchr(rest, NL);
 
         /*
          * See if we need a line split.  If not, we just resume.
@@ -242,11 +251,11 @@ ownership_ok(char const * scan, char const * pfx, size_t p_len)
              * following prefix and any white space after that.
              * At that point, the owner name must continue.  No newline.
              */
-            if (*scan == '\n') {
+            if (*scan == NL) {
                if (strncmp(scan + 1, pfx, p_len) != 0)
                    return false;
                scan = SPN_HORIZ_WHITE_CHARS(scan + p_len + 1);
-               if (*scan == '\n')
+               if (*scan == NL)
                    return false;
             }
         }
@@ -321,18 +330,18 @@ scan_past_years(char * scan, char const * pfx, size_t p_len)
             scan++;
             continue;
 
-        } else if (*scan == '\n') {
+        } else if (*scan == NL) {
             /*
              *  Newline.  Skip over the newline, the line prefix and
              *  any remaining white space on the line.  Another newline,
              *  and we bail out.  We must find something on this new line.
              */
             char * p = scan;
-            while ((*p == '\n') && (strncmp(p + 1, pfx, p_len) == 0)) {
+            while ((*p == NL) && (strncmp(p + 1, pfx, p_len) == 0)) {
                 p += p_len + 1;
                 p = SPN_WHITESPACE_CHARS(p);
             }
-            if (*p == '\n')
+            if (*p == NL)
                 break;
             scan = p;
 
@@ -367,7 +376,7 @@ extract_years(char ** ftext, int * col, char const * pfx,
     {   // figure out what column we are in.  Assume no tabs.
         int cc = 0;
         char * p = scanin;
-        while (*--p != '\n')  cc++;
+        while (*--p != NL)  cc++;
         *col = cc;
     }
 
@@ -396,18 +405,18 @@ extract_years(char ** ftext, int * col, char const * pfx,
             *(scanout++) = *(scanin++);
             was_sp   = false;
 
-        } else if (*scanin == '\n') {
+        } else if (*scanin == NL) {
             /*
              *  Newline.  Skip over the newline, the line prefix and
              *  any remaining white space on the line.  Another newline,
              *  and we bail out.  We must find something on this new line.
              */
             char * p = scanin;
-            while ((*p == '\n') && (strncmp(p + 1, pfx, p_len) == 0)) {
+            while ((*p == NL) && (strncmp(p + 1, pfx, p_len) == 0)) {
                 p += p_len + 1;
                 p = SPN_WHITESPACE_CHARS(p);
             }
-            if (*p == '\n')
+            if (*p == NL)
                 break;
 
             if (! was_sp) {
@@ -835,90 +844,105 @@ initialize(void)
     return preg;
 }
 
-static regex_t *
-assemble_cooked(char * p)
+/**
+ * Count length required for a raw string.  May be too large for
+ * a cooked string, but will not be too short.  Good enough.
+ */
+static size_t
+count_len(char * p)
 {
-    regex_t * res;
-    char * res_str;
-    size_t len = 1;
     char * ptr = p;
+    size_t len = 1; // for terminating NUL byte
+    char   qch = *(p++); // may be single or double quote
 
     for (;;) {
         char ch = *++p;
-        switch (ch) {
-        case NUL:
+
+        if (ch == NUL) {
         found_nul:
             die(CRIGHT_UPDATE_EXIT_REGCOMP, "bad regex string:  %s\n", ptr);
-
-        case '"':
-            p = strchr(p, '\n');
-            if (p == NULL)
-                goto found_nul;
-            if (p[-1] != '\\')
-                goto len_done;
-            p = strchr(p, '"');
-            if (p == NULL)
-                goto found_nul;
-            continue;
-
-        case '\\':
-            if (*++p == NUL)
-                goto found_nul;
-            
-        default:
-            len++;
-            break;
         }
-    } len_done:;
 
-    res = malloc(sizeof(*res) + len);
+        if (ch == qch) {
+            p = SPN_HORIZ_WHITE_CHARS(p+1);
+            if ((*p == BACKS) && (p[1] == NL)) {
+                p = SPN_HORIZ_WHITE_CHARS(p+2);
+                if (ch == qch) {
+                    p++;
+                    continue;
+                }
+            }
+            if (*p == NUL)
+                goto found_nul;
+            break; // done
+        }
+
+        len++;
+    }
+
+    return len;
+}
+
+static regex_t *
+assemble_cooked(char * src_p)
+{
+    size_t    len  = count_len(src_p);  // might be over size
+    regex_t * res  = malloc(sizeof(*res) + len);
+    char * res_str = (char *)(res + 1);
+    char * dst_p   = res_str;
+
     if (res == NULL)
         fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
-    res_str = (char *)(res + 1);
 
-    for (p = res_str;;) {
-        char ch = *++ptr;
+    for (;;) {
+        char ch = *++src_p;
         switch (ch) {
-        case '"':
-            ptr = SPN_HORIZ_WHITE_CHARS(ptr+1);
-            if ((ptr[0] == '\\') && (ptr[1] == '\n')) {
-                ptr = strchr(ptr + 2, '"');
-                if (ptr != NULL)
+        case DQUOT:
+            /*
+             * We may be done.  Check for this sequence:
+             *    <whitespace><backslash><newline><whitespace><doublequote>
+             * If we find it, we continue
+             */
+            src_p = SPN_HORIZ_WHITE_CHARS(src_p+1);
+            if ((src_p[0] == BACKS) && (src_p[1] == NL)) {
+                src_p = SPN_HORIZ_WHITE_CHARS(src_p + 2);
+                if (*src_p == DQUOT) {
+                    src_p++;
                     continue;
+                }
             }
-            *p = NUL;
-            return res;
+            goto done_cooking; // break; break;
 
         default:
-            *(p++) = ch;
+            *(dst_p++) = ch;
             break;
 
-        case '\\':
-            ch = *++ptr;
+        case BACKS:
+            ch = *++src_p;
             switch (ch) {
-            case 'a': *(p++) = '\a'; break;
-            case 'b': *(p++) = '\b'; break;
-            case 't': *(p++) = '\t'; break;
-            case 'n': *(p++) = '\n'; break;
-            case 'v': *(p++) = '\v'; break;
-            case 'f': *(p++) = '\f'; break;
-            case 'r': *(p++) = '\r'; break;
+            case 'a': *(dst_p++) = '\a'; break;
+            case 'b': *(dst_p++) = '\b'; break;
+            case 't': *(dst_p++) = '\t'; break;
+            case 'n': *(dst_p++) = NL;   break;
+            case 'v': *(dst_p++) = '\v'; break;
+            case 'f': *(dst_p++) = '\f'; break;
+            case 'r': *(dst_p++) = '\r'; break;
             case 'x':
             {
                 char buf[4];
                 int ix = 0;
 
                 for (;;) {
-                    if (! IS_HEX_DIGIT_CHAR(ptr[1]))
+                    if (! IS_HEX_DIGIT_CHAR(src_p[1]))
                         break;
 
-                    buf[ix] = *++ptr;
+                    buf[ix] = *++src_p;
                     if (++ix >= 2)
                         break;
                 }
 
                 buf[ix] = NUL;
-                *(p++) = 0xFF & strtoul(buf, 0, 16);
+                *(dst_p++) = 0xFF & strtoul(buf, 0, 16);
                 break;
             }
             case '0': case '1': case '2': case '3':
@@ -928,29 +952,64 @@ assemble_cooked(char * p)
                 int ix = 0;
 
                 for (;;) {
-                    if (! IS_OCT_DIGIT_CHAR(ptr[1]))
+                    if (! IS_OCT_DIGIT_CHAR(src_p[1]))
                         break;
 
-                    buf[ix] = *++ptr;
+                    buf[ix] = *++src_p;
                     if (++ix >= 3)
                         break;
                 }
 
                 buf[ix] = NUL;
-                *(p++) = 0xFF & strtoul(buf, 0, 8);
+                *(dst_p++) = 0xFF & strtoul(buf, 0, 8);
                 break;
             }
             default:
-                *(p++) = ch;
+                *(dst_p++) = ch;
             }
         }
     }
+
+ done_cooking:
+    *dst_p = NUL; // we're done.
+    cu_regcomp(res, res_str, regex_flags);
+    return res;
 }
 
 static regex_t *
-assemble_raw(char * p)
+assemble_raw(char * src_p)
 {
-    die(CRIGHT_UPDATE_EXIT_REGCOMP, "raw regex-es not supported\n");
+    size_t    len  = count_len(src_p);
+    regex_t * res  = malloc(sizeof(*res) + len);
+    char * res_str = (char *)(res + 1);
+    char * dst_p   = res_str;
+
+    if (res == NULL)
+        fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "copyright mark regex");
+
+    for (;;) {
+        char ch = *++src_p;
+        switch (ch) {
+        case SQUOT:
+            src_p = SPN_HORIZ_WHITE_CHARS(src_p+1);
+            if ((src_p[0] == BACKS) && (src_p[1] == NL)) {
+                src_p = SPN_HORIZ_WHITE_CHARS(src_p + 2);
+                if (*src_p == SQUOT) {
+                    src_p++;
+                    continue;
+                }
+            }
+            goto assembly_done; // break; break;
+
+        default:
+            *(dst_p++) = ch;
+        }
+    }
+
+ assembly_done:
+    *dst_p = NUL;
+    cu_regcomp(res, res_str, regex_flags);
+    return res;
 }
 
 static regex_t *
@@ -964,7 +1023,7 @@ assemble_line(char * p)
 {
     regex_t * res;
     size_t res_str_size;
-    char * q = strchr(p, '\n');
+    char * q = strchr(p, NL);
     char * res_str;
 
     if (q == NULL)
@@ -977,6 +1036,7 @@ assemble_line(char * p)
     res_str = (char *)(res + 1);
     memcpy(res_str, p, res_str_size);
     res_str[res_str_size] = NUL;
+    cu_regcomp(res, res_str, regex_flags);
     return res;
 }
 
@@ -994,11 +1054,11 @@ assemble_regex(char * p)
     }
 
     switch (*p) {
-    case '\n': return NULL;
-    case '"':  return assemble_cooked(p);
-    case '\'': return assemble_raw(p);
-    case '<':  return assemble_xml(p);
-    default:   return assemble_line(p);
+    case NL:    return NULL;
+    case DQUOT: return assemble_cooked(p);
+    case SQUOT: return assemble_raw(p);
+    case '<':   return assemble_xml(p);
+    default:    return assemble_line(p);
     }
 
 }
@@ -1024,11 +1084,7 @@ choose_re(char * ftext, regex_t * preg)
         if (preg == NULL)
             fserr(CRIGHT_UPDATE_EXIT_NOMEM, "allocation", "regex struct");
 
-        res_reg = assemble_regex(p + sizeof(mark) - 1);
-        re_str  = (char *)(res_reg + 1);
-        cu_regcomp(res_reg, re_str, regex_flags);
-
-        return res_reg;
+        return assemble_regex(p + sizeof(mark) - 1);
     }
 }
 
@@ -1052,7 +1108,7 @@ fix_copyright(char const * fname, char * ftext, size_t fsize)
     if (preg == NULL)
         preg = initialize();
 
-    re = choose_re(ftext, preg);
+    re    = choose_re(ftext, preg);
     reres = regexec(re, ftext, 2, match, 0);
 
     switch (reres) {

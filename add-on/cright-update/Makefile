@@ -26,6 +26,6 @@
       CMAPFILE = cright.map
         FSMDEF = collapse
 
-        CFLAGS = -g2 -O0
+        CFLAGS = -ggdb3 -gdwarf-3 -O0
 
 include $(TOP)/MakeRules

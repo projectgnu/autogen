@@ -44,7 +44,7 @@ config-header = 'config.h';
 version    = '1.0';
 omit-nls-code;
 copyright = {
-    date  = "1992-2014";
+    date  = "1992-2015";
     owner = "Bruce Korb";
     eaddr = "autogen-users@lists.sourceforge.net";
     type  = gpl;

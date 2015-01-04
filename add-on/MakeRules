@@ -18,7 +18,7 @@
 
 AO_LIBS         := $(shell autoopts-config ldflags)
 AO_CFLAGS       := $(shell autoopts-config cflags)
-CFLAGS          =  -g3 -O0 -std=c99
+CFLAGS          := -ggdb3 -gdwarf-3 -O0 -std=c99
 
 CLOBBER_LIST    =  $(TARGET)
 HEADER_LIST     =  $(LCLHDR)
@@ -91,7 +91,7 @@ endif
 #
 ifdef SRC
 .c.o: $(HEADER_LIST)
-	$(CC) -g $(CFLAGS) $(AO_CFLAGS) -c $*.c
+	$(CC) $(CFLAGS) $(AO_CFLAGS) -c $*.c
 endif
 
 # How to build an executable
@@ -99,7 +99,7 @@ endif
 ifdef EXE
 OBJ             =  $(SRC:.c=.o)
 $(EXE)          : $(OBJ)
-	$(CC) -g -o $@ $(OBJ) $(AO_LIBS)
+	$(CC) -ggdb3 -gdwarf-3 -o $@ $(OBJ) $(AO_LIBS)
 
 install         : /usr/local/bin/$(EXE)
 

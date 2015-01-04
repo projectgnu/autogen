@@ -2,11 +2,6 @@
 
 autogen definitions conftest.tpl;
 
-/*--copyright-mark "(copyright \\(c\\)[ \t]+|date[ \t]*=[ \t]*\")" \
- *  "([12][90][0-9][0-9])"
- *
- */ author =           "Bruce Korb <bkorb@gnu.org>";
-
 /*  This file is part of AutoGen.
  *
  *  AutoGen Copyright (C) 1992-2015 by Bruce Korb - all rights reserved
@@ -25,6 +20,7 @@ autogen definitions conftest.tpl;
  *  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+author      = "Bruce Korb <bkorb@gnu.org>";
 group       = ag;
 output-file = ag_macros.m4;
 

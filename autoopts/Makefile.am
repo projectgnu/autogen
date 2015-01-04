@@ -86,14 +86,13 @@ EXTRA_DIST += $(SRC) $(EXTRA_DATA) $(man_MANS) $(DEF_FILES)
 
 INST_MANS                 = autoopts-config.1 $(GENMAN)
 INST_PKGCFG               = pkgconfig/autoopts.pc
-INST_PKGDATA              = autoopts.m4 $(TPL_FILES)
 INST_LIBS                 = libopts.la
 INST_HDRS                 = autoopts/options.h autoopts/usage-txt.h
 INST_SH                   = autoopts-config
 
 man_MANS                  = $(INST_MANS)
 m4data_DATA               = autoopts.m4
-nobase_data_DATA          = $(INST_PKGCFG)
+pkgconfig_DATA            = $(INST_PKGCFG)
 lib_LTLIBRARIES           = $(INST_LIBS)
 nobase_include_HEADERS    = $(INST_HDRS)
 bin_SCRIPTS               = $(INST_SH)
