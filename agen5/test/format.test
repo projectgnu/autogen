@@ -79,12 +79,12 @@ document.write('" >Bruce Korb</a>');
 </script>
 _EOF_
 
-AUTOGEN_DNE_DATE=false \
+export AUTOGEN_DNE_DATE=false
     run_ag x ${testname}.def || failure autogen failed
 cmp -s ${testname}.base ${testname}.test || \
    failure "`diff ${testname}.base ${testname}.test`"
 
-AUTOGEN_DNE_DATE=true \
+AUTOGEN_DNE_DATE=true
     run_ag x ${testname}.def || failure autogen failed
 dte=`sed -n 's/.*It has been AutoGen-ed *//p' ${testname}.test`
 test "X${dte}" = "X" && \

@@ -30,6 +30,11 @@
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
+ static inline unsigned char to_uchar (char ch) { return ch; }
+
+#define UPPER(_c) (toupper(to_uchar(_c)))
+#define LOWER(_c) (tolower(to_uchar(_c)))
+
 /* = = = START-STATIC-FORWARD = = = */
 static void
 emit_var_text(char const * prog, char const * var, int fdin);
@@ -653,7 +658,7 @@ emit_match_expr(char const * name, tOptDesc * cod, tOptions * opts)
              *  They must not be the same.  They cannot be, because it would
              *  not compile correctly if they were.
              */
-            while (toupper(od->pz_Name[match_ct]) == toupper(name[match_ct]))
+            while (UPPER(od->pz_Name[match_ct]) == UPPER(name[match_ct]))
                 match_ct++;
 
             if (match_ct > min_match_ct)
@@ -905,7 +910,7 @@ genshelloptUsage(tOptions * opts, int exit_cd)
         AGDUPSTR(pz, optionParseShellOptions->pzPROGNAME, "prog name");
         *pp = pz;
         while (*pz != NUL) {
-            *pz = (char)tolower(*pz);
+            *pz = (char)LOWER(*pz);
             pz++;
         }
     }
