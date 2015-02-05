@@ -168,14 +168,14 @@ scan_cflags() {
     do
         case "$1" in
         -I )
-            test -f $2/libguile/__scm.h && {
+            test -f "$2/libguile/__scm.h" && {
                 libguiledir=$2
                 return 0
             }
             ;;
         -I* )
             f=${1#-I}
-            test -f $f/libguile/__scm.h && {
+            test -f "$f/libguile/__scm.h" && {
                 libguiledir=$f
                 return 0
             }
@@ -209,14 +209,14 @@ find_libguiledir() {
         test -d ${libguiledir}/${v} && libguiledir=${libguiledir}/$v
 
     else
-        scan_cflags "$@"
+        scan_cflags $*
     fi
     guile_scm_h=`find ${libguiledir} -type f -name __scm.h`
 }
 
 fix_guile() {
     cd ${builddir}
-    find_libguiledir "${LGCFLAGS}"
+    find_libguiledir ${LGCFLAGS}
 
     list=`exec 2>/dev/null
         find ${libguiledir}/libguile* -type f | \
