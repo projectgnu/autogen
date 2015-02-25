@@ -85,7 +85,7 @@ mk_pager_cmd(char const * fname)
         if (pager == NULL)
             pager = MORE_STR;
 
-        bfsz = strlen(fname) + strlen(pager) + PAGE_USAGE_FMT_LEN;
+        bfsz = 2 * strlen(fname) + strlen(pager) + PAGE_USAGE_FMT_LEN;
         res  = AGALOC(bfsz, "more cmd");
         snprintf(res, bfsz, PAGE_USAGE_FMT, pager, fname);
         AGFREE(fname);
