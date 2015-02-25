@@ -1349,6 +1349,46 @@ void
 [=
 ENDIF die-code              =][=
 
+IF (exist? "warn-code")
+
+=]
+/**
+ * Print a warning message, \a va_list style.
+ *
+ * @param[in] fmt        the "something awry" message
+ * @param[in] ap         the argument list for the message
+ */
+void
+[=(. lc-prefix)=]vwarning_msg(char const * fmt, va_list ap)
+{
+    char const * warn_leader = _("[= prog-name =] WARNING:\n");[=
+  (set! tmp-text (get "warn-code"))
+  (if (> (string-length tmp-text) 1)
+      (string-append "\n\n" tmp-text "\n"))
+ =]
+    fputs(warn_leader, stderr);
+    vfprintf(stderr, fmt, ap);
+    fflush(stderr);
+}
+
+/**
+ * Print a warning message, var-arg style.
+ *
+ * @param[in] fmt        the "something awry" message
+ * @param[in] ...        the list of arguments for the message
+ */
+void
+[=(. lc-prefix)=]warning_msg(char const * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vwarning_msg(fmt, ap);
+    va_end(ap);
+}
+[=
+
+ENDIF have warn-code    =][=
+
 ENDDEF emit-option-callbacks
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # =][=

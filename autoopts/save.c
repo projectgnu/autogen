@@ -306,7 +306,7 @@ prt_entry(FILE * fp, tOptDesc * od, char const * l_arg)
      *  THEN the char pointer is really the number
      */
     if (OPTST_GET_ARGTYPE(od->fOptState) == OPARG_TYPE_NUMERIC)
-        fprintf(fp, "%d", (int)(t_word)l_arg);
+        fprintf(fp, "%d", (int)(intptr_t)l_arg);
 
     else {
         for (;;) {

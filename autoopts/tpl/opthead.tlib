@@ -310,7 +310,12 @@ static inline void
 
     ENDIF  no-memory failure            =][=
 
-  ENDIF die-code exists                 =]
+  ENDIF die-code exists                 =][=
+
+  IF (exist? "warn-code")               =]
+[=(. no-return-str)=]vwarning_msg( char const * fmt, va_list);
+[=(. no-return-str)=]warning_msg(  char const * fmt, ...);[=
+  ENDIF have warn-code                  =]
 #ifdef  __cplusplus
 }
 #endif[=
