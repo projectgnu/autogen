@@ -867,8 +867,8 @@ DEFINE initialization                   =][=
       (begin
          (set! tmp-str (get "more-help-value"))
          (if (> (string-length tmp-str) 0)
-             (set! help-opt (string-append "-" tmp-str))
-             (set! help-opt "--more-help")
+             (set! more-help-opt (string-append "-" tmp-str))
+             (set! more-help-opt "--more-help")
       )  )
   )))
 

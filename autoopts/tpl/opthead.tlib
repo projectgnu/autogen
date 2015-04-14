@@ -313,8 +313,8 @@ static inline void
   ENDIF die-code exists                 =][=
 
   IF (exist? "warn-code")               =]
-[=(. no-return-str)=]vwarning_msg( char const * fmt, va_list);
-[=(. no-return-str)=]warning_msg(  char const * fmt, ...);[=
+extern void [=(. lc-prefix)=]vwarning_msg( char const * fmt, va_list);
+extern void [=(. lc-prefix)=]warning_msg(  char const * fmt, ...);[=
   ENDIF have warn-code                  =]
 #ifdef  __cplusplus
 }

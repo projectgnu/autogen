@@ -199,8 +199,7 @@ tweak_Makefile_am()
             q
         }' Makefile.am
         {
-            find VERSION \
-                config/bootstrap* config/*.m4 config/config.rpath config/*.sh \
+            find VERSION config \
                 autoopts/parse-duration.[ch] autoopts/gettext.h doc/gendocs* \
                 -type f
             echo config/gnulib-cache.m4

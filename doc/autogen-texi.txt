@@ -2476,6 +2476,9 @@ The recognized values for @code{main-type} are @code{guile},
 * main include::            include: code emitted from included template
 * main invoke::             invoke: code emitted from AutoGen macro
 
+The @code{for-each} main  procedure has a number of attributes that
+must be specified:
+
 * main for-each::           for-each: perform function on each operand
 * main-for-each-proc::          procedure to handle each argument
 * main-for-each-type::          handler procedure type
@@ -2659,10 +2662,10 @@ make verbose TESTS=main.test
 @unnumberedsubsubsec procedure to handle each argument
 
 @vindex handler-proc
-This attribute is required.  It is used to name the procedure to call.
-That procedure is presumed to be external, but if you provide the code
-for it, then the procedure is emitted as a static procedure in the
-generated code.
+The @code{handler-proc} attribute is required.  It is used to name the
+procedure to call.  That procedure is presumed to be external, but if
+you provide the code for it, then the procedure is emitted as a static
+procedure in the generated code.
 
 This procedure should return 0 on success, a cumulative error code on warning
 and exit without returning on an unrecoverable error.  As the cumulative
@@ -2688,8 +2691,8 @@ here is part of the emitted code:
 @unnumberedsubsubsec handler procedure type
 
 @vindex handler-type
-If you do not supply this attribute, your handler procedure must be
-the default type.  The profile of the procedure must be:
+If you do not supply the @code{handler-type} attribute, your handler
+procedure must be the default type.  The profile of the procedure must be:
 
 @example
 int @var{my_handler}(char const * pz_entry);
@@ -2743,7 +2746,7 @@ In this case, the profile for your procedure must be:
 
 @example
 program_exit_code_t
-@var{my_handler}(char const* pz_fname, char* file_text,
+@var{my_handler}(char const * fname, char * file_text,
            size_t text_size);
 @end example
 
@@ -2754,6 +2757,10 @@ the file contents.  Also, the memory allocated to hold the text is
 @code{text_size + 1} bytes long and the final byte is always @code{NUL}.  The
 file contents need not be text, as the data are read with the @code{read(2)}
 system call.
+
+@code{file_text} is automatically freed, unless you specify a
+@vindex handler-frees
+@code{handler-frees} attribute.  Then your code must @code{free(3)} the text.
 @end table
 
 If you select one of these file type handlers, then on access or usage errors
@@ -2768,15 +2775,18 @@ message will not be printed.
 @unnumberedsubsubsec code for handler procedure
 
 @vindex MYHANDLER-code
-With this attribute, you provide the code for your handler procedure
-in the option definition file.  In this case, your @code{main()}
+With the @code{MYHANDLER-code} attribute, you provide the code for
+your handler procedure in the option definition file.  Note that the
+spelling of this attribute depends on the name provided with the
+@code{handler-proc} attribute, so we represent it here with
+@code{MYHANDLER} as a place holder.  As an example, your @code{main()}
 procedure specification might look something like this:
 
 @example
 main = @{
   main-type    = for-each;
-  handler-proc = @var{my_handler};
-  @var{my_handler}-code = <<- EndOfMyCode
+  handler-proc = @var{MYHANDLER};
+  @var{MYHANDLER}-code = <<- EndOfMyCode
 	/* whatever you want to do */
 	EndOfMyCode;
 @};
@@ -2788,10 +2798,10 @@ that looks like this:
 
 @example
 static int
-@var{my_handler}( char const* pz_entry )
+@var{MYHANDLER}( char const* pz_entry )
 @{
     int res = 0;
-    <<@var{my_handler}-code goes here>>
+    <<@var{MYHANDLER}-code goes here>>
     return res;
 @}
 @end example
@@ -2804,6 +2814,7 @@ each argument or input line.
 
 @table @samp
 @item interleaved
+@vindex interleaved
 If this attribute is specified, then options and operands may be
 interleaved.  Arguments or input lines beginning with a hyphen will
 cause it to be passed through to an option processing function and

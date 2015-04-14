@@ -33,7 +33,7 @@
  */
 
 #if defined(HAVE_WORKING_FORK)
-static FILE *
+static inline FILE *
 open_tmp_usage(char ** buf)
 {
     char * bf;
@@ -64,7 +64,7 @@ open_tmp_usage(char ** buf)
     }
 }
 
-static char *
+static inline char *
 mk_pager_cmd(char const * fname)
 {
     /*
