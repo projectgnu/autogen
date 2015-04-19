@@ -499,7 +499,7 @@ ag_scm_set_writable(SCM set)
         break;
 
     default:
-        if (AG_SCM_BOOL_P(set) && (set == SCM_BOOL_F))
+        if (scm_is_bool(set) && (set == SCM_BOOL_F))
             CLEAR_OPT(WRITABLE);
         else
             SET_OPT_WRITABLE;

@@ -38,39 +38,24 @@
 LOCAL char *
 ag_scm2zchars(SCM s, const char * type)
 {
-#if GUILE_VERSION < 107000  /* pre-Guile 1.7.x */
-
-    if (! AG_SCM_STRING_P(s))
-        AG_ABEND(aprf(NOT_STR_FMT, type));
-
-    if (SCM_SUBSTRP(s))
-        s = scm_makfromstr(SCM_CHARS(s), SCM_LENGTH(s), 0);
-    return SCM_CHARS(s);
-
-#else
     size_t len;
     char * buf;
+    char * str;
 
     if (! AG_SCM_STRING_P(s))
         AG_ABEND(aprf(NOT_STR_FMT, type));
 
-    len = scm_c_string_length(s);
+    str = scm_to_locale_stringn(s, &len);
     if (len == 0) {
         static char z = NUL;
         return &z;
     }
 
-    buf = scribble_get((ssize_t)len);
-
-    {
-        size_t buflen = scm_to_locale_stringbuf(s, buf, len);
-        if (buflen != len)
-            AG_ABEND(aprf(SCM2ZCHARS_BAD_VAL, buflen, len));
-    }
-
+    buf = scribble_get((ssize_t)len + 1);
+    memmove(buf, str, len);
+    free(str);
     buf[len] = NUL;
     return buf;
-#endif
 }
 
 /**
@@ -81,14 +66,14 @@ ag_scm2zchars(SCM s, const char * type)
 LOCAL teGuileType
 ag_scm_type_e(SCM typ)
 {
-    if (AG_SCM_BOOL_P(  typ)) return GH_TYPE_BOOLEAN;
+    if (scm_is_bool(    typ)) return GH_TYPE_BOOLEAN;
     if (AG_SCM_SYM_P(   typ)) return GH_TYPE_SYMBOL;
     if (AG_SCM_STRING_P(typ)) return GH_TYPE_STRING;
     if (AG_SCM_IS_PROC( typ)) return GH_TYPE_PROCEDURE;
     if (AG_SCM_CHAR_P(  typ)) return GH_TYPE_CHAR;
     if (AG_SCM_VEC_P(   typ)) return GH_TYPE_VECTOR;
     if (AG_SCM_PAIR_P(  typ)) return GH_TYPE_PAIR;
-    if (AG_SCM_NUM_P(   typ)) return GH_TYPE_NUMBER;
+    if (scm_is_number(  typ)) return GH_TYPE_NUMBER;
     if (AG_SCM_LIST_P(  typ)) return GH_TYPE_LIST;
 
     return GH_TYPE_UNDEFINED;
@@ -116,7 +101,7 @@ ag_scm_c_eval_string_from_file_line(
         }
 
         {
-            SCM ln = AG_SCM_INT2SCM(line);
+            SCM ln = scm_from_int(line);
             scm_set_port_filename_x(port, file);
             scm_set_port_line_x(port, ln);
             scm_set_port_column_x(port, SCM_INUM0);
@@ -177,7 +162,7 @@ ag_scm_max(SCM list)
             break;
 
         case GH_TYPE_CHAR:
-            val = (int)AG_SCM_CHAR(car);
+            val = (int)SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
@@ -194,7 +179,7 @@ ag_scm_max(SCM list)
         max_val = MAX(max_val, val);
     }
 
-    return AG_SCM_FROM_LONG(max_val);
+    return scm_from_long(max_val);
 }
 
 
@@ -236,7 +221,7 @@ ag_scm_min(SCM list)
             break;
 
         case GH_TYPE_CHAR:
-            val = (int)AG_SCM_CHAR(car);
+            val = (int)SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
@@ -253,7 +238,7 @@ ag_scm_min(SCM list)
         min_val = MIN(min_val, val);
     }
 
-    return AG_SCM_FROM_LONG(min_val);
+    return scm_from_long(min_val);
 }
 
 
@@ -273,7 +258,7 @@ ag_scm_sum(SCM list)
     long sum = 0;
 
     if (len <= 0)
-        return AG_SCM_INT2SCM(0);
+        return scm_from_int(0);
 
     do  {
         SCM  car = SCM_CAR(list);
@@ -283,7 +268,7 @@ ag_scm_sum(SCM list)
             return SCM_UNDEFINED;
 
         case GH_TYPE_CHAR:
-            sum += (long)(unsigned char)AG_SCM_CHAR(car);
+            sum += (long)(unsigned char)SCM_CHAR(car);
             break;
 
         case GH_TYPE_NUMBER:
@@ -295,7 +280,7 @@ ag_scm_sum(SCM list)
         }
     } while (--len > 0);
 
-    return AG_SCM_FROM_LONG(sum);
+    return scm_from_long(sum);
 }
 
 
@@ -319,7 +304,7 @@ ag_scm_string_to_c_name_x(SCM str)
     if (! AG_SCM_STRING_P(str))
         scm_wrong_type_arg(STR_TO_C_NAME, 1, str);
 
-    for (pz = C(char *, AG_SCM_CHARS(str)), len = (int)AG_SCM_STRLEN(str);
+    for (pz = C(char *, scm_i_string_chars(str)), len = (int)AG_SCM_STRLEN(str);
          --len >= 0;
          pz++) {
 
@@ -356,7 +341,7 @@ ag_scm_string_upcase_x(SCM str)
         return SCM_UNDEFINED;
 
     len = (int)AG_SCM_STRLEN(str);
-    pz  = C(char *, AG_SCM_CHARS(str));
+    pz  = C(char *, scm_i_string_chars(str));
     while (--len >= 0) {
          char ch = *pz;
         if (IS_LOWER_CASE_CHAR(ch))
@@ -385,7 +370,7 @@ ag_scm_string_upcase(SCM str)
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    res = AG_SCM_STR2SCM(AG_SCM_CHARS(str), AG_SCM_STRLEN(str));
+    res = AG_SCM_STR2SCM(scm_i_string_chars(str), AG_SCM_STRLEN(str));
     scm_string_upcase_x(res);
     return res;
 }
@@ -411,7 +396,7 @@ ag_scm_string_capitalize_x(SCM str)
         return SCM_UNDEFINED;
 
     len = (int)AG_SCM_STRLEN(str);
-    pz  = C(char *, AG_SCM_CHARS(str));
+    pz  = C(char *, scm_i_string_chars(str));
 
     while (--len >= 0) {
         char ch = *pz;
@@ -452,7 +437,7 @@ ag_scm_string_capitalize(SCM str)
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    res = AG_SCM_STR2SCM(AG_SCM_CHARS(str), AG_SCM_STRLEN(str));
+    res = AG_SCM_STR2SCM(scm_i_string_chars(str), AG_SCM_STRLEN(str));
     ag_scm_string_capitalize_x(res);
     return res;
 }
@@ -477,7 +462,7 @@ ag_scm_string_downcase_x(SCM str)
         return SCM_UNDEFINED;
 
     len = (int)AG_SCM_STRLEN(str);
-    pz  = C(char *, AG_SCM_CHARS(str));
+    pz  = C(char *, scm_i_string_chars(str));
     while (--len >= 0) {
         char ch = *pz;
         if (IS_UPPER_CASE_CHAR(ch))
@@ -506,7 +491,7 @@ ag_scm_string_downcase(SCM str)
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    res = AG_SCM_STR2SCM(AG_SCM_CHARS(str), AG_SCM_STRLEN(str));
+    res = AG_SCM_STR2SCM(scm_i_string_chars(str), AG_SCM_STRLEN(str));
     ag_scm_string_downcase_x(res);
     return res;
 }
@@ -536,7 +521,7 @@ ag_scm_string_to_camelcase(SCM str)
 
     len = (int)AG_SCM_STRLEN(str);
     res = pzd = scribble_get(len + 1);
-    pzs = C(char *, AG_SCM_CHARS(str));
+    pzs = C(char *, scm_i_string_chars(str));
 
     while (--len >= 0) {
         unsigned int ch = (unsigned int)*(pzs++);

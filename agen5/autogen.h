@@ -596,7 +596,7 @@ static inline SCM ag_eval(char const * str)
     scm_boot_guile((_ac), (_av), (_im), NULL)
 
 #define AG_SCM_APPLY2(_op, _f, _tst) \
-    scm_apply(_op, _f, scm_cons(_tst, AG_SCM_LISTOFNULL()))
+    scm_apply(_op, _f, scm_cons(_tst, scm_list_1(SCM_EOL)))
 
 #define AG_SCM_CHAR_P(_c)            SCM_CHARP(_c)
 

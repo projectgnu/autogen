@@ -138,7 +138,7 @@ run_printf(char const * pzFmt, int len, SCM alist)
             break;
 
         case GH_TYPE_CHAR:
-            *(char *)(argp++) = (char)AG_SCM_CHAR(car);
+            *(char *)(argp++) = (char)SCM_CHAR(car);
             break;
 
         case GH_TYPE_PAIR:
@@ -336,7 +336,7 @@ ag_scm_format_arg_count(SCM fmt)
         }
     } scanDone:;
 
-    return AG_SCM_INT2SCM(ct);
+    return scm_from_int(ct);
 }
 /**
  * @}

@@ -121,12 +121,7 @@ test -f ${testname}-task2-OK \
   && failure unexpected success for test-2
 verb_ok=true
 
-if test ${GUILE_VERSION} -gt 107000
-then
-  omit_pat='Giving up in | is deprecated\.|erasing the .* environment variable'
-else
-  omit_pat='Giving up in '
-fi
+omit_pat='Giving up in | is deprecated\.|erasing the .* environment variable'
 
 ${EGREP} -v "$omit_pat" ${testname}.err2 > ${testname}.res2
 

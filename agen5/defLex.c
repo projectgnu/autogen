@@ -571,7 +571,7 @@ alist_to_autogen_def(void)
     pCtx->scx_scan = \
     pCtx->scx_data = (char *)(pCtx + 1);
     pCtx->scx_line = 0;
-    memcpy(VOIDP(pCtx->scx_scan), VOIDP(AG_SCM_CHARS(res)), res_len);
+    memcpy(VOIDP(pCtx->scx_scan), VOIDP(scm_i_string_chars(res)), res_len);
     pCtx->scx_scan[ res_len ] = NUL;
 
     /*

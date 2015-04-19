@@ -159,7 +159,7 @@ do_stdout_tpl(templ_t * tpl)
          *  a content-type: prefix.  If not, we supply our own HTML prefix.
          */
         res   = ag_scm_out_pop(SCM_BOOL_T);
-        pzRes = AG_SCM_CHARS(res);
+        pzRes = scm_i_string_chars(res);
 
         /* 13 char prefix is:  "content-type:" */
         if (strneqvcmp(pzRes, DO_STDOUT_TPL_CONTENT, 13) != 0)

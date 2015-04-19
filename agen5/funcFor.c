@@ -162,7 +162,7 @@ ag_scm_for_index(SCM which)
     if (p == NULL)
         return SCM_UNDEFINED;
 
-    which = AG_SCM_INT2SCM(p->for_index);
+    which = scm_from_int(p->for_index);
     return which;
 }
 
@@ -179,7 +179,7 @@ ag_scm_for_index(SCM which)
 SCM
 ag_scm_for_from(SCM from)
 {
-    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(from)))
+    if ((! for_state->for_loading) || (! scm_is_number(from)))
         return SCM_UNDEFINED;
 
     for_state->for_from = AG_SCM_TO_INT(from);
@@ -200,7 +200,7 @@ ag_scm_for_from(SCM from)
 SCM
 ag_scm_for_to(SCM to)
 {
-    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(to)))
+    if ((! for_state->for_loading) || (! scm_is_number(to)))
         return SCM_UNDEFINED;
 
     for_state->for_to = AG_SCM_TO_INT(to);
@@ -221,7 +221,7 @@ ag_scm_for_to(SCM to)
 SCM
 ag_scm_for_by(SCM by)
 {
-    if ((! for_state->for_loading) || (! AG_SCM_NUM_P(by)))
+    if ((! for_state->for_loading) || (! scm_is_number(by)))
         return SCM_UNDEFINED;
 
     for_state->for_by = AG_SCM_TO_INT(by);

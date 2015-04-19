@@ -242,7 +242,7 @@ ag_scm_out_move(SCM new_file)
 {
     size_t sz = AG_SCM_STRLEN(new_file);
     char * pz = (char *)AGALOC(sz + 1, "file name");
-    memcpy(pz, AG_SCM_CHARS(new_file), sz);
+    memcpy(pz, scm_i_string_chars(new_file), sz);
     pz[sz] = NUL;
 
     if (OPT_VALUE_TRACE > TRACE_DEBUG_MESSAGE)
@@ -295,7 +295,7 @@ ag_scm_out_pop(SCM ret_contents)
         fprintf(trace_fp, TRACE_POP_FMT, __func__, cur_fpstack->stk_fname,
                 (ret_contents == SCM_UNDEFINED) ? "" : " #t");
 
-    if (AG_SCM_BOOL_P(ret_contents) && AG_SCM_NFALSEP(ret_contents)) {
+    if (scm_is_bool(ret_contents) && scm_is_true(ret_contents)) {
         long  pos = ftell(cur_fpstack->stk_fp);
         char * pz;
 
@@ -342,7 +342,7 @@ ag_scm_output_file_next_line(SCM num_or_str, SCM str)
     char const * fmt;
     int  line_off = 1;
 
-    if (AG_SCM_NUM_P(num_or_str))
+    if (scm_is_number(num_or_str))
         line_off = (int)AG_SCM_TO_LONG(num_or_str);
     else
         str = num_or_str;
@@ -500,7 +500,7 @@ ag_scm_ag_fprintf(SCM port, SCM fmt, SCM alist)
      *  output.  If the number is out of range, we'll fall through to the
      *  abend.
      */
-    else if (AG_SCM_NUM_P(port)) {
+    else if (scm_is_number(port)) {
         out_stack_t * pSaveFp = cur_fpstack;
         long val = AG_SCM_TO_LONG(port);
 
@@ -551,7 +551,7 @@ ag_scm_out_push_add(SCM new_file)
     if (! AG_SCM_STRING_P(new_file))
         AG_ABEND(OUT_ADD_INVALID);
 
-    open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
+    open_output_file(scm_i_string_chars(new_file), AG_SCM_STRLEN(new_file),
                      append_mode, 0);
 
     return SCM_UNDEFINED;
@@ -606,7 +606,7 @@ ag_scm_out_push_new(SCM new_file)
     static char const write_mode[] = "w" FOPEN_BINARY_FLAG "+";
 
     if (AG_SCM_STRING_P(new_file)) {
-        open_output_file(AG_SCM_CHARS(new_file), AG_SCM_STRLEN(new_file),
+        open_output_file(scm_i_string_chars(new_file), AG_SCM_STRLEN(new_file),
                          write_mode, 0);
         return SCM_UNDEFINED;
     }
@@ -694,7 +694,7 @@ ag_scm_out_switch(SCM new_file)
     {
         size_t sz = AG_SCM_STRLEN(new_file);
         pzNewFile = AGALOC(sz + 1, "new file name");
-        memcpy(pzNewFile, AG_SCM_CHARS(new_file), sz);
+        memcpy(pzNewFile, scm_i_string_chars(new_file), sz);
         pzNewFile[ sz ] = NUL;
     }
 
@@ -742,7 +742,7 @@ ag_scm_out_switch(SCM new_file)
 SCM
 ag_scm_out_depth(void)
 {
-    return AG_SCM_INT2SCM(outputDepth);
+    return scm_from_int(outputDepth);
 }
 
 
@@ -792,7 +792,7 @@ ag_scm_out_line(void)
         fseek(cur_fpstack->stk_fp, svpos, SEEK_SET);
     } while(0);
 
-    return AG_SCM_INT2SCM(lineNum);
+    return scm_from_int(lineNum);
 }
 
 #if 0 /* for compilers that do not like C++ comments... */
@@ -883,7 +883,7 @@ ag_scm_make_header_guard(SCM name)
          *  to "HEADER"
          */
         char const * lpz =
-            AG_SCM_STRING_P(name) ? AG_SCM_CHARS(name) : HEADER_STR;
+            AG_SCM_STRING_P(name) ? scm_i_string_chars(name) : HEADER_STR;
         size_t lsz = (lpz == HEADER_STR)
             ? HEADER_STR_LEN : AG_SCM_STRLEN(name);
 

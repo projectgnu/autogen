@@ -26,6 +26,7 @@
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif
+#include <locale.h>
 
 typedef void (void_main_proc_t)(int, char **);
 
@@ -120,6 +121,7 @@ inner_main(void * closure, int argc, char ** argv)
 int
 main(int argc, char ** argv)
 {
+    setlocale(LC_ALL, "");
     setup_signals(ignore_signal, SIG_DFL, catch_sig_and_bail);
     optionSaveState(&autogenOptions);
     trace_fp = stderr;

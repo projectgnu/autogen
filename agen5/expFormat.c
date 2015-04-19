@@ -310,7 +310,7 @@ ag_scm_error(SCM res)
 
     switch (ag_scm_type_e(res)) {
     case GH_TYPE_BOOLEAN:
-        if (AG_SCM_FALSEP(res))
+        if (scm_is_false(res))
             abrt = PROBLEM;
         msg = zNil;
         break;
@@ -326,7 +326,7 @@ ag_scm_error(SCM res)
     }
 
     case GH_TYPE_CHAR:
-        num_bf[0] = (char)AG_SCM_CHAR(res);
+        num_bf[0] = (char)SCM_CHAR(res);
         if ((num_bf[0] == NUL) || (num_bf[0] == '0'))
             abrt = PROBLEM;
         num_bf[1] = NUL;

@@ -232,7 +232,7 @@ do_multi_subs(char ** ppzStr, ssize_t * pStrLen, SCM match, SCM repl)
     /*
      *  Loop for as long as our list has more entries
      */
-    while (! AG_SCM_NULLP(match)) {
+    while (! scm_is_null(match)) {
         /*
          *  "CAR" is the current value, "CDR" is rest of list
          */
@@ -306,7 +306,7 @@ ag_scm_in_p(SCM obj, SCM list)
     if (! AG_SCM_STRING_P(obj))
         return SCM_UNDEFINED;
 
-    pz1  = AG_SCM_CHARS(obj);
+    pz1  = scm_i_string_chars(obj);
     lenz = AG_SCM_STRLEN(obj);
 
     /*
@@ -315,7 +315,7 @@ ag_scm_in_p(SCM obj, SCM list)
      */
     if (AG_SCM_STRING_P(list)) {
         if (  (AG_SCM_STRLEN(list) == lenz)
-           && (strncmp(pz1, AG_SCM_CHARS(list), lenz) == 0))
+           && (strncmp(pz1, scm_i_string_chars(list), lenz) == 0))
             return SCM_BOOL_T;
         return SCM_BOOL_F;
     }
@@ -344,7 +344,7 @@ ag_scm_in_p(SCM obj, SCM list)
         }
 
         if (  (AG_SCM_STRLEN(car) == lenz)
-           && (strncmp(pz1, AG_SCM_CHARS(car), lenz) == 0) )
+           && (strncmp(pz1, scm_i_string_chars(car), lenz) == 0) )
             return SCM_BOOL_T;
     }
 
@@ -383,7 +383,7 @@ ag_scm_join(SCM sep, SCM list)
     if (l_len == 0)
         return AG_SCM_STR02SCM(zNil);
 
-    pzSep   = AG_SCM_CHARS(sep);
+    pzSep   = scm_i_string_chars(sep);
     sep_len = AG_SCM_STRLEN(sep);
     str_len = 0;
 
@@ -434,7 +434,7 @@ ag_scm_join(SCM sep, SCM list)
             car = ag_scm_join(sep, car);
 
         cpy_len = AG_SCM_STRLEN(car);
-        memcpy(VOIDP(pzScan), AG_SCM_CHARS(car), cpy_len);
+        memcpy(VOIDP(pzScan), scm_i_string_chars(car), cpy_len);
         pzScan += cpy_len;
 
         /*
@@ -882,7 +882,7 @@ ag_scm_string_tr_x(SCM str, SCM from_xform, SCM to_xform)
         }
     } map_done:;
 
-    to = C(char *, AG_SCM_CHARS(str));
+    to = C(char *, scm_i_string_chars(str));
     i    = (int)AG_SCM_STRLEN(str);
     while (i-- > 0) {
         *to = (char)ch_map[ (int)*to ];
@@ -907,7 +907,7 @@ SCM
 ag_scm_string_tr(SCM Str, SCM From, SCM To)
 {
     size_t lenz  = AG_SCM_STRLEN(Str);
-    SCM    res   = AG_SCM_STR2SCM(AG_SCM_CHARS(Str), lenz);
+    SCM    res   = AG_SCM_STR2SCM(scm_i_string_chars(Str), lenz);
     return ag_scm_string_tr_x(res, From, To);
 }
 
@@ -941,7 +941,7 @@ ag_scm_string_substitute(SCM str, SCM Match, SCM Repl)
     if (! AG_SCM_STRING_P(str))
         return SCM_UNDEFINED;
 
-    text = AG_SCM_CHARS(str);
+    text = scm_i_string_chars(str);
     len   = (ssize_t)AG_SCM_STRLEN(str);
 
     if (AG_SCM_STRING_P(Match))
@@ -977,10 +977,10 @@ ag_scm_time_string_to_number(SCM time_spec)
     if (! AG_SCM_STRING_P(time_spec))
         return SCM_UNDEFINED;
 
-    pz = AG_SCM_CHARS(time_spec);
+    pz = scm_i_string_chars(time_spec);
     time_period = parse_duration(pz);
 
-    return AG_SCM_INT2SCM((int)time_period);
+    return scm_from_int((int)time_period);
 }
 
 /**

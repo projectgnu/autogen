@@ -1,4 +1,13 @@
-New in __CURRENT_VERSION__ September 2014
+New in __CURRENT_VERSION__ April 2015
+
+* Guile 1.6 is now obsolete.  1.7/8 or newer from now on.
+  Fixed issues with Guile managed locale string processing.
+  (It keeps getting better and better all the time and I
+  must keep adjusting over and over all the time.)
+* for-each handler functions may now be able to free (or not)
+  the file text via the "handler-frees" attribute.
+
+New in 5.18.4 August 2014
 
 * Do Not Edit (dne) warning:  the default of printing a date in the
   warning has now changed to not doing so.  The "-d" option to

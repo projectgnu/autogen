@@ -52,7 +52,7 @@ scm2display(SCM s)
 
     switch (ag_scm_type_e(s)) {
     case GH_TYPE_BOOLEAN:
-        z[0] = AG_SCM_NFALSEP(s) ? '1' : '0'; z[1] = NUL;
+        z[0] = scm_is_true(s) ? '1' : '0'; z[1] = NUL;
         break;
 
     case GH_TYPE_STRING:
@@ -61,7 +61,7 @@ scm2display(SCM s)
         break;
 
     case GH_TYPE_CHAR:
-        z[0] = (char)AG_SCM_CHAR(s); z[1] = NUL; break;
+        z[0] = (char)SCM_CHAR(s); z[1] = NUL; break;
 
     case GH_TYPE_VECTOR:
         res = RESOLVE_SCM_VECTOR; break;
@@ -347,7 +347,7 @@ ag_scm_emit(SCM val)
         out_stack_t * pSaveFp;
         unsigned long pnum;
 
-        if (! AG_SCM_NUM_P(val))
+        if (! scm_is_number(val))
             break;
 
         pSaveFp = cur_fpstack;
@@ -373,7 +373,7 @@ ag_scm_emit(SCM val)
         if (val == SCM_UNDEFINED)
             break;
 
-        if (AG_SCM_NULLP(val))
+        if (scm_is_null(val))
             break;
 
         if (AG_SCM_STRING_P(val)) {
@@ -446,7 +446,7 @@ ag_scm_insert_file(SCM val)
         out_stack_t * pSaveFp;
         unsigned long pnum;
 
-        if (! AG_SCM_NUM_P(val))
+        if (! scm_is_number(val))
             break;
 
         pSaveFp = cur_fpstack;
@@ -472,7 +472,7 @@ ag_scm_insert_file(SCM val)
         if (val == SCM_UNDEFINED)
             break;
 
-        if (AG_SCM_NULLP(val))
+        if (scm_is_null(val))
             break;
 
         if (AG_SCM_STRING_P(val)) {

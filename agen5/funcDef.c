@@ -509,7 +509,7 @@ build_defs(int def_ct, def_list_t * def_list)
                 AGDUPSTR(def_list->de.de_val.dvu_text,
                          ag_scm2zchars(res, "res"), "ev res");
             }
-            else if (AG_SCM_NUM_P(res)) {
+            else if (scm_is_number(res)) {
                 def_list->de.de_val.dvu_text = AGALOC(16, "num buf");
                 snprintf(def_list->de.de_val.dvu_text, (size_t)16,
                          ULONG_FMT, AG_SCM_TO_ULONG(res));

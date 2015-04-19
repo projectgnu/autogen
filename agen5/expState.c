@@ -304,7 +304,7 @@ ag_scm_version_compare(SCM op, SCM v1, SCM v2)
     ver_type_t val2 = str2int_ver(ag_scm2zchars(v2, "ver"));
     v1 = SCM_FROM(val1);
     v2 = SCM_FROM(val2);
-    return scm_apply(op, v1, scm_cons(v2, AG_SCM_LISTOFNULL()));
+    return scm_apply(op, v1, scm_cons(v2, scm_list_1(SCM_EOL)));
 }
 
 /*=gfunc count
@@ -324,7 +324,7 @@ ag_scm_count(SCM obj)
 {
     int ent_len = count_entries(ag_scm2zchars(obj, "ag object"));
 
-    return AG_SCM_INT2SCM(ent_len);
+    return scm_from_int(ent_len);
 }
 
 
@@ -566,15 +566,15 @@ ag_scm_high_lim(SCM obj)
      *  ELSE search the twin list for the high entry
      */
     if (pE == NULL)
-        return AG_SCM_INT2SCM(0);
+        return scm_from_int(0);
 
     if (isIndexed)
-        return AG_SCM_INT2SCM((int)pE->de_index);
+        return scm_from_int((int)pE->de_index);
 
     if (pE->de_etwin != NULL)
         pE = pE->de_etwin;
 
-    return AG_SCM_INT2SCM((int)pE->de_index);
+    return scm_from_int((int)pE->de_index);
 }
 
 
@@ -595,7 +595,7 @@ ag_scm_len(SCM obj)
 {
     int len = entry_length(ag_scm2zchars(obj, "ag value"));
 
-    return AG_SCM_INT2SCM(len);
+    return scm_from_int(len);
 }
 
 
@@ -621,9 +621,9 @@ ag_scm_low_lim(SCM obj)
      *  ELSE we have the low index.
      */
     if (pE == NULL)
-        return AG_SCM_INT2SCM(0);
+        return scm_from_int(0);
 
-    return AG_SCM_INT2SCM((int)pE->de_index);
+    return scm_from_int((int)pE->de_index);
 }
 
 
@@ -672,7 +672,7 @@ ag_scm_suffix(void)
 SCM
 ag_scm_tpl_file(SCM full)
 {
-    if (AG_SCM_BOOL_P(full) && AG_SCM_NFALSEP(full)) {
+    if (scm_is_bool(full) && scm_is_true(full)) {
         static char const * const sfx[] = { TPL_FILE_TPL, NULL };
 
         char z[AG_PATH_MAX];
