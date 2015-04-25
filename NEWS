@@ -4,6 +4,13 @@ New in __CURRENT_VERSION__ April 2015
   Fixed issues with Guile managed locale string processing.
   (It keeps getting better and better all the time and I
   must keep adjusting over and over all the time.)
+* more Guile-config somersaults
+  config/misc.def: sometimes, "pkg-config --cflags-only-I" yields
+  multiple directories for Guile and that incantation is the only
+  way to find libguile/version.h and that header is the only way
+  to determine the micro version and the micro version is the best
+  way to check for certain types of breakage.  (Testing is too
+  convoluted.)
 * for-each handler functions may now be able to free (or not)
   the file text via the "handler-frees" attribute.
 
