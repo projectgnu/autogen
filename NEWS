@@ -23,40 +23,10 @@ New in 5.18.4 August 2014
   "AUTOGEN_DNE_DATE" overrides everything.
 * The RETURN function was not completely implemented and only
   partially worked.  It is working now.
-* optionPrintVersionAndReturn() is a new function for applications
-  that wish to extend the behavior of the "--version" option.
-* mdoc and man pages have been greatly improved.
-* libopts tear-off library used stdnoreturn.h and now includes
-  infrastructure for systems deficient in that area
-* new function: insert-file  It will simply insert the contents of
-  a file (or list of files) into the output stream.
 
 New in 5.18.3 May 2014
-
-* ATTRIBUTE_FORMAT_ARG is a configured attribute that wraps
-  __attribute__((__format_arg__(n))) procedure declaration attributes.
-  To configure it, the ag_macros.m4 has a new macroo,
-  AG_COMPILE_FORMAT_ARG (which is a compile only test probe).
 
 * Auto-edit Guile headers that depend upon configure values
   most especially:  noreturn
   but check for "ptrdiff_t" in our configure too, so that Guile does
   not create its own duplicate definition.
-
-* Abort from the failing function so that stack traces are useful
-* The libopts m4 configure code must configure the libopts/Makefile
-* Happy 2014 New Year
-* make sure library option handling code does nothing when the
-  library is just trying to get information about an option.
-* Only apply texi2mdoc when it is needed.
-* The aoGetsText() emitted i18n helper function needs its argument
-  to have the "format_arg" attribute.
-
-New in 5.18.2 October 2013
-
-* documentation clarifications
-* properly create generated main procedures from user supplied code.
-* ChangeLog files have been removed from GIT sources
-  (though still obtainable with tagged checkouts).
-* LIBGUILE_PATH is not needed and its derivation is wrong on
-  where binaries and libraries have different prefixes.
