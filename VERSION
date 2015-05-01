@@ -39,9 +39,9 @@ AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 #             is capable of handling.
 #
 AO_LIBRARY=libopts.la
-AO_CURRENT=42
-AO_REVISION=0
-AO_AGE=17
+AO_CURRENT=41
+AO_REVISION=1
+AO_AGE=16
 
 # For automake
 #
