@@ -127,7 +127,7 @@ doUsageOpt(tOptions * opts, tOptDesc * od)
     ex_code = HANDLER_EXIT_SUCCESS;
     optionUsage(&handlerOptions, ex_code);
     /* NOTREACHED */
-    exit(1);
+    exit(HANDLER_EXIT_FAILURE);
     (void)opts;
     (void)od;
 }

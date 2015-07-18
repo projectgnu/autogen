@@ -90,8 +90,10 @@ optionTimeDate(tOptions * opts, tOptDesc * od)
 
         if (envptr == NULL) {
             static char const fmt[] = "DATEMSK=%s/datemsk";
-            envptr = AGALOC(sizeof(fmt) + strlen(opts->pzPkgDataDir), fmt);
-            sprintf(envptr, fmt, opts->pzPkgDataDir);
+            size_t sz = sizeof(fmt) + strlen(opts->pzPkgDataDir);
+            envptr = AGALOC(sz, fmt);
+            if (snprintf(envptr, sz, fmt, opts->pzPkgDataDir) >= sz)
+                option_exits(EXIT_FAILURE);
 
             putenv(envptr);
         }

@@ -81,9 +81,9 @@ Mdoc::def_macro( '.Ar', sub { mapwords {"\\f\\*[I-Font]$_\\f[]"} @_ } );
 Mdoc::def_macro( '.Em', sub { mapwords {"\\fI$_\\f[]"} @_ } );
 Mdoc::def_macro( '.Va', sub { mapwords {"\\fI$_\\f[]"} @_ } );
 Mdoc::def_macro( '.Sx', sub { mapwords {"\\fI$_\\f[]"} @_ } );
-Mdoc::def_macro( '.Xr', sub { "\\fC".(shift)."\\fR(".(shift).")\\f[]", @_ } );
-Mdoc::def_macro( '.Fn', sub { "\\f\\*[B-Font]".(shift)."\\fR()\\f[]" } );
-Mdoc::def_macro( '.Fn', sub { "\\fB".(shift)."\\fR()\\f[]" } );
+Mdoc::def_macro( '.Xr', sub { "\\fC".(shift)."\\f[]\\fR(".(shift).")\\f[]", @_ } );
+Mdoc::def_macro( '.Fn', sub { "\\f\\*[B-Font]".(shift)."\\f[]\\fR()\\f[]" } );
+Mdoc::def_macro( '.Fn', sub { "\\fB".(shift)."\\f[]\\fR()\\f[]" } );
 Mdoc::def_macro( '.Fx', sub { "FreeBSD", @_ } );
 Mdoc::def_macro( '.Ux', sub { "UNIX", @_ } );
 

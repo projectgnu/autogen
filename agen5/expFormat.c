@@ -630,8 +630,8 @@ construct_license(
  *
  *  All of these depend upon the existence of a license file named after the
  *  @code{license} argument with a @code{.lic} suffix.  That file should
- *  contain three blocks of text, each separated by two or more newline
- *  characters.
+ *  contain three blocks of text, each separated by two or more consecutive
+ *  newline characters (at least one completely blank line).
  *
  *  The first section describes copyright attribution and the name of the usage
  *  licence.  For GNU software, this should be the text that is to be displayed
@@ -640,15 +640,15 @@ construct_license(
  *
  *  The second section is a short description of the terms of the license.
  *  This is typically the kind of text that gets displayed in the header of
- *  source files.  The third section is strictly the name of the license
- *  without any substitution markers.  Only the <PFX>, <owner> and <program>
- *  markers are substituted.
+ *  source files.  Only the <PFX>, <owner> and <program> markers are
+ *  substituted.
  *
  *  The third section is strictly the name of the license.
  *  No marker substitutions are performed.
  *
  *  @example
  *  <PFX>Copyright (C) <years> <owner>, all rights reserved.
+ *  <PFX>
  *  <PFX>This is free software. It is licensed for use,
  *  <PFX>modification and redistribution under the terms
  *  <PFX>of the GNU General Public License, version 3 or later

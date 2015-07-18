@@ -42,14 +42,6 @@ static void
 add_sys_env(char * env_name);
 /* = = = END-STATIC-FORWARD = = = */
 
-#ifdef DAEMON_ENABLED
- static bool evalProto(char const ** ppzS, uint16_t * pProto);
- static void spawnPipe(char const * pzFile);
- static void spawnListens(char const * pzPort, sa_family_t af);
- static void daemonize(char const *, char const *, char const *,
-                       char const *);
-#endif
-
 #include "expr.ini"
 
 /**
@@ -79,31 +71,6 @@ initialize(int arg_ct, char ** arg_vec)
 
     if (OPT_VALUE_TRACE > TRACE_NOTHING)
         SCM_EVAL_CONST(INIT_SCM_DEBUG_FMT);
-
-#ifdef DAEMON_ENABLED
-
-    if (! HAVE_OPT(DAEMON))
-        return;
-
-#ifdef DEBUG_ENABLED
-    {
-        static char const logf[] = "/tmp/ag-debug.txt";
-        daemonize("/", logf, logf, logf);
-    }
-#else
-    daemonize("/", DEV_NULL, DEV_NULL, DEV_NULL);
-#endif /* DEBUG_ENABLED */
-
-    {
-        sa_family_t  af  = AF_INET;
-        char const * pzS = OPT_ARG(DAEMON);
-
-        if (evalProto(&pzS, &af))
-            spawnListens(pzS, af);
-        else
-            spawnPipe(pzS);
-    }
-#endif /* DAEMON_ENABLED */
 }
 
 static void
@@ -360,7 +327,7 @@ prep_env(void)
     SET_OPT_TEMPL_DIRS(LIBDATADIR);
 
     {
-        char z[ SCRIBBLE_SIZE ] = "__autogen__";
+        char z[ SCRIBBLE_SIZE+8 ] = "__autogen__";
 #if defined(HAVE_SOLARIS_SYSINFO)
         static const int nm[] = {
             SI_SYSNAME, SI_HOSTNAME, SI_ARCHITECTURE, SI_HW_PROVIDER,
@@ -389,14 +356,17 @@ prep_env(void)
         if (uname(&unm) != 0)
             AG_CANT(UNAME_CALL_NAME, SYSCALL_NAME);
 
-        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.sysname);
-        add_sys_env(z);
+        if (snprintf(z+2, SCRIBBLE_SIZE, ADD_ENV_VARS_SUFFIX_FMT, unm.sysname)
+            <= SCRIBBLE_SIZE)
+            add_sys_env(z);
 
-        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.machine);
-        add_sys_env(z);
+        if (snprintf(z+2, SCRIBBLE_SIZE, ADD_ENV_VARS_SUFFIX_FMT, unm.machine)
+            <= SCRIBBLE_SIZE)
+            add_sys_env(z);
 
-        sprintf(z+2, ADD_ENV_VARS_SUFFIX_FMT, unm.nodename);
-        add_sys_env(z);
+        if (snprintf(z+2, SCRIBBLE_SIZE, ADD_ENV_VARS_SUFFIX_FMT, unm.nodename)
+            <= SCRIBBLE_SIZE)
+            add_sys_env(z);
 #else
 
         add_sys_env(z);
@@ -404,337 +374,6 @@ prep_env(void)
     }
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- *  T H E   F O L L O W I N G   I S   D E A D   C O D E
- *
- *  Someday, I want to enable daemon code, but need lotsa time.....
- *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#ifdef DAEMON_ENABLED
-
-  static bool
-evalProto(char const ** ppzS, uint16_t * pProto)
-{
-    char const * pzS = *ppzS;
-
-    if (IS_ALPHABETIC_CHAR(*pzS)) {
-        inet_family_map_t * pMap = inet_family_map;
-        do  {
-            if (strncmp(pzS, pMap->pz_name, pMap->nm_len) == 0) {
-                *pProto = pMap->family;
-                *ppzS += pMap->nm_len;
-                return true;
-            }
-        } while ((++pMap)->pz_name != NULL);
-    }
-
-    return IS_DEC_DIGIT_CHAR(*pzS);
-}
-
-  LOCAL void
-handleSighup(int sig)
-{
-    redoOptions = true;
-}
-
-  static void
-spawnPipe(char const * pzFile)
-{
-#   define S_IRW_ALL \
-        S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
-    fd_pair_t fdpair;
-    char * pzIn;
-    char * pzOut;
-
-    {
-        size_t len = 2 * (strlen(pzFile) + 5);
-        pzIn = AGALOC(len + 5, "fifo name");
-        pzOut = pzIn + sprintf(pzIn, PIPE_FIFO_IN_NAME_FMT, pzFile) + 1;
-    }
-
-    unlink(pzIn);
-    if ((mkfifo(pzIn, S_IRW_ALL) != 0) && (errno != EEXIST))
-        AG_CANT(PIPE_MKFIFO_NAME,    pzIn);
-
-    (void)sprintf(pzOut, PIPE_FIFO_OUT_NAME_FMT, pzFile);
-    unlink(pzOut);
-    if ((mkfifo(pzOut, S_IRW_ALL) != 0) && (errno != EEXIST))
-        AG_CANT(PIPE_MKFIFO_NAME,    pzOut);
-
-    fdpair.fd_read = open(pzIn, O_RDONLY);
-    if (fdpair.fd_read < 0)
-        AG_CANT(PIPE_FIFO_OPEN, pzIn);
-
-    {
-        struct pollfd polls[1];
-        polls[0].fd     = fdpair.fd_read;
-        polls[0].events = POLLIN | POLLPRI;
-
-        for (;;) {
-            int ct = poll(polls, 1, -1);
-            struct strrecvfd recvfd;
-            pid_t child;
-
-            switch (ct) {
-            case -1:
-                if ((errno != EINTR) || (! redoOptions))
-                    goto spawnpipe_finish;
-
-                optionRestore(&autogenOptions);
-                process_ag_opts(autogenOptions.origArgCt,
-                          autogenOptions.origArgVect);
-                SET_OPT_DEFINITIONS(PIPE_DEFS_STDIN_STR);
-                break;
-
-            case 1:
-                if ((polls[0].revents & POLLIN) == 0)
-                    continue;
-
-                child = fork();
-                switch (child) {
-                default:
-                    waitpid(child, &ct, 0);
-                    continue;
-
-                case -1:
-                    AG_CANT(PIPE_FORK_NAME, zNil);
-
-                case 0:
-                }
-
-                if (dup2(fdpair.fd_read, STDIN_FILENO) != STDIN_FILENO)
-                    AG_CANT(PIPE_DUP2_NAME_STR, PIPE_DEFS_STDIN_NAME);
-
-                fdpair.fd_write = open(pzOut, O_WRONLY);
-                if (fdpair.fd_write < 0)
-                    AG_CANT(PIPE_FIFO_OPEN, pzOut);
-
-                polls[0].fd = fdpair.fd_write;
-                polls[0].events = POLLOUT;
-                if (poll(polls, 1, -1) != 1)
-                    AG_CANT(PIPE_POLL_NAME_STR, PIPE_WRITE_NAME_STR);
-
-                if (dup2(fdpair.fd_write, STDOUT_FILENO) != STDOUT_FILENO)
-                    AG_CANT(PIPE_DUP2_NAME_STR, pzOut);
-
-                return;
-            }
-        }
-    }
-
- spawnpipe_finish:
-    unlink(pzIn);
-    unlink(pzOut);
-    AGFREE(pzIn);
-
-#   undef S_IRW_ALL
-
-    exit(AUTOGEN_EXIT_SUCCESS);
-}
-
-
-  static void
-spawnListens(char const * pzPort, sa_family_t addr_family)
-{
-    int socket_fd = socket(addr_family, SOCK_STREAM, 0);
-    union {
-        struct sockaddr     addr;
-        struct sockaddr_in  in_addr;
-        struct sockaddr_un  un_addr;
-    } sa;
-
-    uint32_t        addr_len;
-
-    if (socket_fd < 0)
-        AG_CANT("socket", "AF_INET/SOCK_STREAM");
-
-    switch (addr_family) {
-
-    case AF_UNIX:
-    {
-        uint32_t p_len = strlen(pzPort);
-
-        if (p_len > sizeof(sa.un_addr.sun_path))
-            AG_ABEND(aprf(PATH_TOO_BIG, p_len));
-        sa.un_addr.sun_family  = AF_UNIX;
-        strncpy(sa.un_addr.sun_path, pzPort, p_len);
-        addr_len = sizeof(sa.un_addr) - sizeof(sa.un_addr.sun_path) + p_len;
-    }
-    break;
-
-    case AF_INET:
-    {
-        uint16_t port;
-        char * pz;
-
-        sa.in_addr.sin_family      = AF_INET;
-        sa.in_addr.sin_addr.s_addr = INADDR_ANY;
-
-        errno = 0;
-        if ((unlink(pzPort) != 0) && (errno != ENOENT))
-            AG_CANT("unlink", pzPort);
-
-        port = (uint16_t)strtol(pzPort, &pz, 0);
-        if ((errno != 0) || (*pz != NUL))
-            AG_ABEND(aprf(PORT_NUM_BAD, pzPort));
-
-        sa.in_addr.sin_port = htons((short)port);
-        addr_len = sizeof(sa.in_addr);
-    }
-    break;
-
-    default:
-        AG_ABEND(aprf(ADDR_FAMILY_BAD, addr_family));
-    }
-
-    if (bind(socket_fd, &sa.addr, addr_len) < 0) {
-        char * pz = aprf(LISTEN_PORT_FMT, pzPort, addr_family);
-        AG_CANT("bind", pz);
-    }
-
-    if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
-        AG_CANT("socket-fcntl", "FNDELAY");
-
-    if (listen(socket_fd, 5) < 0)
-        AG_CANT("listen", aprf(LISTEN_PORT_FMT, pzPort));
-
-    for (;;) {
-        fd_set fds;
-        int    max_fd = socket_fd;
-        int    new_conns;
-
-        FD_ZERO(&fds);
-        FD_SET(socket_fd, &fds);
-
-        new_conns = select(max_fd, &fds, NULL, NULL, NULL);
-        if (new_conns < 0) {
-            if (errno == EINTR)
-                continue;
-
-            if (! redoOptions) {
-                unlink(pzPort);
-                exit(AUTOGEN_EXIT_SUCCESS);
-            }
-
-            optionRestore(&autogenOptions);
-            process_ag_opts(autogenOptions.origArgCt,
-                      autogenOptions.origArgVect);
-            SET_OPT_DEFINITIONS("-");
-
-            continue;
-        }
-
-        if (new_conns > 0) {
-            switch (fork()) {
-            default: continue;
-            case -1:
-                AG_CANT("fork", zNil);
-
-            case 0:  break;
-            }
-            break;
-        }
-    }
-
-    for (;;) {
-        static int try_ct = 0;
-        struct sockaddr addr;
-        socklen_t addr_len;
-        int fd = accept(socket_fd, &addr, &addr_len);
-        if (fd < 0)
-            switch (errno) {
-            case EINTR:
-            case EAGAIN:
-#if (EAGAIN != EWOULDBLOCK)
-            case EWOULDBLOCK:
-#endif
-                if (try_ct++ < 10000) {
-                    sleep(1);
-                    continue;
-                }
-            }
-        socket_fd = fd;
-        break;
-    }
-
-    if (dup2(socket_fd, STDOUT_FILENO) != STDOUT_FILENO)
-        AG_CANT("dup2", "out on socket_fd");
-    if (dup2(socket_fd, STDIN_FILENO) != STDIN_FILENO)
-        AG_CANT("dup2", "in on socket_fd");
-}
-
-
-  static void
-daemonize(char const * pzStdin, char const * pzStdout, char const * pzStderr,
-          char const * pzDaemonDir)
-{
-    /*
-     *  Become a daemon process by exiting the current process
-     *  and allowing the child to continue.  Also, change stdin,
-     *  stdout and stderr to point to /dev/null and change to
-     *  the root directory ('/').
-     */
-    {
-        int ret = fork();
-
-        switch (ret) {
-        case -1:
-            fserr(AUTOGEN_EXIT_FS_ERROR, "fork", "");
-            /* NOTREACHED */
-
-        default:
-            exit(AUTOGEN_EXIT_SUCCESS);
-
-        case 0:
-            break;
-        }
-    }
-
-    /*
-     *  Now, become a process group and session group leader.
-     */
-    if (setsid() == -1)
-        fserr(AUTOGEN_EXIT_FS_ERROR, "setsid", "");
-
-    /*
-     *  There is now no controlling terminal.  However, if we open anything
-     *  that resembles a terminal, it will become our controlling terminal.
-     *  So, we will fork again and the child will not be a group leader and
-     *  thus cannot gain a controlling terminal.
-     */
-    switch (fork()) {
-    case -1:
-        fserr(AUTOGEN_EXIT_FS_ERROR, "fork", "");
-
-    default:
-        exit(AUTOGEN_EXIT_SUCCESS);  /* parent process - silently go away */
-
-    case 0:
-        break;
-    }
-
-    umask(0);
-    if (pzDaemonDir == (char *)NULL)
-        pzDaemonDir = "/";
-
-    chdir(pzDaemonDir);
-
-    /*
-     *  Reopen the input, output and error files, unless we were told not to
-     */
-    if (pzStdin != (char *)NULL)
-        freopen(pzStdin,  "r", stdin);
-
-    if (pzStdout != (char *)NULL)
-        freopen(pzStdout, "w", stdout);
-
-    if (pzStderr != (char *)NULL)
-        freopen(pzStderr, "w", stderr);
-
-    /* We are a daemon now */
-}
-#endif /* DAEMON_ENABLED */
 /**
  * @}
  *

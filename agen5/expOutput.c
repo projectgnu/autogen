@@ -570,14 +570,16 @@ ag_scm_make_tmp_dir(void)
 {
     if (pz_temp_tpl == NULL) {
         char * tmpdir = shell_cmd(MK_TMP_DIR_CMD);
-        char * cmdbf  =
-            scribble_get(SET_TMP_DIR_CMD_LEN + 2 * MK_TMP_DIR_CMD_LEN);
+        size_t tmp_sz = strlen(tmpdir);
+        size_t bfsz   = SET_TMP_DIR_CMD_LEN + 2 * tmp_sz;
+        char * cmdbf  = scribble_get(bfsz);
 
         pz_temp_tpl = tmpdir;
-        temp_tpl_dir_len = strlen(tmpdir) - 9;    // "ag-XXXXXX"
+        temp_tpl_dir_len = tmp_sz - 9;    // "ag-XXXXXX"
 
         tmpdir[temp_tpl_dir_len - 1] = NUL;       // trim dir char
-        sprintf(cmdbf, SET_TMP_DIR_CMD, tmpdir);
+        if (snprintf(cmdbf, bfsz, SET_TMP_DIR_CMD, tmpdir) >= bfsz)
+            AG_ABEND(BOGUS_TAG);
         tmpdir[temp_tpl_dir_len - 1] = DIRCH;     // restore dir char
 
         ag_scm_c_eval_string_from_file_line(cmdbf, __FILE__, __LINE__);
@@ -930,10 +932,12 @@ ag_scm_make_header_guard(SCM name)
         size_t sz2 = MK_HEAD_GUARD_GUARD_LEN + 2 * gsz;
         size_t sz  = (sz1 < sz2) ? sz2 : sz1;
         char * p   = scribble_get((ssize_t)sz);
-        sprintf(p, MK_HEAD_GUARD_SCM, opz, gpz);
+        if (snprintf(p, sz, MK_HEAD_GUARD_SCM, opz, gpz) >= sz)
+            AG_ABEND(BOGUS_TAG);
         (void)ag_scm_c_eval_string_from_file_line(p, __FILE__, __LINE__);
 
-        sprintf(p, MK_HEAD_GUARD_GUARD, gpz);
+        if (snprintf(p, sz, MK_HEAD_GUARD_GUARD, gpz) >= sz)
+            AG_ABEND(BOGUS_TAG);
         name = AG_SCM_STR02SCM(p);
     }
 

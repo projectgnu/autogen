@@ -230,11 +230,12 @@ handle_hash_line(char const * pz)
          *  the SHELL environment variable to this executable.
          */
         if (access(nmbuf, X_OK) == 0) {
-            char * sp = malloc((size_t)(len + 7)); // len + "SHELL=" + NUL byte
-            sprintf(sp, HANDLE_HASH_ENV_FMT, HANDLE_HASH_SHELL, nmbuf);
+            char * sp = AGALOC(len + HANDLE_HASH_SHELL_LEN + 1, "set shell");
+            memcpy(sp, HANDLE_HASH_SHELL, HANDLE_HASH_SHELL_LEN);
+            memcpy(sp + HANDLE_HASH_SHELL_LEN, nmbuf, len + 1);
             putenv(sp);
-            AGDUPSTR(shell_program, nmbuf, "prog shell");
-            AGDUPSTR(server_args[0],  nmbuf, "shell name");
+            AGDUPSTR(shell_program,  nmbuf, "prog shell");
+            AGDUPSTR(server_args[0], nmbuf, "shell name");
         }
     }
 

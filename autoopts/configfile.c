@@ -719,6 +719,7 @@ program_directive(tOptions * opts, char * txt)
  *  "txt" points to a '[' character.
  *  The "traditional" [PROG_NAME] segmentation of the config file.
  *  Do not ever mix with the "<?program prog-name>" variation.
+ *  The templates reject program names over 16 characters.
  *
  *  @param[in,out] opts  program option descriptor
  *  @param[in]     txt   scanning pointer
@@ -736,8 +737,10 @@ handle_section(tOptions * opts, char * txt)
         return NULL;
 
     {
-        char z[24];
-        sprintf(z, "[%s]", opts->pzPROGNAME);
+        char z[24] = "[";
+        memcpy(z+1, opts->pzPROGNAME, len);
+        z[++len] = ']';
+        z[++len] = NUL;
         txt = strstr(txt, z);
     }
 
@@ -839,16 +842,22 @@ parse_xml_encoding(char ** ppz)
 static char *
 trim_xml_text(char * intxt, char const * pznm, tOptionLoadMode mode)
 {
-    static char const fmt[] = "</%s>";
-    size_t len = strlen(pznm) + sizeof(fmt) - 2 /* for %s */;
+    size_t nm_len = strlen(pznm);
     char * etext;
 
     {
         char z[64], *pz = z;
-        if (len >= sizeof(z))
-            pz = AGALOC(len, "scan name");
 
-        len = (size_t)sprintf(pz, fmt, pznm);
+        if (nm_len + 4 >= sizeof(z))
+            pz = AGALOC(nm_len + 4, "scan name");
+
+        pz[0] = '<';
+        pz[1] = '/';
+        memcpy(pz+2, pznm, nm_len);
+        nm_len  += 2;
+        pz[nm_len++] = '>';
+        pz[nm_len]   = NUL;
+
         *intxt = ' ';
         etext = strstr(intxt, pz);
         if (pz != z) AGFREE(pz);
@@ -858,7 +867,7 @@ trim_xml_text(char * intxt, char const * pznm, tOptionLoadMode mode)
         return etext;
 
     {
-        char * result = etext + len;
+        char * result = etext + nm_len;
 
         if (mode != OPTION_LOAD_UNCOOKED)
             etext = SPN_WHITESPACE_BACK(intxt, etext);

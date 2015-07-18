@@ -77,15 +77,15 @@ prt_file_arg(FILE * fp, tOptDesc * od, tOptions * opts);
 static char const *
 find_dir_name(tOptions * opts, int * p_free)
 {
-    char const * pzDir;
+    char const * dir;
 
     if (  (opts->specOptIdx.save_opts == NO_EQUIVALENT)
        || (opts->specOptIdx.save_opts == 0))
         return NULL;
 
-    pzDir = opts->pOptDesc[ opts->specOptIdx.save_opts ].optArg.argString;
-    if ((pzDir != NULL) && (*pzDir != NUL))
-        return pzDir;
+    dir = opts->pOptDesc[ opts->specOptIdx.save_opts ].optArg.argString;
+    if ((dir != NULL) && (*dir != NUL))
+        return dir;
 
     /*
      *  This function only works if there is a directory where
@@ -97,60 +97,62 @@ find_dir_name(tOptions * opts, int * p_free)
             return NULL;
 
         while (papz[1] != NULL) papz++;
-        pzDir = *papz;
+        dir = *papz;
     }
 
     /*
      *  IF it does not require deciphering an env value, then just copy it
      */
-    if (*pzDir != '$')
-        return pzDir;
+    if (*dir != '$')
+        return dir;
 
     {
-        char const * pzEndDir = strchr(++pzDir, DIRCH);
-        char * pzFileName;
-        char * pzEnv;
+        char const * end = strchr(++dir, DIRCH);
+        char * env;
 
-        if (pzEndDir != NULL) {
+        if (end != NULL) {
             char z[ AO_NAME_SIZE ];
-            if ((pzEndDir - pzDir) > AO_NAME_LIMIT )
+            if ((end - dir) > AO_NAME_LIMIT )
                 return NULL;
-            memcpy(z, pzDir, (size_t)(pzEndDir - pzDir));
-            z[pzEndDir - pzDir] = NUL;
-            pzEnv = getenv(z);
+            memcpy(z, dir, (size_t)(end - dir));
+            z[end - dir] = NUL;
+            env = getenv(z);
         } else {
 
             /*
              *  Make sure we can get the env value (after stripping off
              *  any trailing directory or file names)
              */
-            pzEnv = getenv(pzDir);
+            env = getenv(dir);
         }
 
-        if (pzEnv == NULL) {
+        if (env == NULL) {
             fprintf(stderr, zsave_warn, opts->pzProgName);
-            fprintf(stderr, zNotDef, pzDir);
+            fprintf(stderr, zNotDef, dir);
             return NULL;
         }
 
-        if (pzEndDir == NULL)
-            return pzEnv;
+        if (end == NULL)
+            return env;
+
+        /*
+         * we will be returning an allocated result
+         */
+        *p_free = 1;
 
         {
-            size_t sz = strlen(pzEnv) + strlen(pzEndDir) + 2;
-            pzFileName = (char *)AGALOC(sz, "dir name");
+            size_t env_len = strlen(env);
+            size_t end_len = strlen(end);
+            char * p;
+            char * res = p = (char *)AGALOC(env_len + end_len + 2, "dir name");
+
+            memcpy(p, env, env_len);
+            p += env_len;
+            *(p++) = '/';
+            memcpy(p, end, end_len + 1);
+
+            return res;
         }
-
-        if (pzFileName == NULL)
-            return NULL;
-
-        *p_free = 1;
-        /*
-         *  Glue together the full name into the allocated memory.
-         *  FIXME: We lose track of this memory.
-         */
-        sprintf(pzFileName, "%s/%s", pzEnv, pzEndDir);
-        return pzFileName;
     }
 }
 
@@ -217,11 +219,9 @@ find_file_name(tOptions * opts, int * p_free_name)
 
         {
             char * pzPath = (char *)AGALOC(sz, "file name");
-#ifdef HAVE_SNPRINTF
-            snprintf(pzPath, sz, "%s/%s", pzDir, opts->pzRcName);
-#else
-            sprintf(pzPath, "%s/%s", pzDir, opts->pzRcName);
-#endif
+            if (snprintf(pzPath, sz, "%s/%s", pzDir, opts->pzRcName) >= sz)
+                option_exits(EXIT_FAILURE);
+
             if (free_dir_name)
                 AGFREE(pzDir);
             pzDir = pzPath;

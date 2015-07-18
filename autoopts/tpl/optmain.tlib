@@ -1231,7 +1231,7 @@ doUsageOpt(tOptions * opts, tOptDesc * od)
   ENDIF                         =][=
   (string-append "\n    " usage-proc "(&" pname "Options, ex_code);") =]
     /* NOTREACHED */
-    exit(1);
+    exit([=(. fail-exit-code)=]);
     (void)opts;[=
     (if od-used "" "\n    (void)od;") =]
 }[=

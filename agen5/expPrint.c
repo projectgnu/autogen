@@ -274,7 +274,8 @@ ag_scm_hide_email(SCM display, SCM eaddr)
     ssize_t st_len  = HIDE_EMAIL_START_STR_LEN;
 
     ssize_t str_size = (ssize_t)(
-        (strlen(end_adr) * HTML_DEC_DIGIT_LEN)
+        HIDE_EMAIL_START_STR_LEN
+        + (strlen(end_adr) * HTML_DEC_DIGIT_LEN)
         + (size_t)st_len + HIDE_EMAIL_END_FMT_LEN + strlen(disp));
 
     char *  res  = scribble_get(str_size);
@@ -286,10 +287,12 @@ ag_scm_hide_email(SCM display, SCM eaddr)
     for (;;) {
         if (*end_adr == NUL)
             break;
-        scan += sprintf(scan, HTML_DEC_DIGIT, *(end_adr++));
+        scan += snprintf(scan, str_size - (scan - res), HTML_DEC_DIGIT, *(end_adr++));
     }
 
-    scan += sprintf(scan, HIDE_EMAIL_END_FMT, disp);
+    scan += snprintf(scan, str_size - (scan - res), HIDE_EMAIL_END_FMT, disp);
+    if (scan >= res + str_size)
+        AG_ABEND(BOGUS_TAG);
 
     return AG_SCM_STR2SCM(res, (size_t)(scan - res));
 }

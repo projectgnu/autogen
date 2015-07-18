@@ -129,8 +129,10 @@ char const *
 optionQuoteString(char const * text, char const * nl)
 {
     size_t   nl_len = strlen(nl);
+    size_t   out_sz = string_size(text, nl_len);
     char *   out;
-    char *   res = out = AGALOC(string_size(text, nl_len), "quot str");
+    char *   res    = out = AGALOC(out_sz, "quot str");
+
     *(out++) = '"';
 
     for (;;) {
@@ -179,16 +181,21 @@ optionQuoteString(char const * text, char const * nl)
              *  deallocate the text string.  Return the scan resumption point.
              */
             *(out++) = '"';
-            *out = NUL;
+            *(out++) = NUL;
+#ifndef NDEBUG
+            if ((out - res) > out_sz) {
+                fputs(misguess_len, stderr);
+                option_exits(EXIT_FAILURE);
+            }
+#endif
             return res;
 
         default:
             /*
              *  sprintf is safe here, because we already computed
-             *  the amount of space we will be using.
+             *  the amount of space we will be using.  Assertion is above.
              */
-            sprintf(out, MK_STR_OCT_FMT, ch);
-            out += 4;
+            out += sprintf(out, MK_STR_OCT_FMT, ch);
         }
 
         text++;

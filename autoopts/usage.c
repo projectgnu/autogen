@@ -351,8 +351,8 @@ print_usage_details(tOptions * opts, int exit_code)
             flen = setGnuOptFmts(opts, &pOptTitle);
             sprintf(line_fmt_buf, zFmtFmt, flen);
             fputc(NL, option_usage_fp);
-        }
-        else {
+
+        } else {
             flen = setStdOptFmts(opts, &pOptTitle);
             sprintf(line_fmt_buf, zFmtFmt, flen);
 
