@@ -15,26 +15,27 @@ the --prefix option.  The generated Makefile inckludes both "install" and
 ** Building from a repository clone
 
 To build from a repository clone, you must first have gperf (the GNU
-Perfect Hash Function Generator) installed). Then run
+Perfect Hash Function Generator) and gnulib (the GNU
+Portability Library) installed. Then run
 
    bootstrap
 
-in the top-level directory.
+in the top-level directory.  Note that for this to work, a precompiled
+autogen binary needs to be in your $PATH.
 
 [To be continued]]
 
 ** Known issues
 
-(esr) There are three remaining issues that I know of:
-
 1. Whatever's going on with local-install
 
-2. autogen requiring itself to build i problem we need to solve.
+2. autogen requiring itself to build is a problem we need to solve.
    The standard way to solve this is check in its build products,
-   then rebuild those only when the ef or *tpl files change. Of
+   then rebuild those only when the *.def or *tpl files change. Of
    course the INSTALL file needs to explicit about which stuff is
    generated 
-3. I'm goino want an easy, documented way to produce a *static*
+
+3. I'm going to want an easy, documented way to produce a *static*
    build outogen so I can experiment with NTP builds without
    colliding with an older shared library.  bkorb replies:
    '"cd $top_builddir/agen5 ; rm autogen ; make LDFLAGS=-static"

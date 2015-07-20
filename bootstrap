@@ -1,8 +1,8 @@
 #!/bin/sh
 
-set -e
+set -e -v
 
 git clean -f -x -d .
-config/bootstrap
+sh config/bootstrap
 ./configure
 make
