@@ -174,7 +174,8 @@ ag_err 5 -T ${testname}.tpl5 ${agopts}5 > /dev/null
 test -f ${testname}-task5-OK \
   && failure unexpected success for test-5
 
-${EGREP} -v "$omit_pat" ${testname}.err5 > ${testname}.res5
+${EGREP} -v "$omit_pat" ${testname}.err5 | \
+  ${SED} -n '/Failing Guile command:/q;p' > ${testname}.res5
 cat > ${testname}.base5 <<'EOF'
 Error in template error.tpl5, line 3
 	Unknown macro or invalid context in error.tpl5 line 3:
