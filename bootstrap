@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e -v
+
+git clean -f -x -d .
+sh config/bootstrap
+./configure
+make

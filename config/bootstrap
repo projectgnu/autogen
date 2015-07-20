@@ -39,7 +39,7 @@
 # forgotten!).
 #
 # In an ideal world, running this bootstrap script (including any extra
-# scripts it executes) should leave a freshly checked out CVS source tree
+# scripts it executes) should leave a freshly checked out repository tree
 # in the same state as a freshly unrolled tarball.  In this way, one
 # no longer has to maintain generated files under source control, they
 # can be generated after checkout using this bootstrap procedure.
