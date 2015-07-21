@@ -3,6 +3,7 @@
 set -e -v
 
 git clean -f -x -d .
+touch ChangeLog		# otherwise automake tosses its cookies
 sh config/bootstrap
 ./configure
 make
