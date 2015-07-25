@@ -65,7 +65,7 @@ set_defaults()
 
 assemble_Makefile() {
     {
-        sed '/# *start-generated-text/q' ${srcdir}/Makefile.am
+        sed '/# *start-generated-text/q' ${srcdir}/Makefile.am.pre
         echo
 
         echo list_stamps = '\'
@@ -93,12 +93,7 @@ assemble_Makefile() {
         printf '.PHONY: stamps\nstamps: $(list_stamps)\n%s' \
             $'\n# end-generated-text\n# end of Makefile.am\n'
 
-    } > Makefile.XX
-
-    if  cmp -s Makefile.XX Makefile.am
-    then rm -f Makefile.XX
-    else mv -f Makefile.XX Makefile.am
-    fi
+    } > Makefile.am
 }
 
 assemble_fmemopen() {

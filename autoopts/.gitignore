@@ -26,3 +26,4 @@
 /tpl/mdoc2texi
 /tpl/texi2man
 /tpl/texi2mdoc
+/Makefile.am

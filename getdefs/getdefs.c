@@ -37,7 +37,7 @@ static compar_func compar_text, compar_defname;
 
 /* START-STATIC-FORWARD */
 static char *
-assignIndex(char * pzOut,  char * pzDef);
+assignIndex(char * pzOut, char * pzDef);
 
 static int
 awaitAutogen(void);
