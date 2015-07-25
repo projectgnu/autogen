@@ -57,9 +57,9 @@ locate_exe()
 
 config_configurables()
 {
-    local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am Makefile.am)
+    local tops=$(ls -d [a-rt-z]* snprintfv/Makefile.am)
     local inf=$(find ${tops} -type f -name '*.in')
-    local in_list
+    local in_list=Makefile$'\n'
 
     {
         for f in $inf
@@ -85,8 +85,7 @@ config_configurables()
 	    r configure.files
 	}"
 
-    sed "$sedcmd" ${config_file} > configure.tmp
-    mv  -f configure.tmp ${config_file}
+    sed "$sedcmd" ${config_file}.pre > ${config_file}
     rm  -f configure.files
 }
 
@@ -103,24 +102,34 @@ install_m4() {
     return 1
 }
 
+one_year_limit() {
+    declare limit=$(date --date=@$(( $(date +%s) - (60 * 60 * 24 * 365) )) +%Y-%M-%d)
+    while IFS= read -r line
+    do
+        if [[ "$line" =~ ^[12].* ]]
+        then
+            set -- $line
+            [[ "$1" < "$limit" ]] && return
+        fi
+
+        echo "$line"
+    done
+}
+
 config_versions() {
     set -a
     eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION)"
     set +a
     unset LANG || LANG=''
 
-    grep '==ADD_CONFIG_FILES==' ${config_file} >/dev/null 2>&1
+    grep '==ADD_CONFIG_FILES==' ${config_file}.pre >/dev/null 2>&1
     test $? -eq 0 && config_configurables
 
     for f in $(egrep -l 'eaddr +=' */*opts.def)
     do sed "/eaddr  *=/s/= .*/= '${EADDR}';/" $f > X ; mv -f X $f
     done
 
-    if grep '__CURRENT_VERSION__' NEWS > /dev/null
-    then
-      sed "1s/__CURRENT_VERSION__.*/${AG_VERSION} - $(date '+%B %Y')/" NEWS > X
-      mv -f X NEWS
-    fi
+    sed "1s/__CURRENT_VERSION__.*/${AG_VERSION} - $(date '+%B %Y')/" NEWS.pre > NEWS
 
     cd ${srcdir}/config
     ${AGexe} -L. libopts.def || exit 1
@@ -176,6 +185,9 @@ config_versions() {
     sed -n "$f" autoopts/gnulib.mk | \
         grep -v '^##' > pkg/libopts/stdnoreturn.mk
     cp ${GNULIBDIR}/build-aux/config.rpath ${GNULIBDIR}/m4/lib-link.m4 config/.
+
+    ${GNULIBDIR}/build-aux/gitlog-to-changelog | \
+        one_year_limit > ${top_srcdir}/ChangeLog
     echo GNULIB-TOOL-DONE
 }
 
@@ -203,7 +215,7 @@ tweak_Makefile_am()
         sed '/^EXTRA_DIST /{
             s/.*/misc_extra     = \\/
             q
-        }' Makefile.am
+        }' Makefile.am.pre
         {
             find VERSION config \
                 autoopts/parse-duration.[ch] autoopts/gettext.h doc/gendocs* \
@@ -212,25 +224,24 @@ tweak_Makefile_am()
         } | sort | \
             columns --spread=1 -I4 --line=' \'
 
-        sed -n '/^EXTRA_DIST /,$p' Makefile.am
-    } > XXX$$ 2>/dev/null
-    mv -f XXX$$ Makefile.am
+        sed -n '/^EXTRA_DIST /,$p' Makefile.am.pre
+    } > Makefile.am
 
     cd pkg
     {
         sed '/^LIBOPTS_FILES  *=/{
             s/=.*/= \\/
             q
-        }' Makefile.am
+        }' Makefile.am.pre
 
         find libopts -type f -name '[a-zA-Z]*' | \
             columns --spread=1 -I4 --line=' \'
         echo
 
-        sed '1,/LIBOPTS_FILES *=/d' Makefile.am
-    } > XXX$$
-    mv -f XXX$$ Makefile.am
+        sed '1,/LIBOPTS_FILES *=/d' Makefile.am.pre
+    } > Makefile.am
     cd ${srcdir}
+    
 }
 
 case "${BOOTSTRAP}" in

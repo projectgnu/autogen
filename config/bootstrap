@@ -55,12 +55,10 @@ PS4='>bs-${FUNCNAME}> '
 
 config_tools()
 {
-    top_srcdir=$(pwd)
-    top_builddir=${top_srcdir}
     srcdir=${top_srcdir}
     config_file=configure.ac
     conf_dir=${top_srcdir}/config
-    test -f "${srcdir}/${config_file}" || die "${config_file} not in ${srcdir}"
+    test -f "${srcdir}/${config_file}.pre" || die "${config_file}.pre not in ${srcdir}"
 
     #  This missing function is used in many places
     #

@@ -1,0 +1,32 @@
+New in __CURRENT_VERSION__ April 2015
+
+* Guile 1.6 is now obsolete.  1.7/8 or newer from now on.
+  Fixed issues with Guile managed locale string processing.
+  (It keeps getting better and better all the time and I
+  must keep adjusting over and over all the time.)
+* more Guile-config somersaults
+  config/misc.def: sometimes, "pkg-config --cflags-only-I" yields
+  multiple directories for Guile and that incantation is the only
+  way to find libguile/version.h and that header is the only way
+  to determine the micro version and the micro version is the best
+  way to check for certain types of breakage.  (Testing is too
+  convoluted.)
+* for-each handler functions may now be able to free (or not)
+  the file text via the "handler-frees" attribute.
+
+New in 5.18.4 August 2014
+
+* Do Not Edit (dne) warning:  the default of printing a date in the
+  warning has now changed to not doing so.  The "-d" option to
+  suppress the date is now deprecated (ignored).  A new option, "-D"
+  will cause the date to be included.  The environment variable,
+  "AUTOGEN_DNE_DATE" overrides everything.
+* The RETURN function was not completely implemented and only
+  partially worked.  It is working now.
+
+New in 5.18.3 May 2014
+
+* Auto-edit Guile headers that depend upon configure values
+  most especially:  noreturn
+  but check for "ptrdiff_t" in our configure too, so that Guile does
+  not create its own duplicate definition.

@@ -113,9 +113,7 @@ add_files_to_mf() {
 
     } > Makefile.lists
 
-    sed '/^GENMAN /r Makefile.lists' Makefile.am > Makefile.tmp
-    mv -f Makefile.tmp Makefile.am
-
+    sed '/^GENMAN /r Makefile.lists' Makefile.am.pre > Makefile.am
     rm -f Makefile.lists gnulib.mk *.3
 }
 
@@ -160,10 +158,10 @@ make_funcs_def()
 
     ${AGexe} usage-txt.def || \
         die "FAILED: ${AGexe} usage-txt.def"
-    mv usage-txt.h   autoopts/.
-    mv usage-txt.pot po/.
+    mv -f usage-txt.h   autoopts/.
+    mv -f usage-txt.pot po/.
 
-    files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am | \
+    files=$(sed -n '/^CSRC/,/\.c$/p' Makefile.am.pre | \
         sed '/^CSRC/d;s/[=\\]//'
     )
 
@@ -189,7 +187,7 @@ make_funcs_def()
 
     ${AGexe} funcs.def || die "FAILED: ${AGexe} funcs.def"
     test -f options.h || die "options.h not created"
-    mv options.h autoopts/.
+    mv -f options.h autoopts/.
     cp project.h autoopts/.
 
     add_files_to_mf
