@@ -85,3 +85,5 @@ config/missing
 cscope.files
 cscope.out
 stamp*
+Makefile.in
+/columns/ag-opts-*.log
