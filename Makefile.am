@@ -38,6 +38,20 @@ endif
 endif
 
 pkgdata_DATA   = config/conftest.tpl config/confmacs.tlib config/liboptschk.m4
+misc_extra     = \
+    VERSION                   autoopts/gettext.h \
+    autoopts/parse-duration.c autoopts/parse-duration.h \
+    config/ag_macros.m4       config/bootstrap \
+    config/bootstrap.local    config/bootstrap.shlib \
+    config/config.rpath       config/confmacs.tlib \
+    config/conftest.tpl       config/gnulib-cache.m4 \
+    config/gnulib-cache.m4    config/gnulib-comp.m4 \
+    config/guile.m4           config/install-defs.sh \
+    config/lib-link.m4        config/libopts.def \
+    config/libopts.m4         config/liboptschk.m4 \
+    config/misc.def           config/mk-shdefs.in \
+    config/pkg.m4             config/snprintfv.m4 \
+    config/unlocked-io.m4
 EXTRA_DIST     = $(misc_extra) $(pkgdata_DATA)
 DISTCLEANFILES = stamp-h
 

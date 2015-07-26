@@ -193,7 +193,7 @@ run_autotools()
 #
 config_tools
 ( pre_local )
-run_autotools 2>&1 | filter_autotool_chaff 1>&2
+run_autotools # 2>&1 | filter_autotool_chaff 1>&2
 post_local
 
 trap '' 0

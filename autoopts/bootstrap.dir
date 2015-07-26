@@ -66,8 +66,8 @@ add_files_to_mf() {
             ( *.in | *.pl | *.sh )
                 g=${f%.??}
                 g=${g//-tlib/.tlib}
-                ndst=${ndst}${g}${nl}    # installed file
-                edta=${edta}${f}${nl}    # distributed file
+                ndst+=${g}${nl}    # installed file
+                edta+=${f}${nl}    # distributed file
                 ;;
 
             ( *tpl-config.tlib | *tpl/usage* ) : ;;

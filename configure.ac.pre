@@ -222,7 +222,16 @@ AC_CONFIG_FILES([autoopts/mk-autoopts-pc],
                 [chmod +x autoopts/mk-autoopts-pc])
 AC_CONFIG_FILES([autoopts/autoopts-config],
                 [chmod +x autoopts/autoopts-config])
-==ADD_CONFIG_FILES==
+
+AC_CONFIG_FILES([autoopts/tpl/tpl-config.tlib:autoopts/tpl/tpl-config-tlib.in])
+AC_CONFIG_FILES([doc/auto_gen.tpl:doc/auto_gen-tpl.in])
+AC_CONFIG_FILES([
+    autoopts/test/defs     config/mk-shdefs       pkg/pkg-env
+    Makefile               agen5/Makefile         agen5/test/Makefile
+    autoopts/Makefile      autoopts/test/Makefile columns/Makefile
+    compat/Makefile        doc/Makefile           getdefs/Makefile
+    getdefs/test/Makefile  pkg/Makefile           snprintfv/Makefile
+    xml2ag/Makefile        xml2ag/test/Makefile])
 
 AC_CONFIG_COMMANDS([stamp-h],
 [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
@@ -247,10 +256,3 @@ Configuration:
 
   See config.h for further configuration information.
 ------------------------------------------------------------------------"
-dnl Local Variables:
-dnl mode: autoconf-mode
-dnl indent-tabs-mode: nil
-dnl sh-indentation: 2
-dnl End:
-dnl
-dnl end of configure.ac
