@@ -10,6 +10,7 @@
 /Makefile.am
 /NEWS
 /TODO
+/_*
 /agen5/Makefile.am
 /agen5/Makefile.in
 /agen5/ag-text.c
@@ -50,6 +51,7 @@
 /configure
 /configure.ac
 /doc/Makefile.in
+/doc/autogen.info*
 /getdefs/Makefile.in
 /getdefs/getdefs.c
 /getdefs/proto.h
