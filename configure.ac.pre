@@ -1,4 +1,4 @@
-dnl --------------------------------------------------------------------
+dnl -*- Mode: autoconf -*-
 dnl configure.ac --- GNU autoconf source for toplevel directory.
 dnl
 dnl Author:           Bruce Korb <bkorb@gnu.org>

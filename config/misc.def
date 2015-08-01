@@ -77,22 +77,19 @@ test = {
 	_EOF_;
 };
 
-#ifdef NOT_YET
-
 test   = {
-    name   = daemon;
+    name   = static_autogen;
     type   = enable;
-    check  = 'using autogen as a daemon';
+    check  = 'statically link autogen to libopts';
     action = { act-type = define; };
 
+    action = { yes; act-type=subst; act-text = "-static"; };
+
     doc = <<-  _EOF_
-	AutoGen may be used as a daemon process.  It will accept definitions
-	either over a socket connection or through a pipe fattach-ed to a file.
-	Which is selected by the argument to the @code{--daemon} option.
+	This option ensures that autogen will be linked against the correct version
+	of libopts and not dynamically linked to an installed version.
 	_EOF_;
 };
-
-#endif
 
 test   = {
   name     = setjmp;

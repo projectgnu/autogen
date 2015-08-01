@@ -44,7 +44,8 @@
 # no longer has to maintain generated files under source control, they
 # can be generated after checkout using this bootstrap procedure.
 
-PS4='>bsl-${FUNCNAME}> '
+PS4='>${FUNCNAME:-bstp}> '
+
 top_srcdir=$(
     cd $(dirname $0)/.. >/dev/null
     pwd )

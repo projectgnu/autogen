@@ -103,7 +103,11 @@ setup_exports()
   OPTIONS_DEF=${AGsrc}/opts.def
   GETDEF_SRC=`${FGREP} -l '/*=' ${AGsrc}/*.[ch] ${AGsrc}/*.scm`
 
-  AGEN_TEXI=${top_builddir}/agen5/invoke-autogen.texi
+  for d in "${top_builddir}" "${top_srcdir}"
+  do test -f "$d/agen5/invoke-autogen.texi" || continue
+     AGEN_TEXI=${d}/agen5/invoke-autogen.texi
+     break
+  done
   DOC_TEXT=${top_srcdir}/doc/autogen-texi.txt
 
   ADDON_TEXI="
