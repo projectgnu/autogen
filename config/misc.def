@@ -202,6 +202,21 @@ test = {
     "Linux has its own special alternative.";
 };
 
+test   = {
+    name   = timeout;
+    type   = enable;
+    check  = 'specify an autogen timeout';
+    action = { act-type = define; };
+
+    action = { yes; act-type=subst;
+      act-text = "${ag_cv_enable_timeout}"; };
+
+    doc = <<-  _EOF_
+	Normally, an approximate timeout value is computed based on configure time.
+	This provides a mechanism for specifying a timeout value.
+	_EOF_;
+};
+
 test = {
     name   = strcspn;
     type   = run;

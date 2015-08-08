@@ -16,7 +16,7 @@ explain         = <<- _EOF_
 	_EOF_;
 
 copyright = {
-    date  = "2009-2014";
+    date  = "2009-2015";
     owner = "Bruce Korb";
     eaddr = "bkorb@gnu.org";
     type  = mbsd;

@@ -309,40 +309,42 @@ next_def(bool invert, def_ent_t ** de_lst)
     return matched;
 }
 
+/**
+ *  IF the for-from and for-to values have not been set,
+ *  THEN we set them from the indices of the first and last
+ *       entries of the twin set.
+ */
+static inline t_word
+set_loop_limit(def_ent_t * found)
+{
+    t_word res  = OPT_VALUE_LOOP_LIMIT;
+    bool invert = (for_state->for_by < 0) ? true : false;
+
+    def_ent_t * lde = (found->de_etwin != NULL) ? found->de_etwin : found;
+
+    if (for_state->for_from == UNASSIGNED)
+        for_state->for_from = invert ? (int)lde->de_index : (int)found->de_index;
+
+    if (for_state->for_to == UNASSIGNED)
+        for_state->for_to = invert ? (int)found->de_index : (int)lde->de_index;
+
+    /*
+     *  "loop limit" is intended to catch runaway ending conditions.
+     *  However, if you really have a gazillion entries, who am I
+     *  to stop you?
+     */
+    if (res <  lde->de_index - found->de_index)
+        res = (lde->de_index - found->de_index) + 1;
+    return res;
+}
+
 static int
 for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
 {
     int         loopCt    = 0;
-    def_ent_t   textDef;
     bool        invert    = (for_state->for_by < 0) ? true : false;
-    t_word      loopLimit = OPT_VALUE_LOOP_LIMIT;
     macro_t *   end_mac   = pT->td_macros + pMac->md_end_idx;
-
-    /*
-     *  IF the for-from and for-to values have not been set,
-     *  THEN we set them from the indices of the first and last
-     *       entries of the twin set.
-     */
-    {
-        def_ent_t * lde = (found->de_etwin != NULL)
-                          ? found->de_etwin : found;
-
-        if (for_state->for_from == UNASSIGNED)
-            for_state->for_from = (invert)
-                ? (int)lde->de_index : (int)found->de_index;
-
-        if (for_state->for_to == UNASSIGNED)
-            for_state->for_to = (invert)
-                ? (int)found->de_index : (int)lde->de_index;
-
-        /*
-         *  "loopLimit" is intended to catch runaway ending conditions.
-         *  However, if you really have a gazillion entries, who am I
-         *  to stop you?
-         */
-        if (loopLimit <  lde->de_index - found->de_index)
-            loopLimit = (lde->de_index - found->de_index) + 1;
-    }
+    t_word      loop_lim = set_loop_limit(found);
 
     /*
      *  Make sure we have some work to do before we start.
@@ -363,9 +365,11 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
      */
     for (;;) {
         int  next_ix;
+        def_ent_t textDef;
+
         for_state->for_not_found = ! next_def(invert, &found);
 
-        if (loopLimit-- < 0) {
+        if (loop_lim-- < 0) {
             fprintf(trace_fp, TRACE_FOR_STEP_TOO_FAR,
                     pT->td_name, pMac->md_line);
             fprintf(trace_fp, TRACE_FOR_BY_STEP,
@@ -416,7 +420,7 @@ for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found)
             curr_def_ctx.dcx_prev = &for_state->for_ctx;
         }
 
-        for_state->for_islast = (invert)
+        for_state->for_islast = invert
             ? ((next_ix < for_state->for_to) ? true : false)
             : ((next_ix > for_state->for_to) ? true : false);
 

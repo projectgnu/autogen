@@ -2376,7 +2376,7 @@ Typically that of the author or copyright holder.
 An example of this might be:
 @example
 copyright = @{
-    date  = "1992-2012";
+    date  = "1992-2015";
     owner = "Bruce Korb";
     eaddr = 'bkorb@@gnu.org';
     type  = GPL;

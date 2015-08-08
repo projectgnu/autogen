@@ -81,7 +81,7 @@ FOR value
   IF (or (first-for?) (last-for?)) =][=
     INVOKE (string-append (get "value") "_macro")
        arg = one  arg = "the second arg = the second"
-       arg = (shell "date +'%A, %D'") arg = 'done.' =][=
+       arg = (shell "LC_ALL=C date +'%A, %D'") arg = 'done.' =][=
   ELSE =]
 
      non first/last value: [=value=] = [= (for-index) =]
@@ -126,7 +126,7 @@ cat > $testname.samp <<_EOF_
 0 Argument list:
 	arg[ 0 ] = one
 	arg[ 1 ] = the second arg = the second
-	arg[ 2 ] = `date +'%A, %D'`
+	arg[ 2 ] = `LC_ALL=C date +'%A, %D'`
 	arg[ 3 ] = done.
 
      non first/last value: secondary = 2

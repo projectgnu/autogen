@@ -132,7 +132,7 @@ MAN PAGE TEMPLATE:  =][=
 
 =]
 \"
-.TH autoopts-config 1 [= `date '+%Y-%m-%d'` =] "" "Programmer's Manual"
+.TH autoopts-config 1 [= `LC_ALL=C date '+%Y-%m-%d'` =] "" "Programmer's Manual"
 .SH NAME
 autoopts-config \- script to get information about installed version of
 autoopts
@@ -238,7 +238,7 @@ DEFINE script-preamble
 ## ---------------------------------------------------------------------
 ## [= (out-name) =] -- Describe AutoOpts configuration
 ##
-##  Autoopts Copyright (C) [=`date +1992-%Y`=] by Bruce Korb
+##  Autoopts Copyright (C) [=`LC_ALL=C date +1992-%Y`=] by Bruce Korb
 ##
 [= (dne "## ") =]
 ##[=

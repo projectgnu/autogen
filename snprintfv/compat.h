@@ -33,7 +33,8 @@
 #define  __EXTENSIONS__ 1 /* and another way to call for it */
 
 #ifdef __cplusplus
-extern "C" {
+#define SNV_START_EXTERN_C extern "C" {
+SNV_START_EXTERN_C
 #define SNV_END_EXTERN_C }
 #else
 #define SNV_END_EXTERN_C

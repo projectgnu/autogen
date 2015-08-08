@@ -29,7 +29,7 @@
 :+][+:
 
 (define head-line (lambda() (string-append
-   ".Dd "   (shell "date '+%B %e %Y' | sed 's/  */ /g'")
+   ".Dd "   (shell "LC_ALL=C date '+%B %e %Y' | sed 's/  */ /g'")
    "\n.Dt " UP-PROG-NAME " " man-sect " " section-name
    "\n.Os " (shell "uname -sr") "\n") ))
 
