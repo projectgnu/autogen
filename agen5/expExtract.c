@@ -29,7 +29,7 @@ static char const *
 load_extract_file(char const * new_fil);
 
 static SCM
-mk_empty_text(char const * start, char const * end, SCM def_scm);
+mk_empty_text(char const * start, char const * end, SCM def);
 
 static SCM
 get_text(char const * text, char const * start, char const * end, SCM def);
@@ -155,32 +155,23 @@ load_extract_file(char const * new_fil)
  *  Either way, emit an empty enclosure.
  */
 static SCM
-mk_empty_text(char const * start, char const * end, SCM def_scm)
+mk_empty_text(char const * start, char const * end, SCM def)
 {
-    size_t start_len = strlen(start);
-    size_t end_len   = strlen(end);
-    size_t def_len   = 0;
-    char const * def;
-    char * out;
+    ssize_t mlen = (ssize_t)(strlen(start) + strlen(end) + 3);
+    char * pzOut;
 
-    if (! AG_SCM_STRING_P(def_scm)) {
-        out = scribble_get(start_len + end_len + 3);
+    if (! AG_SCM_STRING_P(def)) {
+        pzOut = scribble_get(mlen);
+        sprintf(pzOut, LINE_CONCAT3_FMT+3, start, end);
 
     } else {
-        def = ag_scm2zchars(def_scm, "dft extr str");
-        def_len = AG_SCM_STRLEN(def_scm) + 1;
+        char const * pzDef = ag_scm2zchars(def, "dft extr str");
+        mlen += (ssize_t)AG_SCM_STRLEN(def) + 1;
+        pzOut = scribble_get(mlen);
+        sprintf(pzOut, LINE_CONCAT3_FMT, start, pzDef, end);
     }
 
-    memcpy(out, start, start_len);
-    out[start_len] = NL;
-    memcpy(out + start_len + 1, end, end_len + 1);
-    if (def_len > 0) {
-        char * p = out + start_len + 1 + end_len;
-        *(p++) = NL;
-        memcpy(p, def, def_len + 1);
-    }
-
-    return AG_SCM_STR02SCM(out);
+    return AG_SCM_STR02SCM(pzOut);
 }
 
 

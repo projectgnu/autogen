@@ -73,7 +73,7 @@
 
 #define  LOG10_2to32  10  /* rounded up */
 
-#if defined(SHELL_ENABLED) || defined(DAEMON_ENABLED)
+#if defined(SHELL_ENABLED)
 #  ifndef HAVE_WORKING_FORK
 #    error SHELL is enabled and fork() does not work
      choke me
@@ -468,13 +468,6 @@ MODE def_ctx_t      curr_def_ctx     VALUE( { NULL } );
 MODE def_ctx_t      root_def_ctx     VALUE( { NULL } );
 MODE templ_t *      current_tpl      VALUE( NULL );
 MODE char const *   last_scm_cmd     VALUE( NULL );
-#ifdef DAEMON_ENABLED
-/*
- *  When operating as a daemon, autogen can be told to reload
- *  its options the next time it wakes up (send it a SIGHUP).
- */
-MODE bool           redo_opts        VALUE( true );
-#endif
 
 /*
  *  Current Macro

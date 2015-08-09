@@ -181,7 +181,6 @@ rm_target_file(char const * pz)
 LOCAL void
 start_dep_file(void)
 {
-
     /*
      * Set dep_file to a temporary file name
      */

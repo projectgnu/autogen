@@ -205,7 +205,6 @@ ag_scm_sprintf(SCM fmt, SCM alist)
     return run_printf(pzFmt, list_len, alist);
 }
 
-
 /*=gfunc printf
  *
  * what:  format to stdout
@@ -228,7 +227,6 @@ ag_scm_printf(SCM fmt, SCM alist)
     AG_SCM_DISPLAY(run_printf(pzFmt, list_len, alist));
     return SCM_UNDEFINED;
 }
-
 
 /*=gfunc fprintf
  *
@@ -253,7 +251,6 @@ ag_scm_fprintf(SCM port, SCM fmt, SCM alist)
     return  scm_display(res, port);
 }
 
-
 /*=gfunc hide_email
  *
  * what:  convert eaddr to javascript
@@ -271,27 +268,27 @@ ag_scm_hide_email(SCM display, SCM eaddr)
 {
     char *  disp    = ag_scm2zchars(display, "fmt");
     char *  end_adr = ag_scm2zchars(eaddr,   "eaddr");
-    ssize_t st_len  = HIDE_EMAIL_START_STR_LEN;
 
     ssize_t str_size = (ssize_t)(
-        HIDE_EMAIL_START_STR_LEN
-        + (strlen(end_adr) * HTML_DEC_DIGIT_LEN)
-        + (size_t)st_len + HIDE_EMAIL_END_FMT_LEN + strlen(disp));
+        (strlen(end_adr) * 6) // e.g. "&#107;"
+        + HIDE_EMAIL_START_STR_LEN
+        + HIDE_EMAIL_END_FMT_LEN + strlen(disp));
 
     char *  res  = scribble_get(str_size);
     char *  scan = res;
+    char *  end  = res + (str_size - 1);
 
-    memcpy(scan, HIDE_EMAIL_START_STR, (size_t)st_len);
-    scan += st_len;
+    memcpy(scan, HIDE_EMAIL_START_STR, HIDE_EMAIL_START_STR_LEN);
+    scan += HIDE_EMAIL_START_STR_LEN;
 
-    for (;;) {
+    do {
         if (*end_adr == NUL)
             break;
         scan += snprintf(scan, str_size - (scan - res), HTML_DEC_DIGIT, *(end_adr++));
-    }
+    } while (scan < end);
 
     scan += snprintf(scan, str_size - (scan - res), HIDE_EMAIL_END_FMT, disp);
-    if (scan >= res + str_size)
+    if (scan > end)
         AG_ABEND(BOGUS_TAG);
 
     return AG_SCM_STR2SCM(res, (size_t)(scan - res));

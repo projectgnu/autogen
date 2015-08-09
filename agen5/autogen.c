@@ -578,17 +578,6 @@ setup_signals(sighandler_proc_t * hdl_chld,
             sa.sa_handler = SIG_IGN;
             break;
 
-#ifdef DAEMON_ENABLED
-# error DAEMON-ization of AutoGen is not ready for prime time
-  Choke Me.
-        case SIGHUP:
-            if (HAVE_OPT(DAEMON)) {
-                sa.sa_handler = handleSighup;
-                break;
-            }
-            /* FALLTHROUGH */
-#endif
-
         default:
             sa.sa_handler = hdl_dflt;
         }

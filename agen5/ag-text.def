@@ -406,6 +406,7 @@ string = { nm = LD_SEL_INVAL;           str = "Invalid selection clause"; };
 string = { nm = LD_UNKNOWN_INVAL_DEF;   str = "Invalid definition name"; };
 string = { nm = LD_WHILE_NO_ENDWHILE;   str = "ENDWHILE not found"; };
 string = { nm = LD_WHILE_NO_EXPR;       str = "expressionless WHILE"; };
+string = { nm = LINE_CONCAT3_FMT;       str = "%s\n%s\n%s"; };
 string = { nm = LOAD_CGI_DEFS_MARKER;   str = "@@ CGI Definitions @@"; };
 string = { nm = LOAD_CGI_GET_NAME;      str = "GET"; };
 string = { nm = LOAD_CGI_NO_DATA_MSG;   str = "No CGI data were received"; };
