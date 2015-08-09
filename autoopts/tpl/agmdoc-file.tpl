@@ -27,9 +27,16 @@
 # Produce an mdoc page for section 5 - configuration file formats.
 #
 :+][+:
+(out-push-new)  :+]
+if test -z "${SOURCE_DATE}"
+then LC_ALL=C date '+%B %e %Y' | sed 's/  */ /g'
+else echo "${SOURCE_DATE}"
+fi
+[+:
+(define mpage-date (shell (out-pop #t)))
 
 (define head-line (lambda() (string-append
-   ".Dd "   (shell "LC_ALL=C date '+%B %e %Y' | sed 's/  */ /g'")
+   ".Dd "   mpage-date
    "\n.Dt " UP-PROG-NAME " " man-sect " " section-name
    "\n.Os " (shell "uname -sr") "\n") ))
 

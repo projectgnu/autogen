@@ -29,11 +29,18 @@
 # passed to the autogen invocation.  "n" may have a suffix, if desired.
 #
 :+][+:
+(out-push-new)  :+]
+if test -z "${SOURCE_DATE}"
+then LC_ALL=C date '+%d %b %Y' | sed 's/  */ /g'
+else echo "${SOURCE_DATE}"
+fi
+[+:
+(define mpage-date (shell (out-pop #t)))
 
 (define head-line (lambda()
         (sprintf ".TH %s %s \"%s\" \"%s\" \"%s\"\n.\\\"\n"
                 (get "prog-name") man-sect
-        (shell "date '+%d %b %Y'") package-text section-name) ))
+                mpage-date package-text section-name) ))
 
 (define man-page #t)
 (out-push-new)                              :+][+:
