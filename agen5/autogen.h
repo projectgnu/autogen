@@ -401,6 +401,7 @@ MODE char const *   curr_sfx         VALUE( NULL );
  * The time to set for the modification times of the output files.
  */
 MODE time_t         outfile_time     VALUE( 0 );
+MODE time_t         maxfile_time     VALUE( 0 );
 /**
  * The original time autogen started
  */

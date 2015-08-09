@@ -393,7 +393,7 @@ ready_def_input(char const ** ppzfile, size_t * psz)
         }
 
     accept_fifo:
-        outfile_time  = time(NULL);
+        maxfile_time = outfile_time = time(NULL);
         *psz = 0x4000 - (4+sizeof(*base_ctx));
         return INPUT_STDIN;
     }
@@ -421,6 +421,7 @@ ready_def_input(char const ** ppzfile, size_t * psz)
      */
     *psz = (size_t)stbf.st_size;
 
+    maxfile_time = stbf.st_mtime;
     outfile_time = ENABLED_OPT(SOURCE_TIME) ? stbf.st_mtime : time(NULL);
 
     return INPUT_FILE;

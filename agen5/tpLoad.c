@@ -463,6 +463,8 @@ tpl_load(char const * fname, char const * referrer)
 
         if (outfile_time < stbf.st_mtime)
             outfile_time = stbf.st_mtime;
+        if (maxfile_time < stbf.st_mtime)
+            maxfile_time = stbf.st_mtime;
     }
 
     text_mmap(tpl_file, PROT_READ|PROT_WRITE, MAP_PRIVATE, &map_info);
