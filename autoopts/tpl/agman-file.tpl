@@ -28,9 +28,9 @@
 #
 :+][+:
 (out-push-new)  :+]
-if test -z "${SOURCE_DATE}"
+if test -z "${MAN_PAGE_DATE}"
 then LC_ALL=C date '+%d %b %Y' | sed 's/  */ /g'
-else echo "${SOURCE_DATE}"
+else echo "${MAN_PAGE_DATE}"
 fi
 [+:
 (define mpage-date (shell (out-pop #t)))
