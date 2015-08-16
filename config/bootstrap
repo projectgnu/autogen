@@ -67,9 +67,11 @@ config_tools()
 
     #  Check for AutoGen version 5.
     #
-    AGexe=$(command -v autogen)
-    test -x "$AGexe" || \
-        die "AutoGen requires autogen to bootstrap"
+    test -x "${AGexe}" || {
+        AGexe=$(command -v autogen)
+        test -x "$AGexe" || \
+            die "AutoGen requires autogen to bootstrap"
+    }
 
     v="$($AGexe --version || :)"
     v=$(echo "$v" | sed 's/.* //;1q')
@@ -78,8 +80,8 @@ config_tools()
     * ) die "OUT OF DATE AutoGen: $v" ;;
     esac
 
-    GDexe=$(command -v getdefs)
-    CLexe=$(command -v columns)
+    GDexe=${AGexe%/*}/getdefs
+    CLexe=${AGexe%/*}/columns
     test -x "${GDexe}" -a -x "${CLexe}" || \
         die "autogen support programs are missing"
     export AGexe GDexe CLexe

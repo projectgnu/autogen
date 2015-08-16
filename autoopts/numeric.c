@@ -124,7 +124,8 @@ optionNumericVal(tOptions * opts, tOptDesc * od)
      */
     if (  (od == NULL)
        || (od->optArg.argString == NULL)
-       || ((od->fOptState & OPTST_RESET) != 0))
+       || ((od->fOptState & OPTST_RESET) != 0)
+       || (opts <= OPTPROC_EMIT_LIMIT))
         return;
 
     errno = 0;

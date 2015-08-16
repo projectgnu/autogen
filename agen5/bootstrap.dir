@@ -38,12 +38,6 @@ set_defaults()
 {
     builddir=$(pwd)
     srcdir=${srcdir:-$builddir}
-    AGexe=$(command -v autogen)
-    CLexe=$(command -v columns)
-    GDexe=$(command -v getdefs)
-
-    test -x "${AGexe}" -a -x "${GDexe}" -a -x "${CLexe}" || \
-        die "autogen is required"
 
     export builddir srcdir AGexe CLexe GDexe
 
