@@ -131,10 +131,10 @@ set_ag_ver() {
     fi
     declare scmd+=";s/^AG_PATCHLEVEL=.*/AG_PATCHLEVEL=${AG_PATCHLEVEL}/"
     sed "$scmd" VERSION.pre > VERSION
+    eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION | sed 's/^/export /')"
 }
 
 config_versions() {
-    eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION.pre | sed 's/^/export /')"
     find_gnulib
     set_ag_ver
     unset LANG || LANG=''
