@@ -4,6 +4,10 @@ set -e -v
 
 git clean -f -x -d .
 touch ChangeLog		# otherwise automake tosses its cookies
-sh config/bootstrap
+shcmd=$(command -v bash)
+test -x "${shcmd}" || \
+    shcmd=$(command -v sh) || shcmd=/bin/sh
+test -o xtrace && shcmd+=' -x'
+${shcmd} config/bootstrap
 ./configure
 make

@@ -301,8 +301,7 @@ test = {
       act-text = <<- _EOF_
 	AC_DEFINE([DEBUG_ENABLED], [1],
 	          [Define this if debugging is enabled])
-	    [CFLAGS="-g `echo $CFLAGS|sed 's%-g *%%g;s%-O[0-9]* *%%g'`"
-	    f=`which dmalloc 2>/dev/null`
+	    [f=`which dmalloc 2>/dev/null`
 	    test -n "$f" && LIBS="${LIBS} -ldmalloc"]
 	_EOF_; };
 

@@ -26,10 +26,6 @@ AG_REVISION=$AG_MAJOR_VERSION.$AG_MINOR_VERSION
 AG_PATCHLEVEL=".6pre15"
 AG_VERSION=$AG_REVISION$AG_PATCHLEVEL
 
-# Making releases:
-#   AG_PATCHLEVEL=""
-#   AG_MINOR_VERSION += 1 (OR AG_MINOR_VERSION = 0 && AG_MAJOR_VERSION += 1)
-#
 # AutoOpts versioning:
 #
 # AO_CURRENT  represents the number of visible changes to the interface

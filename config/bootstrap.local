@@ -89,10 +89,54 @@ one_year_limit() {
     done
 }
 
+find_gnulib() {
+    test -z "$GNULIBDIR" && {
+        for d in ~gnu/proj/gnulib /usr/share/gnulib $(dirname $(command -v gnulib-tool) )
+        do
+            test -d "$d" && GNULIBDIR=$d && break
+        done
+        test -z "$GNULIBDIR" && die "cannot find GNULIBDIR"
+    }
+    unset LANG || LANG=''
+    for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath build-aux/git-version-gen
+    do test -s ${GNULIBDIR}/$f || die "not found: ${GNULIBDIR}/$f"
+        g=${f##*/} ; g=${g%%.*} ; g=${g//-/_}
+        eval export GL_${g^^}=${GNULIBDIR}/$f
+    done
+}
+
+set_ag_ver() {
+    declare ver=$(${GL_GIT_VERSION_GEN} ZZJUNK) cmt=
+
+    export AG_MAJOR_VERSION=${ver%%.*}
+    ver=${ver#${AG_MAJOR_VERSION}.}
+    declare scmd="s/^AG_MAJOR_VERSION=.*/AG_MAJOR_VERSION=${AG_MAJOR_VERSION}/"
+
+    export AG_MINOR_VERSION=${ver%%.*}
+    ver=${ver#${AG_MINOR_VERSION}}
+    declare scmd+=";s/^AG_MINOR_VERSION=.*/AG_MINOR_VERSION=${AG_MINOR_VERSION}/"
+
+    ver=${ver#.}
+    export AG_PATCHLEVEL=
+    if test ${#ver} -eq 0
+    then
+        export AG_PATCHLEVEL=
+    else
+        export AG_PATCHLEVEL=.${ver%%.*}
+        ver=${ver#${AG_PATCHLEVEL#.}}
+        test ${#ver} -gt 0 && {
+            ver=${ver#.}
+            AG_PATCHLEVEL+=.$(printf %03u ${ver%%-*})
+        }
+    fi
+    declare scmd+=";s/^AG_PATCHLEVEL=.*/AG_PATCHLEVEL=${AG_PATCHLEVEL}/"
+    sed "$scmd" VERSION.pre > VERSION
+}
+
 config_versions() {
-    set -a
-    eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION)"
-    set +a
+    eval "$(egrep '^[A-Z][A-Z0-9_]+=' VERSION.pre | sed 's/^/export /')"
+    find_gnulib
+    set_ag_ver
     unset LANG || LANG=''
 
     config_configurables
@@ -135,18 +179,7 @@ config_versions() {
 	--m4-base=config
         --lgpl=2'
     glmods='parse-duration gendocs gettext-h extensions stdnoreturn'
-    test -z "$GNULIBDIR" && {
-        for d in ~gnu/proj/gnulib /usr/share/gnulib $(dirname $(command -v gnulib-tool) )
-        do
-            test -d "$d" && GNULIBDIR=$d && break
-        done
-        test -z "$GNULIBDIR" && die "cannot find GNULIBDIR"
-    }
-    for f in gnulib-tool m4/lib-link.m4 build-aux/config.rpath
-    do test -s ${GNULIBDIR}/$f || die "not found: ${GNULIBDIR}/$f"
-    done
-    GNULIBTOOL=${GNULIBDIR}/gnulib-tool
-    cmd=$(echo ${GNULIBTOOL} $glopts $glmods)
+    cmd=$(echo ${GL_GNULIB_TOOL} $glopts $glmods)
     echo GNULIB-TOOL: $cmd
     ${cmd}
     sed -i 's/do_not_make_me_.*_SOURCES/EXTRA_DIST/;/do_not_make_me/d' \
