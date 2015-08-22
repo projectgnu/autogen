@@ -355,9 +355,6 @@ done_check(void)
             oops_pfx = zNil;
         }
 
-        // if (OPT_VALUE_TRACE > TRACE_NOTHING)
-            // scm_backtrace(); Guile will sometimes seg fault rather than emit the trace
-
         fprintf(stderr, SCHEME_EVAL_ERR_FMT, current_tpl->td_file,
                 cur_macro->md_line);
 

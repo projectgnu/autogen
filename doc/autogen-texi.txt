@@ -5643,6 +5643,14 @@ The command (@file{man1}) pages are derived from the options definition
 file, and the library (@file{man3}) pages are derived from
 stylized comments (@pxref{getdefs Invocation}).
 
+Man pages include a date in the footer.  By default, this is derived from
+the current date.  However, this may be overridden with the @code{MAN_PAGE_DATE}
+environment variable.  If set and not empty, its contents will be copied
+into where the output of @code{date '+%d %b %Y'} would otherwise go.
+
+Man pages may be formatted as either traditional man pages or using @code{mdoc} formatting.
+The format is selected by selecting the appropriate template.
+
 @menu
 * man1::      command line man pages
 * man3::      library man pages
@@ -5650,6 +5658,12 @@ stylized comments (@pxref{getdefs Invocation}).
 
 @node man1
 @subsection command line man pages
+
+Man pages for commands are documented using the @file{agman-cmd.tpl}
+and @file{agmdoc-cmd.tpl} templates.  If the options specify pulling
+information from @file{RC}/@file{ini}/@file{cfg} files, then you may use
+the @file{rc-sample.tpl} template to produce an example config file for
+your program.
 
 Using the option definitions for an AutoOpts client program,
 the @samp{agman-cmd.tpl} template will produce an nroff document
@@ -5691,6 +5705,8 @@ greatly appreciated.
 
 @node man3
 @subsection library man pages
+
+Man pages for libraries are documented using the @file{agman3.tpl} template.
 
 Two global definitions are required, and then
 one library man page is produced for each @code{export_func} definition

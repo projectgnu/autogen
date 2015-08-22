@@ -1,16 +1,21 @@
 New in __CURRENT_VERSION__ April 2015
 
+* {AG,CL,GD}exe environment variables may be set to force
+  bootstrapping with a particular release.
+* MAN_PAGE_DATE can be used with various man page docs to
+  override the current date default.
+* project may now be bootstrapped and built in the source
+  directory with no ill effect.
+* AutoGen as a daemon will never happen.  Last vestiges gone.
+* templates may now obtain the most recent source modification
+  time with "(max-file-time)"
+
+New in 5.18.5 April 2015
+
 * Guile 1.6 is now obsolete.  1.7/8 or newer from now on.
   Fixed issues with Guile managed locale string processing.
   (It keeps getting better and better all the time and I
   must keep adjusting over and over all the time.)
-* more Guile-config somersaults
-  config/misc.def: sometimes, "pkg-config --cflags-only-I" yields
-  multiple directories for Guile and that incantation is the only
-  way to find libguile/version.h and that header is the only way
-  to determine the micro version and the micro version is the best
-  way to check for certain types of breakage.  (Testing is too
-  convoluted.)
 * for-each handler functions may now be able to free (or not)
   the file text via the "handler-frees" attribute.
 
@@ -21,8 +26,6 @@ New in 5.18.4 August 2014
   suppress the date is now deprecated (ignored).  A new option, "-D"
   will cause the date to be included.  The environment variable,
   "AUTOGEN_DNE_DATE" overrides everything.
-* The RETURN function was not completely implemented and only
-  partially worked.  It is working now.
 
 New in 5.18.3 May 2014
 
