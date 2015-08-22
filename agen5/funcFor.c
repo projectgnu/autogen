@@ -35,6 +35,9 @@ find_for_state(SCM which_scm);
 static bool
 next_def(bool invert, def_ent_t ** de_lst);
 
+static inline t_word
+set_loop_limit(def_ent_t * found);
+
 static int
 for_by_step(templ_t * pT, macro_t * pMac, def_ent_t * found);
 
