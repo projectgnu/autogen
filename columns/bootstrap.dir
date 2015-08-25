@@ -62,11 +62,12 @@ done
 ${free_trap} && {
     trap '' 0
     rm -f ag-opts-*.log
-}
+} || :
 
 # Local Variables:
-# mode:             shell-script
-# sh-indentation:   2
+# mode:shell-script
+# sh-indentation:4
+# sh-basic-offset:4
 # indent-tabs-mode: nil
 # End:
 

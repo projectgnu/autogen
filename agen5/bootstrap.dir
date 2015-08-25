@@ -32,14 +32,14 @@
 
 readonly stamp_list=$(echo "stamp-opts${nl}stamp-proto"
     sed -n '/^make_[a-z_]*[(]/{;s/^make_/stamp-/;s/[()].*//;p;}' \
-        ${srcdir}/mk-stamps.sh)
+        ${top_srcdir}/agen5/mk-stamps.sh)
 
 set_defaults()
 {
     builddir=$(pwd)
-    srcdir=${srcdir:-$builddir}
+    srcdir=${top_srcdir}/agen5
 
-    export builddir srcdir AGexe CLexe GDexe
+    export builddir srcdir
 
     #  Make sure we have a default for top build and source.
     #  Some of the templates need this information.
@@ -90,38 +90,20 @@ assemble_Makefile() {
     } > Makefile.am
 }
 
-assemble_fmemopen() {
-    # The original source lives in a private library.
-    # If not available, leave everything alone.
-    #
-    fmemdir=~bkorb/tools/mine/lib/fmemopen
-    test -f ${fmemdir}/fmemopen.c || return
-
-    test -f agen5/fmemopen.c && rm -f agen5/fmemopen.c
-    {
-        echo '#if defined(ENABLE_FMEMOPEN)'
-        echo '#include <sys/ioctl.h>'
-        echo
-        sed -n '/^typedef enum/,/_IOWR(/p' ${fmemdir}/libfmem.h
-        sed -e '/^#if defined(HAVE_FOPENCOOKIE)/p' \
-            -e '/=--subblock/,/^#if defined(HAVE_FOPENCOOKIE)/d' \
-            -e "s% @file .*% @file fmemopen.c%" \
-            ${fmemdir}/fmemopen.c
-        echo '#endif /* ENABLE_FMEMOPEN */'
-    } > fmemopen.c
-}
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #  M A I N
 #
-PS4='>bsag-${FUNCNAME}> '
 set_defaults ${1+"$@"}
 DEPDIR=
 
-. ${srcdir}/mk-stamps.sh $stamp_list
-assemble_fmemopen
-assemble_Makefile
+if ${skip_gen:-false}
+then
+    untar_touch agen5.tgz
+else
+    . ${srcdir}/mk-stamps.sh $stamp_list
+    assemble_Makefile
+fi
 
 #  IF we symlinked in columns or getdefs,
 #  THEN it is time to unlink them

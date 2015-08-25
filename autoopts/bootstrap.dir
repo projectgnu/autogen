@@ -39,8 +39,8 @@ add_files_to_mf() {
     #  Regenerate the "genshell.h" 'cuz we just altered the template to
     #  contain the header version number.
     #
-    ${AGexe} -Tagman3.tpl funcs.def || \
-        die "FAILED: ${AGexe} -Tagman3.tpl funcs.def"
+    ${ag_aopts} -Tagman3.tpl funcs.def || \
+        die "FAILED: ${ag_aopts} -Tagman3.tpl funcs.def"
 
     local tmpl=$(
         ndst=""
@@ -119,15 +119,14 @@ add_files_to_mf() {
 
 make_funcs_def()
 {
-    $noag && exit 1
     ${char_mapper:-char-mapper} autogen.map || die "FAILED: char-mapper"
-    ${AGexe} ao-strs.def || die "cannot make strings - exited $?"
+    ${ag_aopts} ao-strs.def || die "cannot make strings - exited $?"
 
     declare cmd_list=$(
         sed -n '/case *XAT_CMD_/{;s/.*XAT_CMD_/cmd = /;s/:/;/;p;}' \
             configfile.c | tr '[A-Z_]' '[a-z-]')
 
-    ${AGexe} <<- _EOF_
+    ${ag_aopts} <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-xat-attribute;
 	prefix    = xat;
@@ -140,7 +139,7 @@ make_funcs_def()
     cmd_list=$(
         sed -n '/case *VTP_CMD_/{;s/.*VTP_CMD_/cmd = /;s/:/;/;p;}' \
             configfile.c | tr '[A-Z_]' '[a-z-]')
-    ${AGexe} <<- _EOF_
+    ${ag_aopts} <<- _EOF_
 	AutoGen Definitions str2enum;
 	base-name = option-value-type;
 	prefix    = vtp;
@@ -153,11 +152,11 @@ make_funcs_def()
 
     test -d autoopts || mkdir autoopts
     test -d po       || mkdir po
-    ${AGexe} genshell.def  || \
-        die "FAILED: ${AGexe} genshell.def"
+    ${ag_aopts} genshell.def  || \
+        die "FAILED: ${ag_aopts} genshell.def"
 
-    ${AGexe} usage-txt.def || \
-        die "FAILED: ${AGexe} usage-txt.def"
+    ${ag_aopts} usage-txt.def || \
+        die "FAILED: ${ag_aopts} usage-txt.def"
     mv -f usage-txt.h   autoopts/.
     mv -f usage-txt.pot po/.
 
@@ -185,15 +184,18 @@ make_funcs_def()
 	 */
 	_END_VERS_INFO_
 
-    ${AGexe} funcs.def || die "FAILED: ${AGexe} funcs.def"
-    test -f options.h || die "options.h not created"
+    ${ag_aopts} funcs.def || \
+        die "FAILED: ${ag_aopts} funcs.def"
+    test -f options.h || \
+        die "options.h not created"
     mv -f options.h autoopts/.
     cp project.h autoopts/.
 
     add_files_to_mf
     make_proto
 
-    ${AGexe} aoconf.def || die "FAILED: ${AGexe} aoconf.def"
+    ${ag_aopts} aoconf.def || \
+        die "FAILED: ${ag_aopts} aoconf.def"
 }
 
 test "X${mainpid}" = X && {
@@ -208,36 +210,38 @@ test "X${mainpid}" = X && {
     free_trap=false
 }
 
-export AGexe=${AGexe-autogen}\ -L${top_srcdir}/autoopts/tpl
-noag=`${AGexe} -v > /dev/null 2>&1 && echo false || echo true`
-nl=$'\n'
+${skip_gen} || \
+    export ag_aopts=${AGexe-autogen}\ -L${top_srcdir}/autoopts/tpl
 
 case "$1" in
 *genshell.c )
-    if ${noag}
+    if ${skip_gen}
     then
         test -f ${top_srcdir}/autoopts/genshell.c || \
             die "No autogen for building genshell.c"
     else
-        ${AGexe} genshell.def || \
-            die "FAILED: ${AGexe} genshell.def"
+        ${ag_aopts} genshell.def || \
+            die "FAILED: ${ag_aopts} genshell.def"
     fi
     ;;
 
 *libopts.texi )
-    if ${noag}
+    if ${skip_gen}
     then
         test -f ${top_srcdir}/autoopts/libopts.texi || \
             die "No autogen for building libopts.texi"
     else
         agopts='-Taginfo3.tpl -DLEVEL=subsection -blibopts funcs.def'
-        ${AGexe} ${agopts} || \
-            die "FAILED: ${AGexe} ${agopts}"
+        ${ag_aopts} ${agopts} || \
+            die "FAILED: ${ag_aopts} ${agopts}"
     fi
     ;;
 
 aoconf )
-    make_funcs_def
+    if ${skip_gen}
+    then untar_touch gen-src.tgz
+    else make_funcs_def
+    fi || die "could not rebuild files in $PWD"
     ;;
 esac
 

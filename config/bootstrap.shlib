@@ -79,13 +79,9 @@ then setx=set\ -x dashx=-x ; set -x
 else setx=:       dashx=   ; set +x
 fi
 
-test -n "${BASH_VERSION}" || {
-    local() {
-        "$@"
-    }
-}
+test -z "${BASH_VERSION}" && \
+    local() { "$@" ; }
 
-test -z "${BASH_VERSION}" && local() { : ; }
 # Setup run_ag
 f=$(\cd ${top_srcdir}/autoopts/tpl >/dev/null && pwd)
 g=$(\cd ${top_builddir}/autoopts/tpl >/dev/null && pwd)
@@ -139,7 +135,39 @@ GREP=$(command -v grep)
 EGREP=${GREP}\ -E
 FGREP=${GREP}\ -F
 
-export setx dashx VERBOSE nl ht
+#  Check for AutoGen version 5.
+#
+skip_gen=false
+test -x "${AGexe}" || {
+    AGexe=${AGexe:-$(command -v autogen)}
+    test -x "$AGexe" || {
+        skip_gen=true
+        AGexe='die "AutoGen requires autogen to bootstrap"'
+        GDexe=${AGexe}
+        CLexe=${AGexe}
+    }
+}
+
+${skip_gen} || {
+    v="$($AGexe --version || :)"
+    v=$(echo "$v" | sed 's/.* //;1q')
+    case "$v" in
+    5.* ) : ;;
+    * ) die "OUT OF DATE AutoGen: $v" ;;
+    esac
+
+    GDexe=${AGexe%/*}/getdefs
+    CLexe=${AGexe%/*}/columns
+    test -x "${GDexe}" -a -x "${CLexe}" || \
+        die "autogen support programs are missing"
+}
+
+export AGexe GDexe CLexe setx dashx VERBOSE nl ht
+
+untar_touch() {
+    list=`tar -xzvf "$@"`
+    touch $list
+}
 
 # # # # # # # # # # # # # # # # # # #
 #
@@ -149,14 +177,10 @@ make_opts()
 {
     # Make the option processing files:
     #
-    if [ -z "${AGexe}" ]
-    then
-      test "X${BOOTSTRAP}" = X \
-        && echo "Cannot locate ${AG}.  Giving up"
-      if [ -f opts.h ] && [ -f opts.c ]
-      then exit 0 ; else exit 1 ; fi
+    if ${skip_gen}
+    then untar_touch ${PWD##*/}-opts.tgz
+    else run_ag opts ${DEBUG_OPTS} *opts.def
     fi
-    run_ag opts ${DEBUG_OPTS} *opts.def
 }
 
 # # # # # # # # # # # # # # # # # # #

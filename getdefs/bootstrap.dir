@@ -45,7 +45,7 @@ then make_proto
 else die "Don't know how to make $targets"
 fi
 
-${free_trap} && trap '' 0
+${free_trap} && trap '' 0 || :
 
 # Local Variables:
 # mode:shell-script

@@ -56,35 +56,14 @@ PS4='>bs-${FUNCNAME}> '
 
 config_tools()
 {
-    srcdir=${top_srcdir}
     config_file=configure.ac
     conf_dir=${top_srcdir}/config
-    test -f "${srcdir}/${config_file}.pre" || die "${config_file}.pre not in ${srcdir}"
+    test -f "${top_srcdir}/${config_file}.pre" || \
+        die "${config_file}.pre not in ${top_srcdir}"
 
     #  This missing function is used in many places
     #
-    export config_file srcdir top_srcdir top_builddir
-
-    #  Check for AutoGen version 5.
-    #
-    test -x "${AGexe}" || {
-        AGexe=$(command -v autogen)
-        test -x "$AGexe" || \
-            die "AutoGen requires autogen to bootstrap"
-    }
-
-    v="$($AGexe --version || :)"
-    v=$(echo "$v" | sed 's/.* //;1q')
-    case "$v" in
-    5.* ) : ;;
-    * ) die "OUT OF DATE AutoGen: $v" ;;
-    esac
-
-    GDexe=${AGexe%/*}/getdefs
-    CLexe=${AGexe%/*}/columns
-    test -x "${GDexe}" -a -x "${CLexe}" || \
-        die "autogen support programs are missing"
-    export AGexe GDexe CLexe
+    export config_file top_srcdir top_builddir
 
     # ------------------------------------------------------------------
     # Make sure all of the maintainer tools required for bootstrap are
@@ -119,68 +98,47 @@ config_tools()
 # environment variable to see whether it should run the sections
 # to be called before the main script, or afterwards.
 #
+source_bs() {
+    file=${2}
+    cd ${file%/*}
+    (
+        PS4=">${1#./}-\${FUNCNAME}> "
+        shift 2
+        . ${file##*/} ${1+"$@"} || die ${file} failed
+    )
+    file=${PWD##*/}
+    echo ${FUNCNAME} in ${file} done
+    cd - >/dev/null
+}
+
 pre_local()
 {
     BOOTSTRAP=pre
     export BOOTSTRAP
-
-    local PS4='>pbs-${FUNCNAME}> '
-    . ${conf_dir}/bootstrap.local ${1+"$@"} || \
-        die FAILED: ${conf_dir}/bootstrap.local
-
-    cd autoopts
-    PS4='>aobs-${FUNCNAME}> '
-    . ./bootstrap.dir aoconf
+    source_bs pbs  ${conf_dir}/bootstrap.local pre
+    source_bs aobs autoopts/bootstrap.dir aoconf
 }
 
 post_local()
 {
-    for f in $(find . -name bootstrap.dir)
-    do  (
-        ${setx}
-        cd $(dirname $f)
-        srcdir=`pwd`
-        echo running POST-bootstrap.dir in ${srcdir}
-        PS4='>Abs-${FUNCNAME}> '
-        . ./bootstrap.dir recursive || :
-        )
+    bslist=`find . -name bootstrap.dir`
+    for f in ${bslist}
+    do
+        source_bs ${f%/bootstrap.dir} $f recursive
     done
 
-    local BOOTSTRAP=post
-    local PS4='>Abs-${FUNCNAME}> '
-    . ${conf_dir}/bootstrap.local ${1+"$@"}
-}
-
-filter_autotool_chaff() {
-    set +x
-    pat='^configure.ac:.*warning'
-    while IFS='' read line
-    do
-        [[ $line =~ $pat ]] && break
-        echo "$line"
-    done
-    pat='running POST-bootstrap.dir in '
-    while IFS='' read line
-    do
-        [[ $line =~ $pat ]] && break
-        echo "$line"
-    done > autotool-chaff.txt
-    local chaffct=$(wc -l < autotool-chaff.txt)
-    if (( chaffct <= 4 )) || grep -i -w error autotool-chaff.txt >/dev/null
-    then cat autotool-chaff.txt
-    else
-        echo "<< $chaffct lines of autotool chaff deleted >>"
-    fi
-    echo "$line"
-    cat
+    die now
+    source_bs Abs ${conf_dir}/bootstrap.local post
+    echo ${FUNCNAME} done
 }
 
 run_autotools()
 {
+    cd ${top_builddir}
     # remove any stale config.cache
     doit rm -f config.cache
 
-    test -n "$auxdir" || auxdir=${srcdir}
+    test -n "$auxdir" || auxdir=${top_srcdir}
     test -d $auxdir   || auxdir=.
 
     doit $LIBTOOLIZE    --force
@@ -188,23 +146,27 @@ run_autotools()
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
+    echo ${FUNCNAME} done
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #    M A I N
 #
-config_tools
-( pre_local )
-run_autotools # 2>&1 | filter_autotool_chaff 1>&2
-post_local
+{
+    config_tools
+    pre_local
+    run_autotools 2>&1
+    post_local
 
-trap '' 0
-( exit 0 ) ; exit
-
+    trap '' 0
+    echo 'bootstrap complete'
+    ( exit 0 ) ; exit
+}
 # Local Variables:
-# mode: shell-script
-# sh-indentation: 2
+# mode:shell-script
+# sh-indentation:4
+# sh-basic-offset:4
 # indent-tabs-mode: nil
 # End:
 
