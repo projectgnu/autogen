@@ -90,6 +90,15 @@ config_tools()
     export char_mapper
 
     echo bootstrapping in ${PWD}
+    temp_dir=`mktemp -d ${TMPDIR:-/tmp}/bs-XXXXXX`
+    test -d "$temp_dir" || {
+        temp_dir=${TMPDIR:-/tmp}/bs-$$
+        rm -rf ${temp_dir}
+        mkdir ${temp_dir}
+        chmod 700 ${temp_dir}
+    }
+
+    trap "rm -rf ${temp_dir}" 0
     set +e
 }
 
@@ -129,6 +138,17 @@ post_local()
     source_bs Abs ${conf_dir}/bootstrap.local post
 }
 
+filter_chaff() {
+    cat > ${temp_dir}/config-log.txt
+    if test -f configure
+    then
+        sedcmd='/configure.ac:.*no .* detected/,/configure.ac:.*top level/d'
+        sed "$sedcmd" ${temp_dir}/config-log.txt
+    else
+        cat ${temp_dir}/config-log.txt
+    fi
+}
+
 run_autotools()
 {
     cd ${top_builddir}
@@ -138,11 +158,13 @@ run_autotools()
     test -n "$auxdir" || auxdir=${top_srcdir}
     test -d $auxdir   || auxdir=.
 
-    doit $LIBTOOLIZE    --force
-    doit $ACLOCAL       -I config
-    doit $AUTOHEADER
-    doit $AUTOMAKE      --gnu --add-missing
-    doit $AUTOCONF
+    {
+        doit $LIBTOOLIZE    --force
+        doit $ACLOCAL       -I config
+        doit $AUTOHEADER
+        doit $AUTOMAKE      --gnu --add-missing
+        doit $AUTOCONF
+    } 2>&1 | filter_chaff
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -157,6 +179,7 @@ run_autotools()
 
     trap '' 0
     echo 'bootstrap complete'
+    rm -rf ${temp_dir}
     ( exit 0 ) ; exit
 }
 # Local Variables:
