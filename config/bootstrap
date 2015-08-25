@@ -107,7 +107,6 @@ source_bs() {
         . ${file##*/} ${1+"$@"} || die ${file} failed
     )
     file=${PWD##*/}
-    echo ${FUNCNAME} in ${file} done
     cd - >/dev/null
 }
 
@@ -127,9 +126,7 @@ post_local()
         source_bs ${f%/bootstrap.dir} $f recursive
     done
 
-    die now
     source_bs Abs ${conf_dir}/bootstrap.local post
-    echo ${FUNCNAME} done
 }
 
 run_autotools()
@@ -146,7 +143,6 @@ run_autotools()
     doit $AUTOHEADER
     doit $AUTOMAKE      --gnu --add-missing
     doit $AUTOCONF
-    echo ${FUNCNAME} done
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
