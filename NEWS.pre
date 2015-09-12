@@ -1,4 +1,4 @@
-New in __CURRENT_VERSION__ April 2015
+New in __CURRENT_VERSION__ September 2015
 
 * {AG,CL,GD}exe environment variables may be set to force
   bootstrapping with a particular release.
