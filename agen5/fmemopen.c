@@ -15,7 +15,7 @@ typedef struct {
     size_t     eof;
 } fmemc_get_buf_addr_t;
 
-#ifdef HURD
+#ifdef __gnu_hurd__
 #define _IOT__IOTBASE_fmemc_get_buf_addr_t sizeof(fmemc_get_buf_addr_t)
 #endif
 

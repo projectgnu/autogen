@@ -49,7 +49,11 @@ FOR export-func                +}{+
     (out-push-new (string-append
          (get "name") ".3" ))
 
-+}.TH {+name+} 3 {+ `date +%Y-%m-%d` +} "" "Programmer's Manual"
++}.TH {+name+} 3 {+ `
+  if test -z "${MAN_PAGE_DATE}"
+  then date +%Y-%m-%d
+  else echo "${MAN_PAGE_DATE}"; fi
+` +} "" "Programmer's Manual"
 {+
 
 ;; The following "dne" argument is a string of 5 characters:

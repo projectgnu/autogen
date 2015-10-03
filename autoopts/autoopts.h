@@ -41,6 +41,9 @@
 #  ifdef PATH_MAX
 #    define AG_PATH_MAX         ((size_t)PATH_MAX)
 #  else
+#    ifdef __gnu_hurd__
+#      define size_t unsigned long
+#    endif
 #    define AG_PATH_MAX         ((size_t)4096)
 #  endif
 #else

@@ -254,7 +254,7 @@ ENDFOR
 =]
 test 'X@ENABLE_STATIC@' = Xno && static_libs=''
 case "${libdir}" in
-/lib | /lib64 | /usr/lib | /usr/lib64 )
+/lib | /lib64 | /usr/lib | /usr/lib64 | /usr/lib/* )
     ldopts=''
     ldflags=-lopts
     ;;

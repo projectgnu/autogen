@@ -343,6 +343,7 @@ do-always = <<- _END_ALWAYS_
 	[ag_gv=`gdir=\`pkg-config --cflags-only-I \
 			guile-${GUILE_EFFECTIVE_VERSION} | \
 			sed 's/-I *//;s/ *-I.*/ /g'\`
+		test -z "$gdir" && gdir=/usr/include
 		for d in $gdir
 		do  test -f "$d/libguile/version.h" && gdir=$d && break
 		done

@@ -18,9 +18,6 @@
 ##  You should have received a copy of the GNU General Public License along
 ##  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-set -ex
-exec 2> /tmp/mklibsrc-log.tx
-
 top_builddir=`cd $top_builddir ; pwd`
 top_srcdir=`cd $top_srcdir ; pwd`
 
@@ -105,6 +102,7 @@ EOMakefile
     ${top_srcdir}/pkg/libopts/stdnoreturn.mk
   printf '\nEXTRA_DIST += \\\n'
   find $(ls -A) -type f \
+    | env LC_COLLATE=C sort \
     | egrep -v '^(libopts\.c|Makefile\.am)$' \
     | ${CLexe} -I4 --spread=1 --line-sep="  \\"
 } > Makefile.am
