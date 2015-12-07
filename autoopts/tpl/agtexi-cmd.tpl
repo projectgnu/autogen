@@ -620,7 +620,7 @@ detail to provide.  The default is to print [=
 (if (exist? "gnu-usage")
     "the license name with the version"
     "just the version")
-=].  The licensing infomation may be selected with an option argument.
+=].  The licensing information may be selected with an option argument.
 Only the first letter of the argument is examined:
 
 @table @samp
